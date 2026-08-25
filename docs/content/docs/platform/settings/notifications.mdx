@@ -1,6 +1,6 @@
 ---
 title: Notifications
-description: Send an email when a workflow run reaches a given status — create, edit, and delete notification rules.
+description: Send an email when a workflow run reaches a given status - create, edit, and delete notification rules.
 ---
 
 A **notification** is a rule that says *"when a job reaches this status, tell this address"*. Each rule
@@ -12,7 +12,7 @@ is available in both Community and Enterprise Edition.
 
 ---
 
-![The Notifications page — each notification with the job events it fires on](notifications/notifications.png)
+![The Notifications page - each notification with the job events it fires on](notifications/notifications.png)
 
 ## The page
 
@@ -32,7 +32,7 @@ created yet."
 
 1. Click **New Notification**. The **Create Notification** dialog opens, described as "Define
    notification parameters."
-2. Enter a **Name** — required, up to 256 characters.
+2. Enter a **Name** - required, up to 256 characters.
 3. Pick one or more **Events** from the multi-select. At least one is required.
 4. Choose a **Type**.
 5. Fill in the type's one delivery field.
@@ -62,7 +62,7 @@ sends nothing.
 
 | Type | Field | Notes |
 |---|---|---|
-| **EMAIL** | **Email** — the recipient address. | The default and the only type available out of the box. Requires a mail host to be configured; without one the send is skipped with a warning. |
+| **EMAIL** | **Email** - the recipient address. | The default and the only type available out of the box. Requires a mail host to be configured; without one the send is skipped with a warning. |
 | **WEBHOOK** | **Webhook URL** | *Coming soon.* Behind the `ff-1132` feature flag, and not functional in the latest released version: selecting it stores the URL, but the webhook transport delivers nothing. |
 
 <Callout type="warn" title="Coming soon">
@@ -82,4 +82,4 @@ unaffected.
 
 ## See also
 
-- [Workflow Executions](/platform/automation/monitor/workflow-executions) — the run history a notification points you at.
+- [Workflow Executions](/platform/automation/monitor/workflow-executions) - the run history a notification points you at.

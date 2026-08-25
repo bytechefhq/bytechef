@@ -3,15 +3,15 @@ title: Signing Keys
 description: Manage Signing Keys for your embedded integration.
 ---
 
-<!-- TODO screenshot: Embedded → Settings — the settings landing page showing the available sections -->
+<!-- TODO screenshot: Embedded → Settings - the settings landing page showing the available sections -->
 
 ---
 
 ## Signing Keys
 
-<!-- TODO screenshot: Embedded → Settings → Signing Keys — the signing-keys table with the New Signing Key button -->
+<!-- TODO screenshot: Embedded → Settings → Signing Keys - the signing-keys table with the New Signing Key button -->
 
-Signing Keys are how ByteChef trusts that a JWT presented by the React SDK really came from your backend. When you create a Signing Key, ByteChef generates an RSA 2048-bit keypair — the public key is stored, the private key is shown to you once.
+Signing Keys are how ByteChef trusts that a JWT presented by the React SDK really came from your backend. When you create a Signing Key, ByteChef generates an RSA 2048-bit keypair - the public key is stored, the private key is shown to you once.
 
 Your backend then signs short-lived JWTs (algorithm `RS256`, set the JWT header `kid` to the Key Id) and passes them to `useConnectDialog` or `fetch` calls against the embedded API.
 
@@ -21,7 +21,7 @@ Your backend then signs short-lived JWTs (algorithm `RS256`, set the JWT header 
 |---|---|
 | One-time private key display | The private key appears once at creation time. Save it securely (e.g. as a backend secret). |
 | Key Id (`kid`) | A stable identifier for the public key. Goes into the JWT header so ByteChef can verify the signature. |
-| Last Used Date | When a JWT signed with this key was last verified — handy for spotting unused or rotated keys. |
+| Last Used Date | When a JWT signed with this key was last verified - handy for spotting unused or rotated keys. |
 | Rotation | Create a new Signing Key, deploy the new private key in your backend, then delete the old key. |
 
 ### Table Columns
@@ -41,7 +41,7 @@ Your backend then signs short-lived JWTs (algorithm `RS256`, set the JWT header 
 1. Click **New Signing Key** in the top-right corner.
 2. Enter a **Name** (at least 2 characters).
 3. Click **Save**.
-4. **Copy the private key now** — the dialog shows it once and ByteChef does not store it. After you click **Done**, it's gone.
+4. **Copy the private key now** - the dialog shows it once and ByteChef does not store it. After you click **Done**, it's gone.
 
 #### Using the key in your backend
 

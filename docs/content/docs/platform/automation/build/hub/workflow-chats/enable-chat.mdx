@@ -12,13 +12,13 @@ message, a conversation id, and any attachments.
 ## Add the trigger
 
 1. Open the workflow in the **Workflow Editor**.
-2. Add or replace the trigger — choose **New Chat Request** from the trigger palette.
+2. Add or replace the trigger - choose **New Chat Request** from the trigger palette.
 3. Configure the **Mode** (see below).
 4. Save and deploy.
 
 Once deployed, the workflow becomes selectable as a workflow chat: in Enterprise Edition it appears
 under the **Workflows** cascade of the AI Hub composer's provider popup, labelled
-`project — workflow`; in Community Edition it appears on the standalone **Chats** page, grouped under
+`project - workflow`; in Community Edition it appears on the standalone **Chats** page, grouped under
 its project.
 
 ## The request shape
@@ -50,7 +50,7 @@ The trigger's **Mode** decides where the chat is consumed:
 
 | Mode | Behavior |
 | --- | --- |
-| **Hosted Chat** (default) | ByteChef provides the chat UI — the workflow is listed in the AI Hub composer's **Workflows** cascade (and on the Community Edition **Chats** page). Nothing else to build. |
+| **Hosted Chat** (default) | ByteChef provides the chat UI - the workflow is listed in the AI Hub composer's **Workflows** cascade (and on the Community Edition **Chats** page). Nothing else to build. |
 | **Embedded Chat** | The workflow is hidden from those listings; you invoke its webhook from your own interface. |
 
 Pick **Hosted Chat** when you want ByteChef to provide the chat UI, and **Embedded Chat**
@@ -58,7 +58,7 @@ when you're building the front end yourself and just want the trigger contract.
 
 ## Workflows with multiple triggers
 
-A workflow can have more than one trigger — for example a New Chat Request trigger and a
+A workflow can have more than one trigger - for example a New Chat Request trigger and a
 Slack trigger on a specific channel. When a user picks the workflow from the **Workflows**
 cascade, the chat is bound to the **chat trigger** specifically. Other triggers on the same
 workflow keep firing independently from their own sources.

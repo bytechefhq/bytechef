@@ -8,7 +8,7 @@ comingSoon: true
 ## Human-in-the-loop inside a chat
 
 A workflow turn doesn't have to be a single request and response. A workflow can pause
-mid-run to ask the user a question and resume once they answer — all inside the same
+mid-run to ask the user a question and resume once they answer - all inside the same
 conversation.
 
 When the workflow suspends with a question, the chat renders the prompt and waits.
@@ -17,14 +17,14 @@ paused. This is the same suspend/resume mechanism described in
 [Human in the Loop](/platform/automation/build/workflows/human-in-the-loop), surfaced conversationally: instead
 of an approval inbox or a Slack button, the question appears in the chat thread.
 
-Use it for flows that need a clarification before continuing — confirming an action,
-collecting a missing field, or choosing between options — without leaving the chat.
+Use it for flows that need a clarification before continuing - confirming an action,
+collecting a missing field, or choosing between options - without leaving the chat.
 
 ## Embedded chat
 
 Setting the trigger's **Mode** to **Embedded Chat** keeps the workflow out of the hosted chat
-listings — the AI Hub composer's **Workflows** cascade and the Community Edition **Chats**
-page — and lets you drive it from your own UI. Your interface calls the
+listings - the AI Hub composer's **Workflows** cascade and the Community Edition **Chats**
+page - and lets you drive it from your own UI. Your interface calls the
 [New Chat Request webhook](/platform/automation/build/hub/workflow-chats/enable-chat#the-request-shape) with the
 same `{ message, conversationId, attachments }` body and renders the streamed reply however
 you like. The workflow contract is identical; only the front end changes.

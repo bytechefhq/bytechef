@@ -1,6 +1,6 @@
 ---
 title: Guardrails
-description: Workspace-level content guardrails — PII/secret redaction, blocked terms, moderation, injection detection.
+description: Workspace-level content guardrails - PII/secret redaction, blocked terms, moderation, injection detection.
 ee: true
 comingSoon: true
 ---
@@ -12,7 +12,7 @@ prompt-injection attempts, and can scan the model's own reply on the way back.
 The page lives at **Settings → AI Agents → Guardrails** in the Automation workspace and requires
 the admin role.
 
-{/* TODO screenshot: Settings → AI Agents → Guardrails — the five toggles, the blocked-terms textarea, and the blocking-mode radio group */}
+{/* TODO screenshot: Settings → AI Agents → Guardrails - the five toggles, the blocked-terms textarea, and the blocking-mode radio group */}
 
 ---
 
@@ -29,8 +29,8 @@ the admin role.
 
 Redaction always runs **first**, so the blocked-term, injection, and moderation checks all see
 already-redacted text. Each redaction substitutes a labelled placeholder rather than deleting the
-span — `[REDACTED_EMAIL]`, `[REDACTED_SSN]`, `[REDACTED_CC]`, `[REDACTED_PHONE]`, `[REDACTED_IP]`,
-and `[REDACTED_SECRET]` — so the model still sees that a value was present.
+span - `[REDACTED_EMAIL]`, `[REDACTED_SSN]`, `[REDACTED_CC]`, `[REDACTED_PHONE]`, `[REDACTED_IP]`,
+and `[REDACTED_SECRET]` - so the model still sees that a value was present.
 
 ---
 
@@ -38,11 +38,11 @@ and `[REDACTED_SECRET]` — so the model still sees that a value was present.
 
 **Blocking mode** decides what happens when a *blocking* guardrail trips:
 
-- **Block** (the default) — the request fails with a category-only message. The offending content is
+- **Block** (the default) - the request fails with a category-only message. The offending content is
   never echoed back.
-- **Redact and continue** — the offending content is masked and the call proceeds.
+- **Redact and continue** - the offending content is masked and the call proceeds.
 
-Blocking mode governs only the three blocking guardrails — blocked terms, injection detection, and
+Blocking mode governs only the three blocking guardrails - blocked terms, injection detection, and
 moderation. Redaction and response scanning always redact and continue regardless of the mode:
 there is no reason to fail a request over data the redaction step already masked.
 
@@ -51,7 +51,7 @@ The three blocking guardrails downgrade differently, because they identify diffe
 | Guardrail | Under **Redact and continue** |
 |---|---|
 | **Blocked terms** | Only the matched term is masked (`[REDACTED_BLOCKED_TERM]`). |
-| **Prompt injection** | Nothing further is masked — the prompt proceeds with the PII/secret redaction it already had. |
+| **Prompt injection** | Nothing further is masked - the prompt proceeds with the PII/secret redaction it already had. |
 | **Moderation** | The **whole message** is replaced with `[REDACTED_MODERATED]`, because a moderation verdict has no locatable span to mask. |
 
 ---
@@ -67,7 +67,7 @@ model:
 | **Canvas AI Agent** | Workflow runs using the AI Agent component, on top of any guardrail cluster elements configured on that node. A block fails the step like any other task failure, so `on-error` handling and error workflows apply. |
 | **AI Hub** | Every AI Hub chat turn, including the specialist subagents a turn delegates to. |
 
-A run that cannot be attributed to a workspace — an embedded execution, for instance — falls back to
+A run that cannot be attributed to a workspace - an embedded execution, for instance - falls back to
 the deployment-wide default policy. Guardrails are never skipped because attribution failed; only
 the *scope* is fail-open.
 
@@ -79,12 +79,12 @@ Guardrails are additive. A narrower layer can switch a check **on** or add terms
 never switch one off.
 
 1. **Deployment-wide defaults**, set by the operator as configuration.
-2. **Workspace settings**, configured on this page — unioned with the deployment defaults.
+2. **Workspace settings**, configured on this page - unioned with the deployment defaults.
 3. **AI Gateway per-project overlay**, which can add further restrictions to gateway traffic only.
    The canvas AI Agent and the AI Hub have no project concept and see layers 1 and 2 only.
 
 Because the workspace policy is a floor, it is evaluated ahead of any per-node guardrail cluster
-element on a workflow canvas — those elements can only add restrictions on top.
+element on a workflow canvas - those elements can only add restrictions on top.
 
 ---
 
@@ -107,7 +107,7 @@ need, are configuration:
 
 <Callout>
     These properties keep their `ai.gateway` prefix for compatibility, but they are **not** gateway-only
-    — they are the deployment-wide floor for all three surfaces, and they apply whether or not the AI
+    - they are the deployment-wide floor for all three surfaces, and they apply whether or not the AI
     Gateway itself is enabled.
 </Callout>
 
@@ -117,10 +117,10 @@ need, are configuration:
 
 Guardrail activity is counted in the `bytechef_ai_guardrail` meter, tagged by `event` and `surface`.
 
-- `event` — `pii_redacted`, `secret_redacted`, `blocked_term`, `moderation_flagged`,
+- `event` - `pii_redacted`, `secret_redacted`, `blocked_term`, `moderation_flagged`,
   `injection_flagged`, `response_redacted`, and `blocking_downgraded` (recorded when
   **Redact and continue** converts what would have been a block).
-- `surface` — `gateway`, `ai_agent`, or `ai_hub`.
+- `surface` - `gateway`, `ai_agent`, or `ai_hub`.
 
 The surface tag is what makes the meter useful: it tells you which entry point a policy is actually
 catching things on, rather than only that the policy fired.

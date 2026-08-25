@@ -11,7 +11,7 @@ ByteChef ships a Helm chart for deploying the single-node application on a Kuber
 
 - A Kubernetes cluster and `kubectl` configured to reach it.
 - [Helm 3](https://helm.sh/).
-- A reachable **PostgreSQL 15+** database. The chart does not deploy PostgreSQL — use a managed database or an in-cluster instance you manage separately.
+- A reachable **PostgreSQL 15+** database. The chart does not deploy PostgreSQL - use a managed database or an in-cluster instance you manage separately.
 
 ## 1. Get the chart
 
@@ -26,8 +26,8 @@ cd bytechef/kubernetes/helm/bytechef
 
 The chart is driven by `values.yaml`. The settings you almost always need to change are the image tag, the database connection, and the encryption and remember-me secrets. Configuration is split into two blocks under `env`:
 
-- `env.normal` — non-sensitive environment variables rendered into a ConfigMap.
-- `env.secret` — sensitive environment variables rendered into a Secret.
+- `env.normal` - non-sensitive environment variables rendered into a ConfigMap.
+- `env.secret` - sensitive environment variables rendered into a Secret.
 
 A minimal override file (`my-values.yaml`) looks like this:
 
@@ -50,7 +50,7 @@ env:
     BYTECHEF_SECURITY_REMEMBER_ME_KEY: "<stable-remember-me-key>"
 ```
 
-Use `BYTECHEF_ENCRYPTION_PROVIDER: property` with a fixed `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on Kubernetes. The default `filesystem` provider writes a key to the pod's local disk, which does not survive pod restarts and is not shared across replicas — either would leave stored connection credentials undecryptable. See [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#the-key) for the full reasoning.
+Use `BYTECHEF_ENCRYPTION_PROVIDER: property` with a fixed `BYTECHEF_ENCRYPTION_PROPERTY_KEY` on Kubernetes. The default `filesystem` provider writes a key to the pod's local disk, which does not survive pod restarts and is not shared across replicas - either would leave stored connection credentials undecryptable. See [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#the-key) for the full reasoning.
 
 ## 3. Install
 
@@ -79,7 +79,7 @@ The chart includes optional resources for production exposure:
 | Autoscaling | `autoscaling.enabled` | Disabled by default. When enabled it creates a HorizontalPodAutoscaler between `minReplicas` and `maxReplicas` on `targetCPUUtilizationPercentage`. |
 | Replicas | `replicaCount` | Static replica count when autoscaling is off (default `1`). |
 
-When running more than one replica, align the multi-instance settings described in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) — shared encryption key, a shared message broker and cache, and coordinated schema migrations.
+When running more than one replica, align the multi-instance settings described in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) - shared encryption key, a shared message broker and cache, and coordinated schema migrations.
 
 ## Health probes
 

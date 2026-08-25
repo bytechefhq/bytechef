@@ -9,12 +9,12 @@ description: A reference Next.js + Fastify implementation that demonstrates the 
 
 [**bytechef-embedded-sample-app**](https://github.com/bytechefhq/bytechef-embedded-sample-app) is a runnable reference implementation of an embedded integration. Clone it to see how every piece described in the rest of this section fits together in a real app.
 
-Looking for the smallest possible host app instead? The ByteChef repository itself carries a minimal Next.js host at [`sdks/frontend/embedded/test-apps`](https://github.com/bytechefhq/bytechef/tree/master/sdks/frontend/embedded/test-apps) — just server-side JWT minting (`app/api/generate-jwt`) and an integrations proxy around the `@bytechef/embedded` React SDK. It doubles as the SDK's development harness, so it always tracks the current SDK version.
+Looking for the smallest possible host app instead? The ByteChef repository itself carries a minimal Next.js host at [`sdks/frontend/embedded/test-apps`](https://github.com/bytechefhq/bytechef/tree/master/sdks/frontend/embedded/test-apps) - just server-side JWT minting (`app/api/generate-jwt`) and an integrations proxy around the `@bytechef/embedded` React SDK. It doubles as the SDK's development harness, so it always tracks the current SDK version.
 
 It's split into two pieces:
 
-- **`back-end/`** — a small Fastify + TypeScript server that signs JWTs (`RS256`) for end-user sessions using a Signing Key.
-- **`front-end/`** — a Next.js app that consumes those JWTs to drive the embedded SDK and several embedded APIs.
+- **`back-end/`** - a small Fastify + TypeScript server that signs JWTs (`RS256`) for end-user sessions using a Signing Key.
+- **`front-end/`** - a Next.js app that consumes those JWTs to drive the embedded SDK and several embedded APIs.
 
 ---
 
@@ -23,11 +23,11 @@ It's split into two pieces:
 | Page in the sample | Demonstrates | Underlying API or SDK |
 |---|---|---|
 | **Integrations** (`/integrations`) | Letting an end user connect a third-party service via the ByteChef connect dialog. | `useConnectDialog` from [`@bytechef/embedded`](/platform/embedded/get-started/quick-start#6-install-the-react-sdk) |
-| **Automations** (`/automations`) | Customer-facing workflow management — list / create / enable / disable / delete the user's own workflows. | `GET/POST/DELETE /api/embedded/v1/automation/workflows` |
+| **Automations** (`/automations`) | Customer-facing workflow management - list / create / enable / disable / delete the user's own workflows. | `GET/POST/DELETE /api/embedded/v1/automation/workflows` |
 | **ComponentKit Playground** (`/component-kit`) | Invoking a single component action directly, without authoring a workflow first. | `POST /api/embedded/v1/{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}` |
 | **Chat MCP** (`/chat-mcp`) | Using a ByteChef **MCP Server** as the tool source for an AI assistant chat. | MCP transport against your MCP Server URL, authenticated with the end-user JWT |
 | **Chat Component Kit** (`/chat-component-kit`) | Exposing every component action available to a user as tools for an AI assistant. | `GET /api/embedded/v1/{externalUserId}/tools` |
-| **Generate a workflow from a prompt** (on `/automations`) | Creating a workflow for the user from a natural-language prompt. | [`POST /api/embedded/v1/automation/workflows/generate`](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional) *(depends on the AI Copilot — coming soon)* |
+| **Generate a workflow from a prompt** (on `/automations`) | Creating a workflow for the user from a natural-language prompt. | [`POST /api/embedded/v1/automation/workflows/generate`](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional) *(depends on the AI Copilot - coming soon)* |
 | **App Event** (`/app-event`) | Firing an **App Event** from your application to start every one of the connected user's enabled App Event-triggered workflows. | [`POST /api/embedded/v1/app-events`](/openapi/frontend/embedded-webhook-app-event-trigger) |
 | **Request** (`/request`) | Triggering a single workflow synchronously via its **Request trigger** and reading the workflow's response back. | [`POST /api/embedded/v1/workflows/{workflowUuid}`](/openapi/frontend/embedded-webhook-request-trigger) |
 
@@ -65,7 +65,7 @@ Together these cover the most common embedded integration patterns: the connect 
         ByteChef Embedded API (:5173/9555)
 ```
 
-The back-end never proxies ByteChef traffic — it only mints JWTs. The browser (or the Next.js API routes acting on its behalf) calls ByteChef directly with that JWT.
+The back-end never proxies ByteChef traffic - it only mints JWTs. The browser (or the Next.js API routes acting on its behalf) calls ByteChef directly with that JWT.
 
 ---
 
@@ -136,18 +136,18 @@ Open `http://localhost:3000`, visit the **Integrations** page, click an integrat
 If you're modifying the embedded React SDK and want the sample app to pick up your changes:
 
 ```bash
-# Terminal 1 — rebuild the SDK on save
+# Terminal 1 - rebuild the SDK on save
 cd <repo-root>/sdks/frontend/embedded/library
 npm run watch
 
-# Terminal 2 — after each rebuild, re-link into the sample app
+# Terminal 2 - after each rebuild, re-link into the sample app
 cd <repo-root>/../bytechef-embedded-sample-app/front-end
 npm install --install-links
 rm -rf .next
 npm run dev
 ```
 
-`--install-links` is required because Next.js Turbopack can't resolve symlinked packages — the flag copies the SDK build into the sample's `node_modules` instead of symlinking.
+`--install-links` is required because Next.js Turbopack can't resolve symlinked packages - the flag copies the SDK build into the sample's `node_modules` instead of symlinking.
 
 ---
 

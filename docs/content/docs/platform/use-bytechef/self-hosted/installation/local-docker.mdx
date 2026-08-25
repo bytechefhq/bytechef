@@ -26,8 +26,8 @@ Once running, open [http://localhost:8080/login](http://localhost:8080/login) an
 
 ![The ByteChef login screen on a fresh install, with the Create account link](local-docker/login.png)
 
-The Compose file keeps PostgreSQL's data in a named volume, `storage_db`. Everything you build —
-workflows, connections, and execution history — lives there, so `docker compose down -v` (note the
+The Compose file keeps PostgreSQL's data in a named volume, `storage_db`. Everything you build -
+workflows, connections, and execution history - lives there, so `docker compose down -v` (note the
 `-v`) deletes all of it. Plain `docker compose down` stops the containers and leaves the volume
 intact.
 

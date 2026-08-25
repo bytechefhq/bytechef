@@ -1,9 +1,9 @@
 ---
 title: Data Tables
-description: Create typed relational tables inside ByteChef and read or write them from workflows — no external database required.
+description: Create typed relational tables inside ByteChef and read or write them from workflows - no external database required.
 ---
 
-Data Tables give you first-class relational storage inside ByteChef. Create a table with typed columns, manage rows in a spreadsheet-like grid (or by importing a CSV), and read or write that data from your workflows — without standing up an external database.
+Data Tables give you first-class relational storage inside ByteChef. Create a table with typed columns, manage rows in a spreadsheet-like grid (or by importing a CSV), and read or write that data from your workflows - without standing up an external database.
 
 Use them for lookup tables, configuration, queues, feature flags, deduplication keys, or any small structured dataset your automations need to share.
 
@@ -16,7 +16,7 @@ Data Tables are **workspace-scoped** and **per-environment**: each table belongs
 1. In the Automation workspace, open **Data Tables** from the sidebar.
 2. Click **New Table**.
 3. Enter a **name** and an optional **description**.
-4. Define at least one **column** — give it a name and a type (see below).
+4. Define at least one **column** - give it a name and a type (see below).
 5. Click **Create**.
 
 Every table automatically has an `id` column that uniquely identifies each row, so `id` is reserved and can't be used as a column name.
@@ -40,9 +40,9 @@ Values are coerced to the column's type, so a row written from a workflow or imp
 
 Open a table and use its column menu to:
 
-- **Add a column** — pick a name and type.
+- **Add a column** - pick a name and type.
 - **Rename a column.**
-- **Delete a column** — removes that column's values from every row.
+- **Delete a column** - removes that column's values from every row.
 
 ---
 
@@ -50,13 +50,13 @@ Open a table and use its column menu to:
 
 The table opens in a spreadsheet-like grid where you can:
 
-- **Add a row** — fill in the new empty row at the bottom.
-- **Edit a cell** — click it and type; changes save when you move off the cell. Each cell uses an editor matched to its column type (text, number, checkbox, date, or date-time picker).
-- **Delete rows** — select one or more with the row checkboxes and delete them.
-- **Import a CSV** — from the grid's **⋮** actions menu, bulk-load rows from a file whose header matches your column names.
-- **Export a CSV** — from the same **⋮** menu, download the current rows.
+- **Add a row** - fill in the new empty row at the bottom.
+- **Edit a cell** - click it and type; changes save when you move off the cell. Each cell uses an editor matched to its column type (text, number, checkbox, date, or date-time picker).
+- **Delete rows** - select one or more with the row checkboxes and delete them.
+- **Import a CSV** - from the grid's **⋮** actions menu, bulk-load rows from a file whose header matches your column names.
+- **Export a CSV** - from the same **⋮** menu, download the current rows.
 
-{/* TODO screenshot: Data Table detail grid — typed columns (string, number, boolean, date), an inline cell being edited, row-select checkboxes, and the ⋮ actions menu open showing Import CSV / Export CSV / Rename / Delete */}
+{/* TODO screenshot: Data Table detail grid - typed columns (string, number, boolean, date), an inline cell being edited, row-select checkboxes, and the ⋮ actions menu open showing Import CSV / Export CSV / Rename / Delete */}
 
 Larger tables load more rows as you scroll. Use **tags** to organize tables once you have several.
 
@@ -83,19 +83,19 @@ Add the **Data Table** component to a workflow to read and write your tables as 
 
 A workflow can also start in response to a row change:
 
-- **Record Created** — a new row was added
-- **Record Updated** — a row was changed
-- **Record Deleted** — a row was removed
+- **Record Created** - a new row was added
+- **Record Updated** - a row was changed
+- **Record Deleted** - a row was removed
 
-This makes Data Tables a lightweight event source — for example, "when a row is added to the *Customers* table, send a welcome email."
+This makes Data Tables a lightweight event source - for example, "when a row is added to the *Customers* table, send a welcome email."
 
 ---
 
 ## Scope and access
 
-- **Workspace-scoped** — a table is available to every project and workflow in its workspace.
-- **Per-environment** — the rows are tied to the selected environment, so Development data stays separate from Production.
-- **Workspace membership** — a table is reachable by the members of its workspace. There is no
+- **Workspace-scoped** - a table is available to every project and workflow in its workspace.
+- **Per-environment** - the rows are tied to the selected environment, so Development data stays separate from Production.
+- **Workspace membership** - a table is reachable by the members of its workspace. There is no
   per-operation role split for data tables in the latest released version: a member who can open the
   workspace can read and write its tables. Finer-grained viewer/editor enforcement is on the upcoming
   release track.
@@ -106,7 +106,7 @@ This makes Data Tables a lightweight event source — for example, "when a row i
 
 > **Coming soon.** Storage limits are on the upcoming release track and are not yet enforced in the latest released version of ByteChef.
 
-The total size of all data tables in a tenant is capped — by default at **50 MB**. As usage approaches the cap, a warning alert appears in the Data Tables UI; once the cap is reached, writes that would grow the data (inserting rows, importing CSV, updating rows) are rejected with a limit-exceeded error until space is freed.
+The total size of all data tables in a tenant is capped - by default at **50 MB**. As usage approaches the cap, a warning alert appears in the Data Tables UI; once the cap is reached, writes that would grow the data (inserting rows, importing CSV, updating rows) are rejected with a limit-exceeded error until space is freed.
 
 {/* TODO screenshot: Data Tables page with the storage-usage warning alert visible (usage approaching the cap) */}
 
@@ -123,19 +123,19 @@ right shape for some jobs and the wrong shape for others.
 
 | Use case | How to model it |
 |---|---|
-| **Lookup tables** — map a code to a label, an SKU to a price, a country to a region. | One row per mapping; look the row up with **Find Records**. |
-| **Configuration data** — regional overrides, per-tenant knobs. | One row per configuration key. |
-| **Feature flags** — turn workflow behavior on and off without republishing. | A Boolean column keyed by flag name. |
-| **Work queues** — items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. |
-| **Deduplication keys** — record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing. |
-| **Reference data** — data too dynamic for static configuration. | One row per record, refreshed by a workflow when the upstream changes. |
+| **Lookup tables** - map a code to a label, an SKU to a price, a country to a region. | One row per mapping; look the row up with **Find Records**. |
+| **Configuration data** - regional overrides, per-tenant knobs. | One row per configuration key. |
+| **Feature flags** - turn workflow behavior on and off without republishing. | A Boolean column keyed by flag name. |
+| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. |
+| **Deduplication keys** - record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing. |
+| **Reference data** - data too dynamic for static configuration. | One row per record, refreshed by a workflow when the upstream changes. |
 
 ### What a Data Table is not
 
 - **Not a transactional system of record.** There is no cross-row transaction or multi-writer
   locking. If several systems write the same data concurrently, point the workflow at a real
   database through the matching component instead.
-- **Not a data warehouse.** The bound to plan against is total stored size, not a row count — see
+- **Not a data warehouse.** The bound to plan against is total stored size, not a row count - see
   [Storage limits](#storage-limits) above. How many rows fit under a given size depends entirely on
   how wide they are, so size the data, not the row count.
 - **Not a search index.** For matching by meaning rather than by column value, use the

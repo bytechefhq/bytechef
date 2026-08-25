@@ -27,7 +27,7 @@ Type: condition/v1
 # Additional Instructions
 
 The Condition flow control evaluates a logical expression and routes execution down one of two
-paths: **true** or **false**. Use it for binary decisions — threshold checks, validation, or simple
+paths: **true** or **false**. Use it for binary decisions - threshold checks, validation, or simple
 yes/no branching.
 
 ## Usage
@@ -42,17 +42,17 @@ branch. The node creates two paths, **True** and **False**.
 The **Raw Expression** toggle decides which of two editors you get. See
 [Expressions](/reference/expressions) for the full expression language.
 
-**Raw Expression enabled** — write the expression directly in the **Expression** field:
+**Raw Expression enabled** - write the expression directly in the **Expression** field:
 
 ```
 ${order_1.total} > 1000
 ${user_1.verified} == true && ${user_1.age} >= 18
 ```
 
-Values like `${order_1.total}` come from data pills — output produced by an earlier component or
+Values like `${order_1.total}` come from data pills - output produced by an earlier component or
 trigger, or a value you configured by hand.
 
-**Raw Expression disabled** — build the condition visually. Conditions are structured as **OR**
+**Raw Expression disabled** - build the condition visually. Conditions are structured as **OR**
 groups, each containing one or more **AND** conditions:
 
 1. Click **Add OR Condition** to create a group.
@@ -83,7 +83,7 @@ The operations offered depend on the comparison type you pick.
 | `Starts With` | Value 1 begins with Value 2 |
 | `Ends With` | Value 1 ends with Value 2 |
 | `Regex` | Value 1 matches the regular expression in Value 2 |
-| `Empty` | Value 1 is an empty string — takes no Value 2 |
+| `Empty` | Value 1 is an empty string - takes no Value 2 |
 
 ### Number
 
@@ -95,7 +95,7 @@ The operations offered depend on the comparison type you pick.
 | `Greater or Equals` | Value 1 is greater than or equal to Value 2 |
 | `Less` | Value 1 is less than Value 2 |
 | `Less or Equals` | Value 1 is less than or equal to Value 2 |
-| `Empty` | Value 1 is absent — takes no Value 2 |
+| `Empty` | Value 1 is absent - takes no Value 2 |
 
 ### Boolean
 

@@ -1,10 +1,10 @@
 ---
 title: Memories
-description: View, edit, and delete the durable facts your AI agents remember across conversations — the management surface for Auto Memory.
+description: View, edit, and delete the durable facts your AI agents remember across conversations - the management surface for Auto Memory.
 comingSoon: true
 ---
 
-The **Memories** page is the management surface for **Auto Memory** — the durable, long-term facts an AI agent decides are worth keeping and reuses in every future conversation. Where the [Auto Memory tool](/platform/automation/build/workflows/ai/agent/agent-utils#auto-memory) lets an agent *write* memories at runtime, this page lets you *read, correct, and prune* them.
+The **Memories** page is the management surface for **Auto Memory** - the durable, long-term facts an AI agent decides are worth keeping and reuses in every future conversation. Where the [Auto Memory tool](/platform/automation/build/workflows/ai/agent/agent-utils#auto-memory) lets an agent *write* memories at runtime, this page lets you *read, correct, and prune* them.
 
 Agents create memory entries on their own; there is no manual "new memory" button on this page. You come here to audit what an agent has learned, fix a fact that drifted, retype a mis-classified entry, or delete something the agent should no longer act on.
 
@@ -21,7 +21,7 @@ Agents create memory entries on their own; there is no manual "new memory" butto
 
 Auto Memory complements chat memory: chat memory replays the *current* conversation, while Auto Memory persists facts across *all* future conversations of the same scope. See [Chat memory vs Auto Memory](/platform/automation/build/workflows/ai/agent#chat-memory-vs-auto-memory) for the distinction.
 
-The name of each entry is set by the agent when it first stores the memory and is **immutable** on this page — everything else (title, description, type, and content) is editable.
+The name of each entry is set by the agent when it first stores the memory and is **immutable** on this page - everything else (title, description, type, and content) is editable.
 
 ---
 
@@ -29,8 +29,8 @@ The name of each entry is set by the agent when it first stores the memory and i
 
 Memories live under **AI → Memories** in the automation navigation, alongside [Skills](skills). The page has two regions in the left sidebar:
 
-- The **AI section nav** — switch between **Skills** and **Memories**.
-- The **Type** filter — narrow the table to a single memory type (see [Filtering by type](#filtering-by-type)).
+- The **AI section nav** - switch between **Skills** and **Memories**.
+- The **Type** filter - narrow the table to a single memory type (see [Filtering by type](#filtering-by-type)).
 
 At the top of the page a header shows the active filter as the title, the total memory count, an **environment selector**, and a **search** box.
 
@@ -48,10 +48,10 @@ Every memory carries a **type** that classifies the kind of fact it holds. The t
 
 | Type | What it holds |
 |---|---|
-| **User** | User profile and preferences — role, tone, default choices. |
+| **User** | User profile and preferences - role, tone, default choices. |
 | **Feedback** | Corrections or confirmed approaches the user asked the agent to apply in future turns. |
 | **Project** | Decisions, deadlines, or domain constraints tied to the current workspace. |
-| **Reference** | Pointers to external systems — dashboards, boards, external docs. |
+| **Reference** | Pointers to external systems - dashboards, boards, external docs. |
 
 ---
 
@@ -67,7 +67,7 @@ The table lists every memory in the current workspace and environment (optionall
 | **Updated** | When the memory was last changed, shown as a relative time (for example, "3 days ago"). |
 | **Actions** | The **View**, **Edit**, and **Delete** icon buttons for that row. |
 
-When no memories exist for the current workspace and environment, the page shows an **empty state** explaining that the agent stores facts here as you chat with it — user preferences, project decisions, corrections, and external reference pointers — and that entries appear once the agent learns something worth keeping.
+When no memories exist for the current workspace and environment, the page shows an **empty state** explaining that the agent stores facts here as you chat with it - user preferences, project decisions, corrections, and external reference pointers - and that entries appear once the agent learns something worth keeping.
 
 ---
 
@@ -75,7 +75,7 @@ When no memories exist for the current workspace and environment, the page shows
 
 Use the **Type** filter in the left sidebar to show only one kind of memory. The options are:
 
-1. **All** (default) — show every memory.
+1. **All** (default) - show every memory.
 2. **User**
 3. **Feedback**
 4. **Project**
@@ -114,7 +114,7 @@ Type into the **Search by title or description...** box in the header to filter 
    | Field | Editable | Notes |
    |---|---|---|
    | **Name** | No | Immutable here. To rename a memory, use the agent's rename tool. Shown disabled for reference. |
-   | **Title** | Yes | Required — **Save** stays disabled while the title is empty. Up to 255 characters. |
+   | **Title** | Yes | Required - **Save** stays disabled while the title is empty. Up to 255 characters. |
    | **Description** | Yes | Optional one-line summary. Up to 1024 characters. |
    | **Type** | Yes | Choose **USER**, **FEEDBACK**, **PROJECT**, or **REFERENCE**. |
    | **Content (Markdown)** | Yes | The full memory body, edited as Markdown in a monospace text area. Up to 65,536 characters. |
@@ -154,9 +154,9 @@ where they live with the `BYTECHEF_AI_AUTO_MEMORY_PROVIDER` environment variable
 | `AWS` | The same file-based layout on S3. Requires the Enterprise Edition AWS file-storage module. |
 
 Selecting a provider whose file-storage backend is not configured fails fast at startup rather than
-falling back — a silent fallback would write memories to storage the operator did not choose. File
+falling back - a silent fallback would write memories to storage the operator did not choose. File
 backends are best-effort single-writer: concurrent edits of the same memory resolve last-write-wins,
-and there is no migration path between providers — switching does not move existing memories.
+and there is no migration path between providers - switching does not move existing memories.
 
 ---
 
@@ -171,7 +171,7 @@ Memories are written by agents, not by hand. An agent stores a fact by calling t
 
 <Accordion title="Why don't I see any memories?">
 
-Memories are scoped to a workspace **and** an environment. Confirm you have the right environment selected in the header, and clear the type filter and search box. During editor test runs the Auto Memory tool is inert — nothing is written until the workflow runs under a real deployment.
+Memories are scoped to a workspace **and** an environment. Confirm you have the right environment selected in the header, and clear the type filter and search box. During editor test runs the Auto Memory tool is inert - nothing is written until the workflow runs under a real deployment.
 
 </Accordion>
 

@@ -15,7 +15,7 @@ The **Automations** page is the authoring surface for your **workflow templates*
 Conceptually:
 
 - A **project** is a logical bundle of related templates (for example, "HubSpot sync" or "Slack notifications").
-- A **workflow template** is a workflow definition you author once in your workspace. It is not tied to any specific connected user — it's a reusable blueprint.
+- A **workflow template** is a workflow definition you author once in your workspace. It is not tied to any specific connected user - it's a reusable blueprint.
 
 Runtime activity for end users lives in [Workflow Executions](/platform/embedded/monitor/workflow-executions); this page is strictly about authoring.
 
@@ -29,7 +29,7 @@ Runtime activity for end users lives in [Workflow Executions](/platform/embedded
 | Template CRUD | Create a workflow template from scratch or import one from a `.json`/`.yaml`/`.yml` file. |
 | Publish | Cut a new project version so its templates become available to connected users. |
 | Tags & Categories | Group projects by category (single) and tag (many) for filtering. |
-| Category / Tag filter sidebar | Narrow the list with two stacked navs — **Categories** and **Tags** — in the left sidebar. |
+| Category / Tag filter sidebar | Narrow the list with two stacked navs - **Categories** and **Tags** - in the left sidebar. |
 | Inline template list | Expand any project row to see its templates, their trigger, the components they use, and the last modified date. |
 | Environment scoping | The page reflects projects in the currently selected environment (Development / Staging / Production). |
 

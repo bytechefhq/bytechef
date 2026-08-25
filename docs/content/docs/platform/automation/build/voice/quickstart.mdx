@@ -20,16 +20,16 @@ This is the recommended v1 setup. Splitting the chain across providers (e.g. Dee
 ## Prerequisites
 
 - ByteChef Automation Pro or Enterprise (browser voice is not in Community Edition today)
-- A Deepgram account with an API key — get one free at [console.deepgram.com](https://console.deepgram.com). The free tier covers ~45 minutes of voice agent usage.
+- A Deepgram account with an API key - get one free at [console.deepgram.com](https://console.deepgram.com). The free tier covers ~45 minutes of voice agent usage.
 - A modern browser: Chrome 66+, Firefox 76+, or Safari 14.1+ (older browsers don't support the `AudioWorklet` API)
 
-## Step 1 — Connect Deepgram
+## Step 1 - Connect Deepgram
 
 In ByteChef, go to **Connections** → **New Connection** → search for **Deepgram**. Paste your API key. Save.
 
 You'll need the connection ID in step 3. You can find it in the URL of the connection's detail page.
 
-## Step 2 — Import the example workflow
+## Step 2 - Import the example workflow
 
 The repo ships a working example at `docs/examples/voice/deepgram-voiceagent.json`. Either copy that file's contents into a new workflow in ByteChef, or create the workflow manually:
 
@@ -48,15 +48,15 @@ The repo ships a working example at `docs/examples/voice/deepgram-voiceagent.jso
    - **Audio Input/Output Encoding**: linear16 (must match the trigger's sample rate)
    - **Connection**: the Deepgram connection you created in step 1
 
-## Step 3 — Test from the workflow editor
+## Step 3 - Test from the workflow editor
 
 The fastest way to verify the workflow works:
 
 1. Open the workflow in the editor
-2. Click the **mic icon** in the Playground panel header (top-right). The mic icon only appears when the workflow has a `websocketTasks` extension — you'll see it once you've added the trigger + agent above.
+2. Click the **mic icon** in the Playground panel header (top-right). The mic icon only appears when the workflow has a `websocketTasks` extension - you'll see it once you've added the trigger + agent above.
 3. Grant microphone permission
 4. Wait for the assistant's greeting (1-2 seconds)
-5. Speak naturally — the assistant should respond
+5. Speak naturally - the assistant should respond
 
 If you don't hear anything:
 
@@ -65,7 +65,7 @@ If you don't hear anything:
 - Check the Deepgram connection has a valid API key
 - Verify your browser is one of the supported versions
 
-## Step 4 — Deploy
+## Step 4 - Deploy
 
 Once the workflow works in the editor, publish it. You'll get a webhook URL like:
 
@@ -75,7 +75,7 @@ https://your-bytechef-instance.com/api/automation/webhooks/abc123
 
 That URL is what you'll paste into the embedded chat widget, AI Hub voice settings, or any other frontend that needs voice.
 
-## Step 5 — Wire up a frontend
+## Step 5 - Wire up a frontend
 
 Three places voice can run:
 
@@ -106,18 +106,18 @@ See the [widget README](https://github.com/bytechefhq/bytechef/blob/master/sdks/
 
 ### AI Hub composer
 
-AI Hub voice ships with **two routing paths**, chosen per-workspace by the admin. Both are mutually exclusive — setting one clears the other server-side.
+AI Hub voice ships with **two routing paths**, chosen per-workspace by the admin. Both are mutually exclusive - setting one clears the other server-side.
 
-#### Path A — Workflow webhook (the v1 default)
+#### Path A - Workflow webhook (the v1 default)
 
 1. Workspace **Admin** → **AI Hub Settings** (gear icon in composer) → select **Workflow webhook (Path A)**
 2. Paste the webhook URL from step 4
 3. Save
 4. Open any AI Hub task and click the mic button
 
-Voice runs through YOUR workflow's agent — the system prompt, model, and tools you configured in step 2. AI Hub's own chat agent (with its built-in tools and memory) is **not** active during voice mode on Path A. Recommended when you want voice to share the exact behaviour and tools of an existing browser-voice workflow.
+Voice runs through YOUR workflow's agent - the system prompt, model, and tools you configured in step 2. AI Hub's own chat agent (with its built-in tools and memory) is **not** active during voice mode on Path A. Recommended when you want voice to share the exact behaviour and tools of an existing browser-voice workflow.
 
-#### Path B — Native AI Hub voice
+#### Path B - Native AI Hub voice
 
 1. Create a **Deepgram** connection holding the API key (Connections → New Connection)
 2. Workspace **Admin** → **AI Hub Settings** → select **Native AI Hub voice (Path B)**
@@ -127,13 +127,13 @@ Voice runs through YOUR workflow's agent — the system prompt, model, and tools
 6. Save
 7. Open any AI Hub chat and click the mic button
 
-How it works: Deepgram does STT and TTS only; AI Hub's routing agent runs the LLM in between. Your workspace's configured LLM provider (set in admin → AI gateway settings), task overlay, tools, and chat memory continuity all apply to voice turns the same way they apply to text turns. The session is bound to the AI Hub chat's threadId so voice and text turns share the same session memory — ask the same chat something in voice mode, then switch to text, and the LLM remembers the voice turn.
+How it works: Deepgram does STT and TTS only; AI Hub's routing agent runs the LLM in between. Your workspace's configured LLM provider (set in admin → AI gateway settings), task overlay, tools, and chat memory continuity all apply to voice turns the same way they apply to text turns. The session is bound to the AI Hub chat's threadId so voice and text turns share the same session memory - ask the same chat something in voice mode, then switch to text, and the LLM remembers the voice turn.
 
 > **Want Deepgram's all-in-one voiceAgent (STT + LLM + TTS) instead?** Use Path A with a Deepgram voiceAgent component in your workflow. That gives you full pipeline control and is the supported way to run "provider runs everything" voice.
 
 Current limitations:
 - Sentence-buffered TTS, not token-by-token (v1.3 work).
-- No barge-in interruption when the user starts speaking while the assistant is still talking (v1.3 work — Deepgram emits the signal, we just don't act on it yet).
+- No barge-in interruption when the user starts speaking while the assistant is still talking (v1.3 work - Deepgram emits the signal, we just don't act on it yet).
 - Only Deepgram is wired; ElevenLabs is planned for v1.3.
 
 ## Costs
@@ -146,7 +146,7 @@ Deepgram voiceAgent is billed per-minute by Deepgram (not by ByteChef). At time 
 
 A 5-minute voice call = ~$0.65. Production deployments should set per-workspace concurrent-session limits to prevent runaway costs.
 
-ByteChef does not currently meter or charge for voice minutes — your Deepgram bill is your own to manage. Per-workspace billing is planned for v1.1.
+ByteChef does not currently meter or charge for voice minutes - your Deepgram bill is your own to manage. Per-workspace billing is planned for v1.1.
 
 ## Troubleshooting
 
@@ -180,4 +180,4 @@ Server-side max-duration enforcement kicks in at 30 minutes per session. This is
 
 ## Next steps
 
-- [Testing voice workflows in the editor](./editor-testing) — iterate on prompts and models without deploying
+- [Testing voice workflows in the editor](./editor-testing) - iterate on prompts and models without deploying

@@ -13,7 +13,7 @@ instead be deployed as a set of cooperating microservices, so that task executio
 independently from the API and coordination layers.
 
 This page describes the services, the infrastructure they need, how they find each other, and the
-order to bring them up. It assumes you build the apps from source — there is currently no published
+order to bring them up. It assumes you build the apps from source - there is currently no published
 Docker Compose file or Helm chart for the distributed set (the shipped `docker-compose.yml` and the
 `kubernetes/helm/bytechef` chart deploy the monolith only), so you compose the deployment with your
 own orchestration.
@@ -32,7 +32,7 @@ own orchestration.
 | Connection | `connection-app` | Connections domain (credentials to external services). |
 | Execution | `execution-app` | Workflow-execution read APIs (jobs, task executions). |
 | Coordinator | `coordinator-app` | The workflow engine's control plane: accepts jobs, runs task dispatchers (condition, loop, fork/join, each, map, parallel, subflow, approval), and dispatches task executions onto the message broker. Loads **no** components. |
-| Worker | `worker-app` | Executes task executions consumed from the broker. This is the only app with the component modules (all 180+) on its classpath — scale it horizontally for throughput. |
+| Worker | `worker-app` | Executes task executions consumed from the broker. This is the only app with the component modules (all 180+) on its classpath - scale it horizontally for throughput. |
 | Scheduler | `scheduler-app` | Quartz-backed (JDBC job store) schedule and polling-trigger service. |
 | Webhook | `webhook-app` | Receives inbound `/webhooks/**` requests and turns them into trigger events. |
 | AI gateway | `ai-gateway-app` | Routes and meters model traffic (`/api/ai-gateway/**`). Optional. |
@@ -41,7 +41,7 @@ own orchestration.
 
 The split follows the engine architecture: the **coordinator** owns job state transitions and puts
 task executions on broker queues; **workers** consume those queues, execute the component action,
-and send completions back. Neither talks to the other over HTTP — all coordinator/worker traffic
+and send completions back. Neither talks to the other over HTTP - all coordinator/worker traffic
 goes through the message broker.
 
 <Mermaid
@@ -100,12 +100,12 @@ flowchart TB
 
 ## Required infrastructure
 
-- **PostgreSQL 15+** — one shared database. Each domain app applies its own Liquibase context
+- **PostgreSQL 15+** - one shared database. Each domain app applies its own Liquibase context
   (`configuration`, `connection`, `execution`, `scheduler`), so they can share a single database
   instance.
-- **Redis** — required regardless of broker choice: it backs **service discovery** (apps register
+- **Redis** - required regardless of broker choice: it backs **service discovery** (apps register
   under their `spring.application.name`) and the cache provider, and is the default message broker.
-- **Message broker** — `bytechef.message-broker.provider` set to one of `redis` (default in the EE
+- **Message broker** - `bytechef.message-broker.provider` set to one of `redis` (default in the EE
   config), `amqp` (RabbitMQ), `kafka`, or `jms`/`aws`. The `memory` provider is in-process only and
   **cannot** be used in distributed mode. All broker starters are on the worker/coordinator
   classpath, so the provider is switched purely by configuration.
@@ -115,7 +115,7 @@ RabbitMQ.
 
 ## Configuration model
 
-Each app's own `application.yml` is nearly empty — it sets `spring.application.name` and imports
+Each app's own `application.yml` is nearly empty - it sets `spring.application.name` and imports
 everything else from the config server:
 
 ```yaml
@@ -131,7 +131,7 @@ spring:
 ```
 
 The real, shared configuration lives in `config-server-app`'s classpath at
-`src/main/resources/config/apps/` — a shared `application.yml` (+ `-dev`/`-prod` profiles) plus
+`src/main/resources/config/apps/` - a shared `application.yml` (+ `-dev`/`-prod` profiles) plus
 per-app override files such as `configuration-app.yml` or `worker-app.yml`. Although the import is
 marked `optional:`, the config server is **effectively required**: the datasource coordinates,
 broker provider, edition flag, and internal service token are only served from there. An app booted
@@ -144,16 +144,16 @@ Key properties served to all apps:
 | `bytechef.edition` | `EE` |
 | `bytechef.message-broker.provider` | `redis` (or `amqp`, `kafka`, `jms`, `aws`) |
 | `bytechef.cache.provider` | `redis` |
-| `bytechef.discovery-service.provider` | `redis` — the only supported discovery backend |
+| `bytechef.discovery-service.provider` | `redis` - the only supported discovery backend |
 | `bytechef.data-storage.provider` / `bytechef.workflow.output-storage.provider` | `jdbc` |
 | `bytechef.scheduler.provider` | `quartz` |
-| `bytechef.internal.service-token` | `${BYTECHEF_INTERNAL_SERVICE_TOKEN}` — shared secret for internal `/remote` calls. **Fail-closed**: internal calls are rejected when unset. |
+| `bytechef.internal.service-token` | `${BYTECHEF_INTERNAL_SERVICE_TOKEN}` - shared secret for internal `/remote` calls. **Fail-closed**: internal calls are rejected when unset. |
 | `bytechef.worker.task.subscriptions.*` | per-queue worker consumer counts (see below) |
 
 Secrets you must set in every app's environment:
 
-- `BYTECHEF_CONFIG_SERVER_PASSWORD` (and the matching username) — basic auth to the config server.
-- `BYTECHEF_INTERNAL_SERVICE_TOKEN` — the shared internal service token.
+- `BYTECHEF_CONFIG_SERVER_PASSWORD` (and the matching username) - basic auth to the config server.
+- `BYTECHEF_INTERNAL_SERVICE_TOKEN` - the shared internal service token.
 - The usual monolith secrets served through the config files: datasource credentials, encryption
   key, etc.
 
@@ -165,8 +165,8 @@ LoadBalancer on top of the Redis discovery client. There are no static service U
 
 Cross-service calls use the *remote client* pattern: each domain module has a `*-remote-client`
 (REST stubs used by consumers) and a `*-remote-rest` (the `/remote/**` controllers on the owning
-app). The client sets the logical service name as the hostname — for example the coordinator
-fetches workflow definitions from `http://configuration-app/remote/workflow-service/...` — and the
+app). The client sets the logical service name as the hostname - for example the coordinator
+fetches workflow definitions from `http://configuration-app/remote/workflow-service/...` - and the
 load balancer resolves it against the Redis registry. Every internal request carries the tenant id in a
 `CURRENT_TENANT_ID` header alongside the internal service token; the receiving app validates both.
 
@@ -175,7 +175,7 @@ load balancer resolves it against the Redis registry. Every internal request car
 `api-gateway-app` uses Spring Cloud Gateway (WebMVC flavor) with discovery-based `lb://` URIs:
 
 - `/api/automation/**`, `/api/embedded/**`, `/api/platform/**` → `configuration-app` (with
-  `connection-app` and `execution-app` matching their own overlapping predicates — route order
+  `connection-app` and `execution-app` matching their own overlapping predicates - route order
   matters)
 - `/api/ai-gateway/**` → `ai-gateway-app`
 - `/webhooks/**` → `webhook-app`
@@ -207,14 +207,14 @@ dispatcher stack.
 
 The coordinator/worker split is shared-nothing on the dispatch path. Workers never talk to each
 other, the coordinator holds no per-execution state in memory, and the broker is the only fan-out
-point — so throughput scales with the number of worker instances rather than flattening against a
+point - so throughput scales with the number of worker instances rather than flattening against a
 shared singleton.
 
 | Action | Effect |
 |---|---|
 | Add worker instances | More concurrent task throughput. Each instance consumes its subscribed queues independently. |
 | Add domain-app or gateway instances | More API throughput; more runs admitted per second. |
-| Remove a worker mid-run | Its in-flight tasks are redelivered to another worker (at-least-once, per your broker — see [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers)). |
+| Remove a worker mid-run | Its in-flight tasks are redelivered to another worker (at-least-once, per your broker - see [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers)). |
 | Restart the coordinator mid-run | Job state lives in the database, not in coordinator memory, so a surviving or restarted coordinator continues the run. |
 
 Useful autoscaling signals:
@@ -233,7 +233,7 @@ Kubernetes HPA on the Micrometer metrics described in
 - **PostgreSQL.** The database is the durable backbone and is scaled vertically (or split by tenant
   schema). The architecture pushes the bulk of the work onto workers, but Postgres is still the
   single shared store.
-- **The scheduler.** The shipped Quartz configuration is not clustered — run exactly one
+- **The scheduler.** The shipped Quartz configuration is not clustered - run exactly one
   `scheduler-app` instance. See [Scheduler backends](#scheduler-backends) below.
 
 ### Idempotency
@@ -258,9 +258,9 @@ scheduled. Both backends drive the same four things:
 
 - **Schedule (cron) triggers** in user workflows.
 - **Polling triggers** that periodically check an external system.
-- **Dynamic webhook trigger refresh** — re-registering a provider-side webhook subscription before
+- **Dynamic webhook trigger refresh** - re-registering a provider-side webhook subscription before
   it expires.
-- **One-time tasks** — delayed wake-ups for suspended runs.
+- **One-time tasks** - delayed wake-ups for suspended runs.
 
 OAuth2 connection-token refresh is scheduled through the same backend by a separate scheduler
 component.
@@ -269,7 +269,7 @@ component.
 
 `scheduler-app` runs [Quartz](https://www.quartz-scheduler.org/) with a **JDBC job store** against
 the shared database (`spring.quartz.job-store-type: jdbc`, the PostgreSQL driver delegate, and
-`initialize-schema: never` — the Quartz tables are created by the `scheduler` Liquibase context, not
+`initialize-schema: never` - the Quartz tables are created by the `scheduler` Liquibase context, not
 by Quartz itself). Schedules therefore live in the database and survive a restart.
 
 <Callout type="warn">
@@ -307,7 +307,7 @@ unaffected.
 </Callout>
 
 If you configure a plan tier (`bytechef.plan.tier`), rate limits and concurrency slots are
-enforced per node by default — an N-node deployment admits up to N× the budget. For strict
+enforced per node by default - an N-node deployment admits up to N× the budget. For strict
 global limits set:
 
 ```yaml
@@ -335,7 +335,7 @@ Workers heartbeat every in-flight task every 30 seconds; `coordinator-app` runs 
 monitors. Both the orphaned-job recovery monitor (fails jobs whose heartbeats went stale, making
 them resumable) and the per-run timeout monitor (fails STARTED jobs past the plan's async run
 timeout or `bytechef.workflow.execution.timeout.default-timeout`) work in the distributed
-deployment — their stale/long-running finder queries reach `execution-app` through
+deployment - their stale/long-running finder queries reach `execution-app` through
 `/remote/job-service` and `/remote/task-execution-service` endpoints. The retention purge monitor
 (`bytechef.workflow.execution.retention.*`) also works distributed: it finds expired runs through
 the remote job service and deletes them (rows and the stored output/context blobs) through the
@@ -344,13 +344,13 @@ remote job facade, with the cascade executing on `execution-app`.
 When Redis is the message broker, redelivery after a worker crash is handled by a consumer-group
 pending-entry reclaim: every consumer sweeps its queue's pending entries (XPENDING), claims
 entries idle for 60+ seconds (XCLAIM), and re-runs them through the normal invoke-then-ack path.
-Semantics are at-least-once, matching the AMQP/Kafka brokers — a task interrupted mid-flight runs
+Semantics are at-least-once, matching the AMQP/Kafka brokers - a task interrupted mid-flight runs
 again on another worker.
 
 ## Bring-up order
 
 1. Infrastructure: PostgreSQL, Redis, and the message broker (if not Redis).
-2. `config-server-app` — everything else reads its configuration from it (dev port `6111`).
+2. `config-server-app` - everything else reads its configuration from it (dev port `6111`).
 3. Domain services: `configuration-app`, `connection-app`, `execution-app`, `scheduler-app`
    (each runs its Liquibase context against the shared database).
 4. `coordinator-app` and one or more `worker-app` instances.
@@ -360,12 +360,12 @@ again on another worker.
 ## Current limitations
 
 - **No shipped orchestration**: no Docker Compose file or Helm chart exists for the distributed
-  set — the shipped compose files and the `bytechef` Helm chart are monolith-only.
+  set - the shipped compose files and the `bytechef` Helm chart are monolith-only.
 - **Workflow alert rules are monolith-only for now**: job-status notifications work distributed on
-  all three channels — `coordinator-app` resolves delivery targets through `configuration-app`'s
+  all three channels - `coordinator-app` resolves delivery targets through `configuration-app`'s
   `/remote/notification-service` endpoints, delivers webhook and Slack sends with the shared CE
   transports, and proxies email sends to `configuration-app`'s mail service through
-  `/remote/notification-email-gateway` (SMTP credentials stay in one app) — but workflow alert
+  `/remote/notification-email-gateway` (SMTP credentials stay in one app) - but workflow alert
   rules still require the monolith deployment.
 - **Config server reachability**: apps reach the config server via a static URL
   (`http://localhost:6111` in dev) rather than discovery; point

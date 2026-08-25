@@ -20,7 +20,7 @@ isolated from `PRODUCTION`.
   The Knowledge Base is enabled through configuration
   (`bytechef.ai.knowledge-base.enabled`). If you don't see **Knowledge Base** in the
   Automation navigation, ask your administrator to enable it. The vector store is backed by
-  Postgres with the `pgvector` extension — there is no separate vector database to operate.
+  Postgres with the `pgvector` extension - there is no separate vector database to operate.
 </Callout>
 
 ## What you can do
@@ -45,13 +45,13 @@ isolated from `PRODUCTION`.
 
 ## How it works
 
-1. **Ingest** — You upload a file (or a [source](/platform/automation/data/knowledge-base/sources) syncs
+1. **Ingest** - You upload a file (or a [source](/platform/automation/data/knowledge-base/sources) syncs
    records in). ByteChef extracts text, running OCR first for scanned PDFs and images.
-2. **Chunk** — The text is split into overlapping chunks sized by the knowledge base's
+2. **Chunk** - The text is split into overlapping chunks sized by the knowledge base's
    chunking settings.
-3. **Embed** — Each chunk is turned into a vector by the configured embedding model and
+3. **Embed** - Each chunk is turned into a vector by the configured embedding model and
    stored alongside the chunk text and metadata.
-4. **Retrieve** — A query is embedded the same way, and the nearest chunks are returned
+4. **Retrieve** - A query is embedded the same way, and the nearest chunks are returned
    with a similarity score, optionally filtered by metadata or tags.
 
 ## Where the vectors live
@@ -62,17 +62,17 @@ extension, so the knowledge base is covered by whatever backup and monitoring yo
 the ByteChef database. Because the vectors are ordinary columns, one query can filter on chunk
 metadata and rank by vector similarity in the same round trip.
 
-pgvector can point at a database separate from the main one — useful when you want the vector
+pgvector can point at a database separate from the main one - useful when you want the vector
 workload on its own instance:
 
 | Variable | Purpose | Default |
 |---|---|---|
 | `BYTECHEF_AI_VECTORSTORE_PROVIDER` | Vector store backend. | `PGVECTOR` |
-| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL` | JDBC URL of the pgvector database. Leave unset to use the main database. | — |
-| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME` / `_PASSWORD` | Credentials for that database. | — |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL` | JDBC URL of the pgvector database. Leave unset to use the main database. | - |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME` / `_PASSWORD` | Credentials for that database. | - |
 
 The index itself is configured through the Spring AI pgvector properties, which ship with an
-**HNSW** index, **cosine distance**, and **1536** dimensions — the size of the default OpenAI
+**HNSW** index, **cosine distance**, and **1536** dimensions - the size of the default OpenAI
 embedding model. Changing to an embedding model with a different vector width means changing
 `spring.ai.vectorstore.pgvector.dimensions` to match; see
 [AI Providers → Embedding models](/platform/settings/ai-providers#embedding-models).
@@ -89,14 +89,14 @@ deployment-level choice:
 |---|---|---|
 | `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Master switch for the Knowledge Base. | `false` |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | `NONE`, `AZURE`, or `MISTRAL`. | `NONE` |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key. | — |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key. | - |
 
 <Callout type="warn">
   `MISTRAL` is the only provider with an OCR implementation wired in today. `AZURE` is accepted by
   the configuration but currently behaves like `NONE`.
 </Callout>
 
-OCR runs during ingestion, before chunking — the extracted text then follows the same chunk, embed,
+OCR runs during ingestion, before chunking - the extracted text then follows the same chunk, embed,
 and index path as any other document.
 
 ## Isolation

@@ -6,8 +6,8 @@ description: Deploy and operate ByteChef on your own infrastructure.
 import {Card, Cards} from "fumadocs-ui/components/card";
 import {Activity, Container, Layers, Settings} from "lucide-react";
 
-Run ByteChef on your own infrastructure — Docker, Kubernetes, AWS, Azure, Google Cloud, or
-DigitalOcean — with full control over data, networking, and customization.
+Run ByteChef on your own infrastructure - Docker, Kubernetes, AWS, Azure, Google Cloud, or
+DigitalOcean - with full control over data, networking, and customization.
 
 <Cards>
   <Card icon={<Container className="text-blue-300" />} title="Installation" href="/platform/use-bytechef/self-hosted/installation/local-docker">
@@ -39,14 +39,14 @@ almost every deployment should run. Start at
 [Local Docker](/platform/use-bytechef/self-hosted/installation/local-docker).
 
 To handle more load, run several instances against the same database. A handful of settings have to
-be aligned first — a shared encryption key, a shared message broker and cache, a fixed remember-me
-key, and migrations owned by one instance — see
+be aligned first - a shared encryption key, a shared message broker and cache, a fixed remember-me
+key, and migrations owned by one instance - see
 [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances).
 
 ### Single-shot
 
 The [runtime job runner](/platform/use-bytechef/self-hosted/runtime-job) boots, executes exactly one
-workflow, and exits with the workflow's status. No database, no broker, no triggers — for batch runs
+workflow, and exits with the workflow's status. No database, no broker, no triggers - for batch runs
 whose schedule already lives in Airflow, a CI pipeline, or a Kubernetes `CronJob`. Enterprise Edition.
 
 ## Supported substrates
@@ -63,13 +63,13 @@ whose schedule already lives in Airflow, a CI pipeline, or a Kubernetes `CronJob
 The Helm chart templates the deployment, service, ingress, ConfigMap, Secret, service account, and an
 HPA. Note that it ships `replicaCount: 1` and sets no broker or cache variables, so the default values
 run the in-memory broker. Raising `replicaCount` (or enabling the HPA) on its own gives you replicas
-that cannot hand each other work — add the shared-instance settings under `env.normal` first, per
+that cannot hand each other work - add the shared-instance settings under `env.normal` first, per
 [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances).
 
 ## Your perimeter, your secrets
 
 - **Credentials never leave your network.** Connection credentials are encrypted at rest in your own
-  database with a key you supply — see
+  database with a key you supply - see
   [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials).
 - **Telemetry is opt-in and points at your stack.** OpenTelemetry export ships **disabled**; every
   signal stays off until you set an endpoint and flip the flag

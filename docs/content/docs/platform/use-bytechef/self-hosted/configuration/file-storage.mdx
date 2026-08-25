@@ -1,6 +1,6 @@
 ---
 title: File Storage
-description: Where ByteChef puts the opaque bytes a workflow produces — S3, the local filesystem, or the database — and the three separate storage settings that select it.
+description: Where ByteChef puts the opaque bytes a workflow produces - S3, the local filesystem, or the database - and the three separate storage settings that select it.
 ---
 
 Workflows handle files: webhook payloads, attachments fetched from an inbox, CSVs uploaded for
@@ -11,7 +11,7 @@ backend resolves it. The choice is per deployment, not per workflow.
 ## The three storage settings
 
 ByteChef has three independently configured storage areas, each with its own provider setting and
-its own default. Set all three deliberately in production — they do not inherit from one another.
+its own default. Set all three deliberately in production - they do not inherit from one another.
 
 <TypeTable
   type={{
@@ -36,7 +36,7 @@ its own default. Set all three deliberately in production — they do not inheri
 />
 
 Write the values in lowercase, as the shipped configuration files do. The other two settings accept
-any casing, but `BYTECHEF_FILE_STORAGE_PROVIDER` does not — see [`aws` (S3)](#aws-s3) below.
+any casing, but `BYTECHEF_FILE_STORAGE_PROVIDER` does not - see [`aws` (S3)](#aws-s3) below.
 
 ## The backends
 
@@ -48,7 +48,7 @@ Bytes are written to a local directory, set with `BYTECHEF_FILE_STORAGE_FILESYST
 This is the shipped default and it is the right choice for a single persistent node. It is the wrong
 choice for containers with ephemeral disks and for any multi-replica deployment, because each
 replica would write to its own disk and could not read the others'. Whatever you put in the base
-directory must be part of your backup plan — see
+directory must be part of your backup plan - see
 [Upgrades and backups](/platform/use-bytechef/self-hosted/management/upgrades).
 
 ### `jdbc`
@@ -72,12 +72,12 @@ payloads are typically small.
 | `BYTECHEF_CLOUD_AWS_ACCOUNT_ID` | AWS account id. |
 
 Set `BYTECHEF_FILE_STORAGE_PROVIDER` in **lowercase**, exactly as written above. ByteChef flips
-`spring.cloud.aws.s3.enabled` — which ships `false` — by comparing this value against the literal
+`spring.cloud.aws.s3.enabled` - which ships `false` - by comparing this value against the literal
 string `aws`, and that comparison is case-sensitive. Spring's relaxed binding normalises property
 *names*, never their *values*, so `AWS` reads back as `AWS`, the comparison fails, and the S3 client
 stays disabled. Nothing logs a warning when this happens; the first symptom is a workflow failing to
 read or write a file. (`BYTECHEF_CLOUD_PROVIDER` is compared case-insensitively, so it is more
-forgiving — but leaving it unset fails just as quietly, because the S3 configuration class is
+forgiving - but leaving it unset fails just as quietly, because the S3 configuration class is
 conditional on it and simply never registers.)
 
 Beyond those two, there is no bean override or extra YAML to write. The backend is plain Spring Cloud
@@ -99,10 +99,10 @@ Stored as opaque bytes through file storage:
 
 Not stored through file storage:
 
-- **Workflow definitions** — structured JSON rows in the database.
-- **Connection credentials** — encrypted in the database; see
+- **Workflow definitions** - structured JSON rows in the database.
+- **Connection credentials** - encrypted in the database; see
   [Encryption of stored credentials](/platform/use-bytechef/self-hosted/configuration#encryption-of-stored-credentials).
-- **Metrics, traces, and logs** — exported to your own observability stack; see
+- **Metrics, traces, and logs** - exported to your own observability stack; see
   [Observability](/platform/use-bytechef/self-hosted/management/observability).
 
 ## Production checklist
@@ -110,7 +110,7 @@ Not stored through file storage:
 - Set all three provider variables explicitly rather than relying on the defaults.
 - On `filesystem`, mount durable storage and include the base directory in backups.
 - On S3, set both `BYTECHEF_CLOUD_PROVIDER=aws` and `BYTECHEF_FILE_STORAGE_PROVIDER=aws` in
-  lowercase, then confirm a workflow can actually write a file — a wrong value here fails silently.
+  lowercase, then confirm a workflow can actually write a file - a wrong value here fails silently.
 - On S3, scope the IAM policy to the three object actions on one bucket, and set a lifecycle rule
   so storage cost tracks your retention policy.
 - Server-side encryption on the bucket complements ByteChef's own credential encryption; it does not
@@ -118,5 +118,5 @@ Not stored through file storage:
 
 ## See also
 
-- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) — the full storage variable reference.
-- [Upgrades and backups](/platform/use-bytechef/self-hosted/management/upgrades) — what to back up per provider.
+- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) - the full storage variable reference.
+- [Upgrades and backups](/platform/use-bytechef/self-hosted/management/upgrades) - what to back up per provider.

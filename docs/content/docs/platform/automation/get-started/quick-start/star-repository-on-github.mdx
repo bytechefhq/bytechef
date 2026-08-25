@@ -6,7 +6,7 @@ description: Learn how to connect your GitHub account to ByteChef and star a rep
 In this guide you will connect your GitHub account to ByteChef and automate starring a repository. You will create a project, add a workflow to it, configure the GitHub **Star Repository** action, and run it.
 
 <Callout type="info">
-  Step 3 asks for a GitHub **Client ID** and **Client Secret**. If you do not have them yet, create an OAuth app first — see [Connect your GitHub account](#connect-your-github-account) at the end of this guide.
+  Step 3 asks for a GitHub **Client ID** and **Client Secret**. If you do not have them yet, create an OAuth app first - see [Connect your GitHub account](#connect-your-github-account) at the end of this guide.
 </Callout>
 
 ## 1. Create a project
@@ -16,7 +16,7 @@ A project is the container that holds your workflows.
 <Steps>
 <Step>
 
-Open the **Projects** page and click **Create Project** — the button reads **New Project** once you already have projects.
+Open the **Projects** page and click **Create Project** - the button reads **New Project** once you already have projects.
 
 </Step>
 <Step>
@@ -93,8 +93,8 @@ Back in the **Connection** tab, click **Choose Connection** and select the conne
 
 Switch to the **Properties** tab and fill in the repository you want to star:
 
-- **User/Organization** — the account that owns the repository, for example `bytechefhq`
-- **Repository** — the repository name, for example `bytechef`
+- **User/Organization** - the account that owns the repository, for example `bytechefhq`
+- **Repository** - the repository name, for example `bytechef`
 
 ![The Star Repository action's Properties tab, filled in with bytechefhq and bytechef](star-repository-on-github/properties-tab.png)
 
@@ -111,7 +111,7 @@ Click **Test** to run the workflow. ByteChef executes the **Star Repository** ac
 ![The test run panel showing a DONE status and the executed Star Repository task](star-repository-on-github/test-run.png)
 
 <Callout type="info">
-  The **Output** tab reads *No output data*, which is expected — GitHub's star endpoint returns an
+  The **Output** tab reads *No output data*, which is expected - GitHub's star endpoint returns an
   empty `204 No Content` response. The green **DONE** badge and the task's green check are what tell
   you the call succeeded.
 </Callout>
@@ -119,7 +119,7 @@ Click **Test** to run the workflow. ByteChef executes the **Star Repository** ac
 </Step>
 <Step>
 
-Verify the result by opening the **Stars** tab on your GitHub profile — the repository you configured now appears there.
+Verify the result by opening the **Stars** tab on your GitHub profile - the repository you configured now appears there.
 
 </Step>
 </Steps>
@@ -154,7 +154,7 @@ Then click **Register application**.
 </Step>
 <Step>
 
-Click **Generate a new client secret**, then copy both the **Client ID** and the **Client Secret** — you will paste them into ByteChef in step 3.
+Click **Generate a new client secret**, then copy both the **Client ID** and the **Client Secret** - you will paste them into ByteChef in step 3.
 
 <Callout type="warn">
   GitHub shows the client secret only once. Copy it before leaving the page.

@@ -1,15 +1,15 @@
 ---
 title: Audit Events
-description: The audit log of privileged actions — who did what, and when — with filtering, per-event data, and configurable retention.
+description: The audit log of privileged actions - who did what, and when - with filtering, per-event data, and configurable retention.
 ee: true
 comingSoon: true
 ---
 
-**Settings → Audit Events** records privileged actions across the platform. Recording is automatic — there is no per-resource opt-in and no way for a user to suppress an entry. The page requires the `ADMIN` authority and is Enterprise Edition.
+**Settings → Audit Events** records privileged actions across the platform. Recording is automatic - there is no per-resource opt-in and no way for a user to suppress an entry. The page requires the `ADMIN` authority and is Enterprise Edition.
 
 ---
 
-{/* TODO screenshot: Settings → Audit Events page — the results table with columns Date, Principal, Event Type and a per-row chevron; the left filter sidebar showing Principal, Search data, Event type, From date, and To date; the header showing the active "Filter by" summary */}
+{/* TODO screenshot: Settings → Audit Events page - the results table with columns Date, Principal, Event Type and a per-row chevron; the left filter sidebar showing Principal, Search data, Event type, From date, and To date; the header showing the active "Filter by" summary */}
 
 ## Finding an event
 
@@ -26,29 +26,29 @@ A **Clear filters** link resets everything, and the page header shows a live **F
 
 The results table lists **Date**, **Principal**, and **Event Type**. Clicking a row opens the **Audit Event Details** panel, showing the event type with its timestamp, the **Principal**, the **Event ID**, and the event's recorded **Data** as key/value pairs. When results span multiple pages, **Previous** / **Next** page through them.
 
-{/* TODO screenshot: audit event detail panel — the slide-over showing the event type header with timestamp, the Principal and Event ID rows, and the Data key/value list */}
+{/* TODO screenshot: audit event detail panel - the slide-over showing the event type header with timestamp, the Principal and Event ID rows, and the Data key/value list */}
 
 ## What an entry contains
 
 Each row in `persistent_audit_event` carries exactly four fields, plus its data map in `persistent_audit_event_data`:
 
-- **Event ID** — the entry's identifier.
-- **Principal** — the acting user's login.
-- **Event type** — the verb, e.g. `WORKFLOW_UPDATED`, `CONNECTION_DELETED`. The full set is catalogued below.
-- **Event date** — when it happened.
-- **Data** — a string-to-string map of whatever the emitting site chose to record, typically the affected resource's id and name. Null values are dropped rather than stored.
+- **Event ID** - the entry's identifier.
+- **Principal** - the acting user's login.
+- **Event type** - the verb, e.g. `WORKFLOW_UPDATED`, `CONNECTION_DELETED`. The full set is catalogued below.
+- **Event date** - when it happened.
+- **Data** - a string-to-string map of whatever the emitting site chose to record, typically the affected resource's id and name. Null values are dropped rather than stored.
 
-Anything you want to filter on later has to be in the **Data** map — that is what **Search data** searches.
+Anything you want to filter on later has to be in the **Data** map - that is what **Search data** searches.
 
 ### Correlation IDs for bulk operations
 
-A single admin action that fans out into many writes — reassigning every connection in a workspace, for example — would otherwise read as dozens of unrelated entries. When a bulk operation establishes a correlation scope, every audit event raised beneath it picks up the same id and records it under the `correlationId` data key, so the timeline can be reassembled without relying on timestamps being close together.
+A single admin action that fans out into many writes - reassigning every connection in a workspace, for example - would otherwise read as dozens of unrelated entries. When a bulk operation establishes a correlation scope, every audit event raised beneath it picks up the same id and records it under the `correlationId` data key, so the timeline can be reassembled without relying on timestamps being close together.
 
 The correlation id is carried in a plain thread-local, deliberately not an inheritable one: work handed to another thread does not inherit it, because leaking a correlation id across a recycled pool thread is worse than losing the grouping.
 
 ### Strict-audit events
 
-Some events are marked *strict*: if the audit entry cannot be written, the operation itself fails rather than proceeding unrecorded. The events that can remove someone's access are the ones marked this way — `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, and `AI_HUB_CHAT_DELETED`. A failed non-strict write is counted on the `bytechef_connection_audit_failed` / `bytechef_ai_hub_audit_failed` counters instead of failing the request.
+Some events are marked *strict*: if the audit entry cannot be written, the operation itself fails rather than proceeding unrecorded. The events that can remove someone's access are the ones marked this way - `CONNECTION_DELETED`, `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_REVOKED`, `CONNECTION_REASSIGNED`, and `AI_HUB_CHAT_DELETED`. A failed non-strict write is counted on the `bytechef_connection_audit_failed` / `bytechef_ai_hub_audit_failed` counters instead of failing the request.
 
 ## Event types
 
@@ -75,7 +75,7 @@ The dropdown on the page is populated from the events your instance has actually
 
 ## What is not logged
 
-- **Secret values.** The log records that a credential was created or deleted, by whom, and when — never the secret material.
+- **Secret values.** The log records that a credential was created or deleted, by whom, and when - never the secret material.
 - **Workflow execution data.** Execution inputs and outputs live in execution history, so the audit log stays focused on privileged administrative actions rather than data flow.
 
 ## Retention
@@ -85,6 +85,6 @@ Audit entries persist in your operational database. A scheduled job deletes entr
 | Property | Default | Meaning |
 |---|---|---|
 | `bytechef.audit.retention-days` | `365` | Age at which an entry is purged. |
-| `bytechef.audit.retention-cron` | `0 0 2 * * *` | When the purge runs — daily at 02:00 local time. |
+| `bytechef.audit.retention-cron` | `0 0 2 * * *` | When the purge runs - daily at 02:00 local time. |
 
 Retention is instance-wide, not per workspace.

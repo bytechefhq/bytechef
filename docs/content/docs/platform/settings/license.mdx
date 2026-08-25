@@ -1,6 +1,6 @@
 ---
 title: License
-description: Activate and inspect your Enterprise license — upload the .lic file, read its entitlements, and understand grace and expiry.
+description: Activate and inspect your Enterprise license - upload the .lic file, read its entitlements, and understand grace and expiry.
 ee: true
 comingSoon: true
 ---
@@ -9,11 +9,11 @@ comingSoon: true
 
 ---
 
-{/* TODO screenshot: Settings → License page — the .lic file drop zone with the Upload License button (no license yet), or the activated License Details card (status badge, Holder, Expires At, Allowed Jobs, Max Users, Features) with the Replace / Remove buttons */}
+{/* TODO screenshot: Settings → License page - the .lic file drop zone with the Upload License button (no license yet), or the activated License Details card (status badge, Holder, Expires At, Allowed Jobs, Max Users, Features) with the Replace / Remove buttons */}
 
 ## Validation is local and offline
 
-The license is a signed `.lic` file verified with an **Ed25519** signature against a public key baked into the build. Verification happens locally — there is no callback to a vendor licensing server on the normal path. The file is read at boot, validated, and used to decide which Enterprise features to activate.
+The license is a signed `.lic` file verified with an **Ed25519** signature against a public key baked into the build. Verification happens locally - there is no callback to a vendor licensing server on the normal path. The file is read at boot, validated, and used to decide which Enterprise features to activate.
 
 Periodic online check-in against Keygen exists but is **disabled by default**; see [Configuration](#configuration) below.
 
@@ -42,7 +42,7 @@ Once a license is active, the page shows a **License Details** card with a statu
 | Badge | Meaning |
 |---|---|
 | **Valid** | Within the validity window, or a license with no expiry date. |
-| **In grace** | Past `Expires At` but still inside the grace period — the platform keeps operating normally. |
+| **In grace** | Past `Expires At` but still inside the grace period - the platform keeps operating normally. |
 | **Expired** | Past the grace period. Enterprise features stop activating. |
 | **Invalid** | The file failed signature verification. |
 
@@ -65,11 +65,11 @@ A key the platform does not recognise is logged and ignored rather than treated 
 There is one distribution and one database schema. Liquibase filters changelogs by deployment topology (`mono`, `configuration`, `coordinator`, `multitenant`), never by edition, so the Enterprise-owned tables exist either way. Switching editions is therefore configuration plus a license, not a data migration:
 
 1. Set `bytechef.edition=ee` and restart. Enterprise beans register on that property alone.
-2. Activate a license — upload the `.lic` file on this page, or seed it at boot through `bytechef.licence.path` or `BYTECHEF_LICENSE`.
+2. Activate a license - upload the `.lic` file on this page, or seed it at boot through `bytechef.licence.path` or `BYTECHEF_LICENSE`.
 
 Until a license is active, Enterprise endpoints answer `402` (see the callout above); the Community surface is unaffected throughout.
 
-Because both editions run the same engine, the same workflow format, the same component model, and the same schema, existing projects, workflows, connections, and execution history carry over unchanged — there is nothing to export or re-import.
+Because both editions run the same engine, the same workflow format, the same component model, and the same schema, existing projects, workflows, connections, and execution history carry over unchanged - there is nothing to export or re-import.
 
 Going the other way, **Remove License** on this page reverts the platform to Community Edition after a confirmation. Your data is untouched; the Enterprise-only surfaces simply stop being served.
 

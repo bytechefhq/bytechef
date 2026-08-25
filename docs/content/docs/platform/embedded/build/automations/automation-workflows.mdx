@@ -18,9 +18,9 @@ comingSoon: true
 There are two workflow-building surfaces in Embedded, and they serve different people:
 
 - The **Automation Workflow editor** is where **you** author the workflow templates that ship with your product. It is opened from the [Automations](/platform/embedded/build/automations) page and edits templates in your workspace, against your workspace connections.
-- The **Workflow Builder** is the **white-label, embeddable** editor you drop into your own app so a **connected user** can build and refine their own workflow against **their own** connections. It has no ByteChef chrome around it — see [White-Label Execution](/platform/embedded/get-started/white-label-execution).
+- The **Workflow Builder** is the **white-label, embeddable** editor you drop into your own app so a **connected user** can build and refine their own workflow against **their own** connections. It has no ByteChef chrome around it - see [White-Label Execution](/platform/embedded/get-started/white-label-execution).
 
-Both surfaces render the same drag-and-drop canvas as the standard automation editor, so the core mechanics — adding triggers and actions, wiring data pills, flow controls — are documented once under [Building workflows](/platform/automation/build/workflows/projects). This page focuses on what is specific to the two embedded surfaces.
+Both surfaces render the same drag-and-drop canvas as the standard automation editor, so the core mechanics - adding triggers and actions, wiring data pills, flow controls - are documented once under [Building workflows](/platform/automation/build/workflows/projects). This page focuses on what is specific to the two embedded surfaces.
 
 ---
 
@@ -50,8 +50,8 @@ From left to right the header contains:
 
 The breadcrumb shows the **project name** followed by a status badge:
 
-- `V<n> PUBLISHED` — the project has a published version; `<n>` is the last published version.
-- `V<n> DRAFT` — the project has unpublished changes.
+- `V<n> PUBLISHED` - the project has a published version; `<n>` is the last published version.
+- `V<n> DRAFT` - the project has unpublished changes.
 
 Next to the badge, the **workflow selector** dropdown lets you switch between the workflow templates in the current project. Each entry shows the workflow label (or its UUID when unlabeled).
 
@@ -59,18 +59,18 @@ Next to the badge, the **workflow selector** dropdown lets you switch between th
 
 The sidebar lets you move around your projects and templates without leaving the editor:
 
-1. **Project selector** — a dropdown with **Current project**, **All projects**, and every project by name. Choosing a project lists that project's workflows below.
-2. **New project** (+ icon) — opens the project dialog to create a project (**Name**, **Description**, **Category**, **Tags**).
-3. **Search workflows** — filters the list below by label.
-4. **Sort** (filter icon) — sorts the list by **Last edited**, **Date created**, **A-Z**, or **Z-A**. Tooltip: *Sort workflows*.
-5. **New Workflow** — creates an empty workflow (empty inputs, tasks, and triggers) in the selected project and opens it in the editor.
-6. **Workflow list** — each card shows the icons of the workflow's triggers and components, its label, and the last-edited date. Click a card to open that workflow.
+1. **Project selector** - a dropdown with **Current project**, **All projects**, and every project by name. Choosing a project lists that project's workflows below.
+2. **New project** (+ icon) - opens the project dialog to create a project (**Name**, **Description**, **Category**, **Tags**).
+3. **Search workflows** - filters the list below by label.
+4. **Sort** (filter icon) - sorts the list by **Last edited**, **Date created**, **A-Z**, or **Z-A**. Tooltip: *Sort workflows*.
+5. **New Workflow** - creates an empty workflow (empty inputs, tasks, and triggers) in the selected project and opens it in the editor.
+6. **Workflow list** - each card shows the icons of the workflow's triggers and components, its label, and the last-edited date. Click a card to open that workflow.
 
 {/* TODO screenshot: the editor left sidebar showing the project selector, search, sort, New Workflow button, and workflow cards */}
 
 ### Settings menu
 
-The **Settings** (gear) menu is split into two tabs — **Workflow** and **Project**:
+The **Settings** (gear) menu is split into two tabs - **Workflow** and **Project**:
 
 | Tab | Action | Result |
 |---|---|---|
@@ -116,7 +116,7 @@ Each entry shows the version number (`V<n>`), the published date, and a status b
 The **Workflow Builder** is the white-label editor you embed inside your own product (typically in an iframe) so a connected user can build and refine their own workflow. Unlike the Automation Workflow editor, it:
 
 - operates on a **connected user's** own connections, not your workspace connections;
-- is a **single-workflow** surface — no left sidebar, no project or workflow selector, no settings menu;
+- is a **single-workflow** surface - no left sidebar, no project or workflow selector, no settings menu;
 - receives its context from your host app through a `postMessage` handshake rather than from ByteChef navigation.
 
 {/* TODO screenshot: the white-label Workflow Builder rendered inside a host app, showing the header label, Publish button, and canvas */}
@@ -160,19 +160,19 @@ Connections created or picked here belong to the connected user. New connections
 2. Optionally enter a **Description** (up to 256 characters) in the **Publish Project** popover.
 3. Click **Publish**.
 
-A toast confirms *The workflow has been published.* This publishes the connected user's own workflow instance — it does not change your shipped template.
+A toast confirms *The workflow has been published.* This publishes the connected user's own workflow instance - it does not change your shipped template.
 
 ---
 
 ## Relationship between the two surfaces
 
 - You author reusable **templates** in the **Automation Workflow editor** and publish the project so those templates are available to connected users.
-- A connected user's workflow — created from your template or from scratch — is edited in the embeddable **Workflow Builder** inside your app, against **their** connections, and published on **their** behalf.
+- A connected user's workflow - created from your template or from scratch - is edited in the embeddable **Workflow Builder** inside your app, against **their** connections, and published on **their** behalf.
 
 For how execution stays isolated and white-labeled, see [White-Label Execution](/platform/embedded/get-started/white-label-execution).
 
 ## See also
 
-- [Automations](/platform/embedded/build/automations) — the projects and templates list this editor opens from.
-- [Building workflows](/platform/automation/build/workflows/projects) — the shared canvas mechanics used by both surfaces.
-- [White-Label Execution](/platform/embedded/get-started/white-label-execution) — how the builder is embedded and branded in your product.
+- [Automations](/platform/embedded/build/automations) - the projects and templates list this editor opens from.
+- [Building workflows](/platform/automation/build/workflows/projects) - the shared canvas mechanics used by both surfaces.
+- [White-Label Execution](/platform/embedded/get-started/white-label-execution) - how the builder is embedded and branded in your product.

@@ -174,7 +174,7 @@ substring('someValue', 4)
 
 ByteChef provides built-in functions to help with various type operations.
 
-Built-in functions are only resolved in **formula** expressions — the ones that start with `=`. A plain
+Built-in functions are only resolved in **formula** expressions - the ones that start with `=`. A plain
 `${...}` text expression accepts a value accessor and nothing else, so `substring(...)` inside `${}` is
 left unresolved. Write `=substring(${step_1.text}, 4)` instead.
 
@@ -189,7 +189,7 @@ left unresolved. Write `=substring(${step_1.text}, 4)` instead.
 | `{foo: 1L, bar: 2L, tar: 3L}.?[#this.key == "foo" OR #this.value > 2L]` | `{'tar': 3, 'foo': 1}` | `Map[String, Long]` |
 
 Attempting to access non-present elements fails. Both cases are detected when the expression is
-evaluated, not before — there is no pre-deployment expression validation that resolves map keys.
+evaluated, not before - there is no pre-deployment expression validation that resolves map keys.
 When evaluation fails, ByteChef leaves the expression unresolved and passes the raw text through
 rather than aborting the step, so an unexpected literal in a step's input is the symptom to look for.
 

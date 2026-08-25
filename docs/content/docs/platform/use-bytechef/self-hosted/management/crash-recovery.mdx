@@ -6,7 +6,7 @@ comingSoon: true
 
 A process can die mid-run, leaving a job marked `STARTED` that nothing is working on any more.
 ByteChef ships three monitors that detect and recover that state automatically. Detection lives
-**outside** the Atlas engine — only the heartbeat primitives are engine-owned.
+**outside** the Atlas engine - only the heartbeat primitives are engine-owned.
 
 ## Orphaned-job recovery
 
@@ -14,7 +14,7 @@ Workers publish a heartbeat for every in-flight task every **30 seconds**. The c
 the `STARTED` task row on each heartbeat, bumping its last-modified timestamp.
 
 `OrphanedJobRecoveryMonitor` runs every minute and treats a job as orphaned only when the job row
-**and** all of its non-terminal task executions have gone stale past the staleness threshold — a
+**and** all of its non-terminal task executions have gone stale past the staleness threshold - a
 child task's heartbeat keeps its control-flow parent tasks alive transitively, so a long-running
 `loop` or `fork-join` is not mistaken for a crash.
 
@@ -32,8 +32,8 @@ Auto-resume is at-least-once: the interrupted task re-runs from the last complet
 components in that step must tolerate being executed twice.
 
 <Callout type="info">
-  A deployment whose service implementations do not support the stale-row queries — a lightweight app
-  variant, for example — skips orphan detection entirely rather than failing.
+  A deployment whose service implementations do not support the stale-row queries - a lightweight app
+  variant, for example - skips orphan detection entirely rather than failing.
 </Callout>
 
 ## Per-run timeouts
@@ -47,14 +47,14 @@ or the operator fallback below. With neither set it is a no-op.
 | `BYTECHEF_WORKFLOW_EXECUTION_TIMEOUT_ENABLED` | Enable the timeout monitor. | `true` |
 | `BYTECHEF_WORKFLOW_EXECUTION_TIMEOUT_DEFAULT_TIMEOUT` | Fallback run-duration limit when the plan defines none (ISO-8601 duration, e.g. `PT1H`). Unset means no timeout. | - |
 
-There is deliberately no auto-resume for a timed-out run — it would immediately exceed again.
+There is deliberately no auto-resume for a timed-out run - it would immediately exceed again.
 
 ## Retention purging
 
 `JobRetentionMonitor` sweeps every **6 hours**, per tenant, and permanently deletes finished jobs
 older than the plan's `logRetentionDays` or the operator fallback below. The delete cascades to the
 job's task executions, its job and task output blobs, its context rows, and its
-`CURRENT_EXECUTION`-scoped data-storage rows. Subflow child jobs are skipped — the parent's delete
+`CURRENT_EXECUTION`-scoped data-storage rows. Subflow child jobs are skipped - the parent's delete
 covers them.
 
 | Variable | Purpose | Default |
@@ -76,5 +76,5 @@ invoke-then-ack path, giving the same at-least-once semantics as the other broke
 
 ## See also
 
-- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#execution-recovery) — the full recovery, timeout, and retention variable reference.
-- [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) — where `asyncRunTimeout` and `logRetentionDays` come from.
+- [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#execution-recovery) - the full recovery, timeout, and retention variable reference.
+- [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) - where `asyncRunTimeout` and `logRetentionDays` come from.

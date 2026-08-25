@@ -10,7 +10,7 @@ ByteChef is distributed as a single container image, `docker.bytechef.io/byteche
 ## Prerequisites
 
 - An AWS account with EC2 access and an SSH key pair for reaching the instance.
-- An EC2 instance running a Docker-capable Linux AMI, with **at least 4 GB of RAM** — see [Instance sizing](#instance-sizing) below.
+- An EC2 instance running a Docker-capable Linux AMI, with **at least 4 GB of RAM** - see [Instance sizing](#instance-sizing) below.
 - A **PostgreSQL 15+** database. Use Amazon RDS for PostgreSQL for production, or run PostgreSQL in a second container for a quick evaluation.
 - A security group that allows inbound traffic to port `8080` (or `443` if you front it with a load balancer / reverse proxy) and outbound access to the database.
 
@@ -92,7 +92,7 @@ curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-comp
 docker compose up -d
 ```
 
-That file ships with fixed default credentials and a fixed remember-me key, so use it for evaluation only — never for an internet-reachable instance.
+That file ships with fixed default credentials and a fixed remember-me key, so use it for evaluation only - never for an internet-reachable instance.
 
 ## 6. Access the instance
 
@@ -111,7 +111,7 @@ Browse to `http://<instance-public-dns>:8080/login` (or your `BYTECHEF_PUBLIC_UR
   ```
 
 - **Health checks:** configure the target group / load balancer health check to `GET /actuator/health/readiness` on port `8080`.
-- **Persistence:** all state is in PostgreSQL except file entries, whose provider defaults to **`filesystem`** — mount an EBS volume for `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` if you keep that default, or set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` to keep files in the database, or `aws` (lowercase, with `BYTECHEF_CLOUD_PROVIDER=aws`) to keep them in S3.
+- **Persistence:** all state is in PostgreSQL except file entries, whose provider defaults to **`filesystem`** - mount an EBS volume for `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` if you keep that default, or set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` to keep files in the database, or `aws` (lowercase, with `BYTECHEF_CLOUD_PROVIDER=aws`) to keep them in S3.
 - **Restart policy:** the `--restart unless-stopped` flag above brings the container back after a reboot. Manage it with a systemd unit if you need more control.
 - **Backups:** take regular PostgreSQL dumps. With RDS, use automated snapshots; with a containerized database from the Compose file above:
 
@@ -123,5 +123,5 @@ Browse to `http://<instance-public-dns>:8080/login` (or your `BYTECHEF_PUBLIC_UR
 
 ## Next steps
 
-- [Docker installation](/platform/use-bytechef/self-hosted/installation/local-docker) — the container options in detail
-- [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes) — for high-availability deployments
+- [Docker installation](/platform/use-bytechef/self-hosted/installation/local-docker) - the container options in detail
+- [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes) - for high-availability deployments

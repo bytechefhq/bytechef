@@ -18,13 +18,13 @@ Building a workflow and running it in an environment are deliberately separate s
   enabled workflows, and its own connection wiring.
 
 That split is what lets you edit all afternoon without touching what is running, and what lets the
-*same* version run in Staging and in Production against different credentials — the artifact is
+*same* version run in Staging and in Production against different credentials - the artifact is
 identical, only the deployment around it differs.
 
 ### What a version does and doesn't carry
 
-A published version holds the workflow definitions — tasks, ordering, parameters, expressions, the
-component versions they reference, trigger configuration, and input and output schemas — plus the
+A published version holds the workflow definitions - tasks, ordering, parameters, expressions, the
+component versions they reference, trigger configuration, and input and output schemas - plus the
 publish description and timestamp.
 
 It does **not** hold connections or credentials. Connections are wired on the deployment, so the same
@@ -35,7 +35,7 @@ credential rotation does not invalidate any version.
 
 Open a project in the editor and use the **Settings** menu → **Project** tab → **Project History**.
 Each entry shows the version number, its published date, a Draft or Published badge, and the
-description supplied at publish time — which is why writing a real description at publish time is
+description supplied at publish time - which is why writing a real description at publish time is
 worth the ten seconds.
 
 ### Rolling back
@@ -47,7 +47,7 @@ same operation in the other direction.
 ### Hotfixes
 
 Deployments run published versions, so a fix is not applied in place. Edit the draft, publish it, and
-change the affected deployment to the new version — a Production deployment can be pointed at a new
+change the affected deployment to the new version - a Production deployment can be pointed at a new
 version without first deploying it anywhere else, so this is no slower than editing live would be,
 and it leaves a version history behind.
 
@@ -292,6 +292,6 @@ Click the icon to copy the webhook URL to your clipboard. Use this URL in the ex
 ![An expanded deployment; the workflow with a webhook trigger shows a clipboard icon](workflows/webhook-url.png)
 
 <Callout type="info">
-  Workflows that start with a **form** or **chat** trigger show a form or chat icon instead of the clipboard icon — clicking it opens the hosted page rather than copying a URL.
+  Workflows that start with a **form** or **chat** trigger show a form or chat icon instead of the clipboard icon - clicking it opens the hosted page rather than copying a URL.
 </Callout>
 

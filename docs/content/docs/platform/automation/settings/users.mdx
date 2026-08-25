@@ -1,6 +1,6 @@
 ---
 title: Users
-description: Members of the current workspace and their workspace roles — invite by email, add an existing account, change a role, remove a member.
+description: Members of the current workspace and their workspace roles - invite by email, add an existing account, change a role, remove a member.
 ee: true
 comingSoon: true
 ---
@@ -20,7 +20,7 @@ The gate is deliberately the **scope**, not the organization admin authority: a 
 not an organization admin is exactly the person this page exists for. Without that scope the page
 renders "You do not have permission to manage members of this workspace." and no controls.
 
-{/* TODO screenshot: Settings → Current Workspace → Users — the members table with Email / Name / Role columns, a role dropdown open, and the Invite User button in the header */}
+{/* TODO screenshot: Settings → Current Workspace → Users - the members table with Email / Name / Role columns, a role dropdown open, and the Invite User button in the header */}
 
 ---
 
@@ -33,7 +33,7 @@ renders "You do not have permission to manage members of this workspace." and no
 | **Role** | A dropdown listing the built-in workspace roles plus any custom roles defined for the workspace. Change it here; the change applies immediately. |
 | *(actions)* | A **remove** (trash) button. |
 
-An organization admin appears in the list with the role **Admin — inherited from tenant admin**, shown
+An organization admin appears in the list with the role **Admin - inherited from tenant admin**, shown
 as text rather than a dropdown, and with no remove button. That access comes from the organization
 authority, not from a membership row, so revoking it is an organization-level act performed on the
 [organization Users](/platform/settings/users) page.
@@ -42,13 +42,13 @@ authority, not from a membership row, so revoking it is an organization-level ac
 
 **Invite User** opens a dialog with two tabs:
 
-- **Invite by email** — enter an **Email** and pick a **Role**. "They receive a link on which they set
+- **Invite by email** - enter an **Email** and pick a **Role**. "They receive a link on which they set
   their own password. If they already have an account, it is reused."
-- **Add existing user** — pick someone from a dropdown of accounts that are not already members, and a
+- **Add existing user** - pick someone from a dropdown of accounts that are not already members, and a
   **Role**. "Adds someone who already has a ByteChef account. No email is sent and no seat is
   consumed." This tab appears **only for organization admins**, because listing every account in the
   deployment exposes the whole organization's user list. A workspace admin who is not an organization
-  admin uses the invite tab instead — inviting an address that already has an account reuses it and
+  admin uses the invite tab instead - inviting an address that already has an account reuses it and
   consumes no extra seat.
 
 ## Remove a member
@@ -56,12 +56,12 @@ authority, not from a membership row, so revoking it is an organization-level ac
 Click the **remove** (trash) icon on the row. The member loses access to everything in this workspace
 at once; their account and their membership of other workspaces are untouched.
 
-Some removals and role changes are refused — removing the last admin, demoting yourself, or acting on
+Some removals and role changes are refused - removing the last admin, demoting yourself, or acting on
 an inherited entry. The reason is shown as an inline message above the table rather than as a toast,
 so it stays beside the control you just used.
 
 ## See also
 
-- [Users](/platform/settings/users) — organization membership and the role model the workspace roles
+- [Users](/platform/settings/users) - organization membership and the role model the workspace roles
   sit inside.
-- [Workspaces](/platform/settings/workspaces) — creating the workspaces this page assigns people to.
+- [Workspaces](/platform/settings/workspaces) - creating the workspaces this page assigns people to.

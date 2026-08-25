@@ -12,7 +12,7 @@ description: Allowlist-based URL policy enforcement with scheme, port, userinfo,
 | Property | Description |
 |---|---|
 | **Allowed URLs** | Allowlist of URLs, host names, full URLs, or IP / CIDR ranges. Empty means "everything is blocked" |
-| **Allowed Schemes** | Schemes that are permitted (default: `https`, `http`). Other schemes — including `data:`, `javascript:`, `vbscript:` injection vectors — are rejected |
+| **Allowed Schemes** | Schemes that are permitted (default: `https`, `http`). Other schemes - including `data:`, `javascript:`, `vbscript:` injection vectors - are rejected |
 | **Block Userinfo** | When on, `https://user:pass@host/` is blocked even if the host is allowlisted (phishing defence). Default on |
 | **Allow Subdomain** | When on, allowing `example.com` also allows `api.example.com`, `staging.api.example.com`. Default on |
 
@@ -33,8 +33,8 @@ The **Allowed URLs** array accepts these forms; the detector picks the right mat
 
 ## Two Variants
 
-- **URLs (check)** — flags violations (`HOST_NOT_ALLOWED`, `SCHEME_NOT_ALLOWED`, `USERINFO_BLOCKED`, `MALFORMED_URL`). Each blocked URL becomes one violation.
-- **URLs (sanitize)** — replaces each blocked URL with `<URL>`. Stable placeholder so any downstream regex can post-process the masked text. The **Block Userinfo** label becomes **Sanitize Userinfo** in the sanitize variant since masking and blocking are different operator-facing actions.
+- **URLs (check)** - flags violations (`HOST_NOT_ALLOWED`, `SCHEME_NOT_ALLOWED`, `USERINFO_BLOCKED`, `MALFORMED_URL`). Each blocked URL becomes one violation.
+- **URLs (sanitize)** - replaces each blocked URL with `<URL>`. Stable placeholder so any downstream regex can post-process the masked text. The **Block Userinfo** label becomes **Sanitize Userinfo** in the sanitize variant since masking and blocking are different operator-facing actions.
 
 ---
 
@@ -86,7 +86,7 @@ Mask all unrecognised URLs in the LLM's response so they don't leak to the user:
 
 ## Edge Cases
 
-- **IPv6**: parsed as `HOST_NOT_ALLOWED` since the allowlist machinery only carries IPv4 entries. IPv6 URLs are flagged by default — to allow them, post-process with a regex or extend the detector.
+- **IPv6**: parsed as `HOST_NOT_ALLOWED` since the allowlist machinery only carries IPv4 entries. IPv6 URLs are flagged by default - to allow them, post-process with a regex or extend the detector.
 - **Punycode IDN**: `xn--exmple-cua.com` is matched as a literal host. An allowlist entry of `example.com` does **not** match the punycode form. Add both spellings if you need to permit IDN traffic.
 - **Bare hosts / IPs in prose**: bare domains and bare IPv4 are **not** detected. Only scheme-prefixed forms (`https://10.0.0.1`, `http://example.com`) are scanned. If you need to block bare-host references, prefix them or run a separate `Keywords` guardrail.
 - **`javascript:` / `vbscript:` / `data:` schemes**: matched separately as injection vectors. Allowlist them via **Allowed Schemes** if you genuinely need to permit them; otherwise they're flagged regardless of the **Allowed URLs** list.

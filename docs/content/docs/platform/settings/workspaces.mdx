@@ -1,6 +1,6 @@
 ---
 title: Workspaces
-description: Create and manage workspaces — the grouping for projects, connections, data tables, and knowledge bases.
+description: Create and manage workspaces - the grouping for projects, connections, data tables, and knowledge bases.
 ---
 
 <EEBadge />
@@ -31,7 +31,7 @@ the organization admin authority.
 | **Git configuration** | One repository per workspace. See [Git Configuration](/platform/automation/settings/git-configuration). |
 | **AI guardrails policy** | One content policy per workspace. See [Guardrails](/platform/automation/settings/ai-agents/guardrails). |
 
-All three [environments](/platform/automation/deploy/environments) exist inside every workspace —
+All three [environments](/platform/automation/deploy/environments) exist inside every workspace -
 environments are not a workspace-level choice, and they are not something you model *with*
 workspaces.
 
@@ -54,8 +54,8 @@ The new workspace starts empty.
 
 Each row's **⋮** menu offers:
 
-- **Edit** — change the name and description.
-- **Delete** — remove the workspace, after a confirmation, because it is not reversible.
+- **Edit** - change the name and description.
+- **Delete** - remove the workspace, after a confirmation, because it is not reversible.
 
 <Callout type="warn" title="Coming soon">
     A **Members** entry on the same menu, opening a Workspace Members dialog, plus per-item gating on
@@ -77,9 +77,9 @@ initiative and is the unit that gets published and deployed. A **workspace** gro
 | Two teams that should not see each other's work | Separate workspaces |
 | One team running several initiatives | Several projects in one workspace |
 | Each customer isolated in a multi-tenant deployment | One workspace per tenant |
-| Separating Development, Staging, and Production | Neither — use [environments](/platform/automation/deploy/environments) |
+| Separating Development, Staging, and Production | Neither - use [environments](/platform/automation/deploy/environments) |
 | Onboarding an acquired team | A new workspace |
 
 The last two rows are the ones worth internalising. Environments already exist inside every
-workspace, and workflow versions are deployed per environment — modelling stages as separate
+workspace, and workflow versions are deployed per environment - modelling stages as separate
 workspaces loses that, and leaves you copying projects between workspaces by hand.

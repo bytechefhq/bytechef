@@ -12,7 +12,7 @@ A project is not only a folder. It is the thing that gets versioned and deployed
 the project boundary decides what ships together.
 
 - **Workflows in one project are published together.** Publishing snapshots *every* workflow in the
-  project into one immutable version — you cannot publish half a project.
+  project into one immutable version - you cannot publish half a project.
 - **Versions are immutable.** Once a version is published, its workflows are frozen; further edits
   go to a fresh draft. A published version is what a deployment runs, and it stays available for
   rolling back. See [Deploy Workflows](/platform/automation/deploy/workflows).
@@ -23,12 +23,12 @@ the project boundary decides what ships together.
   workspace-scoped, so they are shared across the workspace's projects rather than owned by one of
   them. See [Workspaces](/platform/settings/workspaces).
 
-Access is governed by [workspace roles](/platform/settings/users#roles-and-permissions) — Admin,
-Editor, or Viewer — granted per member on the workspace and applying to every project inside it.
+Access is governed by [workspace roles](/platform/settings/users#roles-and-permissions) - Admin,
+Editor, or Viewer - granted per member on the workspace and applying to every project inside it.
 There are no per-project roles.
 
 A project has two states, not three: a live **draft** that the editor writes to, and any number of
-**published** versions. Deleting a project is permanent — export it first if you might want it back.
+**published** versions. Deleting a project is permanent - export it first if you might want it back.
 
 ## Create Project
 
@@ -114,7 +114,7 @@ The imported project, together with its workflows, appears in the project list.
 <Callout type="warn" title="Coming soon">
     Creating a code workflow from the Projects page is on the upcoming release track and is not yet
     available in the latest released version of ByteChef. Today a code workflow is authored outside
-    the product and deployed through the API — see
+    the product and deployed through the API - see
     [Code Workflows](/platform/automation/build/workflows/code-workflows).
 </Callout>
 
@@ -136,7 +136,7 @@ Give the code workflow a name and pick its language, then edit the workflow defi
 </Step>
 </Steps>
 
-A code workflow runs on the same engine as a visually built one — see [Build Approaches](/platform/automation/build/workflows/build-approaches) for when to choose full-code.
+A code workflow runs on the same engine as a visually built one - see [Build Approaches](/platform/automation/build/workflows/build-approaches) for when to choose full-code.
 
 ## Edit Project
 
@@ -315,8 +315,8 @@ Click **Publish** to make the project available.
     [Export Project](#export-project) and [Import Project](#import-project).
 </Callout>
 
-Beyond [exporting a project](#export-project) to a `.zip` file for your own backups, a project — or
-an individual workflow, from its own three-dot menu — can be shared as a **template** that anyone
+Beyond [exporting a project](#export-project) to a `.zip` file for your own backups, a project - or
+an individual workflow, from its own three-dot menu - can be shared as a **template** that anyone
 with the link can import into their own workspace.
 
 <Steps>
@@ -327,7 +327,7 @@ Click on the three dots next to the project (or workflow) name and choose **Shar
 </Step>
 <Step>
 
-Write a **Description** of what it does — this is required before you can export it.
+Write a **Description** of what it does - this is required before you can export it.
 
 </Step>
 <Step>
@@ -337,7 +337,7 @@ Click **Export and generate template link**. The dialog turns into a link card w
 </Step>
 <Step>
 
-Use the toggle at the top of the dialog to **disable** the link at any time — the existing link stops working — and to re-enable it later, which generates a fresh export.
+Use the toggle at the top of the dialog to **disable** the link at any time - the existing link stops working - and to re-enable it later, which generates a fresh export.
 
 </Step>
 <Step>
@@ -347,7 +347,7 @@ If you keep editing the project after sharing it, the dialog notes that "an olde
 </Step>
 </Steps>
 
-A second, separate action — **Share with Community** — opens ByteChef's public template submission
+A second, separate action - **Share with Community** - opens ByteChef's public template submission
 form in a new tab, for projects and workflows you want listed in the official gallery (see
 [Templates](/platform/automation/build/workflows/templates)) rather than shared privately by link.
 

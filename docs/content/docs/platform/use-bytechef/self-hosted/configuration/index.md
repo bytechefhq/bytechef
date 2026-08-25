@@ -3,7 +3,7 @@ title: Configuration
 description: Learn how to configure your ByteChef instance
 ---
 
-ByteChef is configured entirely through **externalized configuration** — there is no settings screen inside the application for instance-wide options. Everything from the database connection to the AI provider keys is supplied before the process starts, so the same container image behaves differently per environment based on the values you pass in.
+ByteChef is configured entirely through **externalized configuration** - there is no settings screen inside the application for instance-wide options. Everything from the database connection to the AI provider keys is supplied before the process starts, so the same container image behaves differently per environment based on the values you pass in.
 
 ## How configuration is supplied
 
@@ -11,7 +11,7 @@ ByteChef is a Spring Boot application, so it reads configuration from the standa
 
 1. The bundled defaults (documented on the [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) page).
 2. An external `application.yml` / `application.properties` placed next to the process or pointed at with `--spring.config.additional-location`.
-3. **Environment variables** — the recommended mechanism for containers, and the form every example in this documentation uses.
+3. **Environment variables** - the recommended mechanism for containers, and the form every example in this documentation uses.
 
 Environment variables and YAML properties are interchangeable through Spring's **relaxed binding**: the property `bytechef.datasource.url` is the same setting as the environment variable `BYTECHEF_DATASOURCE_URL`. Uppercase the name, and replace dots and dashes with underscores. Indexed list entries use a trailing number, e.g. `bytechef.feature-flags[0]` becomes `BYTECHEF_FEATURE_FLAGS_0`.
 
@@ -40,7 +40,7 @@ Beyond the defaults, a single-node deployment needs only a handful of settings:
 | `BYTECHEF_DATASOURCE_URL`, `BYTECHEF_DATASOURCE_USERNAME`, `BYTECHEF_DATASOURCE_PASSWORD` | Point ByteChef at your PostgreSQL 15+ database. Schema migrations run automatically on startup. |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | A fixed secret used to sign "remember me" tokens. Set it to a stable random value so existing sessions survive restarts. |
 | `BYTECHEF_PUBLIC_URL` | The externally reachable base URL of the instance (default `http://127.0.0.1:8080`). It is the base for webhook URLs, the OAuth2 redirect URI, and links in outgoing mail. |
-| `BYTECHEF_ENCRYPTION_PROVIDER` / `BYTECHEF_ENCRYPTION_PROPERTY_KEY` | Controls how stored credentials are encrypted at rest — see below. |
+| `BYTECHEF_ENCRYPTION_PROVIDER` / `BYTECHEF_ENCRYPTION_PROPERTY_KEY` | Controls how stored credentials are encrypted at rest - see below. |
 
 ## Encryption of stored credentials
 
@@ -59,23 +59,23 @@ re-encryption pass.
 
 There is **one instance-wide encryption key**, chosen with `BYTECHEF_ENCRYPTION_PROVIDER`:
 
-- **`FILESYSTEM`** (default) — ByteChef generates an AES key on first start and writes it to the
+- **`FILESYSTEM`** (default) - ByteChef generates an AES key on first start and writes it to the
   local filesystem. This is fine for a single, persistent node, but it is **not** suitable for
   containers with ephemeral disks or for multi-instance deployments, because each replica would
   generate its own key and could not decrypt data written by the others.
-- **`PROPERTY`** — you supply the key yourself via `BYTECHEF_ENCRYPTION_PROPERTY_KEY`. Use this for
+- **`PROPERTY`** - you supply the key yourself via `BYTECHEF_ENCRYPTION_PROPERTY_KEY`. Use this for
   Kubernetes and any multi-replica setup so every instance shares one stable key. Store the key in a
   secret manager, never in source control.
 
 Back the key up with the same rigour as the database. A restored database without its key is a
-database of undecryptable credentials — see
+database of undecryptable credentials - see
 [Upgrades and backups](/platform/use-bytechef/self-hosted/management/upgrades). The key is not
 workspace- or tenant-scoped; isolation between tenants comes from the schema boundary, not from
 separate key material.
 
 ### What counts as a credential
 
-A connection's **authorization parameters** — OAuth access and refresh tokens, API keys and bearer
+A connection's **authorization parameters** - OAuth access and refresh tokens, API keys and bearer
 tokens, basic-auth pairs, certificate material and private keys used for client auth, and any custom
 auth fields a component definition declares. A component author declares the connection's properties
 once, and the platform treats them as credentials end-to-end. The REST controllers obfuscate
@@ -87,7 +87,7 @@ Encryption governs *where the secret lives*; it says nothing about who may use t
 
 ### Rotation
 
-Rotate a credential in one place — the connection edit screen. Workflows reference a connection by
+Rotate a credential in one place - the connection edit screen. Workflows reference a connection by
 id rather than inlining its secret, so every running and future execution picks up the new value with
 no workflow change and no redeploy.
 
@@ -98,7 +98,7 @@ no workflow change and no redeploy.
 ## Data retention
 
 ByteChef does not delete your data unless you tell it to, and there is no consolidated retention
-settings screen today — retention is configured per data type through the properties below.
+settings screen today - retention is configured per data type through the properties below.
 
 > **Coming soon.** Execution-history retention (`BYTECHEF_WORKFLOW_EXECUTION_RETENTION_*`) is on the
 > upcoming release track and is not yet available in the latest released version of ByteChef. It
@@ -107,7 +107,7 @@ settings screen today — retention is configured per data type through the prop
 > [Crash recovery](/platform/use-bytechef/self-hosted/management/crash-recovery) for the monitor's
 > cadence, its variables, and their defaults.
 
-Two things to plan for once you set a window. Deletion is not instantaneous — a scheduled monitor
+Two things to plan for once you set a window. Deletion is not instantaneous - a scheduled monitor
 sweeps on a fixed cadence and removes expired records in batches. And expired execution records take
 their [file storage](/platform/use-bytechef/self-hosted/configuration/file-storage) artifacts with
 them, so storage cost tracks the retention policy rather than growing without bound.
@@ -118,7 +118,7 @@ them, so storage cost tracks the retention policy rather than growing without bo
 |---|---|
 | [Environment variables](/platform/use-bytechef/self-hosted/configuration/environment-variables) | The complete, categorized reference for every setting and its default. |
 | [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers) | Choosing the broker that carries task dispatches between the coordinator and the workers. |
-| [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage) | Where the opaque bytes a workflow produces are kept — S3, the filesystem, or the database. |
+| [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage) | Where the opaque bytes a workflow produces are kept - S3, the filesystem, or the database. |
 | [Plan limits](/platform/use-bytechef/self-hosted/configuration/plan-limits) | Rate limits, concurrency slots, cost caps, and resource quotas per tenant. |
 
 ## Edition, tenancy, and sign-up
@@ -135,7 +135,7 @@ A few instance-wide switches shape the whole deployment:
 
 ## Verifying the resolved configuration
 
-Once the instance is running, the effective, merged configuration is exposed through the Actuator `env` endpoint at `/actuator/env`. That endpoint is protected — it is reachable only with the system administrator credentials set via `BYTECHEF_SECURITY_SYSTEM_USERNAME` / `BYTECHEF_SECURITY_SYSTEM_PASSWORD`. See [Observability](/platform/use-bytechef/self-hosted/management/observability) for the full Actuator surface.
+Once the instance is running, the effective, merged configuration is exposed through the Actuator `env` endpoint at `/actuator/env`. That endpoint is protected - it is reachable only with the system administrator credentials set via `BYTECHEF_SECURITY_SYSTEM_USERNAME` / `BYTECHEF_SECURITY_SYSTEM_PASSWORD`. See [Observability](/platform/use-bytechef/self-hosted/management/observability) for the full Actuator surface.
 
 ## Running multiple instances
 
@@ -158,10 +158,10 @@ switch, and both default to on:
 | Variable | Default | Effect when `false` |
 |---|---|---|
 | `BYTECHEF_WORKER_ENABLED` | `true` | The node stops executing tasks. It keeps coordinating jobs and keeps serving the API and UI. |
-| `BYTECHEF_COORDINATOR_ENABLED` | `true` | The node becomes a **headless task executor**: no API, no GraphQL, no UI — see below. |
+| `BYTECHEF_COORDINATOR_ENABLED` | `true` | The node becomes a **headless task executor**: no API, no GraphQL, no UI - see below. |
 
 > **Disabling the coordinator also disables the API.** The switch does not gate job coordination
-> alone — it gates the application surface. Of the 224 classes behind it, 211 are controllers: 87
+> alone - it gates the application surface. Of the 224 classes behind it, 211 are controllers: 87
 > REST API controllers and 104 GraphQL controllers, including account, workflow, connection and
 > project endpoints. A node with `BYTECHEF_COORDINATOR_ENABLED=false` executes tasks and answers
 > nothing else.
@@ -169,7 +169,7 @@ switch, and both default to on:
 That gives you one useful topology: **one node with both halves on**, serving the API and UI and
 coordinating jobs, plus **as many `BYTECHEF_COORDINATOR_ENABLED=false` nodes as you need** to
 execute tasks. Task execution is normally what needs the capacity, so this is the axis worth
-scaling — add executors without adding application nodes.
+scaling - add executors without adding application nodes.
 
 Three things to get right:
 
@@ -183,8 +183,8 @@ Three things to get right:
 - **Do not turn both off on the same node.** Nothing prevents it, and the result is an instance
   that does nothing at all.
 
-Running more than one node with the coordinator enabled is supported — they are ordinary replicas
-once the table above is satisfied — but the coordinator is rarely the bottleneck, so scale the
+Running more than one node with the coordinator enabled is supported - they are ordinary replicas
+once the table above is satisfied - but the coordinator is rarely the bottleneck, so scale the
 executors first.
 
 #### Routing tasks to specific workers

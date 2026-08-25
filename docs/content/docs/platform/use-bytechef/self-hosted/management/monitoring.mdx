@@ -7,15 +7,15 @@ description: Learn how to monitor your ByteChef instance
 
 ByteChef exposes Spring Boot Actuator health probes, split into Kubernetes-friendly groups:
 
-- `GET /actuator/health/liveness` — is the process alive? Use for liveness probes and load-balancer up/down checks.
-- `GET /actuator/health/readiness` — is it ready to serve traffic (database reachable, migrations applied)? Use for readiness probes.
-- `GET /actuator/health` — full detail. All three are **unauthenticated**, and health details ship as `always`, so anyone who can reach the port sees component-level health.
+- `GET /actuator/health/liveness` - is the process alive? Use for liveness probes and load-balancer up/down checks.
+- `GET /actuator/health/readiness` - is it ready to serve traffic (database reachable, migrations applied)? Use for readiness probes.
+- `GET /actuator/health` - full detail. All three are **unauthenticated**, and health details ship as `always`, so anyone who can reach the port sees component-level health.
 
 See [Observability](/platform/use-bytechef/self-hosted/management/observability) for metrics, tracing, and the complete Actuator surface.
 
 ## Administrative access to the management surface
 
-The Actuator endpoints that expose sensitive data — `/actuator/env`, `/actuator/configprops`, `/actuator/loggers`, `/actuator/threaddump` and `/actuator/logfile` — are gated behind a **system administrator** account (HTTP Basic), separate from application users. The health, info, metrics and Prometheus endpoints are deliberately left open for probes and scrapers. Set the administrator credentials with:
+The Actuator endpoints that expose sensitive data - `/actuator/env`, `/actuator/configprops`, `/actuator/loggers`, `/actuator/threaddump` and `/actuator/logfile` - are gated behind a **system administrator** account (HTTP Basic), separate from application users. The health, info, metrics and Prometheus endpoints are deliberately left open for probes and scrapers. Set the administrator credentials with:
 
 - `BYTECHEF_SECURITY_SYSTEM_USERNAME` (default `system_admin`)
 - `BYTECHEF_SECURITY_SYSTEM_PASSWORD`

@@ -28,7 +28,7 @@ Signing Keys produce an RSA keypair. The **public key stays in ByteChef**; the *
 
 1. In the ByteChef UI, go to **Embedded → Settings → Signing Keys**.
 2. Click **New Signing Key** and give it a name (e.g. `web-app-dev`).
-3. Copy the **private key** that's displayed — you will not see it again.
+3. Copy the **private key** that's displayed - you will not see it again.
 4. Note the **Key Id** (`kid`) shown in the table after the dialog closes.
 
 {/* TODO screenshot: the Create Signing Key dialog, including the one-time secret reveal state */}
@@ -39,13 +39,13 @@ You'll store the private key as a secret in your backend (e.g. `BYTECHEF_SIGNING
 
 ## 2. Create an API Key (optional, for server-to-server calls)
 
-If your backend needs to call the embedded API on behalf of your users without minting a JWT — listing a user's integrations, managing their workflows, executing a component action — create an API Key:
+If your backend needs to call the embedded API on behalf of your users without minting a JWT - listing a user's integrations, managing their workflows, executing a component action - create an API Key:
 
 1. Go to **Embedded → Settings → API Keys**.
 2. Click **New API Key**, give it a name.
-3. Copy the **secret key** — also shown only once.
+3. Copy the **secret key** - also shown only once.
 
-Use it in an `Authorization: Bearer <secret>` header against the public API's `/{externalUserId}`-prefixed routes, e.g. `GET /api/embedded/v1/{externalUserId}/integrations` — with an API Key, the connected user is identified by the path segment instead of a JWT `sub` claim. That path segment is required: a request without it has no user to resolve and is rejected, which is why API Keys do not work on the `/api/embedded/internal` endpoints (including workflow executions, which live only there and are read from the ByteChef admin UI or with a Signing Key JWT).
+Use it in an `Authorization: Bearer <secret>` header against the public API's `/{externalUserId}`-prefixed routes, e.g. `GET /api/embedded/v1/{externalUserId}/integrations` - with an API Key, the connected user is identified by the path segment instead of a JWT `sub` claim. That path segment is required: a request without it has no user to resolve and is rejected, which is why API Keys do not work on the `/api/embedded/internal` endpoints (including workflow executions, which live only there and are read from the ByteChef admin UI or with a Signing Key JWT).
 
 ---
 
@@ -138,11 +138,11 @@ When the user clicks the button, the SDK opens the ByteChef-hosted connect dialo
 {/* TODO screenshot: the ByteChef Connect dialog as it renders inside a host application, showing the integration list and a Connect button */}
 
 <Callout title="Component-defined workflow inputs">
-    Beyond connecting and enabling workflows, the connect dialog can also collect **workflow inputs** from the user. When a workflow input references a component (for example, "pick a Slack channel" or "choose a HubSpot pipeline"), the dialog renders the component's own input group — including dynamic dropdowns whose options are fetched live against the user's connection. Dependent fields resolve in order, so a selection can filter the next one (for example, choose a workspace and then one of its channels). This works the same for workflows you expose as MCP tools. The user's selections are saved per integration instance, so each connected user configures the workflow with their own data without you building any of those forms yourself.
+    Beyond connecting and enabling workflows, the connect dialog can also collect **workflow inputs** from the user. When a workflow input references a component (for example, "pick a Slack channel" or "choose a HubSpot pipeline"), the dialog renders the component's own input group - including dynamic dropdowns whose options are fetched live against the user's connection. Dependent fields resolve in order, so a selection can filter the next one (for example, choose a workspace and then one of its channels). This works the same for workflows you expose as MCP tools. The user's selections are saved per integration instance, so each connected user configures the workflow with their own data without you building any of those forms yourself.
 
-    The dialog can also collect a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** — let the user pick a remote object type and map your application's fields to the connected integration's fields, with the option lists fetched live against their connection.
+    The dialog can also collect a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** - let the user pick a remote object type and map your application's fields to the connected integration's fields, with the option lists fetched live against their connection.
 
-    Not every input belongs in front of the end user. An input declared `internalOnly` in the workflow definition is filtered out of the connect dialog — see [internal-only workflow inputs](/platform/embedded/configure/instance-configurations#internal-only-workflow-inputs). Inputs are end-user-facing by default.
+    Not every input belongs in front of the end user. An input declared `internalOnly` in the workflow definition is filtered out of the connect dialog - see [internal-only workflow inputs](/platform/embedded/configure/instance-configurations#internal-only-workflow-inputs). Inputs are end-user-facing by default.
 </Callout>
 
 ---
@@ -158,7 +158,7 @@ Authorization: Bearer <end-user JWT>
 X-Environment: DEVELOPMENT
 ```
 
-The connected user is identified by the JWT `sub` claim. ByteChef looks up that user's enabled integration instances and starts an execution for every enabled workflow that carries an **App Event** trigger. The endpoint takes no request body and no event name, so the App Event Id selected on a trigger does not narrow the fan-out — see [App Events](/platform/embedded/build/app-events) for what that means in practice.
+The connected user is identified by the JWT `sub` claim. ByteChef looks up that user's enabled integration instances and starts an execution for every enabled workflow that carries an **App Event** trigger. The endpoint takes no request body and no event name, so the App Event Id selected on a trigger does not narrow the fan-out - see [App Events](/platform/embedded/build/app-events) for what that means in practice.
 
 See **[App Events](/platform/embedded/build/app-events)** for how to declare event names and JSON schemas.
 
@@ -166,10 +166,10 @@ See **[App Events](/platform/embedded/build/app-events)** for how to declare eve
 
 ## 9. Inspect what happened
 
-- **Embedded → Connected Users** — confirm your end user appears with the integrations they connected.
-- **Embedded → Connections** — see the credentials they authorized.
-- **Embedded → Automations** — view the active workflows for each user.
-- **Embedded → Workflow Executions** — drill into every run, step by step.
+- **Embedded → Connected Users** - confirm your end user appears with the integrations they connected.
+- **Embedded → Connections** - see the credentials they authorized.
+- **Embedded → Automations** - view the active workflows for each user.
+- **Embedded → Workflow Executions** - drill into every run, step by step.
 
 ---
 
@@ -203,16 +203,16 @@ export function WorkflowEditor({jwtToken, workflowUuid, sharedConnectionIds}: {
 
 Pass `includeComponents={['slack', 'gmail', ...]}` to restrict the component palette to a specific set (omit it to allow all). The parent container must be positioned (`position: relative`) with a defined height because the builder fills it.
 
-You can also generate a starter workflow for a user from a natural-language prompt *(coming soon — depends on the AI Copilot, which is on the upcoming release track)* — `POST /api/embedded/v1/automation/workflows/generate` with `{ "prompt": "..." }` returns a new workflow UUID built by AI Copilot, which you can then open in the builder.
+You can also generate a starter workflow for a user from a natural-language prompt *(coming soon - depends on the AI Copilot, which is on the upcoming release track)* - `POST /api/embedded/v1/automation/workflows/generate` with `{ "prompt": "..." }` returns a new workflow UUID built by AI Copilot, which you can then open in the builder.
 
 ---
 
 ## Next steps
 
 - Connect-dialog branding customization is on the roadmap; today the dialog ships with a neutral built-in theme.
-- Add more integrations and version them — publish a `V2` while `V1` continues running for existing users.
+- Add more integrations and version them - publish a `V2` while `V1` continues running for existing users.
 - Restrict integrations or individual workflows to a subset of users with **[Permission Expressions](/platform/embedded/build/integrations)**.
-- Create the equivalent instance configuration in Staging and Production. Each environment keeps its own configurations, so you recreate (or re-point) a configuration per environment — there is no promote operation that moves one between them.
+- Create the equivalent instance configuration in Staging and Production. Each environment keeps its own configurations, so you recreate (or re-point) a configuration per environment - there is no promote operation that moves one between them.
 - Expose components as **[MCP Servers](/platform/embedded/configure/mcp-servers)** so AI agents can use them as tools.
 
 Stuck? Contact [support@bytechef.io](mailto:support@bytechef.io).

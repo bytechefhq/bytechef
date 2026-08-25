@@ -134,7 +134,7 @@ For **Model**, choose the desired model (e.g., `gpt-4`).
 </Step>
 <Step>
 
-Leave **Format** on **Simple** — the default, which asks for a prompt rather than a full message list.
+Leave **Format** on **Simple** - the default, which asks for a prompt rather than a full message list.
 
 </Step>
 <Step>
@@ -209,7 +209,7 @@ Use **Test Action** to run the action for real, or the **…** menu beside it fo
 </Step>
 <Step>
 
-**Test Action** executes the action and shows its real output — in this case, `5`.
+**Test Action** executes the action and shows its real output - in this case, `5`.
 
 </Step>
 <Step>
@@ -281,7 +281,7 @@ After picking **Schedule → Cron**, set the expression and timezone on the **Pr
 
 > **Coming soon.** Multiple triggers per workflow are on the upcoming release track and are not yet available in the latest released version of ByteChef.
 
-A workflow can have **more than one trigger** — for example, run on a schedule *and* on an incoming webhook. Use the add-trigger button next to the existing trigger to attach another one; on deployment every trigger is enabled, and any of them can start a run of the same workflow.
+A workflow can have **more than one trigger** - for example, run on a schedule *and* on an incoming webhook. Use the add-trigger button next to the existing trigger to attach another one; on deployment every trigger is enabled, and any of them can start a run of the same workflow.
 
 ### Edit Component
 
@@ -307,7 +307,7 @@ For moving large volumes of records between systems (bulk sync, export, migratio
 
 ### Canvas Layout
 
-The editor arranges your nodes automatically in a tidy top-down flow as you build. You can still drag any node to a custom position — those positions are saved with the workflow.
+The editor arranges your nodes automatically in a tidy top-down flow as you build. You can still drag any node to a custom position - those positions are saved with the workflow.
 
 To discard your manual positions and snap everything back to the automatic layout, click the **Reset layout** button (the broom icon) in the canvas toolbar. To reset a single node instead, open that node's menu and choose **Reset position** (shown only when the node has been moved).
 
@@ -315,7 +315,7 @@ To discard your manual positions and snap everything back to the automatic layou
 
 > **Coming soon.** Sticky notes are on the upcoming release track and are not yet available in the latest released version of ByteChef.
 
-Sticky notes let you annotate the workflow canvas — describe what a section does, leave review comments, or link a walkthrough video. They are documentation only and are never executed.
+Sticky notes let you annotate the workflow canvas - describe what a section does, leave review comments, or link a walkthrough video. They are documentation only and are never executed.
 
 <Steps>
 <Step>
@@ -325,7 +325,7 @@ Click the **sticky note icon** (Add note) in the editor toolbar. A note appears 
 </Step>
 <Step>
 
-**Double-click** the note to edit its text — Markdown is supported, and pasted YouTube links render as embedded videos.
+**Double-click** the note to edit its text - Markdown is supported, and pasted YouTube links render as embedded videos.
 
 </Step>
 <Step>
@@ -344,7 +344,7 @@ Sticky notes are saved with the workflow, so everyone who opens it sees the same
 
 ### Canvas Controls
 
-A toolbar in the corner of the canvas gives you control over how the workflow is laid out and viewed. None of these controls change what the workflow does — they only affect the editing view.
+A toolbar in the corner of the canvas gives you control over how the workflow is laid out and viewed. None of these controls change what the workflow does - they only affect the editing view.
 
 ![The canvas toolbar](workflows/canvas-toolbar.png)
 
@@ -364,7 +364,7 @@ A toolbar in the corner of the canvas gives you control over how the workflow is
 
 ## Workflow Inputs
 
-Workflow inputs are values supplied to a run from the outside — a caller's parameters, a deployment configuration, or a test value you enter in the editor. Open the **Workflow Inputs** panel from the right sidebar to define them.
+Workflow inputs are values supplied to a run from the outside - a caller's parameters, a deployment configuration, or a test value you enter in the editor. Open the **Workflow Inputs** panel from the right sidebar to define them.
 
 ![The Workflow Inputs sheet with the Create a new Input dialog open](workflows/workflow-inputs.png)
 
@@ -376,7 +376,7 @@ In the workflow editor, click the **Workflow Inputs** icon in the right sidebar.
 </Step>
 <Step>
 
-Click **+** to add an input, then set its fields: - **Type** — one of Boolean, Date, Date Time, Integer, Number, String, or Time. (Two further types, **Field Mapping** and **Component property**, are on the upcoming release track and are not yet available in the latest released version of ByteChef.) - **Name** — the key used to reference the input as a dynamic value. - **Label** — the human-readable label shown when the input is filled in. - **Required** — whether a value must be provided. - **Test Value** — a value used only when you run the workflow in the editor's test mode.
+Click **+** to add an input, then set its fields: - **Type** - one of Boolean, Date, Date Time, Integer, Number, String, or Time. (Two further types, **Field Mapping** and **Component property**, are on the upcoming release track and are not yet available in the latest released version of ByteChef.) - **Name** - the key used to reference the input as a dynamic value. - **Label** - the human-readable label shown when the input is filled in. - **Required** - whether a value must be provided. - **Test Value** - a value used only when you run the workflow in the editor's test mode.
 
 </Step>
 <Step>
@@ -510,8 +510,8 @@ project you're currently editing.
 ### Deploy
 
 **Deploy** opens the same [Create Deployment](/platform/automation/build/workflows/projects) dialog
-used from the Project Deployments page, pre-scoped to the current project. It's disabled — with a
-"Publish the project to enable deployment" tooltip — until the project has at least one published
+used from the Project Deployments page, pre-scoped to the current project. It's disabled - with a
+"Publish the project to enable deployment" tooltip - until the project has at least one published
 version, since a deployment always targets a published version, never a draft. Its **New** tab
 creates a fresh deployment (**Environment**, **Version**, **Name**, **Description**, **Tags**); its
 **Change Version** tab repoints an existing deployment at a different published version.
@@ -521,7 +521,7 @@ creates a fresh deployment (**Environment**, **Version**, **Name**, **Descriptio
 The header's **Test** button runs the current workflow from its trigger and streams the run's
 progress and result into the **Output panel** at the bottom of the editor; while a run is
 in-flight, the button turns into a **Stop** button that cancels it. If the workflow's trigger is a
-chat trigger, the same button is labeled **Chat** instead — clicking it opens the
+chat trigger, the same button is labeled **Chat** instead - clicking it opens the
 [test chat panel](#test-with-chat) rather than starting a run immediately, and you drive the run by
 sending it messages.
 
@@ -532,7 +532,7 @@ without triggering a new one.
 ### Project History
 
 The settings menu's **Project** tab has a **Project History** entry that opens a side sheet listing
-every version of the project — version number, publish date, a **Published**/**Draft** badge, and
+every version of the project - version number, publish date, a **Published**/**Draft** badge, and
 the version's description. It's the project-scoped, always-available counterpart to the
 environment-pinning story covered in
 [Deploying workflows](/platform/automation/deploy/workflows): Project History shows
@@ -543,10 +543,10 @@ every version regardless of which environment, if any, currently has it pinned.
 ### Test with Chat
 
 For a chat-triggered workflow, the test chat panel lets you exchange messages with the workflow the
-same way an end user would through a deployed [chat](/platform/automation/deploy/chats) — type a
+same way an end user would through a deployed [chat](/platform/automation/deploy/chats) - type a
 message, send it, and the reply streams into the same thread as the run executes.
 
-{/* Voice test sessions are coming soon — not in the latest released version, so this section is
+{/* Voice test sessions are coming soon - not in the latest released version, so this section is
 commented out until the browser/v1/voiceSession trigger ships. Tracked in
 .agents/coming-soon-inventory.md.
 
@@ -555,8 +555,8 @@ the composer only when your browser supports the required APIs (AudioContext, Au
 microphone access, and WebSocket, over a secure connection) and the trigger you're testing is one
 that supports a live, streaming connection. Starting a session asks for microphone permission,
 streams your audio to the workflow over a WebSocket, and speaks the assistant's replies back while
-transcribing both sides into the same chat thread as typed messages. Click the button again — now
-shown as a red stop icon — to end the session; a red banner surfaces any connection or permission
+transcribing both sides into the same chat thread as typed messages. Click the button again - now
+shown as a red stop icon - to end the session; a red banner surfaces any connection or permission
 error inline in the panel. */}
 
 ## Delete Workflow

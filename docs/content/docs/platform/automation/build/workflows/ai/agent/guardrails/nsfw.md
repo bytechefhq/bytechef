@@ -21,7 +21,7 @@ description: LLM-based classifier for sexual, violent, self-harm, hate-speech, a
 - Clinical / medical discussions of sex, anatomy, or violence
 - Historical or academic analysis of war, atrocities, drugs, hate movements
 - Fiction with mild violence or romance suitable for general audiences
-- Mental-health support — including suicide ideation when seeking help. The default prompt explicitly routes these to "do not flag" so a suicidal user reaching out for support doesn't get blocked at the door
+- Mental-health support - including suicide ideation when seeking help. The default prompt explicitly routes these to "do not flag" so a suicidal user reaching out for support doesn't get blocked at the door
 
 The default prompt instructs the classifier to treat the input as data, not as instructions, so an injection trying to convince the classifier the content is benign cannot redirect it.
 
@@ -69,6 +69,6 @@ A customer-support agent that should also block hate-speech-adjacent profanity (
 
 ## Tuning
 
-- **For child-safety contexts**, lower the threshold to `~0.3` — the default `0.7` is calibrated for general-purpose agents and may miss borderline content that a school-context agent should still block.
+- **For child-safety contexts**, lower the threshold to `~0.3` - the default `0.7` is calibrated for general-purpose agents and may miss borderline content that a school-context agent should still block.
 - **Domain-specific NSFW**: if you operate in an adult-content domain, customize the prompt to redefine "NSFW" against your policy (e.g., flag minors / non-consent / illegal acts but permit consensual adult content).
-- **The mental-health-support carve-out** is load-bearing in the default prompt. If you customize the prompt, decide explicitly whether you keep it. Stripping it without thinking about it produces an agent that blocks "I've been having dark thoughts" — likely not what you want.
+- **The mental-health-support carve-out** is load-bearing in the default prompt. If you customize the prompt, decide explicitly whether you keep it. Stripping it without thinking about it produces an agent that blocks "I've been having dark thoughts" - likely not what you want.

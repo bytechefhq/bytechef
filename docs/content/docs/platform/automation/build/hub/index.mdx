@@ -1,6 +1,6 @@
 ---
 title: AI Hub
-description: The workspace's AI surface — chats with the assistant, workflow chats, and agent chats in one place.
+description: The workspace's AI surface - chats with the assistant, workflow chats, and agent chats in one place.
 index: true
 ee: true
 comingSoon: true
@@ -9,18 +9,18 @@ comingSoon: true
 import {Card, Cards} from "fumadocs-ui/components/card";
 import {Bot, MessageSquare, Sparkles} from "lucide-react";
 
-{/* TODO screenshot: AI Hub home — chats sidebar on the left (New Chat / More above the Chats list), the home composer in the main panel with the model picker open */}
+{/* TODO screenshot: AI Hub home - chats sidebar on the left (New Chat / More above the Chats list), the home composer in the main panel with the model picker open */}
 
-The **AI Hub** is the conversational home of your automation workspace. It gathers every way you talk to AI in ByteChef — the general-purpose assistant, chat-enabled workflows, and deployed AI agents — into one sidebar of chats, with shared attachments, memory, and model selection.
+The **AI Hub** is the conversational home of your automation workspace. It gathers every way you talk to AI in ByteChef - the general-purpose assistant, chat-enabled workflows, and deployed AI agents - into one sidebar of chats, with shared attachments, memory, and model selection.
 
 ## What lives in the AI Hub
 
 <Cards>
   <Card icon={<Sparkles className="text-purple-300" />} title="Assistant chats">
-    Chat with the workspace assistant: ask questions, research, generate images and slides, read data tables and knowledge bases, run workflows — each chat keeps its own history.
+    Chat with the workspace assistant: ask questions, research, generate images and slides, read data tables and knowledge bases, run workflows - each chat keeps its own history.
   </Card>
   <Card icon={<MessageSquare className="text-green-300" />} title="Workflow Chats" href="/platform/automation/build/hub/workflow-chats">
-    Chats bound to a chat-enabled workflow — a message triggers the workflow and the reply streams back.
+    Chats bound to a chat-enabled workflow - a message triggers the workflow and the reply streams back.
   </Card>
   <Card icon={<Bot className="text-amber-300" />} title="Agent Chats">
     Chats with a deployed AI agent (**Build → Agents**) whose workflow exposes a hosted chat trigger. An agent chat is a workflow chat against the agent's own generated workflow.
@@ -31,56 +31,56 @@ The **AI Hub** is the conversational home of your automation workspace. It gathe
 
 The left sidebar is the AI Hub's navigation. Above the chat list sit two entries:
 
-- **New Chat** — returns to the home view with an empty composer.
-- **More** — a menu linking to **Connectors**, **Memories**, and **Skills**.
+- **New Chat** - returns to the home view with an empty composer.
+- **More** - a menu linking to **Connectors**, **Memories**, and **Skills**.
 
-Below them, **Chats** lists **your own** chats in the current workspace and environment — chats are per-user, so you never see another user's threads — with a search box and an **Archive** toggle.
+Below them, **Chats** lists **your own** chats in the current workspace and environment - chats are per-user, so you never see another user's threads - with a search box and an **Archive** toggle.
 
 ## Starting a chat
 
-The composer's **provider popup** — the model picker in the composer, on the home view — is the single launcher for every kind of chat. Opening it shows a provider search box and then two cascades above the provider list:
+The composer's **provider popup** - the model picker in the composer, on the home view - is the single launcher for every kind of chat. Opening it shows a provider search box and then two cascades above the provider list:
 
-- **Agents** — every deployed AI agent (from **Build → Agents**) whose enabled deployment exposes a hosted chat trigger, listed by the agent's title. When none qualifies, the submenu says so rather than disappearing.
-- **Workflows** — every chat-enabled workflow deployed in the selected environment, listed as `project — workflow`. Every pick starts a fresh chat; earlier chats against the same workflow stay in the list.
+- **Agents** - every deployed AI agent (from **Build → Agents**) whose enabled deployment exposes a hosted chat trigger, listed by the agent's title. When none qualifies, the submenu says so rather than disappearing.
+- **Workflows** - every chat-enabled workflow deployed in the selected environment, listed as `project - workflow`. Every pick starts a fresh chat; earlier chats against the same workflow stay in the list.
 
-Agents live in hidden backing projects, so an agent never also appears under **Workflows** — the two lists are disjoint.
+Agents live in hidden backing projects, so an agent never also appears under **Workflows** - the two lists are disjoint.
 
 Below the cascades, the same popup selects which provider and model answers the chat.
 
 <Callout title="No more Workflow Chats page">
-  The AI Hub used to carry a separate **Workflow Chats** page in its sidebar. It's gone: the provider popup's **Agents** and **Workflows** cascades launch those chats directly, so there is one way in instead of two. Community Edition, which has no AI Hub, still has its own standalone **Chats** page — see [Workflow Chats](/platform/automation/build/hub/workflow-chats).
+  The AI Hub used to carry a separate **Workflow Chats** page in its sidebar. It's gone: the provider popup's **Agents** and **Workflows** cascades launch those chats directly, so there is one way in instead of two. Community Edition, which has no AI Hub, still has its own standalone **Chats** page - see [Workflow Chats](/platform/automation/build/hub/workflow-chats).
 </Callout>
 
 ## Working in a chat
 
-{/* TODO screenshot: chat composer close-up — model picker dropdown open showing the Agents / Workflows cascades above the catalog models, microphone and attachment buttons visible */}
+{/* TODO screenshot: chat composer close-up - model picker dropdown open showing the Agents / Workflows cascades above the catalog models, microphone and attachment buttons visible */}
 
-- **Model picker** — choose which activated [AI provider](/platform/settings/ai-providers) and model answers each chat; different chats can run on different models. This is the same popup that carries the Agents / Workflows cascades, and it is wired into both the home composer and the in-chat composer.
-- **Attachments and files** — the paperclip button (and drag-and-drop) upload files into a chat, and anything the assistant produces (files, charts, data tables, knowledge bases, workflow executions, workflows, custom components, code workflows) opens in a viewer panel beside the chat.
-- **Reference resources** — the **+** button opens the **Resources** menu: a picker for referencing an existing file, workflow, data table, knowledge base, or execution in the message, plus **Connectors** and **Skills** branches. The reference is added as context the assistant can read **and opens in the right-hand panel immediately** — including on the home view, before the chat itself exists.
-- **Connectors** — the Resources menu's **Connectors** branch lists the component connectors available to you, each with a switch controlling whether it acts in *this* chat, plus a **Manage connectors** link to add more or configure their tools. Enabled connectors let the assistant act in those apps on your behalf. On the home view there is no chat yet, so the switches are absent and the list reads as availability only.
-- **Specialist agents** — alongside the general assistant, the AI Hub routes to focused Ask + Build specialists. The `buildCustomComponent` tool lists, explains, creates, and updates [custom components](/platform/settings/components/custom-components), and the `buildCodeWorkflow` tool does the same for [code workflows](/platform/automation/build/workflows/code-workflows). Referenced custom components and code workflows appear in the chat sidebar and open — editable — in the right panel.
-- **Asset files** — the assistant lists and reads [asset files](/platform/automation/data/asset-files) directly; creating or editing a file (writing new content, replacing a file's content, downloading from a URL, storing binary content, or cloning a file into another environment) routes through the `asset_file_agent` specialist.
+- **Model picker** - choose which activated [AI provider](/platform/settings/ai-providers) and model answers each chat; different chats can run on different models. This is the same popup that carries the Agents / Workflows cascades, and it is wired into both the home composer and the in-chat composer.
+- **Attachments and files** - the paperclip button (and drag-and-drop) upload files into a chat, and anything the assistant produces (files, charts, data tables, knowledge bases, workflow executions, workflows, custom components, code workflows) opens in a viewer panel beside the chat.
+- **Reference resources** - the **+** button opens the **Resources** menu: a picker for referencing an existing file, workflow, data table, knowledge base, or execution in the message, plus **Connectors** and **Skills** branches. The reference is added as context the assistant can read **and opens in the right-hand panel immediately** - including on the home view, before the chat itself exists.
+- **Connectors** - the Resources menu's **Connectors** branch lists the component connectors available to you, each with a switch controlling whether it acts in *this* chat, plus a **Manage connectors** link to add more or configure their tools. Enabled connectors let the assistant act in those apps on your behalf. On the home view there is no chat yet, so the switches are absent and the list reads as availability only.
+- **Specialist agents** - alongside the general assistant, the AI Hub routes to focused Ask + Build specialists. The `buildCustomComponent` tool lists, explains, creates, and updates [custom components](/platform/settings/components/custom-components), and the `buildCodeWorkflow` tool does the same for [code workflows](/platform/automation/build/workflows/code-workflows). Referenced custom components and code workflows appear in the chat sidebar and open - editable - in the right panel.
+- **Asset files** - the assistant lists and reads [asset files](/platform/automation/data/asset-files) directly; creating or editing a file (writing new content, replacing a file's content, downloading from a URL, storing binary content, or cloning a file into another environment) routes through the `asset_file_agent` specialist.
 
-{/* Voice is coming soon — not in the latest released version. Tracked in .agents/coming-soon-inventory.md.
+{/* Voice is coming soon - not in the latest released version. Tracked in .agents/coming-soon-inventory.md.
 Voice - the microphone button in the composer starts a spoken interaction instead of typing. */}
 
-- **Memories** — durable facts the assistant learns are saved automatically and listed on the **Memories** page (sidebar → **More** → **Memories**), where you can review and delete them. The same auto-memory capability is available inside workflow [AI Agents](/platform/automation/build/workflows/ai/agent) via the Agent Utils **Auto Memory** tool, scoped to the deployment instead of the user.
-- **Skills** — type `/` at the start of the composer to open a picker over your [skills](/platform/automation/ai/skills) (the same set as the **AI → Skills** page), or use the Resources menu's **Skills** branch. Either way the picked skill becomes a chip above the input rather than text in the message, so several skills can be armed for one turn, and the assistant consults their content to steer the run.
-- **Chats sidebar** — every chat is listed in the collapsible sidebar so you can return to or archive past threads.
+- **Memories** - durable facts the assistant learns are saved automatically and listed on the **Memories** page (sidebar → **More** → **Memories**), where you can review and delete them. The same auto-memory capability is available inside workflow [AI Agents](/platform/automation/build/workflows/ai/agent) via the Agent Utils **Auto Memory** tool, scoped to the deployment instead of the user.
+- **Skills** - type `/` at the start of the composer to open a picker over your [skills](/platform/automation/ai/skills) (the same set as the **AI → Skills** page), or use the Resources menu's **Skills** branch. Either way the picked skill becomes a chip above the input rather than text in the message, so several skills can be armed for one turn, and the assistant consults their content to steer the run.
+- **Chats sidebar** - every chat is listed in the collapsible sidebar so you can return to or archive past threads.
 
-{/* TODO screenshot: AI Hub right-hand resource panel open beside a chat — a viewer tab (e.g. a data table or workflow) with the panel's tab strip and close toggle */}
+{/* TODO screenshot: AI Hub right-hand resource panel open beside a chat - a viewer tab (e.g. a data table or workflow) with the panel's tab strip and close toggle */}
 
 ## Managing connectors and MCP servers
 
 The **Manage connectors** link at the bottom of the Resources menu's **Connectors** branch opens the AI Hub's connectors page, where you decide which tools the assistant can call. It has two lists.
 
-{/* TODO screenshot: AI Hub connectors page — the component connectors list (each row with an enable toggle, a tools chevron, and an ellipsis menu) above the custom MCP servers list, with the Add connector and Add MCP server buttons */}
+{/* TODO screenshot: AI Hub connectors page - the component connectors list (each row with an enable toggle, a tools chevron, and an ellipsis menu) above the custom MCP servers list, with the Add connector and Add MCP server buttons */}
 
 ### Component connectors
 
 1. Click **Add connector** and pick a component from the grid.
-2. If the component needs a connection and none exists yet, its row shows a **Connect** action — click it to create or choose a connection in the **Connect** dialog. (The row's ellipsis menu also offers **Connect** to change the connection later.)
+2. If the component needs a connection and none exists yet, its row shows a **Connect** action - click it to create or choose a connection in the **Connect** dialog. (The row's ellipsis menu also offers **Connect** to change the connection later.)
 3. Toggle the connector **on/off** to control whether the assistant may use it at all.
 4. Expand the row's **tools** chevron to enable or disable individual actions, and click a tool's **Configure** (gear) button to preset parameter values for it, so the assistant only has to supply the rest.
 5. Remove a connector from the ellipsis menu's **Delete**.
@@ -91,7 +91,7 @@ The **Manage connectors** link at the bottom of the Resources menu's **Connector
 2. Expand the server row to see its tools, which are discovered live from the server; toggle the whole server or individual tools on and off.
 3. Remove a server from its row's delete action.
 
-Per chat, the Resources menu's **Connectors** branch still lets you toggle any enabled connector on or off for just that chat — this page sets what is available in the first place. A connector disabled here is unavailable everywhere and drops out of the per-chat list entirely.
+Per chat, the Resources menu's **Connectors** branch still lets you toggle any enabled connector on or off for just that chat - this page sets what is available in the first place. A connector disabled here is unavailable everywhere and drops out of the per-chat list entirely.
 
 ## How the assistant's tools are wired
 
@@ -143,4 +143,4 @@ BYTECHEF_AI_HUB_ENABLED=true
 
 It uses the models you activate in [AI Providers](/platform/settings/ai-providers), so at least one chat provider must be configured for the environment.
 
-The workspace's [AI Guardrails](/platform/automation/settings/ai-agents/guardrails) policy also applies to AI Hub chat turns — the same PII/secret redaction, blocked terms, moderation, and injection detection enforced on the AI Gateway and canvas AI Agent.
+The workspace's [AI Guardrails](/platform/automation/settings/ai-agents/guardrails) policy also applies to AI Hub chat turns - the same PII/secret redaction, blocked terms, moderation, and injection detection enforced on the AI Gateway and canvas AI Agent.

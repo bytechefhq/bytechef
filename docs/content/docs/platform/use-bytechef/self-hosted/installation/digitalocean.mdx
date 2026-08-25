@@ -8,7 +8,7 @@ ByteChef runs on DigitalOcean as the container image `docker.bytechef.io/byteche
 ## Prerequisites
 
 - A DigitalOcean account (and `doctl` if you prefer the CLI).
-- A **Managed PostgreSQL 15+** database cluster, with a `bytechef` database and its connection details (host, port, user, password). DigitalOcean managed databases require SSL — append `?sslmode=require` to the JDBC URL.
+- A **Managed PostgreSQL 15+** database cluster, with a `bytechef` database and its connection details (host, port, user, password). DigitalOcean managed databases require SSL - append `?sslmode=require` to the JDBC URL.
 
 ## Deploy
 
@@ -33,9 +33,9 @@ PostgreSQL database.
    ```
 
 4. Set the App's health check to `GET /actuator/health/readiness` on port `8080`.
-5. Deploy. App Platform terminates TLS and gives the app a public URL — set `BYTECHEF_PUBLIC_URL` to that URL.
+5. Deploy. App Platform terminates TLS and gives the app a public URL - set `BYTECHEF_PUBLIC_URL` to that URL.
 
-App Platform containers have ephemeral local storage, and file storage defaults to **`filesystem`** — so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database rather than on a disk that disappears with the container.
+App Platform containers have ephemeral local storage, and file storage defaults to **`filesystem`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database rather than on a disk that disappears with the container.
 
 </Tab>
 <Tab value="Droplet with Docker">

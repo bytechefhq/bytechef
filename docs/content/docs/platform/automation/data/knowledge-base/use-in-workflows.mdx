@@ -12,26 +12,26 @@ an [AI agent](/platform/automation/build/workflows/ai/agent) as its retrieval la
 Add the Knowledge Base **Search Data** action to a workflow to fetch the most relevant chunks
 for a query. The action takes:
 
-- **Knowledge base** — which knowledge base to query.
-- **Query** — the natural-language text to match against. Leave it empty for a filter-only search.
-- **Tags** — restrict the search to documents carrying one of the given tags.
-- **Top K** — how many chunks to return.
-- **Similarity threshold** — a floor on the relevance score (0.0–1.0); lower-scoring chunks are
+- **Knowledge base** - which knowledge base to query.
+- **Query** - the natural-language text to match against. Leave it empty for a filter-only search.
+- **Tags** - restrict the search to documents carrying one of the given tags.
+- **Top K** - how many chunks to return.
+- **Similarity threshold** - a floor on the relevance score (0.0–1.0); lower-scoring chunks are
   dropped.
-- **Metadata filter** — an optional list of metadata key-value pairs applied before ranking.
+- **Metadata filter** - an optional list of metadata key-value pairs applied before ranking.
   Entries within a group are ANDed; groups are ORed.
 
 It returns an array of matching chunks, each with its content, relevance score, and
-metadata — ready to feed into a prompt, a condition, or any downstream step.
+metadata - ready to feed into a prompt, a condition, or any downstream step.
 
 ## Ground an AI agent (RAG)
 
 Attach a knowledge base to an [AI agent](/platform/automation/build/workflows/ai/agent) so the agent can retrieve
 context on its own:
 
-- **As the agent's vector store** — the agent searches the knowledge base automatically
+- **As the agent's vector store** - the agent searches the knowledge base automatically
   when answering, grounding its responses in your documents.
-- **As a tool** — the agent decides when to call the knowledge base, issuing a search only
+- **As a tool** - the agent decides when to call the knowledge base, issuing a search only
   when it needs supporting facts.
 
 Either way the pattern is the same:
@@ -47,7 +47,7 @@ training data alone.
 
 When a single knowledge base holds distinct kinds of content, pass a **tag filter** so a
 given workflow or agent only retrieves from the documents you intend. Tag matching is
-inclusive — any document carrying one of the requested tags is eligible — so an agent
+inclusive - any document carrying one of the requested tags is eligible - so an agent
 scoped to `policy` never surfaces a chunk from an untagged product spec in the same
 knowledge base.
 
