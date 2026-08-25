@@ -1,6 +1,7 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
 import saveWorkflowDefinition from '@/pages/platform/workflow-editor/utils/saveWorkflowDefinition';
 import {ClusterElementItemType, ClusterElementsType} from '@/shared/types';
 import {useCallback, useMemo} from 'react';
@@ -39,17 +40,38 @@ export default function useAiAgentSkills(): UseAiAgentSkillsI {
 
     const {updateWorkflowMutation} = useWorkflowEditor();
 
-    const toolElements = useMemo<SkillsToolElementType[]>(() => {
-        const clusterElements = rootClusterElementNodeData?.clusterElements;
+    // The cluster elements are read from the workflow definition, never from rootClusterElementNodeData, which is
+    // seeded once per root and so still shows whatever was attached when the AI Agent editor was opened.
+    // saveWorkflowDefinition replaces a cluster root's clusterElements wholesale, so basing the write on that
+    // stale copy would drop the model, the memory and every tool added since.
+    const rootClusterElements = useMemo<ClusterElementsType | undefined>(() => {
+        if (!workflow.definition || !rootClusterElementNodeData?.workflowNodeName) {
+            return undefined;
+        }
 
-        if (!clusterElements || Array.isArray(clusterElements)) {
+        try {
+            const definition = JSON.parse(workflow.definition);
+
+            const rootTask = getTask({
+                tasks: definition.tasks ?? [],
+                workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+            });
+
+            return rootTask?.clusterElements as ClusterElementsType | undefined;
+        } catch {
+            return undefined;
+        }
+    }, [rootClusterElementNodeData?.workflowNodeName, workflow.definition]);
+
+    const toolElements = useMemo<SkillsToolElementType[]>(() => {
+        if (!rootClusterElements || Array.isArray(rootClusterElements)) {
             return [];
         }
 
-        const tools = clusterElements['tools'];
+        const tools = rootClusterElements['tools'];
 
         return Array.isArray(tools) ? (tools as SkillsToolElementType[]) : [];
-    }, [rootClusterElementNodeData?.clusterElements]);
+    }, [rootClusterElements]);
 
     const skillIds = useMemo(() => {
         const skillsToolElement = toolElements.find(isSkillsTool);
@@ -88,10 +110,10 @@ export default function useAiAgentSkills(): UseAiAgentSkillsI {
                 ? [...otherToolElements, skillsToolElement]
                 : otherToolElements;
 
-            const clusterElements = rootClusterElementNodeData.clusterElements;
-
             const updatedClusterElements: ClusterElementsType = {
-                ...((clusterElements && !Array.isArray(clusterElements) ? clusterElements : {}) as ClusterElementsType),
+                ...((rootClusterElements && !Array.isArray(rootClusterElements)
+                    ? rootClusterElements
+                    : {}) as ClusterElementsType),
                 tools: updatedToolElements,
             };
 
@@ -108,7 +130,13 @@ export default function useAiAgentSkills(): UseAiAgentSkillsI {
                 updateWorkflowMutation: updateWorkflowMutation!,
             });
         },
-        [rootClusterElementNodeData, setRootClusterElementNodeData, toolElements, updateWorkflowMutation]
+        [
+            rootClusterElementNodeData,
+            rootClusterElements,
+            setRootClusterElementNodeData,
+            toolElements,
+            updateWorkflowMutation,
+        ]
     );
 
     return {
