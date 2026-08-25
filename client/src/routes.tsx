@@ -98,6 +98,7 @@ const ApiConnectorEditPage = lazy(
     () => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorEditPage')
 );
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
+const EmbeddedVariables = lazy(() => import('@/ee/pages/settings/embedded/variables/Variables'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
 const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
@@ -131,6 +132,7 @@ const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys
 const AiAgents = lazy(() => import('@/ee/pages/settings/automation/ai/agents/AiAgents'));
 const WorkspaceApiKeys = lazy(() => import('@/ee/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
 const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
+const WorkspaceVariables = lazy(() => import('@/ee/pages/settings/automation/variables/Variables'));
 const GlobalCustomRoles = lazy(() => import('@/ee/pages/settings/platform/custom-roles/GlobalCustomRoles'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const OrganizationConnections = lazy(
@@ -239,6 +241,21 @@ const currentWorkspaceSettingsRoutes = {
             path: 'workspace-api-keys',
         },
         {
+            // ADMIN *or* USER: a workspace admin need not be a tenant admin (WorkspaceUsers precedent above). The
+            // page itself hides mutating controls when VARIABLE_MANAGE is absent, and the server enforces
+            // independently.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <WorkspaceVariables />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'variables',
+        },
+        {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
@@ -282,6 +299,10 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'workspace-api-keys',
             title: 'API Keys',
+        },
+        {
+            href: 'variables',
+            title: 'Variables',
         },
         {
             href: 'ai-hub/connectors',
@@ -1444,6 +1465,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                             ),
                                             path: 'api-keys',
                                         },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedVariables />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'variables',
+                                        },
                                         ...platformSettingsRoutes.children,
                                     ],
                                     element: (
@@ -1456,6 +1489,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                                 {
                                                     href: '/embedded/settings/api-keys',
                                                     title: 'API Keys',
+                                                },
+                                                {
+                                                    href: '/embedded/settings/variables',
+                                                    title: 'Variables',
                                                 },
                                                 ...platformSettingsRoutes.navItems,
                                             ]}
