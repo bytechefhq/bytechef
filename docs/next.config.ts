@@ -1,5 +1,8 @@
 import createBundleAnalyzer from '@next/bundle-analyzer';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
 import { createMDX } from 'fumadocs-mdx/next';
+import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD } from 'next/constants.js';
 import type { NextConfig } from 'next';
 
 const withAnalyzer = createBundleAnalyzer({
@@ -334,4 +337,37 @@ const config: NextConfig = {
 
 const withMDX = createMDX();
 
-export default withAnalyzer(withMDX(config));
+/**
+ * Writes the API reference pages under `content/docs/openapi/`, which are generated from the
+ * monorepo's OpenAPI specs and left untracked.
+ *
+ * This runs from the config rather than from a `prebuild` script because the pages are only ever
+ * as present as the command the host happens to run: a build command of `next build` skips every
+ * npm script, and the site still builds -- fumadocs drops nav entries pointing at directories that
+ * do not exist, so the whole reference section disappears without a single error. Generating here
+ * cannot be skipped, and a failure fails the build.
+ *
+ * Only while building or serving in dev: `next start` loads this file too, and the runtime
+ * filesystem is read-only.
+ */
+function generateOpenApiPages() {
+  // Next loads this file again in each build worker, and a worker inherits this environment: without
+  // the guard the tree would be cleared and rewritten underneath a worker already reading it.
+  if (process.env.BYTECHEF_DOCS_OPENAPI_GENERATED === '1') return;
+
+  process.env.BYTECHEF_DOCS_OPENAPI_GENERATED = '1';
+
+  execFileSync(
+    process.execPath,
+    ['--experimental-strip-types', path.join(import.meta.dirname, 'scripts/generate-openapi.mts')],
+    { stdio: 'inherit' },
+  );
+}
+
+export default function nextConfig(phase: string) {
+  if (phase === PHASE_PRODUCTION_BUILD || phase === PHASE_DEVELOPMENT_SERVER) {
+    generateOpenApiPages();
+  }
+
+  return withAnalyzer(withMDX(config));
+}
