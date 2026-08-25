@@ -52,6 +52,12 @@ export interface WorkflowTask {
      */
     description?: string;
     /**
+     * When true, the task is skipped during workflow execution.
+     * @type {boolean}
+     * @memberof WorkflowTask
+     */
+    disabled?: boolean;
+    /**
      * The (optional) list of tasks that are to be executed after execution of a task -- regardless of whether it had failed or not.
      * @type {Array<WorkflowTask>}
      * @memberof WorkflowTask
@@ -142,6 +148,7 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'clusterElements': json['clusterElements'] == null ? undefined : json['clusterElements'],
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
+        'disabled': json['disabled'] == null ? undefined : json['disabled'],
         'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskFromJSON)),
         'label': json['label'] == null ? undefined : json['label'],
         'maxRetries': json['maxRetries'] == null ? undefined : json['maxRetries'],
@@ -168,6 +175,7 @@ export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'clusterRoot'
     return {
         
         'description': value['description'],
+        'disabled': value['disabled'],
         'finalize': value['finalize'] == null ? undefined : ((value['finalize'] as Array<any>).map(WorkflowTaskToJSON)),
         'label': value['label'],
         'maxRetries': value['maxRetries'],

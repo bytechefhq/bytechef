@@ -4197,6 +4197,74 @@ export type UsersQueryVariables = Exact<{
 
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
+export type CreateEmbeddedVariableMutationVariables = Exact<{
+  environmentId: string | number;
+  input: Types.VariableInput;
+}>;
+
+
+export type CreateEmbeddedVariableMutation = { createEmbeddedVariable: { id: string, name: string, value: string } };
+
+export type CreateWorkspaceVariableMutationVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  input: Types.VariableInput;
+}>;
+
+
+export type CreateWorkspaceVariableMutation = { createWorkspaceVariable: { id: string, name: string, value: string } };
+
+export type DeleteEmbeddedVariableMutationVariables = Exact<{
+  environmentId: string | number;
+  id: string | number;
+}>;
+
+
+export type DeleteEmbeddedVariableMutation = { deleteEmbeddedVariable: boolean };
+
+export type DeleteWorkspaceVariableMutationVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  id: string | number;
+}>;
+
+
+export type DeleteWorkspaceVariableMutation = { deleteWorkspaceVariable: boolean };
+
+export type EmbeddedVariablesQueryVariables = Exact<{
+  environmentId: string | number;
+}>;
+
+
+export type EmbeddedVariablesQuery = { embeddedVariables: Array<{ id: string, name: string, value: string, environmentId: string, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null }> };
+
+export type UpdateEmbeddedVariableMutationVariables = Exact<{
+  environmentId: string | number;
+  id: string | number;
+  input: Types.VariableInput;
+}>;
+
+
+export type UpdateEmbeddedVariableMutation = { updateEmbeddedVariable: { id: string, name: string, value: string } };
+
+export type UpdateWorkspaceVariableMutationVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+  id: string | number;
+  input: Types.VariableInput;
+}>;
+
+
+export type UpdateWorkspaceVariableMutation = { updateWorkspaceVariable: { id: string, name: string, value: string } };
+
+export type WorkspaceVariablesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environmentId: string | number;
+}>;
+
+
+export type WorkspaceVariablesQuery = { workspaceVariables: Array<{ id: string, name: string, value: string, environmentId: string, createdBy: string | null, createdDate: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null }> };
+
 export type WorkspaceNotificationsQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -19566,6 +19634,211 @@ export const useUsersQuery = <
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
     queryFn: fetcher<UsersQuery, UsersQueryVariables>(UsersDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateEmbeddedVariableDocument = new TypedDocumentString(`
+    mutation createEmbeddedVariable($environmentId: ID!, $input: VariableInput!) {
+  createEmbeddedVariable(environmentId: $environmentId, input: $input) {
+    id
+    name
+    value
+  }
+}
+    `);
+
+export const useCreateEmbeddedVariableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateEmbeddedVariableMutation, TError, CreateEmbeddedVariableMutationVariables, TContext>) => {
+    
+    return useMutation<CreateEmbeddedVariableMutation, TError, CreateEmbeddedVariableMutationVariables, TContext>(
+      {
+    mutationKey: ['createEmbeddedVariable'],
+    mutationFn: (variables?: CreateEmbeddedVariableMutationVariables) => fetcher<CreateEmbeddedVariableMutation, CreateEmbeddedVariableMutationVariables>(CreateEmbeddedVariableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateWorkspaceVariableDocument = new TypedDocumentString(`
+    mutation createWorkspaceVariable($workspaceId: ID!, $environmentId: ID!, $input: VariableInput!) {
+  createWorkspaceVariable(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    input: $input
+  ) {
+    id
+    name
+    value
+  }
+}
+    `);
+
+export const useCreateWorkspaceVariableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateWorkspaceVariableMutation, TError, CreateWorkspaceVariableMutationVariables, TContext>) => {
+    
+    return useMutation<CreateWorkspaceVariableMutation, TError, CreateWorkspaceVariableMutationVariables, TContext>(
+      {
+    mutationKey: ['createWorkspaceVariable'],
+    mutationFn: (variables?: CreateWorkspaceVariableMutationVariables) => fetcher<CreateWorkspaceVariableMutation, CreateWorkspaceVariableMutationVariables>(CreateWorkspaceVariableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteEmbeddedVariableDocument = new TypedDocumentString(`
+    mutation deleteEmbeddedVariable($environmentId: ID!, $id: ID!) {
+  deleteEmbeddedVariable(environmentId: $environmentId, id: $id)
+}
+    `);
+
+export const useDeleteEmbeddedVariableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteEmbeddedVariableMutation, TError, DeleteEmbeddedVariableMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteEmbeddedVariableMutation, TError, DeleteEmbeddedVariableMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteEmbeddedVariable'],
+    mutationFn: (variables?: DeleteEmbeddedVariableMutationVariables) => fetcher<DeleteEmbeddedVariableMutation, DeleteEmbeddedVariableMutationVariables>(DeleteEmbeddedVariableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteWorkspaceVariableDocument = new TypedDocumentString(`
+    mutation deleteWorkspaceVariable($workspaceId: ID!, $environmentId: ID!, $id: ID!) {
+  deleteWorkspaceVariable(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    id: $id
+  )
+}
+    `);
+
+export const useDeleteWorkspaceVariableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteWorkspaceVariableMutation, TError, DeleteWorkspaceVariableMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteWorkspaceVariableMutation, TError, DeleteWorkspaceVariableMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteWorkspaceVariable'],
+    mutationFn: (variables?: DeleteWorkspaceVariableMutationVariables) => fetcher<DeleteWorkspaceVariableMutation, DeleteWorkspaceVariableMutationVariables>(DeleteWorkspaceVariableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EmbeddedVariablesDocument = new TypedDocumentString(`
+    query embeddedVariables($environmentId: ID!) {
+  embeddedVariables(environmentId: $environmentId) {
+    id
+    name
+    value
+    environmentId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useEmbeddedVariablesQuery = <
+      TData = EmbeddedVariablesQuery,
+      TError = unknown
+    >(
+      variables: EmbeddedVariablesQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedVariablesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedVariablesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedVariablesQuery, TError, TData>(
+      {
+    queryKey: ['embeddedVariables', variables],
+    queryFn: fetcher<EmbeddedVariablesQuery, EmbeddedVariablesQueryVariables>(EmbeddedVariablesDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateEmbeddedVariableDocument = new TypedDocumentString(`
+    mutation updateEmbeddedVariable($environmentId: ID!, $id: ID!, $input: VariableInput!) {
+  updateEmbeddedVariable(environmentId: $environmentId, id: $id, input: $input) {
+    id
+    name
+    value
+  }
+}
+    `);
+
+export const useUpdateEmbeddedVariableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateEmbeddedVariableMutation, TError, UpdateEmbeddedVariableMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateEmbeddedVariableMutation, TError, UpdateEmbeddedVariableMutationVariables, TContext>(
+      {
+    mutationKey: ['updateEmbeddedVariable'],
+    mutationFn: (variables?: UpdateEmbeddedVariableMutationVariables) => fetcher<UpdateEmbeddedVariableMutation, UpdateEmbeddedVariableMutationVariables>(UpdateEmbeddedVariableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateWorkspaceVariableDocument = new TypedDocumentString(`
+    mutation updateWorkspaceVariable($workspaceId: ID!, $environmentId: ID!, $id: ID!, $input: VariableInput!) {
+  updateWorkspaceVariable(
+    workspaceId: $workspaceId
+    environmentId: $environmentId
+    id: $id
+    input: $input
+  ) {
+    id
+    name
+    value
+  }
+}
+    `);
+
+export const useUpdateWorkspaceVariableMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateWorkspaceVariableMutation, TError, UpdateWorkspaceVariableMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateWorkspaceVariableMutation, TError, UpdateWorkspaceVariableMutationVariables, TContext>(
+      {
+    mutationKey: ['updateWorkspaceVariable'],
+    mutationFn: (variables?: UpdateWorkspaceVariableMutationVariables) => fetcher<UpdateWorkspaceVariableMutation, UpdateWorkspaceVariableMutationVariables>(UpdateWorkspaceVariableDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const WorkspaceVariablesDocument = new TypedDocumentString(`
+    query workspaceVariables($workspaceId: ID!, $environmentId: ID!) {
+  workspaceVariables(workspaceId: $workspaceId, environmentId: $environmentId) {
+    id
+    name
+    value
+    environmentId
+    createdBy
+    createdDate
+    lastModifiedBy
+    lastModifiedDate
+  }
+}
+    `);
+
+export const useWorkspaceVariablesQuery = <
+      TData = WorkspaceVariablesQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceVariablesQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceVariablesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceVariablesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceVariablesQuery, TError, TData>(
+      {
+    queryKey: ['workspaceVariables', variables],
+    queryFn: fetcher<WorkspaceVariablesQuery, WorkspaceVariablesQueryVariables>(WorkspaceVariablesDocument, variables),
     ...options
   }
     )};

@@ -11,6 +11,7 @@ Name | Type
 `clusterElements` | { [key: string]: any; }
 `connections` | [Array&lt;ComponentConnection&gt;](ComponentConnection.md)
 `description` | string
+`disabled` | boolean
 `finalize` | [Array&lt;WorkflowTask&gt;](WorkflowTask.md)
 `label` | string
 `maxRetries` | number
@@ -34,6 +35,7 @@ const example = {
   "clusterElements": null,
   "connections": null,
   "description": null,
+  "disabled": null,
   "finalize": null,
   "label": null,
   "maxRetries": null,
