@@ -160,6 +160,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateNoReservedInputNames(definition);
+        workflowValidatorFacade.validateNoReservedNodeNames(definition);
 
         Project project = projectService.getProject(projectId);
 
@@ -591,6 +593,9 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+        workflowValidatorFacade.validateNoReservedInputNames(definition);
+        workflowValidatorFacade.validateNoReservedNodeNames(definition);
+
         workflowFacade.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
