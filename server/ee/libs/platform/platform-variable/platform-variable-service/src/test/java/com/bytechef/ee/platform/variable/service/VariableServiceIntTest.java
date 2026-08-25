@@ -18,6 +18,14 @@ import com.bytechef.ee.platform.variable.exception.VariableErrorType;
 import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -70,6 +78,49 @@ class VariableServiceIntTest {
 
         assertThatThrownBy(() -> variableService.create(VariableScope.embedded(), 10L, "DUP", "2"))
             .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testConcurrentEmbeddedCreateOfSameNameRejectsOneSide() throws Exception {
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        try {
+            Callable<Optional<ConfigurationException>> raceTask = () -> {
+                start.await();
+
+                try {
+                    variableService.create(VariableScope.embedded(), 21L, "RACE", "value");
+
+                    return Optional.empty();
+                } catch (ConfigurationException configurationException) {
+                    return Optional.of(configurationException);
+                }
+            };
+
+            Future<Optional<ConfigurationException>> firstFuture = executorService.submit(raceTask);
+            Future<Optional<ConfigurationException>> secondFuture = executorService.submit(raceTask);
+
+            start.countDown();
+
+            Optional<ConfigurationException> firstOutcome = firstFuture.get(10, TimeUnit.SECONDS);
+            Optional<ConfigurationException> secondOutcome = secondFuture.get(10, TimeUnit.SECONDS);
+
+            List<ConfigurationException> rejections = Stream.of(firstOutcome, secondOutcome)
+                .flatMap(Optional::stream)
+                .toList();
+
+            assertThat(rejections)
+                .as("exactly one racer must be rejected as a duplicate")
+                .hasSize(1);
+            assertThat(rejections.getFirst()
+                .getErrorKey()).isEqualTo(VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS.getErrorKey());
+
+            assertThat(variableService.getVariables(VariableScope.embedded(), 21L)).extracting(Variable::name)
+                .containsExactly("RACE");
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
     @Test

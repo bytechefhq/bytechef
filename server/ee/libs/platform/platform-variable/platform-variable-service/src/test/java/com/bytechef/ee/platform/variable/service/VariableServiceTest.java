@@ -10,7 +10,10 @@ package com.bytechef.ee.platform.variable.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.InstanceOfAssertFactories.type;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -27,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DuplicateKeyException;
 
 /**
  * @version ee
@@ -83,6 +87,50 @@ class VariableServiceTest {
         assertThat(created.id()).isEqualTo(5L);
 
         assertThatThrownBy(() -> variableService.create(VariableScope.workspace(7L), 1L, "API_URL", "x"))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS.getErrorKey());
+    }
+
+    @Test
+    void testCreateTranslatesConstraintViolationForWorkspaceScope() {
+        when(propertyService.fetchProperty("variable.RACE", Property.Scope.WORKSPACE, 7L, 1L))
+            .thenReturn(Optional.empty());
+        doThrow(new DuplicateKeyException("duplicate key"))
+            .when(propertyService)
+            .save(eq("variable.RACE"), any(), eq(Property.Scope.WORKSPACE), eq(7L), eq(1L));
+
+        assertThatThrownBy(() -> variableService.create(VariableScope.workspace(7L), 1L, "RACE", "x"))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS.getErrorKey());
+    }
+
+    @Test
+    void testCreateTranslatesConstraintViolationForEmbeddedScope() {
+        when(propertyService.fetchProperty("variable.RACE", Property.Scope.EMBEDDED, null, 2L))
+            .thenReturn(Optional.empty());
+        doThrow(new DuplicateKeyException("duplicate key"))
+            .when(propertyService)
+            .save(eq("variable.RACE"), any(), eq(Property.Scope.EMBEDDED), isNull(), eq(2L));
+
+        assertThatThrownBy(() -> variableService.create(VariableScope.embedded(), 2L, "RACE", "x"))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS.getErrorKey());
+    }
+
+    @Test
+    void testUpdateTranslatesConstraintViolationOnRename() {
+        when(propertyService.getPropertiesByKeyPrefix("variable.", Property.Scope.WORKSPACE, 7L, 1L))
+            .thenReturn(List.of(property(5L, "variable.OLD", "a", Property.Scope.WORKSPACE, 7L, 1)));
+        when(propertyService.fetchProperty("variable.NEW", Property.Scope.WORKSPACE, 7L, 1L))
+            .thenReturn(Optional.empty());
+        doThrow(new DuplicateKeyException("duplicate key"))
+            .when(propertyService)
+            .save(eq("variable.NEW"), any(), eq(Property.Scope.WORKSPACE), eq(7L), eq(1L));
+
+        assertThatThrownBy(() -> variableService.update(VariableScope.workspace(7L), 1L, 5L, "NEW", "b"))
             .asInstanceOf(type(ConfigurationException.class))
             .extracting(ConfigurationException::getErrorKey)
             .isEqualTo(VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS.getErrorKey());

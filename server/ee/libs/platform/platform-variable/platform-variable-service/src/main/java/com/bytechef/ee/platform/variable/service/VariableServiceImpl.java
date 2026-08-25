@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +54,7 @@ public class VariableServiceImpl implements VariableService {
                 "Variable '" + name + "' already exists", VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS);
         }
 
-        propertyService.save(key, Map.of(Variable.VALUE_KEY, value), propertyScope, scope.workspaceId(), environmentId);
+        saveProperty(key, value, propertyScope, scope, environmentId, name);
 
         return toVariable(fetchSavedProperty(key, propertyScope, scope.workspaceId(), environmentId));
     }
@@ -109,10 +110,23 @@ public class VariableServiceImpl implements VariableService {
             propertyService.delete(existing.getKey(), propertyScope, scope.workspaceId(), environmentId);
         }
 
-        propertyService.save(newKey, Map.of(Variable.VALUE_KEY, value), propertyScope, scope.workspaceId(),
-            environmentId);
+        saveProperty(newKey, value, propertyScope, scope, environmentId, name);
 
         return toVariable(fetchSavedProperty(newKey, propertyScope, scope.workspaceId(), environmentId));
+    }
+
+    private void saveProperty(
+        String key, String value, Property.Scope propertyScope, VariableScope scope, long environmentId,
+        String name) {
+
+        try {
+            propertyService.save(key, Map.of(Variable.VALUE_KEY, value), propertyScope, scope.workspaceId(),
+                environmentId);
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw new ConfigurationException(
+                "Variable '" + name + "' already exists", duplicateKeyException,
+                VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS);
+        }
     }
 
     private Property getProperty(VariableScope scope, long environmentId, long id) {
