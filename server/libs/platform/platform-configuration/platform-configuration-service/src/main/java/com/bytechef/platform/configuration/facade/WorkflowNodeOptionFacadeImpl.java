@@ -57,6 +57,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
@@ -67,6 +68,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         ClusterElementDefinitionService clusterElementDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
+        WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
@@ -77,6 +79,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -101,8 +104,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 WorkflowTestConfigurationConnection::getConnectionId,
                 (existing, ignored) -> existing));
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -191,8 +193,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         @Nullable String searchText, long environmentId) {
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger

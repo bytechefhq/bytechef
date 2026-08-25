@@ -86,6 +86,9 @@ class WorkflowNodeOptionFacadeTest {
     private WorkflowService workflowService;
 
     @Mock
+    private WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
+
+    @Mock
     private WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
     @Mock
@@ -97,8 +100,8 @@ class WorkflowNodeOptionFacadeTest {
     void setUp() {
         workflowNodeOptionFacade = new WorkflowNodeOptionFacadeImpl(
             evaluator, actionDefinitionFacade, clusterElementDefinitionFacade, clusterElementDefinitionService,
-            taskDispatcherDefinitionService, triggerDefinitionFacade, workflowService, workflowNodeOutputFacade,
-            workflowTestConfigurationService);
+            taskDispatcherDefinitionService, triggerDefinitionFacade, workflowService, workflowEvaluationInputsFacade,
+            workflowNodeOutputFacade, workflowTestConfigurationService);
     }
 
     @Test
@@ -109,8 +112,8 @@ class WorkflowNodeOptionFacadeTest {
         String searchText = "invoice";
         long environmentId = 1L;
 
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(workflowId, environmentId);
 
         Workflow workflow = mock(Workflow.class);
         WorkflowTask workflowTask = mock(WorkflowTask.class);
@@ -150,8 +153,8 @@ class WorkflowNodeOptionFacadeTest {
 
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
             .thenReturn(Optional.empty());
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(workflowId, environmentId);
 
         Workflow workflow = mock(Workflow.class);
         WorkflowTask workflowTask = mock(WorkflowTask.class);
@@ -211,8 +214,8 @@ class WorkflowNodeOptionFacadeTest {
         when(workflowTestConfiguration.getConnections()).thenReturn(List.of(agent1Connection, agent2Connection));
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
             .thenReturn(Optional.of(workflowTestConfiguration));
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(workflowId, environmentId);
 
         Workflow workflow = mock(Workflow.class);
         WorkflowTask workflowTask = mock(WorkflowTask.class);
@@ -268,8 +271,8 @@ class WorkflowNodeOptionFacadeTest {
         when(workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
             workflowId, workflowNodeName, environmentId))
                 .thenReturn(Optional.of(connectionId));
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(workflowId, environmentId);
 
         Workflow workflow = mock(Workflow.class);
 
@@ -329,8 +332,8 @@ class WorkflowNodeOptionFacadeTest {
 
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
             .thenReturn(Optional.empty());
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(workflowId, environmentId);
 
         Workflow workflow = mock(Workflow.class);
         WorkflowTask workflowTask = mock(WorkflowTask.class);

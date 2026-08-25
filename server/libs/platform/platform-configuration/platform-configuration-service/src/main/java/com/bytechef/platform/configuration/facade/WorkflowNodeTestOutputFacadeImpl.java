@@ -82,6 +82,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
@@ -93,7 +94,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         Evaluator evaluator, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, WebhookTriggerTestFacade webhookTriggerTestFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
@@ -105,6 +107,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -265,8 +268,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowTestConfigurationConnections, WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowTask.getName(), environmentId);
@@ -300,7 +302,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
         Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
-            workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, environmentId),
+            workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId),
             evaluator);
 
         Long connectionId = null;
@@ -440,8 +442,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             workflowTestConfigurationConnections, WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
             WorkflowTestConfigurationConnection::getConnectionId);
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowTask.getName(), environmentId);
@@ -499,8 +500,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflow.getId(), environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflow.getId(), environmentId);
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflow.getId(), workflowTask.getName(), environmentId);
 
@@ -520,8 +520,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), null, null,

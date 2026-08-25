@@ -24,7 +24,6 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,24 +46,24 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowService workflowService;
-    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDescriptionFacadeImpl(
         ActionDefinitionService actionDefinitionService,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TriggerDefinitionService triggerDefinitionFacade, WorkflowService workflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        TriggerDefinitionService triggerDefinitionFacade,
+        WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade, WorkflowService workflowService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionFacade;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowService = workflowService;
-        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -73,8 +72,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
         String workflowId, String workflowNodeName, String clusterElementName, Long environmentId) {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
@@ -91,8 +89,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         String description;
 

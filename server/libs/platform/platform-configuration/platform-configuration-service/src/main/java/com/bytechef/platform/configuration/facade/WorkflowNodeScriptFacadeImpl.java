@@ -62,6 +62,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     private final List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders;
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
     private final WorkflowService workflowService;
@@ -70,13 +71,15 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     @SuppressFBWarnings("EI")
     public WorkflowNodeScriptFacadeImpl(
         List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders, ConnectionService connectionService,
-        Evaluator evaluator, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        Evaluator evaluator, WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.codeEditorScriptInputProviders = codeEditorScriptInputProviders;
         this.connectionService = connectionService;
         this.evaluator = evaluator;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
         this.workflowService = workflowService;
@@ -162,8 +165,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
             return Map.of();
         }
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowNodeName, environmentId);

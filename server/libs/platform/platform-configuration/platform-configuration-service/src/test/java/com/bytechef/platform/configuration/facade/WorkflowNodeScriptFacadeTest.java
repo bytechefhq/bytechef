@@ -55,6 +55,9 @@ class WorkflowNodeScriptFacadeTest {
     private Evaluator evaluator;
 
     @Mock
+    private WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
+
+    @Mock
     private WorkflowNodeOutputFacade workflowNodeOutputFacade;
 
     @Mock
@@ -71,8 +74,8 @@ class WorkflowNodeScriptFacadeTest {
     @BeforeEach
     void setUp() {
         workflowNodeScriptFacade = new WorkflowNodeScriptFacadeImpl(
-            List.of(), connectionService, evaluator, workflowNodeOutputFacade, workflowNodeTestOutputFacade,
-            workflowService, workflowTestConfigurationService);
+            List.of(), connectionService, evaluator, workflowEvaluationInputsFacade, workflowNodeOutputFacade,
+            workflowNodeTestOutputFacade, workflowService, workflowTestConfigurationService);
     }
 
     @Test

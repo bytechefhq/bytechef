@@ -40,7 +40,6 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.ParameterResultDTO;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -85,26 +84,27 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private final Evaluator evaluator;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
-    private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeParameterFacadeImpl(
         ActionDefinitionService actionDefinitionService,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TriggerDefinitionService triggerDefinitionService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        TriggerDefinitionService triggerDefinitionService,
+        WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.evaluator = evaluator;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowService = workflowService;
-        this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
@@ -758,7 +758,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Workflow workflow, String workflowNodeName,
         WorkflowNodeStructure.OperationType operationType, long environmentId) {
 
-        Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
+        Map<String, ?> inputMap = workflowEvaluationInputsFacade.getEvaluationInputs(
             workflow.getId(), environmentId);
 
         Map<String, ?> previousOutputs = Map.of();
