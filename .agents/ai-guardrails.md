@@ -43,14 +43,127 @@ they cover every LLM-calling surface, not just gateway-routed traffic. Spec:
   - `isActive(workspaceId)` — whether any guardrail is active for a workspace once global +
     workspace policy are unioned, including moderation (only counted active when a moderation
     classifier bean is present); callers use this to skip attaching an advisor entirely.
-  - Static helpers `redactPii` / `redactSecrets` / `redactAll` / `sensitiveMatchRanges` are reused
-    by the gateway adapter and the streaming redactor.
+  - `redactPii` / `redactSecrets` / `redactAll` are instance methods (no longer static — see
+    "Sensitive-data detectors" below for why) reused by the gateway adapter's project overlay and by
+    `scanResponseText`/`StreamingResponseRedactor` for response-direction and streaming redaction.
+    The old `sensitiveMatchRanges` helper is gone, superseded by `SensitiveDataRedactor`'s span-based
+    detect/resolve/apply pipeline.
 - Redaction always runs before the blocked-term check and injection detection, so those checks see
   already-redacted text. Regexes avoid nested optional quantifiers (ReDoS-safe).
 - Effective policy per call = union of global `bytechef.ai.gateway.guardrails.*` properties
   (property names kept for compatibility — the AI Gateway is still the sole reader/writer of these
   keys) and the call's workspace `AiGuardrailsWorkspaceSettings` — additive: a level can enable a
   guardrail or add blocked terms, never turn one off.
+
+## Sensitive-data detectors
+
+- PII/secret redaction, wherever it runs (request-direction, response-direction, or the streaming
+  path), is a **detect → resolve → apply** pipeline over the original text — not a chain of
+  `replaceAll` calls in which each pattern rewrote the text the next pattern was about to scan. The
+  old chain (`redactAll` = `redactSecrets(redactPii(x))`) leaked part of any secret whose body
+  contained a credit-card-shaped digit run: the PII pass claimed the digits first and destroyed the
+  text the secret pattern needed, so `xoxb-1234567890123456-abcdef` came out as
+  `xoxb-[REDACTED_CC]-abcdef` — the token's prefix and suffix intact, disclosing that a Slack
+  credential was present. Detecting against the untouched original and resolving overlaps centrally
+  fixes it: the same input now redacts to `[REDACTED_SECRET]`.
+- The SPI is `SensitiveDataDetector` (`platform-ai-guardrails-api`, package
+  `com.bytechef.ee.platform.ai.guardrails.detector`, still a zero-dependency module — not even Spring
+  is on its compile path): `name()`, `detect(String text) -> List<SensitiveSpan>`, and
+  `default streamSafe() -> true`. Contributing a detector is a bean (`@Component
+  @ConditionalOnEEVersion`) — no engine change. `SensitiveDataRedactor` (`-service`) collects every
+  registered detector, runs each over the WHOLE original text and never another detector's output (so
+  no detector can corrupt another's result), and resolves the combined candidate spans into a
+  non-overlapping accepted set before applying placeholders right-to-left. The two built-ins,
+  `RegexPiiDetector` (categories `EMAIL`/`SSN`/`CC`/`PHONE`/`IP`) and `RegexSecretDetector` (single
+  category `SECRET`), reproduce the exact patterns and placeholder strings the old chain emitted, so
+  the common case is byte-identical.
+- **Resolution order is total, and independent of registration order**: SECRET spans before PII, then
+  longer before shorter, then earlier before later, then category ascending — candidates are taken
+  greedily in that order and a candidate overlapping an already-accepted span is dropped. Because the
+  order is a property of the spans themselves (kind, length, offset, category) and never of which
+  detector reported them or in what sequence detector beans happen to be registered, contributing a
+  new detector cannot change how an existing detector's spans resolve. This is the property that
+  makes the SPI safe to extend.
+- `SensitiveSpan.kind()` (`PII`/`SECRET`) is closed — it is exactly the axis the `redactPii` /
+  `redactSecrets` policy toggles govern, and a redaction call always names which kinds it wants
+  filtered. `SensitiveSpan.category()` is open (a validated uppercase identifier) and drives
+  presentation only: `SensitiveSpan.placeholder()` derives `[REDACTED_<category>]` with no lookup
+  table, so a detector can introduce a new entity type (e.g. `PERSON`) without touching this module.
+  The kind filter is applied to the CANDIDATES, before resolution — filtering the accepted set instead
+  would let a span the caller did not ask for still win an overlap and then be discarded, so a
+  PII-only redaction over a secret containing a digit run would return the text unredacted.
+- `streamSafe()` exists because the streaming response path can only ever offer a detector a bounded
+  lookahead window, not the whole document. A detector needing wider context than that (sentence-level
+  NER, say) must declare `streamSafe() = false`; `SensitiveDataRedactor.streamSafeView()` (resolved
+  once, at `AiGuardrails` construction) then excludes it from the streaming redactor entirely and logs
+  the exclusion once, rather than feeding it a mid-sentence fragment and letting it silently produce a
+  worse answer than it would give over the complete text — a detector that cannot honestly cover a
+  stream is visibly absent from it, not silently contributing nothing usable. Both built-in regex
+  detectors are local, so today's stream-safe set is unchanged.
+- **Failure is fail-open, per detector.** A detector that throws (or reports a span past the end of
+  the text) is caught, WARN-logged, counted as the `detector_failed` metric event, and skipped for
+  that call — the remaining detectors still run, so one flaky detector cannot take down every AI
+  surface. See Metrics below for which instance each call path counts that event through.
+- **Optional detector: `platform-ai-guardrails-opennlp`** (EE, package
+  `com.bytechef.ee.platform.ai.guardrails.opennlp`) plugs Apache OpenNLP named-entity recognition
+  into the SPI to cover what the regex detectors above cannot — unstructured PII: person names,
+  organizations, locations. It is a bean like any other detector (no engine change) and is **off by
+  default**. **It ships no models, and Apache distributes none**: OpenNLP's Maven Central and
+  models page carry sentence/tokenizer/POS models but zero English NER artifacts, and the only
+  English NER models that exist are the legacy SourceForge 1.5 binaries — English-only,
+  newswire-trained, roughly fifteen years old. This module is not a feature an operator merely
+  switches on; it is inert until they supply their own compatible models (realistically ones
+  trained on their own corpus, which is also the case where accuracy is adequate for destructive
+  redaction). Anyone reaching for the legacy 1.5 models should understand they are pointing a
+  fifteen-year-old newswire model at chat and code text, in a redaction path that rewrites prompts
+  irreversibly before the LLM ever sees them. Configuration:
+  ```yaml
+  bytechef:
+    ai:
+      guardrails:
+        opennlp:
+          enabled: false
+          tokenizer-model:                 # optional Resource; SimpleTokenizer when unset
+          min-confidence: 0.85
+          entity-models:                   # empty by default
+            PERSON: file:/opt/bytechef/models/en-ner-person.bin
+            ORGANIZATION: classpath:models/en-ner-organization.bin
+  ```
+  The bean registers only when BOTH `enabled=true` and `entity-models` is non-empty
+  (`OpenNlpGuardrailsConfiguration`) — an enabled-but-empty configuration contributes nothing
+  rather than a detector the engine would call on every request for no gain. `entity-models` keys
+  ARE `SensitiveSpan` categories, not a separate vocabulary: a `PERSON` key produces
+  `[REDACTED_PERSON]` through the same `placeholder()` mechanism described above, with no mapping
+  table anywhere. Models are loaded **eagerly**, in the detector's constructor: a missing,
+  unreadable, or corrupt model fails application startup rather than being caught later by the
+  fail-open policy above — deliberately, because a lazily-loaded broken model would be caught,
+  counted, and skipped, handing the operator a guardrail that silently protects nothing (a typo in
+  a model path should fail loudly, not turn into silent non-coverage). `streamSafe()` returns
+  **`false`**: NER over a bounded lookahead window that starts mid-sentence gives different, worse
+  answers than over the whole text, so **streamed completions get regex redaction only** — batch
+  response scanning and all request-direction scanning still cover NER. `min-confidence` (default
+  `0.85`, `NameFinderME`'s per-span probability) is the only false-positive control on this path,
+  and it carries more weight than a tuning knob normally would: redaction here is destructive and
+  pre-model, so a spurious `PERSON` hit on "Claude", "Stripe", or "Redis" in a developer's prompt
+  silently corrupts the text the model receives, with no signal to the user — exactly the input
+  distribution a newswire-trained model produces on chat and code text. Every span this detector
+  reports is `SensitiveKind.PII`, so it is gated by the same workspace `redactPii` toggle (or the
+  gateway's `pii-redaction-enabled` property) as the regex PII detector — an operator who enables
+  this module and configures valid models but leaves `redactPii` off gets zero redaction from it,
+  silently; the detector's own startup log only confirms what it loaded, not that it is doing
+  anything. And unlike the regex detectors, NER here is not a linear scan: `NameFinderME` runs
+  beam-search sequence decoding over the entire input, synchronously, on the request path, before
+  the LLM call, with no input-size bound anywhere in this module — materially more expensive than
+  the regex detectors, and the engine's fail-open policy does not help, because a slow detector
+  never throws. Finally, the same keys are
+  mirrored on `ApplicationProperties.Ai.Guardrails.OpenNlp` (`server/libs/config/app-config`) — not
+  redundancy: `ApplicationProperties` binds all of `bytechef.*` with `ignoreUnknownFields = false`,
+  so an operator-set key with no field there fails EVERY app's context, including apps that do not
+  carry this optional module. This is the trap for whoever adds the next optional module with
+  operator-settable properties: a standalone `@ConfigurationProperties` class is fine on its own
+  only as long as nothing ever sets its keys; the moment an operator can set `enabled: true`, the
+  keys become present-in-a-property-source and strict binding needs a field for them somewhere every
+  app still loads, module or no module.
 
 ## Settings storage
 
@@ -148,8 +261,9 @@ only its own per-project guardrail overlay.
 
 `bytechef_ai_guardrail{event, surface}` — `surface = gateway | ai_agent | ai_hub`. Events:
 `pii_redacted`, `secret_redacted`, `blocked_term`, `moderation_flagged`, `injection_flagged`,
-`response_redacted`, plus `blocking_downgraded` when `REDACT_AND_CONTINUE` converts a would-be
-block. `moderation_flagged` is no longer gateway-only (superseded, F2 of the standalone-guardrails
+`response_redacted`, `detector_failed` (a `SensitiveDataDetector` threw and was skipped — see below
+for which call paths actually count it), plus `blocking_downgraded` when `REDACT_AND_CONTINUE`
+converts a would-be block. `moderation_flagged` is no longer gateway-only (superseded, F2 of the standalone-guardrails
 follow-up): `AiGuardrails#checkInputs` now also checks moderation, so `ai_agent`/`ai_hub`-tagged
 `moderation_flagged` events are emitted whenever a workspace enables moderation and a moderation
 classifier bean is configured — the engine's `applyToInputs` (the gateway's own throwing path)
@@ -174,6 +288,34 @@ response-direction alike — carries an accurate per-surface tag and emits regar
 gateway is enabled; only the gateway's own `applyToInputs` path is gated. Wired via
 `ObjectProvider<MeterRegistry>` so registry-less apps start clean.
 
+**`detector_failed` follows the same per-surface split as every other event, but it took a second
+pass to get there.** `SensitiveDataRedactor`'s detect/redact methods take an
+`@Nullable AiGuardrailMetrics` and record `detector_failed` through whatever is handed to them, and
+every path that a surface-tagged instance can reach now hands one in:
+
+- **Request direction** — `AiGuardrails#checkInputs` → `#checkInput` → `#redactPiiAndSecrets` threads
+  the caller-supplied instance, so the event lands under the calling surface exactly like
+  `pii_redacted`/`secret_redacted`.
+- **Response direction** — `scanResponseText` and `redactAll` each have an overload taking an
+  `@Nullable AiGuardrailMetrics`, and `AiGuardrailsAdvisor` passes the same per-surface instance it
+  already uses for `response_redacted`. A detector failing while scanning an `ai_agent`/`ai_hub`
+  completion is therefore counted under THAT surface, and counted at all regardless of the gateway
+  toggle.
+- **Streaming** — `StreamingResponseRedactor` takes an `@Nullable AiGuardrailMetrics` through its
+  constructor and threads it into all three redactor calls;
+  `AiGuardrails#newStreamingResponseRedactor(workspaceId, metrics)` is how the advisor supplies it.
+
+Two paths deliberately still record through the engine's own constructor-injected bean, and that is
+correct rather than a gap: the gateway adapter's `applyToInputs`, and the no-argument
+`newStreamingResponseRedactor()` / bare `redactPii`/`redactSecrets`/`redactAll` calls the gateway's
+project overlay makes. Those callers ARE the gateway, so the bean's fixed `surface=gateway` tag is
+accurate for them — and being gated on `bytechef.ai.gateway.enabled` costs nothing, since the gateway
+is by definition enabled when they run.
+
+Note there is deliberately no `newStreamingResponseRedactor(AiGuardrailMetrics)` single-argument
+overload: it would be ambiguous with `newStreamingResponseRedactor(Long workspaceId)` for a bare
+`null` argument, forcing callers to cast. A caller supplying its own metrics instance passes it
+alongside the workspace id.
 
 ## Appendix: extracted from CLAUDE.md
 
@@ -187,7 +329,11 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
 - **Engine**: `AiGuardrails` (`@Component @ConditionalOnEEVersion`) is registered UNCONDITIONALLY —
   decoupled from `bytechef.ai.gateway.enabled` (default false); it is inert when no workspace has anything
   enabled, so registering it unconditionally costs nothing and lets the agent surfaces work even with the
-  gateway toggled off.
+  gateway toggled off. PII/secret redaction itself is a detect → resolve → apply span pipeline
+  (`SensitiveDataRedactor`) behind a bean-contributed `SensitiveDataDetector` SPI published in
+  `platform-ai-guardrails-api` — not the old sequential `String.replaceAll` chain. The resolution order over
+  overlapping spans is total, so detector registration order can never affect the redacted output; see
+  the "Sensitive-data detectors" section above for the full breakdown.
 - **Settings**: `AiGuardrailsWorkspaceSettings` is PROPERTY-BACKED, not a dedicated table — one
   `PropertyService` row per workspace (`Property.Scope.WORKSPACE`); the tenant default (null `workspaceId`)
   uses `Property.Scope.PLATFORM` with a null `scopeId`, the same convention as
@@ -264,6 +410,10 @@ gateway-only implementation; see "AI Gateway content guardrails" below for the g
   own bean. Only `AiGuardrails#applyToInputs` (the gateway adapter's throwing entry point) still records
   through the engine's own internal `AiGuardrailMetrics` bean, gated on `bytechef.ai.gateway.enabled` and
   tagged `surface=gateway`. See `.agents/ai-guardrails.md` for the full breakdown.
+- **Optional NER detector.** `platform-ai-guardrails-opennlp` (EE, off by default) plugs Apache OpenNLP
+  into the `SensitiveDataDetector` SPI for unstructured PII (names, organizations) with no engine
+  change. It ships no models — Apache distributes none — and is not stream-safe, so streamed
+  completions still get regex redaction only. See the "OpenNLP detector" section above.
 - Spec: `docs/superpowers/specs/2026-07-31-ai-guardrails-standalone-design.md`. Agent docs:
   `.agents/ai-guardrails.md` (engine, advisor, surfaces) and `.agents/ai-gateway-guardrails.md`
   (gateway adapter specifics, project overlay).
