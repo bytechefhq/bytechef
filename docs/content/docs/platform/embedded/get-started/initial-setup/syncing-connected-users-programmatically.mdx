@@ -3,7 +3,7 @@ title: Syncing Connected Users
 description: How a Connected User record comes into existence, what an external user id is, and how to attach your own name, email and metadata to it.
 ---
 
-A **Connected User** is ByteChef's record of one of your end users. "Syncing" is the natural word for keeping it current, but it describes the wrong shape: there is no push, no bulk import, and no create endpoint. ByteChef learns that a user exists the first time that user authenticates, and everything you know about them — their name, their email, your own identifiers — you attach afterwards.
+A **Connected User** is ByteChef's record of one of your end users. "Syncing" is the natural word for keeping it current, but it describes the wrong shape: there is no push, no bulk import, and no create endpoint. ByteChef learns that a user exists the first time that user authenticates, and everything you know about them - their name, their email, your own identifiers - you attach afterwards.
 
 This page covers the identity contract, when the record appears, and how to enrich it.
 
@@ -15,13 +15,13 @@ It reaches ByteChef by one of two routes, depending on how the call is authentic
 
 | Credential | Where the id comes from |
 |---|---|
-| **Signing Key JWT** | The token's `sub` claim — see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend). |
+| **Signing Key JWT** | The token's `sub` claim - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend). |
 | **API Key** | The `{externalUserId}` segment of the request path. |
 
 Both routes converge on the same lookup, so a user your frontend created through the Connect dialog and a user your backend addresses by path are the same record.
 
 <Callout type="warn" title="Pick an id that never changes">
-    Use your internal primary key, not an email address or username. Changing the external user id does not rename the Connected User — it creates a second, empty one, and the original user's connections and enabled workflows stay behind on the old id.
+    Use your internal primary key, not an email address or username. Changing the external user id does not rename the Connected User - it creates a second, empty one, and the original user's connections and enabled workflows stay behind on the old id.
 </Callout>
 
 ## The record appears on first contact
@@ -32,9 +32,9 @@ This has one consequence worth designing around: **you cannot pre-provision user
 
 ### One record per environment
 
-The lookup is scoped to the environment the request carries, so the same external user id in Development and in Production is **two independent records** — separate connections, separate enabled workflows, separate metadata. Requests select the environment with the optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, `PRODUCTION`); with the header omitted, ByteChef uses `PRODUCTION`.
+The lookup is scoped to the environment the request carries, so the same external user id in Development and in Production is **two independent records** - separate connections, separate enabled workflows, separate metadata. Requests select the environment with the optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, `PRODUCTION`); with the header omitted, ByteChef uses `PRODUCTION`.
 
-Promoting a user's setup from one environment to another is not something the connected-user API does — each environment's record is built by that environment's own traffic.
+Promoting a user's setup from one environment to another is not something the connected-user API does - each environment's record is built by that environment's own traffic.
 
 ## Attaching your own data
 
@@ -68,13 +68,13 @@ await fetch(`${baseUrl}/api/embedded/v1/${externalUserId}`, {
 
 The body is a free-form object, but the keys are not all treated alike, and the rules are easy to trip over:
 
-- **`name` and `email` become real fields.** They are matched case-insensitively and are the two columns shown in the Connected Users table. They only get this treatment when the value is a **string** — `{"name": 42}` falls through and is stored as metadata instead.
+- **`name` and `email` become real fields.** They are matched case-insensitively and are the two columns shown in the Connected Users table. They only get this treatment when the value is a **string** - `{"name": 42}` falls through and is stored as metadata instead.
 - **Everything else becomes metadata, as a string.** Metadata values are stored as text, so a number, boolean, or nested object is converted with its string form. Send `{"seats": 5}` and you get back `"5"`; send an object and you get its serialized form rather than a structure you can query. Flatten anything nested yourself, and keep values small.
-- **Metadata merges — it never replaces.** Keys you send are added or overwritten; keys you omit are left alone. A PATCH is always additive.
-- **You cannot delete a metadata key.** Sending `null` for a key does not clear it — null values are discarded before the merge, so the previous value survives. Write a sentinel your application understands (an empty string, say) if you need to represent "unset".
+- **Metadata merges - it never replaces.** Keys you send are added or overwritten; keys you omit are left alone. A PATCH is always additive.
+- **You cannot delete a metadata key.** Sending `null` for a key does not clear it - null values are discarded before the merge, so the previous value survives. Write a sentinel your application understands (an empty string, say) if you need to represent "unset".
 
 <Callout type="warn" title="PATCH fails before the user's first authenticated call">
-    The update resolves an existing record; it does not create one. Calling it for an external user id that has never authenticated is an error, not an upsert. Enrich a user *after* they first connect — not when they sign up in your product.
+    The update resolves an existing record; it does not create one. Calling it for an external user id that has never authenticated is an error, not an upsert. Enrich a user *after* they first connect - not when they sign up in your product.
 </Callout>
 
 ## When to call it
@@ -82,12 +82,12 @@ The body is a free-form object, but the keys are not all treated alike, and the 
 Two moments cover most integrations:
 
 1. **Just after the user's first connection succeeds**, when you know the record now exists. This is where the initial name and email belong.
-2. **Whenever the underlying profile changes in your product** — a rename, a plan change, a new account id — so the Connected Users table and anything keyed off metadata stay truthful.
+2. **Whenever the underlying profile changes in your product** - a rename, a plan change, a new account id - so the Connected Users table and anything keyed off metadata stay truthful.
 
 Because the endpoint is additive and cheap, a small reconciliation job that re-PATCHes the users you know are connected is a reasonable safety net. There is no bulk variant, so it is one request per user.
 
 ## Disabled users
 
-An admin can disable a Connected User from the console. A disabled user's requests are rejected at authentication — the Connect dialog will not open for them and their workflows stop executing — until they are re-enabled. The record, its connections, and its metadata all survive; only access is withdrawn.
+An admin can disable a Connected User from the console. A disabled user's requests are rejected at authentication - the Connect dialog will not open for them and their workflows stop executing - until they are re-enabled. The record, its connections, and its metadata all survive; only access is withdrawn.
 
 See [Connected Users](/platform/embedded/monitor/connected-users) for the console side: the table, the detail sheet, and the enable, disable, and delete actions.
