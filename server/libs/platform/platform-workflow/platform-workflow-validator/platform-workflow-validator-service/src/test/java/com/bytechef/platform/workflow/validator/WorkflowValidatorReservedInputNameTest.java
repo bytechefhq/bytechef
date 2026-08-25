@@ -26,10 +26,10 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Covers the {@code __}-prefix reserved-name guards -- {@link WorkflowValidatorFacade#validateNoReservedInputNames} for
+ * Covers the reserved-name guards -- {@link WorkflowValidatorFacade#validateNoReservedInputNames} for
  * {@code inputs[].name} and {@link WorkflowValidatorFacade#validateNoReservedNodeNames} for top-level trigger/task node
- * names -- that protect the reserved {@code __triggerName} job-input key from ever being shadowed by a
- * workflow-authored name.
+ * names -- that protect the reserved {@code __triggerName} and {@code vars} job-input keys from ever being shadowed by
+ * a workflow-authored name.
  */
 class WorkflowValidatorReservedInputNameTest {
 
@@ -124,6 +124,40 @@ class WorkflowValidatorReservedInputNameTest {
 
         assertThatCode(() -> workflowValidatorFacade.validateNoReservedNodeNames(definition))
             .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testValidateNoReservedInputNamesRejectsVars() {
+        String definition = """
+            {"label":"t","inputs":[{"name":"vars","type":"string"}],"tasks":[]}
+            """;
+
+        assertThatThrownBy(() -> workflowValidatorFacade.validateNoReservedInputNames(definition))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(WorkflowValidatorErrorType.RESERVED_INPUT_NAME.getErrorKey());
+    }
+
+    @Test
+    void testValidateNoReservedInputNamesAllowsVarsPrefixedNames() {
+        String definition = """
+            {"label":"t","inputs":[{"name":"varsCount","type":"string"}],"tasks":[]}
+            """;
+
+        assertThatCode(() -> workflowValidatorFacade.validateNoReservedInputNames(definition))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testValidateNoReservedNodeNamesRejectsVars() {
+        String definition = """
+            {"label":"t","triggers":[],"tasks":[{"name":"vars","type":"var/v1/set"}]}
+            """;
+
+        assertThatThrownBy(() -> workflowValidatorFacade.validateNoReservedNodeNames(definition))
+            .asInstanceOf(type(ConfigurationException.class))
+            .extracting(ConfigurationException::getErrorKey)
+            .isEqualTo(WorkflowValidatorErrorType.RESERVED_NODE_NAME.getErrorKey());
     }
 
     /**

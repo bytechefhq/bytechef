@@ -82,6 +82,8 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     @PreAuthorize("isTenantAdmin()")
     public long addWorkflow(long integrationId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateNoReservedInputNames(definition);
+        workflowValidatorFacade.validateNoReservedNodeNames(definition);
 
         Integration integration = integrationService.getIntegration(integrationId);
 
@@ -214,6 +216,9 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     @Override
     @PreAuthorize("isTenantAdmin()")
     public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+        workflowValidatorFacade.validateNoReservedInputNames(definition);
+        workflowValidatorFacade.validateNoReservedNodeNames(definition);
+
         workflowFacade.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
