@@ -111,6 +111,8 @@ docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
+    --env BYTECHEF_ENCRYPTION_PROVIDER=property \
+    --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=tTB1/UBIbYLuCXVi4PPfzA== \
     --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
     --network bytechef_network \
     docker.bytechef.io/bytechef/bytechef:latest
