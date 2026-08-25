@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-code-workflow-loader"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.springframework.data:spring-data-jdbc")

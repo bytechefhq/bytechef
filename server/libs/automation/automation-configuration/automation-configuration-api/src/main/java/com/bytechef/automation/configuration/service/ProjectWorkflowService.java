@@ -40,6 +40,8 @@ public interface ProjectWorkflowService {
 
     Optional<String> fetchProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid);
 
+    Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId);
+
     ProjectWorkflow getLastProjectWorkflow(long projectId, String workflowUuid);
 
     String getLastPublishedWorkflowId(String workflowUuid);

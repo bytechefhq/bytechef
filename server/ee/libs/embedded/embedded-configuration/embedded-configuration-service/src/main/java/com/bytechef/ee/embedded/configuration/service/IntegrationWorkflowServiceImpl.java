@@ -63,6 +63,12 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<IntegrationWorkflow> fetchWorkflowIntegrationWorkflow(String workflowId) {
+        return integrationWorkflowRepository.findByWorkflowId(workflowId);
+    }
+
+    @Override
     public IntegrationWorkflow getIntegrationWorkflow(long id) {
         return integrationWorkflowRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("IntegrationWorkflow not found for id: " + id));

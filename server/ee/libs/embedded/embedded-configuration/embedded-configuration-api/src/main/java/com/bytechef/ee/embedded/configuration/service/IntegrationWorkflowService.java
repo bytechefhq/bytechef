@@ -27,6 +27,8 @@ public interface IntegrationWorkflowService {
 
     Optional<String> fetchLastWorkflowId(String workflowUuid, Environment environment);
 
+    Optional<IntegrationWorkflow> fetchWorkflowIntegrationWorkflow(String workflowId);
+
     IntegrationWorkflow getIntegrationWorkflow(long id);
 
     List<Long> getIntegrationWorkflowIds(long integrationId, int integrationVersion);

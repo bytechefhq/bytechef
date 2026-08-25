@@ -19,6 +19,7 @@ import com.bytechef.ee.automation.configuration.security.scope.ApiKeyPermissionS
 import com.bytechef.ee.automation.configuration.security.scope.DeploymentPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.McpPermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.ProjectPermissionScopeProvider;
+import com.bytechef.ee.automation.configuration.security.scope.VariablePermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.scope.WorkflowPermissionScopeProvider;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -137,7 +138,8 @@ class PermissionScopeRegistryTest {
                 new A2aPermissionScopeProvider(), new ApiKeyPermissionScopeProvider(),
                 new DeploymentPermissionScopeProvider(),
                 new McpPermissionScopeProvider(),
-                new ProjectPermissionScopeProvider(), new WorkflowPermissionScopeProvider()));
+                new ProjectPermissionScopeProvider(), new VariablePermissionScopeProvider(),
+                new WorkflowPermissionScopeProvider()));
 
         @Test
         void testEveryScopeNamedByAGateIsRegistered() {
