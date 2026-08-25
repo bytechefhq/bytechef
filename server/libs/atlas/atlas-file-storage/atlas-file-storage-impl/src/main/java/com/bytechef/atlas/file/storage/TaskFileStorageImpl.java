@@ -19,6 +19,7 @@ package com.bytechef.atlas.file.storage;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.ValueTagUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -57,31 +58,40 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, ?> readContextValue(FileEntry fileEntry) {
-        return JsonUtils.read(
+        Map<String, ?> value = JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXT_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
+
+        return (Map<String, ?>) ValueTagUtils.untag(value);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, ?> readJobOutputs(FileEntry fileEntry) {
-        return JsonUtils.read(
+        Map<String, ?> value = JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOB_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
+
+        return (Map<String, ?>) ValueTagUtils.untag(value);
     }
 
     @Override
     public Object readTaskExecutionOutput(FileEntry fileEntry) {
-        return JsonUtils.read(
+        Object value = JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TASK_EXECUTION_FILES_DIR, fileEntry)),
             Object.class);
+
+        return ValueTagUtils.untag(value);
     }
 
     @Override
     public FileEntry storeContextValue(long stackId, Context.Classname classname, Map<String, ?> value) {
         return fileStorageService.storeFileContent(
-            CONTEXT_FILES_DIR, classname + "_" + stackId + ".json", CompressionUtils.compress(JsonUtils.write(value)));
+            CONTEXT_FILES_DIR, classname + "_" + stackId + ".json",
+            CompressionUtils.compress(JsonUtils.write(ValueTagUtils.tag(value))));
     }
 
     @Override
@@ -90,18 +100,20 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + "_" + subStackId + ".json",
-            CompressionUtils.compress(JsonUtils.write(value)));
+            CompressionUtils.compress(JsonUtils.write(ValueTagUtils.tag(value))));
     }
 
     @Override
     public FileEntry storeJobOutputs(long jobId, Map<String, ?> outputs) {
         return fileStorageService.storeFileContent(
-            JOB_FILES_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs)));
+            JOB_FILES_DIR, jobId + ".json",
+            CompressionUtils.compress(JsonUtils.write(ValueTagUtils.tag(outputs))));
     }
 
     @Override
     public FileEntry storeTaskExecutionOutput(long jobId, long taskExecutionId, Object output) {
         return fileStorageService.storeFileContent(
-            TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json", CompressionUtils.compress(JsonUtils.write(output)));
+            TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json",
+            CompressionUtils.compress(JsonUtils.write(ValueTagUtils.tag(output))));
     }
 }
