@@ -9,13 +9,13 @@ Embedded runs on the ByteChef deployment you operate, which means the capacity q
 
 **Nothing per connected user, and nothing per tenant.** A deployment does not cap how many requests a customer makes, how many workflows run at once, or how much execution time any one of them consumes. Runs from every customer share the same queues and the same worker pool.
 
-The practical consequence is that **one noisy customer can affect another's latency**. Their data stays isolated — a run cannot read another tenant's data, connections, or history — but throughput is shared. See [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) for exactly where that boundary sits.
+The practical consequence is that **one noisy customer can affect another's latency**. Their data stays isolated - a run cannot read another tenant's data, connections, or history - but throughput is shared. See [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) for exactly where that boundary sits.
 
 ## What you should impose
 
 - [ ] **Rate-limit per customer at your own ingress.** This is the single most important control, and the only one that exists today. Your API gateway knows which customer a request belongs to before ByteChef does.
 - [ ] **Throttle your own triggers.** App Events fan out to every subscribed workflow for a user; firing them in a tight loop multiplies into runs.
-- [ ] **Bound what a workflow can do.** Component-level pagination and batch sizes are the lever you have inside a workflow — an unbounded sync over a large dataset is a long-running job whichever customer starts it.
+- [ ] **Bound what a workflow can do.** Component-level pagination and batch sizes are the lever you have inside a workflow - an unbounded sync over a large dataset is a long-running job whichever customer starts it.
 - [ ] **Watch execution volume per customer.** Executions are attributable, so you can see which customer's workflows dominate before it becomes a support ticket.
 
 ## Plan limits *(coming soon)*
@@ -28,4 +28,4 @@ Until then, treat your ingress as the enforcement point and size the deployment 
 
 ## Timeouts and long-running work
 
-A synchronous call — the Request trigger — returns the workflow's result, so it is bounded by how long that workflow takes. Anything that fans out, loops over a large dataset, or waits on a slow provider belongs behind an asynchronous trigger instead, where the caller is not holding a connection open. [Run governance](/platform/use-bytechef/self-hosted/management/crash-recovery) covers how run timeouts and history retention behave.
+A synchronous call - the Request trigger - returns the workflow's result, so it is bounded by how long that workflow takes. Anything that fans out, loops over a large dataset, or waits on a slow provider belongs behind an asynchronous trigger instead, where the caller is not holding a connection open. [Run governance](/platform/use-bytechef/self-hosted/management/crash-recovery) covers how run timeouts and history retention behave.
