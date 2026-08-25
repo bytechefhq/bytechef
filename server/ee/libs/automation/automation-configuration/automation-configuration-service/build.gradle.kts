@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-audit"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-api"))
 
     testImplementation(rootProject.libs.org.graalvm.polyglot.polyglot)
     testImplementation("org.liquibase:liquibase-core")

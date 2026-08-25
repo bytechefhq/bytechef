@@ -94,6 +94,12 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId) {
+        return projectWorkflowRepository.findByWorkflowId(workflowId);
+    }
+
+    @Override
     public String getLastPublishedWorkflowId(String workflowUuid) {
         return projectWorkflowRepository
             .findLastPublishedByUuid(UUID.fromString(workflowUuid))

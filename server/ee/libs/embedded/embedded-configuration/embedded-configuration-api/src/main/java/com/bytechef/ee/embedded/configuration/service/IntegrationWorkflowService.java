@@ -32,6 +32,13 @@ public interface IntegrationWorkflowService {
      */
     Optional<String> fetchLastWorkflowId(String workflowUuid, Environment environment);
 
+    /**
+     * Non-throwing sibling of {@link #getWorkflowIntegrationWorkflow(String)}: an empty result means the id is not an
+     * integration workflow, letting a caller fall through to another resolution path without a rollback-poisoning
+     * exception. The throwing method is unchanged for its existing callers.
+     */
+    Optional<IntegrationWorkflow> fetchWorkflowIntegrationWorkflow(String workflowId);
+
     IntegrationWorkflow getIntegrationWorkflow(long id);
 
     List<Long> getIntegrationWorkflowIds(long integrationId, int integrationVersion);

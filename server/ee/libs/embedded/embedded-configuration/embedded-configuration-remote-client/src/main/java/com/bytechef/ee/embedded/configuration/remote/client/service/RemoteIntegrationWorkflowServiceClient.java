@@ -45,6 +45,11 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
+    public Optional<IntegrationWorkflow> fetchWorkflowIntegrationWorkflow(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationWorkflow getIntegrationWorkflow(long id) {
         throw new UnsupportedOperationException();
     }

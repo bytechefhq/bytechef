@@ -52,6 +52,11 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
+    public Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String getLastWorkflowId(String workflowUuid) {
         throw new UnsupportedOperationException();
     }

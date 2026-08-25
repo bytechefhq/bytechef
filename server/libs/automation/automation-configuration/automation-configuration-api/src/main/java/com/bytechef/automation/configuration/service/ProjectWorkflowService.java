@@ -38,6 +38,13 @@ public interface ProjectWorkflowService {
 
     Optional<String> fetchProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid);
 
+    /**
+     * Non-throwing sibling of {@link #getWorkflowProjectWorkflow(String)}: an empty result means the id is not a
+     * project workflow, letting a caller fall through to another resolution path without a rollback-poisoning
+     * exception. The throwing method is unchanged for its existing callers.
+     */
+    Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId);
+
     ProjectWorkflow getLastProjectWorkflow(long projectId, String workflowUuid);
 
     String getLastPublishedWorkflowId(String workflowUuid);
