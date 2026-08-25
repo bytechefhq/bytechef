@@ -1,9 +1,9 @@
 ---
 title: Headless Embedding
-description: Build your own connect UI against the embedded API when the React SDK does not fit — a non-React frontend, a native app, or a flow you need full control over.
+description: Build your own connect UI against the embedded API when the React SDK does not fit - a non-React frontend, a native app, or a flow you need full control over.
 ---
 
-`@bytechef/embedded` is a React SDK. If your product is not React, or the Connect dialog's flow is not the flow you want, everything it does is available as API calls you can make yourself. The dialog holds no privileged state — it is a client of the same public endpoints your code can call.
+`@bytechef/embedded` is a React SDK. If your product is not React, or the Connect dialog's flow is not the flow you want, everything it does is available as API calls you can make yourself. The dialog holds no privileged state - it is a client of the same public endpoints your code can call.
 
 <Callout type="warn" title="You take on the OAuth dance">
     The SDK's main value is not the markup, it is handling the OAuth 2.0 popup, the state check, and the code exchange. Going headless means implementing that yourself. For non-OAuth connections the saving is smaller and the work is mostly a form.
@@ -11,11 +11,11 @@ description: Build your own connect UI against the embedded API when the React S
 
 ## Which credential
 
-Use a **Signing Key JWT**, the same one the SDK takes. It authenticates one of your end users directly from the browser, so the operations you call are the ones under [Frontend](/openapi/frontend/embedded-configuration-integration) in the API reference — they resolve the user from the token's `sub` claim and carry no user id in the path.
+Use a **Signing Key JWT**, the same one the SDK takes. It authenticates one of your end users directly from the browser, so the operations you call are the ones under [Frontend](/openapi/frontend/embedded-configuration-integration) in the API reference - they resolve the user from the token's `sub` claim and carry no user id in the path.
 
 You can drive the same flow from your backend with an API Key against the `{externalUserId}` paths instead. Do that when the connect step is server-driven; use the JWT when the browser is making the calls, so your API Key never reaches the client.
 
-Mint tokens as described in [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend) — the private key stays on your server and the token is short-lived.
+Mint tokens as described in [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk#2-generate-a-user-token-in-your-backend) - the private key stays on your server and the token is short-lived.
 
 ## The flow
 
@@ -30,7 +30,7 @@ const response = await fetch(`${baseUrl}/api/embedded/v1/integrations/${integrat
 });
 ```
 
-The payload describes everything you need to render: the integration's components, the inputs to collect, and — for OAuth integrations — a `connectionConfig.oauth2` object carrying the `authorizationUrl`, `clientId`, `redirectUri`, and `scopes`. That last part is what makes a headless implementation possible at all.
+The payload describes everything you need to render: the integration's components, the inputs to collect, and - for OAuth integrations - a `connectionConfig.oauth2` object carrying the `authorizationUrl`, `clientId`, `redirectUri`, and `scopes`. That last part is what makes a headless implementation possible at all.
 
 ### 2. Authorize
 
@@ -39,7 +39,7 @@ For an OAuth integration, send the user to the `authorizationUrl` with those par
 - **Generate a `state` value and verify it on return.** A mismatch means the response did not come from the flow you started, and must be rejected.
 - **Match the response type to the grant.** Authorization Code returns a `code` to exchange; implicit-style grants return a token directly.
 
-For a non-OAuth integration there is nothing to authorize — collect the inputs the payload described and go straight to the next step.
+For a non-OAuth integration there is nothing to authorize - collect the inputs the payload described and go straight to the next step.
 
 ### 3. Create the integration instance
 
@@ -57,21 +57,21 @@ await fetch(`${baseUrl}/api/embedded/v1/integrations/${integrationId}/instances`
 });
 ```
 
-This is the step that creates the **Connected User** record if the token's `sub` has never been seen before — see [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically).
+This is the step that creates the **Connected User** record if the token's `sub` has never been seen before - see [Syncing Connected Users](/platform/embedded/get-started/initial-setup/syncing-connected-users-programmatically).
 
 ### 4. Configure and toggle workflows
 
 Afterwards, the instance's workflows are managed individually:
 
-- `PATCH /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}` — set a workflow's inputs.
-- `PATCH /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}/enable` — turn it on or off.
-- `PATCH /api/embedded/v1/integration-instances/{id}` — update the instance itself.
+- `PATCH /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}` - set a workflow's inputs.
+- `PATCH /api/embedded/v1/integration-instances/{id}/workflows/{workflowUuid}/enable` - turn it on or off.
+- `PATCH /api/embedded/v1/integration-instances/{id}` - update the instance itself.
 
 See [Instance Workflows](/openapi/frontend/embedded-configuration-integration-instance-workflow) for the exact bodies.
 
 ### 5. Dynamic dropdowns
 
-Inputs whose options come from the user's own account — a list of their Salesforce objects, say — are resolved at render time:
+Inputs whose options come from the user's own account - a list of their Salesforce objects, say - are resolved at render time:
 
 ```
 POST /api/embedded/v1/integration-instances/{id}/component-input-options
@@ -81,7 +81,7 @@ It runs the component's options function against that user's connection and retu
 
 ## Reconnecting
 
-Pass the existing instance id when you want the user to re-authorize rather than connect fresh. This is what fixes a connection whose credential has gone `INVALID` — it replaces the credential in place instead of creating a second instance. See [Troubleshooting](/platform/embedded/monitor/troubleshooting) for how an invalid credential presents.
+Pass the existing instance id when you want the user to re-authorize rather than connect fresh. This is what fixes a connection whose credential has gone `INVALID` - it replaces the credential in place instead of creating a second instance. See [Troubleshooting](/platform/embedded/monitor/troubleshooting) for how an invalid credential presents.
 
 ## What you give up
 
