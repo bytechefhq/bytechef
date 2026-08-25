@@ -24,7 +24,6 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -160,25 +159,31 @@ public class ConditionTaskUtils {
                 .get(operandType)
                 .get(MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.OPERATION));
 
-            String value1 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_1, "");
-            String value2 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_2, "");
-
             String replacement1;
             String replacement2;
 
             if (operandType.equals(ConditionTaskDispatcherConstants.DATE_TIME)) {
+                Object value1 = MapUtils.get(condition, ConditionTaskDispatcherConstants.VALUE_1);
+                Object value2 = MapUtils.get(condition, ConditionTaskDispatcherConstants.VALUE_2);
+
                 String variableName1 = "dt" + variables.size();
                 String variableName2 = "dt" + (variables.size() + 1);
 
-                variables.put(variableName1, LocalDateTime.parse(value1));
-                variables.put(variableName2, LocalDateTime.parse(value2));
+                variables.put(variableName1, DateTimeOperandParser.parse(value1, "value1"));
+                variables.put(variableName2, DateTimeOperandParser.parse(value2, "value2"));
 
                 replacement1 = "#" + variableName1;
                 replacement2 = "#" + variableName2;
             } else if (operandType.equals(ConditionTaskDispatcherConstants.STRING)) {
+                String value1 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_1, "");
+                String value2 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_2, "");
+
                 replacement1 = EncodingUtils.urlEncode(value1);
                 replacement2 = EncodingUtils.urlEncode(value2);
             } else {
+                String value1 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_1, "");
+                String value2 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_2, "");
+
                 replacement1 = value1;
                 replacement2 = value2;
             }
