@@ -353,6 +353,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-graphql"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-service"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-service"))
 
     // EE Components - filtered by includeComponents/excludeComponents properties
     // Use pre-built JARs when useComponentJars=true for faster IntelliJ startup
