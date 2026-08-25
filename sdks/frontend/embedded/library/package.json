@@ -1,6 +1,6 @@
 {
     "name": "@bytechef/embedded",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "ByteChef Embedded React SDK.",
     "type": "module",
     "scripts": {
@@ -28,6 +28,9 @@
         "dist"
     ],
     "types": "./dist/main.d.ts",
+    "publishConfig": {
+        "access": "public"
+    },
     "peerDependencies": {
         "react": "^19.2.3",
         "react-dom": "^19.2.3"
@@ -84,7 +87,7 @@
         "vite-plugin-lib-inject-css": "2.2.2",
         "vitest": "4.1.7"
     },
-    "main": "eslint.config.js",
+    "main": "./dist/main.js",
     "bugs": {
         "url": "https://github.com/bytechefhq/bytechef/issues"
     },
