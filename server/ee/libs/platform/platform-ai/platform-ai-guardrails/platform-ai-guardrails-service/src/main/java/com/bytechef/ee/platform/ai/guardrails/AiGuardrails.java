@@ -10,11 +10,18 @@ package com.bytechef.ee.platform.ai.guardrails;
 import com.bytechef.ee.platform.ai.gateway.exception.AiGatewayGuardrailException;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayInjectionClassifier;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayModerationClassifier;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveDataDetector;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveDataDetectors;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveDataRedactor;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveDataRedactor.RedactionResult;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveKind;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveSpan;
 import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings;
 import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings.BlockingMode;
 import com.bytechef.ee.platform.ai.guardrails.service.AiGuardrailsWorkspaceSettingsService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -26,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -96,47 +104,11 @@ public class AiGuardrails {
 
     private static final Logger log = LoggerFactory.getLogger(AiGuardrails.class);
 
-    private static final String SECRET_PLACEHOLDER = "[REDACTED_SECRET]";
     private static final String BLOCKED_TERM_PLACEHOLDER = "[REDACTED_BLOCKED_TERM]";
     // A moderation verdict has no locatable span (the classifier judges the whole message), so a REDACT_AND_CONTINUE
     // downgrade replaces the entire message rather than masking a substring -- see the class javadoc's "Moderation and
     // BlockingMode" section for why this differs from how injection currently downgrades.
     private static final String MODERATION_PLACEHOLDER = "[REDACTED_MODERATED]";
-
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
-    private static final Pattern SSN_PATTERN = Pattern.compile("\\b\\d{3}-\\d{2}-\\d{4}\\b");
-    private static final Pattern CREDIT_CARD_PATTERN = Pattern.compile("\\b(?:\\d{4}[ -]?){3}\\d{4}\\b");
-    // Linear, backtracking-safe: a 3-3-4 grouping with a single required separator between groups (no nested optional
-    // quantifiers, so no catastrophic backtracking / ReDoS).
-    private static final Pattern PHONE_PATTERN = Pattern.compile("\\b\\d{3}[-.\\s]\\d{3}[-.\\s]\\d{4}\\b");
-    private static final Pattern IPV4_PATTERN = Pattern.compile(
-        "\\b(?:(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|1?\\d?\\d)\\b");
-
-    // Developer-secret shapes. Each is anchored, fixed-length, or bounded by a single quantifier / literal terminator —
-    // no nested optional quantifiers, so all are ReDoS-safe. This is the high-signal subset; entropy/random-string
-    // detection lives in the workflow-layer SecretKeyDetectorUtils for callers who want it.
-    private static final List<Pattern> SECRET_PATTERNS = List.of(
-        // PEM private-key block (redact the whole block, not just the marker)
-        Pattern.compile("-----BEGIN [A-Z ]*PRIVATE KEY-----[\\s\\S]*?-----END [A-Z ]*PRIVATE KEY-----"),
-        // AWS access key id
-        Pattern.compile("\\bAKIA[0-9A-Z]{16}\\b"),
-        // GitHub personal/OAuth/app tokens (classic) and fine-grained PATs
-        Pattern.compile("\\bgh[pousr]_[A-Za-z0-9]{36}\\b"),
-        Pattern.compile("\\bgithub_pat_[A-Za-z0-9_]{22,}\\b"),
-        // OpenAI API keys (incl. project-scoped)
-        Pattern.compile("\\bsk-(?:proj-)?[A-Za-z0-9_-]{20,}\\b"),
-        // Slack tokens
-        Pattern.compile("\\bxox[baprs]-[A-Za-z0-9-]{10,}\\b"),
-        // Stripe secret / restricted live keys
-        Pattern.compile("\\b[sr]k_live_[0-9a-zA-Z]{24}\\b"),
-        // Google API keys
-        Pattern.compile("\\bAIza[0-9A-Za-z_-]{35}\\b"),
-        // JSON Web Tokens (three base64url segments)
-        Pattern.compile("\\beyJ[A-Za-z0-9_-]+\\.eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+"));
-
-    // Every PII + secret pattern, used by the streaming redactor to locate matched spans so it never emits across the
-    // middle of one.
-    private static final List<Pattern> ALL_SENSITIVE_PATTERNS = buildAllSensitivePatterns();
 
     private final AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService;
     private final List<String> globalBlockedTerms;
@@ -149,12 +121,46 @@ public class AiGuardrails {
     private final @Nullable AiGatewayInjectionClassifier injectionClassifier;
     private final @Nullable AiGatewayModerationClassifier moderationClassifier;
     private final @Nullable AiGuardrailMetrics metrics;
+    private final SensitiveDataRedactor sensitiveDataRedactor;
+    // Resolved once at construction rather than per streamed response -- streamSafeView() logs an exclusion line for
+    // each non-stream-safe detector, and newStreamingResponseRedactor() is called once per streamed response, so
+    // re-deriving this view per call would log on every response in production. The detector list is fixed at
+    // construction, so nothing is lost by resolving it once here.
+    private final SensitiveDataRedactor streamSafeSensitiveDataRedactor;
 
+    /**
+     * Legacy constructor retained so that callers assembling this engine by hand — unit tests in this and other modules
+     * — keep compiling. Uses the built-in regex detectors, which is what those callers had before the detector SPI
+     * existed. Spring uses the {@code @Autowired} constructor below instead, so contributed detector beans participate.
+     */
     public AiGuardrails(
         AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService,
         @Nullable AiGatewayInjectionClassifier injectionClassifier,
         @Nullable AiGatewayModerationClassifier moderationClassifier,
         @Nullable AiGuardrailMetrics metrics,
+        @Value("${bytechef.ai.gateway.guardrails.pii-redaction-enabled:false}") boolean piiRedactionEnabled,
+        @Value("${bytechef.ai.gateway.guardrails.secret-redaction-enabled:false}") boolean secretRedactionEnabled,
+        @Value("${bytechef.ai.gateway.guardrails.blocked-terms:}") String blockedTerms,
+        @Value("${bytechef.ai.gateway.guardrails.injection-detection-enabled:false}") boolean injectionDetectionEnabled,
+        @Value("${bytechef.ai.gateway.guardrails.moderation-enabled:false}") boolean moderationEnabled,
+        @Value("${bytechef.ai.gateway.guardrails.response-scan-enabled:false}") boolean responseScanEnabled,
+        @Value("${bytechef.ai.gateway.guardrails.response-scan-streaming-enabled:false}") boolean streamingResponseScanEnabled) {
+
+        this(
+            aiGuardrailsWorkspaceSettingsService, injectionClassifier, moderationClassifier, metrics,
+            SensitiveDataDetectors.builtIn(), piiRedactionEnabled, secretRedactionEnabled, blockedTerms,
+            injectionDetectionEnabled, moderationEnabled, responseScanEnabled, streamingResponseScanEnabled);
+    }
+
+    // Two constructors are declared, so Spring cannot pick an autowire candidate implicitly. @Autowired marks this one
+    // as the container's entry point, so contributed SensitiveDataDetector beans reach the engine.
+    @Autowired
+    public AiGuardrails(
+        AiGuardrailsWorkspaceSettingsService aiGuardrailsWorkspaceSettingsService,
+        @Nullable AiGatewayInjectionClassifier injectionClassifier,
+        @Nullable AiGatewayModerationClassifier moderationClassifier,
+        @Nullable AiGuardrailMetrics metrics,
+        List<SensitiveDataDetector> sensitiveDataDetectors,
         // Property names kept for compatibility: this engine was extracted from the AI Gateway, which is still the
         // sole owner/reader of these keys today.
         @Value("${bytechef.ai.gateway.guardrails.pii-redaction-enabled:false}") boolean piiRedactionEnabled,
@@ -176,6 +182,8 @@ public class AiGuardrails {
         this.injectionClassifier = injectionClassifier;
         this.moderationClassifier = moderationClassifier;
         this.metrics = metrics;
+        this.sensitiveDataRedactor = new SensitiveDataRedactor(sensitiveDataDetectors);
+        this.streamSafeSensitiveDataRedactor = this.sensitiveDataRedactor.streamSafeView();
     }
 
     /**
@@ -270,6 +278,29 @@ public class AiGuardrails {
      * @return the redacted text, or the original when response scanning is inactive
      */
     public String scanResponseText(String text, @Nullable Long workspaceId) {
+        return scanResponseText(text, workspaceId, metrics);
+    }
+
+    /**
+     * As {@link #scanResponseText(String, Long)}, but counting detector failures through {@code recordingMetrics}
+     * rather than this engine's own bean.
+     *
+     * <p>
+     * Response-direction redaction reaches the engine here, and without this overload it fell through to the engine's
+     * constructor-injected instance — a bean tagged with one fixed {@code surface} for the whole deployment and gated
+     * on the AI Gateway toggle. A detector failing while scanning an AI Hub or canvas-agent completion was therefore
+     * either uncounted or counted as {@code surface=gateway}, pointing an operator at the wrong surface. Callers that
+     * hold a surface-tagged instance should pass it.
+     * </p>
+     *
+     * @param text             the text to scan
+     * @param workspaceId      the workspace the call is attributed to, or {@code null} when unattributed
+     * @param recordingMetrics the instance to count detector failures through, or {@code null}
+     * @return the redacted text, or the original when response scanning is inactive
+     */
+    public String scanResponseText(
+        String text, @Nullable Long workspaceId, @Nullable AiGuardrailMetrics recordingMetrics) {
+
         if (text == null) {
             return null;
         }
@@ -280,7 +311,7 @@ public class AiGuardrails {
             return text;
         }
 
-        return redactAll(text);
+        return redactAll(text, recordingMetrics);
     }
 
     /**
@@ -295,6 +326,20 @@ public class AiGuardrails {
      * @return a fresh {@link StreamingResponseRedactor}, or {@code null} when streaming scanning is inactive
      */
     public @Nullable StreamingResponseRedactor newStreamingResponseRedactor(@Nullable Long workspaceId) {
+        return newStreamingResponseRedactor(workspaceId, metrics);
+    }
+
+    /**
+     * As {@link #newStreamingResponseRedactor(Long)}, but the returned redactor counts detector failures through
+     * {@code recordingMetrics}. Without it a detector failing mid-stream is logged and never counted, on every
+     * deployment.
+     *
+     * @param workspaceId      the workspace the call is attributed to, or {@code null} when unattributed
+     * @param recordingMetrics the instance to count detector failures through, or {@code null}
+     * @return a fresh streaming redactor, or {@code null} when streaming scanning is inactive
+     */
+    public @Nullable StreamingResponseRedactor newStreamingResponseRedactor(
+        @Nullable Long workspaceId, @Nullable AiGuardrailMetrics recordingMetrics) {
         if (!globalStreamingResponseScanEnabled) {
             return null;
         }
@@ -305,7 +350,25 @@ public class AiGuardrails {
             return null;
         }
 
-        return new StreamingResponseRedactor();
+        return new StreamingResponseRedactor(streamSafeSensitiveDataRedactor, recordingMetrics);
+    }
+
+    /**
+     * Returns a fresh streaming redactor over this engine's stream-safe detectors, with no policy check, counting
+     * detector failures through this engine's own metrics instance. For callers that have already decided streaming
+     * scanning applies — the AI Gateway's project-level overlay.
+     *
+     * <p>
+     * There is deliberately no {@code newStreamingResponseRedactor(AiGuardrailMetrics)} overload beside this one: it
+     * would collide with {@link #newStreamingResponseRedactor(Long)} for a bare {@code null} argument, forcing callers
+     * to cast. A caller that wants to supply its own metrics instance passes it alongside the workspace id through the
+     * two-argument form above.
+     * </p>
+     *
+     * @return a fresh streaming redactor
+     */
+    public StreamingResponseRedactor newStreamingResponseRedactor() {
+        return new StreamingResponseRedactor(streamSafeSensitiveDataRedactor, metrics);
     }
 
     /**
@@ -344,86 +407,51 @@ public class AiGuardrails {
     }
 
     /**
-     * Replaces common PII patterns in {@code content} with {@code [REDACTED_*]} placeholders.
+     * Replaces personally-identifiable data in {@code content} with {@code [REDACTED_*]} placeholders.
      */
-    public static String redactPii(@Nullable String content) {
+    public @Nullable String redactPii(@Nullable String content) {
         if (content == null || content.isEmpty()) {
             return content;
         }
 
-        String redacted = EMAIL_PATTERN.matcher(content)
-            .replaceAll("[REDACTED_EMAIL]");
-
-        redacted = SSN_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_SSN]");
-        redacted = CREDIT_CARD_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_CC]");
-        redacted = PHONE_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_PHONE]");
-        redacted = IPV4_PATTERN.matcher(redacted)
-            .replaceAll("[REDACTED_IP]");
-
-        return redacted;
+        return sensitiveDataRedactor.redact(content, EnumSet.of(SensitiveKind.PII), metrics);
     }
 
     /**
      * Replaces recognised developer-secret shapes (cloud/provider API keys, tokens, JWTs, PEM private keys) in
      * {@code content} with a {@code [REDACTED_SECRET]} placeholder.
      */
-    public static String redactSecrets(@Nullable String content) {
+    public @Nullable String redactSecrets(@Nullable String content) {
         if (content == null || content.isEmpty()) {
             return content;
         }
 
-        String redacted = content;
-
-        for (Pattern secretPattern : SECRET_PATTERNS) {
-            redacted = secretPattern.matcher(redacted)
-                .replaceAll(SECRET_PLACEHOLDER);
-        }
-
-        return redacted;
+        return sensitiveDataRedactor.redact(content, EnumSet.of(SensitiveKind.SECRET), metrics);
     }
 
     /**
-     * Applies both the PII and secret redactors to {@code content}. Used for response-direction scanning where both
-     * categories are masked regardless of the request-direction toggles.
+     * Applies both PII and secret redaction to {@code content} in ONE detection pass, resolving any overlap between the
+     * two in favour of the secret. Used for response-direction scanning where both categories are masked regardless of
+     * the request-direction toggles.
      */
-    public static String redactAll(String content) {
-        return redactSecrets(redactPii(content));
+    public @Nullable String redactAll(@Nullable String content) {
+        return redactAll(content, metrics);
     }
 
     /**
-     * Returns the {@code [start, end)} character spans of every PII/secret match in {@code content}, so the streaming
-     * redactor can avoid emitting across the middle of a match. Order is unspecified and spans may overlap.
+     * As {@link #redactAll(String)}, but counting detector failures through {@code recordingMetrics} rather than this
+     * engine's own bean, so the failure is attributed to the surface that actually ran the redaction.
+     *
+     * @param content          the text to redact
+     * @param recordingMetrics the instance to count detector failures through, or {@code null}
+     * @return the redacted text, or {@code content} unchanged when nothing applies
      */
-    static List<int[]> sensitiveMatchRanges(String content) {
-        List<int[]> ranges = new ArrayList<>();
-
-        for (Pattern sensitivePattern : ALL_SENSITIVE_PATTERNS) {
-            Matcher matcher = sensitivePattern.matcher(content);
-
-            while (matcher.find()) {
-                ranges.add(new int[] {
-                    matcher.start(), matcher.end()
-                });
-            }
+    public @Nullable String redactAll(@Nullable String content, @Nullable AiGuardrailMetrics recordingMetrics) {
+        if (content == null || content.isEmpty()) {
+            return content;
         }
 
-        return ranges;
-    }
-
-    private static List<Pattern> buildAllSensitivePatterns() {
-        List<Pattern> patterns = new ArrayList<>();
-
-        patterns.add(EMAIL_PATTERN);
-        patterns.add(SSN_PATTERN);
-        patterns.add(CREDIT_CARD_PATTERN);
-        patterns.add(PHONE_PATTERN);
-        patterns.add(IPV4_PATTERN);
-        patterns.addAll(SECRET_PATTERNS);
-
-        return List.copyOf(patterns);
+        return sensitiveDataRedactor.redact(content, EnumSet.allOf(SensitiveKind.class), recordingMetrics);
     }
 
     private String checkAndRedact(@Nullable String content, EffectivePolicy policy) {
@@ -501,31 +529,45 @@ public class AiGuardrails {
      * caller-supplied instance) paths, which differ only in which {@link AiGuardrailMetrics} instance they record
      * through.
      */
-    private String
-        redactPiiAndSecrets(String content, EffectivePolicy policy, @Nullable AiGuardrailMetrics recordingMetrics) {
-        String redacted = content;
+    private String redactPiiAndSecrets(
+        String content, EffectivePolicy policy, @Nullable AiGuardrailMetrics recordingMetrics) {
+
+        Set<SensitiveKind> kinds = EnumSet.noneOf(SensitiveKind.class);
 
         if (policy.redactPii()) {
-            String piiRedacted = redactPii(redacted);
-
-            if (!piiRedacted.equals(redacted)) {
-                record(recordingMetrics, "pii_redacted");
-            }
-
-            redacted = piiRedacted;
+            kinds.add(SensitiveKind.PII);
         }
 
         if (policy.redactSecrets()) {
-            String secretRedacted = redactSecrets(redacted);
-
-            if (!secretRedacted.equals(redacted)) {
-                record(recordingMetrics, "secret_redacted");
-            }
-
-            redacted = secretRedacted;
+            kinds.add(SensitiveKind.SECRET);
         }
 
-        return redacted;
+        RedactionResult redactionResult = sensitiveDataRedactor.redactWithSpans(content, kinds, recordingMetrics);
+
+        List<SensitiveSpan> accepted = redactionResult.accepted();
+
+        // Recorded from the accepted spans rather than by comparing strings, so the counters describe what was
+        // actually redacted. Under the old chain an overlap could record pii_redacted for a match that the secret
+        // pattern would have covered better; now exactly the winning kind is counted.
+        if (containsKind(accepted, SensitiveKind.PII)) {
+            record(recordingMetrics, "pii_redacted");
+        }
+
+        if (containsKind(accepted, SensitiveKind.SECRET)) {
+            record(recordingMetrics, "secret_redacted");
+        }
+
+        return redactionResult.text();
+    }
+
+    private static boolean containsKind(List<SensitiveSpan> spans, SensitiveKind kind) {
+        for (SensitiveSpan span : spans) {
+            if (span.kind() == kind) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private EffectivePolicy resolvePolicy(@Nullable Long workspaceId) {

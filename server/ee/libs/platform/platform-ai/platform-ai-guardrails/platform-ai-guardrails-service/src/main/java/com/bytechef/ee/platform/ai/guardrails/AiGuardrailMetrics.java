@@ -21,7 +21,8 @@ import org.springframework.stereotype.Component;
 /**
  * Counts guardrail activity so operators can see what the DLP layer is catching. Emits a single
  * {@code bytechef_ai_guardrail} counter tagged by {@code event} — one of {@code pii_redacted}, {@code secret_redacted},
- * {@code response_redacted}, {@code blocked_term}, {@code moderation_flagged}, or {@code injection_flagged} — and by
+ * {@code response_redacted}, {@code blocked_term}, {@code moderation_flagged}, {@code injection_flagged}, or
+ * {@code detector_failed} (a {@code SensitiveDataDetector} threw and was skipped for that call) — and by
  * {@code surface}, identifying which caller is applying guardrails (e.g. {@code gateway} for the AI Gateway adapter).
  * Only these two low-cardinality tags are used (no workspace/project dimension) so the meter stays cheap on unbounded
  * multi-tenant deployments. Wired through {@link ObjectProvider} so lightweight app variants without an actuator

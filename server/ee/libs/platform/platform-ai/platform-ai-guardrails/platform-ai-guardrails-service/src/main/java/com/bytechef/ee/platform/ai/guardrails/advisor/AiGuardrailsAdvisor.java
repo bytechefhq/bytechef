@@ -134,7 +134,7 @@ public final class AiGuardrailsAdvisor implements CallAdvisor, StreamAdvisor {
             return Flux.error(exception);
         }
 
-        StreamingResponseRedactor redactor = aiGuardrails.newStreamingResponseRedactor(workspaceId);
+        StreamingResponseRedactor redactor = aiGuardrails.newStreamingResponseRedactor(workspaceId, metrics);
         Flux<ChatClientResponse> stream = streamAdvisorChain.nextStream(guardedRequest);
 
         if (redactor == null) {
@@ -254,7 +254,7 @@ public final class AiGuardrailsAdvisor implements CallAdvisor, StreamAdvisor {
                 continue;
             }
 
-            String scanned = aiGuardrails.scanResponseText(text, workspaceId);
+            String scanned = aiGuardrails.scanResponseText(text, workspaceId, metrics);
 
             if (scanned.equals(text)) {
                 rewrittenGenerations.add(generation);

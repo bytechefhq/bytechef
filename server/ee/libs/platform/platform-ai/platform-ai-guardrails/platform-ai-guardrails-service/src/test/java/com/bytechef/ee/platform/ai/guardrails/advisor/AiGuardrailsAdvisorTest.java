@@ -16,6 +16,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.platform.ai.gateway.guardrail.AiGatewayModerationClassifier;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveDataDetector;
+import com.bytechef.ee.platform.ai.guardrails.detector.SensitiveSpan;
 import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings;
 import com.bytechef.ee.platform.ai.guardrails.domain.AiGuardrailsWorkspaceSettings.BlockingMode;
 import com.bytechef.ee.platform.ai.guardrails.exception.AiGuardrailViolationException;
@@ -231,6 +233,31 @@ class AiGuardrailsAdvisorTest {
         assertThat(counter(advisorMeterRegistry, "response_redacted", "copilot")).isEqualTo(1.0);
     }
 
+    /**
+     * A detector that fails while scanning a completion must be counted against the surface that actually ran the scan.
+     * Response-direction redaction reaches the engine through {@code scanResponseText}, which previously carried no
+     * metrics instance of its own and fell back to the engine's constructor-injected bean — so the failure landed under
+     * that bean's fixed {@code surface} tag (or nowhere at all, since the bean is gated on the AI Gateway toggle)
+     * rather than under the calling surface, sending an operator to the wrong place.
+     */
+    @Test
+    void testDetectorFailureDuringResponseScanIsRecordedUnderTheCallingSurface() {
+        AiGuardrails aiGuardrails = guardrailsWithDetectors(List.of(throwingDetector()), true);
+
+        when(settingsService.fetchSettings(WORKSPACE_ID)).thenReturn(Optional.empty());
+
+        AiGuardrailsAdvisor advisor = new AiGuardrailsAdvisor(aiGuardrails, WORKSPACE_ID, advisorMetrics);
+        ChatClientRequest request = requestWithUserMessage("Who do I contact?");
+        CallAdvisorChain chain = mock(CallAdvisorChain.class);
+
+        when(chain.nextCall(any())).thenReturn(responseChunk("Contact bob@acme.io for details"));
+
+        advisor.adviseCall(request, chain);
+
+        assertThat(counter(advisorMeterRegistry, "detector_failed", "copilot")).isEqualTo(1.0);
+        assertThat(counter(engineMeterRegistry, "detector_failed", "gateway")).isEqualTo(0.0);
+    }
+
     @Test
     void testModerationBlockModeThrowsCategoryOnlyException() {
         AiGuardrails aiGuardrails = guardrails(content -> true, false, false, "", false, true, false, false);
@@ -318,6 +345,29 @@ class AiGuardrailsAdvisorTest {
         advisor.adviseCall(request, chain);
 
         assertThat(counter(advisorMeterRegistry, "moderation_flagged", "copilot")).isEqualTo(0.0);
+    }
+
+    private static SensitiveDataDetector throwingDetector() {
+        return new SensitiveDataDetector() {
+
+            @Override
+            public String name() {
+                return "broken";
+            }
+
+            @Override
+            public List<SensitiveSpan> detect(String text) {
+                throw new IllegalStateException("detector is broken");
+            }
+        };
+    }
+
+    private AiGuardrails guardrailsWithDetectors(
+        List<SensitiveDataDetector> sensitiveDataDetectors, boolean responseScanEnabled) {
+
+        return new AiGuardrails(
+            settingsService, null, null, engineMetrics, sensitiveDataDetectors, false, false, "", false, false,
+            responseScanEnabled, false);
     }
 
     private static double counter(SimpleMeterRegistry meterRegistry, String event, String surface) {

@@ -37,10 +37,11 @@ class AiGuardrailsTest {
         mock(AiGuardrailsWorkspaceSettingsService.class);
     private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
     private final AiGuardrailMetrics metrics = new AiGuardrailMetrics(meterRegistry, "gateway");
+    private final AiGuardrails redactionGuardrails = guardrails(null, false, false, "", false, false);
 
     @Test
     void testRedactPiiReplacesCommonPatterns() {
-        String redacted = AiGuardrails.redactPii(
+        String redacted = redactionGuardrails.redactPii(
             "Email me at jane.doe@example.com or call 415-555-0132. SSN 123-45-6789, card 4111 1111 1111 1111, " +
                 "host 192.168.1.20.");
 
@@ -57,12 +58,12 @@ class AiGuardrailsTest {
     void testRedactPiiLeavesCleanTextUnchanged() {
         String content = "Summarize the quarterly revenue report.";
 
-        assertThat(AiGuardrails.redactPii(content)).isEqualTo(content);
+        assertThat(redactionGuardrails.redactPii(content)).isEqualTo(content);
     }
 
     @Test
     void testRedactSecretsReplacesKnownTokens() {
-        String redacted = AiGuardrails.redactSecrets(
+        String redacted = redactionGuardrails.redactSecrets(
             "aws AKIAIOSFODNN7EXAMPLE gh ghp_1234567890abcdefghij1234567890abcdef openai " +
                 "sk-abcdefghij1234567890ABCD jwt eyJhbGciOiJIUzI.eyJzdWIiOiIxMjM0.SflKxwRJSMeKKF2QT4 done");
 
@@ -75,7 +76,7 @@ class AiGuardrailsTest {
 
     @Test
     void testRedactSecretsRedactsPemPrivateKeyBlock() {
-        String redacted = AiGuardrails.redactSecrets(
+        String redacted = redactionGuardrails.redactSecrets(
             "key:\n-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34Gkx...\n-----END RSA PRIVATE KEY-----\ntail");
 
         assertThat(redacted).contains("[REDACTED_SECRET]");
@@ -87,7 +88,23 @@ class AiGuardrailsTest {
     void testRedactSecretsLeavesCleanTextUnchanged() {
         String content = "The deployment succeeded and the health check is green.";
 
-        assertThat(AiGuardrails.redactSecrets(content)).isEqualTo(content);
+        assertThat(redactionGuardrails.redactSecrets(content)).isEqualTo(content);
+    }
+
+    /**
+     * The null/empty-input contract for redactPii/redactSecrets/redactAll lives here, on AiGuardrails, not on the
+     * underlying SensitiveDataRedactor -- that engine takes a non-null text parameter by contract, and these three
+     * public methods are the boundary that guards null/empty before ever delegating to it.
+     */
+    @Test
+    void testRedactMethodsReturnNullForNullContent() {
+        assertThat(redactionGuardrails.redactPii(null)).isNull();
+        assertThat(redactionGuardrails.redactSecrets(null)).isNull();
+        assertThat(redactionGuardrails.redactAll(null)).isNull();
+
+        assertThat(redactionGuardrails.redactPii("")).isEmpty();
+        assertThat(redactionGuardrails.redactSecrets("")).isEmpty();
+        assertThat(redactionGuardrails.redactAll("")).isEmpty();
     }
 
     @Test
@@ -411,6 +428,27 @@ class AiGuardrailsTest {
     private double counter(String event) {
         return meterRegistry.counter(AiGuardrailMetrics.COUNTER_NAME, "event", event, "surface", "gateway")
             .count();
+    }
+
+    /**
+     * The request-direction path ({@code applyToInputs} -> {@code redactPiiAndSecrets}) and the response-direction path
+     * ({@code redactAll} -> {@code SensitiveDataRedactor.redact}) must produce identical text for the same set of
+     * enabled kinds. They are two entry points onto one pipeline, and this pins that they stay one pipeline: the
+     * fixture deliberately contains an email, a Slack token whose body holds a credit-card-shaped digit run, and an
+     * IPv4 address, so the assertion exercises overlap resolution and not merely "both redacted something".
+     */
+    @Test
+    void testRequestAndResponseRedactionPathsAgree() {
+        AiGuardrails guardrails = guardrails(null, true, true, "", false, false);
+
+        String text = "bob@example.com used xoxb-1234567890123456-abcdef from 10.0.0.5";
+
+        String viaRequestPath = guardrails.applyToInputs(List.of(text), null)
+            .getFirst();
+        String viaResponsePath = guardrails.redactAll(text);
+
+        assertThat(viaResponsePath).isNotEqualTo(text);
+        assertThat(viaRequestPath).isEqualTo(viaResponsePath);
     }
 
     private AiGuardrails guardrails(
