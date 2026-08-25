@@ -86,6 +86,7 @@ const ApiConnectorImportPage = lazy(
 );
 const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-connectors/pages/ApiConnectorAiPage'));
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
+const EmbeddedVariables = lazy(() => import('@/ee/pages/settings/embedded/variables/Variables'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
 const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
@@ -123,6 +124,7 @@ const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integrati
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const WorkspaceApiKeys = lazy(() => import('@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
+const WorkspaceVariables = lazy(() => import('@/ee/pages/settings/automation/variables/Variables'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
@@ -206,6 +208,18 @@ const currentWorkspaceSettingsRoutes = {
             ),
             path: 'workspace-api-keys',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <WorkspaceVariables />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'variables',
+        },
     ],
     navItems: [
         {
@@ -218,6 +232,10 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'workspace-api-keys',
             title: 'API Keys',
+        },
+        {
+            href: 'variables',
+            title: 'Variables',
         },
     ],
 };
@@ -1177,6 +1195,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                             ),
                                             path: 'api-keys',
                                         },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                                                    <EEVersion>
+                                                        <LazyLoadWrapper>
+                                                            <EmbeddedVariables />
+                                                        </LazyLoadWrapper>
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'variables',
+                                        },
                                         ...platformSettingsRoutes.children,
                                     ],
                                     element: (
@@ -1189,6 +1219,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                                 {
                                                     href: '/embedded/settings/api-keys',
                                                     title: 'API Keys',
+                                                },
+                                                {
+                                                    href: '/embedded/settings/variables',
+                                                    title: 'Variables',
                                                 },
                                                 organizationSettingsNavItem,
                                                 ...platformSettingsRoutes.navItems,
