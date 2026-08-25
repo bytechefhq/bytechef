@@ -1,15 +1,15 @@
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/Select/Select';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/shared/middleware/automation/configuration';
+import {ChevronDownIcon} from 'lucide-react';
 
 interface WorkflowSelectProps {
     currentWorkflowLabel?: string;
@@ -25,23 +25,21 @@ const WorkflowSelect = ({
     projectWorkflowId,
     projectWorkflows,
 }: WorkflowSelectProps) => (
-    <Select
-        aria-label={`Select workflow (${currentWorkflowLabel})`}
-        defaultValue={projectWorkflowId.toString()}
-        name="projectWorkflowSelect"
-        onValueChange={(value) => onValueChange(+value)}
-        value={projectWorkflowId.toString()}
-    >
+    <DropdownMenu>
         <Tooltip>
             <TooltipTrigger asChild>
-                <SelectTrigger
+                <DropdownMenuTrigger
                     aria-label="Workflow select"
-                    className="w-64 gap-2 border bg-surface-neutral-primary shadow-none hover:bg-surface-neutral-primary-hover [&>span]:line-clamp-0 [&>span]:truncate [&>svg]:min-w-4"
+                    className="flex max-w-64 items-center gap-1 rounded-md px-1.5 py-1 font-semibold text-content-neutral-primary outline-hidden hover:bg-surface-neutral-primary-hover data-[state=open]:bg-surface-neutral-primary-hover"
                 >
-                    <SelectValue className="font-semibold" placeholder="Select a workflow">
-                        {!currentWorkflowLabel ? <Skeleton className="h-3 w-44" /> : currentWorkflowLabel}
-                    </SelectValue>
-                </SelectTrigger>
+                    {currentWorkflowLabel ? (
+                        <span className="truncate">{currentWorkflowLabel}</span>
+                    ) : (
+                        <Skeleton className="h-3 w-44" />
+                    )}
+
+                    <ChevronDownIcon className="size-4 shrink-0 text-content-neutral-secondary" />
+                </DropdownMenuTrigger>
             </TooltipTrigger>
 
             {currentWorkflowLabel && currentWorkflowLabel.length > 30 && (
@@ -50,24 +48,27 @@ const WorkflowSelect = ({
         </Tooltip>
 
         {projectWorkflows && (
-            <SelectContent>
-                <SelectGroup>
-                    <SelectLabel>Workflows</SelectLabel>
+            <DropdownMenuContent align="start" className="max-w-80 min-w-64">
+                <DropdownMenuLabel>Workflows</DropdownMenuLabel>
 
+                <DropdownMenuRadioGroup
+                    onValueChange={(value) => onValueChange(+value)}
+                    value={projectWorkflowId.toString()}
+                >
                     {projectWorkflows.map((workflow) => (
-                        <SelectItem
-                            className="[&>span]:truncate"
+                        <DropdownMenuRadioItem
+                            className="cursor-pointer"
                             key={workflow.projectWorkflowId!}
                             title={workflow.label!.length > 32 ? workflow.label! : undefined}
                             value={workflow.projectWorkflowId!.toString()}
                         >
-                            {workflow.label!}
-                        </SelectItem>
+                            <span className="truncate">{workflow.label!}</span>
+                        </DropdownMenuRadioItem>
                     ))}
-                </SelectGroup>
-            </SelectContent>
+                </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
         )}
-    </Select>
+    </DropdownMenu>
 );
 
 export default WorkflowSelect;

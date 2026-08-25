@@ -1,9 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import WorkflowSelect from '@/pages/automation/project/components/project-header/components/WorkflowSelect';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {expect, it, vi} from 'vitest';
-
-screen.debug();
 
 const mockOnValueChange = vi.fn();
 
@@ -36,34 +34,46 @@ it('should render the closed workflow select with current workflow as value', ()
     expect(screen.queryByText('Workflow 2')).not.toBeInTheDocument();
 });
 
-it('should open the select menu on click', () => {
+it('should open the select menu on click', async () => {
     renderWorkflowSelect();
 
     expect(screen.queryByText('Workflows')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText('Workflow select'));
+    await userEvent.click(screen.getByLabelText('Workflow select'));
 
     expect(screen.getByText('Workflows')).toBeInTheDocument();
 });
 
-it('should show the other workflow once the menu is open', () => {
+it('should show the other workflow once the menu is open', async () => {
     renderWorkflowSelect();
 
-    expect(screen.queryByText('Worflow 2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Workflow 2')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText('Workflow select'));
+    await userEvent.click(screen.getByLabelText('Workflow select'));
 
     expect(screen.getByText('Workflow 2')).toBeInTheDocument();
+});
+
+it('should mark the current workflow as the checked menu item', async () => {
+    renderWorkflowSelect();
+
+    await userEvent.click(screen.getByLabelText('Workflow select'));
+
+    const menuItems = screen.getAllByRole('menuitemradio');
+
+    expect(menuItems[0]).toHaveAttribute('aria-checked', 'true');
+
+    expect(menuItems[1]).toHaveAttribute('aria-checked', 'false');
 });
 
 it('should call the onValueChange function with correct workflowId on click', async () => {
     renderWorkflowSelect();
 
-    expect(screen.queryByText('Worflow 2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Workflow 2')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByLabelText('Workflow select'));
+    await userEvent.click(screen.getByLabelText('Workflow select'));
 
-    fireEvent.click(screen.getByText('Workflow 2'));
+    await userEvent.click(screen.getByText('Workflow 2'));
 
     expect(mockOnValueChange).toHaveBeenCalledWith(2222);
 });
