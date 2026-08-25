@@ -28,22 +28,27 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
- * @author Marija Horvat
+ * @author Anshul Goel
  */
-public class MicrosoftExcelNewRowTrigger {
+public class MicrosoftExcelNewRowTriggerV2 {
+
+    private static final String KNOWN_ROW_IDS = "knownRowIds";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
-        .description("Triggers when a new row is added.")
-        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v1#new-row")
+        .description(
+            "Triggers when a new row is added. Tracks rows by 1-based worksheet row index so editing an existing row " +
+                "does not fire the trigger again.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v2#new-row")
         .type(TriggerType.POLLING)
         .properties(
             string(WORKBOOK_ID)
@@ -59,36 +64,40 @@ public class MicrosoftExcelNewRowTrigger {
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY)
         .output()
-        .poll(MicrosoftExcelNewRowTrigger::poll)
+        .poll(MicrosoftExcelNewRowTriggerV2::poll)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
-    private MicrosoftExcelNewRowTrigger() {
+    private MicrosoftExcelNewRowTriggerV2() {
     }
 
     protected static PollOutput poll(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        int lastRowIndex = closureParameters.getInteger("lastRowIndex", 0);
+        List<List<Object>> rows = MicrosoftExcelUtils.getUsedRangeValues(inputParameters, context);
 
-        int currentRowCount = MicrosoftExcelUtils.getLastUsedRowIndex(inputParameters, context);
+        Set<Integer> knownRowIds = new HashSet<>(
+            closureParameters.getList(KNOWN_ROW_IDS, Integer.class, List.of()));
 
-        if (currentRowCount <= lastRowIndex) {
-            return new PollOutput(List.of(), Map.of("lastRowIndex", lastRowIndex), false);
-        }
-
+        List<Integer> currentRowIds = new ArrayList<>();
         List<Map<String, Object>> newRows = new ArrayList<>();
 
-        for (int rowNum = lastRowIndex + 1; rowNum <= currentRowCount; rowNum++) {
-            List<Object> row = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, rowNum);
+        for (int i = 0; i < rows.size(); i++) {
+            List<Object> row = rows.get(i);
 
-            if (!row.isEmpty()) {
-                Map<String, Object> mappedRow = MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row);
+            if (row.isEmpty()) {
+                continue;
+            }
 
-                newRows.add(mappedRow);
+            int rowId = i + 1;
+
+            currentRowIds.add(rowId);
+
+            if (!knownRowIds.contains(rowId)) {
+                newRows.add(MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row));
             }
         }
 
-        return new PollOutput(newRows, Map.of("lastRowIndex", currentRowCount), false);
+        return new PollOutput(newRows, Map.of(KNOWN_ROW_IDS, currentRowIds), false);
     }
 }

@@ -16,19 +16,15 @@
 
 package com.bytechef.component.google.sheets.trigger;
 
-import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -61,6 +57,7 @@ import org.mockito.MockedStatic;
 class GoogleSheetsNewRowTriggerTest {
 
     private final ArgumentCaptor<Channel> channelArgumentCaptor = forClass(Channel.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
     private final Channels mockedChannels = mock(Channels.class);
@@ -154,97 +151,37 @@ class GoogleSheetsNewRowTriggerTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void testWebhookRequestOnFirstRunReturnsAllRowsAsNew() throws Exception {
+    void testWebhookRequest() {
         mockedParameters = MockParametersFactory.create(Map.of(SPREADSHEET_ID, "123", SHEET_NAME, "abc"));
-
-        List<Object> row1 = List.of("a1", "a2");
-        List<Object> row2 = List.of("b1", "b2");
-
-        TriggerContext.Data mockedData = mock(TriggerContext.Data.class);
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-
             googleServicesMockedStatic
                 .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedSheets);
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getSpreadsheetValues(mockedSheets, "123", "abc"))
-                .thenReturn(List.of(row1, row2));
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, row1))
-                .thenReturn(Map.of("col1", "a1"));
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, row2))
-                .thenReturn(Map.of("col1", "b1"));
+                .when(() -> GoogleSheetsUtils.getSpreadsheetValues(
+                    sheetsArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(List.of(List.of()));
+            googleServicesMockedStatic
+                .when(() -> GoogleSheetsUtils.getMapOfValuesForRowAndColumn(
+                    parametersArgumentCaptor.capture(), sheetsArgumentCaptor.capture(), listArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture(), integerArgumentCaptor.capture()))
+                .thenReturn(List.of());
 
-            when(mockedData.<Object>fetch(WORKFLOW, "knownRowHashes"))
-                .thenReturn(Optional.empty());
             when(mockedTriggerContext.data(any()))
-                .thenAnswer(invocation -> {
-                    ContextFunction<TriggerContext.Data, Object> function = invocation.getArgument(0);
-
-                    return function.apply(mockedData);
-                });
+                .thenReturn(Optional.of(123));
 
             List<Map<String, Object>> result = GoogleSheetsNewRowTrigger.webhookRequest(
                 mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
                 mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
-            assertEquals(List.of(Map.of("col1", "a1"), Map.of("col1", "b1")), result);
+            assertEquals(List.of(), result);
 
-            verify(mockedData).put(eq(WORKFLOW), eq("knownRowHashes"), listArgumentCaptor.capture());
-
-            assertEquals(List.of(row1.hashCode(), row2.hashCode()), listArgumentCaptor.getValue());
-        }
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testWebhookRequestDetectsRowInsertedInTheMiddle() throws Exception {
-        mockedParameters = MockParametersFactory.create(Map.of(SPREADSHEET_ID, "123", SHEET_NAME, "abc"));
-
-        // rowC is inserted between rowA and rowB, so the sheet no longer just grew at the bottom
-        List<Object> rowA = List.of("a1", "a2");
-        List<Object> rowB = List.of("b1", "b2");
-        List<Object> rowC = List.of("c1", "c2");
-
-        TriggerContext.Data mockedData = mock(TriggerContext.Data.class);
-
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
-            MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedSheets);
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getSpreadsheetValues(mockedSheets, "123", "abc"))
-                .thenReturn(List.of(rowA, rowC, rowB));
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(mockedParameters, mockedSheets, rowC))
-                .thenReturn(Map.of("col1", "c1"));
-
-            when(mockedData.<Object>fetch(WORKFLOW, "knownRowHashes"))
-                .thenReturn(Optional.of(List.of(rowA.hashCode(), rowB.hashCode())));
-            when(mockedTriggerContext.data(any()))
-                .thenAnswer(invocation -> {
-                    ContextFunction<TriggerContext.Data, Object> function = invocation.getArgument(0);
-
-                    return function.apply(mockedData);
-                });
-
-            List<Map<String, Object>> result = GoogleSheetsNewRowTrigger.webhookRequest(
-                mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-                mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
-
-            // Only rowC is genuinely new; the old position-based logic would have wrongly
-            // returned rowB here, since rowB now sits in the last position.
-            assertEquals(List.of(Map.of("col1", "c1")), result);
-
-            verify(mockedData).put(eq(WORKFLOW), eq("knownRowHashes"), listArgumentCaptor.capture());
-
-            assertEquals(
-                List.of(rowA.hashCode(), rowC.hashCode(), rowB.hashCode()), listArgumentCaptor.getValue());
+            assertEquals(List.of(mockedSheets, mockedSheets), sheetsArgumentCaptor.getAllValues());
+            assertEquals(List.of("123", "abc"), stringArgumentCaptor.getAllValues());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of(123, 1), integerArgumentCaptor.getAllValues());
         }
     }
 }

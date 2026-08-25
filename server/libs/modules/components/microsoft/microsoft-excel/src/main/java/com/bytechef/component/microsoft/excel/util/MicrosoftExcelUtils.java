@@ -207,9 +207,8 @@ public class MicrosoftExcelUtils {
     }
 
     /**
-     * Fetches every row currently in the worksheet's used range in a single request. Used by the New Row trigger to
-     * detect rows by content rather than by position, so a row inserted in the middle of the sheet is not confused with
-     * the row that has shifted into the last position.
+     * Fetches every row currently in the worksheet's used range in a single request. Used by the v2 New Row trigger to
+     * iterate rows with stable 1-based row indices.
      */
     public static List<List<Object>> getUsedRangeValues(Parameters inputParameters, Context context) {
         Map<String, Object> body = context

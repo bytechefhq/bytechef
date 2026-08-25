@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mockStatic;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -40,8 +41,10 @@ import org.mockito.MockedStatic;
  */
 class MicrosoftExcelNewRowTriggerTest {
 
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = forClass(Integer.class);
     @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<List> listArgumentCaptor = forClass(List.class);
+    private final Parameters mockedClosureParameters = MockParametersFactory.create(Map.of("lastRowIndex", 1));
     private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test", IS_THE_FIRST_ROW_HEADER, true));
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
@@ -49,93 +52,41 @@ class MicrosoftExcelNewRowTriggerTest {
     private final ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @Test
-    @SuppressWarnings("unchecked")
-    void testPollOnFirstRunReturnsAllRowsAsNew() {
-        List<Object> row1 = List.of("abc", "sheetName", false);
-        List<Object> row2 = List.of("def", "sheetName2", true);
-        Map<String, Object> map1 = Map.of("key", "value1");
-        Map<String, Object> map2 = Map.of("key", "value2");
+    void testPoll() {
+        List<Object> row = List.of("abc", "sheetName", false);
+        Map<String, Object> map = Map.of("key", "value");
 
-        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of());
+        try (MockedStatic<MicrosoftExcelUtils> microsoftExcelUtilsMockedStatic = mockStatic(MicrosoftExcelUtils.class);
+            MockedStatic<MicrosoftExcelRowUtils> microsoftExcelRowUtilsMockedStatic =
+                mockStatic(MicrosoftExcelRowUtils.class)) {
 
-        try (
-            MockedStatic<MicrosoftExcelUtils> microsoftExcelUtilsMockedStatic = mockStatic(MicrosoftExcelUtils.class)) {
             microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getUsedRangeValues(
-                    parametersArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
-                .thenReturn(List.of(row1, row2));
+                .when(() -> MicrosoftExcelUtils.getLastUsedRowIndex(parametersArgumentCaptor.capture(),
+                    triggerContextArgumentCaptor.capture()))
+                .thenReturn(2);
+            microsoftExcelRowUtilsMockedStatic
+                .when(() -> MicrosoftExcelRowUtils.getRowFromWorksheet(
+                    parametersArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture()))
+                .thenReturn(row);
             microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getMapOfValuesForRow(mockedInputParameters, mockedTriggerContext, row1))
-                .thenReturn(map1);
-            microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getMapOfValuesForRow(mockedInputParameters, mockedTriggerContext, row2))
-                .thenReturn(map2);
+                .when(() -> MicrosoftExcelUtils.getMapOfValuesForRow(
+                    parametersArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(),
+                    listArgumentCaptor.capture()))
+                .thenReturn(map);
 
             PollOutput result = MicrosoftExcelNewRowTrigger.poll(
                 mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
 
+            assertEquals(new PollOutput(List.of(map), Map.of("lastRowIndex", 2), false), result);
             assertEquals(
-                new PollOutput(
-                    List.of(map1, map2), Map.of("knownRowHashes", List.of(row1.hashCode(), row2.hashCode())),
-                    false),
-                result);
-            assertEquals(mockedInputParameters, parametersArgumentCaptor.getValue());
-            assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
-        }
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testPollDetectsRowInsertedInTheMiddle() {
-        // rowC is inserted between rowA and rowB, so the worksheet no longer just grew at the bottom
-        List<Object> rowA = List.of("a1", "a2");
-        List<Object> rowB = List.of("b1", "b2");
-        List<Object> rowC = List.of("c1", "c2");
-        Map<String, Object> mapC = Map.of("key", "c");
-
-        Parameters mockedClosureParameters = MockParametersFactory.create(
-            Map.of("knownRowHashes", List.of(rowA.hashCode(), rowB.hashCode())));
-
-        try (
-            MockedStatic<MicrosoftExcelUtils> microsoftExcelUtilsMockedStatic = mockStatic(MicrosoftExcelUtils.class)) {
-            microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getUsedRangeValues(
-                    parametersArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
-                .thenReturn(List.of(rowA, rowC, rowB));
-            microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getMapOfValuesForRow(mockedInputParameters, mockedTriggerContext, rowC))
-                .thenReturn(mapC);
-
-            PollOutput result = MicrosoftExcelNewRowTrigger.poll(
-                mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
-
-            // Only rowC is genuinely new; the old position-based logic would have wrongly
-            // returned rowB here, since rowB now sits in the last position.
+                List.of(mockedInputParameters, mockedInputParameters, mockedInputParameters),
+                parametersArgumentCaptor.getAllValues());
             assertEquals(
-                new PollOutput(
-                    List.of(mapC),
-                    Map.of("knownRowHashes", List.of(rowA.hashCode(), rowC.hashCode(), rowB.hashCode())),
-                    false),
-                result);
-        }
-    }
-
-    @Test
-    void testPollSkipsEmptyRows() {
-        List<Object> emptyRow = List.of();
-
-        Parameters mockedClosureParameters = MockParametersFactory.create(Map.of());
-
-        try (
-            MockedStatic<MicrosoftExcelUtils> microsoftExcelUtilsMockedStatic = mockStatic(MicrosoftExcelUtils.class)) {
-            microsoftExcelUtilsMockedStatic
-                .when(() -> MicrosoftExcelUtils.getUsedRangeValues(mockedInputParameters, mockedTriggerContext))
-                .thenReturn(List.of(emptyRow));
-
-            PollOutput result = MicrosoftExcelNewRowTrigger.poll(
-                mockedInputParameters, null, mockedClosureParameters, mockedTriggerContext);
-
-            assertEquals(new PollOutput(List.of(), Map.of("knownRowHashes", List.of()), false), result);
+                List.of(mockedTriggerContext, mockedTriggerContext, mockedTriggerContext),
+                triggerContextArgumentCaptor.getAllValues());
+            assertEquals(2, integerArgumentCaptor.getValue());
+            assertEquals(row, listArgumentCaptor.getValue());
         }
     }
 }

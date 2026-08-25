@@ -23,7 +23,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRowAndColumn;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -38,24 +38,27 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.Channel;
 import com.google.api.services.sheets.v4.Sheets;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Set;
 
 /**
- * @author Marko Kriskovic
+ * @author Anshul Goel
  */
-public class GoogleSheetsNewRowTrigger {
+public class GoogleSheetsNewRowTriggerV2 {
+
+    private static final String KNOWN_ROW_IDS = "knownRowIds";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
-        .description("Triggers when a new row is added.")
+        .description(
+            "Triggers when a new row is added. Tracks rows by 1-based sheet row index so editing an existing row " +
+                "does not fire the trigger again.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(SPREADSHEET_ID)
@@ -71,60 +74,28 @@ public class GoogleSheetsNewRowTrigger {
                 .optionsLookupDependsOn(SPREADSHEET_ID)
                 .required(true))
         .output()
-        .webhookEnable(GoogleSheetsNewRowTrigger::webhookEnable)
-        .webhookDisable(GoogleSheetsNewRowTrigger::webhookDisable)
-        .webhookRequest(GoogleSheetsNewRowTrigger::webhookRequest)
-        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v1#new-row");
+        .webhookEnable(GoogleSheetsNewRowTriggerV2::webhookEnable)
+        .webhookDisable(GoogleSheetsNewRowTriggerV2::webhookDisable)
+        .webhookRequest(GoogleSheetsNewRowTriggerV2::webhookRequest)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v2#new-row");
 
-    private GoogleSheetsNewRowTrigger() {
+    private GoogleSheetsNewRowTriggerV2() {
     }
 
     protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-        String fileId = inputParameters.getRequiredString(SPREADSHEET_ID);
-
-        String uuid = String.valueOf(UUID.randomUUID());
-
-        Channel channelConfig = new Channel()
-            .setAddress(webhookUrl)
-            .setId(uuid)
-            .setPayload(true)
-            .setType("web_hook");
-
-        Channel channel;
-
-        try {
-            channel = drive.files()
-                .watch(fileId, channelConfig)
-                .execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new WebhookEnableOutput(
-            Map.of("id", channel.getId(), "resourceId", channel.getResourceId()), null);
+        return GoogleSheetsNewRowTrigger.webhookEnable(
+            inputParameters, connectionParameters, webhookUrl, workflowExecutionId, context);
     }
 
     protected static void webhookDisable(
         Parameters inputParameters, Parameters connectionParameters, Parameters outputParameters,
         String workflowExecutionId, TriggerContext context) {
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        Channel channelConfig = new Channel()
-            .setId(outputParameters.getRequiredString("id"))
-            .setResourceId(outputParameters.getRequiredString("resourceId"));
-
-        try {
-            drive.channels()
-                .stop(channelConfig)
-                .execute();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        GoogleSheetsNewRowTrigger.webhookDisable(
+            inputParameters, connectionParameters, outputParameters, workflowExecutionId, context);
     }
 
     protected static List<Map<String, Object>> webhookRequest(
@@ -134,20 +105,48 @@ public class GoogleSheetsNewRowTrigger {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        Optional<Object> currentRowNumOptional = context.data(data -> data.fetch(WORKFLOW, "currentRow"));
-
-        int currentRowNum = currentRowNumOptional.map(o -> Integer.parseInt(o.toString()))
-            .orElse(0);
-
         List<List<Object>> values = GoogleSheetsUtils.getSpreadsheetValues(
             sheets, inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredString(SHEET_NAME));
 
         if (values == null) {
             return Collections.emptyList();
-        } else {
-            context.data(data -> data.put(WORKFLOW, "currentRow", values.size()));
-
-            return getMapOfValuesForRowAndColumn(inputParameters, sheets, values, currentRowNum, values.size());
         }
+
+        Optional<Object> knownRowIdsOptional = context.data(data -> data.fetch(WORKFLOW, KNOWN_ROW_IDS));
+
+        Set<Integer> knownRowIds = knownRowIdsOptional
+            .map(GoogleSheetsNewRowTriggerV2::toRowIdSet)
+            .orElseGet(Set::of);
+
+        List<Integer> currentRowIds = new ArrayList<>();
+        List<Map<String, Object>> newRows = new ArrayList<>();
+
+        for (int i = 0; i < values.size(); i++) {
+            int rowId = i + 1;
+
+            currentRowIds.add(rowId);
+
+            if (!knownRowIds.contains(rowId)) {
+                newRows.add(getMapOfValuesForRow(inputParameters, sheets, values.get(i)));
+            }
+        }
+
+        context.data(data -> data.put(WORKFLOW, KNOWN_ROW_IDS, currentRowIds));
+
+        return newRows;
+    }
+
+    private static Set<Integer> toRowIdSet(Object storedRowIds) {
+        Set<Integer> rowIds = new HashSet<>();
+
+        if (storedRowIds instanceof List<?> list) {
+            for (Object rowId : list) {
+                if (rowId instanceof Number number) {
+                    rowIds.add(number.intValue());
+                }
+            }
+        }
+
+        return rowIds;
     }
 }
