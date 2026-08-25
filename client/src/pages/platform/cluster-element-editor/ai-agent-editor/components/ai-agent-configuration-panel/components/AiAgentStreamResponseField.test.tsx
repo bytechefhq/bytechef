@@ -33,6 +33,19 @@ describe('AiAgentStreamResponseField', () => {
         expect(container).toBeEmptyDOMElement();
     });
 
+    it('renders the title as a standalone heading, with the switch on its own row below', () => {
+        mockHook(false, true);
+
+        render(<AiAgentStreamResponseField />);
+
+        const heading = screen.getByRole('heading', {name: 'Stream response'});
+        const switchElement = screen.getByRole('switch', {name: /stream response/i});
+
+        expect(heading).toBeInTheDocument();
+        expect(heading).not.toContainElement(switchElement);
+        expect(screen.getByText(/token by token/i)).toBeInTheDocument();
+    });
+
     it('renders an unchecked switch for the chat action', () => {
         mockHook(false, true);
 
