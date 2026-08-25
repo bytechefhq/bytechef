@@ -1,0 +1,3 @@
+mutation deleteEmbeddedVariable($environmentId: ID!, $id: ID!) {
+    deleteEmbeddedVariable(environmentId: $environmentId, id: $id)
+}

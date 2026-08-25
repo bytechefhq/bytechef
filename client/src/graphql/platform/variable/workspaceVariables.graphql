@@ -1,0 +1,12 @@
+query workspaceVariables($workspaceId: ID!, $environmentId: ID!) {
+    workspaceVariables(workspaceId: $workspaceId, environmentId: $environmentId) {
+        id
+        name
+        value
+        environmentId
+        createdBy
+        createdDate
+        lastModifiedBy
+        lastModifiedDate
+    }
+}

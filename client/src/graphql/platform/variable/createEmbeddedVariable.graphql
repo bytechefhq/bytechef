@@ -1,0 +1,7 @@
+mutation createEmbeddedVariable($environmentId: ID!, $input: VariableInput!) {
+    createEmbeddedVariable(environmentId: $environmentId, input: $input) {
+        id
+        name
+        value
+    }
+}

@@ -1,0 +1,7 @@
+mutation updateWorkspaceVariable($workspaceId: ID!, $environmentId: ID!, $id: ID!, $input: VariableInput!) {
+    updateWorkspaceVariable(workspaceId: $workspaceId, environmentId: $environmentId, id: $id, input: $input) {
+        id
+        name
+        value
+    }
+}

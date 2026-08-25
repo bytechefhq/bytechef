@@ -10,6 +10,8 @@ import {
 } from '@/ee/shared/mutations/automation/projectGit.queries';
 import {registerAgentChatApi} from '@/shared/edition/agent-chat/agentChatApi';
 import {registerProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
+import {registerVariablesApi} from '@/shared/edition/variables/variablesApi';
+import {useEmbeddedVariablesQuery, useWorkspaceVariablesQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 
 /**
@@ -49,4 +51,31 @@ registerProjectGitApi({
 
 registerAgentChatApi({
     useOpenAgentChat,
+});
+
+registerVariablesApi({
+    useWorkflowVariablesQuery: (scope, environmentId) => {
+        // Both hooks are always called (rules of hooks); `enabled` picks the live one.
+        const workspaceQuery = useWorkspaceVariablesQuery(
+            {
+                environmentId: `${environmentId}`,
+                workspaceId: scope?.type === 'WORKSPACE' ? `${scope.workspaceId}` : '',
+            },
+            {enabled: scope?.type === 'WORKSPACE'}
+        );
+        const embeddedQuery = useEmbeddedVariablesQuery(
+            {environmentId: `${environmentId}`},
+            {enabled: scope?.type === 'EMBEDDED'}
+        );
+
+        if (scope?.type === 'WORKSPACE') {
+            return {data: workspaceQuery.data?.workspaceVariables};
+        }
+
+        if (scope?.type === 'EMBEDDED') {
+            return {data: embeddedQuery.data?.embeddedVariables};
+        }
+
+        return {data: undefined};
+    },
 });

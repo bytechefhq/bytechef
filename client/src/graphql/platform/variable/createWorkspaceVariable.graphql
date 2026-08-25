@@ -1,0 +1,7 @@
+mutation createWorkspaceVariable($workspaceId: ID!, $environmentId: ID!, $input: VariableInput!) {
+    createWorkspaceVariable(workspaceId: $workspaceId, environmentId: $environmentId, input: $input) {
+        id
+        name
+        value
+    }
+}

@@ -102,6 +102,7 @@ const config: CodegenConfig = {
         '../server/libs/platform/platform-ai/platform-ai-auto-memory/platform-ai-auto-memory-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-ai/platform-ai-guardrails/platform-ai-guardrails-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-ai/platform-ai-workspace-prompt/platform-ai-workspace-prompt-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/platform/platform-variable/platform-variable-graphql/src/main/resources/graphql/*.graphqls',
         '../server/ee/libs/platform/platform-ai/platform-ai-agent/platform-ai-agent-eval/platform-ai-agent-eval-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/libs/platform/platform-ai/platform-ai-skill/platform-ai-skill-graphql/src/main/resources/graphql/**/*.graphqls',
         '../server/ee/libs/licence/licence-graphql/src/main/resources/graphql/*.graphqls',
