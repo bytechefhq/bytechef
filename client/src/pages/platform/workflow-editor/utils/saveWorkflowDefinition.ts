@@ -173,11 +173,16 @@ export default async function saveWorkflowDefinition({
                 combinedParameters = newTask.parameters ?? {};
             }
 
+            const existingDefinitionTask = getTask({
+                tasks: workflowDefinitionTasks,
+                workflowNodeName: newTask.name,
+            });
+
             const taskToUpdate = existingWorkflowTask.clusterRoot
                 ? {
                       ...newTask,
                       clusterElements: {
-                          ...(newTask.clusterElements || {}),
+                          ...(newTask.clusterElements ?? existingDefinitionTask?.clusterElements ?? {}),
                       },
                   }
                 : {

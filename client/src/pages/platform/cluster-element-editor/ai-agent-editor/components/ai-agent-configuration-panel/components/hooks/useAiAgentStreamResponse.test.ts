@@ -40,10 +40,25 @@ const rootClusterElementNodeData = {
     workflowNodeName: 'aiAgent_1',
 };
 
+// The live cluster elements, deliberately different from the seeded snapshot above: the definition is the
+// only source that tracks tools added after the AI Agent editor was opened.
+const definitionClusterElements = {
+    model: {label: 'Claude', name: 'anthropic_1', parameters: {model: 'claude-opus-5'}, type: 'anthropic/v1/model'},
+    tools: [
+        {
+            label: 'Sheets',
+            name: 'googleSheets_1',
+            parameters: {spreadsheetId: 'abc'},
+            type: 'googleSheets/v1/insertRow',
+        },
+    ],
+};
+
 const buildDefinition = (operationName: string) =>
     JSON.stringify({
         tasks: [
             {
+                clusterElements: definitionClusterElements,
                 name: 'aiAgent_1',
                 parameters: {
                     response: {responseFormat: 'JSON'},
@@ -116,8 +131,42 @@ describe('useAiAgentStreamResponse', () => {
             systemPrompt: 'Be helpful',
             userPrompt: 'Hello',
         });
-        expect(nodeData.clusterElements).toEqual(rootClusterElementNodeData.clusterElements);
+        expect(nodeData.clusterElements).toEqual(definitionClusterElements);
         expect(setRootClusterElementNodeDataMock).toHaveBeenCalledWith(nodeData);
+    });
+
+    it('keeps the cluster elements the definition holds, not the stale seeded snapshot', () => {
+        const {result} = renderHook(() => useAiAgentStreamResponse());
+
+        result.current.updateStreaming(true);
+
+        const [{nodeData}] = saveWorkflowDefinitionMock.mock.calls[0];
+
+        expect(nodeData.clusterElements).toEqual(definitionClusterElements);
+        expect(nodeData.clusterElements).not.toEqual(rootClusterElementNodeData.clusterElements);
+    });
+
+    it('keeps the cluster elements when the seeded root node data carries none at all', () => {
+        useWorkflowEditorStoreMock.mockImplementation((selector: (state: unknown) => unknown) =>
+            selector({
+                rootClusterElementNodeData: {
+                    componentName: 'aiAgent',
+                    name: 'aiAgent_1',
+                    operationName: 'chat',
+                    type: 'aiAgent/v1/chat',
+                    workflowNodeName: 'aiAgent_1',
+                },
+                setRootClusterElementNodeData: setRootClusterElementNodeDataMock,
+            })
+        );
+
+        const {result} = renderHook(() => useAiAgentStreamResponse());
+
+        result.current.updateStreaming(true);
+
+        const [{nodeData}] = saveWorkflowDefinitionMock.mock.calls[0];
+
+        expect(nodeData.clusterElements).toEqual(definitionClusterElements);
     });
 
     it('falls back to the node data operation when the workflow has no definition', () => {
