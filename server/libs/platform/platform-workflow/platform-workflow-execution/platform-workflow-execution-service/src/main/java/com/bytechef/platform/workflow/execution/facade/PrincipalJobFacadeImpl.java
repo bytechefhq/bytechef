@@ -21,13 +21,18 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,16 +48,19 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     private final JobFacade jobFacade;
     private final JobService jobService;
     private final WorkflowService workflowService;
+    private final ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider;
 
     @SuppressFBWarnings("EI")
     public PrincipalJobFacadeImpl(
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
-        WorkflowService workflowService) {
+        WorkflowService workflowService,
+        ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider) {
 
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.workflowService = workflowService;
+        this.workflowVariablesResolverObjectProvider = workflowVariablesResolverObjectProvider;
     }
 
     @Override
@@ -63,7 +71,8 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
             long principalId = principalIdOptional.get();
 
             return jobFacade.createJob(
-                jobParametersDTO, childJobId -> principalJobService.create(childJobId, principalId, platformType));
+                withVariables(jobParametersDTO, principalId, platformType),
+                childJobId -> principalJobService.create(childJobId, principalId, platformType));
         }
 
         long childJobId = jobFacade.createJob(jobParametersDTO);
@@ -79,7 +88,8 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         // The principal_job row must exist before the start, where it marks the job as deployed for billing.
         return jobFacade.createJob(
-            jobParametersDTO, jobId -> principalJobService.create(jobId, jobPrincipalId, type));
+            withVariables(jobParametersDTO, jobPrincipalId, type),
+            jobId -> principalJobService.create(jobId, jobPrincipalId, type));
     }
 
     @Override
@@ -107,16 +117,37 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
             "A principal-linked job is a top-level job; use createChildJob for a sub-workflow");
 
         return jobFacade.createJob(
-            jobParametersDTO, jobId -> principalJobService.create(jobId, jobPrincipalId, platformType));
+            withVariables(jobParametersDTO, jobPrincipalId, platformType),
+            jobId -> principalJobService.create(jobId, jobPrincipalId, platformType));
     }
 
     @Override
     @Transactional
     public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
-        Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
+        Job job = jobService.create(
+            withVariables(jobParametersDTO, jobPrincipalId, type),
+            workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
         principalJobService.create(Validate.notNull(job.getId(), "id"), jobPrincipalId, type);
 
         return job;
+    }
+
+    private JobParametersDTO withVariables(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+        WorkflowVariablesResolver workflowVariablesResolver = workflowVariablesResolverObjectProvider.getIfAvailable();
+
+        if (workflowVariablesResolver == null) {
+            return jobParametersDTO;
+        }
+
+        Map<String, Object> inputs = new HashMap<>(jobParametersDTO.getInputs());
+
+        inputs.put(
+            JobInputConstants.VARIABLES_INPUT, workflowVariablesResolver.resolveForJobPrincipal(jobPrincipalId, type));
+
+        return new JobParametersDTO(
+            jobParametersDTO.getWorkflowId(), jobParametersDTO.getParentTaskExecutionId(), inputs,
+            jobParametersDTO.getLabel(), jobParametersDTO.getPriority(), jobParametersDTO.getWebhooks(),
+            jobParametersDTO.getMetadata());
     }
 }

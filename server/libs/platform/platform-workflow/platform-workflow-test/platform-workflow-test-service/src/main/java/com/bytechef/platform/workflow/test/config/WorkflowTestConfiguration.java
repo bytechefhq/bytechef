@@ -61,6 +61,7 @@ import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacadeImpl;
@@ -89,6 +90,7 @@ import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEvent
 import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -121,7 +123,8 @@ public class WorkflowTestConfiguration {
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
@@ -154,7 +157,7 @@ public class WorkflowTestConfiguration {
                     subflowResolver, taskExecutionService, taskFileStorage, workflowService),
                 taskExecutionService, syncWorkerExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
-            workflowNodeOutputFacade, workflowTestConfigurationService);
+            workflowNodeOutputFacade, workflowTestConfigurationService, workflowVariablesResolverObjectProvider);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

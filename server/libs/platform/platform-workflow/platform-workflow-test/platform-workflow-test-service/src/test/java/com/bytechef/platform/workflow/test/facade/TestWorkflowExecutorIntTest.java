@@ -22,6 +22,9 @@ import static com.bytechef.platform.workflow.test.config.TestWorkflowExecutorInt
 import static com.bytechef.platform.workflow.test.config.TestWorkflowExecutorIntTestConfiguration.STREAMED_CHUNK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
@@ -41,9 +44,11 @@ import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepo
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
@@ -73,6 +78,7 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -115,6 +121,9 @@ class TestWorkflowExecutorIntTest {
 
     @Autowired
     private WorkflowTestConfigurationService workflowTestConfigurationService;
+
+    @MockitoBean
+    private WorkflowVariablesResolver workflowVariablesResolver;
 
     @AfterEach
     void afterEach() {
@@ -184,6 +193,37 @@ class TestWorkflowExecutorIntTest {
             });
 
         assertThat(result.triggerExecution()).isNull();
+    }
+
+    @Test
+    void executeSyncSeedsWorkflowVariablesUnderVarsInput() {
+        String workflowId = createWorkflow(
+            """
+                {
+                    "tasks": [
+                        {
+                            "name": "echo",
+                            "type": "testComponent/v1/echo",
+                            "parameters": {"inValue": "${vars.region}"}
+                        }
+                    ]
+                }
+                """);
+
+        when(workflowVariablesResolver.resolveForWorkflow(eq(workflowId), anyLong()))
+            .thenReturn(Map.of("region", "eu-west-1"));
+
+        WorkflowTestExecutionDTO result = testWorkflowExecutor.executeSync(workflowId, new HashMap<>(), ENVIRONMENT_ID);
+
+        JobDTO jobDTO = result.job();
+
+        assertThat(jobDTO.status()).isEqualTo(Job.Status.COMPLETED);
+        assertThat(toObjectMap(jobDTO.inputs()))
+            .containsEntry(JobInputConstants.VARIABLES_INPUT, Map.of("region", "eu-west-1"));
+        assertThat(jobDTO.taskExecutions())
+            .singleElement()
+            .satisfies(taskExecutionDTO -> assertThat(taskExecutionDTO.output())
+                .isEqualTo(Map.of("inValue", "eu-west-1")));
     }
 
     @Test
