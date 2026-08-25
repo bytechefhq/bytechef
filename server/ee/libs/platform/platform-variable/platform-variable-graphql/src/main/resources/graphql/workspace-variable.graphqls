@@ -1,0 +1,25 @@
+extend type Query {
+    workspaceVariables(workspaceId: ID!, environmentId: ID!): [Variable!]!
+}
+
+extend type Mutation {
+    createWorkspaceVariable(workspaceId: ID!, environmentId: ID!, input: VariableInput!): Variable!
+    updateWorkspaceVariable(workspaceId: ID!, environmentId: ID!, id: ID!, input: VariableInput!): Variable!
+    deleteWorkspaceVariable(workspaceId: ID!, environmentId: ID!, id: ID!): Boolean!
+}
+
+type Variable {
+    id: ID!
+    name: String!
+    value: String!
+    environmentId: ID!
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+}
+
+input VariableInput {
+    name: String!
+    value: String!
+}
