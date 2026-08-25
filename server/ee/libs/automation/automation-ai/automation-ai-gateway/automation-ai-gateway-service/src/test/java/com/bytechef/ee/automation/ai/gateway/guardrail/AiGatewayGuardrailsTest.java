@@ -41,10 +41,16 @@ class AiGatewayGuardrailsTest {
         mock(AiGatewayProjectSettingsService.class);
     private final SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
     private final AiGuardrailMetrics metrics = new AiGuardrailMetrics(meterRegistry, "gateway");
+    // AiGatewayGuardrails no longer exposes redactPii/redactSecrets/redactAll -- they were dead public API (nothing
+    // outside this test called them) once every internal call site used the aiGuardrails field directly, so they were
+    // deleted rather than kept as pass-throughs. These four tests exercise the same redaction the deleted delegates
+    // used to, straight against the engine this adapter wraps.
+    private final AiGuardrails redactionGuardrails =
+        new AiGuardrails(settingsService, null, null, metrics, false, false, "", false, false, false, false);
 
     @Test
     void testRedactPiiReplacesCommonPatterns() {
-        String redacted = AiGatewayGuardrails.redactPii(
+        String redacted = redactionGuardrails.redactPii(
             "Email me at jane.doe@example.com or call 415-555-0132. SSN 123-45-6789, card 4111 1111 1111 1111, " +
                 "host 192.168.1.20.");
 
@@ -61,12 +67,12 @@ class AiGatewayGuardrailsTest {
     void testRedactPiiLeavesCleanTextUnchanged() {
         String content = "Summarize the quarterly revenue report.";
 
-        assertThat(AiGatewayGuardrails.redactPii(content)).isEqualTo(content);
+        assertThat(redactionGuardrails.redactPii(content)).isEqualTo(content);
     }
 
     @Test
     void testRedactSecretsReplacesKnownTokens() {
-        String redacted = AiGatewayGuardrails.redactSecrets(
+        String redacted = redactionGuardrails.redactSecrets(
             "aws AKIAIOSFODNN7EXAMPLE gh ghp_1234567890abcdefghij1234567890abcdef openai " +
                 "sk-abcdefghij1234567890ABCD jwt eyJhbGciOiJIUzI.eyJzdWIiOiIxMjM0.SflKxwRJSMeKKF2QT4 done");
 
@@ -79,7 +85,7 @@ class AiGatewayGuardrailsTest {
 
     @Test
     void testRedactSecretsRedactsPemPrivateKeyBlock() {
-        String redacted = AiGatewayGuardrails.redactSecrets(
+        String redacted = redactionGuardrails.redactSecrets(
             "key:\n-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAKj34Gkx...\n-----END RSA PRIVATE KEY-----\ntail");
 
         assertThat(redacted).contains("[REDACTED_SECRET]");
@@ -91,7 +97,7 @@ class AiGatewayGuardrailsTest {
     void testRedactSecretsLeavesCleanTextUnchanged() {
         String content = "The deployment succeeded and the health check is green.";
 
-        assertThat(AiGatewayGuardrails.redactSecrets(content)).isEqualTo(content);
+        assertThat(redactionGuardrails.redactSecrets(content)).isEqualTo(content);
     }
 
     @Test

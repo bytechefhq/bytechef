@@ -36,9 +36,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * AI Gateway adapter over the standalone {@link AiGuardrails} engine (extracted to {@code platform-ai-guardrails}).
- * Preserves the exact pre-extraction public surface — chat/embedding DTO methods, {@code projectId} overloads, and the
- * static redaction helpers — so every caller of this class (the gateway facade, and this module's own tests) keeps
- * working unchanged.
+ * Preserves the exact pre-extraction public surface — chat/embedding DTO methods and {@code projectId} overloads — so
+ * every caller of this class (the gateway facade, and this module's own tests) keeps working unchanged. The
+ * {@code redactPii}/{@code redactSecrets}/{@code redactAll} static delegates this class used to expose were removed
+ * once the detector SPI turned the engine's own static redactors into instance methods: this adapter has always had an
+ * {@link AiGuardrails} instance to call them on directly, and nothing outside this module's own tests ever called the
+ * delegates, so keeping them would only have been dead public API.
  *
  * <p>
  * The engine resolves the global-property + workspace-settings union for plain text; this adapter owns everything the
@@ -46,7 +49,7 @@ import org.springframework.stereotype.Component;
  * moved — it is a gateway/chat-only concept), and the project-level guardrail overlay. The overlay is additive (a
  * project can only enable a guardrail or add blocked terms, never turn one off) — for each call, this adapter first
  * delegates the text to the engine (global + workspace policy), then layers any project-only additions on top using the
- * engine's static redactors and its own moderation/injection classifiers.
+ * engine's own {@code redactPii}/{@code redactSecrets} instance methods and its own moderation/injection classifiers.
  * </p>
  *
  * <p>
@@ -282,10 +285,14 @@ public class AiGatewayGuardrails {
             String scanned = aiGuardrails.scanResponseText(content, workspaceId);
 
             if (projectScanResponses) {
-                scanned = AiGuardrails.redactAll(scanned);
+                scanned = aiGuardrails.redactAll(scanned);
             }
 
-            if (scanned.equals(content)) {
+            // scanResponseText/redactAll are declared @Nullable, so scanned is compared null-safely rather than
+            // dereferenced -- the compiler cannot see that content != null (checked above) makes both calls return
+            // non-null here. That is also why the assignment below hands scanned to the constructor unchecked: it is
+            // provably non-null at this point, just not statically so.
+            if (Objects.equals(scanned, content)) {
                 redactedChoices.add(choice);
 
                 continue;
@@ -349,33 +356,10 @@ public class AiGatewayGuardrails {
         AiGatewayProjectSettings projectSettings = findProjectSettings(projectId);
 
         if (projectSettings != null && Boolean.TRUE.equals(projectSettings.scanResponses())) {
-            return new StreamingResponseRedactor();
+            return aiGuardrails.newStreamingResponseRedactor();
         }
 
         return null;
-    }
-
-    /**
-     * Replaces common PII patterns in {@code content} with {@code [REDACTED_*]} placeholders.
-     */
-    public static String redactPii(@Nullable String content) {
-        return AiGuardrails.redactPii(content);
-    }
-
-    /**
-     * Replaces recognised developer-secret shapes (cloud/provider API keys, tokens, JWTs, PEM private keys) in
-     * {@code content} with a {@code [REDACTED_SECRET]} placeholder.
-     */
-    public static String redactSecrets(@Nullable String content) {
-        return AiGuardrails.redactSecrets(content);
-    }
-
-    /**
-     * Applies both the PII and secret redactors to {@code content}. Used for response-direction scanning where both
-     * categories are masked regardless of the request-direction toggles.
-     */
-    public static String redactAll(String content) {
-        return AiGuardrails.redactAll(content);
     }
 
     /**
@@ -402,9 +386,12 @@ public class AiGatewayGuardrails {
         String result = text;
 
         if (Boolean.TRUE.equals(projectSettings.redactPii())) {
-            String redacted = AiGuardrails.redactPii(result);
+            String redacted = aiGuardrails.redactPii(result);
 
-            if (!redacted.equals(result)) {
+            // aiGuardrails.redactPii is declared @Nullable, so redacted is compared null-safely rather than
+            // dereferenced -- result is never actually null here (callers only ever pass non-null, non-empty text
+            // into applyProjectOverlay), but the compiler has no way to know that from the declared signature.
+            if (!Objects.equals(redacted, result)) {
                 record("pii_redacted");
             }
 
@@ -412,9 +399,10 @@ public class AiGatewayGuardrails {
         }
 
         if (Boolean.TRUE.equals(projectSettings.redactSecrets())) {
-            String redacted = AiGuardrails.redactSecrets(result);
+            String redacted = aiGuardrails.redactSecrets(result);
 
-            if (!redacted.equals(result)) {
+            // Same null-safety reasoning as the redactPii branch above.
+            if (!Objects.equals(redacted, result)) {
                 record("secret_redacted");
             }
 
