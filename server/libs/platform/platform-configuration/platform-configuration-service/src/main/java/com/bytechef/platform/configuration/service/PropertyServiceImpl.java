@@ -115,6 +115,21 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
+    public List<Property> getPropertiesByKeyPrefix(
+        String keyPrefix, Property.Scope scope, @Nullable Long scopeId, Long environmentId) {
+
+        if (scopeId == null) {
+            return populateAll(
+                propertyRepository.findAllByKeyStartingWithAndScopeAndScopeIdIsNullAndEnvironment(
+                    keyPrefix, scope.ordinal(), environmentId.intValue()));
+        }
+
+        return populateAll(
+            propertyRepository.findAllByKeyStartingWithAndScopeAndScopeIdAndEnvironment(
+                keyPrefix, scope.ordinal(), scopeId, environmentId.intValue()));
+    }
+
+    @Override
     public void save(String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId) {
         save(key, value, scope, scopeId, null);
     }

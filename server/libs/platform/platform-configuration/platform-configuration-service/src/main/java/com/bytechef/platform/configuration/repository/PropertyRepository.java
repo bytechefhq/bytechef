@@ -37,6 +37,12 @@ public interface PropertyRepository extends CrudRepository<Property, Long> {
     List<Property> findAllByKeyInAndScopeAndScopeIdAndEnvironment(
         List<String> keys, int scope, long scopeId, int environment);
 
+    List<Property> findAllByKeyStartingWithAndScopeAndScopeIdAndEnvironment(
+        String keyPrefix, int scope, long scopeId, int environment);
+
+    List<Property> findAllByKeyStartingWithAndScopeAndScopeIdIsNullAndEnvironment(
+        String keyPrefix, int scope, int environment);
+
     Optional<Property> findByKeyAndScope(String key, int scope);
 
     Optional<Property> findByKeyAndScopeAndEnvironment(String key, int scope, int environment);

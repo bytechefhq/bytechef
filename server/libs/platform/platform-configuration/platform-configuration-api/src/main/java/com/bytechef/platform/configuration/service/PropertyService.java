@@ -45,6 +45,14 @@ public interface PropertyService {
     List<Property> getProperties(
         List<String> keys, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
 
+    /**
+     * Returns every property whose key starts with {@code keyPrefix} in the given scope and environment, values
+     * populated from each row's credential store. {@code scopeId == null} matches rows whose scope id is null.
+     * {@code environmentId} is required — the prefix listing exists for environment-scoped entity families (variables).
+     */
+    List<Property> getPropertiesByKeyPrefix(
+        String keyPrefix, Scope scope, @Nullable Long scopeId, Long environmentId);
+
     void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId);
 
     void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);

@@ -164,6 +164,48 @@ class PropertyServiceImplTest {
         verify(databaseStore, never()).getSecret(any());
     }
 
+    @Test
+    void testGetPropertiesByKeyPrefixDispatchesToScopeIdAndEnvironmentFinderAndPopulatesValues() {
+        PropertyServiceImpl propertyService = new PropertyServiceImpl(List.of(databaseStore), propertyRepository);
+
+        Property property = new Property();
+
+        property.setKey("variable.API_URL");
+        property.setScope(Property.Scope.WORKSPACE);
+        property.setScopeId(7L);
+        property.setEnabled(true);
+        property.setCredentialStoreType(CredentialStoreType.DATABASE);
+
+        when(propertyRepository.findAllByKeyStartingWithAndScopeAndScopeIdAndEnvironment(
+            "variable.", Property.Scope.WORKSPACE.ordinal(), 7L, 0))
+                .thenReturn(List.of(property));
+        doReturn(Map.of("value", "https://api")).when(databaseStore)
+            .getSecret(any());
+
+        List<Property> properties = propertyService.getPropertiesByKeyPrefix(
+            "variable.", Property.Scope.WORKSPACE, 7L, 0L);
+
+        assertThat(properties).hasSize(1);
+        assertThat(properties.getFirst()
+            .get("value")).isEqualTo("https://api");
+    }
+
+    @Test
+    void testGetPropertiesByKeyPrefixWithNullScopeIdUsesScopeIdIsNullFinder() {
+        PropertyServiceImpl propertyService = new PropertyServiceImpl(List.of(databaseStore), propertyRepository);
+
+        when(propertyRepository.findAllByKeyStartingWithAndScopeAndScopeIdIsNullAndEnvironment(
+            "variable.", Property.Scope.EMBEDDED.ordinal(), 2))
+                .thenReturn(List.of());
+
+        List<Property> properties = propertyService.getPropertiesByKeyPrefix(
+            "variable.", Property.Scope.EMBEDDED, null, 2L);
+
+        assertThat(properties).isEmpty();
+        verify(propertyRepository).findAllByKeyStartingWithAndScopeAndScopeIdIsNullAndEnvironment(
+            "variable.", Property.Scope.EMBEDDED.ordinal(), 2);
+    }
+
     private static CredentialStore stubStore(CredentialStoreType type, boolean readOnly) {
         CredentialStore store = Mockito.mock(CredentialStore.class);
 
