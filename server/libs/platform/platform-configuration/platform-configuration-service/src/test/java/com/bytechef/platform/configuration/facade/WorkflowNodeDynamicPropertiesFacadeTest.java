@@ -348,8 +348,8 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
 
         when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
             .thenReturn(Optional.empty());
-        doReturn(Map.of()).when(workflowTestConfigurationService)
-            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+        doReturn(Map.of()).when(workflowEvaluationInputsFacade)
+            .getEvaluationInputs(workflowId, environmentId);
 
         Workflow workflow = mock(Workflow.class);
         WorkflowTask workflowTask = mock(WorkflowTask.class);

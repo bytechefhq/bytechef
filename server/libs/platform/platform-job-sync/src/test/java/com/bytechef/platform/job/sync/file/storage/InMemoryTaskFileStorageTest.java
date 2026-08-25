@@ -21,14 +21,23 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class InMemoryTaskFileStorageTest {
 
     private static final long jobId = 123L;
@@ -62,8 +71,8 @@ class InMemoryTaskFileStorageTest {
         Map<String, ?> readOnce = storage.readJobOutputs(durableFileEntry);
         Map<String, ?> readTwice = storage.readJobOutputs(durableFileEntry);
 
-        assertSame(outputs, readOnce);
-        assertSame(outputs, readTwice);
+        assertEquals(outputs, readOnce);
+        assertSame(readOnce, readTwice);
         assertEquals(0, durable.readJobOutputsCalls.get());
     }
 
@@ -99,7 +108,7 @@ class InMemoryTaskFileStorageTest {
 
         Map<String, ?> read = storage.readContextValue(durableFileEntry);
 
-        assertSame(contextValue, read);
+        assertEquals(contextValue, read);
         assertEquals(1, durable.storeContextCalls.get());
         assertEquals(0, durable.readContextCalls.get());
     }
@@ -120,6 +129,20 @@ class InMemoryTaskFileStorageTest {
         assertSame(output, read);
         assertEquals(1, durable.storeTaskExecutionCalls.get());
         assertEquals(0, durable.readTaskExecutionCalls.get());
+    }
+
+    @Test
+    void testCachedReadReturnsTheSameTypeAsTheDurableRead() {
+        Object output = List.of(Map.of("APPLYDATE", Timestamp.from(Instant.parse("2026-08-26T00:00:00Z"))));
+
+        TaskFileStorage taskFileStorage = new InMemoryTaskFileStorage(
+            new TaskFileStorageImpl(new Base64FileStorageService()));
+
+        FileEntry fileEntry = taskFileStorage.storeTaskExecutionOutput(1L, 1L, output);
+
+        assertEquals(
+            List.of(Map.of("APPLYDATE", ZonedDateTime.parse("2026-08-26T00:00:00Z"))),
+            taskFileStorage.readTaskExecutionOutput(fileEntry));
     }
 
     private static final class RecordingTaskFileStorage implements TaskFileStorage {

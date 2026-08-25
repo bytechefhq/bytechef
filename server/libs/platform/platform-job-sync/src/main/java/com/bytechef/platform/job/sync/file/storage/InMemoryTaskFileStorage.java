@@ -18,6 +18,7 @@ package com.bytechef.platform.job.sync.file.storage;
 
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.commons.util.TemporalValueUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -71,9 +72,9 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
 
         Map<String, ?> value = durableTaskFileStorage.readContextValue(fileEntry);
 
-        cache(fileEntry, value);
+        Object normalizedValue = cache(fileEntry, value);
 
-        return value;
+        return (Map<String, ?>) normalizedValue;
     }
 
     @Override
@@ -87,9 +88,9 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
 
         Map<String, ?> value = durableTaskFileStorage.readJobOutputs(fileEntry);
 
-        cache(fileEntry, value);
+        Object normalizedValue = cache(fileEntry, value);
 
-        return value;
+        return (Map<String, ?>) normalizedValue;
     }
 
     @Override
@@ -102,9 +103,7 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
 
         Object value = durableTaskFileStorage.readTaskExecutionOutput(fileEntry);
 
-        cache(fileEntry, value);
-
-        return value;
+        return cache(fileEntry, value);
     }
 
     @Override
@@ -166,11 +165,18 @@ public final class InMemoryTaskFileStorage implements TaskFileStorage {
         durableTaskFileStorage.deleteTaskExecutionOutput(fileEntry);
     }
 
-    private void cache(FileEntry fileEntry, @Nullable Object value) {
+    @Nullable
+    private Object cache(FileEntry fileEntry, @Nullable Object value) {
         if (value == null) {
-            return;
+            return null;
         }
 
-        jobDataStorage.put(fileEntry.getUrl(), value);
+        Object normalizedValue = TemporalValueUtils.normalize(value);
+
+        if (normalizedValue != null) {
+            jobDataStorage.put(fileEntry.getUrl(), normalizedValue);
+        }
+
+        return normalizedValue;
     }
 }
