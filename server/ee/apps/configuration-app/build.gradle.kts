@@ -112,6 +112,8 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-service"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client"))

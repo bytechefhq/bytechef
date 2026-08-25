@@ -9,6 +9,8 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-api"))
+    implementation(project(":server:ee:libs:platform:platform-variable:platform-variable-graphql"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")

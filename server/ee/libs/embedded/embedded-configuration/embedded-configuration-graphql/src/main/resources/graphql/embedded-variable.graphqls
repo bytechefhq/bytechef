@@ -1,0 +1,9 @@
+extend type Query {
+    embeddedVariables(environmentId: ID!): [Variable!]!
+}
+
+extend type Mutation {
+    createEmbeddedVariable(environmentId: ID!, input: VariableInput!): Variable!
+    updateEmbeddedVariable(environmentId: ID!, id: ID!, input: VariableInput!): Variable!
+    deleteEmbeddedVariable(environmentId: ID!, id: ID!): Boolean!
+}
