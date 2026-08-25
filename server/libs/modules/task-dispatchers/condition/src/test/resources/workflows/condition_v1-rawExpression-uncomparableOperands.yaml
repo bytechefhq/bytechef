@@ -1,0 +1,26 @@
+---
+label: "If Task Raw Expression Uncomparable Operands"
+inputs:
+- name: "restDate"
+  type: "string"
+  required: true
+tasks:
+- name: "dbDate"
+  type: "var/v1/set"
+  parameters:
+    value: "2026-08-26T00:00:00.000Z"
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    rawExpression: true
+    expression: "=${dbDate} > parseDate(${restDate}, \"yyyy-MM-dd'T'HH:mm:ssX\")"
+    caseTrue:
+    - name: "comparisonResult"
+      type: "var/v1/set"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "comparisonResult"
+      type: "var/v1/set"
+      parameters:
+        value: "false branch"
