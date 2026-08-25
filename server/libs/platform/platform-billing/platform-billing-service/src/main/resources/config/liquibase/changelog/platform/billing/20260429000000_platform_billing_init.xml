@@ -65,6 +65,8 @@
                                  constraintName="fk_billing_subscription_webhook_event_billing_subscription"
                                  referencedTableName="billing_subscription"
                                  referencedColumnNames="id"/>
+
+        <rollback/>
     </changeSet>
 
     <changeSet id="20260625000000-1" author="Matija Petanjek">
