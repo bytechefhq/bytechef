@@ -1,4 +1,14 @@
-# bytechef-embedded-react-sdk
+# @bytechef/embedded
+
+> Previously published as `@bytechef/embedded-react`. That package is deprecated — use this one.
+
+## Install
+
+```bash
+npm install @bytechef/embedded
+```
+
+Requires `react` and `react-dom` >= 19.2.3 as peer dependencies.
 
 ## Features
 
