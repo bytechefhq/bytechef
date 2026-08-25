@@ -33,16 +33,16 @@ Reads the `Model` child attached to the parent `Check For Violations` (or `Sanit
 
 ## Two Variants
 
-- **LLM PII (check)** — emits a violation listing the entity types the classifier reported.
-- **LLM PII (sanitize)** — masks each detected span with `<TYPE>` placeholders, the same as rule-based PII.
+- **LLM PII (check)** - emits a violation listing the entity types the classifier reported.
+- **LLM PII (sanitize)** - masks each detected span with `<TYPE>` placeholders, the same as rule-based PII.
 
-Both run in the LLM stage, so they consume preflight-masked text. The classifier sees, e.g., `"<EMAIL_ADDRESS> lives at 123 Main St"` rather than the raw email — but the address (which the rule-based PII detector doesn't know how to find) is still in the visible text for the classifier to flag.
+Both run in the LLM stage, so they consume preflight-masked text. The classifier sees, e.g., `"<EMAIL_ADDRESS> lives at 123 Main St"` rather than the raw email - but the address (which the rule-based PII detector doesn't know how to find) is still in the visible text for the classifier to flag.
 
 ---
 
 ## Hallucination Defence
 
-LLMs occasionally invent spans that aren't in the input — saying "I detected the SSN 123-45-6789" when no such substring exists. The detector defends against this in two layers:
+LLMs occasionally invent spans that aren't in the input - saying "I detected the SSN 123-45-6789" when no such substring exists. The detector defends against this in two layers:
 
 1. **Substring verification**: every span the classifier returns is checked to be a literal substring of the input. Spans that don't match the input verbatim are dropped with a per-call WARN log line.
 2. **All-hallucinated fail-closed**: if every returned span fails substring verification, the check escalates to a "100% hallucination" exception and the advisor treats it as a check failure → request blocked.
@@ -88,6 +88,6 @@ Sanitize prose-form PII inline (mask in place rather than block):
 
 ## Cost Considerations
 
-`LLM PII` makes one LLM call per request. Pair with a fast / cheap model (gpt-4o-mini, claude-3-5-haiku, gemini-1.5-flash) — the prompt is short and the output is a structured list, so even small models do well here.
+`LLM PII` makes one LLM call per request. Pair with a fast / cheap model (gpt-4o-mini, claude-3-5-haiku, gemini-1.5-flash) - the prompt is short and the output is a structured list, so even small models do well here.
 
 If your traffic is high, consider running rule-based `PII` alone and reserving `LLM PII` for a sampled subset of requests via a router upstream. The rule-based detector covers ~80% of common PII at a fraction of the cost.

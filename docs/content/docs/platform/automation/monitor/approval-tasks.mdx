@@ -1,6 +1,6 @@
 ---
 title: "Approval Tasks"
-description: "The in-app inbox for approval requests raised by human-in-the-loop steps — review a request, set its priority and assignee, and respond."
+description: "The in-app inbox for approval requests raised by human-in-the-loop steps - review a request, set its priority and assignee, and respond."
 ---
 
 When a workflow reaches a [human-in-the-loop](/platform/automation/build/workflows/human-in-the-loop)
@@ -8,10 +8,10 @@ step configured with the **Approval Task** channel, the request lands here. **Ap
 in-app inbox for those requests: the workflow stays paused until someone responds, and responding
 from this page resumes it exactly as an emailed or Slack link would.
 
-Use this channel when your approvers are already ByteChef users — operations, on-call, team leads —
+Use this channel when your approvers are already ByteChef users - operations, on-call, team leads -
 and you would rather not depend on email or Slack delivery reaching them.
 
-![The Approval Tasks page — the task list on the left and the selected task's detail on the right](approval-tasks/approval-tasks.png)
+![The Approval Tasks page - the task list on the left and the selected task's detail on the right](approval-tasks/approval-tasks.png)
 
 ---
 
@@ -30,14 +30,14 @@ with these fields alongside.
 | Field | What it does |
 |---|---|
 | **Status** | Where the request stands. Change it here to respond. |
-| **Priority** | How urgent the request is — set by the workflow step, editable here. |
+| **Priority** | How urgent the request is - set by the workflow step, editable here. |
 | **Assignee** | Who owns the request. New tasks arrive **Unassigned**; pick a person to make ownership explicit. |
 | **Due Date** | When the request should be answered by, if the step set one. |
 | **Created** | When the workflow raised the request. |
 
 <Callout type="info">
   The list opens filtered to **Open** tasks. If the page reads *No approval tasks found* while you
-  expect history, the filter is hiding answered requests rather than the inbox being empty — use
+  expect history, the filter is hiding answered requests rather than the inbox being empty - use
   **Clear filters** to see everything.
 </Callout>
 
@@ -49,7 +49,7 @@ above. */}
 
 ## Scope
 
-The inbox is scoped to one [environment](/platform/automation/deploy/environments) at a time — the
+The inbox is scoped to one [environment](/platform/automation/deploy/environments) at a time - the
 selector sits in the page header, and switching it changes which requests you see. A request raised
 by a workflow running in Production does not appear while you are looking at Development.
 
@@ -57,7 +57,7 @@ by a workflow running in Production does not appear while you are looking at Dev
 
 ## See also
 
-- [Human-in-the-Loop (Approval)](/platform/automation/build/workflows/human-in-the-loop) — how to add
+- [Human-in-the-Loop (Approval)](/platform/automation/build/workflows/human-in-the-loop) - how to add
   an approval step to a workflow, and the other channels a request can be delivered through.
-- [Workflow Executions](/platform/automation/monitor/workflow-executions) — the run that is waiting
+- [Workflow Executions](/platform/automation/monitor/workflow-executions) - the run that is waiting
   on the request, and where it resumes once answered.

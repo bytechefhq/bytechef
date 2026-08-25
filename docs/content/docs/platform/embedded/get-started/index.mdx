@@ -8,7 +8,7 @@ import {Link2, Package, PanelsTopLeft, Rocket} from "lucide-react";
 
 <EEBadge />
 
-ByteChef **Embedded** lets you offer native third-party integrations inside your own SaaS product. Your users authenticate with the services they already use (Gmail, Slack, HubSpot, AWS S3, and 200+ more), and your application triggers workflows on their behalf — all without your team having to build and maintain those integrations yourself.
+ByteChef **Embedded** lets you offer native third-party integrations inside your own SaaS product. Your users authenticate with the services they already use (Gmail, Slack, HubSpot, AWS S3, and 200+ more), and your application triggers workflows on their behalf - all without your team having to build and maintain those integrations yourself.
 
 <Callout title="Enterprise Edition only">
     Embedded requires an Enterprise Edition deployment (`bytechef.edition=ee`). The open-source (CE) build doesn't expose the `/embedded` UI or APIs.
@@ -18,7 +18,7 @@ ByteChef **Embedded** lets you offer native third-party integrations inside your
 
 ## Get started
 
-Three short pages take you from zero to a working connect flow — or follow the single-page [Quick Start](/platform/embedded/get-started/quick-start) that covers the same ground end-to-end:
+Three short pages take you from zero to a working connect flow - or follow the single-page [Quick Start](/platform/embedded/get-started/quick-start) that covers the same ground end-to-end:
 
 <Cards>
   <Card icon={<Package className="text-purple-300" />} title="Installing the SDK" href="/platform/embedded/get-started/initial-setup/installing-the-sdk">
@@ -42,20 +42,20 @@ Three short pages take you from zero to a working connect flow — or follow the
 | Capability | What it means for your product |
 |---|---|
 | **200+ pre-built integrations** | Drop-in connectors for the SaaS apps your users already work with. |
-| **Embeddable React SDK** | `useConnectDialog` renders a branded connect-and-authorize flow, and `EmbeddedWorkflowBuilder` embeds the full workflow editor — both inside your app. |
+| **Embeddable React SDK** | `useConnectDialog` renders a branded connect-and-authorize flow, and `EmbeddedWorkflowBuilder` embeds the full workflow editor - both inside your app. |
 | **Per-user connection store** | Each of your end users gets their own credentials, isolated by environment (Development / Staging / Production). |
 | **App Events** | Define events in your product (e.g. `user.signed_up`, `order.placed`) and let your customers attach workflows to them. |
 | **Permission expressions** | Scope integrations and individual workflows to a subset of your connected users with a SpEL expression. |
 | **AI workflow generation** *(coming soon)* | Generate a starter workflow for a user from a natural-language prompt via the embedded Copilot API. |
-| **Workflow execution history** | Every run, step by step, in the ByteChef admin UI — read-only, and served by the internal API rather than the public one. |
+| **Workflow execution history** | Every run, step by step, in the ByteChef admin UI - read-only, and served by the internal API rather than the public one. |
 | **MCP Servers** *(coming soon)* | Expose components as Model Context Protocol tool servers for AI agents (in your product or your customer's). |
 
 ### Going deeper
 
-- [White-label execution](/platform/embedded/get-started/white-label-execution) — the workflow engine running inside your product, branded as yours, and the [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) defaults each connected user's data sits behind.
-- [Permission expressions](/platform/embedded/build/permission-expressions) — gate which integrations and workflows each connected user sees.
-- [Embedded Configuration APIs](/openapi/backend/embedded-configuration-integration) — programmatic CRUD for integrations, workflows, and connections, designed for product surfaces.
-- [MCP servers](/platform/embedded/configure/mcp-servers) *(coming soon)* — surface each tenant's workflows as MCP tools for their agents.
+- [White-label execution](/platform/embedded/get-started/white-label-execution) - the workflow engine running inside your product, branded as yours, and the [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security) defaults each connected user's data sits behind.
+- [Permission expressions](/platform/embedded/build/permission-expressions) - gate which integrations and workflows each connected user sees.
+- [Embedded Configuration APIs](/openapi/backend/embedded-configuration-integration) - programmatic CRUD for integrations, workflows, and connections, designed for product surfaces.
+- [MCP servers](/platform/embedded/configure/mcp-servers) *(coming soon)* - surface each tenant's workflows as MCP tools for their agents.
 
 ---
 
@@ -69,14 +69,14 @@ Your product (web app, mobile, backend)
         │
         ▼
    ByteChef Embedded
-   ├── Integrations         — templates you build for your customers
-   ├── Configurations       — published integration versions per environment
-   ├── Connected Users      — your end users (identified by externalUserId)
-   ├── Connections          — per-user credentials for each integration
-   ├── App Events           — events your product fires to trigger workflows
-   ├── Automations          — workflows running for each connected user (feature-flagged)
-   ├── Executions           — history of every workflow run
-   └── MCP Servers          — components exposed as MCP tools (coming soon)
+   ├── Integrations         - templates you build for your customers
+   ├── Configurations       - published integration versions per environment
+   ├── Connected Users      - your end users (identified by externalUserId)
+   ├── Connections          - per-user credentials for each integration
+   ├── App Events           - events your product fires to trigger workflows
+   ├── Automations          - workflows running for each connected user (feature-flagged)
+   ├── Executions           - history of every workflow run
+   └── MCP Servers          - components exposed as MCP tools (coming soon)
 ```
 
 The mental model is bidirectional:

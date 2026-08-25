@@ -23,7 +23,7 @@ Because migrations run at startup, always take a database backup before deployin
 | Change | What it involves | Typical window |
 |---|---|---|
 | **Patch / minor version** | Backwards compatible. Liquibase changes are additive; a rolling restart onto the new image is enough. | Minutes, no downtime. |
-| **Major version** | May include breaking schema changes. Liquibase applies them at startup, but the change is one-way — take a backup first, and re-read the environment-variable reference for renamed or newly required settings. | Announce a maintenance window. |
+| **Major version** | May include breaking schema changes. Liquibase applies them at startup, but the change is one-way - take a backup first, and re-read the environment-variable reference for renamed or newly required settings. | Announce a maintenance window. |
 | **Community → Enterprise** | Not a different artifact. Both editions ship in the same image and the same schema (there is no separate EE Liquibase context); set `BYTECHEF_EDITION=EE` and restart. Existing workflows, executions, and connections carry over unchanged, and you enable EE features incrementally. | Minutes. |
 | **Single instance → several** | Align the encryption key, the message broker, the cache provider and the remember-me key across instances first, and keep migrations owned by one of them. See [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances). | One restart per instance. |
 | **Broker swap** | Drain in-flight tasks on the old broker, change `BYTECHEF_MESSAGE_BROKER_PROVIDER` and its connection settings, restart the coordinator and workers. Suspended executions resume against the new substrate. See [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers). | Minutes, after the drain. |
@@ -31,7 +31,7 @@ Because migrations run at startup, always take a database backup before deployin
 
 ## Before every upgrade
 
-- Take a database backup — and confirm you have a *tested* restore procedure, not just a dump file.
+- Take a database backup - and confirm you have a *tested* restore procedure, not just a dump file.
 - Back up the encryption key (see below). A restored database without its key is unreadable.
 - Commit your Helm values or Compose file so the configuration you are running is recoverable.
 - Have observability in place before you start, so you can tell a slow migration from a stuck one.
@@ -54,4 +54,4 @@ pg_restore -h <host> -U <user> -d bytechef --clean bytechef-backup.dump
 
 If you configured `BYTECHEF_FILE_STORAGE_PROVIDER=FILESYSTEM` or `BYTECHEF_DATA_STORAGE_PROVIDER=FILESYSTEM`, also back up the directory in `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` (default `${user.home}/bytechef/data/file-storage`). With the `JDBC` provider (the default for data and output storage) that data is already in the database; with the `AWS` provider it lives in your S3 bucket and is covered by your bucket's own backup policy.
 
-Also preserve the encryption key across restores — if `BYTECHEF_ENCRYPTION_PROVIDER=FILESYSTEM`, the generated key file must be restored alongside the database, or stored connection credentials become undecryptable. Using `BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY` with a key you hold avoids this coupling.
+Also preserve the encryption key across restores - if `BYTECHEF_ENCRYPTION_PROVIDER=FILESYSTEM`, the generated key file must be restored alongside the database, or stored connection credentials become undecryptable. Using `BYTECHEF_ENCRYPTION_PROVIDER=PROPERTY` with a key you hold avoids this coupling.

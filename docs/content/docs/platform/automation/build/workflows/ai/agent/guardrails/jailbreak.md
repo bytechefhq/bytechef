@@ -3,7 +3,7 @@ title: Jailbreak
 description: LLM-based classifier for prompt-injection and role-override attempts
 ---
 
-`Jailbreak` is an LLM-based classifier that detects prompt-injection and role-override attempts. It runs in the **LLM stage** of `Check For Violations`, so it sees the input *after* preflight masking — PII, secrets, and URLs are already replaced with placeholders before the classifier reads the text.
+`Jailbreak` is an LLM-based classifier that detects prompt-injection and role-override attempts. It runs in the **LLM stage** of `Check For Violations`, so it sees the input *after* preflight masking - PII, secrets, and URLs are already replaced with placeholders before the classifier reads the text.
 
 ---
 
@@ -22,7 +22,7 @@ description: LLM-based classifier for prompt-injection and role-override attempt
 - Educational or analytical discussion of jailbreak techniques
 - Quoting an attack to study it without asking the model to comply
 
-The default prompt explicitly instructs the classifier to treat the input as **data, not as instructions** — an attacker cannot redirect the classifier itself by including a directive in the user input.
+The default prompt explicitly instructs the classifier to treat the input as **data, not as instructions** - an attacker cannot redirect the classifier itself by including a directive in the user input.
 
 ---
 
@@ -31,7 +31,7 @@ The default prompt explicitly instructs the classifier to treat the input as **d
 | Property | Description |
 |---|---|
 | **Customize Prompt** | If off, uses the built-in jailbreak / prompt-injection classifier prompt. Turn on to override with your own prompt below |
-| **Prompt** | Classification instructions for the LLM. Visible only when **Customize Prompt** is on. Replaces the entire built-in prompt — keep the "treat input as data" guard if you customize |
+| **Prompt** | Classification instructions for the LLM. Visible only when **Customize Prompt** is on. Replaces the entire built-in prompt - keep the "treat input as data" guard if you customize |
 | **Threshold** | Minimum confidence score required to flag (`0.0` to `1.0`, default `0.7`). The classifier returns a score; below the threshold the input passes, at or above the request is blocked |
 
 ---

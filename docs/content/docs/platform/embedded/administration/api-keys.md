@@ -3,15 +3,15 @@ title: API Keys
 description: Manage API Keys for your embedded integration.
 ---
 
-<!-- TODO screenshot: Embedded → Settings — the settings landing page showing the available sections -->
+<!-- TODO screenshot: Embedded → Settings - the settings landing page showing the available sections -->
 
 ---
 
 ## API Keys
 
-<!-- TODO screenshot: Embedded → Settings → API Keys — the keys table with the environment selector and the New API Key button -->
+<!-- TODO screenshot: Embedded → Settings → API Keys - the keys table with the environment selector and the New API Key button -->
 
-API Keys are bearer tokens for **server-to-server** calls from your backend to the embedded public API — for example listing a user's integrations, executing a component action, or reading their workflow executions.
+API Keys are bearer tokens for **server-to-server** calls from your backend to the embedded public API - for example listing a user's integrations, executing a component action, or reading their workflow executions.
 
 They act on behalf of a connected user, just like a Signing Key JWT does; the difference is only in how that user is named. An API Key is accepted **only** on the `/api/embedded/v1/{externalUserId}/…` routes, where the path segment names the user. A request without that segment has no user to resolve and is rejected, so browser-originated calls (which have no user id in the path) still need a JWT signed with a Signing Key.
 
@@ -40,11 +40,11 @@ They act on behalf of a connected user, just like a Signing Key JWT does; the di
 1. Click **New API Key** in the top-right corner.
 2. Enter a **Name**.
 3. Click **Save**.
-4. **Copy the secret key now** — like Signing Keys, the secret appears once and is gone after you close the dialog.
+4. **Copy the secret key now** - like Signing Keys, the secret appears once and is gone after you close the dialog.
 
 #### Using the key
 
-Pass it as a bearer token against the public API's `/{externalUserId}`-prefixed routes — the connected user is identified by the path segment:
+Pass it as a bearer token against the public API's `/{externalUserId}`-prefixed routes - the connected user is identified by the path segment:
 
 ```http
 GET /api/embedded/v1/user-42/integrations HTTP/1.1

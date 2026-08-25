@@ -1,11 +1,11 @@
 ---
 title: Component Visibility
-description: Curate which components — and which of their actions and triggers — builders can see and run, enforced at listing time and again at execution time.
+description: Curate which components - and which of their actions and triggers - builders can see and run, enforced at listing time and again at execution time.
 ee: true
 comingSoon: true
 ---
 
-**Settings → Components → Component Visibility** lets an administrator curate the component catalog. Each component — and, individually, each of its actions and triggers — can be switched off tenant-wide, disappearing from builders' component lists and refusing to execute even when a workflow references it directly.
+**Settings → Components → Component Visibility** lets an administrator curate the component catalog. Each component - and, individually, each of its actions and triggers - can be switched off tenant-wide, disappearing from builders' component lists and refusing to execute even when a workflow references it directly.
 
 <Callout title="Availability">
     Component policies are an Enterprise Edition feature and require the `ADMIN` or `USER` authority on an EE deployment. In Community Edition every component is always available.
@@ -19,7 +19,7 @@ The tab shows a **Search components** box that filters by title or name, and a l
 
 Expand a row with its chevron to reveal that component's individual **actions and triggers**, each with its own switch. Disabling one operation leaves the rest of the component usable.
 
-{/* TODO screenshot: Settings → Components page, Component Visibility tab — the search box and the component list with each row showing icon, title, description, and an on/off toggle, one row expanded to show its per-action and per-trigger switches */}
+{/* TODO screenshot: Settings → Components page, Component Visibility tab - the search box and the component list with each row showing icon, title, description, and an on/off toggle, one row expanded to show its per-action and per-trigger switches */}
 
 Toggling a switch updates optimistically and rolls back if the mutation fails.
 
@@ -34,8 +34,8 @@ Toggling a switch updates optimistically and rolls back if the mutation fails.
 
 | Layer | Effect |
 |---|---|
-| **Listing** | The component (or the individual action or trigger) disappears from component lists — builders no longer see it in the workflow editor palette. |
-| **Execution** | Any attempt to run it — as an action, a trigger, or an agent cluster element — is rejected. |
+| **Listing** | The component (or the individual action or trigger) disappears from component lists - builders no longer see it in the workflow editor palette. |
+| **Execution** | Any attempt to run it - as an action, a trigger, or an agent cluster element - is rejected. |
 
 The execution layer is what makes this a control rather than a UI filter. A workflow that already references a disabled component keeps its definition, but the referencing steps **fail at run time** while the policy is in place. Re-enabling restores them without any workflow change.
 
@@ -56,7 +56,7 @@ The tab is backed by four admin-only GraphQL operations:
 | Operation | Effect |
 |---|---|
 | `componentPolicies` (query) | Lists every registry component with its tenant-wide `enabled` flag. Components with no policy row report enabled. |
-| `componentOperationPolicies(componentName)` (query) | Lists the disabled operations of one component — deny-list rows only. |
+| `componentOperationPolicies(componentName)` (query) | Lists the disabled operations of one component - deny-list rows only. |
 | `updateComponentPolicy(name, enabled)` (mutation) | Enables or disables one component tenant-wide. |
 | `updateComponentOperationPolicy(componentName, operationType, operationName, enabled)` (mutation) | Disables or re-enables a single action or trigger. `operationType` is `ACTION` or `TRIGGER`. |
 

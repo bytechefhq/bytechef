@@ -3,7 +3,7 @@ title: "Workflow Executions"
 description: "Learn how to monitor projects and workflows in ByteChef."
 ---
 
-After a project is deployed and executed, its workflow activity appears here—allowing you to review how your automation
+After a project is deployed and executed, its workflow activity appears here-allowing you to review how your automation
 is performing and explore the details of each execution.
 
 ## The executions table
@@ -38,7 +38,7 @@ Executions can be narrowed by any combination of these filters:
 
 The **Status** filter offers `STARTED`, `COMPLETED`, `CREATED`, `STOPPED`, and `FAILED`. The
 **Environment** selector in the page header scopes the whole list, and is available on Enterprise
-Edition only — a Community Edition instance works in a single environment and shows no selector.
+Edition only - a Community Edition instance works in a single environment and shows no selector.
 
 Use the **Refresh** button in the page header to reload the executions list with the latest runs.
 
@@ -46,23 +46,23 @@ Use the **Refresh** button in the page header to reload the executions list with
 
 From a row's **⋮** menu:
 
-- **View** — open the execution detail described below.
-- **Stop** — cancel a run that is still going. The item is disabled unless the run's status is
+- **View** - open the execution detail described below.
+- **Stop** - cancel a run that is still going. The item is disabled unless the run's status is
   `STARTED`.
 
 ## What the detail view shows
 
 The detail opens as two panes:
 
-- **Left** — the run's task list, one entry per task with its status. Selecting a task shows its
+- **Left** - the run's task list, one entry per task with its status. Selecting a task shows its
   **Input** and **Output**, and the error for a failed task. A task that ran a subflow is navigable
   through a breadcrumb back to its parent.
-- **Right** — the workflow rendered read-only on the canvas, so the selected task is visible in the
+- **Right** - the workflow rendered read-only on the canvas, so the selected task is visible in the
   context of the whole workflow.
 
 <Callout type="warn">
     Task inputs and outputs are recorded verbatim. They are serialized to JSON and stored as-is, with
-    no redaction of sensitive values — a password, token, or customer record that a task receives or
+    no redaction of sensitive values - a password, token, or customer record that a task receives or
     returns is readable in that task's Input and Output panels by anyone who can open the execution.
     Treat the execution history as carrying the same sensitivity as the data flowing through the
     workflow, and keep secrets in connections, whose parameters are never returned in the clear.
@@ -84,12 +84,12 @@ In the newly opened panel, you can inspect the input and output of each workflow
 </Step>
 </Steps>
 
-![A completed execution — the task list, the selected task's output, and the workflow graph](workflow-executions/execution-completed.png)
+![A completed execution - the task list, the selected task's output, and the workflow graph](workflow-executions/execution-completed.png)
 
 
 ## Execution Details - Failed
 
-![A failed execution — the failed task is flagged and an Error tab carries the message](workflow-executions/execution-failed.png)
+![A failed execution - the failed task is flagged and an Error tab carries the message](workflow-executions/execution-failed.png)
 
 <Steps>
 <Step>
@@ -115,7 +115,7 @@ If the execution fails, you’ll see which component encountered the error, alon
 > **Coming soon.** Execution retention is on the upcoming release track and is not yet enforced in the latest released version of ByteChef.
 
 Execution records are kept indefinitely unless a retention window is configured. When one is, a
-sweep runs every six hours per tenant and deletes runs that finished before the window — the job
+sweep runs every six hours per tenant and deletes runs that finished before the window - the job
 row, its task outputs, its stored context, and its `CURRENT_EXECUTION` data storage. Retention
 applies to *finished* runs of every outcome; there is no separate window for failures. Subflow
 child runs are left to their parent.
@@ -125,7 +125,7 @@ child runs are left to their parent.
 | `bytechef.workflow.execution.retention.enabled` | Turns the sweep off. Defaults to on. |
 | `bytechef.workflow.execution.retention.default-retention-days` | The window, in days, when the tenant's plan does not set one. Unset means no purging. |
 
-Deleting a run deletes its history — export anything you need for audit or analytics before the
+Deleting a run deletes its history - export anything you need for audit or analytics before the
 window elapses.
 
 ## Reading executions programmatically

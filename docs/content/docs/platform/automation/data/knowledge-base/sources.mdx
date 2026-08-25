@@ -32,15 +32,15 @@ Each source row shows:
 
 Under the hood a source is a generated data-stream workflow: it reads records from the
 configured component, transforms each record into a document, and writes it into the
-knowledge base — where it is chunked and embedded exactly like an uploaded file. A
+knowledge base - where it is chunked and embedded exactly like an uploaded file. A
 connection supplies any credentials the source component needs.
 
 ### Sync modes
 
-- **Full replace** — Records not seen in the latest run are removed from the knowledge
+- **Full replace** - Records not seen in the latest run are removed from the knowledge
   base. Use this when the source is the complete, authoritative set and deletions should
   propagate.
-- **Partial** — Unseen records are left in place. Use this for incremental or append-only
+- **Partial** - Unseen records are left in place. Use this for incremental or append-only
   feeds where each run only brings new or changed records.
 
 ## Managing a source

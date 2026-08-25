@@ -1,6 +1,6 @@
 ---
 title: Secret Keys
-description: Rule-based detection of API tokens and credential shapes — AWS, GitHub, Stripe, OpenAI, Slack, Google, JWT, and a tunable random-string detector
+description: Rule-based detection of API tokens and credential shapes - AWS, GitHub, Stripe, OpenAI, Slack, Google, JWT, and a tunable random-string detector
 ---
 
 `Secret Keys` detects API tokens and credential shapes in the input. It runs in the **preflight stage** so the matched substrings are masked before the LLM sees them.
@@ -20,7 +20,7 @@ The detector combines three signals, gated by the **Permissiveness** setting:
    - `OPENAI_KEY` (`sk-…`)
    - `JWT` (the three-segment base64 form)
 2. **Random-looking high-information strings** (Strict and Balanced): tokens that are long enough, varied enough, and have enough character-class diversity (lowercase, uppercase, digit, symbol) to look credential-shaped rather than English text.
-3. **Generic key-value assignments** (Strict only): patterns like `apikey="..."`, `secret = '...'`, `token: ...` — useful when an LLM dumps a config snippet but noisy if your inputs legitimately contain config samples.
+3. **Generic key-value assignments** (Strict only): patterns like `apikey="..."`, `secret = '...'`, `token: ...` - useful when an LLM dumps a config snippet but noisy if your inputs legitimately contain config samples.
 
 ---
 
@@ -45,8 +45,8 @@ For project-specific secret shapes, attach the standalone **Custom Regex** actio
 
 ## Two Variants
 
-- **Secret Keys (check)** — emits a violation listing the detected provider types so you can see, e.g., that `["AWS_ACCESS_KEY", "JWT"]` triggered the block.
-- **Secret Keys (sanitize)** — masks each match with `<TYPE>` (`<AWS_ACCESS_KEY>`, `<JWT>`, etc.). Stable placeholders so downstream tools can post-process consistently.
+- **Secret Keys (check)** - emits a violation listing the detected provider types so you can see, e.g., that `["AWS_ACCESS_KEY", "JWT"]` triggered the block.
+- **Secret Keys (sanitize)** - masks each match with `<TYPE>` (`<AWS_ACCESS_KEY>`, `<JWT>`, etc.). Stable placeholders so downstream tools can post-process consistently.
 
 ---
 

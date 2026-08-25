@@ -7,12 +7,12 @@ comingSoon: true
 
 The workflow editor's **Playground** panel includes a mic button when the open workflow has a voice
 trigger. Click it to speak directly to your workflow without going through the embedded chat widget or
-AI Hub — useful for iterating on prompts, models, and turn-taking behavior while building the workflow.
+AI Hub - useful for iterating on prompts, models, and turn-taking behavior while building the workflow.
 
 ## When the mic button appears
 
 The mic icon only renders when the open workflow has at least one trigger carrying a `websocketTasks`
-extension — i.e. the embedded sub-workflow that runs during the voice session. Practically:
+extension - i.e. the embedded sub-workflow that runs during the voice session. Practically:
 
 - Open a workflow with a `browser/v1/voiceSession` trigger → mic appears
 - Open a workflow with no voice trigger → no mic
@@ -44,7 +44,7 @@ What you test in the editor is what your customers will get from the embedded wi
 
 1. Click the mic icon in the Playground header. The icon flips to a red mic-off when active.
 2. The browser prompts for microphone permission. Grant it. (If you've denied it before, you'll need to
-   re-grant via browser site settings — see Troubleshooting below.)
+   re-grant via browser site settings - see Troubleshooting below.)
 3. A status banner appears: "Connecting microphone…"
 4. Once the WS is open and Deepgram has accepted the audio: the banner flips to "🎙 Listening… click mic
    to end." (Or "🔊 Assistant is speaking…" once it responds.)
@@ -60,7 +60,7 @@ Voice testing is the fastest way to evaluate prompt + model changes:
 3. Click mic, speak, listen
 4. Repeat
 
-Each click of the mic starts a fresh session — the previous Deepgram WS closes, a new sub-workflow job
+Each click of the mic starts a fresh session - the previous Deepgram WS closes, a new sub-workflow job
 spawns, and chat memory resets (unless you've configured a fixed `threadId` on a streaming agent task).
 This is the right semantics for prompt iteration; you don't want the previous test's context bleeding
 into the next.
@@ -77,7 +77,7 @@ explicitly via the mic-off button.
 ## Browser requirements
 
 Same as production voice: Chrome 66+, Firefox 76+, or Safari 14.1+. The mic button is disabled with a
-tooltip explaining why on unsupported browsers — no silent failures.
+tooltip explaining why on unsupported browsers - no silent failures.
 
 ## Troubleshooting
 
@@ -118,4 +118,4 @@ conversations, close and re-open the mic between iterations.
 
 ## What's next
 
-- [Voice Quickstart](./quickstart) — initial workflow setup
+- [Voice Quickstart](./quickstart) - initial workflow setup

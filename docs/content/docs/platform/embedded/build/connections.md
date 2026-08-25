@@ -39,7 +39,7 @@ Each connection in the list displays:
 4. Assign tags if desired.
 5. Click **Save** to create the connection.
 
-A newly created connection shows **Not Active** until a workflow, integration instance, or test configuration actually references it — the badge reports usage, not reachability.
+A newly created connection shows **Not Active** until a workflow, integration instance, or test configuration actually references it - the badge reports usage, not reachability.
 
 ### Managing Connections
 

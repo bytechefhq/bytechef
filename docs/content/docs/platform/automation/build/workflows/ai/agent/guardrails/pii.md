@@ -1,6 +1,6 @@
 ---
 title: PII
-description: Rule-based detection of personally-identifiable information — emails, phones, SSNs, IBANs, credit cards, IPs, and locale-specific identifiers
+description: Rule-based detection of personally-identifiable information - emails, phones, SSNs, IBANs, credit cards, IPs, and locale-specific identifiers
 ---
 
 `PII` is a rule-based detector for personally-identifiable information. It runs in the **preflight stage** of `Check For Violations` (or `Sanitize Text`) and emits matched spans for the parent advisor's longest-first masking pass.
@@ -19,7 +19,7 @@ The built-in entity catalogue covers globally-recognized identifiers and several
 | **Italy** | `IT_FISCAL_CODE`, `IT_DRIVER_LICENSE`, `IT_VAT_CODE`, `IT_IDENTITY_CARD`, `IT_PASSPORT` |
 | **Spain, Poland, Singapore, Australia, India, Finland** | Regional national-ID and passport formats |
 
-Open the **Entities** dropdown in the editor for the live list — new entities are added behind the same property without a version bump.
+Open the **Entities** dropdown in the editor for the live list - new entities are added behind the same property without a version bump.
 
 ---
 
@@ -38,8 +38,8 @@ For project-specific patterns (internal ticket IDs, study identifiers, custom ac
 
 `PII` exposes two cluster elements with the same configuration surface:
 
-- **PII (check)** — emits a violation so the parent advisor blocks the request and lists the entity types that fired in the violation diagnostic.
-- **PII (sanitize)** — emits the same mask entities but the parent advisor rewrites the text instead of blocking.
+- **PII (check)** - emits a violation so the parent advisor blocks the request and lists the entity types that fired in the violation diagnostic.
+- **PII (sanitize)** - emits the same mask entities but the parent advisor rewrites the text instead of blocking.
 
 Both feed into the parent's mask pass, so PII matches merge with secret-key, URL, and custom-regex matches in a single longest-first redaction.
 
@@ -47,7 +47,7 @@ Both feed into the parent's mask pass, so PII matches merge with secret-key, URL
 
 ## Mask Placeholders
 
-Each entity type renders as `<TYPE>` — `<EMAIL_ADDRESS>`, `<US_SSN>`, `<CREDIT_CARD>`, etc. The placeholder is stable across runs so downstream tools (a chat-memory store, a logging pipeline) can rely on matching on the placeholder string.
+Each entity type renders as `<TYPE>` - `<EMAIL_ADDRESS>`, `<US_SSN>`, `<CREDIT_CARD>`, etc. The placeholder is stable across runs so downstream tools (a chat-memory store, a logging pipeline) can rely on matching on the placeholder string.
 
 ---
 

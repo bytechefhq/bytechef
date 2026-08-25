@@ -6,7 +6,7 @@ description: "Gate which integrations, automation workflow projects, and workflo
 In an [embedded](/platform/embedded/get-started) deployment, not every customer should see every integration or automation workflow. A free-tier user shouldn't see the Salesforce integration you sell as a premium add-on; an EU customer shouldn't see an integration that isn't GDPR-cleared; a beta feature should reach only the accounts you've flagged. **Permission expressions** let you encode those rules directly on an integration, an automation workflow project, or one of their workflows, evaluated per connected user at request time.
 
 <Callout type="info">
-  Permission expressions are an **Enterprise, embedded-edition** feature. They gate visibility for **connected users** — the end-users of your product who authenticate through your backend — not the admins who build integrations in the ByteChef UI.
+  Permission expressions are an **Enterprise, embedded-edition** feature. They gate visibility for **connected users** - the end-users of your product who authenticate through your backend - not the admins who build integrations in the ByteChef UI.
 </Callout>
 
 ## How it works
@@ -29,9 +29,9 @@ For each integration / project / workflow:
 
 The evaluator **fails closed**, which is the safe default for an access decision:
 
-- A **blank or absent** expression means *no restriction* — the integration is visible to everyone. (Most integrations have no expression.)
+- A **blank or absent** expression means *no restriction* - the integration is visible to everyone. (Most integrations have no expression.)
 - An expression that evaluates to **`true`** makes the integration visible.
-- **Anything else hides it** — `false`, a malformed expression, a null dereference, any evaluation error. A typo in an expression hides the integration rather than exposing it.
+- **Anything else hides it** - `false`, a malformed expression, a null dereference, any evaluation error. A typo in an expression hides the integration rather than exposing it.
 
 ## What the expression can reference
 
@@ -39,8 +39,8 @@ The expression is evaluated against a context built from the requesting connecte
 
 | Variable | Type | Meaning |
 |---|---|---|
-| `metadata` | map of string → string | The key/value metadata your backend attached to the connected user (plan tier, region, feature flags, account ID, …). Values are stored as **strings**, whatever JSON type you sent — compare against a quoted literal. |
-| `externalId` | string | The user's ID in *your* system — the external user ID you provisioned them with. |
+| `metadata` | map of string → string | The key/value metadata your backend attached to the connected user (plan tier, region, feature flags, account ID, …). Values are stored as **strings**, whatever JSON type you sent - compare against a quoted literal. |
+| `externalId` | string | The user's ID in *your* system - the external user ID you provisioned them with. |
 | `email` | string | The connected user's email. |
 | `name` | string | The connected user's display name. |
 | `environment` | string | The environment name (`DEVELOPMENT`, `STAGING`, `PRODUCTION`) the request is scoped to. |
@@ -61,7 +61,7 @@ Restrict a workflow to a specific region:
 metadata['region'] == 'eu'
 ```
 
-Gate a beta integration to explicitly flagged accounts (note the quotes — metadata values are strings):
+Gate a beta integration to explicitly flagged accounts (note the quotes - metadata values are strings):
 
 ```
 metadata['betaIntegrations'] == 'true'
@@ -81,7 +81,7 @@ Each expression is a multi-line **Permission Expression** text field, scoped to 
 
 **Integrations:**
 
-- In **Embedded → Integrations**, the integration create/edit dialog (**New Integration** / edit) has a **Permission Expression** field alongside the component, name, description, category, and tags — it gates the whole integration.
+- In **Embedded → Integrations**, the integration create/edit dialog (**New Integration** / edit) has a **Permission Expression** field alongside the component, name, description, category, and tags - it gates the whole integration.
 - In the integration's workflow list, each workflow row exposes its own **Permission Expression** field so you can gate individual workflows inside an otherwise broadly visible integration.
 
 **Automation workflow projects:**
@@ -96,14 +96,14 @@ The same expressions are settable programmatically, scoped to the resource they 
 **Integrations:**
 
 - The integration-level expression is set as part of the integration update (a `permissionExpression` field on the integration), so it is saved together with the rest of the integration in a single write.
-- `updateIntegrationWorkflowPermissionExpression` — sets the expression on a single workflow within an integration.
+- `updateIntegrationWorkflowPermissionExpression` - sets the expression on a single workflow within an integration.
 
 **Automation workflow projects:**
 
 - The project-level expression is folded into `createAutomationWorkflowProject` / `updateAutomationWorkflowProject` as a `permissionExpression` argument, so it is saved with the rest of the project in a single write. A `null` argument leaves any stored expression unchanged; an empty string clears it.
 - A workflow's expression can be passed on `createAutomationWorkflowProjectWorkflow`, and changed later with `updateAutomationWorkflowProjectWorkflowPermissionExpression`.
 
-A workflow-level expression lets you ship an integration or automation workflow project broadly while still gating individual workflows inside it — e.g., the project is visible to everyone, but its "bulk export" workflow only to enterprise accounts. The project-level expression behaves like the integration-level one: when it evaluates `false`, the whole project (and all its workflows) drops out of that connected user's catalog.
+A workflow-level expression lets you ship an integration or automation workflow project broadly while still gating individual workflows inside it - e.g., the project is visible to everyone, but its "bulk export" workflow only to enterprise accounts. The project-level expression behaves like the integration-level one: when it evaluates `false`, the whole project (and all its workflows) drops out of that connected user's catalog.
 
 ## Where it fits
 

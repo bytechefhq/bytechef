@@ -26,7 +26,7 @@ The trigger definition is used to specify the properties of a trigger. Below is 
 
 ## Trigger Type
 
-- **CALLABLE**: A trigger that has no inbound endpoint of its own — the workflow is invoked directly, by another workflow or by a caller that holds a reference to it. `workflow/v1/newWorkflowCall` is the built-in example, and it is also the trigger that makes a workflow exposable as an MCP or A2A tool.
+- **CALLABLE**: A trigger that has no inbound endpoint of its own - the workflow is invoked directly, by another workflow or by a caller that holds a reference to it. `workflow/v1/newWorkflowCall` is the built-in example, and it is also the trigger that makes a workflow exposable as an MCP or A2A tool.
 - **DYNAMIC_WEBHOOK**: A trigger that listens for incoming HTTP requests at a dynamically generated URL.
 - **HYBRID**: Combines features of both polling and webhook triggers. It can listen for events via webhooks and also poll for updates, providing flexibility in handling different event sources.
 - **LISTENER**: A trigger that continuously listens for specific events or messages from a source, such as a message queue or event stream, and activates when those events occur.

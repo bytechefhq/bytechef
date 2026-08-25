@@ -1,6 +1,6 @@
 ---
 title: "Unified API"
-description: "One normalized, provider-agnostic REST schema across many CRM and Accounting providers — integrate once, support many."
+description: "One normalized, provider-agnostic REST schema across many CRM and Accounting providers - integrate once, support many."
 comingSoon: true
 ---
 
@@ -11,7 +11,7 @@ The **Unified API** is a normalized REST layer that gives you a single schema ac
 An embedded product that supports "CRM" usually means supporting five CRMs, each with its own object model, field names, pagination scheme, and auth. The Unified API collapses that fan-out:
 
 - **Integrate once.** Build your feature against the unified `account` (or `contact`, `opportunity`, …) model. Adding a new provider in the same category requires no code change on your side.
-- **Provider-agnostic.** The same request works whether the connected user is on HubSpot, Pipedrive, or Xero — ByteChef maps unified fields to the provider's fields and back.
+- **Provider-agnostic.** The same request works whether the connected user is on HubSpot, Pipedrive, or Xero - ByteChef maps unified fields to the provider's fields and back.
 - **Connected-user scoped.** Every call runs against the calling connected user's own connection, so you never handle provider credentials directly.
 
 Under the hood the Unified API is built on the same [component connectors](/platform/embedded/build/integrations) that power everything else in Embedded. Each supporting provider component ships a mapping between its native model and the unified model; the Unified API sits on top of those component connections and does the translation for you.
@@ -33,7 +33,7 @@ The Unified API is organized into **categories** (a domain such as CRM or Accoun
     The model catalogs above define the normalized schema. The REST endpoints wired today are the **Account** resource in both the **CRM** and **Accounting** categories. Additional model endpoints follow the same request/response contract as they are enabled.
 </Callout>
 
-Provider coverage today includes HubSpot and Pipedrive (CRM) and Xero (Accounting). Because the mapping lives in each provider component, coverage grows as more components implement the unified mapping — with no change to your integration code.
+Provider coverage today includes HubSpot and Pipedrive (CRM) and Xero (Accounting). Because the mapping lives in each provider component, coverage grows as more components implement the unified mapping - with no change to your integration code.
 
 ## Base path and endpoint shape
 
@@ -68,13 +68,13 @@ Every request is authenticated as a connected user with a bearer token:
 Authorization: Bearer <connected-user-token>
 ```
 
-The token resolves the calling **connected user**; ByteChef then selects that user's integration instance and connection for the target category and runs the operation against the provider they connected. A caller can never reach another connected user's connection — an `x-instance-id` that does not belong to the resolved connected user is rejected. See [connected users](/platform/embedded/monitor/connected-users) and [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security).
+The token resolves the calling **connected user**; ByteChef then selects that user's integration instance and connection for the target category and runs the operation against the provider they connected. A caller can never reach another connected user's connection - an `x-instance-id` that does not belong to the resolved connected user is rejected. See [connected users](/platform/embedded/monitor/connected-users) and [tenant-isolated security](/platform/embedded/get-started/white-label-execution#tenant-isolated-security).
 
 ## Request headers
 
 | Header | Required | Description |
 |---|---|---|
-| `Authorization` | Yes | `Bearer <connected-user-token>` — identifies the connected user. |
+| `Authorization` | Yes | `Bearer <connected-user-token>` - identifies the connected user. |
 | `X-Environment` | No | Target environment: `TEST` or `PRODUCTION`. |
 | `x-instance-id` | No | The integration instance ID identifying the connected user's specific integration instance. When omitted, ByteChef picks the connected user's integration instance for the requested category. |
 
@@ -106,7 +106,7 @@ GET /api/embedded/v1/unified/crm/accounts?size=50
 GET /api/embedded/v1/unified/crm/accounts?size=50&continuationToken=<token-from-previous-response>
 ```
 
-The continuation token encodes the query filter it was issued for. Changing the `sort` or `direction` while paging with a token is rejected — start a fresh page (drop the token) whenever you change the filter.
+The continuation token encodes the query filter it was issued for. Changing the `sort` or `direction` while paging with a token is rejected - start a fresh page (drop the token) whenever you change the filter.
 
 ## Example: create an account
 
@@ -188,16 +188,16 @@ A subset of the normalized **CRM account** model:
 | `createdDate` | date-time | When the record was created. |
 | `lastModifiedDate` | date-time | When the record was last modified. |
 
-The **Accounting account** model is different — it carries fields such as `accountNumber`, `classification`, `currency`, `currentBalance`, `status`, `type`, and `parentAccountId`. Each category defines its own normalized schema; the shared machinery (auth, pagination, `remoteData`, `customFields`) is the same across both.
+The **Accounting account** model is different - it carries fields such as `accountNumber`, `classification`, `currency`, `currentBalance`, `status`, `type`, and `parentAccountId`. Each category defines its own normalized schema; the shared machinery (auth, pagination, `remoteData`, `customFields`) is the same across both.
 
 ## How it relates to component connectors
 
-The Unified API does not replace [components](/platform/embedded/build/integrations) — it composes them:
+The Unified API does not replace [components](/platform/embedded/build/integrations) - it composes them:
 
 - A connected user still connects a specific provider (HubSpot, Pipedrive, Xero) through the normal [connection flow](/platform/embedded/build/connections).
 - Each supporting provider component declares how its native objects map to the unified model.
 - When you call the Unified API, ByteChef looks up the connected user's connection for the category, invokes the matching component action, and translates between the unified schema and the provider's schema in both directions.
 
-That means you get the breadth of the component catalog with the ergonomics of a single, stable schema — integrate once against the Unified API, and every provider that implements the mapping is available to your connected users automatically.
+That means you get the breadth of the component catalog with the ergonomics of a single, stable schema - integrate once against the Unified API, and every provider that implements the mapping is available to your connected users automatically.
 
 {/* TODO screenshot: the Unified API category filter (Accounting / CRM) on the Integrations list, shown when the Unified API feature flag is enabled */}

@@ -1,6 +1,6 @@
 ---
 title: "Architecture"
-description: How ByteChef works inside — the Atlas workflow engine, configuration vs execution, triggers and webhooks, the message broker, and how the Component SDK maps into the runtime.
+description: How ByteChef works inside - the Atlas workflow engine, configuration vs execution, triggers and webhooks, the message broker, and how the Component SDK maps into the runtime.
 ---
 
 This page explains how ByteChef executes workflows under the hood. It is written for contributors and component authors who want to understand the moving parts: the **Atlas** engine that runs jobs, the **trigger and webhook** machinery that starts them, the **message broker** that connects everything, and the **Component SDK** whose definitions become both editor UI and executable tasks.
@@ -78,7 +78,7 @@ Three properties of this design are worth internalizing early:
 
 ## Module layout
 
-The server modules form strict layers — each layer only depends downward:
+The server modules form strict layers - each layer only depends downward:
 
 <Mermaid
   chart={`
@@ -166,8 +166,8 @@ The design-time side lives in `atlas-configuration`. A **`Workflow`** is parsed 
 
 Two things in this JSON drive everything else:
 
-- **The task `type` string** — `component/vVERSION/operation`. It is parsed by `WorkflowNodeType.ofType("googleMail/v1/searchEmail")` into `(name=googleMail, version=1, operation=searchEmail)` and doubles as the task-handler registry key at execution time.
-- **`${...}` expressions** — evaluated lazily against the accumulated job context, not at save time (see [Expression evaluation](#expression-evaluation)).
+- **The task `type` string** - `component/vVERSION/operation`. It is parsed by `WorkflowNodeType.ofType("googleMail/v1/searchEmail")` into `(name=googleMail, version=1, operation=searchEmail)` and doubles as the task-handler registry key at execution time.
+- **`${...}` expressions** - evaluated lazily against the accumulated job context, not at save time (see [Expression evaluation](#expression-evaluation)).
 
 Above Atlas, the automation layer (`automation-configuration`) adds the product concepts: **projects** version workflows, **deployments** bind a published project version to an environment, per-workflow **connections** and **inputs**. Enabling a deployment workflow is what activates its triggers.
 
@@ -188,7 +188,7 @@ Task outputs, job outputs, and context values are **not stored inline in Postgre
 
 ### How a job runs
 
-Every hop below is an event on a named broker route — the class names and route names are real, so you can grep for them.
+Every hop below is an event on a named broker route - the class names and route names are real, so you can grep for them.
 
 <Mermaid
   chart={`
@@ -232,20 +232,20 @@ Step by step:
 2. **Event-to-message bridge.** Atlas publishes plain Spring application events; `MessageEventListener` (a `@TransactionalEventListener(AFTER_COMMIT)`) forwards each one onto its broker route. Publishing after commit guarantees a consumer never sees a message for state that isn't in the database yet.
 3. **Coordinator starts the job.** `TaskCoordinator.onStartJobEvent` marks the job `STARTED` and calls `JobExecutor.execute(job)`, which reads the current context, builds the next `TaskExecution` from `workflow.getTasks().get(job.getCurrentTask())`, **evaluates its `${...}` parameters**, persists it, and hands it to the dispatcher.
 4. **Dispatch.** The primary dispatcher is a `TaskDispatcherChain`. Control-flow dispatchers (condition, loop, ...) get first refusal; if none claims the task, `DefaultTaskDispatcher` publishes it to the worker route. Tasks can target named worker pools: a task with `"node": "gpu"` routes to `task.gpu_task_execution_events` instead of `task.default_task_execution_events`.
-5. **Execute.** `TaskWorker` resolves a `TaskHandler` through the `TaskHandlerRegistry` — keyed by the exact task type string (`googleMail/v1/searchEmail`) — invokes it (24h default timeout), stores the output via `TaskFileStorage`, and publishes `TaskExecutionCompleteEvent`.
+5. **Execute.** `TaskWorker` resolves a `TaskHandler` through the `TaskHandlerRegistry` - keyed by the exact task type string (`googleMail/v1/searchEmail`) - invokes it (24h default timeout), stores the output via `TaskFileStorage`, and publishes `TaskExecutionCompleteEvent`.
 6. **Complete and advance.** Back on the coordinator, the `TaskCompletionHandlerChain` gives control-flow completion handlers first refusal; `DefaultTaskCompletionHandler` handles top-level tasks: it merges the output into the job context under the task's name, then either dispatches the next task or completes the job (evaluating declared workflow `outputs` against the final context).
 
 Stop and resume follow the same pattern (`StopJobEvent` on `task.stop_job_events`, `ResumeJobEvent` on `task.resume_job_events`), as do errors (`task.error_events`).
 
 ### Expression evaluation
 
-`${...}` references are resolved by `SpelEvaluator` (Spring SpEL with a custom map property accessor, in `core/evaluator`) — plus a formula syntax where a parameter value starting with `=` is evaluated as an expression with built-in functions (`concat`, `join`, `range`, `now`, `uuid`, ...).
+`${...}` references are resolved by `SpelEvaluator` (Spring SpEL with a custom map property accessor, in `core/evaluator`) - plus a formula syntax where a parameter value starting with `=` is evaluated as an expression with built-in functions (`concat`, `join`, `range`, `now`, `uuid`, ...).
 
-Evaluation happens **at dispatch time**, on the coordinator, against the context accumulated so far — that's why `${searchEmail_1.id}` works in task 3 but not in task 1. Control-flow dispatchers register *deferred evaluation keys* (e.g. `condition` defers `caseTrue`/`caseFalse`) so expressions inside not-yet-taken branches survive verbatim until the branch is actually dispatched.
+Evaluation happens **at dispatch time**, on the coordinator, against the context accumulated so far - that's why `${searchEmail_1.id}` works in task 3 but not in task 1. Control-flow dispatchers register *deferred evaluation keys* (e.g. `condition` defers `caseTrue`/`caseFalse`) so expressions inside not-yet-taken branches survive verbatim until the branch is actually dispatched.
 
 ### Control flow: task dispatchers
 
-Control flow is not built into the engine — each construct is a pluggable extension in `server/libs/modules/task-dispatchers/` following one pattern:
+Control flow is not built into the engine - each construct is a pluggable extension in `server/libs/modules/task-dispatchers/` following one pattern:
 
 <Mermaid
   chart={`
@@ -267,7 +267,7 @@ Fan-out constructs (`parallel`, `fork-join`, `each`, `map`) additionally use the
 
 ### The message broker
 
-The broker abstraction lives in `core/message`: a `MessageRoute` (name + exchange), a `MessageBroker.send(route, message)`, and per-provider implementations selected by `bytechef.message-broker.provider` — `memory` (default), `amqp` (RabbitMQ), `jms`, `kafka`, `redis`, and AWS SQS (EE).
+The broker abstraction lives in `core/message`: a `MessageRoute` (name + exchange), a `MessageBroker.send(route, message)`, and per-provider implementations selected by `bytechef.message-broker.provider` - `memory` (default), `amqp` (RabbitMQ), `jms`, `kafka`, `redis`, and AWS SQS (EE).
 
 <Mermaid
   chart={`
@@ -285,7 +285,7 @@ flowchart TB
 `}
 />
 
-Because coordinator and worker only ever talk through routes, scaling out means moving off the in-process broker to a shared one and running more instances — the Atlas code is identical either way. Workers subscribe to routes by node name (`bytechef.worker.task.subscriptions`), which is how a task can be pinned to a dedicated queue.
+Because coordinator and worker only ever talk through routes, scaling out means moving off the in-process broker to a shared one and running more instances - the Atlas code is identical either way. Workers subscribe to routes by node name (`bytechef.worker.task.subscriptions`), which is how a task can be pinned to a dedicated queue.
 
 There is one deliberate bypass: `JobSyncExecutor` (`platform/platform-job-sync`) hand-wires a private coordinator + worker around an in-process broker to run a workflow synchronously start-to-finish. That's what powers the editor's test runs and streamed executions, without touching the shared queues.
 
@@ -319,7 +319,7 @@ flowchart TB
 `}
 />
 
-The `WorkflowExecutionId` deserves a note: it is the base64-encoded tuple `tenantId : type : jobPrincipalId : workflowUuid : triggerName`. It is the webhook URL path segment, the scheduler job identity, and the trigger-state key — one durable address for "this trigger of this workflow in this deployment".
+The `WorkflowExecutionId` deserves a note: it is the base64-encoded tuple `tenantId : type : jobPrincipalId : workflowUuid : triggerName`. It is the webhook URL path segment, the scheduler job identity, and the trigger-state key - one durable address for "this trigger of this workflow in this deployment".
 
 `TriggerStateService` persists whatever a trigger needs to remember between invocations: the webhook registration output for dynamic webhooks, and the **`closureParameters`** cursor for polling triggers.
 
@@ -333,9 +333,9 @@ All trigger sources converge on the `TriggerCoordinator`, which mirrors the task
 - **batch** → one job with the whole list as the trigger's output;
 - single value → one job.
 
-The trigger's output lands in the job inputs under the trigger's name — which is why workflow expressions reference `${trigger_1.someField}`.
+The trigger's output lands in the job inputs under the trigger's name - which is why workflow expressions reference `${trigger_1.someField}`.
 
-For **polling** triggers the worker loops the component's `poll` function: each call returns `PollOutput(records, closureParameters, pollImmediately)`; the records accumulate (safety caps: 10,000 records / 100 iterations per run) and the final `closureParameters` — typically a "last seen" timestamp or cursor — are persisted as trigger state and passed back on the next poll. Deduplication is cursor-based, not record-hash based.
+For **polling** triggers the worker loops the component's `poll` function: each call returns `PollOutput(records, closureParameters, pollImmediately)`; the records accumulate (safety caps: 10,000 records / 100 iterations per run) and the final `closureParameters` - typically a "last seen" timestamp or cursor - are persisted as trigger state and passed back on the next poll. Deduplication is cursor-based, not record-hash based.
 
 ## Webhooks
 
@@ -372,15 +372,15 @@ sequenceDiagram
 
 Details that matter:
 
-- **Request capture.** The raw HTTP request (method, headers, query, body — including multipart, stored to temp file storage) is normalized into a `WebhookRequest` and attached to the `TriggerExecution`, so the component's `webhookRequest` function sees the full request regardless of broker hops.
-- **Sync execution** is opt-in per trigger (`workflowSyncExecution` flag on the trigger definition). The response body comes from whichever task in the workflow produced an output tagged `WEBHOOK_RESPONSE` — that's what the Webhook component's "response" actions set.
-- **`JobCompletionAwaiter`** is how a synchronous HTTP response works when the job does not run on the receiving thread: the node that received the request parks a `CompletableFuture` keyed by job id and completes it when the job-status event arrives over the broker — so the job may well have executed elsewhere. A race guard checks whether the job is already terminal before parking.
+- **Request capture.** The raw HTTP request (method, headers, query, body - including multipart, stored to temp file storage) is normalized into a `WebhookRequest` and attached to the `TriggerExecution`, so the component's `webhookRequest` function sees the full request regardless of broker hops.
+- **Sync execution** is opt-in per trigger (`workflowSyncExecution` flag on the trigger definition). The response body comes from whichever task in the workflow produced an output tagged `WEBHOOK_RESPONSE` - that's what the Webhook component's "response" actions set.
+- **`JobCompletionAwaiter`** is how a synchronous HTTP response works when the job does not run on the receiving thread: the node that received the request parks a `CompletableFuture` keyed by job id and completes it when the job-status event arrives over the broker - so the job may well have executed elsewhere. A race guard checks whether the job is already terminal before parking.
 - **Validation flags** (`workflowSyncValidation`, `workflowSyncOnEnableValidation`) let a trigger validate a request (e.g. a provider's URL-verification handshake) synchronously before any job is created.
 - There is also an SSE variant (`/webhooks/:id/sse`) that streams job progress events back to the caller.
 
 ## The Component SDK
 
-Components are authored against `sdks/backend/java/component-api` — a dependency-free definition model plus the `ComponentDsl` fluent builder:
+Components are authored against `sdks/backend/java/component-api` - a dependency-free definition model plus the `ComponentDsl` fluent builder:
 
 ```java
 @AutoService(ComponentHandler.class)
@@ -402,7 +402,7 @@ public final class SlackComponentHandler implements ComponentHandler {
 }
 ```
 
-`@AutoService` generates the `META-INF/services` entry, and the platform discovers handlers with `ServiceLoader`. No Spring, no annotations beyond that one — a component is a plain object graph describing itself.
+`@AutoService` generates the `META-INF/services` entry, and the platform discovers handlers with `ServiceLoader`. No Spring, no annotations beyond that one - a component is a plain object graph describing itself.
 
 ### What `Optional` means in the definition interfaces
 
@@ -421,7 +421,7 @@ public interface ActionDefinition {
 }
 ```
 
-The rule: **an `Optional` getter marks an attribute the component author *may or may not* have set in the fluent definition.** A present value means the author called that builder method; an empty `Optional` means they didn't, and the platform substitutes a fallback or treats the capability as absent. (Mechanically, every DSL builder getter is literally `Optional.ofNullable(field)` — the field stays `null` until the corresponding builder method runs.)
+The rule: **an `Optional` getter marks an attribute the component author *may or may not* have set in the fluent definition.** A present value means the author called that builder method; an empty `Optional` means they didn't, and the platform substitutes a fallback or treats the capability as absent. (Mechanically, every DSL builder getter is literally `Optional.ofNullable(field)` - the field stays `null` until the corresponding builder method runs.)
 
 The non-`Optional` getters are the mandatory attributes the DSL factory itself guarantees: `component(name)` sets the name, `action(name)` sets the action name, versions default to `1`.
 
@@ -434,9 +434,9 @@ What "empty" concretely means, per attribute:
 | `getProperties()` | The action/trigger takes no input parameters | Treated as `List.of()` |
 | `getConnection()` (component) | Component needs no connection | No connection UI; actions run connectionless |
 | `getOutputDefinition()` | No output declared | Editor can't offer typed data pills for this node |
-| `getPerform()` | No hand-written execute function | Legitimate for OpenAPI components — the loader synthesizes one (see below). If still empty at execution: `getPerform().orElseThrow(...)` fails the task |
+| `getPerform()` | No hand-written execute function | Legitimate for OpenAPI components - the loader synthesizes one (see below). If still empty at execution: `getPerform().orElseThrow(...)` fails the task |
 
-`OutputDefinition` itself illustrates the pattern one level deeper: it holds *either* a static schema/sample (`getOutputResponse()`) *or* a function that computes the schema at runtime against live parameters (`getOutput()`) — both `Optional`, and which one is present changes how the editor resolves the node's output shape.
+`OutputDefinition` itself illustrates the pattern one level deeper: it holds *either* a static schema/sample (`getOutputResponse()`) *or* a function that computes the schema at runtime against live parameters (`getOutput()`) - both `Optional`, and which one is present changes how the editor resolves the node's output shape.
 
 ### From definition to editor and runtime
 
@@ -467,8 +467,8 @@ flowchart LR
 />
 
 - **The registry** (`ComponentDefinitionRegistry`) is the single catalog. It is fully lazy: at startup nothing is loaded; a build-time index (`META-INF/bytechef/component-index.json`, generated by the `generateComponentIndex` Gradle task) serves the components-*list* view from lightweight stubs, and the first deep read triggers a one-time `ServiceLoader` sweep. If the index is absent, the registry transparently falls back to full loading.
-- **The domain model** (`com.bytechef.platform.component.domain.*`) is the flattened, `Optional`-free, function-free mirror used by services and serialized to the REST API — this is where the fallbacks from the table above are applied, once, eagerly.
-- **Task handlers**: `ComponentTaskHandlerProvider` registers one `ComponentTaskHandler` per action under the key `component/vN/actionName` — exactly the workflow task `type` string. That is the whole trick connecting workflow JSON to component code.
+- **The domain model** (`com.bytechef.platform.component.domain.*`) is the flattened, `Optional`-free, function-free mirror used by services and serialized to the REST API - this is where the fallbacks from the table above are applied, once, eagerly.
+- **Task handlers**: `ComponentTaskHandlerProvider` registers one `ComponentTaskHandler` per action under the key `component/vN/actionName` - exactly the workflow task `type` string. That is the whole trick connecting workflow JSON to component code.
 
 At execution time the path is:
 
@@ -494,40 +494,40 @@ sequenceDiagram
 
 The perform function receives three arguments:
 
-- **`Parameters inputParameters`** — the task's evaluated parameters (expressions already resolved by the coordinator);
-- **`Parameters connectionParameters`** — the decrypted parameters of the resolved connection (token, base URI, ...);
-- **`ActionContext context`** — the capability surface: `context.http(...)` (the HTTP client — how components call external APIs), `context.json(...)`, `context.file(...)` (file storage in/out via `FileEntry`), `context.log(...)`, `context.data(...)` (key/value storage scoped to execution / workflow / deployment / account), plus `event` progress publishing and `suspend` for human-in-the-loop pauses.
+- **`Parameters inputParameters`** - the task's evaluated parameters (expressions already resolved by the coordinator);
+- **`Parameters connectionParameters`** - the decrypted parameters of the resolved connection (token, base URI, ...);
+- **`ActionContext context`** - the capability surface: `context.http(...)` (the HTTP client - how components call external APIs), `context.json(...)`, `context.file(...)` (file storage in/out via `FileEntry`), `context.log(...)`, `context.data(...)` (key/value storage scoped to execution / workflow / deployment / account), plus `event` progress publishing and `suspend` for human-in-the-loop pauses.
 
-Note what this means architecturally: connections are bound to deployments and resolved **server-side at dispatch** — connection ids never appear in the workflow definition, and credentials never leave the facade layer except as the already-scoped `connectionParameters`.
+Note what this means architecturally: connections are bound to deployments and resolved **server-side at dispatch** - connection ids never appear in the workflow definition, and credentials never leave the facade layer except as the already-scoped `connectionParameters`.
 
 ### OpenAPI-generated components
 
-Components scaffolded from an OpenAPI spec (via the CLI: `component init --name=... --open-api-path=...`) implement `OpenApiComponentHandler`. Their generated actions declare **only properties and metadata** (HTTP method, path, where each property goes: `PATH` / `QUERY` / `HEADER` / `BODY`) — and no `perform`. At load time, `OpenApiComponentHandlerLoader` wraps each such action and injects a generic perform that assembles the HTTP call from that metadata. This is the clearest demonstration of the `Optional` contract: `getPerform()` being empty isn't an error, it's a signal the loader acts on. Hand-written `modify*` hooks let authors adjust the generated definitions without touching generated code.
+Components scaffolded from an OpenAPI spec (via the CLI: `component init --name=... --open-api-path=...`) implement `OpenApiComponentHandler`. Their generated actions declare **only properties and metadata** (HTTP method, path, where each property goes: `PATH` / `QUERY` / `HEADER` / `BODY`) - and no `perform`. At load time, `OpenApiComponentHandlerLoader` wraps each such action and injects a generic perform that assembles the HTTP call from that metadata. This is the clearest demonstration of the `Optional` contract: `getPerform()` being empty isn't an error, it's a signal the loader acts on. Hand-written `modify*` hooks let authors adjust the generated definitions without touching generated code.
 
 ## AI & Agents
 
-AI is built on the same component and connection model described above — an agent is a component; a deployed agent is a generated `Workflow`. Nothing here bypasses the Atlas engine or Component SDK.
+AI is built on the same component and connection model described above - an agent is a component; a deployed agent is a generated `Workflow`. Nothing here bypasses the Atlas engine or Component SDK.
 
 | Capability | Module | What it does |
 |---|---|---|
 | **AI Agent component** | `server/libs/modules/components/ai/agent` | A cluster-root workflow node. The model, chat memory, retrieval (RAG), guardrails, and tools are separate components attached as cluster-element children, resolved through the same `ComponentDefinitionRegistry` as any other component. |
 | **Deployable agents** *(coming soon)* | `automation-ai-agent` | A chat-first alternative to hand-authoring a workflow: configuring an `AiAgent` (model, tools, skills, sub-agents) generates a real `Workflow` (`branch_in` on the trigger → `aiAgent/v1/streamChat` → `branch_out` on the reply channel) inside a hidden `__AI_AGENT__`-prefixed system project, which then runs through the exact same pipeline described in [Execution: the Atlas engine](#execution-the-atlas-engine). |
-| **MCP servers** | `automation-ai-mcp-*` | Expose a workflow's `workflow/newWorkflowCall` trigger as a tool an MCP client can call — the workflow itself is unmodified, only the trigger surface changes. |
+| **MCP servers** | `automation-ai-mcp-*` | Expose a workflow's `workflow/newWorkflowCall` trigger as a tool an MCP client can call - the workflow itself is unmodified, only the trigger surface changes. |
 | **AI Copilot** *(coming soon)* | `ai-copilot-service` (CE) / `automation-ai-copilot` (EE) | A chat client wired into the editor that authors workflows, components, and code by calling the same facades a human editing session would. |
-| **Guardrails** | `server/libs/modules/components/ai/agent/guardrails` | Guardrails are cluster elements attached to an AI Agent node — PII and secret detection, keyword and regex rules, jailbreak and NSFW checks, topical alignment — so each agent node declares the checks it runs. |
-| **Workspace-wide guardrail policy** *(coming soon)* | `platform-ai-guardrails` (EE) | A Spring AI `CallAdvisor`/`StreamAdvisor` (`AiGuardrailsAdvisor`) registered at `HIGHEST_PRECEDENCE`, ahead of the node-level elements above — redaction, blocked terms, moderation, and prompt-injection detection applied as a floor underneath every agent surface, not just the nodes a workflow author remembered to wire up. |
+| **Guardrails** | `server/libs/modules/components/ai/agent/guardrails` | Guardrails are cluster elements attached to an AI Agent node - PII and secret detection, keyword and regex rules, jailbreak and NSFW checks, topical alignment - so each agent node declares the checks it runs. |
+| **Workspace-wide guardrail policy** *(coming soon)* | `platform-ai-guardrails` (EE) | A Spring AI `CallAdvisor`/`StreamAdvisor` (`AiGuardrailsAdvisor`) registered at `HIGHEST_PRECEDENCE`, ahead of the node-level elements above - redaction, blocked terms, moderation, and prompt-injection detection applied as a floor underneath every agent surface, not just the nodes a workflow author remembered to wire up. |
 
 {/* @coming-soon Commented out until these ship; tracked in .agents/coming-soon-inventory.md.
 The MCP row above previously covered A2A as well.
 
 | **Agentic AI** *(coming soon)* | `server/libs/modules/components/ai/agentic-ai` (opt-in, `agentic` profile) | Wraps Embabel's goal-oriented action planning (GOAP) engine: instead of a fixed task sequence, the planner chooses which actions to run and in what order to reach a declared goal, using the canvas-selected model for both action prompts and goal evaluation. |
 | **AI Gateway** *(coming soon, Enterprise)* | `automation-ai-gateway` | Routes every AI call through one place for model selection, budget/rate limits, and per-project cost tracking, independent of which surface (canvas AI Agent, AI Hub, Copilot) issued the call. |
-| **MCP / A2A servers** *(A2A coming soon)* | `automation-ai-mcp-*` / `automation-ai-a2a` (+ CE protocol core `platform-ai-a2a`) | Expose a workflow's `workflow/newWorkflowCall` trigger as a tool an MCP client can call, or as a skill an A2A-speaking agent can delegate to — the workflow itself is unmodified, only the trigger surface changes. |
+| **MCP / A2A servers** *(A2A coming soon)* | `automation-ai-mcp-*` / `automation-ai-a2a` (+ CE protocol core `platform-ai-a2a`) | Expose a workflow's `workflow/newWorkflowCall` trigger as a tool an MCP client can call, or as a skill an A2A-speaking agent can delegate to - the workflow itself is unmodified, only the trigger surface changes. |
 */}
 
 ## Putting it together
 
-One last trace, end to end — a scheduled Gmail-to-Drive workflow like the one from the configuration example:
+One last trace, end to end - a scheduled Gmail-to-Drive workflow like the one from the configuration example:
 
 1. Deployment enabled → `TriggerLifecycleFacade` sees the Schedule trigger is a `LISTENER` → its `listenerEnable` registers a Quartz cron keyed by the `WorkflowExecutionId`.
 2. Cron fires → `TriggerListenerEvent` → `TriggerCoordinator` stores the trigger output and hands it to `TriggerCompletionHandler` → `createJob` with inputs `{ trigger_1: {...}, ...deployment inputs }`.
@@ -544,8 +544,8 @@ A single ByteChef installation can serve one tenant or many. `BYTECHEF_TENANT_MO
 connection pool. Every tenant gets its own schema named `bytechef_<tenantId>`, and a `DataSource`
 wrapper issues `SET search_path TO <schema>` on each connection it hands out, based on the tenant
 bound to the current context. The practical guarantee is the same one a separate database would give
-for query isolation — a query for "workflows" in tenant A cannot return tenant B's rows, because they
-are not in the same table — without the connection-pool multiplication that per-tenant pools imply.
+for query isolation - a query for "workflows" in tenant A cannot return tenant B's rows, because they
+are not in the same table - without the connection-pool multiplication that per-tenant pools imply.
 
 <Mermaid
   chart={`
@@ -575,7 +575,7 @@ Consequences worth planning for:
 - **The scheduler is tenant-aware, not tenant-partitioned.** There is one shared Quartz job store.
   Schedule and polling trigger keys are built from a `WorkflowExecutionId` that carries the tenant id,
   and connection-refresh keys are prefixed with it, so those are addressable and cancellable per
-  tenant — but they are not stored separately. The prefixing is not universal: one-time tasks (the
+  tenant - but they are not stored separately. The prefixing is not universal: one-time tasks (the
   delayed wake-ups behind a suspended run) are keyed on the bare job id, with no tenant component.
 - **Internal service calls carry the tenant.** Where one ByteChef process calls another over
   `/remote/**`, the tenant id travels in a `CURRENT_TENANT_ID` header alongside the internal service
@@ -603,7 +603,7 @@ component definition and a workflow JSON behave the same either way.
 
 ## Notifications and alerts
 
-The engine itself is notification-agnostic — nothing under `server/libs/atlas/` sends email or
+The engine itself is notification-agnostic - nothing under `server/libs/atlas/` sends email or
 webhooks. Instead, every job status transition publishes a `JobStatusApplicationEvent`, and the
 coordinator's listener fan-out (in `platform-coordinator`) turns those events into deliveries.
 `platform-notification` is the central registry for notification channels (`EMAIL`, `WEBHOOK`,
@@ -646,17 +646,17 @@ flowchart TB
 `}
 />
 
-Alert rules (Enterprise) are workspace-scoped rows that own the **when** — consecutive failures,
-failure rate, error count, latency threshold/spike, cost threshold, usage threshold, no activity —
+Alert rules (Enterprise) are workspace-scoped rows that own the **when** - consecutive failures,
+failure rate, error count, latency threshold/spike, cost threshold, usage threshold, no activity -
 while the notification registry owns the **where and how**. Rule evaluation state lives on the
 rule row and is updated per terminal job event; time-based rules (no-activity, usage-threshold)
 fire from scheduled monitors.
 
 ## Related reading
 
-- [Build a component](/developer-guide/build-component/initial-setup) — the hands-on authoring guide
-- [Component specification](/developer-guide/component-specification/component) — every DSL method, one by one
-- [Working with triggers](/developer-guide/working-with-triggers) — trigger authoring specifics
-- [AI Agent](/platform/automation/build/workflows/ai/agent) — the cluster-root component in depth, including cluster-element slots
-- [Cloud](/platform/use-bytechef/cloud) — run this architecture without managing any of it yourself
-- [Self-hosting configuration](/platform/use-bytechef/self-hosted/configuration/environment-variables) — broker/worker/scheduler properties
+- [Build a component](/developer-guide/build-component/initial-setup) - the hands-on authoring guide
+- [Component specification](/developer-guide/component-specification/component) - every DSL method, one by one
+- [Working with triggers](/developer-guide/working-with-triggers) - trigger authoring specifics
+- [AI Agent](/platform/automation/build/workflows/ai/agent) - the cluster-root component in depth, including cluster-element slots
+- [Cloud](/platform/use-bytechef/cloud) - run this architecture without managing any of it yourself
+- [Self-hosting configuration](/platform/use-bytechef/self-hosted/configuration/environment-variables) - broker/worker/scheduler properties

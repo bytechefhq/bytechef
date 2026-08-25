@@ -4,7 +4,7 @@ description: Test and evaluate your AI agents with scenario-based evaluations an
 comingSoon: true
 ---
 
-The Evals section is your command center for testing and evaluating AI agent performance. Located in the **Evals** tab within the AI Agent node editor, Evals enables you to create tests, define evaluation criteria (judges), run automated evaluations, and review detailed results — all without manual testing.
+The Evals section is your command center for testing and evaluating AI agent performance. Located in the **Evals** tab within the AI Agent node editor, Evals enables you to create tests, define evaluation criteria (judges), run automated evaluations, and review detailed results - all without manual testing.
 
 ![Evals panel overview](evals/evals-overview.png)
 
@@ -30,9 +30,9 @@ Review detailed results with per-scenario scores, judge verdicts with explanatio
 
 The Evals panel contains three tabs, accessible from the top of the panel:
 
-- **Tests** — Create and manage groups of test scenarios for your agent. Each test can contain multiple scenarios with different prompts and evaluation criteria.
-- **Judges** — Configure agent-level evaluation criteria that apply across all scenarios. These are reusable judges you want checked every time — such as professional tone, no hallucinations, or safety compliance.
-- **Runs** — View your evaluation run history and results. See average scores, number of scenarios evaluated, progress status, token usage, and timestamps for all past runs.
+- **Tests** - Create and manage groups of test scenarios for your agent. Each test can contain multiple scenarios with different prompts and evaluation criteria.
+- **Judges** - Configure agent-level evaluation criteria that apply across all scenarios. These are reusable judges you want checked every time - such as professional tone, no hallucinations, or safety compliance.
+- **Runs** - View your evaluation run history and results. See average scores, number of scenarios evaluated, progress status, token usage, and timestamps for all past runs.
 
 ---
 
@@ -50,7 +50,7 @@ Scenario judges are created within individual test scenarios. They evaluate the 
 
 ### Agent Judges
 
-Agent judges are configured in the **Judges** tab. They apply to every scenario across all tests for this agent — think of them as reusable defaults.
+Agent judges are configured in the **Judges** tab. They apply to every scenario across all tests for this agent - think of them as reusable defaults.
 
 - Created in the **Judges** tab (separate from tests)
 - Automatically included when running any test
@@ -62,11 +62,11 @@ When creating a judge (either scenario-level or agent-level), you choose from th
 
 #### LLM Rule
 
-Uses an LLM to evaluate conversations against a rule you define in natural language. This is the most flexible judge type — use it when evaluation criteria are subjective or complex.
+Uses an LLM to evaluate conversations against a rule you define in natural language. This is the most flexible judge type - use it when evaluation criteria are subjective or complex.
 
 | Field | Description |
 |---|---|
-| **Rule** | Describe the criteria for passing. Be specific — include examples of what passing looks like. |
+| **Rule** | Describe the criteria for passing. Be specific - include examples of what passing looks like. |
 | **Truncate Long Conversations** | When enabled, conversations exceeding 100,000 characters are trimmed from the oldest messages first, and the eval runs on the remaining portion. When disabled, oversized conversations fail with an error instead. Note that trimming removes early context, which can affect score accuracy if your evaluation criteria depend on the beginning of the conversation. |
 
 #### Contains Text
@@ -80,7 +80,7 @@ Checks whether the agent's response includes specific text.
 
 #### Regex Match
 
-Validates the agent's response against a regular expression pattern. Useful for checking response format — dates, order numbers, URLs, or structured templates.
+Validates the agent's response against a regular expression pattern. Useful for checking response format - dates, order numbers, URLs, or structured templates.
 
 | Field | Description |
 |---|---|
@@ -232,7 +232,7 @@ You can add multiple scenarios to a single test to evaluate different aspects of
 
 Here are some example test scenarios you might create:
 
-### IT Helpdesk — Troubleshooting Accuracy
+### IT Helpdesk - Troubleshooting Accuracy
 
 **Scenario name**: Password Reset Guidance
 **Type**: Single Turn
@@ -241,7 +241,7 @@ Here are some example test scenarios you might create:
 
 - *Rule*: Did the agent suggest appropriate troubleshooting steps such as checking caps lock, clearing browser cache, or initiating a password reset? The response should not assume the user is at fault and should guide them through steps in a logical order.
 
-### E-Commerce — Order Issue Handling
+### E-Commerce - Order Issue Handling
 
 **Scenario name**: Missing Item Resolution
 **Type**: Multi Turn
@@ -252,7 +252,7 @@ Here are some example test scenarios you might create:
 
 - *Rule*: Did the agent verify the order details, acknowledge the missing item, and provide a concrete resolution with an estimated timeline? The agent should not offer a generic apology without taking action or ask the customer to re-order the item.
 
-### HR Assistant — Policy Compliance
+### HR Assistant - Policy Compliance
 
 **Scenario name**: Time-Off Policy Inquiry
 **Type**: Single Turn
@@ -266,7 +266,7 @@ Here are some example test scenarios you might create:
 - *Tool Name*: lookupPolicy
 - *Comparison*: At least 1
 
-### Sales — Lead Qualification
+### Sales - Lead Qualification
 
 **Scenario name**: Enterprise Qualification
 **Type**: Multi Turn
@@ -282,10 +282,10 @@ Here are some example test scenarios you might create:
 
 You can run an entire test or select specific scenarios within a test by clicking the **Run Test** button in the **Runs** tab.
 
-1. Enter a **name** for the evaluation run (e.g., "v2.1 Prompt Update — March 31"). A default name with timestamp is provided.
+1. Enter a **name** for the evaluation run (e.g., "v2.1 Prompt Update - March 31"). A default name with timestamp is provided.
 2. Select the **environment** to use for connections and configuration.
-3. (Optional) Select which **scenarios** to include — by default all scenarios in the test are run.
-4. (Optional) Select which **agent judges** to include — by default all agent judges apply. Scenario-level judges are always included automatically.
+3. (Optional) Select which **scenarios** to include - by default all scenarios in the test are run.
+4. (Optional) Select which **agent judges** to include - by default all agent judges apply. Scenario-level judges are always included automatically.
 5. Click **Run** to begin. The system will execute your agent with each scenario's input, then evaluate the responses with your selected judges.
 
 ![Run test dialog](evals/evals-run-test.png)
@@ -365,10 +365,10 @@ Tool simulations let you test your agent without calling real external services.
 
 ### When to Use Tool Simulations
 
-- **Avoid side effects** — Prevent test runs from creating real tickets, sending real emails, or modifying real data
-- **Control tool output** — Provide specific tool responses to test how the agent handles different situations
-- **Test without credentials** — Run evaluations in environments where external service credentials aren't configured
-- **Simulate error conditions** — Use response prompts that generate error responses to test agent error handling
+- **Avoid side effects** - Prevent test runs from creating real tickets, sending real emails, or modifying real data
+- **Control tool output** - Provide specific tool responses to test how the agent handles different situations
+- **Test without credentials** - Run evaluations in environments where external service credentials aren't configured
+- **Simulate error conditions** - Use response prompts that generate error responses to test agent error handling
 
 ### How It Works
 
@@ -382,13 +382,13 @@ Tool simulations are configured at the scenario level:
 
 When the agent calls a tool that has a simulation configured, the actual call is intercepted and the simulation's response prompt is sent to an LLM, which generates a realistic response. The agent receives this simulated response and continues as if the real tool had responded.
 
-Tool simulations are scenario-specific — the same agent can have different simulations in different scenarios.
+Tool simulations are scenario-specific - the same agent can have different simulations in different scenarios.
 
 ---
 
 ## Multi-Turn Conversations
 
-Multi-turn scenarios simulate a back-and-forth conversation between a user persona and your agent. This lets you test conversational abilities that single-turn scenarios cannot capture — such as context retention, follow-up handling, and multi-step problem resolution.
+Multi-turn scenarios simulate a back-and-forth conversation between a user persona and your agent. This lets you test conversational abilities that single-turn scenarios cannot capture - such as context retention, follow-up handling, and multi-step problem resolution.
 
 ### How It Works
 
@@ -431,7 +431,7 @@ Begin with a few core scenarios that test your agent's primary use cases. Add co
 
 ### Be Specific with Judges
 
-Write detailed evaluation rules. Vague criteria like "the response should be good" lead to inconsistent results. Include specific conditions for what passing looks like — for example: "The agent should acknowledge the customer's issue, provide the order status, and offer at least one resolution option."
+Write detailed evaluation rules. Vague criteria like "the response should be good" lead to inconsistent results. Include specific conditions for what passing looks like - for example: "The agent should acknowledge the customer's issue, provide the order status, and offer at least one resolution option."
 
 ### Test Edge Cases
 
@@ -464,9 +464,9 @@ You can add as many scenarios as you need to a single test. Each scenario is eva
 
 Tokens consumed for each scenario include:
 
-- **The agent task** — the conversation between the simulated user and your agent
-- **The user simulator** (multi-turn only) — uses an LLM to generate user messages based on the persona prompt
-- **The judge evaluations** — each LLM-based judge uses an LLM to evaluate the conversation
+- **The agent task** - the conversation between the simulated user and your agent
+- **The user simulator** (multi-turn only) - uses an LLM to generate user messages based on the persona prompt
+- **The judge evaluations** - each LLM-based judge uses an LLM to evaluate the conversation
 
 Each scenario shows its token usage in the results, and the run shows aggregated totals.
 
@@ -492,7 +492,7 @@ Yes, with configuration. The LLM Rule judge includes a **Truncate Long Conversat
 
 <Accordion title="What happens when a conversation is truncated?">
 
-The oldest messages are removed from the start of the conversation until it fits within the limit. The judge evaluates the remaining portion. If your evaluation criteria depend on early context — such as the user's original request or instructions given at the start — the result may be less accurate. In those cases, consider disabling truncation and keeping Max Turns lower.
+The oldest messages are removed from the start of the conversation until it fits within the limit. The judge evaluates the remaining portion. If your evaluation criteria depend on early context - such as the user's original request or instructions given at the start - the result may be less accurate. In those cases, consider disabling truncation and keeping Max Turns lower.
 
 </Accordion>
 
@@ -504,7 +504,7 @@ When a scenario encounters an error during execution, its status is set to **Fai
 
 <Accordion title="Can I run only some scenarios from a test?">
 
-Yes. When starting a run, you can select specific scenarios to include. This is useful for quick iteration — when you're debugging a specific scenario, run only that one to save time and tokens.
+Yes. When starting a run, you can select specific scenarios to include. This is useful for quick iteration - when you're debugging a specific scenario, run only that one to save time and tokens.
 
 </Accordion>
 

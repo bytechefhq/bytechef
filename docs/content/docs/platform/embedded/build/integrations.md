@@ -69,9 +69,9 @@ Publishing creates a new version of the integration that can be deployed to conn
 
 ### Restricting who sees an integration
 
-By default every active integration is offered to every connected user. To scope an integration to a subset of your users, set a **Permission Expression** — an optional [SpEL](https://docs.spring.io/spring-framework/reference/core/expressions.html) expression evaluated against the calling connected user. When the expression evaluates to `true`, the integration is visible to that user; otherwise it is hidden. Leaving it blank makes the integration visible to everyone.
+By default every active integration is offered to every connected user. To scope an integration to a subset of your users, set a **Permission Expression** - an optional [SpEL](https://docs.spring.io/spring-framework/reference/core/expressions.html) expression evaluated against the calling connected user. When the expression evaluates to `true`, the integration is visible to that user; otherwise it is hidden. Leaving it blank makes the integration visible to everyone.
 
-The expression is evaluated against the connected user's attributes — `email`, `name`, `externalId`, `environment`, and any custom `metadata` your backend attached with `PATCH /api/embedded/v1/me` or `PATCH /api/embedded/v1/{externalUserId}`. (Metadata does not come from JWT claims; the JWT contributes only the `sub` claim, which becomes `externalId`.) Metadata values are stored as strings. For example:
+The expression is evaluated against the connected user's attributes - `email`, `name`, `externalId`, `environment`, and any custom `metadata` your backend attached with `PATCH /api/embedded/v1/me` or `PATCH /api/embedded/v1/{externalUserId}`. (Metadata does not come from JWT claims; the JWT contributes only the `sub` claim, which becomes `externalId`.) Metadata values are stored as strings. For example:
 
 ```text
 metadata['plan'] == 'pro'
@@ -80,8 +80,8 @@ email.endsWith('@acme.com')
 
 Permission expressions apply at two levels:
 
-- **Integration level** — set in the integration's create/edit dialog. Controls whether the entire integration (all of its workflows) is offered to the user.
-- **Workflow level** — set per workflow from the integration's workflow list. Controls whether that single workflow is offered, even when the parent integration is visible.
+- **Integration level** - set in the integration's create/edit dialog. Controls whether the entire integration (all of its workflows) is offered to the user.
+- **Workflow level** - set per workflow from the integration's workflow list. Controls whether that single workflow is offered, even when the parent integration is visible.
 
 Both filters are fail-closed: an expression that errors or evaluates to `false` hides the resource. See **[Permission Expressions](/platform/embedded/build/permission-expressions)** for the full reference.
 
@@ -91,4 +91,4 @@ Both filters are fail-closed: an expression that errors or evaluates to `false` 
 
 > **Coming soon.** The AI Copilot is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
-The integration workflow editor carries the [AI Copilot](/platform/automation/build/ai-copilot) panel on par with the automation project editor — an integration-scoped assistant with **Ask** and **Build** modes for understanding and building the current integration's workflows. Copilot is an Enterprise Edition feature and is disabled by default.
+The integration workflow editor carries the [AI Copilot](/platform/automation/build/ai-copilot) panel on par with the automation project editor - an integration-scoped assistant with **Ask** and **Build** modes for understanding and building the current integration's workflows. Copilot is an Enterprise Edition feature and is disabled by default.

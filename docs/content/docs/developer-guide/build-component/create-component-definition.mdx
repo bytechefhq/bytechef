@@ -31,11 +31,11 @@ public class NewComponentComponentHandler implements ComponentHandler {
 
 `@AutoService(ComponentHandler.class)` registers the class with the JDK `ServiceLoader`, which is how
 the platform discovers components. A handler discovered this way is instantiated by the platform, not
-by Spring, so it has **no dependency injection** — everything it needs must be a constant or come from
+by Spring, so it has **no dependency injection** - everything it needs must be a constant or come from
 the `Context` passed into `perform`.
 
 If your component genuinely needs Spring beans (for example an AI model registry), annotate the
-handler with `@Component("newComponent_v1_ComponentHandler")` instead and use constructor injection —
+handler with `@Component("newComponent_v1_ComponentHandler")` instead and use constructor injection -
 Spring-managed handlers are collected by type and merged with the ServiceLoader ones. Keep the
 `<componentName>_v<version>_ComponentHandler` bean-name shape; it is the convention every such
 handler in the codebase follows. Only a handful of built-in components need this;
@@ -43,7 +43,7 @@ handler in the codebase follows. Only a handful of built-in components need this
 
 ### Icon
 
-Find and download a user interface icon in .svg format for your component and place it in `server/libs/modules/components/newcomponent/src/main/resources/assets/newcomponent.svg` — the file name has to match the `icon("path:assets/…")` value above.
+Find and download a user interface icon in .svg format for your component and place it in `server/libs/modules/components/newcomponent/src/main/resources/assets/newcomponent.svg` - the file name has to match the `icon("path:assets/…")` value above.
 
 The `title`, `description`, and `icon` you set here are exactly what the workflow editor shows when the component is discovered: once the module is on the classpath and the server is running, the component appears in the editor's component panel and can be dropped into a workflow.
 

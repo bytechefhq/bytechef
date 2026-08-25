@@ -14,7 +14,7 @@ This page covers the ByteChef console view. For how a Connected User record come
 | Feature | Description |
 |---|---|
 | User table | A paginated table of all connected users with key details. |
-| Search | Search by name, email, or **External Id** — the unique identifier your application assigns to each user (also referred to as "User ERC" in the search placeholder). |
+| Search | Search by name, email, or **External Id** - the unique identifier your application assigns to each user (also referred to as "User ERC" in the search placeholder). |
 | Status filtering | Filter by connection status (Valid or Invalid). |
 | Integration filtering | Filter by specific integration to find users of a particular service. |
 | Date range filtering | Filter by the date range when users were created. |

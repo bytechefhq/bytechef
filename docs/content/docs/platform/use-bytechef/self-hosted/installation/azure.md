@@ -46,7 +46,7 @@ Use **stable** values for the encryption and remember-me keys, held in Container
 
 - Set the Container App's readiness/liveness probe to `GET /actuator/health/readiness` and `GET /actuator/health/liveness` on port `8080`.
 - Set `BYTECHEF_PUBLIC_URL` to the Container App's public FQDN so webhook and OAuth2 redirect URLs resolve.
-- Because schema migrations run at container startup, keep the app at a single replica during the first deploy and any upgrade. If you scale beyond one replica, apply the multi-instance settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) — a shared message broker and cache, and a shared encryption key.
+- Because schema migrations run at container startup, keep the app at a single replica during the first deploy and any upgrade. If you scale beyond one replica, apply the multi-instance settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) - a shared message broker and cache, and a shared encryption key.
 
 ## 4. Access the instance
 
@@ -56,4 +56,4 @@ Open the Container App's ingress URL and click **Create account** to register th
 
 ## Storage note
 
-Container Apps replicas have ephemeral local storage, and file storage defaults to **`filesystem`** — so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database, or attach durable object storage of your own. Leaving the default in place writes files to a disk that disappears with the replica. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage).
+Container Apps replicas have ephemeral local storage, and file storage defaults to **`filesystem`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database, or attach durable object storage of your own. Leaving the default in place writes files to a disk that disappears with the replica. See [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage).

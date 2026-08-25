@@ -5,7 +5,7 @@ comingSoon: true
 ---
 
 An **automation code workflow** lets you author a [code workflow](/platform/automation/build/workflows/code-workflows)
-— a `ProjectHandler` artifact, the same contract a standalone automation project uses — and make it
+- a `ProjectHandler` artifact, the same contract a standalone automation project uses - and make it
 invocable by your connected users, without hand-authoring it in the visual [Automation Workflow
 editor](/platform/embedded/build/automations) and without giving every connected user their own private copy.
 
@@ -15,14 +15,14 @@ endpoint you deploy it through**:
 - `POST /api/automation/v1/projects/deploy` creates a plain automation project. Nothing about it is
   reachable from embedded.
 - `POST /api/embedded/internal/automation/projects/deploy` deploys the identical artifact behind the
-  embedded catalog — an internal, `ADMIN`-only surface with the same Java-hardening posture
+  embedded catalog - an internal, `ADMIN`-only surface with the same Java-hardening posture
   (`BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED`, the Espresso sandbox loader) as
   `/integrations/deploy`. The multipart field is `projectFile`.
 
 ## Deploy once, reference per user
 
-Unlike the visual bridge — where each connected user gets their own **copy** of a workflow template
-— a code workflow is deployed **once** into a shared catalog project, and every connected user holds
+Unlike the visual bridge - where each connected user gets their own **copy** of a workflow template
+- a code workflow is deployed **once** into a shared catalog project, and every connected user holds
 a **reference** to it. Code is not something a connected user can edit per-user, so a copy would only
 duplicate the same container for no benefit.
 
@@ -31,7 +31,7 @@ Practically:
 - The catalog project is resolved (or created, on first deploy) by name, hidden behind the same
   `__EMBEDDED_AUTOMATION__` marker convention the visual bridge uses to keep the underlying
   automation `Project` out of view.
-- Redeploying the same artifact **upgrades every referencing user's workflow at once** — there is no
+- Redeploying the same artifact **upgrades every referencing user's workflow at once** - there is no
   per-user version pinning and no per-user bespoke deploy. If you need to stage a change, stage it in
   a separate environment before deploying to the one your customers use.
 - A workflow keeps the same identity (its `ProjectWorkflow` uuid) across redeploys as long as its name
@@ -40,20 +40,20 @@ Practically:
 The project appears in the same catalog listing as visual workflow templates, distinguished by a
 `kind` field:
 
-- `kind: "COPY"` — a visual template; provisioning creates a per-user copy.
-- `kind: "REFERENCE"` — a code workflow; provisioning creates a per-user reference to the shared,
+- `kind: "COPY"` - a visual template; provisioning creates a per-user copy.
+- `kind: "REFERENCE"` - a code workflow; provisioning creates a per-user reference to the shared,
   deploy-once workflow.
 
-## Invocation — the same two endpoints, the same rules
+## Invocation - the same two endpoints, the same rules
 
-Automation code workflows are invoked through the existing embedded public endpoints — there is no
+Automation code workflows are invoked through the existing embedded public endpoints - there is no
 new invocation surface:
 
-- **Sync** — `POST /api/embedded/v1/workflows/{workflowUuid}`, addressed by the workflow's catalog
-  uuid. Requires a **`request` trigger** and an action that writes the response payload — exactly the
+- **Sync** - `POST /api/embedded/v1/workflows/{workflowUuid}`, addressed by the workflow's catalog
+  uuid. Requires a **`request` trigger** and an action that writes the response payload - exactly the
   contract [integration workflows](/platform/embedded/build/app-events) already follow: a workflow without both will
   acknowledge the call but never return a payload.
-- **Async** — `POST /api/embedded/v1/app-events`. Requires the **App Event** trigger. Every enabled,
+- **Async** - `POST /api/embedded/v1/app-events`. Requires the **App Event** trigger. Every enabled,
   non-dangling reference whose workflow declares that trigger fires when the connected user's app
   event is posted, alongside their integration workflows.
 
@@ -66,7 +66,7 @@ reference-mode rows (code workflows) and copy-mode rows (visual bridge copies, a
 copy's own workflow uuid, not the template's). The sync endpoint resolves the same three shapes
 against a single `workflowUuid`: a connected user's own copy uuid dispatches directly; a catalog uuid
 for a code workflow (`kind: "REFERENCE"`) goes through the existing reference resolution; a catalog
-uuid for a visual template (`kind: "COPY"`) provisions a per-user copy on first call, sync-only — see
+uuid for a visual template (`kind: "COPY"`) provisions a per-user copy on first call, sync-only - see
 [Implicit provisioning on first call](#implicit-provisioning-on-first-call) below.
 
 ## Implicit provisioning on first call
@@ -76,10 +76,10 @@ with a catalog workflow uuid the connected user has never used before **provisio
 part of the call**:
 
 1. ByteChef auto-wires the workflow's node connections from the connected user's existing connections,
-   matched by component — the same mechanism the visual copy flow uses.
+   matched by component - the same mechanism the visual copy flow uses.
 2. If every required component resolves to a connection, the reference is created enabled and the
    call runs.
-3. If a component has no matching connection, the reference is still created — left **disabled** —
+3. If a component has no matching connection, the reference is still created - left **disabled** -
    and the call fails with **HTTP 409**:
 
    ```json
@@ -87,12 +87,12 @@ part of the call**:
    ```
 
    The disabled reference row is **not** self-healing on repeat calls: once it exists, any later call
-   — the invocation endpoint, or the explicit provision endpoint below — finds the existing row and
+   - the invocation endpoint, or the explicit provision endpoint below - finds the existing row and
    returns it unchanged rather than re-attempting connection resolution. Concretely, invoking again
    after fixing the connection still gets the invocation endpoint's ordinary "not found" response (a
    disabled reference is invisible to invocation, indistinguishable from a nonexistent one), and
    calling provision again reports success (`204`) without actually resolving anything. To pick up a
-   connection created after the fact, de-provision and provision again (next section) — that deletes
+   connection created after the fact, de-provision and provision again (next section) - that deletes
    the row outright, so the follow-up provision call creates a fresh one and reruns auto-wiring from
    scratch.
 
@@ -100,18 +100,18 @@ The steps above describe reference-mode (code workflow) provisioning, reachable 
 invocation endpoint. **Visual-template provisioning is sync-only** and behaves a little differently:
 calling `POST /workflows/{workflowUuid}` with a visual template's catalog uuid the connected user has
 never copied before performs the same copy the explicit
-`POST /automation/workflow-templates/{uuid}/copy` endpoint performs — including its best-effort
-connection auto-wiring — and dispatches the new copy. A component with no matching connection is
+`POST /automation/workflow-templates/{uuid}/copy` endpoint performs - including its best-effort
+connection auto-wiring - and dispatches the new copy. A component with no matching connection is
 silently left unwired rather than producing the 409 the reference path returns; the copy still runs,
 just without that connection configured. Calling the same template uuid again resolves the copy
-already provisioned for that connected user instead of creating a duplicate — the copy is
+already provisioned for that connected user instead of creating a duplicate - the copy is
 subsequently addressable by its own uuid, same as an explicitly-provisioned one. The async endpoint
 has no implicit-provisioning case for either kind: there is nothing to iterate before a row exists.
 
 ## Explicit provisioning
 
-To pre-wire connections before the first real call — so the first invocation doesn't pay the 409
-round-trip — provision the reference explicitly:
+To pre-wire connections before the first real call - so the first invocation doesn't pay the 409
+round-trip - provision the reference explicitly:
 
 ```http
 POST /api/embedded/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision
@@ -127,37 +127,37 @@ De-provisioning removes the reference (and its per-node connection wiring) outri
 DELETE /api/embedded/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision
 ```
 
-There is no separate public disable-without-deleting call for a reference — de-provision, then
+There is no separate public disable-without-deleting call for a reference - de-provision, then
 provision again when you want the connected user back on the workflow.
 
 ## Dangling references
 
-If a redeploy removes a workflow a connected user is already referencing — you renamed or deleted it
-from the artifact — their reference doesn't silently disappear and doesn't silently keep running
+If a redeploy removes a workflow a connected user is already referencing - you renamed or deleted it
+from the artifact - their reference doesn't silently disappear and doesn't silently keep running
 against a nonexistent workflow. It flips to a **dangling** state:
 
-- Invisible to both invocation endpoints — a dangling reference behaves exactly like a disabled one
+- Invisible to both invocation endpoints - a dangling reference behaves exactly like a disabled one
   to a caller (same `404`, no existence leak).
 - Still listed for the connected user, carrying a reason (`"Removed from the catalog project on
   redeploy"`).
 - The connected user's connection configuration is preserved on the row, so nothing is lost even
   though the row itself stops being usable.
 
-Dangling is permanent for that reference row — nothing currently clears the flag. Uuid carry-forward
+Dangling is permanent for that reference row - nothing currently clears the flag. Uuid carry-forward
 only spans one deploy of history: if you restore a same-named workflow in a *later* deploy (after an
 intervening deploy that dropped it), the restored workflow gets a **new** uuid, not the one the
 dangling reference still points at. Recovering means de-provisioning the dangling reference and
-provisioning a fresh one against the workflow's new uuid — the connection auto-wiring runs again from
+provisioning a fresh one against the workflow's new uuid - the connection auto-wiring runs again from
 scratch, so nothing carries over automatically.
 
-Dangling only ever compares one catalog project's previous deploy against its current one — a
+Dangling only ever compares one catalog project's previous deploy against its current one - a
 redeploy of one catalog project never dangles a reference into a different catalog project.
 
 ## Limits
 
 - **No per-user version pinning.** A redeploy upgrades every referencing user at once; there's no way
   to keep one connected user on an older version of the workflow while others move to a new one.
-- **No per-user editing.** A reference has no definition of its own — the workflow update/edit APIs
+- **No per-user editing.** A reference has no definition of its own - the workflow update/edit APIs
   reject reference rows outright. If a connected user needs their own customized copy, that's what
   the visual bridge's copy-mode is for.
 - **Catalog projects are not editable in the code editor.** The in-app code workflow editor excludes
@@ -167,14 +167,14 @@ redeploy of one catalog project never dangles a reference into a different catal
   references. The only write path for a catalog project is the deploy endpoint itself.
 - **Resolution differs by kind.** A code-workflow reference always resolves to the catalog project's
   **last published** workflow. A visual copy resolves to **its own, independently deployed**
-  workflow — the connected user's copy, not the template it was copied from. Two connected users
+  workflow - the connected user's copy, not the template it was copied from. Two connected users
   calling the same catalog uuid on a code workflow always run the same (latest) logic; two connected
   users who each copied the same template can be running different versions if one of them edited
   their copy since.
 
 ## See also
 
-- [Automations](/platform/embedded/build/automations) — the visual bridge's copy-mode counterpart.
-- [Code Workflows](/platform/automation/build/workflows/code-workflows) — the underlying `ProjectHandler`
+- [Automations](/platform/embedded/build/automations) - the visual bridge's copy-mode counterpart.
+- [Code Workflows](/platform/automation/build/workflows/code-workflows) - the underlying `ProjectHandler`
   artifact contract, shared with standalone automation projects.
-- [App Events](/platform/embedded/build/app-events) — the async invocation endpoint and its trigger contract.
+- [App Events](/platform/embedded/build/app-events) - the async invocation endpoint and its trigger contract.

@@ -3,9 +3,9 @@ title: "Component Kit"
 description: A Java SDK that turns a connected user's component actions into AI tools your own LLM application can call.
 ---
 
-**AI ComponentKit** is a backend Java SDK for AI-native products: it fetches the component actions a [connected user](/platform/embedded/monitor/connected-users) has access to and exposes them as **tools** your own LLM application can call — so your agent acts through the user's ByteChef connections without you writing per-integration glue.
+**AI ComponentKit** is a backend Java SDK for AI-native products: it fetches the component actions a [connected user](/platform/embedded/monitor/connected-users) has access to and exposes them as **tools** your own LLM application can call - so your agent acts through the user's ByteChef connections without you writing per-integration glue.
 
-The tools it returns are the connected user's **component actions** — not their workflows. To let an agent run a whole workflow instead, expose the workflow through an [MCP server](/platform/embedded/configure/mcp-servers) or trigger it with an [App Event](/platform/embedded/build/app-events).
+The tools it returns are the connected user's **component actions** - not their workflows. To let an agent run a whole workflow instead, expose the workflow through an [MCP server](/platform/embedded/configure/mcp-servers) or trigger it with an [App Event](/platform/embedded/build/app-events).
 
 ## `ToolClient`
 
@@ -24,7 +24,7 @@ Object result = toolClient.executeTool(externalUserId, toolName, Map.of(/* param
 
 - Authentication is an embedded **API key** (`Authorization: Bearer`), created under **Embedded → Settings → API Keys**.
 - `Environment` selects the target environment (`DEVELOPMENT`, `STAGING`, `PRODUCTION`), sent as the `X-Environment` header.
-- `getTools` fetches from `GET /api/embedded/v1/{externalUserId}/tools` and returns the tools keyed by component name; `executeTool` POSTs `{ "name": ..., "parameters": ... }` to the matching `/tools` endpoint — each call runs the component action with the connected user's own credentials.
+- `getTools` fetches from `GET /api/embedded/v1/{externalUserId}/tools` and returns the tools keyed by component name; `executeTool` POSTs `{ "name": ..., "parameters": ... }` to the matching `/tools` endpoint - each call runs the component action with the connected user's own credentials.
 
 ## Spring AI integration
 
@@ -38,7 +38,7 @@ chatClient.prompt(userMessage)
     .call();
 ```
 
-The LLM now sees every action the user has connected — send a Slack message, create a CRM contact — and invocations execute server-side in ByteChef under that user's connections.
+The LLM now sees every action the user has connected - send a Slack message, create a CRM contact - and invocations execute server-side in ByteChef under that user's connections.
 
 <Callout title="ComponentKit in the Sample App">
     The [Sample App](/platform/embedded/get-started/quick-start/sample-app) includes a "ComponentKit Playground" and a tool-based AI chat page that demonstrate this exact flow end to end.
@@ -46,5 +46,5 @@ The LLM now sees every action the user has connected — send a Slack message, c
 
 ## Sample projects
 
-- [ComponentKit + Spring AI (Java)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-spring-ai) — a Java LLM app calling a connected user's actions as Spring AI tools.
-- [ComponentKit + Vercel AI SDK (TypeScript)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-vercel-ai-sdk) — the same tools consumed from a TypeScript app via the `/tools` REST endpoints and the Vercel AI SDK.
+- [ComponentKit + Spring AI (Java)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-spring-ai) - a Java LLM app calling a connected user's actions as Spring AI tools.
+- [ComponentKit + Vercel AI SDK (TypeScript)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-vercel-ai-sdk) - the same tools consumed from a TypeScript app via the `/tools` REST endpoints and the Vercel AI SDK.
