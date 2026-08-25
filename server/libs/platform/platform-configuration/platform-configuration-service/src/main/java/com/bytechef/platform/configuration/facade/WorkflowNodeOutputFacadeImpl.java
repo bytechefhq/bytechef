@@ -87,6 +87,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowCacheManager workflowCacheManager;
+    private final WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade;
     private final WorkflowService workflowService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -98,7 +99,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        WorkflowCacheManager workflowCacheManager, WorkflowService workflowService,
+        WorkflowCacheManager workflowCacheManager, WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
+        WorkflowService workflowService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
@@ -110,6 +112,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowCacheManager = workflowCacheManager;
+        this.workflowEvaluationInputsFacade = workflowEvaluationInputsFacade;
         this.workflowService = workflowService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
@@ -638,8 +641,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         String workflowId, WorkflowTask workflowTask, long environmentId,
         Map<String, Map<String, ?>> sampleOutputsCache) {
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
         OutputResponse outputResponse;
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
@@ -678,8 +680,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
         Map<String, Map<String, ?>> sampleOutputsCache) {
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
         OutputResponse outputResponse = null;
         OutputResponse variableOutputResponse = null;
 
@@ -758,8 +759,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     private Optional<OutputResponse> getWorkflowTriggerDynamicOutputResponse(
         String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
         Map<String, ?> inputParameters = workflowTrigger.evaluateParameters(inputs, evaluator);

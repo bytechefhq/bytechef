@@ -56,6 +56,8 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionServiceImpl;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManagerImpl;
+import com.bytechef.platform.configuration.facade.WorkflowEvaluationInputsFacade;
+import com.bytechef.platform.configuration.facade.WorkflowEvaluationInputsFacadeImpl;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacadeImpl;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
@@ -66,6 +68,7 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServiceImpl;
 import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.variable.WorkflowVariablesResolver;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -326,15 +329,24 @@ public class TestWorkflowExecutorIntTestConfiguration {
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        WorkflowCacheManager workflowCacheManager, WorkflowService workflowService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        WorkflowCacheManager workflowCacheManager, WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade,
+        WorkflowService workflowService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         return new WorkflowNodeOutputFacadeImpl(
             actionDefinitionFacade, actionDefinitionService, clusterElementDefinitionFacade,
             clusterElementDefinitionService, evaluator, taskDispatcherDefinitionService, triggerDefinitionFacade,
-            triggerDefinitionService, workflowCacheManager, workflowService, workflowNodeTestOutputService,
-            workflowTestConfigurationService);
+            triggerDefinitionService, workflowCacheManager, workflowEvaluationInputsFacade, workflowService,
+            workflowNodeTestOutputService, workflowTestConfigurationService);
+    }
+
+    @Bean
+    WorkflowEvaluationInputsFacade workflowEvaluationInputsFacade(
+        ObjectProvider<WorkflowVariablesResolver> workflowVariablesResolverObjectProvider,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
+
+        return new WorkflowEvaluationInputsFacadeImpl(
+            workflowVariablesResolverObjectProvider, workflowTestConfigurationService);
     }
 
     @Bean
