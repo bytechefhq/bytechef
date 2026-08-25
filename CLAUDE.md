@@ -379,8 +379,15 @@ See `.agents/hitl-approvals.md`.
 `server/ee/libs/platform/platform-variable/` (`-api`/`-service`/`-graphql`). One `Property` row per variable:
 key `variable.<NAME>`, value `{"value": …}`, `Scope.WORKSPACE`/workspaceId (automation) or `Scope.EMBEDDED`/null
 (embedded — its first use), `environment` always set; listed via `PropertyService.getPropertiesByKeyPrefix`. No
-table, no changelog. `VariableServiceImpl` re-lists the scope on every by-id operation rather than trusting the id
-alone, so a variable id from another scope is indistinguishable from a missing one — ids never leak across scopes.
+new table — variables reuse the existing `property` table. One changelog exists:
+`20260825000001_platform_configuration_property_unique_null_scope_id.xml` adds a partial unique index on
+`property (key, scope, environment) WHERE scope_id IS NULL`, because `uk_property_key_scope_scope_id_environment`
+(non-partial, includes `scope_id`) never fires for `Scope.EMBEDDED` rows — Postgres treats every NULL `scope_id`
+as distinct, so two concurrent embedded creates of the same name both inserted before this index existed.
+`VariableServiceImpl.create`/`update` catch the resulting `DataIntegrityViolationException` and translate it to
+`VARIABLE_NAME_ALREADY_EXISTS`. `VariableServiceImpl` re-lists the scope on every by-id operation rather than
+trusting the id alone, so a variable id from another scope is indistinguishable from a missing one — ids never
+leak across scopes.
 Name/value validation (`^[A-Za-z_][A-Za-z0-9_]{0,49}$`, 4096-char value cap) is a static, unconditional
 `VariableNameValidator`, deliberately not a Spring bean so it can't be silently disabled by a conditional.
 

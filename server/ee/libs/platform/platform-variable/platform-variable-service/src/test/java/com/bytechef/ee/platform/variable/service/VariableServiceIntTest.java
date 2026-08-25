@@ -18,6 +18,14 @@ import com.bytechef.ee.platform.variable.exception.VariableErrorType;
 import com.bytechef.exception.ConfigurationException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -78,12 +86,64 @@ class VariableServiceIntTest {
     @Test
     void testDuplicateNameIsRejected() {
         // Scope.EMBEDDED rows carry a null scope_id, and Postgres unique constraints treat every null as distinct,
-        // so uk_property_key_scope_scope_id_environment alone would NOT catch this -- the rejection has to come
-        // from VariableServiceImpl's own fetchProperty existence check, which this proves against a real table.
+        // so uk_property_key_scope_scope_id_environment alone does NOT catch this. Sequentially, the rejection
+        // comes from VariableServiceImpl's own fetchProperty existence check; the partial unique index
+        // uk_property_key_scope_environment_null_scope_id (20260825000001) backs it up for the concurrent case --
+        // see testConcurrentEmbeddedCreateOfSameNameRejectsOneSide below, which proves that constraint fires.
         variableService.create(VariableScope.embedded(), 10L, "DUP", "1");
 
         assertThatThrownBy(() -> variableService.create(VariableScope.embedded(), 10L, "DUP", "2"))
             .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testConcurrentEmbeddedCreateOfSameNameRejectsOneSide() throws Exception {
+        // Reproduces the original bug directly: two threads both call create() for the same embedded variable
+        // name at the same time, so both can pass VariableServiceImpl's pre-save fetchProperty existence check
+        // before either has committed. Before this change, both inserts succeeded (Scope.EMBEDDED's scope_id is
+        // always null, and uk_property_key_scope_scope_id_environment never fires when scope_id is null on both
+        // sides), leaving two rows for the same key -- every later read/write for that key then failed with
+        // IncorrectResultSizeDataAccessException. With uk_property_key_scope_environment_null_scope_id in place,
+        // exactly one insert wins and the other is translated to VARIABLE_NAME_ALREADY_EXISTS.
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        try {
+            Callable<Optional<ConfigurationException>> raceTask = () -> {
+                start.await();
+
+                try {
+                    variableService.create(VariableScope.embedded(), 21L, "RACE", "value");
+
+                    return Optional.empty();
+                } catch (ConfigurationException configurationException) {
+                    return Optional.of(configurationException);
+                }
+            };
+
+            Future<Optional<ConfigurationException>> firstFuture = executorService.submit(raceTask);
+            Future<Optional<ConfigurationException>> secondFuture = executorService.submit(raceTask);
+
+            start.countDown();
+
+            Optional<ConfigurationException> firstOutcome = firstFuture.get(10, TimeUnit.SECONDS);
+            Optional<ConfigurationException> secondOutcome = secondFuture.get(10, TimeUnit.SECONDS);
+
+            List<ConfigurationException> rejections = Stream.of(firstOutcome, secondOutcome)
+                .flatMap(Optional::stream)
+                .toList();
+
+            assertThat(rejections)
+                .as("exactly one racer must be rejected as a duplicate")
+                .hasSize(1);
+            assertThat(rejections.getFirst()
+                .getErrorKey()).isEqualTo(VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS.getErrorKey());
+
+            assertThat(variableService.getVariables(VariableScope.embedded(), 21L)).extracting(Variable::name)
+                .containsExactly("RACE");
+        } finally {
+            executorService.shutdownNow();
+        }
     }
 
     @Test

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+    uk_property_key_scope_scope_id_environment (20250408000000-3) does not catch a duplicate (key, scope,
+    environment) when scope_id is NULL: Postgres treats every NULL as distinct, so it never fires for
+    Scope.EMBEDDED variable rows (workspace-variable-store, scope_id always null for embedded) or for
+    Scope.PLATFORM rows that carry a real environment (AiProviderFacadeImpl's per-provider properties).
+    Two concurrent creates of the same embedded variable name both insert; PropertyServiceImpl#findProperty
+    then throws IncorrectResultSizeDataAccessException on every subsequent read/write for that key, and the
+    variable becomes permanently unusable without manual SQL.
+
+    This partial unique index restores the invariant the original constraint intended for the null-scope_id
+    case. It is deliberately not narrowed to variable rows: any property family that saves with a null
+    scope_id and a non-null environment shares the same race (today that is Scope.EMBEDDED variables and
+    Scope.PLATFORM AI-provider properties, see AiProviderFacadeImpl#updateAiProvider). Property rows with a
+    null environment (the platform-wide AiGuardrailsWorkspaceSettings default row and the "mcp.server"
+    property) are unaffected either way: a null environment value never equals another null under this
+    index, so the index build cannot fail on them and it does not start enforcing anything new for them.
+
+    VariableServiceImpl#create/update now catch the DataIntegrityViolationException/DuplicateKeyException
+    this index raises on the losing side of a race and translate it into VariableErrorType.
+    VARIABLE_NAME_ALREADY_EXISTS, the same error a non-concurrent duplicate produces.
+
+    CREATE UNIQUE INDEX CONCURRENTLY + runInTransaction="false" so existing property write paths are not
+    stalled while the index builds. The IF NOT EXISTS guard makes the changeSet re-runnable if the build
+    aborts partway through.
+
+    If an installation already holds duplicate (key, scope, environment) rows with a null scope_id, which
+    can only have happened via the same race this migration closes, CREATE UNIQUE INDEX CONCURRENTLY fails
+    at startup rather than silently leaving the bug in place. That is intentional: a unique index cannot be
+    built on non-unique data, and the failure is the signal that those specific duplicate rows need manual
+    cleanup before the index (and the fix) can take effect.
+    -->
+    <changeSet id="20260825000001" author="Ivica Cardic" dbms="postgresql" runInTransaction="false">
+        <sql>
+            CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS uk_property_key_scope_environment_null_scope_id
+                ON property (key, scope, environment)
+                WHERE scope_id IS NULL;
+        </sql>
+
+        <rollback>
+            DROP INDEX CONCURRENTLY IF EXISTS uk_property_key_scope_environment_null_scope_id;
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

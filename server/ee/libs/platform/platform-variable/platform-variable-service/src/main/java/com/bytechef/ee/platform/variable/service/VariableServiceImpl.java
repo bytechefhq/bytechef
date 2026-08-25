@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +58,7 @@ public class VariableServiceImpl implements VariableService {
                 "Variable '" + name + "' already exists", VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS);
         }
 
-        propertyService.save(key, Map.of(Variable.VALUE_KEY, value), propertyScope, scope.workspaceId(), environmentId);
+        saveProperty(key, value, propertyScope, scope, environmentId, name);
 
         return toVariable(fetchSavedProperty(key, propertyScope, scope.workspaceId(), environmentId));
     }
@@ -113,10 +114,35 @@ public class VariableServiceImpl implements VariableService {
             propertyService.delete(existing.getKey(), propertyScope, scope.workspaceId(), environmentId);
         }
 
-        propertyService.save(newKey, Map.of(Variable.VALUE_KEY, value), propertyScope, scope.workspaceId(),
-            environmentId);
+        saveProperty(newKey, value, propertyScope, scope, environmentId, name);
 
         return toVariable(fetchSavedProperty(newKey, propertyScope, scope.workspaceId(), environmentId));
+    }
+
+    /**
+     * Saves the property row, translating a unique-index violation into the same
+     * {@link VariableErrorType#VARIABLE_NAME_ALREADY_EXISTS} the pre-save {@code fetchProperty} check above throws. The
+     * pre-save check only rejects a duplicate that already committed before this call started; a second concurrent
+     * create/rename racing for the same name can still lose to {@code uk_property_key_scope_scope_id_environment}
+     * (workspace scope) or {@code uk_property_key_scope_environment_null_scope_id} (embedded/platform scope, null
+     * {@code scope_id}) at the database, surfacing as {@link DuplicateKeyException} -- caught here rather than left to
+     * bubble up as an opaque 500. Deliberately narrower than the umbrella
+     * {@link org.springframework.dao.DataIntegrityViolationException}: a unique-index hit is the only integrity
+     * violation this method should ever reinterpret as "already exists" -- a future NOT NULL or FK violation on this
+     * shared table must still surface as a genuine failure rather than being mislabeled as a duplicate name.
+     */
+    private void saveProperty(
+        String key, String value, Property.Scope propertyScope, VariableScope scope, long environmentId,
+        String name) {
+
+        try {
+            propertyService.save(key, Map.of(Variable.VALUE_KEY, value), propertyScope, scope.workspaceId(),
+                environmentId);
+        } catch (DuplicateKeyException duplicateKeyException) {
+            throw new ConfigurationException(
+                "Variable '" + name + "' already exists", duplicateKeyException,
+                VariableErrorType.VARIABLE_NAME_ALREADY_EXISTS);
+        }
     }
 
     /**
