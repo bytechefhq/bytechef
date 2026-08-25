@@ -39,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Matija Petanjek
@@ -170,6 +171,17 @@ class BillingSubscriptionFacadeImplTest {
         assertThatThrownBy(() -> facade.updateSubscription("ENTERPRISE"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Unknown plan: ENTERPRISE");
+    }
+
+    @Test
+    void testCreateCheckoutSessionThrowsWhenNoUserIsAuthenticated() {
+        SecurityContextHolder.clearContext();
+
+        assertThatThrownBy(() -> facade.createCheckoutSession("STARTER"))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Current user is not set!");
+
+        verify(stripeClient, never()).createCustomer(any(), any());
     }
 
     private BillingSubscription starterSubscription() {
