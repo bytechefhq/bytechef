@@ -29,6 +29,7 @@
     "--- Settings ---",
     "settings/users",
     "settings/git-configuration",
-    "settings/api-keys"
+    "settings/api-keys",
+    "settings/variables"
   ]
 }

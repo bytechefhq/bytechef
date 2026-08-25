@@ -306,9 +306,9 @@ components.
 | Case | Behaviour |
 | --- | --- |
 | Invalid name / too-long value | `ConfigurationException(VARIABLE_NAME_INVALID / VARIABLE_VALUE_TOO_LONG)` → 4xx GraphQL error → toast; dialog keeps state |
-| Duplicate name in scope+environment | `VARIABLE_NAME_ALREADY_EXISTS`; also guarded by `uk_property_key_scope_scope_id_environment` if two admins race — the second commit fails, surfaced as the same error |
+| Duplicate name in scope+environment | `VARIABLE_NAME_ALREADY_EXISTS`; for workspace-scoped rows also guarded by `uk_property_key_scope_scope_id_environment` if two admins race — the second commit fails, surfaced as the same error. Embedded rows have a NULL `scope_id`, which Postgres treats as distinct per row, so that constraint does not fire there — the embedded duplicate check is service-level (`VariableServiceImpl`'s pre-check) only, and a genuine race can still create two rows |
 | Id from another scope | `VARIABLE_NOT_FOUND` (indistinguishable from a missing id) |
-| Property service unavailable at job creation (distributed apps) | empty `vars`, WARN once, job proceeds |
+| Property service unavailable at job creation (`execution-app`) | if the resolver bean exists but the store call fails, empty `vars`, WARN once per JVM, job proceeds. `execution-app` does not carry the resolver module at all, so in practice no resolver bean exists there — the same empty-`vars`/job-proceeds outcome occurs, but nothing is attempted and no WARN is logged |
 | `${vars.X}` with unknown `X` | expression left as literal text (existing missing-key behaviour) |
 | Concurrent edits of the **same** variable | last write wins at the row level (`PropertyService.save` re-reads before writing); accepted |
 

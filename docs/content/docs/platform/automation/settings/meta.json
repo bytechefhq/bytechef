@@ -5,6 +5,7 @@
   "pages": [
     "users",
     "git-configuration",
-    "api-keys"
+    "api-keys",
+    "variables"
   ]
 }

@@ -1,0 +1,110 @@
+---
+title: Variables
+description: Admin-defined string values, scoped per workspace (or embedded organization) and per environment, read from any workflow as `${vars.NAME}`.
+---
+
+# Variables
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Variables are on the upcoming release track and are not yet available in the latest released
+    version of ByteChef.
+</Callout>
+
+A **variable** is a named string value an admin defines once, that every workflow in scope can then
+read as `${vars.NAME}` — the same `${...}` syntax as a data pill, just resolved from a value stored on
+the workspace (automation) or organization (embedded) instead of an earlier step's output. Use a
+variable for a value that's the same across many workflows but changes per environment — a base API
+URL, an account id, a feature-flag string — instead of hard-coding it into every workflow that needs
+it.
+
+## Where to define them
+
+- **Automation:** open **Settings → Current Workspace → Variables**. Both workspace admins and
+  members can reach the page; the **New Variable** button and the row actions menu only appear if
+  you hold the `VARIABLE_MANAGE` scope, and the server enforces the same check independently, so
+  hiding the controls is a convenience, not the only guard.
+- **Embedded:** open **Settings → Variables**. This page is admin-only.
+
+Both pages show an **environment selector** at the top. A variable belongs to exactly one (scope,
+environment) pair, so switching the selector switches which set of variables you're looking at — it
+does not copy or merge variables across environments.
+
+The list shows each variable's **name** and **value** in clear text, with a copy-to-clipboard action
+that copies the ready-to-paste `${vars.NAME}` reference. There's no masking or "reveal" step —
+variables are not treated as secrets (see [Rules and limits](#rules-and-limits)).
+
+## Reference variables in a workflow
+
+Drop `${vars.NAME}` into any property field, the same way you'd drop in a data pill. In the workflow
+editor, open the **Data Pill Panel** — variables appear in their own **Variables** section, separate
+from the trigger and upstream steps, so you can insert one the same way you'd insert any other pill.
+
+Every variable value is a **string**. To use one as a number, boolean, or structured value, wrap the
+reference in the usual expression casts:
+
+```text
+=int(vars.RETRIES)
+=toBoolean(vars.FEATURE_ENABLED)
+=toMap(vars.CONFIG)
+```
+
+If a workflow references a variable that doesn't exist in the current scope and environment, the
+expression is left unresolved as its literal text — the same behavior as referencing any other
+missing key.
+
+### From a code workflow
+
+A [code workflow](../build/workflows/build-approaches) task reads the same resolved map through its
+`TaskContext`, alongside its other inputs:
+
+```java
+Map<String, ?> vars = (Map<String, ?>) context.input().get("vars");
+String apiUrl = (String) vars.get("API_URL");
+```
+
+## Rules and limits
+
+- **Name pattern.** A variable name must match `^[A-Za-z_][A-Za-z0-9_]{0,49}$` — it starts with a
+  letter or underscore, contains only letters, digits, and underscores, and is at most 50
+  characters. A leading digit is rejected because `${vars.1abc}` wouldn't be a valid property path.
+- **Value length.** A value is capped at 4096 characters.
+- **`vars` is reserved for workflow inputs and node names — not for variable names.** You can't name
+  a workflow input `vars`, or a trigger or task node `vars`, because that would collide with the
+  `vars.*` namespace in the workflow's flat execution context. This doesn't restrict what you can
+  name an individual *variable*: a variable named `vars` is allowed and resolves as
+  `${vars.vars}`, just like any other name matching the pattern above.
+- **Values are snapshotted at run start, not live.** When a top-level run starts, ByteChef resolves
+  the scope's current variables once and seeds them into that job's inputs, so editing a variable's
+  value while the run is in flight has no effect on its own resolved snapshot — only on runs that
+  start afterward. A subflow started mid-run is a separate job creation, though, and re-resolves its
+  own `vars` snapshot at that point — so a subflow can observe a value edited after its parent run
+  started, even while the parent run is still in flight.
+- **Read-only from workflows.** There is no `set`-style action to write a variable's value from
+  inside a workflow. Values only change through the Variables settings page.
+- **Per-environment, no inheritance.** A variable belongs to one (scope, environment) pair. There's
+  no fallback to another environment's value and no "copy to environment" action — define the
+  variable separately in each environment that needs it.
+- **Not for secrets.** Variable values are shown in clear text on the Variables settings page, in the
+  workflow editor's data-pill panel, and — because a run's resolved `vars` map is seeded into the
+  job's inputs — on that run's execution detail page. Storage is encrypted at rest, but only because
+  the underlying property storage always encrypts its values; that's an implementation detail, not a
+  security boundary. Use a [connection](../build/connections) for anything that needs to stay a
+  secret.
+- **Monolith only, for now.** Resolving variables requires the real property store, which is only
+  wired into the monolith and the distributed `configuration-app`. Of the distributed EE deployment
+  shapes, only `execution-app` creates jobs at all (`webhook-app` and `coordinator-app` dispatch job
+  creation to it remotely) — and `execution-app` does not carry the variable-resolution module, so no
+  resolution is ever attempted there: the run simply proceeds without `vars` seeded, silently and
+  without any log line, so `${vars.X}` is left unresolved in those deployments' runs. This is
+  different from the fail-open behavior you may see described for variable resolution elsewhere
+  (a WARN logged once per JVM): that WARN covers a resolver that exists but fails against a
+  misbehaving property store, not this missing-module case, so don't expect to find that log line in
+  a distributed deployment's logs — there's nothing to find.
+
+## Reference
+
+- [Data Pills & Input Modes](../build/workflows/data-pills) — the general data-pill mechanism variables plug into.
+- [Build Approaches](../build/workflows/build-approaches) — visual, Script, and Code Workflow, all of which can read variables.
+- [Environments](../../enterprise/collaboration-devops/environments) — how Development, Staging, and Production scope variables (and everything else) separately.
