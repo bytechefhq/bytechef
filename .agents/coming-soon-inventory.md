@@ -23,7 +23,7 @@ Two ways something here is hidden, and the tables below mark both:
 
 Both are reversible and neither deletes anything.
 
-**45 whole-page** (20 hidden) · **29 partial** pages (6 with a commented-out section)
+**45 whole-page** (20 hidden) · **30 partial** pages (7 with a commented-out section)
 
 ---
 
@@ -134,6 +134,7 @@ arriving soon was not helping a reader.
 | [`/platform/embedded/get-started/quick-start`](/platform/embedded/get-started/quick-start) | Let your users build their own workflows (optional) | rendered |
 | [`/platform/embedded/get-started/quick-start/sample-app`](/platform/embedded/get-started/quick-start/sample-app) | What the sample demonstrates | rendered |
 | [`/platform/embedded/get-started/tenant-isolated-security`](/platform/embedded/get-started/tenant-isolated-security) | Layer 3: Crypto | rendered |
+| [`/platform/embedded/monitor/failures-and-retries`](/platform/embedded/monitor/failures-and-retries) | No replay from your product; **No automatic retry policy** | **1 of 2 commented out** |
 | [`/platform/embedded/monitor/workflow-executions`](/platform/embedded/monitor/workflow-executions) | Execution Detail View | rendered |
 | [`/platform/settings/ai-providers`](/platform/settings/ai-providers) | What uses activated providers | rendered |
 | [`/platform/settings/notifications`](/platform/settings/notifications) | Delivery types | rendered |
