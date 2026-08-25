@@ -39,7 +39,9 @@ them.
 | `embedded-webhook-*` | `server/ee/libs/embedded/embedded-webhook/embedded-webhook-public-rest/openapi.yaml` |
 | `custom-components` | `server/ee/libs/platform/platform-custom-component/platform-custom-component-configuration/platform-custom-component-configuration-rest/openapi.yaml` |
 
-After editing a spec, regenerate from this directory:
+`npm run dev` and `next build` both generate them, from `next.config.ts`, so a fresh checkout needs
+no extra step and a deployment cannot skip it by overriding the build command. After editing a spec
+outside a running dev server, regenerate from this directory:
 
 ```bash
 npm run generate:openapi
