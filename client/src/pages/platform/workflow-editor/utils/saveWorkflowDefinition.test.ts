@@ -742,4 +742,74 @@ describe('saveWorkflowDefinition', () => {
             expect(mutation.mutate).toHaveBeenCalledOnce();
         });
     });
+    describe('clusterRoot clusterElements preservation', () => {
+        const clusterElements = {
+            model: {label: 'Claude', name: 'anthropic_1', parameters: {}, type: 'anthropic/v1/model'},
+            tools: [{label: 'Sheets', name: 'googleSheets_1', parameters: {}, type: 'googleSheets/v1/insertRow'}],
+        };
+
+        function makeClusterRootState() {
+            return makeWorkflowState([
+                {
+                    clusterElements,
+                    label: 'Agent',
+                    name: 'aiAgent_1',
+                    parameters: {systemPrompt: 'Be helpful'},
+                    type: 'aiAgent/v1/chat',
+                },
+            ]);
+        }
+
+        beforeEach(() => {
+            mockWorkflowState = makeClusterRootState();
+
+            mockWorkflowState.workflow.tasks = mockWorkflowState.workflow.tasks.map((task) => ({
+                ...task,
+                clusterRoot: true,
+            }));
+        });
+
+        it('should keep the existing cluster elements when the node data does not carry them', async () => {
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'aiAgent',
+                    name: 'aiAgent_1',
+                    parameters: {systemPrompt: 'Be helpful'},
+                    type: 'aiAgent/v1/streamChat',
+                    workflowNodeName: 'aiAgent_1',
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const savedTask = JSON.parse(
+                (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0].workflow.definition
+            ).tasks[0];
+
+            expect(savedTask.clusterElements).toEqual(clusterElements);
+        });
+
+        it('should still clear the cluster elements when the node data carries an explicit empty map', async () => {
+            const mutation = makeMutation();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    clusterElements: {},
+                    componentName: 'aiAgent',
+                    name: 'aiAgent_1',
+                    parameters: {systemPrompt: 'Be helpful'},
+                    type: 'aiAgent/v1/chat',
+                    workflowNodeName: 'aiAgent_1',
+                } as unknown as NodeDataType,
+                updateWorkflowMutation: mutation,
+            });
+
+            const savedTask = JSON.parse(
+                (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0].workflow.definition
+            ).tasks[0];
+
+            expect(savedTask.clusterElements).toEqual({});
+        });
+    });
 });

@@ -21,9 +21,6 @@ export default function useAiAgentStreamResponse(): UseAiAgentStreamResponseI {
 
     const {updateWorkflowMutation} = useWorkflowEditor();
 
-    // The root task is read from the workflow definition rather than from rootClusterElementNodeData, which is
-    // seeded once per root and never carries the prompts written by AiAgentPromptField. saveWorkflowDefinition
-    // replaces a cluster root's parameters wholesale, so writing the stale copy back would wipe them.
     const rootTask = useMemo(() => {
         if (!workflow.definition || !rootClusterElementNodeData?.workflowNodeName) {
             return undefined;
@@ -64,6 +61,7 @@ export default function useAiAgentStreamResponse(): UseAiAgentStreamResponseI {
 
             const updatedRootClusterElementNodeData = {
                 ...rootClusterElementNodeData,
+                clusterElements: rootTask.clusterElements,
                 operationName: targetOperationName,
                 parameters,
                 type: `${rootClusterElementNodeData.componentName}/v${componentVersion}/${targetOperationName}`,
