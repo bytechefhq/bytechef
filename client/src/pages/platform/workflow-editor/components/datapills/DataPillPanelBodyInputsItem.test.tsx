@@ -35,7 +35,10 @@ vi.mock('../../stores/useWorkflowDataStore', () => ({
         selector({
             workflow: {
                 id: 'w1',
-                inputs: [{name: 'contactMapping', type: 'field_mapping'}],
+                inputs: [
+                    {name: 'contactMapping', type: 'field_mapping'},
+                    {name: 'apiKey', type: 'string'},
+                ],
             },
         }),
 }));
@@ -45,7 +48,7 @@ describe('DataPillPanelBodyInputsItem', () => {
         render(
             <Accordion collapsible defaultValue="inputs" type="single">
                 <AccordionItem value="inputs">
-                    <DataPillPanelBodyInputsItem />
+                    <DataPillPanelBodyInputsItem dataPillFilterQuery="" />
                 </AccordionItem>
             </Accordion>
         );
@@ -58,7 +61,20 @@ describe('DataPillPanelBodyInputsItem', () => {
         // appears only if the component passes a child DataPill with property.name === 'title'.
         expect(screen.getByText('title')).toBeInTheDocument();
 
-        // Two pills total: one root + one child.
-        expect(screen.getAllByTestId('data-pill')).toHaveLength(2);
+        // Three pills total: contactMapping root + title child + apiKey root.
+        expect(screen.getAllByTestId('data-pill')).toHaveLength(3);
+    });
+
+    it('filters inputs by the data pill filter query', () => {
+        render(
+            <Accordion collapsible defaultValue="inputs" type="single">
+                <AccordionItem value="inputs">
+                    <DataPillPanelBodyInputsItem dataPillFilterQuery="api" />
+                </AccordionItem>
+            </Accordion>
+        );
+
+        expect(screen.getByText('apiKey')).toBeInTheDocument();
+        expect(screen.queryByText('contactMapping')).not.toBeInTheDocument();
     });
 });

@@ -40,6 +40,10 @@ export function validateGraphNodeName(
         return {error: 'Node name cannot be empty.', valid: false};
     }
 
+    if (trimmedName === 'vars') {
+        return {error: '"vars" is a reserved name.', valid: false};
+    }
+
     const isDuplicate = nodes.some((graphNode, index) => index !== nodeIndex && graphNode.name === trimmedName);
 
     if (isDuplicate) {

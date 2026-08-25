@@ -8,7 +8,11 @@ import {ChevronDownIcon, FormInputIcon} from 'lucide-react';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import getFieldMappingPillProperties from '../../utils/getFieldMappingPillProperties';
 
-const DataPillPanelBodyInputsItem = () => {
+interface DataPillPanelBodyInputsItemProps {
+    dataPillFilterQuery: string;
+}
+
+const DataPillPanelBodyInputsItem = ({dataPillFilterQuery}: DataPillPanelBodyInputsItemProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
@@ -24,6 +28,10 @@ const DataPillPanelBodyInputsItem = () => {
         return <p className="text-sm">No defined inputs.</p>;
     }
 
+    const filteredInputs = workflow.inputs.filter((input) =>
+        input.name.toLowerCase().includes(dataPillFilterQuery.toLowerCase())
+    );
+
     return (
         <>
             <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-surface-main p-4 group-data-[state=closed]:border-b">
@@ -38,7 +46,7 @@ const DataPillPanelBodyInputsItem = () => {
 
             <AccordionContent className="size-full space-y-2 border-b border-b-border/50 px-4 pb-4">
                 <ul className="flex w-full flex-col space-y-2 border-l border-l-border/50 pl-4 group-data-[state=open]:h-full">
-                    {workflow.inputs.map((input, index) => {
+                    {filteredInputs.map((input, index) => {
                         const sampleOutput = workflowTestConfiguration?.inputs?.[input.name];
 
                         const rootProperty = {

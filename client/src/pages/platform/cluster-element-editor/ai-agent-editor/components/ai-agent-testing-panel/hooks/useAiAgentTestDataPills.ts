@@ -1,7 +1,9 @@
+import useWorkflowVariables from '@/pages/platform/workflow-editor/hooks/useWorkflowVariables';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import getDataPillsFromProperties from '@/pages/platform/workflow-editor/utils/getDataPillsFromProperties';
 import getOutputSchemaFromWorkflowNodeOutput from '@/pages/platform/workflow-editor/utils/getOutputSchemaFromWorkflowNodeOutput';
+import getWorkflowInputAndVariableDataPills from '@/pages/platform/workflow-editor/utils/getWorkflowInputAndVariableDataPills';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ComponentPropertiesType} from '@/shared/types';
@@ -20,6 +22,8 @@ export default function useAiAgentTestDataPills() {
             workflow: state.workflow,
         }))
     );
+
+    const variables = useWorkflowVariables();
 
     const {data: workflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
         {
@@ -79,15 +83,8 @@ export default function useAiAgentTestDataPills() {
 
         const dataPills = getDataPillsFromProperties(componentProperties, filteredNodeNames).flat(Infinity);
 
-        const workflowInputDataPills =
-            workflow.inputs?.map((input) => ({
-                id: input.name,
-                nodeName: input.name,
-                value: input.name,
-            })) || [];
-
-        return [...dataPills, ...workflowInputDataPills];
-    }, [componentDefinitions, taskDispatcherDefinitions, workflow.inputs, workflowNodeOutputs]);
+        return [...dataPills, ...getWorkflowInputAndVariableDataPills(workflow.inputs, variables ?? [])];
+    }, [componentDefinitions, taskDispatcherDefinitions, variables, workflow.inputs, workflowNodeOutputs]);
 
     useEffect(() => {
         if (calculatedDataPills.length > 0) {

@@ -13,6 +13,7 @@ import {useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import useWorkflowVariables from '../../hooks/useWorkflowVariables';
 import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
@@ -43,6 +44,8 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
         }))
     );
+
+    const variables = useWorkflowVariables();
 
     const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
         const {actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
@@ -162,6 +165,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
                             <DataPillPanelBody
                                 dataPillFilterQuery={dataPillFilterQuery}
                                 operations={operations}
+                                variables={variables}
                                 workflowInputs={workflow.inputs}
                             />
                         )}

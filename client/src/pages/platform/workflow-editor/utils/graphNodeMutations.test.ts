@@ -37,6 +37,17 @@ describe('validateGraphNodeName', () => {
     it('should accept a fresh, unique name', () => {
         expect(validateGraphNodeName(makeNodes(), 0, 'entry')).toEqual({valid: true});
     });
+
+    it('should reject the reserved "vars" name', () => {
+        expect(validateGraphNodeName([], 0, 'vars')).toEqual({
+            error: '"vars" is a reserved name.',
+            valid: false,
+        });
+    });
+
+    it('should accept a name that only starts with "vars"', () => {
+        expect(validateGraphNodeName([], 0, 'varsCount')).toEqual({valid: true});
+    });
 });
 
 describe('renameGraphNode', () => {

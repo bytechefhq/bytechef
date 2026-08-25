@@ -1,5 +1,6 @@
 import {ScrollArea} from '@/components/ui/scroll-area';
 import DataPillPanelBodyInputsItem from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBodyInputsItem';
+import {VariableI} from '@/shared/edition/variables/variablesApi';
 import {
     ActionDefinition,
     ComponentDefinitionBasic,
@@ -12,6 +13,7 @@ import {Accordion, AccordionItem} from '@radix-ui/react-accordion';
 import {InfoIcon} from 'lucide-react';
 
 import DataPillPanelBodyPropertiesItem from './DataPillPanelBodyPropertiesItem';
+import DataPillPanelBodyVariablesItem from './DataPillPanelBodyVariablesItem';
 
 interface BaseComponentOperationI {
     workflowNodeName: string;
@@ -41,14 +43,20 @@ export type OperationType = ComponentActionOperationI | ComponentTriggerOperatio
 interface DataPillPanelBodyProps {
     operations: Array<OperationType>;
     dataPillFilterQuery: string;
+    variables: VariableI[] | undefined;
     workflowInputs?: WorkflowInput[];
 }
 
-const DataPillPanelBody = ({dataPillFilterQuery, operations, workflowInputs}: DataPillPanelBodyProps) => {
+const DataPillPanelBody = ({dataPillFilterQuery, operations, variables, workflowInputs}: DataPillPanelBodyProps) => {
     const hasWorkflowInputs = !!workflowInputs?.length;
     const hasOperations = operations.length > 0;
 
-    if (!hasWorkflowInputs && !hasOperations) {
+    // `variables === undefined` means this build has no variables feature at all (the CE edition-seam default) —
+    // an empty array means the feature exists but nothing is defined yet, which DOES get its own section (with
+    // an empty-state message), so the check here is feature-presence, not variable count.
+    const hasVariablesFeature = variables !== undefined;
+
+    if (!hasWorkflowInputs && !hasOperations && !hasVariablesFeature) {
         return (
             <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                 <InfoIcon className="size-8 text-muted-foreground/50" />
@@ -69,7 +77,13 @@ const DataPillPanelBody = ({dataPillFilterQuery, operations, workflowInputs}: Da
             <Accordion className="size-full max-w-data-pill-panel-width" collapsible type="single">
                 {hasWorkflowInputs && (
                     <AccordionItem className="group" value="inputs">
-                        <DataPillPanelBodyInputsItem />
+                        <DataPillPanelBodyInputsItem dataPillFilterQuery={dataPillFilterQuery} />
+                    </AccordionItem>
+                )}
+
+                {hasVariablesFeature && (
+                    <AccordionItem className="group" value="variables">
+                        <DataPillPanelBodyVariablesItem dataPillFilterQuery={dataPillFilterQuery} />
                     </AccordionItem>
                 )}
 

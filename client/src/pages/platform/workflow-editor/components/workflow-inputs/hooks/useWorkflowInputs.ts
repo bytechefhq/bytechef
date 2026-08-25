@@ -148,7 +148,13 @@ export default function useWorkflowInputs({
     }
 
     function saveWorkflowInput(input: WorkflowInputType) {
-        const {getValues} = form;
+        const {getValues, setError} = form;
+
+        if (input.name === 'vars') {
+            setError('name', {message: '"vars" is a reserved name.'});
+
+            return;
+        }
 
         // `type === 'component'` is a UI-only discriminator. componentReference.componentVersion and .groupName are
         // set via setValue (no registered FormField), so they can be missing from the submitted payload — pull the
