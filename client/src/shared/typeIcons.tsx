@@ -15,6 +15,7 @@ import {
     HashIcon,
     ToggleLeftIcon,
     TriangleIcon,
+    VariableIcon,
 } from 'lucide-react';
 
 export const TYPE_ICONS = {
@@ -31,4 +32,5 @@ export const TYPE_ICONS = {
     OBJECT: <BracesIcon className="size-4 text-content-neutral-primary" />,
     STRING: <CaseUpperIcon className="size-4 text-content-neutral-primary" />,
     TIME: <ClockIcon className="size-4 text-content-neutral-primary" />,
+    VARIABLE: <VariableIcon className="size-4 text-content-neutral-primary" />,
 };

@@ -159,7 +159,13 @@ export default function useWorkflowInputs({
     }
 
     function saveWorkflowInput(formInput: WorkflowInputType) {
-        const {getValues} = form;
+        const {getValues, setError} = form;
+
+        if (formInput.name === 'vars') {
+            setError('name', {message: '"vars" is a reserved name.'});
+
+            return;
+        }
 
         const inputFields: WorkflowInputType = {...formInput};
 

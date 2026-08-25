@@ -318,4 +318,29 @@ describe('useWorkflowInputs', () => {
 
         expect(result.current.isDeleteDialogOpen).toBe(false);
     });
+    it('rejects "vars" as a reserved input name and does not save', () => {
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.saveWorkflowInput({label: 'Vars', name: 'vars', required: false, type: 'string'} as never);
+        });
+
+        expect(updateWorkflowMutationMock.mutate).not.toHaveBeenCalled();
+        expect(result.current.form.getFieldState('name').error?.message).toBe('"vars" is a reserved name.');
+    });
+
+    it('accepts "varsCount" as an input name', () => {
+        const {result} = renderInputs();
+
+        act(() => {
+            result.current.saveWorkflowInput({
+                label: 'Vars Count',
+                name: 'varsCount',
+                required: false,
+                type: 'string',
+            } as never);
+        });
+
+        expect(updateWorkflowMutationMock.mutate).toHaveBeenCalled();
+    });
 });

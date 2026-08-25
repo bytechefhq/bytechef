@@ -69,6 +69,7 @@ import {
     extractClusterElementComponentOperations,
 } from '../../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowIssues from '../../hooks/useWorkflowIssues';
+import useWorkflowVariables from '../../hooks/useWorkflowVariables';
 import {useWorkflowEditor} from '../../providers/workflowEditorProvider';
 import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
@@ -80,6 +81,7 @@ import findWorkflowIssueParameterPaths, {getParameterPathRoot} from '../../utils
 import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getNodeIssues from '../../utils/getNodeIssues';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
+import getWorkflowInputAndVariableDataPills from '../../utils/getWorkflowInputAndVariableDataPills';
 import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
 import hasDataPillPanelContent from '../../utils/hasDataPillPanelContent';
 import {resolveClusterRootId, resolveMainClusterRootName} from '../../utils/resolveClusterRootId';
@@ -188,6 +190,8 @@ export default function useWorkflowNodeDetailsPanel({
     );
 
     const setDataPillPanelHasContent = useDataPillPanelStore((state) => state.setDataPillPanelHasContent);
+
+    const variables = useWorkflowVariables();
 
     const queryClient = useQueryClient();
 
@@ -1015,14 +1019,7 @@ export default function useWorkflowNodeDetailsPanel({
 
         const dataPills = getDataPillsFromProperties(componentProperties, filteredNodeNames);
 
-        const workflowInputDataPills: Array<DataPillType> =
-            workflow.inputs?.map((input) => ({
-                id: input.name,
-                nodeName: input.name,
-                value: input.name,
-            })) || [];
-
-        return [...dataPills.flat(Infinity), ...workflowInputDataPills];
+        return [...dataPills.flat(Infinity), ...getWorkflowInputAndVariableDataPills(workflow.inputs, variables ?? [])];
     }, [
         currentNode?.branchData,
         currentNode?.conditionData,
@@ -1031,6 +1028,7 @@ export default function useWorkflowNodeDetailsPanel({
         filterNodeNamesForCondition,
         filterNodeNamesForOnError,
         previousComponentDefinitions,
+        variables,
         workflow.inputs,
         workflowNodeOutputs,
     ]);

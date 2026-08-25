@@ -1,3 +1,4 @@
+import {VARIABLES_NODE_NAME} from '@/pages/platform/workflow-editor/utils/getWorkflowInputAndVariableDataPills';
 import {forEachNestedTaskGroup} from '@/pages/platform/workflow-editor/utils/taskTraversalUtils';
 import {getWorkflowNodeComponentName} from '@/pages/platform/workflow-editor/utils/workflowNodeNameUtils';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
@@ -79,6 +80,12 @@ export function getDataPillIconSource({
     const dispatchers = taskDispatcherDefinitions ?? [];
 
     const [nodeName = '', inputName] = getExpressionSegments(mentionDisplay ?? '');
+
+    if (nodeName === VARIABLES_NODE_NAME) {
+        const svgString = renderToStaticMarkup(TYPE_ICONS.VARIABLE);
+
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+    }
 
     if (nodeName === 'inputs') {
         return getTypeIconSource(getWorkflowInputType(workflow, inputName) ?? 'STRING');
