@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.configuration.security.scope;
 
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class WorkflowPermissionScopeProvider implements PermissionScopeProvider {
 
     @Override
