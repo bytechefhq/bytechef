@@ -652,6 +652,88 @@ export const getClusterElementsLayoutElements = ({
         }
     }
 
+    const getNodeWidth = (node: Node): number =>
+        node.data.clusterElementTypesCount
+            ? calculateNodeWidth(node.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH
+            : CLUSTER_ELEMENT_NODE_WIDTH;
+
+    const getAbsolutePoint = (node: Node): {x: number; y: number} => {
+        let absoluteX = node.position.x;
+        let absoluteY = node.position.y;
+        let ancestorId = node.parentId;
+
+        while (ancestorId) {
+            const ancestor = positionedNodes.find((positioned) => positioned.id === ancestorId);
+
+            if (!ancestor) {
+                break;
+            }
+
+            absoluteX += ancestor.position.x;
+            absoluteY += ancestor.position.y;
+            ancestorId = ancestor.parentId;
+        }
+
+        return {x: absoluteX, y: absoluteY};
+    };
+
+    const getAbsoluteX = (node: Node): number => getAbsolutePoint(node).x;
+
+    const rows: Node[][] = [];
+
+    const parentedNodes = positionedNodes
+        .filter((node) => !!node.parentId)
+        .sort((nodeA, nodeB) => getAbsolutePoint(nodeA).y - getAbsolutePoint(nodeB).y);
+
+    for (const node of parentedNodes) {
+        const nodeY = getAbsolutePoint(node).y;
+        const openRow = rows.find((row) => Math.abs(getAbsolutePoint(row[0]).y - nodeY) < NODE_HEIGHT + labelOverhang);
+
+        if (openRow) {
+            openRow.push(node);
+        } else {
+            rows.push([node]);
+        }
+    }
+
+    for (const rowNodes of rows) {
+        if (rowNodes.length < 2) {
+            continue;
+        }
+
+        const placements = rowNodes
+            .map((node) => ({absoluteX: getAbsoluteX(node), node, width: getNodeWidth(node)}))
+            .sort((placementA, placementB) => placementA.absoluteX - placementB.absoluteX);
+
+        for (let index = 1; index < placements.length; index++) {
+            const previous = placements[index - 1];
+            const current = placements[index];
+
+            const previousLabelPadding = previous.node.data.clusterElementTypesCount
+                ? 0
+                : CLUSTER_ELEMENT_LABEL_PADDING;
+            const currentLabelPadding = current.node.data.clusterElementTypesCount ? 0 : CLUSTER_ELEMENT_LABEL_PADDING;
+            const minGap =
+                previous.node.data.clusterElementTypesCount && current.node.data.clusterElementTypesCount
+                    ? CLUSTER_ROOT_GAP
+                    : overlapPadding;
+
+            const minAbsoluteX =
+                previous.absoluteX + previous.width + previousLabelPadding + currentLabelPadding + minGap;
+
+            const encroachmentX = containsNodePosition(current.node.data.metadata)
+                ? previous.absoluteX + previous.width
+                : minAbsoluteX;
+
+            if (current.absoluteX < encroachmentX) {
+                const shift = minAbsoluteX - current.absoluteX;
+
+                current.node.position = {...current.node.position, x: current.node.position.x + shift};
+                current.absoluteX = minAbsoluteX;
+            }
+        }
+    }
+
     // Center the graph on the canvas.
     if (positionedNodes.length === 1) {
         const viewportWidth = canvasWidth / DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM;

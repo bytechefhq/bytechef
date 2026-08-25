@@ -20,6 +20,7 @@ import {
 import {Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
+import {calculateNodeWidth} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {
     CLUSTER_ELEMENT_GAP,
     CLUSTER_ELEMENT_LABEL_PADDING,
@@ -604,5 +605,220 @@ describe('getClusterElementsLayoutElements new node positioning with moved sibli
 
         // Second node should be one gap away from the first
         expect(secondNode!.position.x).toBe(firstNode!.position.x + horizontalGap);
+    });
+});
+
+describe('getClusterElementsLayoutElements cross-subtree overlap', () => {
+    const canvasWidth = 1200;
+    const childBaseY = 160 + PLACEHOLDER_NODE_HEIGHT + NODE_HEIGHT / 4;
+
+    function buildTwoNestedRootsWithChildren(): Node[] {
+        const nestedRoot = (nodeId: string): Node => ({
+            data: {
+                clusterElementType: 'tools',
+                clusterElementTypeIndex: 0,
+                clusterElementTypesCount: 2,
+                isNestedClusterRoot: true,
+                metadata: {},
+                parentClusterRootElementsTypeCount: 1,
+            },
+            id: nodeId,
+            parentId: 'root',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        });
+
+        const grandChild = (nodeId: string, parentId: string): Node => ({
+            data: {
+                clusterElementType: 'tools',
+                clusterElementTypeIndex: 0,
+                isNestedClusterRoot: false,
+                metadata: {},
+                parentClusterRootElementsTypeCount: 2,
+            },
+            id: nodeId,
+            parentId,
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        });
+
+        return [
+            {
+                data: {clusterElementTypesCount: 1, clusterElements: {tools: []}},
+                id: 'root',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            },
+            nestedRoot('taskTool'),
+            nestedRoot('approvalGateTool'),
+            grandChild('subagentTool', 'taskTool'),
+            grandChild('gatedTool', 'approvalGateTool'),
+        ];
+    }
+
+    it('separates children that belong to different nested roots', () => {
+        const result = getClusterElementsLayoutElements({
+            canvasHeight: 800,
+            canvasWidth,
+            edges: [],
+            nodes: buildTwoNestedRootsWithChildren(),
+        });
+
+        const absoluteX = (nodeId: string): number => {
+            let node = result.nodes.find((candidate) => candidate.id === nodeId);
+            let x = 0;
+
+            while (node) {
+                x += node.position.x;
+
+                node = node.parentId ? result.nodes.find((candidate) => candidate.id === node!.parentId) : undefined;
+            }
+
+            return x;
+        };
+
+        const subagentX = absoluteX('subagentTool');
+        const gatedToolX = absoluteX('gatedTool');
+
+        const leftX = Math.min(subagentX, gatedToolX);
+        const rightX = Math.max(subagentX, gatedToolX);
+
+        expect(rightX - leftX).toBeGreaterThanOrEqual(CLUSTER_ELEMENT_NODE_WIDTH);
+    });
+
+    it('keeps both grandchildren on the same row', () => {
+        const result = getClusterElementsLayoutElements({
+            canvasHeight: 800,
+            canvasWidth,
+            edges: [],
+            nodes: buildTwoNestedRootsWithChildren(),
+        });
+
+        const subagent = result.nodes.find((node) => node.id === 'subagentTool');
+        const gatedTool = result.nodes.find((node) => node.id === 'gatedTool');
+
+        expect(subagent!.position.y).toBe(childBaseY);
+        expect(gatedTool!.position.y).toBe(childBaseY);
+    });
+});
+
+describe('getClusterElementsLayoutElements sibling spacing after a cross-subtree shift', () => {
+    function buildAgentWithNeighbouringSubtrees(): Node[] {
+        const element = (
+            id: string,
+            parentId: string,
+            clusterElementType: string,
+            clusterElementTypeIndex: number,
+            parentClusterRootElementsTypeCount: number,
+            ownTypes?: number
+        ): Node => ({
+            data: {
+                clusterElementType,
+                clusterElementTypeIndex,
+                ...(ownTypes ? {clusterElementTypesCount: ownTypes} : {}),
+                isNestedClusterRoot: !!ownTypes,
+                metadata: {},
+                parentClusterRootElementsTypeCount,
+            },
+            id,
+            parentId,
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        });
+
+        return [
+            {
+                data: {clusterElementTypesCount: 5, clusterElements: {chatMemory: {}, rag: []}},
+                id: 'aiAgent_2',
+                position: {x: 0, y: 0},
+                type: 'workflow',
+            },
+            element('anthropic_5', 'aiAgent_2', 'model', 0, 5),
+            element('vectorStoreChatMemory_2', 'aiAgent_2', 'chatMemory', 1, 5, 1),
+            element('pinecone_3', 'vectorStoreChatMemory_2', 'vectorStore', 0, 1, 1),
+            element('modularRag_2', 'aiAgent_2', 'rag', 2, 5, 5),
+            element('documentJoiner_2', 'modularRag_2', 'documentJoiner', 0, 5),
+            element('vectorStoreDocumentRetriever_2', 'modularRag_2', 'documentRetriever', 1, 5, 1),
+            element('queryAugmenter_2', 'modularRag_2', 'queryAugmenter', 2, 5, 1),
+            element('queryExpander_2', 'modularRag_2', 'queryExpander', 3, 5, 1),
+        ];
+    }
+
+    function layOutAgent() {
+        const result = getClusterElementsLayoutElements({
+            canvasHeight: 900,
+            canvasWidth: 1900,
+            edges: [],
+            nodes: buildAgentWithNeighbouringSubtrees(),
+        });
+
+        const absolutePoint = (nodeId: string): {x: number; y: number} => {
+            let node = result.nodes.find((candidate) => candidate.id === nodeId);
+            let x = 0;
+            let y = 0;
+
+            while (node) {
+                x += node.position.x;
+                y += node.position.y;
+
+                node = node.parentId ? result.nodes.find((candidate) => candidate.id === node!.parentId) : undefined;
+            }
+
+            return {x, y};
+        };
+
+        const nodeWidth = (nodeId: string): number => {
+            const node = result.nodes.find((candidate) => candidate.id === nodeId)!;
+
+            return node.data.clusterElementTypesCount
+                ? calculateNodeWidth(node.data.clusterElementTypesCount as number) || ROOT_CLUSTER_WIDTH
+                : CLUSTER_ELEMENT_NODE_WIDTH;
+        };
+
+        return {absolutePoint, nodeWidth, result};
+    }
+
+    it('does not stack two children of the same cluster root on top of each other', () => {
+        const {absolutePoint, nodeWidth} = layOutAgent();
+
+        const joiner = {id: 'documentJoiner_2', x: absolutePoint('documentJoiner_2').x};
+        const retriever = {id: 'vectorStoreDocumentRetriever_2', x: absolutePoint('vectorStoreDocumentRetriever_2').x};
+
+        const [left, right] = joiner.x <= retriever.x ? [joiner, retriever] : [retriever, joiner];
+
+        expect(right.x).toBeGreaterThanOrEqual(left.x + nodeWidth(left.id));
+    });
+
+    it('leaves no overlapping pair anywhere on the canvas', () => {
+        const {absolutePoint, nodeWidth, result} = layOutAgent();
+
+        const rows = new Map<number, Array<{id: string; x: number}>>();
+
+        for (const node of result.nodes) {
+            const {x, y} = absolutePoint(node.id);
+            const row = Math.round(y);
+
+            if (!rows.has(row)) {
+                rows.set(row, []);
+            }
+
+            rows.get(row)!.push({id: node.id, x});
+        }
+
+        const overlaps: string[] = [];
+
+        for (const rowEntries of rows.values()) {
+            const sorted = [...rowEntries].sort((entryA, entryB) => entryA.x - entryB.x);
+
+            for (let index = 1; index < sorted.length; index++) {
+                const previous = sorted[index - 1];
+
+                if (sorted[index].x < previous.x + nodeWidth(previous.id)) {
+                    overlaps.push(`${previous.id} / ${sorted[index].id}`);
+                }
+            }
+        }
+
+        expect(overlaps).toEqual([]);
     });
 });
