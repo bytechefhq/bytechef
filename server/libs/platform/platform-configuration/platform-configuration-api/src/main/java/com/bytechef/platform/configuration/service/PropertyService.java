@@ -45,6 +45,9 @@ public interface PropertyService {
     List<Property> getProperties(
         List<String> keys, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);
 
+    List<Property> getPropertiesByKeyPrefix(
+        String keyPrefix, Scope scope, @Nullable Long scopeId, Long environmentId);
+
     void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId);
 
     void save(String key, Map<String, ?> value, Scope scope, @Nullable Long scopeId, @Nullable Long environmentId);

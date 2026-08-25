@@ -70,6 +70,13 @@ public class RemotePropertyServiceClient implements PropertyService {
     }
 
     @Override
+    public List<Property> getPropertiesByKeyPrefix(
+        String keyPrefix, Property.Scope scope, @Nullable Long scopeId, Long environmentId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void save(String key, Map<String, ?> value, Property.Scope scope, @Nullable Long scopeId) {
         throw new UnsupportedOperationException();
     }
