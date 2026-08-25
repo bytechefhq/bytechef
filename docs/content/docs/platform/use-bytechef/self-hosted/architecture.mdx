@@ -4,8 +4,8 @@ description: "What runs when you self-host ByteChef, what you have to provide, a
 ---
 
 This page is for whoever operates the deployment. It covers what processes run, what infrastructure
-they depend on, and what changes as load grows. For how the engine itself works — the job lifecycle,
-the Component SDK, how a definition becomes an executable task — see the
+they depend on, and what changes as load grows. For how the engine itself works - the job lifecycle,
+the Component SDK, how a definition becomes an executable task - see the
 [Architecture deep dive](/developer-guide/architecture) in the Developer Guide.
 
 ## What you actually run
@@ -19,11 +19,11 @@ Three things have to exist outside the container:
 | You provide | Why | Notes |
 |---|---|---|
 | **PostgreSQL 15+** | Every durable thing lives here: workflow definitions, deployments, connections, execution history | The only hard dependency. Schema migrations run automatically at startup |
-| **A message broker** | Carries work between the coordinator and the workers | Defaults to in-memory, which is fine for a single instance. More than one instance needs a real broker — see [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers) |
-| **Somewhere for files** | Trigger payloads, task outputs, uploaded documents | Defaults to the local filesystem. Use S3 or the database if the container's disk is not durable — see [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage) |
+| **A message broker** | Carries work between the coordinator and the workers | Defaults to in-memory, which is fine for a single instance. More than one instance needs a real broker - see [Message brokers](/platform/use-bytechef/self-hosted/configuration/message-brokers) |
+| **Somewhere for files** | Trigger payloads, task outputs, uploaded documents | Defaults to the local filesystem. Use S3 or the database if the container's disk is not durable - see [File storage](/platform/use-bytechef/self-hosted/configuration/file-storage) |
 
-Everything else — the component catalog, the workflow editor, credential encryption, webhook
-ingress, the scheduler, execution history — is inside the image.
+Everything else - the component catalog, the workflow editor, credential encryption, webhook
+ingress, the scheduler, execution history - is inside the image.
 
 <Mermaid
   chart={`
@@ -51,10 +51,10 @@ flowchart LR
 
 Worth knowing because it explains what to watch and what to scale:
 
-1. Something **starts** the run — a schedule fires, a webhook arrives, a user clicks Run, or another
+1. Something **starts** the run - a schedule fires, a webhook arrives, a user clicks Run, or another
    workflow calls this one.
 2. The **coordinator** reads the workflow and decides which task is next.
-3. A **worker** picks that task off the broker and executes it — calling an API, running a script,
+3. A **worker** picks that task off the broker and executes it - calling an API, running a script,
    evaluating a condition.
 4. The result goes back through the broker, and the coordinator decides what follows.
 5. Repeat until the workflow ends. Every step is recorded, which is what you see in
@@ -77,7 +77,7 @@ flowchart LR
 />
 
 Two consequences fall out of this. Work is **queued, not held on a request thread**, so a long task
-does not tie up a web worker — but a backlog shows up as queue depth rather than slow responses.
+does not tie up a web worker - but a backlog shows up as queue depth rather than slow responses.
 And because each step is persisted before the next begins, a process that dies mid-run leaves a job
 that can be recovered rather than a half-finished one; see
 [Crash Recovery](/platform/use-bytechef/self-hosted/management/crash-recovery).
@@ -91,10 +91,10 @@ When one instance is not enough, the constraint tells you what to do:
 
 | Symptom | What to do |
 |---|---|
-| Tasks queue up while CPU is idle | More workers — the executing side scales horizontally |
+| Tasks queue up while CPU is idle | More workers - the executing side scales horizontally |
 | The UI is slow but runs are fine | More instances behind a load balancer |
 | Runs are slow and the database is the bottleneck | A bigger database before more instances |
-| Task execution is the bottleneck | Run more copies of the same image as headless executors — see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
+| Task execution is the bottleneck | Run more copies of the same image as headless executors - see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
 
 Running more than one instance means three settings have to agree across them: the **encryption
 key**, a **shared message broker**, and a **shared cache**. Get the encryption key wrong and
@@ -103,18 +103,18 @@ instances cannot read each other's stored credentials. See
 
 ## Deployment shapes
 
-The first three are the same image — which one you run is configuration, not a different build. The fourth is
+The first three are the same image - which one you run is configuration, not a different build. The fourth is
 a separate set of services and is Enterprise only.
 
 | Shape | What it is | When |
 |---|---|---|
-| **Single instance** | One container doing everything — API, UI, scheduler, coordinating and executing | The default. Start here |
-| **Split roles** | Several copies of the *same* image, some serving the API and coordinating, the rest running as headless executors | When task execution is what needs capacity. Set `BYTECHEF_COORDINATOR_ENABLED=false` on the executors — see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
-| **Single-shot** | Boots, runs one workflow, exits. No database, no broker | CI steps and batch jobs — see [Runtime job](/platform/use-bytechef/self-hosted/runtime-job) |
-| **Microservices** | Separate coordinator, worker, scheduler, webhook and domain services instead of one image, so execution scales independently of the API | Enterprise, and the heaviest option to operate — see [Distributed](/platform/use-bytechef/self-hosted/installation/distributed) |
+| **Single instance** | One container doing everything - API, UI, scheduler, coordinating and executing | The default. Start here |
+| **Split roles** | Several copies of the *same* image, some serving the API and coordinating, the rest running as headless executors | When task execution is what needs capacity. Set `BYTECHEF_COORDINATOR_ENABLED=false` on the executors - see [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles) |
+| **Single-shot** | Boots, runs one workflow, exits. No database, no broker | CI steps and batch jobs - see [Runtime job](/platform/use-bytechef/self-hosted/runtime-job) |
+| **Microservices** | Separate coordinator, worker, scheduler, webhook and domain services instead of one image, so execution scales independently of the API | Enterprise, and the heaviest option to operate - see [Distributed](/platform/use-bytechef/self-hosted/installation/distributed) |
 
 Splitting roles is the axis worth scaling first, because executing tasks is normally what runs out
-of capacity before serving the UI does. It also has two failure modes that are easy to walk into —
+of capacity before serving the UI does. It also has two failure modes that are easy to walk into -
 [Splitting coordinator and worker roles](/platform/use-bytechef/self-hosted/configuration#splitting-coordinator-and-worker-roles)
 covers them and the switches themselves.
 
@@ -132,7 +132,7 @@ default, `MULTI` being an Enterprise capability).
 
 Each tenant gets **its own schema inside one database**, and every query is confined to the schema of
 the tenant the request resolved to. A query for one tenant's workflows cannot return another's,
-because the rows are not in the same tables — the same guarantee separate databases would give,
+because the rows are not in the same tables - the same guarantee separate databases would give,
 without a connection pool per tenant.
 
 <Mermaid
@@ -174,6 +174,6 @@ that recover interrupted runs and purge expired history. See
 
 ## Related reading
 
-- [Configuration](/platform/use-bytechef/self-hosted/configuration) — what to set before going to production
-- [Upgrades](/platform/use-bytechef/self-hosted/management/upgrades) — what an upgrade involves
-- [Architecture deep dive](/developer-guide/architecture) — how the engine and Component SDK work inside
+- [Configuration](/platform/use-bytechef/self-hosted/configuration) - what to set before going to production
+- [Upgrades](/platform/use-bytechef/self-hosted/management/upgrades) - what an upgrade involves
+- [Architecture deep dive](/developer-guide/architecture) - how the engine and Component SDK work inside

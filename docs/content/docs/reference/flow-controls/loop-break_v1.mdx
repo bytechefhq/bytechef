@@ -19,7 +19,7 @@ Type: loopBreak/v1
 # Additional Instructions
 
 **Loop** and **Loop Break** are two halves of one mechanism, and this section covers both. Loop
-repeats a set of actions — either once for each item in a list, or continuously; Loop Break is the
+repeats a set of actions - either once for each item in a list, or continuously; Loop Break is the
 statement that ends a continuous loop from inside its body.
 
 ## Using Loop
@@ -30,7 +30,7 @@ Select **Loop** from the **Flows** component panel and add it where execution sh
 
 ### Step 2: Choose the loop mode
 
-**Iterate over a list** — leave **Loop Forever** off, and set **List of Items** to the collection to
+**Iterate over a list** - leave **Loop Forever** off, and set **List of Items** to the collection to
 walk. The value normally comes from a data pill produced by an earlier step:
 
 ```
@@ -41,7 +41,7 @@ ${webhook_1.orders}
 
 The loop ends on its own when the list is exhausted.
 
-**Loop forever** — switch **Loop Forever** on. No list is needed; the loop runs until a **Loop
+**Loop forever** - switch **Loop Forever** on. No list is needed; the loop runs until a **Loop
 Break** inside its body ends it.
 
 ### Step 3: Add the loop body
@@ -54,7 +54,7 @@ a list, the current element is available as `${item}`, and its fields as `${item
 
 Loop Break takes no properties. Add it inside a loop body, normally on a branch of a
 [Condition](/reference/flow-controls/condition_v1), and reaching it ends the enclosing loop
-immediately — the rest of the current pass does not run.
+immediately - the rest of the current pass does not run.
 
 **Loop Forever needs a reachable break.** With **Loop Forever** on and no Loop Break that can
 actually fire, the loop never terminates; it consumes resources until the run hits its execution

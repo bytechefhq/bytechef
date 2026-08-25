@@ -10,26 +10,26 @@ an **expression**. This page explains data pills and the three ways a field can 
 
 ## Data Pills
 
-A **data pill** is a reference to a piece of data produced earlier in the workflow — the trigger's
+A **data pill** is a reference to a piece of data produced earlier in the workflow - the trigger's
 payload or the output of a component that runs before the current step. Instead of hard-coding a
 value, you drop in a pill and ByteChef resolves it to the real value at run time.
 
 Under the hood a pill is stored as a `${...}` reference, for example:
 
-- `${mathHelper_1}` — the whole output of the step named `mathHelper_1`.
-- `${trigger_1.body.email}` — a nested field inside an earlier step's output.
+- `${mathHelper_1}` - the whole output of the step named `mathHelper_1`.
+- `${trigger_1.body.email}` - a nested field inside an earlier step's output.
 
 The name in the reference is the *node* name, not the component name. Action nodes
 are named after their component (`mathHelper_1`, `slack_1`); the trigger node is
 always named `trigger_1` whichever component provides it, so a webhook trigger's
 body is `${trigger_1.body...}`.
 
-You never have to type this syntax by hand — the editor inserts it for you and renders it as a
-colored pill — but it is what gets saved in the workflow's JSON.
+You never have to type this syntax by hand - the editor inserts it for you and renders it as a
+colored pill - but it is what gets saved in the workflow's JSON.
 
 ### Use the Data Pill Panel
 
-{/* TODO screenshot: workflow editor with the Data Pill Panel open on the left — trigger and upstream components expanded into their output field pills, next to a property field mid-insertion */}
+{/* TODO screenshot: workflow editor with the Data Pill Panel open on the left - trigger and upstream components expanded into their output field pills, next to a property field mid-insertion */}
 
 1. Click into a property field that supports dynamic input. The **Data Pill Panel** opens on the
    left, listing the trigger and every component that runs before the current one.
@@ -49,9 +49,9 @@ Data pills are built from each step's **output schema**. If a component hasn't b
 predefined schema, its fields won't show up as pills yet. Open the component's **Output** tab and use
 one of:
 
-- **Test Action** — runs the action and reads the real output structure.
-- **Upload Sample Output Data** — provide your own representative output.
-- **Reset** — show the structure with placeholder sample values.
+- **Test Action** - runs the action and reads the real output structure.
+- **Upload Sample Output Data** - provide your own representative output.
+- **Reset** - show the structure with placeholder sample values.
 
 See the [Output section](./workflows#output) on the Workflows page for the full walkthrough.
 
@@ -64,8 +64,8 @@ fixed constant, a value assembled from data pills, or a computed expression.
 
 ### Static (constant) value
 
-This is the default. You type a literal value — a number, a piece of text, a selection from a
-dropdown — and that exact value is used every time the workflow runs.
+This is the default. You type a literal value - a number, a piece of text, a selection from a
+dropdown - and that exact value is used every time the workflow runs.
 
 Use static input when the value never changes, for example a fixed subject line or a constant limit.
 
@@ -84,7 +84,7 @@ an expression.
 
 ### Formula (expression) mode
 
-When a field needs a computed value — concatenating strings, formatting a date, doing arithmetic —
+When a field needs a computed value - concatenating strings, formatting a date, doing arithmetic -
 start the field with an equals sign (`=`) to enter **formula mode**. The leading icon changes to an
 `f(x)` marker to show the field is now an expression.
 
@@ -169,15 +169,15 @@ by category.
 #### Operators
 
 Beyond the functions above, expressions support the standard operators for arithmetic,
-comparison, and conditional logic — combine them freely with data pills and functions.
+comparison, and conditional logic - combine them freely with data pills and functions.
 
 | Operator | Purpose | Example |
 | --- | --- | --- |
 | `+` `-` `*` `/` `%` | Arithmetic (`+` also concatenates strings) | `=${trigger_1.body.price} * 1.2` |
 | `==` `!=` `>` `>=` `<` `<=` | Comparison | `=${trigger_1.body.total} >= 100` |
 | `&&` `\|\|` `!` | Logical and / or / not | `=${trigger_1.body.active} && ${trigger_1.body.total} > 0` |
-| `? :` | Ternary — pick one of two values on a condition | `=${trigger_1.body.count} > 0 ? 'has items' : 'empty'` |
-| `?:` | Elvis — fall back to a default when the left side is null | `=${trigger_1.body.name} ?: 'Anonymous'` |
+| `? :` | Ternary - pick one of two values on a condition | `=${trigger_1.body.count} > 0 ? 'has items' : 'empty'` |
+| `?:` | Elvis - fall back to a default when the left side is null | `=${trigger_1.body.name} ?: 'Anonymous'` |
 
 <Callout type="info">
 To leave formula mode, clear the field and remove the leading `=`. To go back to a plain constant,
@@ -186,6 +186,6 @@ turn the **Dynamic** switch off.
 
 ## Which mode should I use?
 
-- **Static** — the value is the same on every run.
-- **Dynamic** — the value comes from the trigger or an earlier step, optionally mixed with fixed text.
-- **Formula** — the value must be computed or transformed before it is used.
+- **Static** - the value is the same on every run.
+- **Dynamic** - the value comes from the trigger or an earlier step, optionally mixed with fixed text.
+- **Formula** - the value must be computed or transformed before it is used.

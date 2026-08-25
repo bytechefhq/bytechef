@@ -3,7 +3,7 @@ title: Troubleshooting
 description: Inspect a running ByteChef instance, restart it after a configuration change, and diagnose the failures that come up most often
 ---
 
-Configuration is read once, at startup — so most "I changed it and nothing happened" reports are a
+Configuration is read once, at startup - so most "I changed it and nothing happened" reports are a
 missing restart rather than a wrong value. This page covers how to see what a running instance
 actually resolved, how to restart it, and how to diagnose the failures that come up most often.
 
@@ -36,7 +36,7 @@ kubectl get pods -l app.kubernetes.io/name=bytechef
 The ConfigMap and Secret are named after the Helm release, so `bytechef-envs` and
 `bytechef-secrets` assume `helm install bytechef ...`. Substitute your release name otherwise.
 
-ByteChef also serves its resolved configuration over Actuator — see
+ByteChef also serves its resolved configuration over Actuator - see
 [Verifying the resolved configuration](/platform/use-bytechef/self-hosted/configuration#verifying-the-resolved-configuration),
 which shows the values as the application bound them rather than as the platform passed them in.
 
@@ -83,7 +83,7 @@ look, the current container may not have logged the failure yet.
 
 ### The instance will not start
 
-Read the startup logs first — schema migrations run on start, so a migration or database failure
+Read the startup logs first - schema migrations run on start, so a migration or database failure
 surfaces there rather than as a health-check failure:
 
 ```bash
@@ -108,7 +108,7 @@ kubectl exec deployment/bytechef -- nc -zv postgres 5432
 ```
 
 If the host resolves but the port refuses, the database is up but not accepting connections from
-this network — check the security group, firewall rule, or `pg_hba.conf`.
+this network - check the security group, firewall rule, or `pg_hba.conf`.
 
 ### Email is not being delivered
 
@@ -130,7 +130,7 @@ docker exec bytechef env | grep -E 'BYTECHEF_OAUTH2_REDIRECT_URI|BYTECHEF_PUBLIC
 ```
 
 `BYTECHEF_OAUTH2_REDIRECT_URI` defaults to `BYTECHEF_PUBLIC_URL` + `/callback`, so on an instance
-behind a proxy or load balancer, an unset or wrong `BYTECHEF_PUBLIC_URL` is the usual cause — the
+behind a proxy or load balancer, an unset or wrong `BYTECHEF_PUBLIC_URL` is the usual cause - the
 instance advertises its internal address and the provider redirects the user somewhere unreachable.
 The resulting URL must be:
 
@@ -140,6 +140,6 @@ The resulting URL must be:
 
 ## See also
 
-- [Monitoring](/platform/use-bytechef/self-hosted/management/monitoring) — health probes and the management surface
-- [Crash Recovery](/platform/use-bytechef/self-hosted/management/crash-recovery) — what recovers a job whose worker died
-- [Observability](/platform/use-bytechef/self-hosted/management/observability) — metrics, logs, and traces
+- [Monitoring](/platform/use-bytechef/self-hosted/management/monitoring) - health probes and the management surface
+- [Crash Recovery](/platform/use-bytechef/self-hosted/management/crash-recovery) - what recovers a job whose worker died
+- [Observability](/platform/use-bytechef/self-hosted/management/observability) - metrics, logs, and traces

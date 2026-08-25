@@ -47,8 +47,8 @@ Click the **New Instance Configuration** button in the top-right corner to open 
 
 A workflow input can carry an `internalOnly` flag, declared on the input in the workflow definition. The editor's **Edit Input** dialog has no checkbox for it, so set it by editing the workflow definition and bringing it in with **Import Workflow**.
 
-- **`internalOnly: true`** — the connect dialog filters the input out, so it is never shown to the connected user. Use it for values you set yourself (an account ID, a default that should not be end-user editable).
-- **`internalOnly` absent or `false`** *(default)* — the input is collected from the connected user in the [connect dialog](/platform/embedded/get-started/quick-start#7-render-the-connect-dialog).
+- **`internalOnly: true`** - the connect dialog filters the input out, so it is never shown to the connected user. Use it for values you set yourself (an account ID, a default that should not be end-user editable).
+- **`internalOnly` absent or `false`** *(default)* - the input is collected from the connected user in the [connect dialog](/platform/embedded/get-started/quick-start#7-render-the-connect-dialog).
 
 The flag is enforced by the React SDK, which drops internal-only inputs from the forms it renders. Existing inputs carry no flag and so are end-user-facing.
 

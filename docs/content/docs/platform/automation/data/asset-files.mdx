@@ -4,7 +4,7 @@ description: Upload and manage files that workflows and the AI Hub can read and 
 comingSoon: true
 ---
 
-**Asset Files** is the workspace's file library — a place to upload files once and reuse them across automations, and to find the files your runs produce.
+**Asset Files** is the workspace's file library - a place to upload files once and reuse them across automations, and to find the files your runs produce.
 
 Asset Files are **workspace-scoped** and **per-environment**: use the environment selector in the page header to switch between Development, Staging, and Production.
 
@@ -12,14 +12,14 @@ Asset Files are **workspace-scoped** and **per-environment**: use the environmen
 
 Drag files onto the page's upload zone, or click to browse and pick them. Files you upload are labeled with an **Upload** source badge to distinguish them from files an AI Hub conversation or a workflow produced.
 
-{/* TODO screenshot: Asset Files page — file list with source badges and the drag-and-drop upload zone */}
+{/* TODO screenshot: Asset Files page - file list with source badges and the drag-and-drop upload zone */}
 
 ## Browse and organize
 
-- **Filter by tag** — the left sidebar lists your tags; pick one to narrow the list.
-- **Edit tags** — add or remove tags on a file from its row.
-- **Download** — each file row links to its content for download.
-- **Rename** or **Delete** — available from the file's row; deleting asks for confirmation.
+- **Filter by tag** - the left sidebar lists your tags; pick one to narrow the list.
+- **Edit tags** - add or remove tags on a file from its row.
+- **Download** - each file row links to its content for download.
+- **Rename** or **Delete** - available from the file's row; deleting asks for confirmation.
 
 ## Inspect a file
 
@@ -34,21 +34,21 @@ The detail sheet renders files through the same viewer as the AI Hub resource pa
 - Other **text and code** files open straight in an editor with syntax highlighting.
 - **Images** and **PDFs** render inline; PowerPoint and other binaries offer a download.
 
-Text files get a **Preview / Split / Edit** toggle — Split shows the editor and the rendered preview side by side, updating live as you type.
+Text files get a **Preview / Split / Edit** toggle - Split shows the editor and the rendered preview side by side, updating live as you type.
 
 Reuse these files in workflows and AI Hub conversations instead of re-uploading per run.
 
 ## Version history
 
-Every time a file's content changes — an in-place edit, a workflow action, or an AI agent updating it — the previous content is kept as a **version**. Open the history panel from the clock icon in the detail sheet to browse versions and **Restore** any of them; restoring snapshots the current content first, so a restore is itself undoable.
+Every time a file's content changes - an in-place edit, a workflow action, or an AI agent updating it - the previous content is kept as a **version**. Open the history panel from the clock icon in the detail sheet to browse versions and **Restore** any of them; restoring snapshots the current content first, so a restore is itself undoable.
 
 By default the last 10 versions per file are kept (configurable via `bytechef.asset-file.max-versions-per-file`; a negative value keeps versions forever).
 
 ## Share a file
 
-From a file's row menu you can **enable a public link** — a URL with an unguessable token that allows anyone who has it to download the file (always as an attachment) without signing in. The same menu copies or disables the link; disabling it invalidates the URL immediately.
+From a file's row menu you can **enable a public link** - a URL with an unguessable token that allows anyone who has it to download the file (always as an attachment) without signing in. The same menu copies or disables the link; disabling it invalidates the URL immediately.
 
-Operators can turn off public links platform-wide with `bytechef.asset-file.sharing.public-link-enabled=false` — existing links stop resolving as soon as the switch flips.
+Operators can turn off public links platform-wide with `bytechef.asset-file.sharing.public-link-enabled=false` - existing links stop resolving as soon as the switch flips.
 
 For programmatic integrations, the GraphQL API can also mint **short-lived signed download URLs** (`assetFileSignedDownloadUrl`) that expire on the platform's signed-URL TTL, without making the file durably public.
 
@@ -59,8 +59,8 @@ For programmatic integrations, the GraphQL API can also mint **short-lived signe
 A sparkle button in the page header opens the [AI Copilot](/platform/automation/build/ai-copilot) panel scoped to your files, in Ask or Build mode.
 
 - **Ask mode** (read-only, the default) can list your files and read the text content of any file up to 1 MB.
-- **Build mode** can additionally write a new text file (a report, a spec, CSV, JSON, markdown, or code), replace the content of an existing text file, store a base64-encoded binary file, or copy a file into another environment of the same workspace — for example, promoting a file from Development to Production.
+- **Build mode** can additionally write a new text file (a report, a spec, CSV, JSON, markdown, or code), replace the content of an existing text file, store a base64-encoded binary file, or copy a file into another environment of the same workspace - for example, promoting a file from Development to Production.
 
-Build mode can also fetch a file from a public URL and store it as an asset file. The download happens on the server rather than inside the conversation, so the file's size isn't limited by the chat itself — it's still bounded by the workspace's configured per-file size limit. The URL must be a public `http(s)` address; private, loopback, and other internal addresses are refused, and a URL that redirects is refused too, with the error naming the redirect's destination so you can retry with the final URL. Text content fetched this way must be UTF-8.
+Build mode can also fetch a file from a public URL and store it as an asset file. The download happens on the server rather than inside the conversation, so the file's size isn't limited by the chat itself - it's still bounded by the workspace's configured per-file size limit. The URL must be a public `http(s)` address; private, loopback, and other internal addresses are refused, and a URL that redirects is refused too, with the error naming the redirect's destination so you can retry with the final URL. Text content fetched this way must be UTF-8.
 
 The same file capabilities are also available in the [AI Hub](/platform/automation/build/hub) and on the [management MCP server](/platform/settings/mcp-server), through the `asset_file_agent` delegate.

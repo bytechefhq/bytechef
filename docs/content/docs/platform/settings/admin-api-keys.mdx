@@ -8,10 +8,10 @@ comingSoon: true
 
 An **Admin API key** is scoped to your account and a single environment. Use it for programmatic administration and as the Bearer credential for the [management MCP server](/platform/settings/mcp-server).
 
-It is also the intended credential for the account-wide `/api/platform/v1` API — see the [Custom Components API](/openapi/custom-components). Those operations act on the whole tenant rather than one workspace or environment.
+It is also the intended credential for the account-wide `/api/platform/v1` API - see the [Custom Components API](/openapi/custom-components). Those operations act on the whole tenant rather than one workspace or environment.
 
 <Callout type="warn" title="Coming soon">
-  Enforcing that — rejecting a workspace or embedded API key on `/api/platform/v1` — is on the upcoming release track. In the latest released version any API key valid for the environment authenticates there, and access is decided by the owning user's admin authority alone.
+  Enforcing that - rejecting a workspace or embedded API key on `/api/platform/v1` - is on the upcoming release track. In the latest released version any API key valid for the environment authenticates there, and access is decided by the owning user's admin authority alone.
 </Callout>
 
 <Callout title="Availability">
@@ -24,16 +24,16 @@ ByteChef issues a second kind of key as well: workspace API keys, scoped to a wo
 
 ## The page
 
-**Settings → Admin API Keys** is headed "Use Admin keys for programmatic administration of your account. Do not share your API key with others or expose it.", with an **Environment** selector and — once at least one key exists — a **New API Key** button.
+**Settings → Admin API Keys** is headed "Use Admin keys for programmatic administration of your account. Do not share your API key with others or expose it.", with an **Environment** selector and - once at least one key exists - a **New API Key** button.
 
 With no keys yet, the body shows an empty state titled **No API Keys** with the message "Get started by creating a new API key." and a **New API Key** button.
 
-![The Admin API Keys page — the environment selector, New API Key button, and the keys table](admin-api-keys/admin-api-keys.png)
+![The Admin API Keys page - the environment selector, New API Key button, and the keys table](admin-api-keys/admin-api-keys.png)
 
 | Column | Description |
 |---|---|
 | **Name** | The label you gave the key. |
-| **Secret Key** | A masked preview — the full secret is shown only once, at creation. |
+| **Secret Key** | A masked preview - the full secret is shown only once, at creation. |
 | **Created Date** | When the key was created. |
 | **Last Used Date** | When the key last authenticated a request. |
 | **Created By** | Who created it. |
@@ -55,11 +55,11 @@ The dialog switches to the **Save your API Key** view and shows the full secret 
 
 > Please save this secret key somewhere safe and accessible. For security reasons, you won't be able to view it again through your ByteChef account. If you lose this secret key, you'll need to generate a new one.
 
-5. Click **Copy** — a "The secret API key is copied." confirmation appears — store the secret somewhere safe, then click **Done**.
+5. Click **Copy** - a "The secret API key is copied." confirmation appears - store the secret somewhere safe, then click **Done**.
 
 The key appears in the table showing only its masked preview from this point on.
 
-{/* TODO screenshot: Create API Key dialog in the "Save your API Key" state — the read-only secret field, the Copy button, the one-time-reveal warning text, and the Done button */}
+{/* TODO screenshot: Create API Key dialog in the "Save your API Key" state - the read-only secret field, the Copy button, the one-time-reveal warning text, and the Done button */}
 
 ## Rename a key
 
@@ -67,7 +67,7 @@ Click the **edit** (pencil) icon, change the **Name** in the **Edit API Key** di
 
 ## Revoke a key
 
-Deleting a key is how you revoke it — there is no enable/disable toggle.
+Deleting a key is how you revoke it - there is no enable/disable toggle.
 
 Click the **delete** (trash) icon and confirm in the **Are you absolutely sure?** dialog ("This action cannot be undone. This will permanently delete the API key."). Any client presenting the deleted key is rejected immediately. Keys are independent, so deleting one client's key does not affect any other.
 
@@ -83,4 +83,4 @@ Authorization: Bearer <your-api-key>
 
 The key is bound to an environment, so requests must target the same one via the `X-ENVIRONMENT` header. That header defaults to `PRODUCTION` when omitted, and an unrecognised value is rejected as bad credentials rather than falling back.
 
-Because the key is tied to your account, the assistant acts with your permissions — and you can revoke a single client by deleting its key, without touching the server URL or the other clients. See [MCP Server](/platform/settings/mcp-server) for the full setup.
+Because the key is tied to your account, the assistant acts with your permissions - and you can revoke a single client by deleting its key, without touching the server URL or the other clients. See [MCP Server](/platform/settings/mcp-server) for the full setup.

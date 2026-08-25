@@ -11,16 +11,16 @@ The Developer Guide is for engineers who want to extend ByteChef with new **comp
 
 There are two supported paths, and they are complementary:
 
-- **[Build a component by hand](/developer-guide/build-component/initial-setup)** — start from the `example` component template and write the definition, actions, triggers, connection, and tests yourself. Best for components with custom logic, non-REST protocols, or bespoke behavior.
-- **[Generate a component from OpenAPI](/developer-guide/generate-component)** — point the CLI at an OpenAPI specification and let it scaffold the actions, properties, and connection for you, then customize the generated code. Best for REST APIs that already ship an OpenAPI spec.
+- **[Build a component by hand](/developer-guide/build-component/initial-setup)** - start from the `example` component template and write the definition, actions, triggers, connection, and tests yourself. Best for components with custom logic, non-REST protocols, or bespoke behavior.
+- **[Generate a component from OpenAPI](/developer-guide/generate-component)** - point the CLI at an OpenAPI specification and let it scaffold the actions, properties, and connection for you, then customize the generated code. Best for REST APIs that already ship an OpenAPI spec.
 
 Both paths produce the same artifact: a component module that the platform discovers and surfaces in the workflow editor's component panel.
 
 ## Reference
 
-- **[Component specification](/developer-guide/component-specification/component)** — every DSL method for the [component](/developer-guide/component-specification/component), [action](/developer-guide/component-specification/action), [trigger](/developer-guide/component-specification/trigger), [connection](/developer-guide/component-specification/connection), and [property](/developer-guide/component-specification/property) builders, method by method.
-- **[Working with triggers](/developer-guide/working-with-triggers)** — configuring ngrok and the local webhook URL so provider callbacks reach your machine while developing webhook triggers.
+- **[Component specification](/developer-guide/component-specification/component)** - every DSL method for the [component](/developer-guide/component-specification/component), [action](/developer-guide/component-specification/action), [trigger](/developer-guide/component-specification/trigger), [connection](/developer-guide/component-specification/connection), and [property](/developer-guide/component-specification/property) builders, method by method.
+- **[Working with triggers](/developer-guide/working-with-triggers)** - configuring ngrok and the local webhook URL so provider callbacks reach your machine while developing webhook triggers.
 
 ## Understand the internals
 
-- **[Architecture deep dive](/developer-guide/architecture)** — how the Atlas engine, message broker, trigger machinery, and Component SDK fit together, and what happens between hitting **Run** and a task's `perform` function executing.
+- **[Architecture deep dive](/developer-guide/architecture)** - how the Atlas engine, message broker, trigger machinery, and Component SDK fit together, and what happens between hitting **Run** and a task's `perform` function executing.

@@ -5,27 +5,27 @@ description: "Put a public web form in front of a workflow. A submission trigger
 
 A **form** turns a workflow into a public web page that anyone can fill in. A
 visitor submits the form, the submission triggers the workflow, the workflow
-runs, and — because the form runs synchronously — the result comes back to the
+runs, and - because the form runs synchronously - the result comes back to the
 submitter in the same request. It's the simplest way to collect structured
 input from people outside ByteChef without building any UI of your own.
 
 Forms are provided by the [**Form**](/reference/components/form_v1) component
 through its single trigger, **New Form Request**. For the full, generated list
 of trigger properties and the JSON shape, see the
-[component reference](/reference/components/form_v1) — this page covers the
+[component reference](/reference/components/form_v1) - this page covers the
 concepts and how to build with it.
 
 ---
 
 ## When to use a form
 
-- **Intake** — contact requests, support tickets, lead capture, job
+- **Intake** - contact requests, support tickets, lead capture, job
   applications.
-- **Surveys and feedback** — collect typed answers and route them downstream.
-- **Internal data entry** — a quick branded page to push records into a CRM,
+- **Surveys and feedback** - collect typed answers and route them downstream.
+- **Internal data entry** - a quick branded page to push records into a CRM,
   spreadsheet, or [data table](/platform/automation/data/data-tables) without a
   custom front end.
-- **File collection** — accept uploads (documents, images) as the first step of
+- **File collection** - accept uploads (documents, images) as the first step of
   a processing workflow.
 
 If you instead need a *conversational* front end, use the
@@ -40,12 +40,12 @@ If you instead need a *conversational* front end, use the
 The **New Form Request** trigger is a `STATIC_WEBHOOK`: every deployed workflow
 that uses it gets a fixed webhook URL, and ByteChef serves a rendered form page
 built from the input fields you define. The two are different paths sharing one
-id — the webhook is `/webhooks/{id}`, the public form page is
+id - the webhook is `/webhooks/{id}`, the public form page is
 `/form/{environmentId}/{id}`. The deployment's workflow list links straight to
 the form page, so you don't have to assemble it by hand. When a visitor submits:
 
 1. The browser `POST`s the form values to the trigger's webhook URL.
-2. The trigger runs **synchronously** (`workflowSyncExecution`) — the workflow
+2. The trigger runs **synchronously** (`workflowSyncExecution`) - the workflow
    executes and its output is returned to the submitter in the same response,
    so the page can show a result rather than just firing and forgetting.
 3. `submittedAt` is stamped on the payload (a UTC instant by default), and each
@@ -59,15 +59,15 @@ the form page, so you don't have to assemble it by hand. When a visitor submits:
 
 ## Building a form
 
-{/* TODO screenshot: workflow editor form trigger/step configuration — the form fields builder and page options */}
+{/* TODO screenshot: workflow editor form trigger/step configuration - the form fields builder and page options */}
 
 1. In the workflow editor, click the trigger slot and search for **Form**.
 2. Select the **New Form Request** trigger.
-3. Set the page-level options — **Form Title**, **Form Description**, and
-   **Button Label** — which control the heading, subtitle, and submit button of
+3. Set the page-level options - **Form Title**, **Form Description**, and
+   **Button Label** - which control the heading, subtitle, and submit button of
    the hosted page.
 4. Add one or more **Form Inputs** (see [Field types](#field-types) below). Each
-   field needs a **Field Name** — that name becomes the key of the submitted
+   field needs a **Field Name** - that name becomes the key of the submitted
    value and the data pill downstream tasks reference.
 5. Wire downstream tasks to read the submitted fields from the trigger output.
    The trigger node is named `trigger_1`, so the pills read
@@ -91,7 +91,7 @@ A form input can be any of the following types:
 | **Select** | Dropdown; can allow **multiple choice** with optional min/max selection. |
 | **File** | File upload, surfaced downstream as a file entry. |
 | **Hidden Field** | A pre-set value the visitor doesn't see. |
-| **Custom HTML** | Raw HTML rendered inline — for headings, instructions, or layout between fields. |
+| **Custom HTML** | Raw HTML rendered inline - for headings, instructions, or layout between fields. |
 
 Some per-field options only appear for certain types: **Placeholder** applies to
 the text-like inputs (Input, Email, Number, Password, Textarea); **Field
@@ -106,11 +106,11 @@ Choice** plus **Min/Max selection** apply to Select. Every field can be marked
 ## Form output
 
 The trigger's output is generated dynamically from your field definitions, so
-downstream tasks get correctly-typed data — you don't parse a raw blob. The
+downstream tasks get correctly-typed data - you don't parse a raw blob. The
 output is an object with:
 
-- `submittedAt` — a timestamp string for when the form was submitted.
-- `body` — an object with one property per field, keyed by **Field Name** and
+- `submittedAt` - a timestamp string for when the form was submitted.
+- `body` - an object with one property per field, keyed by **Field Name** and
   typed to match the field:
 
 | Field type | Output type |
@@ -134,15 +134,15 @@ Because the schema is known ahead of time, references like
 Beyond the fields themselves, the trigger exposes a few options that shape the
 hosted page and its behavior:
 
-- **Ignore Bots** — drops requests from bots and link previewers (matched on the
+- **Ignore Bots** - drops requests from bots and link previewers (matched on the
   `User-Agent`), so crawler previews don't accidentally trigger the workflow.
   Off by default.
-- **Use Workflow Timezone** — controls who stamps `submittedAt`. Off by default,
+- **Use Workflow Timezone** - controls who stamps `submittedAt`. Off by default,
   in which case ByteChef overwrites the field with the server's own UTC instant.
   Turn it on and the value submitted with the form is kept as-is instead.
-- **Append Attribution** — shows a small "powered by" footer on the public form.
+- **Append Attribution** - shows a small "powered by" footer on the public form.
   On by default; turn it off for a clean branded page.
-- **Custom Form Styling (CSS)** — override the default form styles with your own
+- **Custom Form Styling (CSS)** - override the default form styles with your own
   CSS for full control over the page's look.
 
 See the [Form component reference](/reference/components/form_v1) for the exact
@@ -152,9 +152,9 @@ property names, defaults, and the full JSON example.
 
 ## Related
 
-- [`form/v1`](/reference/components/form_v1) — the generated Form component
+- [`form/v1`](/reference/components/form_v1) - the generated Form component
   reference (trigger properties, output, JSON example).
-- [Chats](/platform/automation/deploy/chats) — a conversational front end for
+- [Chats](/platform/automation/deploy/chats) - a conversational front end for
   a workflow.
-- [Human-in-the-loop (Approval)](/platform/automation/build/workflows/human-in-the-loop) — pause a
+- [Human-in-the-loop (Approval)](/platform/automation/build/workflows/human-in-the-loop) - pause a
   running workflow for a person to approve or fill in input.

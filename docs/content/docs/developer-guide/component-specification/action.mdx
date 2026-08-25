@@ -12,16 +12,16 @@ The action definition is used to specify the behavior and UI of an action inside
 - `deprecated(boolean deprecated)` - Marks the action as deprecated. Deprecated actions should not be used in new integrations.
 - `perform(PerformFunction perform)` - Defines the action logic with access to the configured connection. Several overloads exist for specialized cases (`CallableResponsePerformFunction`, `WebhookResponsePerformFunction`, `StreamPerformFunction`, `WebSocketPerformFunction`), all sharing the same three-argument shape below.
   Perform functions receive:
-  - `Parameters inputParameters` — Getter for action properties (values set by the user in the Properties tab).
-  - `Parameters connectionParameters` — Getter for connection properties (if the action uses a connection).
-  - `ActionContext actionContext` — Utilities for implementing logic:
-    - `encoder` — Encode/decode data.
-    - `file` — Work with temporary files (produces/consumes FileEntry).
-    - `data` — Read/write persistent action data between runs.
-    - `log` — Structured logging.
-    - `json` — JSON read/write helpers.
-    - `http` — HTTP client for external calls.
-    - `event` — Publish platform events (e.g. action progress) when needed.
+  - `Parameters inputParameters` - Getter for action properties (values set by the user in the Properties tab).
+  - `Parameters connectionParameters` - Getter for connection properties (if the action uses a connection).
+  - `ActionContext actionContext` - Utilities for implementing logic:
+    - `encoder` - Encode/decode data.
+    - `file` - Work with temporary files (produces/consumes FileEntry).
+    - `data` - Read/write persistent action data between runs.
+    - `log` - Structured logging.
+    - `json` - JSON read/write helpers.
+    - `http` - HTTP client for external calls.
+    - `event` - Publish platform events (e.g. action progress) when needed.
 - `help(String body)` / `help(String body, String learnMoreUrl)` - Adds help text (and optional *Learn more* link) displayed in the UI.
 - `properties(P... properties)` - Lists the properties that the action needs to perform its task. Properties are shown in the Properties tab. See [Property](/developer-guide/component-specification/property).
 

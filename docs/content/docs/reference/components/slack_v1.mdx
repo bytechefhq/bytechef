@@ -27,7 +27,7 @@ Version: 1
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | clientId | Client Id | STRING |  | true |
 | clientSecret | Client Secret | STRING |  | true |
-| signingSecret | Signing Secret | STRING | The Slack app's signing secret. When set, approval request messages use in-place Approve/Discard buttons resolved directly in Slack — configure the app's Interactivity Request URL to &lt;public-url&gt;/slack/interactivity. When unset, buttons link to the hosted approval form. | false |
+| signingSecret | Signing Secret | STRING | The Slack app's signing secret. When set, approval request messages use in-place Approve/Discard buttons resolved directly in Slack - configure the app's Interactivity Request URL to &lt;public-url&gt;/slack/interactivity. When unset, buttons link to the hosted approval form. | false |
 
 
 
@@ -482,7 +482,7 @@ In the output of the Slack actions you will find `ts` property, that is timestam
 
 ### Add Integration To Desired Channel
 
-For a workflow to be triggered by channel events, the integration or bot must first be added as a member of that channel. Slack only dispatches events to applications that are active participants in the channel — if the bot is not a member, no events from that channel will be received, and the workflow will not trigger.
+For a workflow to be triggered by channel events, the integration or bot must first be added as a member of that channel. Slack only dispatches events to applications that are active participants in the channel - if the bot is not a member, no events from that channel will be received, and the workflow will not trigger.
 
 1. Login into your Slack workspace.
 2. Click three dots.

@@ -4,9 +4,9 @@ description: Connect AI assistants to ByteChef using the Model Context Protocol
 comingSoon: true
 ---
 
-ByteChef exposes a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that lets AI assistants — such as Claude, Cursor, and Windsurf — interact directly with your ByteChef instance to manage projects, workflows, and components.
+ByteChef exposes a [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server that lets AI assistants - such as Claude, Cursor, and Windsurf - interact directly with your ByteChef instance to manage projects, workflows, and components.
 
-This is the **management** server: its tools operate on ByteChef itself. To publish your own component actions and workflows as tools for an assistant to call, use [MCP Servers](/platform/automation/deploy/mcp-servers) in the Automation workspace instead — that is a different server, with a different URL and a different tool set.
+This is the **management** server: its tools operate on ByteChef itself. To publish your own component actions and workflows as tools for an assistant to call, use [MCP Servers](/platform/automation/deploy/mcp-servers) in the Automation workspace instead - that is a different server, with a different URL and a different tool set.
 
 The management server is **on by default**. An administrator turns it off with:
 
@@ -18,12 +18,12 @@ See the [AI MCP Server configuration reference](/platform/use-bytechef/self-host
 
 ## Get Your MCP Server URL
 
-{/* TODO screenshot: Settings → MCP Server page — the Require authentication toggle at the top, and the client tabs (Claude / Cursor / Windsurf / Other) below with a config snippet and its Refresh control */}
+{/* TODO screenshot: Settings → MCP Server page - the Require authentication toggle at the top, and the client tabs (Claude / Cursor / Windsurf / Other) below with a config snippet and its Refresh control */}
 
-The settings page presents the server URL inside ready-to-copy configuration snippets, grouped into per-client tabs — **Claude**, **Cursor**, **Windsurf**, and **Other**. Each snippet has a **Refresh** control that rotates the secret in the URL (when the SSE transport is enabled, a separate SSE snippet appears alongside the Streamable HTTP one).
+The settings page presents the server URL inside ready-to-copy configuration snippets, grouped into per-client tabs - **Claude**, **Cursor**, **Windsurf**, and **Other**. Each snippet has a **Refresh** control that rotates the secret in the URL (when the SSE transport is enabled, a separate SSE snippet appears alongside the Streamable HTTP one).
 
 1. Open ByteChef and go to **Settings** → **MCP Server**
-2. Copy the MCP server URL — it has the form:
+2. Copy the MCP server URL - it has the form:
 
    ```
    https://<your-host>/api/management/<secret-key>/mcp
@@ -31,24 +31,24 @@ The settings page presents the server URL inside ready-to-copy configuration sni
 
 > **Keep this URL private.** The secret key identifies your MCP server. You can regenerate it at any time from the same settings page.
 
-The URL alone is not enough to connect — every request must also carry a valid credential (see [Authentication](#authentication) below).
+The URL alone is not enough to connect - every request must also carry a valid credential (see [Authentication](#authentication) below).
 
 ---
 
 ## Authentication
 
-The URL secret identifies the server. When the server has **Require authentication** enabled, a separate credential also authenticates the caller, and requests without a valid one are rejected with `401`. Whether a credential is required is a setting on the server — see [Require authentication](#require-authentication) below.
+The URL secret identifies the server. When the server has **Require authentication** enabled, a separate credential also authenticates the caller, and requests without a valid one are rejected with `401`. Whether a credential is required is a setting on the server - see [Require authentication](#require-authentication) below.
 
 ### Require authentication
 
 The management MCP server has a **Require authentication** toggle on its settings page:
 
-- **On** — every request must carry a valid admin API key or OAuth2 token; token-less requests get `401`. **This is the default.** The server authenticates unless an administrator explicitly turns the toggle off.
-- **Off** — the URL secret alone is enough; requests are served without a credential, and any credential that *is* sent is ignored. This mode is opt-in: it applies only when the toggle has been explicitly switched off, and that choice is honoured.
+- **On** - every request must carry a valid admin API key or OAuth2 token; token-less requests get `401`. **This is the default.** The server authenticates unless an administrator explicitly turns the toggle off.
+- **Off** - the URL secret alone is enough; requests are served without a credential, and any credential that *is* sent is ignored. This mode is opt-in: it applies only when the toggle has been explicitly switched off, and that choice is honoured.
 
-> **Upgrading?** A server configured before this setting existed has no stored value for it, and such a server now reads as **on**. Its clients are challenged and must start sending an admin API key or OAuth2 token — see [API key](#api-key-default) below. To restore credential-less access instead, an administrator must explicitly switch **Require authentication** off.
+> **Upgrading?** A server configured before this setting existed has no stored value for it, and such a server now reads as **on**. Its clients are challenged and must start sending an admin API key or OAuth2 token - see [API key](#api-key-default) below. To restore credential-less access instead, an administrator must explicitly switch **Require authentication** off.
 
-Keep the URL secret private in both modes — it is the server's only protection when authentication is off.
+Keep the URL secret private in both modes - it is the server's only protection when authentication is off.
 
 ### API key (default)
 
@@ -58,13 +58,13 @@ Create an admin API key under **Settings** → **Admin API Keys** and send it wi
 Authorization: Bearer <your-api-key>
 ```
 
-It must be an **Admin** API key. A workspace API key — the kind under **Settings** → **API Keys**, for the automation public API — is rejected here with `401`, because it is bound to a workspace while this server administers the whole account.
+It must be an **Admin** API key. A workspace API key - the kind under **Settings** → **API Keys**, for the automation public API - is rejected here with `401`, because it is bound to a workspace while this server administers the whole account.
 
-The connection snippets below include this header. The API key is bound to an environment; requests target the environment given in the `X-ENVIRONMENT` header (`PRODUCTION` when omitted), and the key's environment must match. Because the key is bound to your user account, the AI assistant acts with your permissions — and you can revoke a single client by deleting its key without touching the server URL or other clients.
+The connection snippets below include this header. The API key is bound to an environment; requests target the environment given in the `X-ENVIRONMENT` header (`PRODUCTION` when omitted), and the key's environment must match. Because the key is bound to your user account, the AI assistant acts with your permissions - and you can revoke a single client by deleting its key without touching the server URL or other clients.
 
 ### OAuth2 (optional)
 
-For MCP clients that support OAuth2 — including those that cannot send custom headers, such as claude.ai web integrations — ByteChef can run its own OAuth2 authorization server:
+For MCP clients that support OAuth2 - including those that cannot send custom headers, such as claude.ai web integrations - ByteChef can run its own OAuth2 authorization server:
 
 ```
 BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true
@@ -72,13 +72,13 @@ BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true
 
 Once enabled, OAuth2-capable clients need no manual credential setup: on the first unauthenticated request the server advertises its authorization metadata, the client registers itself automatically (Dynamic Client Registration), and you complete a standard authorization-code + PKCE flow using your existing ByteChef login, followed by a consent screen. The client then presents the issued token as a Bearer JWT.
 
-API keys keep working alongside OAuth2 — enabling one does not disable the other.
+API keys keep working alongside OAuth2 - enabling one does not disable the other.
 
 ### External identity provider
 
-The MCP endpoints can also trust JWTs issued by your own identity provider (Okta, Microsoft Entra, Keycloak, …) instead of, or alongside, the embedded authorization server. List each trusted issuer and its claim-to-tenant/authority mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties — see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). The resource server stays dormant until at least one issuer is configured.
+The MCP endpoints can also trust JWTs issued by your own identity provider (Okta, Microsoft Entra, Keycloak, …) instead of, or alongside, the embedded authorization server. List each trusted issuer and its claim-to-tenant/authority mapping under the `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_*` properties - see [Environment Variables](/platform/use-bytechef/self-hosted/configuration/environment-variables#oauth2-configuration). The resource server stays dormant until at least one issuer is configured.
 
-Statically listed issuers work on any edition. Resolving an issuer that is *not* listed — per-tenant identity-provider federation — is an Enterprise Edition capability; without it such a token is rejected.
+Statically listed issuers work on any edition. Resolving an issuer that is *not* listed - per-tenant identity-provider federation - is an Enterprise Edition capability; without it such a token is rejected.
 
 ---
 
@@ -233,7 +233,7 @@ The MCP server exposes the following tools to connected AI assistants.
 
 ### Tasks
 
-These tools address a *task* uniformly, whatever kind it is — an action, a trigger, a task dispatcher, or a cluster element — through a `type` argument.
+These tools address a *task* uniformly, whatever kind it is - an action, a trigger, a task dispatcher, or a cluster element - through a `type` argument.
 
 | Tool | Description |
 |---|---|
@@ -270,13 +270,13 @@ Some capabilities are exposed as a single delegate tool that takes a natural-lan
 
 | Tool | Description |
 |---|---|
-| `asset_file_agent` | Lists, reads, creates, and edits [asset files](/platform/automation/data/asset-files) in a workspace — including creating a file from a public URL, storing binary content, and cloning a file into another environment. Workspace-scoped: accepts an optional `workspaceId` (auto-selected when the tenant has exactly one workspace) and an optional `environment` (defaults to Development). |
+| `asset_file_agent` | Lists, reads, creates, and edits [asset files](/platform/automation/data/asset-files) in a workspace - including creating a file from a public URL, storing binary content, and cloning a file into another environment. Workspace-scoped: accepts an optional `workspaceId` (auto-selected when the tenant has exactly one workspace) and an optional `environment` (defaults to Development). |
 
-> This is not a complete list of delegate tools. The management MCP server also exposes delegates for other domains — MCP servers, deployments, data tables, knowledge bases, skills, and API collections, among others — that aren't documented on this page yet.
+> This is not a complete list of delegate tools. The management MCP server also exposes delegates for other domains - MCP servers, deployments, data tables, knowledge bases, skills, and API collections, among others - that aren't documented on this page yet.
 
 ## Rich in-chat viewers
 
-On MCP Apps–capable hosts (Claude Desktop, Claude.ai), several tools render their result as a **read-only visual viewer** inline in the conversation instead of as raw JSON. The host fetches a small self-contained widget and the server pushes the tool result into it — the widget only projects what the tool returned; it makes no further calls.
+On MCP Apps–capable hosts (Claude Desktop, Claude.ai), several tools render their result as a **read-only visual viewer** inline in the conversation instead of as raw JSON. The host fetches a small self-contained widget and the server pushes the tool result into it - the widget only projects what the tool returned; it makes no further calls.
 
 | When you call | The host renders |
 |---|---|
@@ -286,4 +286,4 @@ On MCP Apps–capable hosts (Claude Desktop, Claude.ai), several tools render th
 | `getCustomComponentSource` | The custom component source, syntax-highlighted |
 | `getAssetFileContent` | The file's text content, syntax-highlighted |
 
-Hosts that don't support MCP Apps simply ignore the viewers and show the tool's text result as usual. The viewers are read-only — they display, they don't edit.
+Hosts that don't support MCP Apps simply ignore the viewers and show the tool's text result as usual. The viewers are read-only - they display, they don't edit.

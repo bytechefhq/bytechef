@@ -6,7 +6,7 @@ comingSoon: true
 
 <EEBadge />
 
-A visual workflow has a canonical file form — a single JSON document holding its tasks, their
+A visual workflow has a canonical file form - a single JSON document holding its tasks, their
 parameters, its trigger configuration, its connection references (by name, never by secret), and
 its input and output schemas. Connecting a workspace to a Git repository turns that file into the
 thing your team reviews: projects push their workflows to a branch when they publish, and can be
@@ -24,24 +24,24 @@ pulled back from that branch afterwards.
 
 The repository is configured once per workspace, by an admin.
 
-{/* TODO screenshot: Settings → Git Configuration page — the URL, Username, and Password fields with the Save button */}
+{/* TODO screenshot: Settings → Git Configuration page - the URL, Username, and Password fields with the Save button */}
 
 1. Go to **Settings → Git Configuration** in the Automation area.
-2. Fill in **URL** — the Git repository URL. Any HTTPS remote works: GitHub, GitLab, Bitbucket, or
+2. Fill in **URL** - the Git repository URL. Any HTTPS remote works: GitHub, GitLab, Bitbucket, or
    self-hosted.
 3. Fill in **Username** and **Password**. The password field accepts a personal access token, which
    is what most hosts want.
 4. Click **Save**.
 
 Every project in the workspace shares this one repository. The stored password is never sent back to
-the browser — the field reads `********` once a password is saved, and saving the form with that
+the browser - the field reads `********` once a password is saved, and saving the form with that
 placeholder untouched leaves the existing password in place. Type a new value only when you actually
 mean to rotate the credential.
 
 ## Point a project at a branch
 
-Each project then picks its branch. Open a project's **⋮** menu on the Projects list — or the
-project editor's **Settings** menu, **Project** tab — and choose **Git Configuration**:
+Each project then picks its branch. Open a project's **⋮** menu on the Projects list - or the
+project editor's **Settings** menu, **Project** tab - and choose **Git Configuration**:
 
 1. In the **Update Git Configuration** dialog, pick a **Branch**. The dropdown lists the
    repository's actual remote branches, so a typo can't silently create one.
@@ -69,12 +69,12 @@ separate push action.
 - The commit message is the version description you type at publish time. If you leave it empty, the
   commit message is `Update workflows`.
 - After the push, the version's description is annotated with the repository URL, the branch, and the
-  commit hash — so a ByteChef version and a Git commit each point at the other.
+  commit hash - so a ByteChef version and a Git commit each point at the other.
 - The push writes the complete workflow set of the project's latest version and clears everything
   else from the branch first, so a workflow deleted from the project disappears from the branch on
   the next publish.
 
-Each workflow is one file, named after its label with the workflow's format as the extension —
+Each workflow is one file, named after its label with the workflow's format as the extension -
 a workflow labelled `Invoice Import` becomes `Invoice Import.json`. Renaming a workflow therefore
 renames its file.
 
@@ -87,8 +87,8 @@ renames its file.
 2. Publishes a new project version, whose description records the Git commit message, the repository,
    the branch, and the commit hash.
 
-Because a pull ends in a publish, anything that landed on the branch — a merged pull request, a
-`git revert`, a cross-repo refactor — arrives as an ordinary immutable version, deployable exactly
+Because a pull ends in a publish, anything that landed on the branch - a merged pull request, a
+`git revert`, a cross-repo refactor - arrives as an ordinary immutable version, deployable exactly
 like one published from the editor.
 
 <Callout type="warn">
@@ -103,9 +103,9 @@ like one published from the editor.
 
 The two directions are meant to be mixed:
 
-- **UI to Git** — build in the visual editor, publish, and the push happens for you. Suited to
+- **UI to Git** - build in the visual editor, publish, and the push happens for you. Suited to
   prototyping and to teams whose primary builders are not developers.
-- **Git to UI** — edit the JSON in your editor, open a pull request, merge it, then pull. Suited to
+- **Git to UI** - edit the JSON in your editor, open a pull request, merge it, then pull. Suited to
   refactors, bulk edits, and any change your review policy requires a PR for.
 
 Once the workflows are files on a branch, the ordinary repository tooling applies to them: diffs in

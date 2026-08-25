@@ -36,7 +36,7 @@ Use **stable** values for the encryption and remember-me keys in Secret Manager 
 - **Health checks:** point the Cloud Run startup / liveness probe at `GET /actuator/health/readiness` and `/actuator/health/liveness` on port `8080`.
 - **Public URL:** set `BYTECHEF_PUBLIC_URL` to the Cloud Run service URL (or your mapped custom domain) so webhook and OAuth2 redirect URLs resolve.
 - **Startup time:** ByteChef runs schema migrations on first start; give the startup probe a generous timeout so the first revision becomes ready.
-- **Concurrency and instances:** because migrations run at startup, deploy a single revision for the first release and any upgrade. If you allow more than one instance, apply the multi-instance settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) — a shared message broker and cache, and a shared encryption key.
+- **Concurrency and instances:** because migrations run at startup, deploy a single revision for the first release and any upgrade. If you allow more than one instance, apply the multi-instance settings in [Running multiple instances](/platform/use-bytechef/self-hosted/configuration#running-multiple-instances) - a shared message broker and cache, and a shared encryption key.
 
 ## 4. Access the instance
 
@@ -46,8 +46,8 @@ Open the Cloud Run service URL and click **Create account** to register the firs
 
 ## Compute Engine
 
-Cloud Run is the managed path. If you want a plain VM you control — with local Docker, a
-containerized database, and no Cloud SQL connector — deploy to Compute Engine instead.
+Cloud Run is the managed path. If you want a plain VM you control - with local Docker, a
+containerized database, and no Cloud SQL connector - deploy to Compute Engine instead.
 
 ### Machine sizing
 
@@ -108,7 +108,7 @@ docker compose up -d
 ```
 
 That Compose file brings up ByteChef and PostgreSQL together, but ships with fixed default
-credentials and a fixed remember-me key — use it for evaluation only. For anything durable, point
+credentials and a fixed remember-me key - use it for evaluation only. For anything durable, point
 the container at a Cloud SQL instance and supply your own secrets, as in the
 [`docker run` command in the AWS EC2 guide](/platform/use-bytechef/self-hosted/installation/aws-ec2#5-run-bytechef).
 
@@ -131,5 +131,5 @@ Then browse to `http://<external-ip>:8080` and click **Create account** to regis
 
 ## Storage note (Cloud Run)
 
-Cloud Run instances have ephemeral local storage, and file storage defaults to **`filesystem`** — so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database, or store them in object storage of your own. Leaving the default in place writes files to a disk that disappears with the instance.
+Cloud Run instances have ephemeral local storage, and file storage defaults to **`filesystem`** - so set `BYTECHEF_FILE_STORAGE_PROVIDER=jdbc` explicitly to keep files in the database, or store them in object storage of your own. Leaving the default in place writes files to a disk that disappears with the instance.
 

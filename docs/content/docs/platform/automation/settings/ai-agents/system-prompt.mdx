@@ -7,17 +7,17 @@ comingSoon: true
 
 **Settings → AI Agents → System Prompt** holds one block of text per workspace: standing instructions
 that ride along with every model call an agent in that workspace makes. It is the sibling tab of
-[Guardrails](/platform/automation/settings/ai-agents/guardrails) — guardrails decide what a prompt may
+[Guardrails](/platform/automation/settings/ai-agents/guardrails) - guardrails decide what a prompt may
 *contain*, this decides what every agent is *told*.
 
 The page describes itself: "Standing instructions appended to every AI agent operating in this
-workspace... Each agent's own prompt and safety rules always come first — these instructions cannot
+workspace... Each agent's own prompt and safety rules always come first - these instructions cannot
 override them."
 
 Reading the prompt needs `AI_GATEWAY_VIEW` on the workspace; saving it is restricted to the
 organization admin.
 
-{/* TODO screenshot: Settings → AI Agents → System Prompt — the monospace textarea with the character counter beneath it and the Save button */}
+{/* TODO screenshot: Settings → AI Agents → System Prompt - the monospace textarea with the character counter beneath it and the Save button */}
 
 ---
 
@@ -54,8 +54,8 @@ heading, with fixed framing that keeps it subordinate:
 Two consequences of that placement:
 
 - It is **advisory, not enforcement**. A model can be argued out of an instruction in a way it cannot
-  be argued out of a guardrail. Anything that must hold — redaction, blocked terms, injection
-  detection — belongs in [Guardrails](/platform/automation/settings/ai-agents/guardrails), not here.
+  be argued out of a guardrail. Anything that must hold - redaction, blocked terms, injection
+  detection - belongs in [Guardrails](/platform/automation/settings/ai-agents/guardrails), not here.
 - It is applied **after** the guardrails input scan, so your own instructions are never redacted or
   blocked by the workspace's own guardrail policy.
 

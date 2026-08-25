@@ -5,7 +5,7 @@ description: Configuration options for ByteChef through environment variables
 
 ByteChef can be configured using environment variables. This page documents all available environment variables, organized by category.
 
-Every name below is the property path uppercased with dots **and dashes** replaced by underscores — `bytechef.ai.provider.open-ai.api-key` becomes `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`. Dropping the underscore that stands for a dash (`..._OPENAI_API_KEY`) produces a name that binds to nothing: as an environment variable it is silently ignored, and the same key in a YAML file fails the boot, because `bytechef.*` binds with `ignoreUnknownFields = false`.
+Every name below is the property path uppercased with dots **and dashes** replaced by underscores - `bytechef.ai.provider.open-ai.api-key` becomes `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`. Dropping the underscore that stands for a dash (`..._OPENAI_API_KEY`) produces a name that binds to nothing: as an environment variable it is silently ignored, and the same key in a YAML file fails the boot, because `bytechef.*` binds with `ignoreUnknownFields = false`.
 
 ## AI Copilot Configuration
 
@@ -14,9 +14,9 @@ Every name below is the property path uppercased with dots **and dashes** replac
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
-| `BYTECHEF_AI_COPILOT_PROVIDER` | Chat-model provider to prefer for Copilot — accepts the short provider name (e.g. `anthropic`, `openAi`) or the full catalog key (e.g. `ai.provider.anthropic`), case-insensitively; unrecognized values fall back to auto-detection. In CE it overrides auto-detection from the configured provider API keys/endpoints. In EE it is used as the environment default provider when set, provided that provider is enabled and has a configured chat model (`BYTECHEF_AI_PROVIDER_CHAT_<PROVIDER>_OPTIONS_MODEL`); otherwise Copilot falls back to the first enabled chat provider. A per-turn model picked in the Copilot toolbar always overrides this. | - |
+| `BYTECHEF_AI_COPILOT_PROVIDER` | Chat-model provider to prefer for Copilot - accepts the short provider name (e.g. `anthropic`, `openAi`) or the full catalog key (e.g. `ai.provider.anthropic`), case-insensitively; unrecognized values fall back to auto-detection. In CE it overrides auto-detection from the configured provider API keys/endpoints. In EE it is used as the environment default provider when set, provided that provider is enabled and has a configured chat model (`BYTECHEF_AI_PROVIDER_CHAT_<PROVIDER>_OPTIONS_MODEL`); otherwise Copilot falls back to the first enabled chat provider. A per-turn model picked in the Copilot toolbar always overrides this. | - |
 | `BYTECHEF_AI_COPILOT_EMBEDDING_PROVIDER` | Embedding provider for the Copilot vector index (OLLAMA, OPENAI) | - |
-| `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider — OpenAI only; Ollama runs locally and needs none (sensitive) | - |
+| `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider - OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
 ## AI Brave Configuration
 
@@ -38,7 +38,7 @@ Every name below is the property path uppercased with dots **and dashes** replac
 
 <!-- Commented out until this ships; tracked in .agents/coming-soon-inventory.md (AI Gateway).
 When restoring: automation/deploy/ai-gateway.md linked to #ai-gateway-configuration and lost the
-fragment while this heading was hidden — give it back.
+fragment while this heading was hidden - give it back.
 ## AI Gateway Configuration
 
 > **Coming soon.** The AI Gateway is on the upcoming release track and is not yet available in the latest released version of ByteChef.
@@ -64,7 +64,7 @@ fragment while this heading was hidden — give it back.
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES` | Maximum total size in bytes of all knowledge base documents in a tenant. `0` means unlimited. *Coming soon — upcoming release* | `1073741824` (1 GB) |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES` | Maximum total size in bytes of all knowledge base documents in a tenant. `0` means unlimited. *Coming soon - upcoming release* | `1073741824` (1 GB) |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key (sensitive) | - |
 | `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
@@ -111,7 +111,7 @@ fragment while this heading was hidden — give it back.
 | `BYTECHEF_AI_PROVIDER_CHAT_GROQ_OPTIONS_MODEL` | Groq chat model name | `llama-3.3-70b-versatile` |
 | `BYTECHEF_AI_PROVIDER_CHAT_MISTRAL_OPTIONS_MODEL` | Mistral chat model name | `mistral-large-latest` |
 | `BYTECHEF_AI_PROVIDER_CHAT_NVIDIA_OPTIONS_MODEL` | NVIDIA chat model name | `meta/llama-3.1-70b-instruct` |
-| `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` | Ollama chat model name (e.g., `deepseek-r1:8b`) — no default; the model must be pulled on your Ollama instance | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` | Ollama chat model name (e.g., `deepseek-r1:8b`) - no default; the model must be pulled on your Ollama instance | - |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_MODEL` | OpenAI chat model name | `gpt-5.1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_TEMPERATURE` | OpenAI chat temperature (0.0-2.0) | `1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_REASONING_EFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
@@ -124,7 +124,7 @@ fragment while this heading was hidden — give it back.
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_MISTRAL_OPTIONS_MODEL` | Mistral embedding model name | `mistral-embed` |
-| `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` | Ollama embedding model name (e.g., `qwen3-embedding:8b`) — no default; the model must be pulled on your Ollama instance | - |
+| `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` | Ollama embedding model name (e.g., `qwen3-embedding:8b`) - no default; the model must be pulled on your Ollama instance | - |
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_OPEN_AI_OPTIONS_MODEL` | OpenAI embedding model name | `text-embedding-3-small` |
 
 ## AI Image Model Configuration
@@ -146,16 +146,16 @@ fragment while this heading was hidden — give it back.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable product analytics (PostHog). `false` in the base configuration, but the `prod` profile — which the published container image activates — sets it to `true`, so a self-hosted container has analytics **on** unless you set this explicitly. | `true` in the published image |
+| `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable product analytics (PostHog). `false` in the base configuration, but the `prod` profile - which the published container image activates - sets it to `true`, so a self-hosted container has analytics **on** unless you set this explicitly. | `true` in the published image |
 
 <!-- Commented out until this ships; tracked in .agents/coming-soon-inventory.md (Context Store).
 When restoring: automation/data/context-store.md linked to #context-store-configuration and lost
-the fragment while this heading was hidden — give it back.
+the fragment while this heading was hidden - give it back.
 ## Context Store Configuration
 
 > **Coming soon.** The Context Store is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
-The Context Store sync engine writes records to Postgres by default (the same database used for the rest of ByteChef). Setting a `CLICKHOUSE_URL` opts the deployment into an alternative ClickHouse backend for record storage; each Context Store source then picks `POSTGRES` or `CLICKHOUSE` at create time. Postgres-backed sources are unaffected by these variables — they continue to use the primary application database.
+The Context Store sync engine writes records to Postgres by default (the same database used for the rest of ByteChef). Setting a `CLICKHOUSE_URL` opts the deployment into an alternative ClickHouse backend for record storage; each Context Store source then picks `POSTGRES` or `CLICKHOUSE` at create time. Postgres-backed sources are unaffected by these variables - they continue to use the primary application database.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
@@ -183,8 +183,8 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. *Coming soon — upcoming release* | `true` |
-| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon — upcoming release* | `CLASS_LOADER` |
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. *Coming soon - upcoming release* | `true` |
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
 | `BYTECHEF_COMPONENT_REGISTRY_EXCLUDE` | List of components to exclude from registry | - |
 
 ## Coordinator Configuration
@@ -234,7 +234,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_DATA_TABLE_MAX_SIZE_BYTES` | Maximum total size in bytes of all data tables in a tenant. `0` means unlimited. *Coming soon — upcoming release* | `52428800` (50 MB) |
+| `BYTECHEF_DATA_TABLE_MAX_SIZE_BYTES` | Maximum total size in bytes of all data tables in a tenant. `0` means unlimited. *Coming soon - upcoming release* | `52428800` (50 MB) |
 
 ## Discovery Service Configuration
 
@@ -340,7 +340,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_PLAN_TIER` | Plan tier whose limits apply to the deployment (`SELF_HOSTED`, `FREE`, `PRO`, `TEAM`, `ENTERPRISE`). `SELF_HOSTED` leaves every limit unset — the pre-plan unlimited behavior | `SELF_HOSTED` |
+| `BYTECHEF_PLAN_TIER` | Plan tier whose limits apply to the deployment (`SELF_HOSTED`, `FREE`, `PRO`, `TEAM`, `ENTERPRISE`). `SELF_HOSTED` leaves every limit unset - the pre-plan unlimited behavior | `SELF_HOSTED` |
 | `BYTECHEF_PLAN_ENFORCEMENT_ENABLED` | Enable plan-limit enforcement (rate limits, concurrency slots, cost cap, quotas). With the `SELF_HOSTED` tier every limit is null, so enforcement is a no-op until a tier is configured | `true` |
 | `BYTECHEF_PLAN_ENFORCEMENT_PROVIDER` | Backing store for rate buckets and concurrency counters (`local`, `redis`). `local` keeps per-node in-memory state; `redis` shares state across nodes for strict global limits and fails open on Redis outages | `local` |
 | `BYTECHEF_PLAN_LIMITS_INCLUDED_MONTHLY_COST_USD` | Override: execution spend (USD) allowed per calendar month (UTC) before new asynchronous runs are rejected | tier default |
@@ -359,7 +359,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 Rejections increment the `bytechef_plan_limit_rejection` counter (tag `limit` =
 `login`, `sync`, `api`, `preauth`, `resume`, `async`, `concurrency`, `cost`, `timeout`,
 `workspace`, `member` or `storage`) when observability is enabled. Rate and cost rejections return HTTP 429
-with `Retry-After`; quota rejections (workspaces, members, storage) return HTTP 403 — a capacity
+with `Retry-After`; quota rejections (workspaces, members, storage) return HTTP 403 - a capacity
 ceiling is not retryable.
 
 ## Public URL Configuration
@@ -479,7 +479,7 @@ System administrator is used for accessing protected data reachable through /act
 |---|---|---|
 | `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_ENABLED` | Enable the orphaned-job recovery monitor. Workers heartbeat every in-flight task every 30 seconds; a job whose row and non-terminal task executions all go stale is marked FAILED and becomes resumable | `true` |
 | `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_STALENESS_THRESHOLD` | How long a STARTED job and its tasks must go without a heartbeat before being treated as orphaned (ISO-8601 duration) | `PT5M` |
-| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_AUTO_RESUME` | Automatically resume recovered jobs from the last completed task (at-least-once semantics — the interrupted task re-runs) | `false` |
+| `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_AUTO_RESUME` | Automatically resume recovered jobs from the last completed task (at-least-once semantics - the interrupted task re-runs) | `false` |
 | `BYTECHEF_WORKFLOW_EXECUTION_RECOVERY_MAX_AUTO_RESUME_ATTEMPTS` | Cap on automatic resume attempts per job | `3` |
 
 ### Execution Timeout
@@ -500,8 +500,8 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java code workflows continue to work. *Coming soon — upcoming release* | `true` |
-| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon — upcoming release* | `CLASS_LOADER` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java code workflows continue to work. *Coming soon - upcoming release* | `true` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon - upcoming release* | `CLASS_LOADER` |
 
 ### Output Storage
 

@@ -3,7 +3,7 @@ title: Displaying the Connect Dialog
 description: Open the hosted Connect dialog from your app so end users can authorize integrations and enable workflows.
 ---
 
-The **Connect dialog** is the embedded surface your end users interact with: it walks them through authorizing the third-party account (OAuth consent, API key entry), enabling the integration's workflows, and filling in any workflow inputs — and it stores the resulting credentials as a **Connection** under their **Connected User** record. You never handle or refresh their tokens yourself.
+The **Connect dialog** is the embedded surface your end users interact with: it walks them through authorizing the third-party account (OAuth consent, API key entry), enabling the integration's workflows, and filling in any workflow inputs - and it stores the resulting credentials as a **Connection** under their **Connected User** record. You never handle or refresh their tokens yourself.
 
 ## 1. Activate the integration
 
@@ -16,7 +16,7 @@ Both steps are covered in [Adding an Integration](/platform/embedded/get-started
 
 ## 2. Display the Connect dialog in your app
 
-First, make sure your backend can mint an end-user JWT — see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk). Then hand the token and the integration's id to `useConnectDialog`:
+First, make sure your backend can mint an end-user JWT - see [Installing the SDK](/platform/embedded/get-started/initial-setup/installing-the-sdk). Then hand the token and the integration's id to `useConnectDialog`:
 
 ```tsx
 'use client';
@@ -52,9 +52,9 @@ const response = await fetch(`${baseUrl}/api/embedded/v1/integrations`, {
 const integrations = await response.json();
 ```
 
-Each returned integration includes its id, title, description, and icon — plus the user's existing instances, so you can render "Connect" vs "Connected" states. The [Sample App](/platform/embedded/get-started/quick-start/sample-app) implements this exact page.
+Each returned integration includes its id, title, description, and icon - plus the user's existing instances, so you can render "Connect" vs "Connected" states. The [Sample App](/platform/embedded/get-started/quick-start/sample-app) implements this exact page.
 
-For an **already-connected** integration, pass the instance's id as `integrationInstanceId` alongside `integrationId` — the dialog then opens directly in the workflows view for that instance (the manage/edit path: toggle workflows, adjust inputs) instead of the first-time connect flow.
+For an **already-connected** integration, pass the instance's id as `integrationInstanceId` alongside `integrationId` - the dialog then opens directly in the workflows view for that instance (the manage/edit path: toggle workflows, adjust inputs) instead of the first-time connect flow.
 
 <Callout title="The dialog can collect more than credentials">
     Beyond the account authorization step, the dialog renders any end-user-facing **workflow inputs** (including live dropdowns fetched against the user's new connection) and, when configured, a **[Field Mapping](/platform/embedded/build/workflows/field-mapping)** step where the user maps your application's fields to the integration's fields.
@@ -64,8 +64,8 @@ For an **already-connected** integration, pass the instance's id as `integration
 
 When the user clicks your button, the dialog opens and the flow depends on the component's authorization type:
 
-- **OAuth 2.0** — the user is sent to the provider's consent screen (branded as your [developer app](/platform/embedded/get-started/initial-setup/adding-an-integration#2-create-a-developer-app)) and returns with an authorized connection.
-- **API key / other credentials** — the dialog renders the component's credential form and validates the entry.
+- **OAuth 2.0** - the user is sent to the provider's consent screen (branded as your [developer app](/platform/embedded/get-started/initial-setup/adding-an-integration#2-create-a-developer-app)) and returns with an authorized connection.
+- **API key / other credentials** - the dialog renders the component's credential form and validates the entry.
 
 Either way, the credential is stored server-side as a Connection scoped to the Connected User identified by the JWT's `sub` claim, in the environment the dialog was opened with.
 
@@ -73,11 +73,11 @@ Either way, the credential is stored server-side as a Connection scoped to the C
 
 After a user connects, confirm everything landed:
 
-- **Embedded → Connected Users** — the user appears with the integrations they connected.
-- **Embedded → Connections** — the authorized credential, with its status.
-- **Embedded → Workflow Executions** — runs of the integration's workflows as they start firing.
+- **Embedded → Connected Users** - the user appears with the integrations they connected.
+- **Embedded → Connections** - the authorized credential, with its status.
+- **Embedded → Workflow Executions** - runs of the integration's workflows as they start firing.
 
 ## Next steps
 
 - Trigger the user's workflows from your product with [App Events](/platform/embedded/build/app-events).
-- Let users author their own automations with the embedded workflow builder — see the [Quick Start](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional).
+- Let users author their own automations with the embedded workflow builder - see the [Quick Start](/platform/embedded/get-started/quick-start#let-your-users-build-their-own-workflows-optional).
