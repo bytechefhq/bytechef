@@ -44,8 +44,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Renders an {@code AiAgent} aggregate (agent + channels + elements) into a complete workflow-definition JSON: one
- * trigger per {@code AiAgentChannel}, all fanning into a {@code branch_in} dispatcher, an {@code aiAgent/v1/streamChat}
- * node, and a {@code branch_out} dispatcher that routes the reply back through the channel that asked for it. See
+ * trigger per {@code AiAgentChannel}, all fanning into a {@code branch_in} dispatcher, an {@code aiAgent/v1} node
+ * ({@code streamChat} or {@code chat} — see {@code AiAgentSettings#STREAM_RESPONSE}), and a {@code branch_out}
+ * dispatcher that routes the reply back through the channel that asked for it. See
  * {@code docs/superpowers/specs/2026-08-10-agents-design.md}, "Workflow generation".
  *
  * <p>
@@ -83,13 +84,15 @@ import org.jspecify.annotations.Nullable;
  * empty {@code clusterElements: {}} (unlike before this feature).
  *
  * <p>
- * <b>{@code __AGENT_OUTPUT__}'s expression.</b> {@code streamChat}'s output function is
+ * <b>{@code __AGENT_OUTPUT__}'s expression.</b> Both actions' output function is
  * {@code ModelUtils.output(inputParameters, null, context)}. Since {@code STREAM_CHAT_PROPERTIES} has no
- * {@code RESPONSE_PROPERTY}, {@code inputParameters} never has a {@code response.responseFormat} path, so
+ * {@code RESPONSE_PROPERTY} — and since this generator emits no {@code response} parameter even for {@code chat}, which
+ * does declare one — {@code inputParameters} never has a {@code response.responseFormat} path, so
  * {@code getFromPath(..., TEXT)} falls back to its default {@code TEXT}, and {@code output(...)} returns
  * {@code OutputResponse.of(string())} — an *unnamed* string schema. The node's entire output is the assistant's text,
  * with no field path, so {@code __AGENT_OUTPUT__} resolves to the bare node reference {@code ${aiAgent_1}}, not
- * {@code ${aiAgent_1.text}}.
+ * {@code ${aiAgent_1.text}}. Turning {@code streamResponse} off therefore changes which action runs, never the shape
+ * every reply node reads.
  *
  * <p>
  * <b>HITL approval gate.</b> {@code TOOL} rows with {@code parameters["requiresApproval"] = true} are pulled out of the
@@ -126,7 +129,8 @@ public final class AiAgentWorkflowGenerator {
     private static final String BRANCH_TYPE = "branch/v1";
     private static final String VAR_SET_TYPE = "var/v1/set";
     private static final String AI_AGENT_NODE_NAME = "aiAgent_1";
-    private static final String AI_AGENT_TYPE = "aiAgent/v1/streamChat";
+    private static final String AI_AGENT_STREAM_CHAT_TYPE = "aiAgent/v1/streamChat";
+    private static final String AI_AGENT_CHAT_TYPE = "aiAgent/v1/chat";
 
     private static final String BRANCH_IN_NAME = "branch_in";
     private static final String BRANCH_OUT_NAME = "branch_out";
@@ -689,8 +693,10 @@ public final class AiAgentWorkflowGenerator {
 
         Map<String, Object> aiAgentNode = new LinkedHashMap<>();
 
+        boolean streamResponse = AiAgentSettings.isStreamResponseEnabled(agent.getSettings());
+
         aiAgentNode.put("name", AI_AGENT_NODE_NAME);
-        aiAgentNode.put("type", AI_AGENT_TYPE);
+        aiAgentNode.put("type", streamResponse ? AI_AGENT_STREAM_CHAT_TYPE : AI_AGENT_CHAT_TYPE);
         aiAgentNode.put("parameters", parameters);
         aiAgentNode.put(
             "clusterElements", buildClusterElements(agent, channels, elements, subAgentResolver, channelResolver));

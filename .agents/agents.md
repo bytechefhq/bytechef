@@ -96,7 +96,8 @@ row rather than per channel type.
   `slack/v1/newMessage` itself, which declines to fire rather than firing and terminating.
   `envelope.channel` is now vestigial — `branch_out` stopped keying on it (below) and nothing else
   reads it; it is still emitted so stored definitions keep their shape.
-- **`aiAgent_1`** — a single `aiAgent/v1/streamChat` node. `userPrompt` and `attachments` read from
+- **`aiAgent_1`** — a single `aiAgent/v1` node, `streamChat` or `chat` depending on
+  `settings.streamResponse` (default ON ⇒ `streamChat`). `userPrompt` and `attachments` read from
   `branch_in`'s envelope; `systemPrompt` is `agent.instructions` (omitted, not empty-string, when
   blank). `clusterElements` are built from `AiAgentElement` rows plus `agent.settings` into
   `tools[]`, in this fixed group order: `TOOL` rows (the HITL gate, if any gated tool exists, sits
@@ -395,8 +396,8 @@ simply omitted from the component's cluster elements if no such bean is present.
 ## Built-in tool settings
 
 `ai_agent.settings` (nullable JSON, `AiAgent.getSettings()`/`setSettings(...)`, `MapWrapper`-backed
-like `parameters` on channel/element rows) holds `{builtInTools: {askUserQuestion, autoMemory,
-skillManagement, webSearch, webSearchConnectionId?}}` — per-agent on/off switches for the
+like `parameters` on channel/element rows) holds `{streamResponse?, builtInTools: {askUserQuestion,
+autoMemory, skillManagement, webSearch, webSearchConnectionId?}}` — per-agent on/off switches for the
 `aiAgentUtils` built-in tools `AiAgentWorkflowGenerator` emits, read via
 `com.bytechef.automation.ai.agent.util.AiAgentSettings` (shared by the generator and
 `AiAgentFacadeImpl`'s publish validation so the two can never read a different default). Absence of
@@ -805,6 +806,11 @@ that are off by default because absence of the row IS off: `KIND_APPROVAL_TOOL` 
 gate), and `KIND_APPROVAL_GATE` is the agent-level MASTER SWITCH for per-tool gating — with no such
 row `buildToolSequence` emits every tool ungated regardless of its own `requiresApproval` flag, and
 the flags stay on their TOOL rows so switching the gate back on restores the previous gating.
+`AiAgent.settings.streamResponse` (default ON) picks which `aiAgent` action the generated node runs —
+`streamChat` on, `chat` off — the same choice the workflow editor's AI Agent panel offers as its
+"Stream response" switch; it sits at the top level of `settings`, not inside `builtInTools`, because it
+is not a tool. Switching it changes no other part of the generated shape: the generator emits no
+`response` parameter for either action, so `__AGENT_OUTPUT__` stays the bare `${aiAgent_1}`.
 `AiAgent.settings.builtInTools` (`AiAgentSettings`) turns the generator's `aiAgentUtils` built-ins
 on/off per agent — `askUserQuestion`/`autoMemory`/`skillManagement` default ON, `webSearch`
 (`braveWebSearchTool`) defaults OFF and needs a `webSearchConnectionId` to publish; this replaced the

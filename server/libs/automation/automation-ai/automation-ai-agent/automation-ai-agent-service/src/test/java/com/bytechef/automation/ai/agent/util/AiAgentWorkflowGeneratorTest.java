@@ -1583,6 +1583,35 @@ class AiAgentWorkflowGeneratorTest {
     }
 
     @Test
+    void testStreamResponseOffSwitchesTheAiAgentNodeToTheChatAction() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("streamResponse", false));
+
+        Map<String, Object> parsed = generateAndParse(agent, twoChannelFixtureChannels());
+
+        Map<String, Object> aiAgentNode = tasks(parsed).get(1);
+
+        assertThat(aiAgentNode.get("type")).isEqualTo("aiAgent/v1/chat");
+
+        // The action swap must not touch the output contract every reply node reads: neither action is
+        // given a `response` parameter, so both still emit an unnamed string.
+        assertThat(parameters(aiAgentNode)).doesNotContainKey("response");
+    }
+
+    @Test
+    void testStreamResponseDefaultsToTheStreamChatActionWhenTheKeyIsAbsent() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("builtInTools", Map.of("webSearch", false)));
+
+        Map<String, Object> parsed = generateAndParse(agent, twoChannelFixtureChannels());
+
+        assertThat(tasks(parsed).get(1)
+            .get("type")).isEqualTo("aiAgent/v1/streamChat");
+    }
+
+    @Test
     void testSkillRowsAloneEmitSkillsToolRegardlessOfSettings() {
         AiAgent agent = newAgent();
 

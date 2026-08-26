@@ -48,7 +48,8 @@ public class GetAiAgentToolCallback implements ToolCallback {
         channel (inbound trigger — channelType, parameters, connectionId), every element (building
         block — kind, referenceId, parameters, connectionId; kinds are MODEL, TOOL, SKILL, SUB_AGENT,
         KNOWLEDGE_BASE, CHAT_MEMORY, APPROVAL_GATE, APPROVAL_CHANNEL, APPROVAL_TOOL), the settings
-        object (builtInTools on/off switches), and unpublishedChanges/lastPublishedVersion. Always call
+        object (streamResponse plus the builtInTools on/off switches), and
+        unpublishedChanges/lastPublishedVersion. Always call
         this before modifying an agent so you know its current channels and elements.""";
 
     private static final String INPUT_SCHEMA = """

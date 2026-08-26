@@ -23,22 +23,36 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Reads {@code com.bytechef.automation.ai.agent.domain.AiAgent#getSettings()}' {@code builtInTools} block — the
- * per-agent on/off switches (plus one connection id) controlling which {@code aiAgentUtils} built-in tools
- * {@link AiAgentWorkflowGenerator} emits into the flat tools array. Shared between the generator and
- * {@code AiAgentFacadeImpl} (publish validation) so the two can never read a different default for the same key.
+ * Reads {@code com.bytechef.automation.ai.agent.domain.AiAgent#getSettings()} — the {@code builtInTools} block (the
+ * per-agent on/off switches, plus one connection id, controlling which {@code aiAgentUtils} built-in tools
+ * {@link AiAgentWorkflowGenerator} emits into the flat tools array) and the top-level keys beside it. Shared between
+ * the generator and {@code AiAgentFacadeImpl} (publish validation) so the two can never read a different default for
+ * the same key.
  *
  * <p>
- * Shape: {@code {builtInTools: {askUserQuestion: bool, autoMemory: bool, skillManagement: bool,
- * webSearch: bool, webSearchProvider?: "BRAVE"|"NATIVE", webSearchConnectionId?: number}}}. Absence of the
- * {@code builtInTools} key, or of any individual key inside it, means that key's documented default below applies —
- * there is no separate "explicitly unset" state.
+ * Shape: {@code {streamResponse?: bool, builtInTools: {askUserQuestion: bool, autoMemory: bool,
+ * skillManagement: bool, webSearch: bool, webSearchProvider?: "BRAVE"|"NATIVE", webSearchConnectionId?: number}}}.
+ * Absence of the {@code builtInTools} key, of any individual key inside it, or of a top-level key means that key's
+ * documented default below applies — there is no separate "explicitly unset" state.
  *
  * @author Ivica Cardic
  */
 public final class AiAgentSettings {
 
     public static final String BUILT_IN_TOOLS = "builtInTools";
+
+    /**
+     * Which {@code aiAgent} action the generated {@code aiAgent_1} node runs: {@code aiAgent/v1/streamChat} when on
+     * (the default, and what every agent predating this key reads — the generator hardcoded it before), else
+     * {@code aiAgent/v1/chat}. Top level rather than inside {@link #BUILT_IN_TOOLS} because it is not a tool: it picks
+     * the agent's own action, the way the workflow editor's AI Agent panel does with its "Stream response" switch.
+     *
+     * <p>
+     * Switching it does not change the node's output contract — {@code chat} carries a {@code response} property
+     * {@code streamChat} lacks, but the generator emits no {@code response} parameter, so {@code ModelUtils.output}
+     * still resolves to an unnamed {@code string()} and {@code __AGENT_OUTPUT__} stays the bare {@code ${aiAgent_1}}.
+     */
+    public static final String STREAM_RESPONSE = "streamResponse";
 
     /** {@code aiAgentUtils/v1/askUserQuestionTool} — default ON. */
     public static final String ASK_USER_QUESTION = "askUserQuestion";
@@ -114,6 +128,10 @@ public final class AiAgentSettings {
     }
 
     private AiAgentSettings() {
+    }
+
+    public static boolean isStreamResponseEnabled(Map<String, ?> settings) {
+        return MapUtils.getBoolean(settings, STREAM_RESPONSE, true);
     }
 
     public static boolean isAskUserQuestionEnabled(Map<String, ?> settings) {
