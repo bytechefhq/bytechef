@@ -98,6 +98,14 @@ public class AiAgentErrorType extends AbstractErrorType {
      */
     public static final AiAgentErrorType INVALID_AGENT = new AiAgentErrorType(115);
 
+    /**
+     * Publishing an agent whose {@code settings.builtInTools.webSearchProvider} is {@code NATIVE} while its
+     * {@code MODEL} element names a provider with no provider-side web search — the generated model element would carry
+     * a {@code webSearch} parameter that provider's model cluster element does not declare, so the agent would publish
+     * looking search-capable and then never search. See {@code AiAgentSettings#NATIVE_WEB_SEARCH_MODEL_PROVIDERS}.
+     */
+    public static final AiAgentErrorType NATIVE_WEB_SEARCH_UNSUPPORTED = new AiAgentErrorType(116);
+
     public AiAgentErrorType(int errorKey) {
         super(AiAgentFacade.class, errorKey);
     }

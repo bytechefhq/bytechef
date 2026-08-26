@@ -1443,6 +1443,145 @@ class AiAgentWorkflowGeneratorTest {
                     AiAgentWorkflowGenerator.ConnectionRefOwnerKind.AGENT_SETTINGS));
     }
 
+    /**
+     * An agent stored before {@code webSearchProvider} existed carries only {@code webSearch: true} — it must keep
+     * generating the brave tool it generated then, which the two tests above already pin. This pins the other half:
+     * writing the default value explicitly changes nothing.
+     */
+    @Test
+    void testExplicitBraveProviderGeneratesTheSameToolAsAnAbsentProvider() {
+        AiAgent implicitAgent = newAgent();
+
+        implicitAgent.setSettings(Map.of("builtInTools", Map.of("webSearch", true)));
+
+        AiAgent explicitAgent = newAgent();
+
+        explicitAgent.setSettings(
+            Map.of("builtInTools", Map.of("webSearch", true, "webSearchProvider", "BRAVE")));
+
+        assertThat(generateClusterElements(explicitAgent, List.of()))
+            .isEqualTo(generateClusterElements(implicitAgent, List.of()));
+    }
+
+    @Test
+    void testFirecrawlProviderEmitsFirecrawlSearchToolWiredToTheFirecrawlConnection() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(
+            Map.of("builtInTools", Map.of("webSearch", true, "webSearchProvider", "FIRECRAWL")));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of());
+
+        Map<String, Object> webSearchTool = toolByType(clusterElements, "firecrawl/v1/search");
+
+        assertThat(webSearchTool.get("name")).isEqualTo("firecrawl_1");
+        assertThat(webSearchTool.get("parameters")).isEqualTo(Map.of());
+        assertClusterElementConnectionsBlock(webSearchTool, "firecrawl");
+
+        assertThat(tools(clusterElements)).extracting(tool -> tool.get("type"))
+            .doesNotContain("brave/v1/webSearch");
+    }
+
+    @Test
+    void testFirecrawlProviderConnectionRefIsKeyedByTheFirecrawlToolElementNode() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(
+            Map.of(
+                "builtInTools",
+                Map.of("webSearch", true, "webSearchProvider", "FIRECRAWL", "webSearchConnectionId", 55)));
+
+        List<AiAgentWorkflowGenerator.ConnectionRef> connectionRefs =
+            AiAgentWorkflowGenerator.buildConnectionRefs(agent, List.of(), List.of(), CHANNEL_RESOLVER);
+
+        assertThat(connectionRefs).extracting(
+            AiAgentWorkflowGenerator.ConnectionRef::workflowNodeName,
+            AiAgentWorkflowGenerator.ConnectionRef::workflowConnectionKey,
+            AiAgentWorkflowGenerator.ConnectionRef::ownerKind)
+            .containsExactly(
+                org.assertj.core.groups.Tuple.tuple(
+                    "aiAgent_1", "firecrawl_1",
+                    AiAgentWorkflowGenerator.ConnectionRefOwnerKind.AGENT_SETTINGS));
+    }
+
+    /**
+     * Native web search is a model property, not a tool: the provider searches inside the completion, so there is no
+     * tool element to emit and — the part that matters for deployment — no connection ref to resolve.
+     */
+    @Test
+    void testNativeProviderEmitsNoToolElementAndSetsTheModelWebSearchParameter() {
+        AiAgentElement model = new AiAgentElement(1L, AiAgentElement.KIND_MODEL);
+
+        model.setId(1L);
+        model.setPosition(0);
+        model.setParameters(Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"));
+
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("builtInTools", Map.of("webSearch", true, "webSearchProvider", "NATIVE")));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of(model));
+
+        assertThat(tools(clusterElements)).extracting(tool -> tool.get("type"))
+            .doesNotContain("brave/v1/webSearch", "firecrawl/v1/search");
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> modelElement = (Map<String, Object>) clusterElements.get("model");
+
+        assertThat(parameters(modelElement))
+            .isEqualTo(Map.of("webSearch", true, "model", "claude-sonnet-4-5"));
+    }
+
+    @Test
+    void testNativeProviderAddsNoConnectionRef() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(
+            Map.of(
+                "builtInTools",
+                Map.of("webSearch", true, "webSearchProvider", "NATIVE", "webSearchConnectionId", 55)));
+
+        List<AiAgentWorkflowGenerator.ConnectionRef> connectionRefs =
+            AiAgentWorkflowGenerator.buildConnectionRefs(agent, List.of(), List.of(), CHANNEL_RESOLVER);
+
+        assertThat(connectionRefs).isEmpty();
+    }
+
+    /**
+     * The settings map is free-form JSON, so a typo must degrade to the documented default rather than make an
+     * otherwise valid agent ungeneratable.
+     */
+    @Test
+    void testUnknownProviderFallsBackToBrave() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(
+            Map.of("builtInTools", Map.of("webSearch", true, "webSearchProvider", "GOOGLE")));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of());
+
+        assertThat(toolByType(clusterElements, "brave/v1/webSearch").get("name")).isEqualTo("brave_1");
+    }
+
+    /**
+     * Turning native web search off must not leave the previous generation's true behind — every save regenerates the
+     * whole definition, so the key has to be absent, not stale.
+     */
+    @Test
+    void testModelWebSearchParameterIsAbsentWhenWebSearchIsOff() {
+        AiAgentElement model = new AiAgentElement(1L, AiAgentElement.KIND_MODEL);
+
+        model.setId(1L);
+        model.setPosition(0);
+        model.setParameters(Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> modelElement =
+            (Map<String, Object>) generateClusterElements(List.of(model)).get("model");
+
+        assertThat(parameters(modelElement)).doesNotContainKey("webSearch");
+    }
+
     @Test
     void testSkillRowsAloneEmitSkillsToolRegardlessOfSettings() {
         AiAgent agent = newAgent();

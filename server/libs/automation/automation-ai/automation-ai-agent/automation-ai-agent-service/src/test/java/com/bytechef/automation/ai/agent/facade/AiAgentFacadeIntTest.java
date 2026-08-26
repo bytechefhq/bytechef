@@ -674,6 +674,57 @@ class AiAgentFacadeIntTest {
     }
 
     @Test
+    void testUpdateAgentSettingsWithFirecrawlProviderRegeneratesDefinitionWithFirecrawlSearchTool() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.updateAgentSettings(
+            agent.getId(),
+            Map.of(
+                "builtInTools",
+                Map.of("webSearch", true, "webSearchProvider", "FIRECRAWL", "webSearchConnectionId", 42)));
+
+        String definition = draftDefinition(agent.getProjectId());
+
+        assertThat(definition).contains("\"firecrawl/v1/search\"");
+        assertThat(definition).doesNotContain("brave/v1/webSearch");
+    }
+
+    /**
+     * Native web search has no tool element and no connection, so the connection precondition the other two providers
+     * must satisfy does not apply to it — provided the model provider can actually do it.
+     */
+    @Test
+    void testPublishAgentWithNativeWebSearchAndNoConnectionPublishesOnASupportedModelProvider() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null,
+            Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"), null);
+        agentFacade.updateAgentSettings(
+            agent.getId(), Map.of("builtInTools", Map.of("webSearch", true, "webSearchProvider", "NATIVE")));
+
+        assertThatCode(() -> agentFacade.publishAgent(agent.getId(), "First release")).doesNotThrowAnyException();
+    }
+
+    @Test
+    void testPublishAgentWithNativeWebSearchOnAnUnsupportedModelProviderThrows() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openai", "model", "gpt-4"), null);
+        agentFacade.updateAgentSettings(
+            agent.getId(), Map.of("builtInTools", Map.of("webSearch", true, "webSearchProvider", "NATIVE")));
+
+        assertThatThrownBy(() -> agentFacade.publishAgent(agent.getId(), "First release"))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorKey())
+                .isEqualTo(AiAgentErrorType.NATIVE_WEB_SEARCH_UNSUPPORTED.getErrorKey()));
+    }
+
+    @Test
     void testDeleteScheduleChannelRegeneratesDefinitionWithoutIt() {
         AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
         AiAgent agent = agentDTO.agent();

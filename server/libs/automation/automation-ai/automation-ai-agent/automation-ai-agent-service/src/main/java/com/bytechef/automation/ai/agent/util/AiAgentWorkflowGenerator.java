@@ -25,6 +25,7 @@ import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel.Binding;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
+import com.bytechef.automation.ai.agent.util.AiAgentSettings.WebSearchProvider;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
@@ -354,9 +355,14 @@ public final class AiAgentWorkflowGenerator {
             }
         }
 
-        if (AiAgentSettings.isWebSearchEnabled(settings)) {
-            // The brave counter, not aiAgentUtils: webSearch is the brave component's own tool element.
-            String nodeName = nextNodeName(nodeCounters, BRAVE_COMPONENT);
+        // Only a component-backed provider takes a node (and therefore a connection) of its own; NATIVE rides the
+        // model element, which is emitted before this point and carries the model's own connection.
+        if (AiAgentSettings.isConnectionBackedWebSearchEnabled(settings)) {
+            // The provider component's own counter, not aiAgentUtils: web search is that component's tool element.
+            WebSearchToolRef webSearchToolRef =
+                WEB_SEARCH_TOOL_REFS.get(AiAgentSettings.getWebSearchProvider(settings));
+
+            String nodeName = nextNodeName(nodeCounters, webSearchToolRef.componentName());
 
             connectionRefs.add(
                 new ConnectionRef(
@@ -734,6 +740,14 @@ public final class AiAgentWorkflowGenerator {
     private static final String MODEL_PARAM_MODEL = "model";
 
     /**
+     * The model cluster element's own web-search switch, set when {@code settings.builtInTools.webSearchProvider} is
+     * {@code NATIVE}. Declared as a property only by the model components that can honour it — see
+     * {@code AiAgentSettings#NATIVE_WEB_SEARCH_MODEL_PROVIDERS}, which publish validation checks the agent's provider
+     * against, so a provider that would ignore this key never reaches generation with it set.
+     */
+    private static final String MODEL_PARAM_WEB_SEARCH = "webSearch";
+
+    /**
      * Nested map of the model node's remaining properties (temperature, maxTokens, …), mirroring
      * {@link #TOOL_PARAM_PARAMETERS} on a {@code TOOL} row — see {@link #buildModelElement}.
      */
@@ -824,13 +838,26 @@ public final class AiAgentWorkflowGenerator {
         "createAiSkill", "updateAiSkill", "deleteAiSkill", "appendFilesToAiSkill", "removeFileFromAiSkill");
 
     /**
-     * The {@code brave} component's own web-search tool — {@code BraveComponentHandler} registers
-     * {@code BraveWebSearchAction} ({@code action("webSearch")}) as a cluster element via
-     * {@code ComponentDsl.tool(...)}, which names the element after the action. See {@link #buildWebSearchToolElement}.
+     * The component-backed web search providers, each pointing at that component's OWN search tool cluster element:
+     * {@code BraveComponentHandler} registers {@code BraveWebSearchAction} ({@code action("webSearch")}) and
+     * {@code FirecrawlComponentHandler} registers {@code FirecrawlSearchAction} ({@code action("search")}), both via
+     * {@code ComponentDsl.tool(...)}, which names the element after the action. {@code NATIVE} is deliberately absent —
+     * it has no tool element at all. See {@link #buildWebSearchToolElement}.
      */
-    private static final String BRAVE_COMPONENT = "brave";
-    private static final int BRAVE_COMPONENT_VERSION = 1;
-    private static final String BRAVE_WEB_SEARCH_ELEMENT_NAME = "webSearch";
+    private static final Map<WebSearchProvider, WebSearchToolRef> WEB_SEARCH_TOOL_REFS = Map.of(
+        WebSearchProvider.BRAVE, new WebSearchToolRef("brave", 1, "webSearch"),
+        WebSearchProvider.FIRECRAWL, new WebSearchToolRef("firecrawl", 1, "search"));
+
+    /**
+     * One component-backed web search provider's tool cluster element — the component it lives on, that component's
+     * version, and the element's own name.
+     */
+    private record WebSearchToolRef(String componentName, int componentVersion, String elementName) {
+
+        private String type() {
+            return "%s/v%d/%s".formatted(componentName, componentVersion, elementName);
+        }
+    }
 
     /**
      * The platform {@code approval} component's LLM-invocable tool — verified against
@@ -941,7 +968,11 @@ public final class AiAgentWorkflowGenerator {
         if (!modelElements.isEmpty()) {
             // Exactly one MODEL element is expected per agent; a duplicate (should never occur) falls back to the
             // first by position, same as every other singleton kind below.
-            clusterElements.put(CLUSTER_KEY_MODEL, buildModelElement(modelElements.get(0), nodeCounters));
+            clusterElements.put(
+                CLUSTER_KEY_MODEL,
+                buildModelElement(
+                    modelElements.get(0), AiAgentSettings.isNativeWebSearchEnabled(agent.getSettings()),
+                    nodeCounters));
         }
 
         List<Map<String, Object>> tools = buildTools(
@@ -991,7 +1022,9 @@ public final class AiAgentWorkflowGenerator {
      * authoritative {@code model} key, which the picker and publish validation both read.
      * </p>
      */
-    private static Map<String, Object> buildModelElement(AiAgentElement element, Map<String, Integer> nodeCounters) {
+    private static Map<String, Object> buildModelElement(
+        AiAgentElement element, boolean nativeWebSearch, Map<String, Integer> nodeCounters) {
+
         Map<String, ?> parameters = element.getParameters();
 
         String provider = MapUtils.getRequiredString(parameters, MODEL_PARAM_PROVIDER);
@@ -1000,6 +1033,14 @@ public final class AiAgentWorkflowGenerator {
 
         Map<String, Object> modelParameters = new LinkedHashMap<>(
             MapUtils.getMap(parameters, MODEL_PARAM_PARAMETERS, Map.of()));
+
+        // NATIVE web search is a property of the model, not a tool: the provider searches server-side and the
+        // agent never sees a tool call. Written unconditionally when on so that turning it back off re-emits
+        // false rather than leaving the previous generation's true behind (see this method's javadoc on
+        // regeneration dropping anything not re-emitted).
+        if (nativeWebSearch) {
+            modelParameters.put(MODEL_PARAM_WEB_SEARCH, true);
+        }
 
         modelParameters.put(MODEL_PARAM_MODEL, model);
 
@@ -1074,8 +1115,10 @@ public final class AiAgentWorkflowGenerator {
             }
         }
 
-        if (AiAgentSettings.isWebSearchEnabled(settings)) {
-            tools.add(buildWebSearchToolElement(nodeCounters));
+        if (AiAgentSettings.isConnectionBackedWebSearchEnabled(settings)) {
+            tools.add(
+                buildWebSearchToolElement(
+                    WEB_SEARCH_TOOL_REFS.get(AiAgentSettings.getWebSearchProvider(settings)), nodeCounters));
         }
 
         if (singleElementOfKind(elements, AiAgentElement.KIND_APPROVAL_TOOL) != null) {
@@ -1103,22 +1146,23 @@ public final class AiAgentWorkflowGenerator {
     }
 
     /**
-     * {@code brave/v1/webSearch} — the {@code brave} component's OWN tool cluster element, on its own component, with
-     * its own connection.
+     * {@code brave/v1/webSearch} or {@code firecrawl/v1/search} — the chosen provider component's OWN tool cluster
+     * element, on its own component, with its own connection.
      * <p>
-     * It deliberately does not use {@code aiAgentUtils/v1/braveWebSearchTool}. That element sits on
+     * Brave deliberately does not use {@code aiAgentUtils/v1/braveWebSearchTool}. That element sits on
      * {@code aiAgentUtils}, which has no connection of its own, so it could only reach a Brave connection through a
      * hand-wired {@code connections} block pointing at a different component than the node's own type — and it reads
      * that connection under {@code "braveApiKey"} while {@code BraveConnection} stores
      * {@code Authorization.API_TOKEN = "api_token"}, so the key never arrived and its {@code apply} silently returned
      * zero tools. {@code BraveComponentHandler} already registers {@code BraveWebSearchAction} as a tool cluster
      * element, so the connection, the key names, and the deployment/test-config wiring all follow the ordinary
-     * component path with no special case.
+     * component path with no special case — and firecrawl, added later, follows exactly that same ordinary path.
      */
-    private static Map<String, Object> buildWebSearchToolElement(Map<String, Integer> nodeCounters) {
-        String type = "%s/v%d/%s".formatted(
-            BRAVE_COMPONENT, BRAVE_COMPONENT_VERSION, BRAVE_WEB_SEARCH_ELEMENT_NAME);
-        String nodeName = nextNodeName(nodeCounters, BRAVE_COMPONENT);
+    private static Map<String, Object> buildWebSearchToolElement(
+        WebSearchToolRef webSearchToolRef, Map<String, Integer> nodeCounters) {
+
+        String type = webSearchToolRef.type();
+        String nodeName = nextNodeName(nodeCounters, webSearchToolRef.componentName());
 
         Map<String, Object> element = new LinkedHashMap<>();
 

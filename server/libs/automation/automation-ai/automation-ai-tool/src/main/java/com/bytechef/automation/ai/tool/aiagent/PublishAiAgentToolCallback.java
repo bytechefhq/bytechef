@@ -47,7 +47,9 @@ public class PublishAiAgentToolCallback implements ToolCallback {
             when: no MODEL element is present; a channel needing a connection has none; a SUB_AGENT
             element's target agent has never been published itself; a TOOL has requiresApproval=true (or
             an APPROVAL_TOOL element is present) but there is no APPROVAL_CHANNEL element; or
-            settings.builtInTools.webSearch is on with no webSearchConnectionId set. Always call
+            settings.builtInTools.webSearch is on with webSearchProvider BRAVE or FIRECRAWL and no
+            webSearchConnectionId set; or webSearchProvider is NATIVE and the MODEL element's provider
+            has no built-in web search (only anthropic does). Always call
             getAiAgent first to check these preconditions and report a clear error to the user rather
             than retrying blindly. Publishing does not deploy the agent — deployment is a separate,
             user-driven action on the Agent Deployments page, outside this tool's scope. Returns

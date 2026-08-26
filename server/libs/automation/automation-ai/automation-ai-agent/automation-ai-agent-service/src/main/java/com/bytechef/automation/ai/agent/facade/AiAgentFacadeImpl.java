@@ -53,6 +53,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -1066,12 +1067,41 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
 
         Map<String, ?> settings = agent.getSettings();
 
-        if (AiAgentSettings.isWebSearchEnabled(settings)
+        // Only a component-backed provider (brave/firecrawl) needs a connection — native web search runs inside
+        // the model call and has none.
+        if (AiAgentSettings.isConnectionBackedWebSearchEnabled(settings)
             && AiAgentSettings.getWebSearchConnectionId(settings) == null) {
             throw new ConfigurationException(
                 "Agent " + agent.getId()
                     + " has settings.builtInTools.webSearch enabled but no webSearchConnectionId to publish",
                 AiAgentErrorType.BUILT_IN_TOOL_CONNECTION_MISSING);
+        }
+
+        if (AiAgentSettings.isNativeWebSearchEnabled(settings)) {
+            validateNativeWebSearchSupported(agent, elements);
+        }
+    }
+
+    /**
+     * Native web search is switched on through the model element, so it only works for a provider whose model cluster
+     * element declares the {@code webSearch} property. Checked here rather than left to generation, which would emit a
+     * parameter the provider silently ignores.
+     */
+    private void validateNativeWebSearchSupported(AiAgent agent, List<AiAgentElement> elements) {
+        // Exactly one MODEL element is guaranteed by the modelCount check at the top of validateForPublish.
+        AiAgentElement modelElement = elements.stream()
+            .filter(element -> AiAgentElement.KIND_MODEL.equals(element.getKind()))
+            .findFirst()
+            .orElseThrow();
+
+        String provider = MapUtils.getString(modelElement.getParameters(), "provider", "");
+
+        if (!AiAgentSettings.NATIVE_WEB_SEARCH_MODEL_PROVIDERS.contains(provider)) {
+            throw new ConfigurationException(
+                "Agent " + agent.getId() + " uses native web search, which model provider '" + provider
+                    + "' does not support — supported providers: "
+                    + AiAgentSettings.NATIVE_WEB_SEARCH_MODEL_PROVIDERS,
+                AiAgentErrorType.NATIVE_WEB_SEARCH_UNSUPPORTED);
         }
     }
 
