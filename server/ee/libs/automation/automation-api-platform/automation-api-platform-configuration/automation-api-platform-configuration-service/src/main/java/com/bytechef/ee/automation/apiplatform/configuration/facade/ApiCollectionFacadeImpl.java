@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -109,6 +110,12 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     public ApiCollectionDTO createApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
+        Project project = projectService.getProject(apiCollectionDTO.projectId());
+
+        checkNameNotAlreadyExists(
+            apiCollection.getName(), project.getWorkspaceId(), apiCollectionDTO.environment(),
+            apiCollection.getId());
+
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setDescription(apiCollection.getDescription());
@@ -149,21 +156,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(
             apiCollectionEndpoint.getApiCollectionId());
 
-        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflowService
-            .fetchProjectDeploymentWorkflow(
-                apiCollection.getProjectDeploymentId(),
-                projectWorkflowService.getProjectWorkflowWorkflowId(
-                    apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()))
-            .orElseGet(() -> {
-                ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
-
-                newProjectDeploymentWorkflow.setProjectDeploymentId(apiCollection.getProjectDeploymentId());
-                newProjectDeploymentWorkflow.setWorkflowId(
-                    projectWorkflowService.getProjectWorkflowWorkflowId(
-                        apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid()));
-
-                return projectDeploymentWorkflowService.create(newProjectDeploymentWorkflow);
-            });
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = resolveProjectDeploymentWorkflow(
+            apiCollection.getProjectDeploymentId(), apiCollectionEndpointDTO.workflowUuid());
 
         apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
 
@@ -278,6 +272,20 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     public ApiCollectionDTO updateApiCollection(ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
+        // projectDeploymentId is readOnly on the REST model, so the client-supplied DTO never carries it (it
+        // defaults to 0 via toApiCollection()). Resolve the deployment from the persisted entity instead.
+        ApiCollection persistedApiCollection = apiCollectionService.getApiCollection(apiCollection.getId());
+
+        Long persistedProjectDeploymentId = persistedApiCollection.getProjectDeploymentId();
+
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+            persistedProjectDeploymentId);
+        Project project = projectService.getProjectDeploymentProject(persistedProjectDeploymentId);
+
+        checkNameNotAlreadyExists(
+            apiCollection.getName(), project.getWorkspaceId(), projectDeployment.getEnvironment(),
+            apiCollection.getId());
+
         List<Tag> tags = checkTags(apiCollectionDTO.tags());
 
         if (!tags.isEmpty()) {
@@ -287,13 +295,38 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         return toApiCollectionDTO(apiCollectionService.update(apiCollection));
     }
 
+    /**
+     * Updates an endpoint and, when the supplied DTO names a workflow, re-points it at that workflow's
+     * {@link ProjectDeploymentWorkflow} — find-or-create, exactly as {@link #createApiCollectionEndpoint} does.
+     *
+     * <p>
+     * {@link ApiCollectionEndpointDTO#toApiCollectionEndpoint()} maps neither {@code apiCollectionId} reliably (the
+     * REST model marks it read-only) nor {@code projectDeploymentWorkflowId} at all, so both are resolved from the
+     * PERSISTED row rather than from the DTO — the same reason {@link #updateApiCollection} resolves its deployment
+     * from the persisted collection. Without the re-resolution an endpoint whose {@code workflowUuid} changed kept
+     * pointing at its previous workflow, silently serving the wrong one.
+     * </p>
+     */
     @Override
     public ApiCollectionEndpointDTO updateApiCollectionEndpoint(ApiCollectionEndpointDTO apiCollectionEndpointDTO) {
         ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointDTO.toApiCollectionEndpoint();
 
-        apiCollectionEndpoint = apiCollectionEndpointService.update(apiCollectionEndpoint);
+        String workflowUuid = apiCollectionEndpointDTO.workflowUuid();
 
-        return toApiCollectionEndpointDTO(apiCollectionEndpoint);
+        if (workflowUuid != null) {
+            ApiCollectionEndpoint persistedApiCollectionEndpoint = apiCollectionEndpointService.getOpenApiEndpoint(
+                Objects.requireNonNull(apiCollectionEndpoint.getId(), "id"));
+
+            ApiCollection apiCollection = apiCollectionService.getApiCollection(
+                persistedApiCollectionEndpoint.getApiCollectionId());
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = resolveProjectDeploymentWorkflow(
+                apiCollection.getProjectDeploymentId(), workflowUuid);
+
+            apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
+        }
+
+        return toApiCollectionEndpointDTO(apiCollectionEndpointService.update(apiCollectionEndpoint));
     }
 
     @Override
@@ -301,6 +334,46 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         tags = checkTags(tags);
 
         apiCollectionService.update(id, CollectionUtils.map(tags, Tag::getId));
+    }
+
+    /**
+     * A malformed uuid never reaches the repository — {@code UUID.fromString} throws first — so it is normalised into
+     * the same absent result as a well-formed uuid naming no workflow, and reported identically by the caller.
+     */
+    private Optional<String> fetchProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid) {
+        try {
+            return projectWorkflowService.fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Find-or-create the {@link ProjectDeploymentWorkflow} row of {@code workflowUuid} within
+     * {@code projectDeploymentId}. Shared by the create and the update path so an endpoint can never be pointed at a
+     * workflow one path knows how to resolve and the other does not.
+     */
+    private ProjectDeploymentWorkflow resolveProjectDeploymentWorkflow(
+        long projectDeploymentId, String workflowUuid) {
+
+        // fetch, not get: getProjectWorkflowWorkflowId reports a stale or foreign uuid as an untyped
+        // IllegalArgumentException, which the global resolver turns into a 500. A uuid naming no workflow of this
+        // deployment is bad caller input, so it is reported the way this facade reports its other bad input.
+        String workflowId = fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid)
+            .orElseThrow(
+                () -> new ConfigurationException(
+                    "Workflow '%s' does not belong to this API collection".formatted(workflowUuid),
+                    ApiCollectionErrorType.WORKFLOW_NOT_FOUND));
+
+        return projectDeploymentWorkflowService.fetchProjectDeploymentWorkflow(projectDeploymentId, workflowId)
+            .orElseGet(() -> {
+                ProjectDeploymentWorkflow newProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+                newProjectDeploymentWorkflow.setProjectDeploymentId(projectDeploymentId);
+                newProjectDeploymentWorkflow.setWorkflowId(workflowId);
+
+                return projectDeploymentWorkflowService.create(newProjectDeploymentWorkflow);
+            });
     }
 
     private void buildPathItem(
@@ -320,6 +393,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         operation.responses(createApiResponses(parameters));
 
         pathItem.operation(httpMethod, operation);
+    }
+
+    private void checkNameNotAlreadyExists(String name, long workspaceId, Environment environment, Long excludeId) {
+        if (apiCollectionService.existsByNameAndEnvironment(name, workspaceId, environment, excludeId)) {
+            throw new ConfigurationException(
+                "API collection with name '%s' already exists in environment %s".formatted(name, environment),
+                ApiCollectionErrorType.NAME_ALREADY_EXISTS);
+        }
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

@@ -1,5 +1,6 @@
 dependencies {
     api("org.springframework.data:spring-data-commons")
+    api(project(":server:libs:core:exception:exception-api"))
     api(project(":server:libs:platform:platform-api"))
     api(project(":server:libs:platform:platform-category:platform-category-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))

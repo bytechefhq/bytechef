@@ -15,6 +15,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,6 +48,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
+    public Optional<ProjectDeployment> fetchProjectDeployment(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
         throw new UnsupportedOperationException();
     }
@@ -57,7 +63,17 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
+    public Optional<ProjectDeployment> fetchProjectDeployment(UUID uuid, Environment environment) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isProjectDeploymentEnabled(long projectDeploymentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ProjectDeployment> getAllProjectDeployments(long projectId) {
         throw new UnsupportedOperationException();
     }
 

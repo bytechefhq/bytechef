@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Ivica Cardic
@@ -30,6 +31,20 @@ public interface ProjectDeploymentService {
 
     void delete(long id);
 
+    /**
+     * Retrieves a project deployment by id without throwing when it does not exist.
+     *
+     * <p>
+     * Callers evaluating an authorization decision must use this rather than {@link #getProjectDeployment(long)}: an
+     * exception raised while a {@code @PreAuthorize} expression is being evaluated escapes as a server error instead of
+     * an authorization verdict.
+     * </p>
+     *
+     * @param id the project deployment id
+     * @return the project deployment, if one exists
+     */
+    Optional<ProjectDeployment> fetchProjectDeployment(long id);
+
     Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
 
     /**
@@ -39,6 +54,17 @@ public interface ProjectDeploymentService {
      * name rather than environment.
      */
     Optional<ProjectDeployment> fetchProjectDeploymentByName(long projectId, String name);
+
+    Optional<ProjectDeployment> fetchProjectDeployment(UUID uuid, Environment environment);
+
+    /**
+     * Returns every project deployment of the given project, including the system deployments backing API collections,
+     * MCP servers and A2A servers, which {@link #getProjectDeployments(long)} hides from display surfaces.
+     *
+     * @param projectId the id of the project
+     * @return every project deployment of the given project
+     */
+    List<ProjectDeployment> getAllProjectDeployments(long projectId);
 
     ProjectDeployment getProjectDeployment(long id);
 

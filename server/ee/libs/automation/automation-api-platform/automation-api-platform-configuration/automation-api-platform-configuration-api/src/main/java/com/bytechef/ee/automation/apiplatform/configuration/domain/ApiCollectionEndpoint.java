@@ -124,7 +124,10 @@ public class ApiCollectionEndpoint {
     }
 
     public Long getProjectDeploymentWorkflowId() {
-        return projectDeploymentWorkflowId.getId();
+        // Null-safe like ApiCollection#getProjectDeploymentId: an endpoint built from a DTO through
+        // ApiCollectionEndpointDTO#toApiCollectionEndpoint carries no pointer at all, and callers reconciling one
+        // must be able to ask for it without an NPE. Persisted rows always have it (the column is NOT NULL).
+        return projectDeploymentWorkflowId == null ? null : projectDeploymentWorkflowId.getId();
     }
 
     public int getVersion() {

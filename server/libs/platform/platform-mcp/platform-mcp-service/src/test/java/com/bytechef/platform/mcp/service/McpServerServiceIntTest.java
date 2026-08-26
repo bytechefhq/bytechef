@@ -27,6 +27,7 @@ import com.bytechef.platform.mcp.config.PlatformMcpIntTestConfiguration;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import java.util.List;
+import java.util.UUID;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
@@ -231,6 +232,40 @@ public class McpServerServiceIntTest {
 
         assertThatThrownBy(() -> mcpServerService.update(mcpServer))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    /**
+     * Proves the derived queries behind {@code existsByNameAndEnvironment} actually derive, and that the constraint
+     * they mirror is per-environment: the same name in another environment is not a conflict.
+     */
+    @Test
+    void testExistsByNameAndEnvironment() {
+        mcpServerRepository.save(new McpServer("taken", PlatformType.AUTOMATION, Environment.STAGING));
+
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, null)).isTrue();
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.PRODUCTION, null)).isFalse();
+        assertThat(mcpServerService.existsByNameAndEnvironment("free", Environment.STAGING, null)).isFalse();
+    }
+
+    @Test
+    void testExistsByNameAndEnvironmentExcludesTheGivenLineage() {
+        McpServer mcpServer = mcpServerRepository.save(
+            new McpServer("taken", PlatformType.AUTOMATION, Environment.STAGING));
+
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, mcpServer.getUuid()))
+            .isFalse();
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, UUID.randomUUID()))
+            .isTrue();
+    }
+
+    /**
+     * The constraint the check mirrors spans platform types, so an EMBEDDED server blocks an AUTOMATION name.
+     */
+    @Test
+    void testExistsByNameAndEnvironmentSpansPlatformTypes() {
+        mcpServerRepository.save(new McpServer("taken", PlatformType.EMBEDDED, Environment.STAGING));
+
+        assertThat(mcpServerService.existsByNameAndEnvironment("taken", Environment.STAGING, null)).isTrue();
     }
 
     private McpServer getMcpServer() {

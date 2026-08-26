@@ -24,6 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,10 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
         projectDeployment.setEnabled(false);
 
+        if (projectDeployment.getUuid() == null) {
+            projectDeployment.setUuid(UUID.randomUUID());
+        }
+
         ProjectDeployment savedProjectDeployment = projectDeploymentRepository.save(projectDeployment);
 
         projectDeploymentAuditPublisher.publish(
@@ -74,6 +79,12 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<ProjectDeployment> fetchProjectDeployment(long id) {
+        return projectDeploymentRepository.findById(id);
+    }
+
+    @Override
     public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
         return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal());
     }
@@ -82,6 +93,18 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Transactional(readOnly = true)
     public Optional<ProjectDeployment> fetchProjectDeploymentByName(long projectId, String name) {
         return projectDeploymentRepository.findByProjectIdAndName(projectId, name);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ProjectDeployment> fetchProjectDeployment(UUID uuid, Environment environment) {
+        return projectDeploymentRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProjectDeployment> getAllProjectDeployments(long projectId) {
+        return projectDeploymentRepository.findAllByProjectId(projectId);
     }
 
     @Override

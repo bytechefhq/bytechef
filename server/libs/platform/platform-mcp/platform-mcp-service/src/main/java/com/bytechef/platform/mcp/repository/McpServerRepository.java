@@ -18,6 +18,7 @@ package com.bytechef.platform.mcp.repository;
 
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -29,5 +30,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface McpServerRepository extends ListCrudRepository<McpServer, Long> {
 
+    boolean existsByNameAndEnvironment(String name, int environment);
+
+    boolean existsByNameAndEnvironmentAndUuidNot(String name, int environment, UUID uuid);
+
     Optional<McpServer> findBySecretKey(String secretKey);
+
+    Optional<McpServer> findByUuidAndEnvironment(UUID uuid, int environment);
 }

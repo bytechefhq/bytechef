@@ -59,6 +59,12 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ApiCollectionEndpoint> getProjectDeploymentWorkflowApiEndpoints(long projectDeploymentWorkflowId) {
+        return apiEndpointRepository.findAllByProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+    }
+
+    @Override
     public ApiCollectionEndpoint update(ApiCollectionEndpoint apiCollectionEndpoint) {
         Assert.notNull(apiCollectionEndpoint, "'apiCollectionEndpoint' must not be null");
         Assert.notNull(apiCollectionEndpoint.getId(), "id");
@@ -68,6 +74,15 @@ public class ApiCollectionEndpointServiceImpl implements ApiCollectionEndpointSe
         curApiCollectionEndpoint.setHttpMethod(apiCollectionEndpoint.getHttpMethod());
         curApiCollectionEndpoint.setName(apiCollectionEndpoint.getName());
         curApiCollectionEndpoint.setPath(apiCollectionEndpoint.getPath());
+
+        Long projectDeploymentWorkflowId = apiCollectionEndpoint.getProjectDeploymentWorkflowId();
+
+        // Copied only when the caller supplied one. ApiCollectionEndpointDTO#toApiCollectionEndpoint does not map
+        // the pointer, so an entity converted from a DTO carries none and the persisted pointer must survive;
+        // callers that deliberately re-point an endpoint at another workflow set it before calling update.
+        if (projectDeploymentWorkflowId != null) {
+            curApiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflowId);
+        }
 
         return apiEndpointRepository.save(curApiCollectionEndpoint);
     }

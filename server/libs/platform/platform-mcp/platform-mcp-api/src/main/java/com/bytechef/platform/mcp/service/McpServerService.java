@@ -20,6 +20,9 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Service interface for managing MCP servers within the system. Provides methods to create, update, delete, and query
@@ -67,6 +70,25 @@ public interface McpServerService {
     void delete(long mcpServerId);
 
     /**
+     * Reports whether an MCP server named {@code name} already exists in {@code environment}.
+     *
+     * <p>
+     * <b>The scope of this check is the {@code (name, environment)} unique constraint on {@code mcp_server}, and
+     * nothing narrower.</b> That constraint spans every workspace and both {@link PlatformType}s, so a {@code true}
+     * here may be caused by a server the caller cannot see, or by an {@code EMBEDDED} server when the caller is
+     * creating an {@code AUTOMATION} one. It is deliberately NOT workspace-scoped: a workspace-scoped answer would
+     * report {@code false} for names that still cannot be inserted.
+     * </p>
+     *
+     * @param name        the server name to test
+     * @param environment the environment to test it in
+     * @param excludeUuid a cross-environment lineage identifier to exclude from the answer, so a caller re-promoting a
+     *                    server does not see its own counterpart as a conflict; {@code null} excludes nothing
+     * @return {@code true} when a server of that name already exists in that environment
+     */
+    boolean existsByNameAndEnvironment(String name, Environment environment, @Nullable UUID excludeUuid);
+
+    /**
      * Retrieves an MCP server by its unique identifier.
      *
      * @param mcpServerId the unique identifier of the MCP server to retrieve
@@ -90,6 +112,16 @@ public interface McpServerService {
      * @return the MCP server associated with the specified secret key
      */
     McpServer getMcpServer(String secretKey);
+
+    /**
+     * Retrieves an MCP server by its cross-environment lineage identifier and environment.
+     *
+     * @param uuid        the cross-environment lineage identifier shared by the server's counterparts in other
+     *                    environments
+     * @param environment the environment to look the server up in
+     * @return the MCP server matching the given uuid and environment, if one exists
+     */
+    Optional<McpServer> fetchMcpServer(UUID uuid, Environment environment);
 
     /**
      * Gets MCP servers filtered by type.
