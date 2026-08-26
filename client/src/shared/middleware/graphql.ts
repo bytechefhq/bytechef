@@ -1515,6 +1515,11 @@ export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type EnvironmentsQuery = { environments: Array<{ id: string, name: string } | null> | null };
 
+export type EvaluatorFunctionDefinitionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EvaluatorFunctionDefinitionsQuery = { evaluatorFunctionDefinitions: Array<{ name: string, title: string, description: string, category: Types.EvaluatorFunctionCategory, returnType: Types.EvaluatorFunctionType, example: string, parameters: Array<{ name: string, description: string, type: Types.EvaluatorFunctionType, required: boolean }> }> };
+
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7554,6 +7559,41 @@ export const useEnvironmentsQuery = <
       {
     queryKey: variables === undefined ? ['environments'] : ['environments', variables],
     queryFn: fetcher<EnvironmentsQuery, EnvironmentsQueryVariables>(EnvironmentsDocument, variables),
+    ...options
+  }
+    )};
+
+export const EvaluatorFunctionDefinitionsDocument = new TypedDocumentString(`
+    query evaluatorFunctionDefinitions {
+  evaluatorFunctionDefinitions {
+    name
+    title
+    description
+    category
+    returnType
+    example
+    parameters {
+      name
+      description
+      type
+      required
+    }
+  }
+}
+    `);
+
+export const useEvaluatorFunctionDefinitionsQuery = <
+      TData = EvaluatorFunctionDefinitionsQuery,
+      TError = unknown
+    >(
+      variables?: EvaluatorFunctionDefinitionsQueryVariables,
+      options?: Omit<UseQueryOptions<EvaluatorFunctionDefinitionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EvaluatorFunctionDefinitionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EvaluatorFunctionDefinitionsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['evaluatorFunctionDefinitions'] : ['evaluatorFunctionDefinitions', variables],
+    queryFn: fetcher<EvaluatorFunctionDefinitionsQuery, EvaluatorFunctionDefinitionsQueryVariables>(EvaluatorFunctionDefinitionsDocument, variables),
     ...options
   }
     )};
