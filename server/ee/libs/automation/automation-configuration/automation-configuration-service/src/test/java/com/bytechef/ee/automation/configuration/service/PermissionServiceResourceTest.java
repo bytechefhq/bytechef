@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Pins the EE behavior of {@code hasResourceScope} (workspace-scope path, fail-closed when no workspace) and
@@ -43,7 +44,8 @@ class PermissionServiceResourceTest {
     private PermissionServiceImpl service(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of());
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of(),
+            Mockito.mock(ObjectProvider.class));
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
@@ -153,6 +155,75 @@ class PermissionServiceResourceTest {
         PermissionServiceImpl service = service(workflowOwnershipResolver());
 
         assertThat(service.hasWorkflowScope("nope", "WORKFLOW_EDIT")).isFalse();
+    }
+
+    /**
+     * The escalation this overload exists to stop, asserted against its own sibling. The caller holds WORKFLOW_EDIT in
+     * the union over every environment they can reach — which is all the environment-unaware overload ever consults —
+     * but holds nothing in PRODUCTION. Before this overload existed, a workflow-keyed gate took the union branch (a
+     * workflow has no environment, so no ResourceEnvironmentResolver can narrow it) and the caller could start a
+     * PRODUCTION run on the strength of a Development role.
+     */
+    @Test
+    void testHasWorkflowScopeInEnvironmentDeniesScopeHeldOnlyInAnotherEnvironment() {
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+
+        com.bytechef.automation.configuration.domain.Project project =
+            Mockito.mock(com.bytechef.automation.configuration.domain.Project.class);
+
+        when(project.getWorkspaceId()).thenReturn(42L);
+        when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(java.util.Optional.of(project));
+
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(7L, 42L))
+            .thenReturn(Set.of("WORKFLOW_EDIT"));
+        when(
+            workspaceScopeCacheService.getWorkspaceScopes(
+                7L, 42L, com.bytechef.platform.configuration.domain.Environment.PRODUCTION))
+                    .thenReturn(Set.of());
+
+        PermissionServiceImpl service = service(workflowOwnershipResolver());
+
+        assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+        assertThat(
+            service.hasWorkflowScope(
+                "wf-uuid", "WORKFLOW_EDIT", com.bytechef.platform.configuration.domain.Environment.PRODUCTION))
+                    .isFalse();
+    }
+
+    @Test
+    void testHasWorkflowScopeInEnvironmentPermitsScopeHeldInThatEnvironment() {
+        lenient().when(currentUserResolver.fetchCurrentUserId())
+            .thenReturn(OptionalLong.of(7L));
+
+        com.bytechef.automation.configuration.domain.Project project =
+            Mockito.mock(com.bytechef.automation.configuration.domain.Project.class);
+
+        when(project.getWorkspaceId()).thenReturn(42L);
+        when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(java.util.Optional.of(project));
+        when(
+            workspaceScopeCacheService.getWorkspaceScopes(
+                7L, 42L, com.bytechef.platform.configuration.domain.Environment.PRODUCTION))
+                    .thenReturn(Set.of("WORKFLOW_EDIT"));
+
+        PermissionServiceImpl service = service(workflowOwnershipResolver());
+
+        assertThat(
+            service.hasWorkflowScope(
+                "wf-uuid", "WORKFLOW_EDIT", com.bytechef.platform.configuration.domain.Environment.PRODUCTION))
+                    .isTrue();
+    }
+
+    @Test
+    void testHasWorkflowScopeInEnvironmentUnknownWorkflowFailsClosedInEe() {
+        when(projectRepository.findByWorkflowId("nope")).thenReturn(java.util.Optional.empty());
+
+        PermissionServiceImpl service = service(workflowOwnershipResolver());
+
+        assertThat(
+            service.hasWorkflowScope(
+                "nope", "WORKFLOW_EDIT", com.bytechef.platform.configuration.domain.Environment.PRODUCTION))
+                    .isFalse();
     }
 
     /**

@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -241,7 +242,7 @@ class PermissionServiceAgentVisibilityTest {
             workspaceScopeCacheService, workspaceUserRepository,
             List.of(new AiAgentOwnershipResolver(aiAgentRepository)),
             List.of(new AiAgentVisibilityProvider(aiAgentRepository, projectService)),
-            capturingResolver(grantedProjectIds), List.of());
+            capturingResolver(grantedProjectIds), List.of(), mock(ObjectProvider.class));
     }
 
     private static AiAgent agent(long id, long projectId) {

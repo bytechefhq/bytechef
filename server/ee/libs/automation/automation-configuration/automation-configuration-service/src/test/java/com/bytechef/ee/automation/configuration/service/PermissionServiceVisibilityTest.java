@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -254,7 +255,8 @@ class PermissionServiceVisibilityTest {
             currentUserResolver, mock(PermissionScopeRegistry.class), mock(ProjectRepository.class),
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(connectionOwnershipResolver(), apiKeyOwnershipResolver()),
-            List.of(connectionVisibilityProvider()), visibilityResolver(grantedConnectionIds), List.of());
+            List.of(connectionVisibilityProvider()), visibilityResolver(grantedConnectionIds), List.of(),
+            mock(ObjectProvider.class));
     }
 
     private static ResourceOwnershipResolver connectionOwnershipResolver() {
@@ -366,7 +368,8 @@ class PermissionServiceVisibilityTest {
         return new PermissionServiceImpl(
             currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class), List.of(ownershipResolver(WORKFLOW)),
-            List.of(workflowVisibilityProvider()), capturingResolver(grantedProjectIds), List.of());
+            List.of(workflowVisibilityProvider()), capturingResolver(grantedProjectIds), List.of(),
+            mock(ObjectProvider.class));
     }
 
     /**
@@ -444,7 +447,8 @@ class PermissionServiceVisibilityTest {
         return new PermissionServiceImpl(
             currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class), List.of(ownershipResolver(PROJECT)),
-            List.of(projectVisibilityProvider()), visibilityResolver(grantedProjectIds), List.of());
+            List.of(projectVisibilityProvider()), visibilityResolver(grantedProjectIds), List.of(),
+            mock(ObjectProvider.class));
     }
 
     private static ResourceVisibilityProvider projectVisibilityProvider() {

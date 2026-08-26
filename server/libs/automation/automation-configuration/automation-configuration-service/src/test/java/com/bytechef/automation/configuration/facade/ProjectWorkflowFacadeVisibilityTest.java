@@ -236,7 +236,8 @@ class ProjectWorkflowFacadeVisibilityTest {
 
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
 
-        expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService()));
+        expressionHandler.setPermissionEvaluator(
+            new AutomationPermissionEvaluator(permissionService(), mock(ObjectProvider.class)));
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();

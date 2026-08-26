@@ -132,6 +132,13 @@ public class PermissionServiceImpl implements PermissionService {
         return hasResourceScope(projectId, "Project", scope);
     }
 
+    /**
+     * Deliberately NOT wired to {@code ResourceMembershipDecider}, unlike its EE twin. The asymmetry is intentional
+     * rather than an oversight: the decider's first precedence rule is "no {@code ResourceMembershipResolver} bean
+     * means no governed principal", the only implementation is {@code @ConditionalOnEEVersion}, and this implementation
+     * only runs in Community Edition — so the decider could answer nothing but {@code NOT_GOVERNED} here. Should a
+     * Community-Edition resolver ever exist, this method needs the same wiring the EE one has.
+     */
     @Override
     public boolean hasResourceScope(Serializable id, String resourceType, String scope) {
         if (!SecurityUtils.isAuthenticated()) {
@@ -220,6 +227,17 @@ public class PermissionServiceImpl implements PermissionService {
     public boolean hasWorkflowScope(String workflowId, String scope) {
         // A workflow-keyed check is a resource-scope check on the workflow: routing through hasResourceScope gives it
         // the visibility precondition, and WorkflowVisibilityProvider redirects the lookup to the owning project.
+        return hasResourceScope(workflowId, "Workflow", scope);
+    }
+
+    /**
+     * Drops the {@link Environment} and runs exactly what the environment-unaware overload runs. CE has no
+     * per-environment roles — {@link #hasWorkspaceScope(long, String, Environment)} is itself environment-blind — so
+     * nothing is lost, and routing both workflow-keyed overloads through the same {@code hasResourceScope} call is what
+     * keeps them from disagreeing about the same workflow.
+     */
+    @Override
+    public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
         return hasResourceScope(workflowId, "Workflow", scope);
     }
 

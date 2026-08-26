@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.security;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +36,11 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 public class AutomationMethodSecurityConfiguration {
 
     @Bean
-    AutomationPermissionEvaluator automationPermissionEvaluator(@Lazy PermissionService permissionService) {
-        return new AutomationPermissionEvaluator(permissionService);
+    AutomationPermissionEvaluator automationPermissionEvaluator(
+        @Lazy PermissionService permissionService,
+        ObjectProvider<ResourceMembershipResolver> resourceMembershipResolverProvider) {
+
+        return new AutomationPermissionEvaluator(permissionService, resourceMembershipResolverProvider);
     }
 
     @Bean
@@ -50,10 +54,11 @@ public class AutomationMethodSecurityConfiguration {
     @Bean
     static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
         @Lazy PermissionService permissionService, PermissionEvaluator permissionEvaluator,
-        RoleHierarchy roleHierarchy) {
+        RoleHierarchy roleHierarchy,
+        ObjectProvider<ResourceMembershipResolver> resourceMembershipResolverProvider) {
 
         AutomationMethodSecurityExpressionHandler handler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
+            new AutomationMethodSecurityExpressionHandler(permissionService, resourceMembershipResolverProvider);
 
         handler.setPermissionEvaluator(permissionEvaluator);
         handler.setRoleHierarchy(roleHierarchy);

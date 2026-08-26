@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -94,7 +95,8 @@ class PromotionGuardExpressionRoutingTest {
 
         DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
 
-        expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+        expressionHandler.setPermissionEvaluator(
+            new AutomationPermissionEvaluator(permissionService, mock(ObjectProvider.class)));
 
         Authentication authentication =
             new UsernamePasswordAuthenticationToken("alice", "credentials", List.of());

@@ -306,9 +306,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationWorkflow.getId(), enable);
     }
 
+    /**
+     * By-id read of an integration's instance configuration, reached only from
+     * {@code ConnectedUserIntegrationFacadeImpl#getConnectedUserIntegration(...)} on the embedded connected-user path.
+     *
+     * <p>
+     * Gated on the caller owning the requested integration rather than on {@code isTenantAdmin()}. The admin gate was
+     * vestigial: no admin surface calls this method (the admin REST controller uses
+     * {@code getIntegrationInstanceConfiguration(...)} and the create/update/delete/enable methods), and it passed only
+     * because the embedded skip-mode aspect widened authorization to full. The predicate applies the same check the
+     * list path applies per row, so the two reads cannot disagree about one integration.
+     */
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("@embeddedIntegrationAuthorization.canAccessIntegration(#integrationId, #environment)")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfigurationIntegration(
         long integrationId, boolean enabled, Environment environment) {
 
@@ -325,9 +336,27 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 IntegrationInstanceConfigurationErrorType.INSTANCE_CONFIGURATION_NOT_FOUND));
     }
 
+    /**
+     * Shared-facade read returning every integration instance configuration in the environment. It deliberately does
+     * NOT authorize on entry, and the weak {@code isAuthenticated()} gate is the intended gate, not an oversight.
+     *
+     * <p>
+     * Entry gating cannot express what needs expressing here: the method takes no resource id, so there is no single
+     * thing whose ownership a predicate could establish. Authorization is inherently per element and is applied by the
+     * only caller, {@code ConnectedUserIntegrationFacadeImpl#getConnectedUserIntegrations(...)}, which filters each row
+     * through {@code isIntegrationVisible(...)} —
+     * {@link com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator} against that integration's
+     * own permission expression. That is the API facade owning authorization while the shared facade stays unguarded,
+     * as this codebase's API-facade/shared-facade split prescribes.
+     *
+     * <p>
+     * The previous {@code isTenantAdmin()} gate was vestigial — no admin surface calls this method, and it passed only
+     * because the embedded skip-mode aspect widened authorization to full. Do not restore it: doing so breaks the
+     * connected-user integration list. Any NEW caller of this method must apply its own per-row filtering.
+     */
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("isTenantAdmin()")
+    @PreAuthorize("isAuthenticated()")
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurationIntegrations(
         boolean enabled, Environment environment) {
 
