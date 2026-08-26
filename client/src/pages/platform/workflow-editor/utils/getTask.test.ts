@@ -94,31 +94,30 @@ describe('getTask', () => {
         expect(getTask({tasks: [forkJoinTask], workflowNodeName: 'forked_action'})).toBe(nested);
     });
 
-    it('finds a task nested inside a graph node', () => {
+    it('finds a task via direct match within a graph node list', () => {
         const nested = task({name: 'node_action'});
         const graphTask = task({
             name: 'graph_1',
-            parameters: {maxTransitions: 100, nodes: [{name: 'node_0', tasks: [nested]}]},
+            parameters: {maxTransitions: 100, nodes: [nested], transitions: []},
             type: 'graph/v1',
         });
 
         expect(getTask({tasks: [graphTask], workflowNodeName: 'node_action'})).toBe(nested);
     });
 
-    it('finds a task nested inside the second graph node', () => {
-        const nested = task({name: 'second_node_action'});
+    it('finds a task nested inside a task dispatcher that is itself a graph node', () => {
+        const nested = task({name: 'nested_condition_action'});
+        const conditionNode = task({
+            name: 'condition_1',
+            parameters: {caseTrue: [nested]},
+            type: 'condition/v1',
+        });
         const graphTask = task({
             name: 'graph_1',
-            parameters: {
-                maxTransitions: 100,
-                nodes: [
-                    {name: 'node_0', tasks: [task({name: 'first_node_action'})]},
-                    {name: 'node_1', tasks: [nested]},
-                ],
-            },
+            parameters: {maxTransitions: 100, nodes: [conditionNode], transitions: []},
             type: 'graph/v1',
         });
 
-        expect(getTask({tasks: [graphTask], workflowNodeName: 'second_node_action'})).toBe(nested);
+        expect(getTask({tasks: [graphTask], workflowNodeName: 'nested_condition_action'})).toBe(nested);
     });
 });

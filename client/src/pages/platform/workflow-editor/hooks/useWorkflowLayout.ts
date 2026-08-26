@@ -100,11 +100,22 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
+    // `workflowNodeName` as well as `name`: every node in the store is addressed by the former, and
+    // the graph container the transition popover points this slot at carries no `name` of its own —
+    // gating on `name` alone disabled the query there, which emptied the data pill panel completely.
+    const currentNodeName = currentNode?.workflowNodeName ?? currentNode?.name;
+
+    // The graph transition editor counts as a consumer even though neither panel is open. It lives on
+    // the canvas and deliberately does not slide the Data Pill Panel over the graph it is pinned to —
+    // but its condition field resolves data pills like any other expression field, and gating the
+    // fetch on a visible panel left it offering "No data pills found" with nothing wrong upstream.
+    const graphTransitionEditorOpen = !!currentNode?.dataPillAnchorNodeName;
+
     const shouldFetchPreviousWorkflowNodeOutputs =
-        (dataPillPanelOpen || workflowNodeDetailsPanelOpen) &&
+        (dataPillPanelOpen || workflowNodeDetailsPanelOpen || graphTransitionEditorOpen) &&
         !!workflowNodes?.length &&
         !!currentNode &&
-        !!currentNode?.name;
+        !!currentNodeName;
 
     const {data: workflowNodeOutputs, isPending: isWorkflowNodeOutputsPending} = useGetPreviousWorkflowNodeOutputsQuery(
         {
@@ -112,7 +123,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
             id: workflow.id!,
             lastWorkflowNodeName: currentNode?.clusterElementType
                 ? rootClusterElementNodeData?.workflowNodeName
-                : currentNode?.name,
+                : (currentNode?.dataPillAnchorNodeName ?? currentNodeName),
         },
         shouldFetchPreviousWorkflowNodeOutputs
     );

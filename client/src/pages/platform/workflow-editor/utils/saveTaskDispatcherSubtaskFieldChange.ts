@@ -167,7 +167,6 @@ export default function saveTaskDispatcherSubtaskFieldChange({
 
             taskDispatcherContext = {
                 index: currentNodeIndex,
-                nodeIndex: currentNode.graphData.nodeIndex,
                 taskDispatcherId: currentNode.graphData.graphId,
             };
 

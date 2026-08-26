@@ -22,11 +22,10 @@ function getTaskDispatcherPropertyName(taskDispatcherName: string): string {
  * Walks a subtask up through every enclosing task dispatcher, rewriting each ancestor's
  * subtasks with the edited descendant, until it reaches the root task in the workflow
  * definition. Shared by every edge-rendered chip that mutates a task dispatcher's own
- * structural parameters (branch case keys, graph node names/next expressions) from outside
- * the properties panel — those chips can't rely on `useWorkflowNodeDetailsPanelStore`'s
- * `currentNode` (a different node, or none, may be selected while an edge chip is edited), so
- * the update must be threaded from the edited node all the way back to the root before calling
- * `saveWorkflowDefinition`.
+ * structural parameters (branch case keys) from outside the properties panel — those chips
+ * can't rely on `useWorkflowNodeDetailsPanelStore`'s `currentNode` (a different node, or none,
+ * may be selected while an edge chip is edited), so the update must be threaded from the edited
+ * node all the way back to the root before calling `saveWorkflowDefinition`.
  */
 export default function getRecursivelyUpdatedRootTaskDispatcherNodeData(
     currentTaskNodeData: NodeDataType,

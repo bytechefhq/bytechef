@@ -49,12 +49,11 @@ export default function isElkLayoutSupported(nodes: Node[]): boolean {
 }
 
 /**
- * Shared gate for "is the ELK engine actually in effect for this node set" — used both to
- * decide the transition-overlay behavior and to pick the layout function. The predicate only
- * inspects each node's taskDispatcher/componentName fields, so it is equivalent whether it is
- * run over the full node array or a dispatcher-scoped subset; callers pass whichever array they
- * already have on hand. Extracted so the two call sites can never diverge (previously each
- * inlined `layoutEngine === 'elk' && isElkLayoutSupported(<nodes>)` separately).
+ * Shared gate for "is the ELK engine actually in effect for this node set" — it is what picks the
+ * layout function, both for the outer layout and for the graph-frame pre-pass that runs ahead of
+ * it. The predicate only inspects each node's taskDispatcher/componentName fields, so it is
+ * equivalent whether it is run over the full node array or a dispatcher-scoped subset; callers
+ * pass whichever array they already have on hand.
  */
 export function isElkLayoutActive(layoutEngine: LayoutEngineType, nodes: Node[]): boolean {
     return layoutEngine === 'elk' && isElkLayoutSupported(nodes);

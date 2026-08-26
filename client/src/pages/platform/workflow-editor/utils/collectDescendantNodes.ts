@@ -1,4 +1,4 @@
-import {FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
+import {FINAL_PLACEHOLDER_NODE_ID, GRAPH_TRANSITION_EDGE_TYPE} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node, XYPosition} from '@xyflow/react';
 
@@ -74,15 +74,14 @@ export function collectChainSuccessorNodes(
     const successorPositions = new Map<string, XYPosition>();
     const nodeMap = new Map(allNodes.map((node) => [node.id, node]));
 
-    // Build edge lookup: source → target IDs. `graphTransition` overlay edges (see
-    // createGraphTransitionEdges) are excluded — they are a paint-time decoration anchored on a
-    // graph lane's first task, not a structural chain link, so they must never be
-    // walked as one (a back/self transition would otherwise look like a real
-    // successor of that lane's entry task).
+    // Build edge lookup: source → target IDs. `graphTransition` edges (see createGraphEdges) are
+    // excluded — they are free-form routes between members inside a graph frame, not structural
+    // chain links, so they must never be walked as one (a back or self transition would otherwise
+    // look like a real successor of the member it leaves).
     const edgesBySource = new Map<string, string[]>();
 
     for (const edge of allEdges) {
-        if (edge.type === 'graphTransition') {
+        if (edge.type === GRAPH_TRANSITION_EDGE_TYPE) {
             continue;
         }
 

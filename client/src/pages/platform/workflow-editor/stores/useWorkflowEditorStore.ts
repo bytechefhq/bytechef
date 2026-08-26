@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
-import {NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/types';
+import {GraphPendingConnectionType, NestedClusterRootComponentDefinitionType, NodeDataType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -20,6 +20,26 @@ export interface WorkflowEditorI {
 
     copiedWorkflowId: string | undefined;
     setCopiedWorkflowId: (copiedWorkflowId: string | undefined) => void;
+
+    /**
+     * A graph transition dropped on empty frame space, or a component dropped into a frame, waiting
+     * for the popover to name the task it creates. Consumed (and cleared) by
+     * `insertTaskDispatcherSubtask`, which is where that task is appended to `parameters.nodes`.
+     */
+    graphPendingConnection: GraphPendingConnectionType | undefined;
+    setGraphPendingConnection: (graphPendingConnection: GraphPendingConnectionType | undefined) => void;
+
+    /**
+     * Where each graph transition edge's label sits, in flow coordinates, published by the edge as it
+     * renders. It is the ONLY thing the canvas-level transition editor needs from the edge, and the
+     * reason it is a store entry rather than a prop: React Flow recreates its edge components on
+     * every relayout, so an editor rendered inside one lost its caret, its data pill popup and its
+     * pending save each time the canvas settled. Read alongside the edge's own `selected` flag, which
+     * stays the source of truth for whether an editor is open — a position left behind by a deleted
+     * or deselected edge is simply never looked up.
+     */
+    graphTransitionLabelPositions: Record<string, {labelX: number; labelY: number}>;
+    setGraphTransitionLabelPosition: (edgeId: string, position: {labelX: number; labelY: number}) => void;
 
     mainClusterRootComponentDefinition: ComponentDefinition | undefined;
     setMainClusterRootComponentDefinition: (
@@ -70,9 +90,16 @@ export interface WorkflowEditorI {
     workflowTestExecution?: WorkflowTestExecution;
     setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) => void;
 
+    /**
+     * Live per-node status of the last test run, keyed by node name. Node names (`var_1`, `task_1`, ...)
+     * are only unique within a workflow, so the id of the workflow the run belongs to is kept alongside
+     * them -- read them through `useWorkflowTestNodeStates`, never straight off the store, or another
+     * workflow's nodes light up wherever the names happen to coincide.
+     */
     workflowTestNodeStates: Record<string, WorkflowTestNodeStateI>;
+    workflowTestNodeStatesWorkflowId: string | undefined;
     setWorkflowTestNodeState: (nodeName: string, nodeState: WorkflowTestNodeStateI) => void;
-    resetWorkflowTestNodeStates: () => void;
+    resetWorkflowTestNodeStates: (workflowId: string | undefined) => void;
 }
 
 const useWorkflowEditorStore = create<WorkflowEditorI>()(
@@ -95,6 +122,32 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                 set(() => ({
                     copiedWorkflowId,
                 })),
+
+            graphPendingConnection: undefined,
+            setGraphPendingConnection: (graphPendingConnection) =>
+                set(() => ({
+                    graphPendingConnection,
+                })),
+
+            graphTransitionLabelPositions: {},
+            setGraphTransitionLabelPosition: (edgeId, position) =>
+                set((state) => {
+                    const currentPosition = state.graphTransitionLabelPositions[edgeId];
+
+                    // Every edge republishes on every render, and the canvas renders on every tween
+                    // frame — so writing an unchanged position would loop the whole canvas back
+                    // through the store for the length of each animation.
+                    if (currentPosition?.labelX === position.labelX && currentPosition?.labelY === position.labelY) {
+                        return state;
+                    }
+
+                    return {
+                        graphTransitionLabelPositions: {
+                            ...state.graphTransitionLabelPositions,
+                            [edgeId]: position,
+                        },
+                    };
+                }),
 
             mainClusterRootComponentDefinition: undefined,
             setMainClusterRootComponentDefinition: (mainClusterRootComponentDefinition) =>
@@ -187,13 +240,15 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
                 })),
 
             workflowTestNodeStates: {},
+            workflowTestNodeStatesWorkflowId: undefined,
             setWorkflowTestNodeState: (nodeName, nodeState) =>
                 set((state) => ({
                     workflowTestNodeStates: {...state.workflowTestNodeStates, [nodeName]: nodeState},
                 })),
-            resetWorkflowTestNodeStates: () =>
+            resetWorkflowTestNodeStates: (workflowId) =>
                 set(() => ({
                     workflowTestNodeStates: {},
+                    workflowTestNodeStatesWorkflowId: workflowId,
                 })),
         }),
         {

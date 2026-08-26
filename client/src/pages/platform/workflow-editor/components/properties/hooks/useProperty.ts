@@ -216,6 +216,21 @@ export const useProperty = ({
     const previousPropertyPathForParameterSyncRef = useRef<string | undefined>(undefined);
     const resetOnModeChangeRef = useRef(false);
 
+    // `<Property>` HAS NO EXPLICIT TARGET: the node it displays and the node it writes to are both
+    // read from this one global slot — here for every displayed value, display condition and
+    // `metadata.ui` read, and again inside `saveProperty` for the write. That is unambiguous on the
+    // node details panel, which owns the slot, and NOT unambiguous anywhere else. Selecting an edge
+    // on the canvas, for instance, does not move `currentNode`.
+    //
+    // So reusing `<Property>` outside the details panel means pointing this slot at the task you
+    // mean for as long as the editor is mounted — see `GraphTransitionPopover`, which does exactly
+    // that for a graph transition's `condition` and documents the three costs: a refresh effect so
+    // the snapshot is not stale, an unmount restore, and standing down under a multi-select because
+    // one global slot cannot serve two editors. Do not half-thread a target through instead:
+    // `currentNode` is read from dozens of places in this hook alone, and taking the value from a
+    // prop while any of the rest still comes from the store is worse than either extreme. Removing
+    // the assumption means threading an explicit node through `<Properties>`, `<Property>`, its
+    // recursive children and `saveProperty` together.
     const {currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,

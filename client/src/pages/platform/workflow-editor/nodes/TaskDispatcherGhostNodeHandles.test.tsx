@@ -125,3 +125,30 @@ describe('ghost bar side handles', () => {
         expect(handle('-right')?.className).toContain('bottom-8');
     });
 });
+
+describe('ghost bars carry no graph transition handles', () => {
+    beforeEach(() => {
+        directionStoreState.layoutDirection = 'TB';
+    });
+
+    // A graph transition names its endpoints by TASK name, and a dispatcher member's transitions
+    // therefore anchor on the dispatcher's own node rather than on the bottom ghost bar the retired
+    // lane model routed them through. The ghost bars must stay free of transition handles so no
+    // second anchor for the same transition can appear.
+    it.each([
+        ['top', 'loop_1-loop-top-ghost'],
+        ['bottom', 'loop_1-loop-bottom-ghost'],
+    ])('renders no graph transition handle on the %s bar', (component, id) => {
+        const {container} = render(
+            <ReactFlowProvider>
+                {component === 'top' ? (
+                    <TaskDispatcherTopGhostNode id={id} />
+                ) : (
+                    <TaskDispatcherBottomGhostNode id={id} />
+                )}
+            </ReactFlowProvider>
+        );
+
+        expect(container.querySelector('[data-handleid*="graph-transition"]')).toBeNull();
+    });
+});

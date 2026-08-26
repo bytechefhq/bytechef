@@ -121,10 +121,24 @@ export const EDGE_STYLES = {
 };
 
 // Muted indigo, deliberately distinct from EDGE_STYLES' neutral gray so `graphTransition`
-// overlay edges (cyclic/self next-expression transitions rendered on top of the stable lane
-// layout) read as a separate visual layer from the structural lane-chain edges underneath.
+// edges read as a separate visual layer from the structural connector edges underneath.
 export const GRAPH_TRANSITION_EDGE_COLOR = '#8B7FE8';
 export const GRAPH_TRANSITION_EDGE_SELECTED_COLOR = '#5B4FC7';
+// Amber, for a transition whose `from`/`to` names no member. The editor never leaves one behind,
+// so this only shows up after an edit made outside it — a warning, not an error state.
+export const GRAPH_TRANSITION_EDGE_DANGLING_COLOR = '#D97706';
+
+// The auto-sizing container a `graph/v1` dispatcher's member tasks live inside, and the
+// non-deletable Start pill marking its entry point. The pill is parented to the frame where it
+// is minted; the member tasks are parented to it, and positioned relative to it, by the layout
+// pre-pass.
+export const GRAPH_FRAME_NODE_TYPE = 'graphFrame';
+export const GRAPH_START_NODE_TYPE = 'graphStart';
+
+// One `graphTransition` edge per `parameters.transitions[]` entry; the single `graphStart` edge
+// joins the Start pill to the graph's start node.
+export const GRAPH_TRANSITION_EDGE_TYPE = 'graphTransition';
+export const GRAPH_START_EDGE_TYPE = 'graphStart';
 
 export const PATH_SPACE_REPLACEMENT = '_SPACE_';
 export const PATH_DIGIT_PREFIX = '_DIGIT_';

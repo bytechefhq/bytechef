@@ -17,6 +17,11 @@ import useTaskDispatcherGhostStatus from './useTaskDispatcherGhostStatus';
 // dagre make every ring connector double back in box-shaped detours.
 const LR_FLIPPED_RING_BAR_PATTERN = /-(loop|each|map)-(top|bottom)-ghost$/;
 
+// A graph's members live free-form inside its frame, so nothing ever hangs off this bar the way a
+// loop's body or a condition's branches do. Painting it would put a stray horizontal rule on the
+// chain for no reader to interpret, so the graph's ghosts keep their handles and drop their ink.
+const GRAPH_GHOST_BAR_PATTERN = /-graph-(top|bottom)-ghost$/;
+
 const TaskDispatcherTopGhostNode = ({data, id}: {data?: unknown; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const lastAppliedLayoutEngine = useLayoutEngineStore((state) => state.lastAppliedLayoutEngine);
@@ -24,13 +29,14 @@ const TaskDispatcherTopGhostNode = ({data, id}: {data?: unknown; id: string}) =>
     const isFlippedRingBar = isHorizontal && lastAppliedLayoutEngine === 'elk' && LR_FLIPPED_RING_BAR_PATTERN.test(id);
 
     const dispatcherStatus = useTaskDispatcherGhostStatus(data);
+    const isGraphBar = GRAPH_GHOST_BAR_PATTERN.test(id);
 
     return (
         <div
             className={twMerge(
                 'nodrag',
                 isHorizontal ? 'h-[72px] w-0.5' : 'h-0.5 w-[72px]',
-                'bg-stroke-neutral-tertiary',
+                isGraphBar ? 'bg-transparent' : 'bg-stroke-neutral-tertiary',
                 dispatcherStatus === 'COMPLETED' && 'bg-green-500',
                 dispatcherStatus === 'FAILED' && 'bg-red-500'
             )}

@@ -89,25 +89,67 @@ describe('getTasksStructuralFingerprint', () => {
     });
 });
 
-describe('graph next expressions', () => {
-    it('changes the fingerprint when a graph node next expression changes', () => {
-        const makeGraphTask = (next?: string) =>
-            ({
-                name: 'graph_1',
-                parameters: {
-                    nodes: [
-                        {name: 'node_0', tasks: []},
-                        {name: 'node_1', next, tasks: []},
-                    ],
-                },
-                type: 'graph/v1',
-            }) as unknown as WorkflowTask;
+describe('graph layout signature', () => {
+    const makeGraphTask = (
+        transitions: Array<{condition?: string; from: string; to: string}>,
+        positions: Record<string, {x: number; y: number}> = {},
+        startNode = 'node_0'
+    ) =>
+        ({
+            name: 'graph_1',
+            parameters: {
+                nodes: ['node_0', 'node_1'].map((name) => ({
+                    name,
+                    ...(positions[name] ? {metadata: {ui: {nodePosition: positions[name]}}} : {}),
+                })),
+                startNode,
+                transitions,
+            },
+            type: 'graph/v1',
+        }) as unknown as WorkflowTask;
 
-        const before = getTasksStructuralFingerprint([makeGraphTask(undefined)]);
-        const after = getTasksStructuralFingerprint([makeGraphTask("'node_0'")]);
-        const edited = getTasksStructuralFingerprint([makeGraphTask("'node_2'")]);
+    it('changes the fingerprint when a transition is added, retargeted or conditioned', () => {
+        const none = getTasksStructuralFingerprint([makeGraphTask([])]);
+        const added = getTasksStructuralFingerprint([makeGraphTask([{from: 'node_0', to: 'node_1'}])]);
+        const retargeted = getTasksStructuralFingerprint([makeGraphTask([{from: 'node_0', to: 'node_2'}])]);
+        const conditioned = getTasksStructuralFingerprint([
+            makeGraphTask([{condition: '${node_0.ok}', from: 'node_0', to: 'node_2'}]),
+        ]);
 
-        expect(before).not.toBe(after);
-        expect(after).not.toBe(edited);
+        expect(none).not.toBe(added);
+        expect(added).not.toBe(retargeted);
+        expect(retargeted).not.toBe(conditioned);
+    });
+
+    it('changes the fingerprint when a member moves, since the frame is sized from member positions', () => {
+        const transitions = [{from: 'node_0', to: 'node_1'}];
+
+        const unplaced = getTasksStructuralFingerprint([makeGraphTask(transitions)]);
+        const placed = getTasksStructuralFingerprint([makeGraphTask(transitions, {node_1: {x: 300, y: 0}})]);
+        const moved = getTasksStructuralFingerprint([makeGraphTask(transitions, {node_1: {x: 300, y: 120}})]);
+
+        expect(unplaced).not.toBe(placed);
+        expect(placed).not.toBe(moved);
+    });
+
+    // Re-pointing the Start pill writes `startNode` and nothing else, so this is the only thing
+    // that can tell the layout to re-emit the `graphStart` edge. Without it the canvas keeps
+    // asserting the graph enters where it used to, while the saved workflow enters somewhere else.
+    it('changes the fingerprint when the start node is re-pointed', () => {
+        const transitions = [{from: 'node_0', to: 'node_1'}];
+        const positions = {node_0: {x: 24, y: 0}, node_1: {x: 300, y: 0}};
+
+        expect(getTasksStructuralFingerprint([makeGraphTask(transitions, positions, 'node_0')])).not.toBe(
+            getTasksStructuralFingerprint([makeGraphTask(transitions, positions, 'node_1')])
+        );
+    });
+
+    it('keeps the fingerprint stable when nothing structural changed', () => {
+        const transitions = [{from: 'node_0', to: 'node_1'}];
+        const positions = {node_1: {x: 300, y: 0}};
+
+        expect(getTasksStructuralFingerprint([makeGraphTask(transitions, positions)])).toBe(
+            getTasksStructuralFingerprint([makeGraphTask(transitions, positions)])
+        );
     });
 });

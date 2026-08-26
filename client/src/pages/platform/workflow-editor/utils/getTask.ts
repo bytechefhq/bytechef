@@ -1,6 +1,6 @@
 import {TASK_DISPATCHER_SUBTASK_COLLECTIONS} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, GraphNodeType} from '@/shared/types';
+import {BranchCaseType} from '@/shared/types';
 
 type GetParentTaskType = {
     tasks: Array<WorkflowTask>;
@@ -32,8 +32,6 @@ export function getTask({tasks, workflowNodeName}: GetParentTaskType): WorkflowT
                 subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
             } else if (collectionName === 'branches') {
                 subtasks = subtasks?.flat();
-            } else if (collectionName === 'nodes') {
-                subtasks = subtasks?.flatMap((graphNode: GraphNodeType) => graphNode.tasks);
             } else if (collectionName === 'iteratee') {
                 if (subtasks && typeof subtasks === 'object' && !Array.isArray(subtasks)) {
                     subtasks = [subtasks];

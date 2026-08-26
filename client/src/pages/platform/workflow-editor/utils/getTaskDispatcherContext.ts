@@ -51,7 +51,6 @@ function getContextFromTaskNodeData(
     } else if (nodeData.graphData) {
         context.graphId = nodeData.graphData.graphId as string;
         context.index = (nodeData.graphData.index as number) + indexIncrement;
-        context.nodeIndex = nodeData.graphData.nodeIndex as number;
         context.taskDispatcherId = nodeData.graphData.graphId as string;
     } else if (nodeData.onErrorData) {
         context.index = (nodeData.onErrorData.index as number) + indexIncrement;
@@ -137,12 +136,12 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     } else if (isGraphPlaceholder) {
         const graphId = placeholderNode.data?.graphId as string;
 
-        // Unlike fork-join's placeholder (whose trailing segment is a branch index, not a
-        // task position), a graph placeholder's trailing segment IS the task-insertion
-        // position within that node's lane — the generic `placeholderIndex` parse above is
-        // already correct, so `context.index` is left as-is here.
+        // A graph's add-node placeholder is a bare `<graphId>-graph-placeholder` carrying no
+        // index, so the generic trailing-segment parse above yields NaN — pin it to 0 the way
+        // fork-join's branch does. `insertTaskDispatcherSubtask` keys its append correction off
+        // `index === 0` and resolves the real position from the current `nodes` length.
+        context.index = 0;
         context.graphId = graphId;
-        context.nodeIndex = placeholderNode.data?.nodeIndex as number;
         context.taskDispatcherId = graphId;
     } else if (isOnErrorPlaceholder) {
         const onErrorId = placeholderNode.data.onErrorId as string;

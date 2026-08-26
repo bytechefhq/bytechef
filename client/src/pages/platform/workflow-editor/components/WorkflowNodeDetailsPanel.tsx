@@ -9,7 +9,7 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
-import GraphStatesPanel from '@/pages/platform/workflow-editor/components/properties/graph/GraphStatesPanel';
+import GraphTransitionsPanel from '@/pages/platform/workflow-editor/components/properties/graph/GraphTransitionsPanel';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {
     ActionDefinition,
@@ -18,7 +18,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {ChevronDownIcon, ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+import {ReactNode, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -85,6 +85,22 @@ const WorkflowNodeDetailsPanel = ({
         updateWorkflowMutation,
         workflowNodeOutputs,
     });
+
+    const isGraphNode = !!currentNode?.taskDispatcher && currentNode.componentName === 'graph';
+
+    // A graph's `transitions` are a routing table, not a list of objects: declared order within a
+    // source node is conditional priority, more than one unconditional edge from a node is a
+    // warning, and an entry naming a node the graph does not declare cannot be drawn at all.
+    // `GraphTransitionsPanel` renders exactly that, so the generic ARRAY_BUILDER is dropped rather
+    // than left beside it — two editors over one field, one of which can author rows the canvas
+    // cannot represent. `startNode` and `maxTransitions` are plain scalars and stay generic.
+    const displayedOperationProperties = useMemo(
+        () =>
+            isGraphNode
+                ? currentOperationProperties?.filter((property) => property.name !== 'transitions')
+                : currentOperationProperties,
+        [currentOperationProperties, isGraphNode]
+    );
 
     if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
         return <></>;
@@ -325,22 +341,18 @@ const WorkflowNodeDetailsPanel = ({
                                             />
                                         )}
 
-                                    {activeTab === 'properties' &&
-                                        currentNode?.taskDispatcher &&
-                                        currentNode.componentName === 'graph' && (
-                                            <GraphStatesPanel
-                                                taskDispatcherDefinition={currentTaskDispatcherDefinition}
-                                            />
-                                        )}
+                                    {activeTab === 'properties' && isGraphNode && currentNode?.workflowNodeName && (
+                                        <GraphTransitionsPanel graphId={currentNode.workflowNodeName} />
+                                    )}
 
                                     {activeTab === 'properties' &&
-                                        (!operationDataMissing && currentOperationProperties?.length ? (
+                                        (!operationDataMissing && displayedOperationProperties?.length ? (
                                             <Properties
                                                 customClassName="p-4"
                                                 displayConditionsQuery={activeDisplayConditionsQuery}
                                                 key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
                                                 operationName={currentOperationName}
-                                                properties={currentOperationProperties}
+                                                properties={displayedOperationProperties}
                                             />
                                         ) : (
                                             <PropertiesTabSkeleton />

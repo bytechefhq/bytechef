@@ -104,7 +104,6 @@ export default async function handleTaskDispatcherClick({
             newNodeData.graphData = {
                 graphId: taskDispatcherContext.graphId as string,
                 index: (taskDispatcherContext.index ?? 0) as number,
-                nodeIndex: (taskDispatcherContext.nodeIndex ?? 0) as number,
             };
         } else if (taskDispatcherContext.terminateId) {
             newNodeData.terminateData = {

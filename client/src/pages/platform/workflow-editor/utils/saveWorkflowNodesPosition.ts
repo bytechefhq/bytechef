@@ -170,6 +170,20 @@ export function updateTaskPositions(
             };
         }
 
+        if (updatedTask.parameters?.nodes) {
+            updatedTask = {
+                ...updatedTask,
+                parameters: {
+                    ...updatedTask.parameters,
+                    nodes: updateTaskPositions(
+                        updatedTask.parameters.nodes as WorkflowTask[],
+                        nodePositions,
+                        clearPositionNodeIds
+                    ),
+                },
+            };
+        }
+
         return updatedTask;
     });
 }
@@ -231,10 +245,15 @@ export default function saveWorkflowNodesPosition({
     // so this is the only way to keep positions in sync without a full refetch.
     const updatedDefinitionStr = stringifyWorkflowDefinition(workflowDefinition);
 
+    const updatedTasks = workflow.tasks
+        ? updateTaskPositions(workflow.tasks, nodePositions, clearPositionNodeIds)
+        : workflow.tasks;
+
     useWorkflowDataStore.setState((state) => ({
         workflow: {
             ...state.workflow,
             definition: updatedDefinitionStr,
+            tasks: updatedTasks,
         },
     }));
 
@@ -244,6 +263,7 @@ export default function saveWorkflowNodesPosition({
     const previousNodes = nodes;
 
     const previousDefinition = workflow.definition;
+    const previousTasks = workflow.tasks;
 
     const updatedNodes = nodes.map((node) => {
         const position = nodePositions[node.id];
@@ -282,6 +302,7 @@ export default function saveWorkflowNodesPosition({
         definition: updatedDefinitionStr,
         previousDefinition,
         previousNodes,
+        previousTasks,
         setNodes,
         updateWorkflowMutation,
         version: workflow.version,
@@ -293,6 +314,7 @@ interface FirePositionMutationProps {
     definition: string;
     previousDefinition: string;
     previousNodes: Node[];
+    previousTasks?: WorkflowTask[];
     setNodes: (nodes: Node[]) => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     version?: number;
@@ -303,6 +325,7 @@ function firePositionMutation({
     definition,
     previousDefinition,
     previousNodes,
+    previousTasks,
     setNodes,
     updateWorkflowMutation,
     version,
@@ -328,6 +351,7 @@ function firePositionMutation({
                         workflow: {
                             ...state.workflow,
                             definition: previousDefinition,
+                            tasks: previousTasks,
                         },
                     }));
                 });
@@ -346,6 +370,7 @@ function firePositionMutation({
                         definition: pendingDefinition,
                         previousDefinition: currentWorkflow.definition!,
                         previousNodes: useWorkflowDataStore.getState().nodes,
+                        previousTasks: currentWorkflow.tasks,
                         setNodes: useWorkflowDataStore.getState().setNodes,
                         updateWorkflowMutation,
                         version: currentWorkflow.version,

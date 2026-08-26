@@ -1,4 +1,6 @@
 import {
+    GRAPH_START_EDGE_TYPE,
+    GRAPH_TRANSITION_EDGE_TYPE,
     LayoutDirectionType,
     NODE_HEIGHT,
     PLACEHOLDER_NODE_HEIGHT,
@@ -7,7 +9,7 @@ import {
     TRIGGER_PLACEHOLDER_NODE_ID,
     TRIGGER_PLACEHOLDER_NODE_SIZE,
 } from '@/shared/constants';
-import {GraphNodeType, NodeDataType} from '@/shared/types';
+import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
 import {getCrossAxis} from './directionUtils';
@@ -21,7 +23,6 @@ import {
     getLayoutElements,
     positionTriggerPlaceholder,
 } from './layoutUtils';
-import orderGraphNodeIndexes from './orderGraphNodeIndexes';
 import {
     CHAIN_CENTERING_MAX_SLACK,
     applySavedPositions,
@@ -436,15 +437,14 @@ function collectChainMainNodes(
             ? getGhostIds(currentNode).bottomGhostId
             : currentNode.id;
 
-        // `graphTransition` overlay edges must never be mistaken for the chain's real
-        // continuation — a graph lane's first task doubles as a `graphTransition`
-        // source (see createGraphTransitionEdges), and without this guard a stray
-        // match would divert the chain walk onto the overlay instead of the
-        // structural next-node edge.
+        // A `graphTransition` edge (createGraphEdges) must never be mistaken for the chain's
+        // real continuation: it is a free-form route between two members of a graph frame, and
+        // a member with an outgoing transition also has its own structural wiring — without this
+        // guard a stray match would divert the chain walk onto the transition.
         const continuationEdge = edges.find(
             (candidateEdge) =>
                 candidateEdge.source === continuationSourceId &&
-                candidateEdge.type !== 'graphTransition' &&
+                candidateEdge.type !== GRAPH_TRANSITION_EDGE_TYPE &&
                 nodesById.get(candidateEdge.target)?.type !== 'placeholder'
         );
 
@@ -494,6 +494,21 @@ const getChildAlignmentOptions = (direction: LayoutDirectionType): Record<string
  * ELK_LAYER_SPACING + 1×slack — the consistency guarantee of the ELK engine.
  */
 function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+    const graphFrame = (node.data as NodeDataType).graphFrame;
+
+    // A graph frame arrives pre-sized from the layout pre-pass. Its box IS its rendered size, so
+    // it only takes the same per-side slack a configured cluster root does on the main axis,
+    // keeping the box-adjacent gaps on the engine's rhythm.
+    if (graphFrame) {
+        const frameSlack = ANCHOR_MAIN_FOOTPRINT - NODE_ANCHOR_SIZE;
+
+        if (direction === 'TB') {
+            return {height: graphFrame.height + frameSlack, width: graphFrame.width};
+        }
+
+        return {height: graphFrame.height, width: graphFrame.width + frameSlack};
+    }
+
     const {height, width} = getDagreNodeSize(node, direction);
 
     const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
@@ -543,7 +558,7 @@ function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: nu
  * Child tasks — including nested dispatcher nodes — carry
  * conditionData.conditionId / loopData.loopId.
  */
-function getOwningDispatcherId(node: Node): string | undefined {
+export function getOwningDispatcherId(node: Node): string | undefined {
     const nodeData = node.data as NodeDataType;
 
     if (nodeData.taskDispatcherId && nodeData.taskDispatcherId !== node.id) {
@@ -692,12 +707,13 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
             return;
         }
 
-        // `graphTransition` overlay edges (see createGraphTransitionEdges) are a
-        // paint-time decoration, not part of the structural flow — a back or self
-        // transition is a REAL CYCLE in graph node terms, and feeding it into ELK's
-        // layered ranking algorithm would corrupt the ranking of every other node.
-        // They must never enter the ELK graph, same as the left-ghost rail above.
-        if (currentEdge.type === 'graphTransition') {
+        // A graph frame's own routes (`graphTransition`, `graphStart`) are free-form paths
+        // between members inside the box, not part of the structural flow — a back or self
+        // transition is a REAL CYCLE in graph node terms, and feeding it into ELK's layered
+        // ranking algorithm would corrupt the ranking of every other node. `layoutGraphFrames`
+        // already strips both before the outer layout runs; this keeps direct callers safe, same
+        // as the left-ghost rail above.
+        if (currentEdge.type === GRAPH_TRANSITION_EDGE_TYPE || currentEdge.type === GRAPH_START_EDGE_TYPE) {
             return;
         }
 
@@ -733,30 +749,6 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
     // Condition ranks are intrinsic (caseTrue < caseFalse); branch ranks need
     // the scope dispatcher's params-derived ordinal list — unknown or missing
     // keys rank last, stable, as a fail-safe for malformed state.
-    // orderGraphNodeIndexes is pure but runs a topological sort, and getMemberCaseRank is called
-    // once per container member — memoize per dispatcher so an n-lane graph sorts once, not n+1
-    // times. Scoped to this buildElkGraph call, so it never outlives one layout pass.
-    const graphVisualOrderByDispatcherId = new Map<string, number[]>();
-
-    const getGraphVisualOrder = (dispatcherNode: Node): number[] => {
-        const cachedOrder = graphVisualOrderByDispatcherId.get(dispatcherNode.id);
-
-        if (cachedOrder) {
-            return cachedOrder;
-        }
-
-        const dispatcherData = dispatcherNode.data as NodeDataType;
-        const graphNodes = (dispatcherData.parameters?.nodes ?? []) as Array<GraphNodeType>;
-        const visualOrder = orderGraphNodeIndexes(
-            graphNodes,
-            dispatcherData.parameters?.startNode as string | undefined
-        );
-
-        graphVisualOrderByDispatcherId.set(dispatcherNode.id, visualOrder);
-
-        return visualOrder;
-    };
-
     const getMemberCaseRank = (memberNode: Node | undefined, scopeDispatcherNode: Node | undefined): number => {
         if (!memberNode) {
             return -1;
@@ -800,34 +792,6 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
             // carry an explicit branchIndex; the trailing add-a-branch
             // placeholder gets branchCount and so ranks last naturally
             return memberData.forkJoinData?.branchIndex ?? memberData.branchIndex ?? Number.MAX_SAFE_INTEGER;
-        }
-
-        if (scopeComponentName === 'graph') {
-            // Both children (graphData) and placeholders (top-level field) carry an explicit
-            // declaration nodeIndex. Lanes rank by their VISUAL position so the canvas reads in
-            // transition order; the trailing add-node placeholder carries nodes.length, which is
-            // outside the permutation and so keeps ranking last. With no node metadata at all the
-            // permutation is empty and every member falls back to its declaration index, which is
-            // exactly the pre-topological behaviour.
-            const declaredNodeIndex = memberData.graphData?.nodeIndex ?? memberData.nodeIndex;
-
-            if (declaredNodeIndex === undefined) {
-                return Number.MAX_SAFE_INTEGER;
-            }
-
-            if (!scopeDispatcherNode) {
-                return declaredNodeIndex;
-            }
-
-            const visualOrder = getGraphVisualOrder(scopeDispatcherNode);
-
-            if (declaredNodeIndex >= visualOrder.length) {
-                return declaredNodeIndex;
-            }
-
-            const visualPosition = visualOrder.indexOf(declaredNodeIndex);
-
-            return visualPosition === -1 ? declaredNodeIndex : visualPosition;
         }
 
         if (scopeComponentName === 'on-error') {
@@ -906,11 +870,17 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
     };
 }
 
-type ElkInstanceType = {layout: (graph: ElkNode) => Promise<ElkNode>};
+export type ElkInstanceType = {layout: (graph: ElkNode) => Promise<ElkNode>};
 
 let elkInstance: ElkInstanceType | null = null;
 
-const loadElk = async (): Promise<ElkInstanceType> => {
+/**
+ * Lazily loads and caches the singleton ELK instance behind a dynamic import, so the (sizeable)
+ * ELK bundle only enters a chunk that actually needs layout — never the initial one. Exported so
+ * other ELK-backed layout modules (e.g. graphFrameGeometry's autoPlaceGraphMembers) reuse this one
+ * singleton instead of loading/instantiating a second copy of the bundle.
+ */
+export const loadElk = async (): Promise<ElkInstanceType> => {
     if (!elkInstance) {
         const {default: ELK} = await import('elkjs/lib/elk.bundled.js');
 
@@ -932,6 +902,14 @@ const loadElk = async (): Promise<ElkInstanceType> => {
  * reservation is.
  */
 function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+    const graphFrame = (node.data as NodeDataType).graphFrame;
+
+    // The frame paints exactly the box the pre-pass computed — GraphFrameNode styles itself from
+    // the same `data.graphFrame` — so there is no anchor box to center inside its footprint.
+    if (graphFrame) {
+        return {height: graphFrame.height, width: graphFrame.width};
+    }
+
     const isGhostNode = node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode';
     const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
 
@@ -1265,13 +1243,13 @@ export const getElkLayoutElements = async ({
                 node.position = {...node.position, [mainAxis]: footprintStart + renderedOffset};
             };
 
-            // Same guard as collectChainMainNodes above: a graph lane's first task is
-            // also a `graphTransition` source, so the overlay edge must be excluded
-            // here too or the main-axis compaction walk could follow it instead of
-            // the structural continuation edge.
+            // Same guard as collectChainMainNodes above: a graph member can be both a
+            // `graphTransition` source and a structural chain node, so the transition must be
+            // excluded here too or the main-axis compaction walk could follow it instead of the
+            // structural continuation edge.
             const findContinuationEdge = (sourceId: string): Edge | undefined =>
                 edges.find((candidateEdge) => {
-                    if (candidateEdge.source !== sourceId || candidateEdge.type === 'graphTransition') {
+                    if (candidateEdge.source !== sourceId || candidateEdge.type === GRAPH_TRANSITION_EDGE_TYPE) {
                         return false;
                     }
 

@@ -3,6 +3,9 @@ import {
     DATA_PILL_PANEL_WIDTH,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
+    GRAPH_FRAME_NODE_TYPE,
+    GRAPH_START_EDGE_TYPE,
+    GRAPH_TRANSITION_EDGE_TYPE,
     LayoutDirectionType,
     NODE_DETAILS_PANEL_WIDTH,
     ON_ERROR_WIRE_KEY_ERROR_BRANCH,
@@ -18,7 +21,7 @@ import {
     Workflow,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, NodeDataType} from '@/shared/types';
+import {BranchCaseType, GraphTransitionType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
@@ -55,6 +58,7 @@ import createParallelNode from '../utils/createParallelNode';
 import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
 import {getEffectivelyDisabledTaskNames} from '../utils/getEffectivelyDisabledTaskNames';
+import {LayoutGraphFramesResultI, layoutGraphFrames} from '../utils/graph/layoutGraphFrames';
 import {isElkLayoutActive} from '../utils/isElkLayoutSupported';
 import {createLayoutRetryState, onLayoutFailure, onLayoutSuccess} from '../utils/layoutRetryController';
 import {
@@ -70,38 +74,67 @@ import {buildStickyNoteNodes} from '../utils/stickyNoteUtils';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
 /**
- * Builds a string key that changes only when the task graph structure changes
- * (task names, types, nested task counts) but NOT when parameter values change.
- * This prevents unnecessary dagre layout recalculations on every property save.
- */
-/**
- * Rewrites edges for read-only rendering: all surviving edges become plain
- * `smoothstep` connectors. `graphTransition` overlay edges are dropped
- * entirely rather than rewritten — they anchor to hidden `-graph-transition-
- * source`/`-graph-transition-target` handles that only `WorkflowNode` and
- * `PlaceholderNode` expose (see createGraphTransitionEdges); read-only
- * rendering swaps those node types for `ReadOnlyNode`/`ReadOnlyPlaceholderNode`,
- * which carry no such handles, so keeping the edges (under any type) would
- * reference connection points that do not exist on the read-only nodes.
+ * Rewrites edges for read-only rendering. Structural connectors become plain `smoothstep` ones:
+ * their editing chrome (the add-node button, the case labels' menus) has nothing to act on once
+ * `WorkflowNode`/`PlaceholderNode` have been swapped for their read-only counterparts.
+ *
+ * A graph's own edges are the exception and keep their type. `ReadOnlyNode` renders the same
+ * `-graph-transition-source`/`-target`/`-dynamic` anchors an editable member does — just not
+ * connectable — so they have somewhere to route; and rewriting them would lose exactly what makes
+ * a graph readable: a transition's dashed dynamic stroke, its `dynamic` badge, its dangling color,
+ * its arrow marker and its executed-path highlight, and the start edge's distinct plain styling.
+ * The result would look almost right, which is worse than looking broken.
+ *
+ * What read-only takes away from them instead is editing: each transition is stamped
+ * `data.readOnly`, which closes its editor popover, and the start edge's `reconnectable` opt-in is
+ * cleared so the entry point cannot be dragged onto another member. Members are locked separately,
+ * by `toReadOnlyLayoutNodes`.
  */
 export function toReadOnlyLayoutEdges(edges: Edge[]): Edge[] {
-    return edges
-        .filter((edge) => edge.type !== 'graphTransition')
-        .map((edge) => ({
-            ...edge,
-            type: 'smoothstep',
-        }));
+    return edges.map((edge) => {
+        if (edge.type === GRAPH_TRANSITION_EDGE_TYPE) {
+            return {...edge, data: {...edge.data, readOnly: true}};
+        }
+
+        if (edge.type === GRAPH_START_EDGE_TYPE) {
+            return {...edge, reconnectable: false};
+        }
+
+        return {...edge, type: 'smoothstep'};
+    });
 }
 
 /**
- * Collects every graph node `next` expression found under any `nodes` array in the given value. The
- * `next` expressions ARE structural for graph dispatchers — they define the rendered transition
- * overlay edges — so the fingerprint must change when one is edited, or the canvas keeps showing the
- * transitions from the last full layout until a page reload.
+ * Clears each node's OWN `draggable` flag for read-only rendering.
+ *
+ * The canvas already passes `nodesDraggable={false}`, but React Flow reads that only as a default:
+ * a node is draggable when `node.draggable || (nodesDraggable && node.draggable === undefined)`.
+ * `layoutGraphFrames` stamps `draggable: true` on every direct graph member so members can be
+ * arranged freely inside their frame — which, unhandled, would leave exactly those nodes draggable
+ * in an execution view where nothing else moves.
+ *
+ * Nodes that never declared the flag are returned untouched, so the canvas-wide lock stays the one
+ * place ordinary nodes are locked.
  */
-function collectGraphNextExpressions(value: unknown, sink: string[]): void {
+export function toReadOnlyLayoutNodes(nodes: Node[]): Node[] {
+    return nodes.map((node) => (node.draggable ? {...node, draggable: false} : node));
+}
+
+/**
+ * Collects a layout signature for every graph dispatcher found under the given value: its entry
+ * point, its declared transitions and its members' stored positions.
+ *
+ * All three ARE structural for a graph. The transitions are the edges the canvas paints, the entry
+ * point is the one the `graphStart` edge leaves from — and re-pointing the Start pill writes
+ * `startNode` and nothing else, so without it here the canvas would go on asserting the graph
+ * enters where it used to while the saved workflow enters somewhere else — and the member
+ * positions are what `layoutGraphFrames` sizes the frame from, the frame's size being what the
+ * outer flow reflows around. Without them in the fingerprint the canvas would keep showing the
+ * previous entry point, the previous transitions and the previous box size until a page reload.
+ */
+function collectGraphLayoutSignature(value: unknown, sink: string[]): void {
     if (Array.isArray(value)) {
-        value.forEach((item) => collectGraphNextExpressions(item, sink));
+        value.forEach((item) => collectGraphLayoutSignature(item, sink));
 
         return;
     }
@@ -113,14 +146,43 @@ function collectGraphNextExpressions(value: unknown, sink: string[]): void {
     const record = value as Record<string, unknown>;
 
     if (Array.isArray(record.nodes)) {
-        for (const graphNode of record.nodes as Array<{next?: unknown}>) {
-            if (graphNode && typeof graphNode === 'object') {
-                sink.push(typeof graphNode.next === 'string' ? graphNode.next : '');
-            }
-        }
+        const transitions = (Array.isArray(record.transitions) ? record.transitions : [])
+            .map((transition) => {
+                const {condition, from, to} = (transition ?? {}) as GraphTransitionType;
+
+                return `${from}->${to}[${condition ?? ''}]`;
+            })
+            .join(';');
+
+        const positions = (record.nodes as Array<{metadata?: NodeDataType['metadata']; name?: string}>)
+            .map((graphNode) => {
+                const nodePosition = graphNode?.metadata?.ui?.nodePosition;
+
+                return `${graphNode?.name ?? ''}@${nodePosition ? `${nodePosition.x},${nodePosition.y}` : ''}`;
+            })
+            .join(';');
+
+        sink.push(`start:${record.startNode ?? ''}|transitions:${transitions}|positions:${positions}`);
     }
 
-    Object.values(record).forEach((nested) => collectGraphNextExpressions(nested, sink));
+    Object.values(record).forEach((nested) => collectGraphLayoutSignature(nested, sink));
+}
+
+/**
+ * Builds a string key that changes only when the task graph structure changes
+ * (task names, types, nested task counts) but NOT when parameter values change.
+ * This prevents unnecessary dagre layout recalculations on every property save.
+ */
+/**
+ * Moves the canvas sideways by `shift` when a side panel opens or closes.
+ *
+ * A parented node is positioned RELATIVE to its parent, so a graph frame's members ride along with
+ * the frame's own shift; moving them too applies it twice and walks them out of the box.
+ */
+export function shiftCanvasNodes(nodes: Node[], shift: number): Node[] {
+    return nodes.map((node) =>
+        node.parentId ? node : {...node, position: {...node.position, x: node.position.x + shift}}
+    );
 }
 
 export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
@@ -149,12 +211,12 @@ export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
                     parts.push(counts.length === 1 ? `${key}${counts[0]}` : `${key}${counts.join('-')}`);
                 }
 
-                const graphNextExpressions: string[] = [];
+                const graphLayoutSignatures: string[] = [];
 
-                collectGraphNextExpressions(task.parameters, graphNextExpressions);
+                collectGraphLayoutSignature(task.parameters, graphLayoutSignatures);
 
-                if (graphNextExpressions.length > 0) {
-                    parts.push(`next:${graphNextExpressions.join(';')}`);
+                if (graphLayoutSignatures.length > 0) {
+                    parts.push(`graph:${graphLayoutSignatures.join('&')}`);
                 }
             }
 
@@ -172,6 +234,43 @@ interface UseLayoutProps {
     leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
+}
+
+/**
+ * Re-applies edge selection across a relayout.
+ *
+ * Every relayout rebuilds the edges from the definition, and a freshly built edge carries no
+ * `selected` flag — so a debounced parameter save while the user is typing silently deselected
+ * whatever edge was selected, and anything anchored on that selection closed under them. That is
+ * how `GraphTransitionPopover` shut mid-keystroke: its open state IS the transition edge's
+ * selection. Nodes never had the problem, because the details panel tracks the current node in its
+ * own store rather than through the canvas selection.
+ *
+ * Withheld only when a graph transition was removed. Transition edge ids are positional
+ * (`<graph>-transition-<n>`), so dropping one shifts every later transition down an id and the
+ * selection would land on a different transition than the one that was selected.
+ */
+function withPreservedEdgeSelection(previousEdges: Edge[], nextEdges: Edge[]): Edge[] {
+    const selectedEdgeIds = new Set(
+        previousEdges.filter((previousEdge) => previousEdge.selected).map((previousEdge) => previousEdge.id)
+    );
+
+    if (selectedEdgeIds.size === 0) {
+        return nextEdges;
+    }
+
+    // Withheld only when a graph transition was REMOVED. Nothing else about the edge set has to
+    // match: requiring it to be identical meant any unrelated change arriving in the same pass
+    // dropped the selection, which unmounted the transition editor — taking the caret, the data pill
+    // popup and the half-typed condition with it.
+    const countTransitionEdges = (edges: Edge[]) =>
+        edges.filter((edge) => edge.type === GRAPH_TRANSITION_EDGE_TYPE).length;
+
+    if (countTransitionEdges(nextEdges) < countTransitionEdges(previousEdges)) {
+        return nextEdges;
+    }
+
+    return nextEdges.map((nextEdge) => (selectedEdgeIds.has(nextEdge.id) ? {...nextEdge, selected: true} : nextEdge));
 }
 
 export default function useLayout({
@@ -274,6 +373,11 @@ export default function useLayout({
     const previousTestChatPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
     const previousRightSidebarOpenRef = useRef<boolean | undefined>(undefined);
+    // graphId -> member name -> content-origin position, for members the layout pre-pass had to
+    // place itself. Held rather than saved: the spec persists an auto-placed position on the
+    // user's first interaction with that graph, not on every relayout. `handleNodeDragStop` in
+    // `useWorkflowEditorCanvas` flushes a graph's entry when a member of it is dropped.
+    const autoPlacedGraphPositionsRef = useRef<LayoutGraphFramesResultI['autoPlaced']>({});
 
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
@@ -486,16 +590,6 @@ export default function useLayout({
 
     const firstDownstreamNodeId = allNodes[0]?.id ?? FINAL_PLACEHOLDER_NODE_ID;
 
-    // `allNodes` is fully assembled by this point (the loop above only ever pushes/splices
-    // into it), so this mirrors exactly the engine choice `layoutFunction` makes further down
-    // from the same two inputs — ELK-only per the phase-3 spec: dagre keeps the phase-2 badges
-    // as its sole transition visualization, graphTransition overlay edges are never emitted on
-    // that path. Shared `isElkLayoutActive` keeps this gate and the `layoutFunction` gate below
-    // from ever diverging — `allNodes` here and `layoutNodes` there are different arrays, but
-    // the predicate only inspects each node's taskDispatcher/componentName, so it is equivalent
-    // over either one.
-    const usesElkGraphTransitionOverlay = isElkLayoutActive(layoutEngine, allNodes);
-
     const taskEdges: Array<Edge> = [];
 
     // Create edges based on nodes
@@ -595,9 +689,7 @@ export default function useLayout({
 
         // Create initial edges for the Graph node
         if (isGraphNode) {
-            const graphEdges = createGraphEdges(node, {
-                orderLanesByVisualPosition: usesElkGraphTransitionOverlay,
-            });
+            const graphEdges = createGraphEdges(node);
 
             taskEdges.push(...graphEdges);
 
@@ -609,14 +701,17 @@ export default function useLayout({
 
             const nextNodeData: NodeDataType = nextNode.data as NodeDataType;
 
-            const isTaskDispatcherBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
+            // A graph has no bottom bar: its frame is what the chain leaves the container from, so
+            // it takes the same branch. Everything that branch reads — `taskDispatcherId` and
+            // `isNestedBottomGhost` — `createGraphNode` puts on the frame for exactly this.
+            const isTaskDispatcherBottomGhostNode =
+                node.type === 'taskDispatcherBottomGhostNode' || node.type === GRAPH_FRAME_NODE_TYPE;
 
             if (isTaskDispatcherBottomGhostNode) {
                 const edgeFromTaskDispatcherBottomGhost = createEdgeFromTaskDispatcherBottomGhostNode({
                     allNodes,
                     index,
                     node,
-                    orderLanesByVisualPosition: usesElkGraphTransitionOverlay,
                     tasks,
                 });
 
@@ -681,6 +776,16 @@ export default function useLayout({
                         return;
                     }
                 }
+            }
+
+            // A graph's members are free-form inside its frame: they are reached only through
+            // `parameters.transitions`, never by array adjacency, and the container is entered and
+            // left through its ghost bars alone. Without this the array-order pass below would wire
+            // one member to the next declared one and the LAST member straight out to whatever task
+            // follows the graph — an edge that escapes the frame entirely. Members with an outgoing
+            // transition escape that only incidentally, via the dedupe at the bottom of this block.
+            if (nodeData.graphData?.graphId) {
+                return;
             }
 
             if (isConditionPlaceholderNode || isBranchPlaceholderNode || isOnErrorPlaceholderNode) {
@@ -885,13 +990,7 @@ export default function useLayout({
         const shift = -widthDelta / 2;
         const {nodes: currentNodes, setNodes: updateNodes} = useWorkflowDataStore.getState();
 
-        const shiftedNodes = currentNodes.map((node) => ({
-            ...node,
-            position: {
-                ...node.position,
-                x: node.position.x + shift,
-            },
-        }));
+        const shiftedNodes = shiftCanvasNodes(currentNodes, shift);
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
     }, [
@@ -1075,14 +1174,43 @@ export default function useLayout({
 
         const layoutFunction = isElkLayoutActive(layoutEngine, layoutNodes) ? getElkLayoutElements : getLayoutElements;
 
-        layoutFunction({
-            canvasHeight: canvasHeightRef.current,
-            canvasWidth: canvasWidthRef.current,
-            direction: layoutDirection,
-            edges,
-            nodes: layoutNodes,
-            savedPositionCrossAxisShift,
-        })
+        // Graph frames are laid out first and handed to the engine as single sized leaf nodes;
+        // their members carry frame-relative positions, so they are re-appended afterwards and
+        // the outer result cannot disturb them.
+        layoutGraphFrames(layoutNodes, edges, layoutDirection, layoutFunction)
+            .then((framedGraphs) =>
+                layoutFunction({
+                    canvasHeight: canvasHeightRef.current,
+                    canvasWidth: canvasWidthRef.current,
+                    direction: layoutDirection,
+                    edges: framedGraphs.outerEdges,
+                    nodes: framedGraphs.outerNodes,
+                    savedPositionCrossAxisShift,
+                }).then((elements) => {
+                    // Auto-placed members are NOT written back here — the spec persists them on
+                    // the user's first interaction with that graph, so they are parked on a ref
+                    // that `registerAutoPlacedGraphPositions` publishes for the interaction
+                    // handlers to flush (a member drop, a connect, an add). Auto-arrange needs no
+                    // flush: it writes a position for every member. Threading them through the
+                    // returned elements would mean widening `LayoutElementsResultI` for one
+                    // caller's bookkeeping.
+                    //
+                    // Assigned wholesale, so nothing an earlier pass reported can outlive this one.
+                    autoPlacedGraphPositionsRef.current = framedGraphs.autoPlaced;
+
+                    const layoutElementNodes = [...elements.nodes, ...framedGraphs.memberNodes];
+
+                    // Applied here rather than alongside the read-only node type conversion above:
+                    // the pre-pass runs in between and is what stamps `draggable` on graph members,
+                    // so anything cleared earlier would be stamped back on.
+                    // `engine` rides along in the spread: geometry-coupled renderers key on it.
+                    return {
+                        ...elements,
+                        edges: [...elements.edges, ...framedGraphs.memberEdges],
+                        nodes: readOnlyWorkflow ? toReadOnlyLayoutNodes(layoutElementNodes) : layoutElementNodes,
+                    };
+                })
+            )
             .then((elements) => {
                 if (isCancelled) {
                     return;
@@ -1097,7 +1225,7 @@ export default function useLayout({
 
                 if (isInitialLayoutRef.current || readOnlyWorkflow) {
                     setNodes(targetNodes);
-                    setEdges(elements.edges);
+                    setEdges(withPreservedEdgeSelection(useWorkflowDataStore.getState().edges, elements.edges));
                     isInitialLayoutRef.current = false;
                 } else {
                     const structureChanged = frozenNodes.length !== targetNodes.length;
@@ -1106,7 +1234,7 @@ export default function useLayout({
                         // Snap immediately when nodes are added or removed — animating
                         // a large centering shift looks like a visual jump
                         setNodes(targetNodes);
-                        setEdges(elements.edges);
+                        setEdges(withPreservedEdgeSelection(useWorkflowDataStore.getState().edges, elements.edges));
                     } else {
                         const previousPositionMap = new Map(frozenNodes.map((node) => [node.id, node.position]));
 
@@ -1119,7 +1247,7 @@ export default function useLayout({
 
                         // Set final nodes (at frozen positions) and final edges immediately
                         setNodes(nodesWithCurrentPositions);
-                        setEdges(elements.edges);
+                        setEdges(withPreservedEdgeSelection(useWorkflowDataStore.getState().edges, elements.edges));
 
                         // Each tween frame re-renders the whole canvas, so big
                         // workflows manage only a few frames per second — scale the
@@ -1169,4 +1297,6 @@ export default function useLayout({
             initializeWithCanvasWidth(canvasWidth);
         }
     }, [canvasWidth, initializeWithCanvasWidth, isWorkflowLoaded, readOnlyWorkflow]);
+
+    return {autoPlacedGraphPositionsRef};
 }

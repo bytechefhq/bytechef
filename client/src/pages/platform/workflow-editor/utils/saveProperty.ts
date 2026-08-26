@@ -46,6 +46,9 @@ export default function saveProperty({
     value,
     workflowId,
 }: SavePropertyProps) {
+    // The write target is the details panel's current node, never a parameter — so a caller
+    // rendering `<Property>` outside that panel must point this slot at the task it means first.
+    // `useProperty` carries the full account of that assumption and what removing it would cost.
     const {currentNode} = useWorkflowNodeDetailsPanelStore.getState();
     const {rootClusterElementNodeData} = useWorkflowEditorStore.getState();
 

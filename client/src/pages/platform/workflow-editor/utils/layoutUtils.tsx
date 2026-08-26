@@ -6,6 +6,8 @@ import {
     DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
+    GRAPH_START_EDGE_TYPE,
+    GRAPH_TRANSITION_EDGE_TYPE,
     LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
@@ -45,7 +47,6 @@ import InlineSVG from 'react-inlinesvg';
 import {calculateNodeWidth, getHandlePosition} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import {getConditionBranchSide} from './createConditionEdges';
 import {getForkJoinBranchSide} from './createForkJoinEdges';
-import createGraphEdges, {getGraphNodeSide} from './createGraphEdges';
 import {getOnErrorBranchSide} from './createOnErrorEdges';
 import {getCrossAxis, getCrossAxisNodeSize} from './directionUtils';
 import {
@@ -90,6 +91,10 @@ const TRIGGER_NODE_DAGRE_WIDTH = 160;
 // The visible trigger box is a 72px icon square (w-18/min-h-18). Used to vertically
 // center the small add-trigger "+" slot on that square.
 const TRIGGER_NODE_BOX_SIZE = 72;
+// Half the 72px icon box every node carries its chain handles at the centre of. dagre positions
+// are top-left of that box, so the chain axis is this far past a node's cross-axis position —
+// the same half-box `triggerCrossHalf` uses when centring the canvas.
+const NODE_ANCHOR_HALF = 36;
 // The add-trigger slot's visible box is inset from its node by this horizontal margin
 const TRIGGER_PLACEHOLDER_BOX_MARGIN = 8;
 // A trigger's three RENDERED label lines (title, operation, name). Distinct from the layout
@@ -136,6 +141,13 @@ const loadDagre = async () => {
     return dagre;
 };
 
+// A graph's chain runs dispatcher -> top ghost -> frame -> bottom ghost like every other task
+// dispatcher's, but its ghosts are bare anchors: no branch rails hang off them and they paint no
+// bar. The rank each of those edges is widened by elsewhere buys room for chrome a graph does not
+// have, so they are taken back to a single rank.
+const GRAPH_TOP_GHOST_SUFFIX = '-graph-top-ghost';
+const GRAPH_BOTTOM_GHOST_SUFFIX = '-graph-bottom-ghost';
+
 export const calculateNodeHeight = (node: Node) => {
     const isTopGhostNode = node.type === 'taskDispatcherTopGhostNode';
     const isBottomGhostNode = node.type === 'taskDispatcherBottomGhostNode';
@@ -162,6 +174,15 @@ export const calculateNodeHeight = (node: Node) => {
  * top-left position that ReactFlow expects.
  */
 function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): number {
+    // A graph frame paints its whole box, so — unlike every other node type, whose rendered box is
+    // placed with its top-left ON the footprint centre — its box has to start at the footprint's
+    // leading edge or it would overrun the next rank by half its size.
+    const graphFrame = (node.data as NodeDataType)?.graphFrame;
+
+    if (graphFrame) {
+        return direction === 'LR' ? graphFrame.width : graphFrame.height;
+    }
+
     if (direction !== 'LR') {
         return 0;
     }
@@ -182,6 +203,14 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
 }
 
 export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+    // A graph frame is handed to the engine as a sized leaf: the layout pre-pass has already laid
+    // its members out and written the box it needs, so its footprint IS that box on both axes.
+    const graphFrame = (node.data as NodeDataType)?.graphFrame;
+
+    if (graphFrame) {
+        return {height: graphFrame.height, width: graphFrame.width};
+    }
+
     const height = calculateNodeHeight(node);
 
     // Triggers render as a ~72px icon box; reserving the full task footprint
@@ -838,21 +867,23 @@ export const getClusterElementsLayoutElements = ({
  * paths: prioritizes task edges over ghost/placeholder edges per source, keeps
  * a single edge per source unless the source legitimately fans out (ghosts,
  * cluster roots, branch, fork-join), dedupes by endpoint+handle key, and drops
- * edges referencing nodes that no longer exist. `graphTransition` overlay edges
- * (ELK-only, see createGraphTransitionEdges) bypass the single-edge-per-source
- * fan-out rule entirely — they legitimately coexist with their source lane
- * anchor's structural edge — but still go through the dedupe and dangling-
- * reference passes.
+ * edges referencing nodes that no longer exist.
  */
 export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edge[] {
-    // `graphTransition` overlay edges (see createGraphTransitionEdges) deliberately
-    // share their source with that lane anchor's real structural edge — it is a
-    // paint-time decoration, not a competing structural fan-out. Routing it through
-    // the "one edge per source" collapse below would make the collapse treat it as a
-    // duplicate of the anchor's real successor edge and silently drop one of the two,
-    // so transition edges bypass that collapse entirely and are re-added untouched.
-    const transitionEdges = edges.filter((edge) => edge.type === 'graphTransition');
-    const structuralEdges = edges.filter((edge) => edge.type !== 'graphTransition');
+    // BACKSTOP, not a live path. A graph frame's own routes (`graphTransition`, `graphStart`) do
+    // not reach here from the editor: `layoutGraphFrames` partitions them out before the outer
+    // layout runs and `useLayout` appends them to the result afterwards, so they skip this
+    // function entirely. This guard exists for direct callers, the same defence-in-depth the two
+    // engine entry points already carry (`getLayoutElements`'s pre-dagre filter and
+    // `buildElkGraph`'s skip). Without it such a caller would silently lose routes: a route
+    // shares its source with that member's own structural wiring, so the "one edge per source"
+    // collapse below would treat the two as competing and keep only one. Routes still go through
+    // the dedupe and dangling-reference passes.
+    const isGraphFrameRoute = (edge: Edge) =>
+        edge.type === GRAPH_TRANSITION_EDGE_TYPE || edge.type === GRAPH_START_EDGE_TYPE;
+
+    const graphFrameRouteEdges = edges.filter(isGraphFrameRoute);
+    const structuralEdges = edges.filter((edge) => !isGraphFrameRoute(edge));
 
     const sourceEdgeMap = new Map<string, Edge[]>();
 
@@ -884,7 +915,7 @@ export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edg
         sourceEdgeMap.get(edge.source)?.push(edge);
     });
 
-    const filteredEdges: Edge[] = [...transitionEdges];
+    const filteredEdges: Edge[] = [...graphFrameRouteEdges];
 
     // Filter edges so that only one edge is kept for each source node
     sourceEdgeMap.forEach((sourceEdges, source) => {
@@ -945,44 +976,6 @@ export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edg
     return dedupedEdges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
 }
 
-/**
- * getElkLayoutElements's error-fallback branch (see the `graphTransition` filter's comment in
- * `getLayoutElements` immediately below) re-invokes this function with the SAME edges array ELK
- * was given. Beyond the `graphTransition` overlay edges themselves, those edges' STRUCTURAL
- * handles are also tainted: they were built with `orderLanesByVisualPosition: true` (see
- * `CreateGraphEdgesOptionsI`, threaded from `useLayout.tsx`'s `isElkLayoutActive` check), so every
- * graph dispatcher's shared top/bottom-ghost handle (left/middle/right, see
- * `distributeGraphNodeIndexes`) — including a nested dispatcher's own bottom-ghost edge into that
- * same handle, via `getGraphNodeSide` — follows the VISUAL lane permutation. Dagre always lays
- * lanes out in DECLARATION order, so reusing those edges verbatim reproduces the exact
- * boxy-staircase / apparent-empty-column regression the visual lane ordering feature was written
- * around: a lane's edges leave from a handle that no longer matches its physical column.
- *
- * Each graph dispatcher's own edges are regenerated in declaration order (`createGraphEdges` with
- * no options) and spliced back in by id — ids are derived from node ids alone (never from lane
- * position, per the no-visual-position-in-ids invariant), so they are stable regardless of which
- * order produced the edge being replaced. This mirrors the `graphTransition` filter immediately
- * below: closing the gap at this one seam covers every downstream consumer, including a bare call
- * into `getLayoutElements` that happens to be handed ELK-ordered edges for any other reason.
- */
-export function realignGraphLaneHandlesToDeclarationOrder(nodes: Node[], edges: Edge[]): Edge[] {
-    const graphDispatcherNodes = nodes.filter((node) => (node.data as NodeDataType).componentName === 'graph');
-
-    if (graphDispatcherNodes.length === 0) {
-        return edges;
-    }
-
-    const declarationOrderEdgesById = new Map<string, Edge>();
-
-    graphDispatcherNodes.forEach((graphDispatcherNode) => {
-        createGraphEdges(graphDispatcherNode).forEach((declarationOrderEdge) => {
-            declarationOrderEdgesById.set(declarationOrderEdge.id, declarationOrderEdge);
-        });
-    });
-
-    return edges.map((edge) => declarationOrderEdgesById.get(edge.id) ?? edge);
-}
-
 export const getLayoutElements = async ({
     canvasHeight,
     canvasWidth,
@@ -991,19 +984,14 @@ export const getLayoutElements = async ({
     nodes,
     savedPositionCrossAxisShift = 0,
 }: GetLayoutElementsProps) => {
-    // `graphTransition` overlay edges (ELK-only, see createGraphTransitionEdges) must
-    // never reach dagre or this function's post-dagre chain-walker pipeline — dagre
-    // keeps the phase-2 badges as its sole transition visualization. The happy path
-    // never creates them for the dagre engine (see usesElkGraphTransitionOverlay in
-    // useLayout), but getElkLayoutElements's error-fallback branch re-invokes this
-    // function with the SAME edges array ELK was given, which may include them —
-    // filtering here closes that gap for every downstream consumer in one place,
-    // including dagre's own ranking (a cyclic pair would corrupt it exactly like the
-    // ELK case).
-    edges = edges.filter((edge) => edge.type !== 'graphTransition');
-
-    // Closes the handle-side half of the same gap — see the function's own doc comment.
-    edges = realignGraphLaneHandlesToDeclarationOrder(nodes, edges);
+    // `graphTransition` and `graphStart` edges must never reach dagre or this function's
+    // post-dagre chain-walker pipeline: they are free-form routes between members inside a
+    // `graphFrame`, not chain links, and a cyclic pair of transitions would corrupt dagre's own
+    // ranking while a start edge would walk the chain straight into the frame. `layoutGraphFrames`
+    // already strips both before the outer layout runs, so this is a backstop for direct callers
+    // (and for getElkLayoutElements's error-fallback branch, which re-invokes this function with
+    // the SAME edges array ELK was given).
+    edges = edges.filter((edge) => edge.type !== GRAPH_TRANSITION_EDGE_TYPE && edge.type !== GRAPH_START_EDGE_TYPE);
 
     const dagreModule = await loadDagre();
 
@@ -1029,7 +1017,11 @@ export const getLayoutElements = async ({
             // span only sizes the lower (bus→first-task) leg to one task-to-task gap.
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
         } else if (edge.target.includes('bottom-ghost')) {
-            dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+            // A graph's ghosts carry no branch rails and paint no bar, so the extra rank every
+            // other dispatcher needs to clear its own chrome is dead space here.
+            dagreGraph.setEdge(edge.source, edge.target, {
+                minlen: edge.target.includes(GRAPH_BOTTOM_GHOST_SUFFIX) ? 1 : 2,
+            });
         } else if (edge.target.includes('top-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 1});
         } else {
@@ -1046,7 +1038,7 @@ export const getLayoutElements = async ({
             // Edges from top ghosts to content children need extra space
             // so the edge add-button (+) has room between the case label and the node.
             if (sourceNode?.type === 'taskDispatcherTopGhostNode') {
-                edgeLength = 2;
+                edgeLength = edge.source.includes(GRAPH_TOP_GHOST_SUFFIX) ? 1 : 2;
             }
 
             dagreGraph.setEdge(edge.source, edge.target, {minlen: edgeLength});
@@ -1085,6 +1077,16 @@ export const getLayoutElements = async ({
 
         if (hasValidClusterElements && node.data.clusterRoot && direction === 'TB') {
             crossAxisPosition -= 85;
+        }
+
+        // Same compensation the configured cluster root gets above, computed rather than
+        // hard-coded: dagre reports the footprint CENTRE on the cross axis, and the convention
+        // downstream is that a node's chain axis sits half a 72px icon box past its position. A
+        // frame paints its whole box, so its own centre has to land on that axis instead.
+        const graphFrame = (node.data as NodeDataType).graphFrame;
+
+        if (graphFrame) {
+            crossAxisPosition -= (direction === 'TB' ? graphFrame.width : graphFrame.height) / 2 - NODE_ANCHOR_HALF;
         }
 
         const mainAxis = direction === 'TB' ? 'y' : 'x';
@@ -1158,10 +1160,6 @@ interface CreateEdgeFromTaskDispatcherBottomGhostNodeProps {
     allNodes?: Node[];
     index?: number;
     node: Node;
-    // ELK-only, forwarded straight to `getGraphNodeSide` (see that function's doc comment) — this
-    // is the shared edge path both dagre and ELK call, so the flag must default to off and only
-    // be passed true from the ELK call site.
-    orderLanesByVisualPosition?: boolean;
     tasks?: WorkflowTask[];
 }
 
@@ -1169,7 +1167,6 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
     allNodes = [],
     index = 0,
     node,
-    orderLanesByVisualPosition = false,
     tasks = [],
 }: CreateEdgeFromTaskDispatcherBottomGhostNodeProps): Edge | null => {
     const nodeData = node.data as NodeDataType;
@@ -1250,19 +1247,12 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
 
                 break;
             }
-            case 'graph': {
-                const graphNodes = (parentTaskDispatcher.parameters?.nodes || []) as Array<{tasks?: WorkflowTask[]}>;
-
-                const graphNodeIndex = graphNodes.findIndex(
-                    (graphNode) =>
-                        Array.isArray(graphNode.tasks) &&
-                        graphNode.tasks.some((subtask) => subtask.name === taskDispatcherId)
-                );
-
-                parentSubtasks = graphNodeIndex !== -1 ? graphNodes[graphNodeIndex]?.tasks || [] : [];
-
-                break;
-            }
+            // A graph's members live free-form inside its frame: nothing chains a member to the
+            // next declared one, and nothing wires a member back to the graph's own bottom bar.
+            // Routes between members are `graphTransition` edges, built from
+            // `parameters.transitions` by createGraphEdges.
+            case 'graph':
+                return null;
             default: {
                 parentSubtasks = TASK_DISPATCHER_CONFIG[
                     componentName as keyof typeof TASK_DISPATCHER_CONFIG
@@ -1312,15 +1302,6 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
         } else if (componentName === 'fork-join') {
             const branchSide = getForkJoinBranchSide(taskDispatcherId, tasks, parentTaskDispatcher.name);
-
-            targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
-        } else if (componentName === 'graph') {
-            const branchSide = getGraphNodeSide(
-                taskDispatcherId,
-                tasks,
-                parentTaskDispatcher.name,
-                orderLanesByVisualPosition
-            );
 
             targetHandle = `${parentTaskDispatcherBottomGhostId}-${branchSide}`;
         } else if (componentName === 'branch') {
@@ -1561,11 +1542,7 @@ export function collectTaskDispatcherData(
         };
     } else if (componentName === 'graph') {
         graphChildTasks[name] = {
-            nodes: Array.isArray(parameters?.nodes)
-                ? parameters.nodes.map((graphNode: {tasks?: WorkflowTask[]}) =>
-                      Array.isArray(graphNode.tasks) ? graphNode.tasks.map((task: WorkflowTask) => task.name) : []
-                  )
-                : [],
+            nodes: Array.isArray(parameters?.nodes) ? parameters.nodes.map((task: WorkflowTask) => task.name) : [],
         };
     }
 }
@@ -1789,29 +1766,12 @@ export function getTaskAncestry({
 
     if (!isNested) {
         for (const [graphId, graphData] of Object.entries(graphChildTasks)) {
-            const graphSubtaskNameNodes = graphData.nodes;
+            const taskIndex = graphData.nodes.indexOf(taskName);
 
-            graphSubtaskNameNodes.forEach((graphNodeTaskNames, nodeIndex) => {
-                if (isNested) {
-                    return;
-                }
+            if (taskIndex !== -1) {
+                nestingData = {graphData: {graphId, index: taskIndex}};
+                isNested = true;
 
-                const taskIndex = graphNodeTaskNames.indexOf(taskName);
-
-                if (taskIndex !== -1) {
-                    nestingData = {
-                        graphData: {
-                            graphId,
-                            index: taskIndex,
-                            nodeIndex,
-                        },
-                    };
-
-                    isNested = true;
-                }
-            });
-
-            if (isNested) {
                 break;
             }
         }

@@ -12,7 +12,6 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BranchCaseType,
     BuildNodeDataType,
-    GraphNodeType,
     NodeDataType,
     PropertyAllType,
     TaskDispatcherContextType,
@@ -21,7 +20,6 @@ import {
 import {Node} from '@xyflow/react';
 
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
-import {getNextAvailableGraphNodeName} from './graphNodeMutations';
 import {branchCaseKeysMatch} from './layoutUtils';
 
 export function buildGenericNodeData(
@@ -96,7 +94,6 @@ export function buildGenericNodeData(
                 newNodeData.graphData = {
                     graphId: taskDispatcherId,
                     index: taskDispatcherContext.index ?? 0,
-                    nodeIndex: taskDispatcherContext.nodeIndex ?? 0,
                 };
             } else if (type === 'on-error') {
                 newNodeData.onErrorData = {
@@ -427,82 +424,45 @@ export const TASK_DISPATCHER_CONFIG = {
         contextIdentifier: 'graphId',
         dataKey: 'graphData',
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
-            // Convention: `<graphId>-graph-node-<nodeIndex>-placeholder-<pos>` — the node's lane
-            // index sits right after the 'node' segment. Unlike loop/branch, this parser does NOT
-            // also extract `index` from the trailing `pos` segment: `getContextFromPlaceholderNode`
-            // already parses that generically off every placeholder id's last segment before this
-            // function ever runs, and `insertTaskDispatcherSubtask` merges this result on top
-            // without overwriting a pre-existing `index` — so re-parsing it here would be pure
-            // duplication, not a correctness requirement.
+            // Minted as a bare `<graphId>-graph-placeholder` (createGraphNode.ts). This function
+            // deliberately resolves no index — `graph`'s append index is instead resolved in
+            // insertTaskDispatcherSubtask.ts's own `graph` branch (mirroring `parallel`'s), which
+            // reads the CURRENT `nodes` length rather than trusting anything parsed from a
+            // placeholder id that may already be stale by the time it's clicked.
             const parts = placeholderId.split('-');
-            const nodeSegmentIndex = parts.indexOf('node');
-            const nodeIndex = parseInt(
-                (nodeSegmentIndex !== -1 ? parts[nodeSegmentIndex + 1] : parts[parts.length - 1]) || '-1'
-            );
 
-            return {nodeIndex, taskDispatcherId: parts[0]};
+            return {taskDispatcherId: parts[0]};
         },
         getDispatcherId: (context: TaskDispatcherContextType) => context.graphId,
+        // `maxTransitions` is deliberately absent: the dispatcher definition declares it with
+        // `defaultValue(DEFAULT_MAX_TRANSITIONS)`, so `getParametersWithDefaultValues` already
+        // carries it across and a literal here would only be a second copy to drift.
         getInitialParameters: (properties: Array<PropertyAllType>) => ({
             ...getParametersWithDefaultValues({properties}),
-            maxTransitions: 100,
             nodes: [],
+            transitions: [],
         }),
-        getSubtasks: ({
-            context,
-            getAllSubtasks = false,
-            node,
-            task,
-        }: {
-            context?: TaskDispatcherContextType;
-            getAllSubtasks?: boolean;
-            node?: Node;
-            task?: WorkflowTask;
-        }): Array<WorkflowTask> => {
+        getSubtasks: ({node, task}: {node?: Node; task?: WorkflowTask}): Array<WorkflowTask> => {
             const parameters = (node?.data as NodeDataType)?.parameters || task?.parameters;
-            const nodes = (parameters?.nodes || []) as Array<GraphNodeType>;
 
-            if (getAllSubtasks) {
-                return nodes.flatMap((graphNode) => graphNode.tasks || []);
-            }
-
-            const nodeIndex = context?.nodeIndex ?? 0;
-
-            if (nodeIndex >= 0 && nodeIndex < nodes.length) {
-                return nodes[nodeIndex]?.tasks || [];
-            }
-
-            return [];
+            return (parameters?.nodes || []) as Array<WorkflowTask>;
         },
         getTask: getTaskDispatcherTask,
+        // The repair path for a graph task that reached the editor with no `parameters` at all —
+        // it has no property definitions to read defaults from, so this is the one place the
+        // client restates the server's `GraphTaskDispatcherConstants.DEFAULT_MAX_TRANSITIONS`.
         initializeParameters: () => ({
             maxTransitions: 100,
             nodes: [],
+            transitions: [],
         }),
-        updateTaskParameters: ({context, task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => {
-            const nodes = [...((task.parameters?.nodes || []) as Array<GraphNodeType>)];
-            const nodeIndex = context?.nodeIndex ?? 0;
-
-            if (nodeIndex >= 0 && nodeIndex < nodes.length) {
-                nodes[nodeIndex] = {...nodes[nodeIndex], tasks: updatedSubtasks};
-            } else {
-                const reservedNodeNames = new Set(nodes.map((graphNode) => graphNode.name));
-
-                while (nodes.length <= nodeIndex) {
-                    nodes.push({name: getNextAvailableGraphNodeName(reservedNodeNames), tasks: []});
-                }
-
-                nodes[nodeIndex] = {...nodes[nodeIndex], tasks: updatedSubtasks};
-            }
-
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    nodes,
-                },
-            };
-        },
+        updateTaskParameters: ({task, updatedSubtasks}: UpdateTaskParametersType): WorkflowTask => ({
+            ...task,
+            parameters: {
+                ...task.parameters,
+                nodes: updatedSubtasks,
+            },
+        }),
     },
     loop: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
@@ -820,8 +780,6 @@ export function getTaskDispatcherTask({
                     subtasks = subtasks?.flatMap((branchCase: BranchCaseType) => branchCase.tasks);
                 } else if (collectionName === 'branches') {
                     subtasks = subtasks?.flat();
-                } else if (collectionName === 'nodes') {
-                    subtasks = subtasks?.flatMap((graphNode: GraphNodeType) => graphNode.tasks);
                 } else if (collectionName === 'iteratee') {
                     if (subtasks && typeof subtasks === 'object' && !Array.isArray(subtasks)) {
                         subtasks = [subtasks];

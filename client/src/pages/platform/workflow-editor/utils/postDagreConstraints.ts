@@ -1,6 +1,8 @@
 import {
     CLUSTER_ELEMENT_NODE_WIDTH,
     CLUSTER_ROOT_NODE_WIDTH,
+    FINAL_PLACEHOLDER_NODE_ID,
+    GRAPH_FRAME_NODE_TYPE,
     LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
@@ -1810,6 +1812,13 @@ export function applySavedPositions(
     const dispatcherDeltas = new Map<string, {x: number; y: number}>();
 
     for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
+        // A node parented to a graph frame stores a FRAME-relative position (see
+        // toFrameChildPosition); applying it as an absolute canvas coordinate would fling the
+        // member off the canvas. The graph-frame layout pre-pass owns those positions.
+        if (allNodes[nodeIndex].parentId) {
+            continue;
+        }
+
         const nodeData = allNodes[nodeIndex].data as NodeDataType;
 
         if (containsNodePosition(nodeData.metadata)) {
@@ -1838,10 +1847,14 @@ export function applySavedPositions(
     }
 
     if (dispatcherDeltas.size > 0) {
+        // A graph frame belongs to this set for the same reason the ghost bars do: it is chrome
+        // carrying its dispatcher's id, and it has to ride rigidly with a dispatcher that moved.
+        // Its own children need no entry — their positions are relative to the frame.
         const ghostAndPlaceholderTypes = new Set([
             'taskDispatcherTopGhostNode',
             'taskDispatcherBottomGhostNode',
             'taskDispatcherLeftGhostNode',
+            GRAPH_FRAME_NODE_TYPE,
             'placeholder',
         ]);
 
@@ -1857,6 +1870,12 @@ export function applySavedPositions(
 
             for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
                 if (shifted.has(allNodes[nodeIndex].id)) {
+                    continue;
+                }
+
+                // Frame children move with their frame, not with a dispatcher delta — their
+                // positions are relative to the parent, so shifting them would double the move.
+                if (allNodes[nodeIndex].parentId) {
                     continue;
                 }
 
@@ -2311,6 +2330,14 @@ export function alignChainNodesCrossAxis(
         'placeholder',
     ]);
 
+    // `placeholder` covers two different things. Inside a dispatcher a placeholder sits in a lane
+    // dagre chose for it — a condition's two branch stubs are the clearest case — and aligning it
+    // to a predecessor would pull it out of that lane. The trailing placeholder is not that: it is
+    // an ordinary chain successor of the last task, and excluding it leaves the "+" behind in the
+    // old column when the task above it is dragged, joined to it by a diagonal.
+    const isAlignmentTarget = (node: Node): boolean =>
+        !AUXILIARY_TYPES.has(node.type!) || node.id === FINAL_PLACEHOLDER_NODE_ID;
+
     // Build predecessor map: workflow node → its workflow-node predecessor
     // For direct workflow-to-workflow edges, use the source directly.
     // For edges from ghost nodes, resolve to the parent dispatcher so that
@@ -2331,7 +2358,7 @@ export function alignChainNodesCrossAxis(
     for (const edge of edges) {
         const targetNode = allNodes.find((node) => node.id === edge.target);
 
-        if (!targetNode || AUXILIARY_TYPES.has(targetNode.type!)) {
+        if (!targetNode || !isAlignmentTarget(targetNode)) {
             continue;
         }
 
@@ -2700,6 +2727,15 @@ export function alignTrailingPlaceholder(
  * Returns the main-axis rendered size for any node type.
  */
 function getNodeMainAxisSize(node: Node, mainAxis: 'x' | 'y'): number {
+    // A graph frame is the one node whose size is data-driven rather than a per-type constant —
+    // the layout pre-pass sizes it from its members. Falling through to NODE_HEIGHT would make
+    // the centering passes below treat a 400px box as a 100px node and shove it off the chain.
+    const graphFrame = (node.data as NodeDataType).graphFrame;
+
+    if (graphFrame) {
+        return mainAxis === 'y' ? graphFrame.height : graphFrame.width;
+    }
+
     if (node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode') {
         return 2;
     }

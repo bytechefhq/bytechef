@@ -7,9 +7,10 @@ import {twMerge} from 'tailwind-merge';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import DisabledNodeBadge from './DisabledNodeBadge';
+import GraphTransitionHandles from './GraphTransitionHandles';
 import styles from './NodeTypes.module.css';
 
-const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
+const ReadOnlyNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     return (
@@ -50,6 +51,13 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
                 style={layoutDirection === 'TB' ? {left: '36px'} : undefined}
                 type="source"
             />
+
+            {/* This component IS the read-only rendering of a task, so a graph member drawn here
+                shows its transition endpoints but never accepts a new connection. */}
+
+            {data.graphData && (
+                <GraphTransitionHandles boxWidth={72} connectable={false} direction={layoutDirection} nodeId={id} />
+            )}
         </div>
     );
 };

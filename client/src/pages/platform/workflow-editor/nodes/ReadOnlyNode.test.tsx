@@ -18,7 +18,7 @@ const BASE_DATA = {
 function renderNode(data: NodeDataType) {
     return render(
         <ReactFlowProvider>
-            <ReadOnlyNode data={data} />
+            <ReadOnlyNode data={data} id="approval_1" />
         </ReactFlowProvider>
     );
 }

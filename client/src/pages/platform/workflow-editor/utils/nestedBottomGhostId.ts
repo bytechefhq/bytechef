@@ -1,3 +1,5 @@
+import {getGraphFrameId} from './graph/graphFrameGeometry';
+
 /**
  * Builds the bottom-ghost node id for a task dispatcher nested inside another
  * dispatcher's chain, so the enclosing chain can wire an edge from the nested
@@ -23,6 +25,11 @@ export function nestedDispatcherGhostSegment(componentName: string): string {
 
 export function nestedBottomGhostIdForDispatcherTask(taskNodeId: string): string {
     const componentName = taskNodeId.split('_')[0];
+
+    // A graph has no bottom bar — its frame is the node the enclosing chain leaves it from.
+    if (componentName === 'graph') {
+        return getGraphFrameId(taskNodeId);
+    }
 
     return `${taskNodeId}-${nestedDispatcherGhostSegment(componentName)}-bottom-ghost`;
 }

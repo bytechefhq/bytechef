@@ -19,9 +19,10 @@ import {
     UpdateWorkflowMutationType,
 } from '@/shared/types';
 import {QueryClient, useQueryClient} from '@tanstack/react-query';
-import {Edge, Node} from '@xyflow/react';
+import {Edge, Node, XYPosition} from '@xyflow/react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import calculateNodeInsertIndex from '../utils/calculateNodeInsertIndex';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
@@ -194,6 +195,7 @@ export default function useHandleDrop({
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType, targetTriggerName: string) => void,
     (droppedNode: ClickedDefinitionType) => void,
+    (graphId: string, dropPosition: XYPosition, droppedNode: ClickedDefinitionType) => void,
 ] {
     const {captureComponentUsed} = useAnalytics();
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -275,10 +277,45 @@ export default function useHandleDrop({
         });
     }
 
+    /**
+     * A component dropped into a graph frame becomes an unconnected member at the drop point.
+     *
+     * It goes in through the graph's own add-node placeholder, which is the insertion anchor every
+     * other add path already resolves the graph from; the drop position rides along as a pending
+     * connection with no `from`, which is what tells the insertion to place the task without
+     * drawing an edge to it.
+     */
+    async function handleDropOnGraphFrame(
+        graphId: string,
+        dropPosition: XYPosition,
+        droppedNode: ClickedDefinitionType
+    ) {
+        const placeholderNode = useWorkflowDataStore
+            .getState()
+            .nodes.find((node) => node.id === `${graphId}-graph-placeholder`);
+
+        if (!placeholderNode) {
+            return;
+        }
+
+        const {setGraphPendingConnection} = useWorkflowEditorStore.getState();
+
+        setGraphPendingConnection({dropPosition, from: '', graphId});
+
+        try {
+            await handleDropOnPlaceholderNode(placeholderNode, droppedNode);
+        } finally {
+            // The insertion consumes it on the way through; clearing again is a no-op there and is
+            // what stops a failed drop from leaving its position behind for the NEXT add to use.
+            setGraphPendingConnection(undefined);
+        }
+    }
+
     return [
         handleDropOnPlaceholderNode,
         handleDropOnWorkflowEdge,
         handleDropOnTriggerNode,
         handleDropOnTriggerPlaceholder,
+        handleDropOnGraphFrame,
     ];
 }

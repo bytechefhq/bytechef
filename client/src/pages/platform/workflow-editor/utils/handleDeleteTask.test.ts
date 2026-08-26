@@ -374,12 +374,15 @@ describe('handleDeleteTask', () => {
         expect(updatedDefinition.tasks[0].parameters.branches[0][0].name).toBe('branch_b_1');
     });
 
-    it('should delete a task from a graph node, addressed by node index rather than name', () => {
+    it('removes a graph node task together with every transition naming it and clears startNode', () => {
         const graphTask = makeTask('graph_1', {
             maxTransitions: 100,
-            nodes: [
-                {name: 'node_0', tasks: [makeTask('node0_action_1'), makeTask('node0_action_2')]},
-                {name: 'node_1', next: "'node_0'", tasks: [makeTask('node1_action')]},
+            nodes: [makeTask('a'), makeTask('b'), makeTask('c')],
+            startNode: 'b',
+            transitions: [
+                {from: 'a', to: 'b'},
+                {from: 'b', to: 'c'},
+                {from: 'c', to: 'a'},
             ],
         });
         const workflow = makeWorkflow([graphTask]);
@@ -389,8 +392,8 @@ describe('handleDeleteTask', () => {
             cancelWorkflowQueries: vi.fn(),
             data: {
                 componentName: 'test',
-                graphData: {graphId: 'graph_1', index: 0, nodeIndex: 0},
-                name: 'node0_action_1',
+                graphData: {graphId: 'graph_1', index: 1},
+                name: 'b',
             } as unknown as NodeDataType,
             invalidateWorkflowQueries: vi.fn(),
             queryClient: makeQueryClient(),
@@ -402,111 +405,11 @@ describe('handleDeleteTask', () => {
 
         const mutationArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
         const updatedDefinition = JSON.parse(mutationArgs.workflow.definition);
-        const updatedNodes = updatedDefinition.tasks[0].parameters.nodes;
+        const updatedParameters = updatedDefinition.tasks[0].parameters;
 
-        expect(updatedNodes[0].tasks).toHaveLength(1);
-        expect(updatedNodes[0].tasks[0].name).toBe('node0_action_2');
-        // The other node is untouched, including its name and next expression.
-        expect(updatedNodes[1]).toEqual({
-            name: 'node_1',
-            next: "'node_0'",
-            tasks: [{name: 'node1_action', type: 'test/node1_action'}],
-        });
-    });
-
-    it('should leave a graph node EMPTY (not remove it) when its last task is deleted', () => {
-        const graphTask = makeTask('graph_1', {
-            maxTransitions: 100,
-            nodes: [{name: 'node_0', next: "'node_0'", tasks: [makeTask('only_action')]}],
-        });
-        const workflow = makeWorkflow([graphTask]);
-        const mutation = makeMockMutation();
-
-        handleDeleteTask({
-            cancelWorkflowQueries: vi.fn(),
-            data: {
-                componentName: 'test',
-                graphData: {graphId: 'graph_1', index: 0, nodeIndex: 0},
-                name: 'only_action',
-            } as unknown as NodeDataType,
-            invalidateWorkflowQueries: vi.fn(),
-            queryClient: makeQueryClient(),
-            updateWorkflowMutation: mutation,
-            workflow,
-        });
-
-        const mutationArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
-        const updatedDefinition = JSON.parse(mutationArgs.workflow.definition);
-        const updatedNodes = updatedDefinition.tasks[0].parameters.nodes;
-
-        // The node itself survives (it may be a router driven only by `next`) — deleting the
-        // node is a separate, explicit chip action, not a side effect of clearing its tasks.
-        expect(updatedNodes).toHaveLength(1);
-        expect(updatedNodes[0].name).toBe('node_0');
-        expect(updatedNodes[0].next).toBe("'node_0'");
-        expect(updatedNodes[0].tasks).toEqual([]);
-    });
-
-    it('should prune an inert graph node (no next, unreferenced) when its last task is deleted', () => {
-        const graphTask = makeTask('graph_1', {
-            maxTransitions: 100,
-            nodes: [{name: 'node_0', tasks: [makeTask('only_action')]}],
-        });
-        const workflow = makeWorkflow([graphTask]);
-        const mutation = makeMockMutation();
-
-        handleDeleteTask({
-            cancelWorkflowQueries: vi.fn(),
-            data: {
-                componentName: 'test',
-                graphData: {graphId: 'graph_1', index: 0, nodeIndex: 0},
-                name: 'only_action',
-            } as unknown as NodeDataType,
-            invalidateWorkflowQueries: vi.fn(),
-            queryClient: makeQueryClient(),
-            updateWorkflowMutation: mutation,
-            workflow,
-        });
-
-        const mutationArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
-        const updatedDefinition = JSON.parse(mutationArgs.workflow.definition);
-        const updatedNodes = updatedDefinition.tasks[0].parameters.nodes;
-
-        // Adding a task to an empty graph auto-creates the lane, so removing that task returns the
-        // graph to its initial empty state instead of stranding an empty, meaningless lane.
-        expect(updatedNodes).toEqual([]);
-    });
-
-    it('should keep an emptied graph node that another node references via next', () => {
-        const graphTask = makeTask('graph_1', {
-            maxTransitions: 100,
-            nodes: [
-                {name: 'node_0', tasks: [makeTask('only_action')]},
-                {name: 'node_1', next: "'node_0'", tasks: [makeTask('node1_action')]},
-            ],
-        });
-        const workflow = makeWorkflow([graphTask]);
-        const mutation = makeMockMutation();
-
-        handleDeleteTask({
-            cancelWorkflowQueries: vi.fn(),
-            data: {
-                componentName: 'test',
-                graphData: {graphId: 'graph_1', index: 0, nodeIndex: 0},
-                name: 'only_action',
-            } as unknown as NodeDataType,
-            invalidateWorkflowQueries: vi.fn(),
-            queryClient: makeQueryClient(),
-            updateWorkflowMutation: mutation,
-            workflow,
-        });
-
-        const mutationArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
-        const updatedDefinition = JSON.parse(mutationArgs.workflow.definition);
-        const updatedNodes = updatedDefinition.tasks[0].parameters.nodes;
-
-        expect(updatedNodes).toHaveLength(2);
-        expect(updatedNodes[0]).toEqual({name: 'node_0', tasks: []});
+        expect(updatedParameters.nodes.map((node: WorkflowTask) => node.name)).toEqual(['a', 'c']);
+        expect(updatedParameters.transitions).toEqual([{from: 'c', to: 'a'}]);
+        expect(updatedParameters.startNode).toBeUndefined();
     });
 
     it('should delete a task from map iteratee', () => {

@@ -1,5 +1,5 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
-import {BranchCaseType, GraphNodeType} from '@/shared/types';
+import {BranchCaseType} from '@/shared/types';
 
 /**
  * Iterates over all nested subtask groups within a task dispatcher's parameters,
@@ -51,10 +51,6 @@ export function forEachNestedTaskGroup(
     }
 
     if (Array.isArray(parameters.nodes)) {
-        for (const graphNode of parameters.nodes as GraphNodeType[]) {
-            if (Array.isArray(graphNode.tasks)) {
-                callback(graphNode.tasks, 'nodes');
-            }
-        }
+        callback(parameters.nodes as WorkflowTask[], 'nodes');
     }
 }

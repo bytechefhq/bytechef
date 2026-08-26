@@ -147,31 +147,6 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 position={mapHandlePosition(Position.Bottom, effectiveDirection)}
                                 type="source"
                             />
-
-                            {/* Hidden anchors for `graphTransition` overlay edges — used when
-                                this placeholder is an empty graph lane's entry point. Kept
-                                separate from the default (id-less) handles above so the overlay
-                                edge never binds to the same connection point as the structural
-                                lane-chain edge. */}
-
-                            <Handle
-                                className={styles.handle}
-                                id={`${id}-graph-transition-target`}
-                                position={Position.Top}
-                                type="target"
-                            />
-
-                            {/* TB routes arcs through a band ABOVE the lanes, so the source sits
-                                on top alongside the target — a bottom source would double back up
-                                past this placeholder before it could climb. LR has no band and
-                                keeps the original bottom source. */}
-
-                            <Handle
-                                className={styles.handle}
-                                id={`${id}-graph-transition-source`}
-                                position={effectiveDirection === 'TB' ? Position.Top : Position.Bottom}
-                                type="source"
-                            />
                         </div>
                     </WorkflowNodesPopoverMenu>
                 </div>

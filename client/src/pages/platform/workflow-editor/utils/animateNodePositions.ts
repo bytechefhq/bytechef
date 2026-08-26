@@ -72,8 +72,17 @@ const GHOST_AND_PLACEHOLDER_TYPES = new Set([
 /**
  * Returns the direct parent dispatcher ID for a node, or null if the node is a root-level node.
  * Ghost/placeholder nodes use taskDispatcherId; workflow nodes use their nesting data.
+ *
+ * A node React Flow already parents (a graph frame's members and chrome) is excluded: its position
+ * is relative to that parent, so it follows for free — offsetting it against the dispatcher's
+ * ABSOLUTE interpolated position on top of that would slide it around inside its frame for the
+ * length of the tween.
  */
 function getDirectParentDispatcherId(node: Node): string | null {
+    if (node.parentId) {
+        return null;
+    }
+
     const data = node.data as NodeDataType;
 
     if (GHOST_AND_PLACEHOLDER_TYPES.has(node.type || '')) {

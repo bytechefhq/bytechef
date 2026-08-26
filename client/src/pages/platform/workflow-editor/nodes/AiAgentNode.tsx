@@ -34,6 +34,7 @@ import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import {toggleNodeDisabled} from '../utils/toggleNodeDisabled';
 import DisabledNodeBadge from './DisabledNodeBadge';
+import GraphTransitionHandles from './GraphTransitionHandles';
 import styles from './NodeTypes.module.css';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
@@ -110,7 +111,10 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
-    const hasSavedNodePosition = data.metadata?.ui?.nodePosition;
+    // A graph member is excluded: inside a frame a position IS the model rather than a pin
+    // override, so a reset would not restore a layout default — it would re-auto-place the member
+    // somewhere else entirely.
+    const hasSavedNodePosition = !data.graphData && data.metadata?.ui?.nodePosition;
 
     const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
 
@@ -590,6 +594,19 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     }
                     type="source"
                 />
+
+                {/* `AiAgentNode` never renders in a read-only workflow — `useLayout` converts every
+                    `clusterRoot` node to `readonly` there — so an agent rendered by this component
+                    is always on an editable canvas and its handles are connectable. */}
+
+                {data.graphData && (
+                    <GraphTransitionHandles
+                        boxWidth={hasValidClusterElements ? 240 : 72}
+                        connectable
+                        direction={layoutDirection}
+                        nodeId={id}
+                    />
+                )}
             </div>
         </WorkflowNodeContextMenu>
     );

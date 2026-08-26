@@ -95,14 +95,13 @@ describe('getContextFromTaskNodeData', () => {
 
     it('should extract context for graphData', () => {
         const nodeData: NodeDataType = makeNodeData({
-            graphData: {graphId: 'graph_1', index: 2, nodeIndex: 1},
+            graphData: {graphId: 'graph_1', index: 2},
             taskDispatcherId: 'graph_1',
         });
 
         expect(getContextFromTaskNodeData(nodeData)).toEqual({
             graphId: 'graph_1',
             index: 2,
-            nodeIndex: 1,
             taskDispatcherId: 'graph_1',
         });
     });
@@ -185,30 +184,21 @@ describe('getContextFromPlaceholderNode', () => {
         });
     });
 
-    it('should extract context for graph placeholder', () => {
-        const node = makePlaceholderNode('graph_1-graph-node-1-placeholder-0', {
+    it('should extract context for the graph add-node placeholder', () => {
+        // Id shape as actually minted by createGraphNode.ts: a bare `<graphId>-graph-placeholder`.
+        // If that id ever changes again, update this fixture and the `index` assertion below
+        // together, don't just delete them.
+        const node = makePlaceholderNode('graph_1-graph-placeholder', {
             graphId: 'graph_1',
-            nodeIndex: 1,
         });
 
+        // The id carries no index, so the generic trailing-segment parse would yield NaN — the
+        // graph branch sets `index` to 0 explicitly instead (exactly as fork-join's does). The
+        // real append position is resolved downstream, in insertTaskDispatcherSubtask.ts's own
+        // `graph` branch (see that file's comment), which keys off `index === 0`.
         expect(getContextFromPlaceholderNode(node)).toMatchObject({
             graphId: 'graph_1',
             index: 0,
-            nodeIndex: 1,
-            taskDispatcherId: 'graph_1',
-        });
-    });
-
-    it('should extract context for a graph trailing add-node placeholder with a multi-digit node index', () => {
-        const node = makePlaceholderNode('graph_1-graph-node-12-placeholder-0', {
-            graphId: 'graph_1',
-            nodeIndex: 12,
-        });
-
-        expect(getContextFromPlaceholderNode(node)).toMatchObject({
-            graphId: 'graph_1',
-            index: 0,
-            nodeIndex: 12,
             taskDispatcherId: 'graph_1',
         });
     });

@@ -16,15 +16,25 @@ export default function filterWorkflowNodeOutputs(
 
     return workflowNodeOutputs.reduce(
         (acc, output) => {
-            const {actionDefinition, taskDispatcherDefinition, triggerDefinition} = output;
+            const {
+                actionDefinition,
+                outputResponse,
+                taskDispatcherDefinition,
+                triggerDefinition,
+                variableOutputResponse,
+            } = output;
 
-            if (
-                !actionDefinition &&
-                !triggerDefinition &&
-                !taskDispatcherDefinition?.outputDefined &&
-                !taskDispatcherDefinition?.variablePropertiesDefined
-            ) {
-                return acc;
+            // A task dispatcher is kept only when THIS response actually carries a schema, not merely because the
+            // dispatcher type declares an output function. The server asks an ENCLOSING dispatcher for neither its
+            // output nor its variable properties (`taskDispatcherOutput = false` in `WorkflowNodeOutputFacadeImpl`),
+            // because a container has produced nothing while one of its own children is still being edited — so it
+            // answers with both responses null. Loop and each stay visible through their variable properties
+            // (`item`, `index`), which is exactly the distinction; condition, branch, fork-join and graph have none
+            // and would otherwise render an empty section named after the container the node sits inside.
+            if (!actionDefinition && !triggerDefinition) {
+                if (!outputResponse?.outputSchema && !variableOutputResponse?.outputSchema) {
+                    return acc;
+                }
             }
 
             let componentName: string | undefined;

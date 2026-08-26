@@ -23,16 +23,14 @@ describe('getRecursivelyUpdatedTasks', () => {
         expect(result[1]).toEqual(tasks[1]);
     });
 
-    it('should replace a task nested inside a graph node', () => {
+    it('should replace a task inside a graph node list', () => {
         const graphTask: WorkflowTask = {
             label: 'graph_1',
             name: 'graph_1',
             parameters: {
                 maxTransitions: 100,
-                nodes: [
-                    {name: 'node_0', tasks: [makeTask('task_1')]},
-                    {name: 'node_1', tasks: [makeTask('task_2')]},
-                ],
+                nodes: [makeTask('task_1'), makeTask('task_2')],
+                transitions: [],
             },
             type: 'graph/v1',
         } as WorkflowTask;
@@ -44,11 +42,11 @@ describe('getRecursivelyUpdatedTasks', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const nodes = (result[0].parameters as any).nodes;
 
-        expect(nodes[0].tasks).toEqual([makeTask('task_1')]);
-        expect(nodes[1].tasks).toEqual([replacement]);
+        expect(nodes[0]).toEqual(makeTask('task_1'));
+        expect(nodes[1]).toEqual(replacement);
     });
 
-    it('should replace a task nested inside a condition nested inside a graph node (pins the previously-missing nodes branch)', () => {
+    it('should replace a task nested inside a condition that is itself a graph node (pins the previously-missing nodes branch)', () => {
         const conditionTask: WorkflowTask = {
             label: 'condition_1',
             name: 'condition_1',
@@ -64,7 +62,8 @@ describe('getRecursivelyUpdatedTasks', () => {
             name: 'graph_1',
             parameters: {
                 maxTransitions: 100,
-                nodes: [{name: 'node_0', tasks: [conditionTask]}],
+                nodes: [conditionTask],
+                transitions: [],
             },
             type: 'graph/v1',
         } as WorkflowTask;
@@ -75,7 +74,7 @@ describe('getRecursivelyUpdatedTasks', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const nodes = (result[0].parameters as any).nodes;
-        const updatedConditionTask = nodes[0].tasks[0];
+        const updatedConditionTask = nodes[0];
 
         expect(updatedConditionTask.parameters.caseTrue).toEqual([replacement]);
     });
@@ -86,7 +85,8 @@ describe('getRecursivelyUpdatedTasks', () => {
             name: 'graph_1',
             parameters: {
                 maxTransitions: 100,
-                nodes: [{name: 'node_0', tasks: [makeTask('task_1')]}],
+                nodes: [makeTask('task_1')],
+                transitions: [],
             },
             type: 'graph/v1',
         } as WorkflowTask;

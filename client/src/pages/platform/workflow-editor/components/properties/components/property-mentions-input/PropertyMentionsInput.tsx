@@ -21,6 +21,7 @@ import './PropertyMentionsInput.css';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
+import {useCanvasPropertyEditorContext} from '@/pages/platform/workflow-editor/components/properties/CanvasPropertyEditorContext';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -122,10 +123,12 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
         const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
 
+        const canvasPropertyEditor = useCanvasPropertyEditorContext();
+
         const onFocus = (editor: Editor) => {
             setFocusedInput(editor);
 
-            if (workflowNodeDetailsPanelOpen && expressionEnabled !== false) {
+            if (workflowNodeDetailsPanelOpen && !canvasPropertyEditor && expressionEnabled !== false) {
                 setDataPillPanelOpen(true);
             }
         };

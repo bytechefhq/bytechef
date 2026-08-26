@@ -144,7 +144,6 @@ type ForkJoinDataType = {
 type GraphDataType = {
     graphId: string;
     index: number;
-    nodeIndex: number;
 };
 
 export type TaskDispatcherDataType = BranchDataType &
@@ -207,6 +206,17 @@ export type NodeDataType = {
     connections?: Array<ComponentConnection>;
     conditionId?: string;
     connectionId?: number;
+    /**
+     * The node the previous-node-outputs query should be anchored at, when that is NOT this node.
+     *
+     * `GraphTransitionPopover` points the details panel at the graph container, because a transition
+     * is a parameter of the graph rather than of either endpoint — but a condition on that transition
+     * is evaluated INSIDE the graph, after the member it leaves has run. Anchored at the container,
+     * the query returns only what precedes the whole graph and the condition can reach none of the
+     * graph's own members. Naming the transition's target here gives the condition exactly the
+     * context that member itself would be edited with.
+     */
+    dataPillAnchorNodeName?: string;
     description?: string;
     disabled?: boolean;
     displayConditions?: {
@@ -218,7 +228,11 @@ export type NodeDataType = {
     forkJoinId?: string;
     forkJoinData?: ForkJoinDataType;
     graphData?: GraphDataType;
+    /** Present only on the `graphFrame` container node; carries its auto-computed size. */
+    graphFrame?: {graphId: string; height: number; width: number};
     graphId?: string;
+    /** Present only on the `graphStart` pill node. */
+    graphStart?: {graphId: string};
     icon?: ReactNode;
     /**
      * Set only on the execution-detail read-only canvas: whether this node is disabled or sits
@@ -277,15 +291,22 @@ export type BranchCaseType = {
     tasks: Array<WorkflowTask>;
 };
 
+export type GraphTransitionType = {
+    condition?: string;
+    from: string;
+    to: string;
+};
+
 /**
- * A single lane within a `graph` task dispatcher's `nodes` array. Addressed by INDEX
- * (not by name) when the editor inserts/deletes tasks — `name` is display/runtime
- * identity and a rename must not re-home the node's tasks.
+ * A graph edit waiting for the component popover to name the task it creates: a transition released
+ * over empty frame space, or a component dropped into the frame (which carries no `from`).
  */
-export type GraphNodeType = {
-    name: string;
-    next?: string;
-    tasks: Array<WorkflowTask>;
+export type GraphPendingConnectionType = {
+    /** Where the new member goes, in the frame's CONTENT coordinates. */
+    dropPosition: {x: number; y: number};
+    /** The member the transition leaves — empty when the node is being added unconnected. */
+    from: string;
+    graphId: string;
 };
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};
@@ -449,7 +470,7 @@ export type LoopChildTasksType = {[loopId: string]: {iteratee: string[]}};
 export type MapChildTasksType = {[mapId: string]: {iteratee: string[]}};
 export type ParallelChildTasksType = {[parallelId: string]: {tasks: string[]}};
 export type ForkJoinChildTasksType = {[forkJoinId: string]: {branches: string[][]}};
-export type GraphChildTasksType = {[graphId: string]: {nodes: string[][]}};
+export type GraphChildTasksType = {[graphId: string]: {nodes: string[]}};
 
 export type WorkflowInputType = WorkflowInput & {
     testValue?: string;

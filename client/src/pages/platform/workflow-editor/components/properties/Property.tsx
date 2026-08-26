@@ -231,7 +231,10 @@ const Property = ({
         <li
             aria-label={`${name} property`}
             className={twMerge(
-                'w-full',
+                // A property is an `li` for structure, but it is laid out by the form around it and
+                // never wants a bullet. Most surfaces render it inside a container that suppresses
+                // the marker anyway; the graph transition popover does not, and one showed up there.
+                'w-full list-none',
                 hidden && 'hidden',
                 controlType === 'OBJECT_BUILDER' && 'flex-col',
                 controlType === 'ARRAY_BUILDER' && 'flex-col',

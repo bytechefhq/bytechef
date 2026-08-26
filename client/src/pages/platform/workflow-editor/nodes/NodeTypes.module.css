@@ -9,6 +9,16 @@
         @apply invisible;
     }
 
+    /* A graph member's transition handles are the only connectable handles on the canvas, so
+       unlike every other handle here they have to be visible enough to aim a drag at. */
+    .handleConnectable {
+        @apply size-2.5!;
+        @apply rounded-full!;
+        @apply border!;
+        @apply border-stroke-neutral-secondary!;
+        @apply bg-surface-neutral-primary!;
+    }
+
     .handleVisible {
         @apply -z-10;
         @apply h-1.5!;

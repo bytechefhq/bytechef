@@ -23,16 +23,19 @@ import {Node, NodeChange, XYPosition, useNodesInitialized, useReactFlow} from '@
 import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import GraphStartEdge from '../edges/GraphStartEdge';
 import GraphTransitionEdge from '../edges/GraphTransitionEdge';
 import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
-import LabeledGraphNodeEdge from '../edges/LabeledGraphNodeEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import RoundedSmoothStepEdge from '../edges/RoundedSmoothStepEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
+import useGraphConnections from '../hooks/useGraphConnections';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
 import useStickyNotes from '../hooks/useStickyNotes';
 import AiAgentNode from '../nodes/AiAgentNode';
+import GraphFrameNode from '../nodes/GraphFrameNode';
+import GraphStartNode from '../nodes/GraphStartNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import ReadOnlyNode from '../nodes/ReadOnlyNode';
 import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
@@ -51,6 +54,14 @@ import {
     buildDraggingPlaceholderState,
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
+import {registerAutoPlacedGraphPositions, takeAutoPlacedGraphPositions} from '../utils/graph/autoPlacedGraphPositions';
+import {toGraphContentPosition} from '../utils/graph/graphConnections';
+import {GRAPH_FRAME_ID_ATTRIBUTE, getGraphFrameId, getGraphIdFromFrameNodeId} from '../utils/graph/graphFrameGeometry';
+import {resizeGraphFrameForMembers} from '../utils/graph/graphFrameResize';
+import {buildGraphMemberDragStopPositions, filterToSharedParent} from '../utils/graph/graphMemberDrag';
+import {findSelectedGraphTransition, isCanvasDeleteKeyTarget} from '../utils/graph/graphTransitionDeleteKey';
+import {removeTransition} from '../utils/graph/graphTransitionMutations';
+import {saveGraphTransitions} from '../utils/graph/saveGraphParameters';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
@@ -104,7 +115,7 @@ const useWorkflowEditorCanvas = ({
     );
     const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
 
-    const {fitView, setViewport} = useReactFlow();
+    const {fitView, getInternalNode, screenToFlowPosition, setViewport} = useReactFlow();
 
     // True once React Flow has measured every node's dimensions — fitView is a no-op before this, so we
     // gate the embedded fit-to-view on it (see the fitViewOnWorkflowChange effect below).
@@ -119,6 +130,7 @@ const useWorkflowEditorCanvas = ({
         handleDropOnWorkflowEdge,
         handleDropOnTriggerNode,
         handleDropOnTriggerPlaceholder,
+        handleDropOnGraphFrame,
     ] = useHandleDrop({
         taskDispatcherDefinitions,
     });
@@ -129,9 +141,93 @@ const useWorkflowEditorCanvas = ({
     const draggingPlaceholderRef = useRef<DraggingPlaceholderStateType | null>(null);
     const resetPendingRef = useRef(false);
 
+    let canvasWidth = window.innerWidth - 120;
+
+    if (copilotPanelOpen) {
+        canvasWidth -= COPILOT_PANEL_WIDTH;
+    }
+
+    if (dataPillPanelOpen) {
+        canvasWidth -= DATA_PILL_PANEL_WIDTH;
+    }
+
+    if (leftSidebarOpen) {
+        canvasWidth -= PROJECT_LEFT_SIDEBAR_WIDTH;
+    }
+
+    if (rightSidebarOpen) {
+        canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
+    }
+
+    if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
+        canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
+    }
+
+    const canvasHeight = window.innerHeight - 60;
+
+    // Runs here, ahead of the effect that publishes the auto-placed positions it returns, because
+    // a later declaration would put that ref in the effect's dependency array — evaluated during
+    // render — before it exists. Hook order IS effect order, so it sits as late as that allows.
+    const {autoPlacedGraphPositionsRef} = useLayout({
+        canvasHeight,
+        canvasWidth: customCanvasWidth || canvasWidth,
+        componentDefinitions,
+        copilotPanelOpen,
+        leftSidebarOpen,
+        readOnlyWorkflow: readOnlyWorkflow ? workflow : undefined,
+        taskDispatcherDefinitions,
+    });
+
+    const {handleConnect, handleConnectEnd, handleReconnect, isValidConnection} = useGraphConnections({
+        updateWorkflowMutation,
+    });
+
+    /**
+     * Deletes the selected graph transition on Backspace/Delete.
+     *
+     * React Flow's own delete key stays off (`deleteKeyCode={null}` in `WorkflowEditor`), so this is
+     * the only delete-by-key path on the canvas and it is deliberately narrow: a transition is one
+     * row in `parameters.transitions`, and dropping it drops nothing else. `WorkflowEditor`
+     * registers this on the document, which is why the focused element is checked: the key belongs
+     * to whatever is layered over the canvas — a contenteditable condition, the editor's own To
+     * picker, a dialog opened while an edge stayed selected — before it belongs to the canvas.
+     */
+    const handleTransitionDeleteKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+            if (readOnlyWorkflow || !updateWorkflowMutation) {
+                return;
+            }
+
+            if (event.key !== 'Backspace' && event.key !== 'Delete') {
+                return;
+            }
+
+            if (!isCanvasDeleteKeyTarget(document.activeElement)) {
+                return;
+            }
+
+            const selectedTransition = findSelectedGraphTransition(useWorkflowDataStore.getState().edges);
+
+            if (!selectedTransition) {
+                return;
+            }
+
+            event.preventDefault();
+
+            saveGraphTransitions(
+                selectedTransition.graphId,
+                (transitions) => removeTransition(transitions, selectedTransition.index),
+                updateWorkflowMutation
+            );
+        },
+        [readOnlyWorkflow, updateWorkflowMutation]
+    );
+
     const nodeTypes = useMemo(
         () => ({
             clusterRoot: AiAgentNode,
+            graphFrame: GraphFrameNode,
+            graphStart: GraphStartNode,
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,
@@ -147,9 +243,9 @@ const useWorkflowEditorCanvas = ({
 
     const edgeTypes = useMemo(
         () => ({
+            graphStart: GraphStartEdge,
             graphTransition: GraphTransitionEdge,
             labeledBranchCase: LabeledBranchCaseEdge,
-            labeledGraphNode: LabeledGraphNodeEdge,
             placeholder: PlaceholderEdge,
             smoothstep: RoundedSmoothStepEdge,
             workflow: WorkflowEdge,
@@ -257,6 +353,30 @@ const useWorkflowEditorCanvas = ({
             const isTargetEdge = event.target instanceof SVGElement;
 
             if (isTargetNode) {
+                // A frame's own element is the only drop target inside the box: React Flow renders
+                // members as siblings in the viewport rather than nested in their parent, so a drop
+                // landing on a member never reaches here through the frame.
+                const graphFrameElement = (event.target as HTMLElement).closest(`[${GRAPH_FRAME_ID_ATTRIBUTE}]`);
+
+                const graphFrameId = graphFrameElement?.getAttribute(GRAPH_FRAME_ID_ATTRIBUTE);
+
+                // A frame element with no node behind it is mid-teardown; falling through leaves
+                // the drop to the normal handling below rather than silently discarding it.
+                const graphFrameNode = graphFrameId ? getInternalNode(getGraphFrameId(graphFrameId)) : undefined;
+
+                if (graphFrameId && graphFrameNode) {
+                    handleDropOnGraphFrame(
+                        graphFrameId,
+                        toGraphContentPosition(
+                            screenToFlowPosition({x: event.clientX, y: event.clientY}),
+                            graphFrameNode.internals.positionAbsolute
+                        ),
+                        droppedNode
+                    );
+
+                    return;
+                }
+
                 const targetNodeElement = (event.target as HTMLElement).closest('.react-flow__node') as HTMLElement;
 
                 if (targetNodeElement && targetNodeElement?.dataset.nodetype !== 'trigger') {
@@ -338,7 +458,15 @@ const useWorkflowEditorCanvas = ({
                     new Set(descendants.keys())
                 );
 
-                childDragStartRef.current = new Map([...descendants, ...chainSuccessors]);
+                // A graph's members are descendants of its dispatcher but are parented to the
+                // frame node, so React Flow already carries them when the frame moves. Only nodes
+                // sharing the dragged node's parent are in its coordinate space and may take the
+                // drag delta — which still includes a dragged member's own subtree.
+                childDragStartRef.current = filterToSharedParent(
+                    new Map([...descendants, ...chainSuccessors]),
+                    currentNodes,
+                    node.parentId
+                );
             }
 
             draggingPlaceholderRef.current = buildDraggingPlaceholderState(
@@ -355,6 +483,42 @@ const useWorkflowEditorCanvas = ({
 
     const handleNodesChange = useCallback(
         (changes: NodeChange<Node>[]) => {
+            const nodesBeforeChanges = useWorkflowDataStore.getState().nodes;
+
+            const resizingGraphIds = new Set<string>();
+
+            for (const change of changes) {
+                if (change.type !== 'position') {
+                    continue;
+                }
+
+                const graphId = getGraphIdFromFrameNodeId(
+                    nodesBeforeChanges.find((node) => node.id === change.id)?.parentId
+                );
+
+                if (graphId) {
+                    resizingGraphIds.add(graphId);
+                }
+            }
+
+            // The frame's authoritative size comes from `layoutGraphFrames`, which only re-runs
+            // once the drop has changed the definition. Recomputing it here is what makes the box
+            // grow and shrink under the cursor.
+            //
+            // Only the frame directly parenting a changed node is resized. Dragging a member of a
+            // graph nested inside another therefore grows the inner frame live but leaves the
+            // enclosing one at its last laid-out size until the drop, which relayouts both. The
+            // gap is transient and self-healing, so the frame chain is deliberately not walked.
+            const resizeChangedGraphFrames = (candidateNodes: Node[]): Node[] => {
+                let resizedNodes = candidateNodes;
+
+                for (const graphId of resizingGraphIds) {
+                    resizedNodes = resizeGraphFrameForMembers(resizedNodes, graphId);
+                }
+
+                return resizedNodes;
+            };
+
             let childPositions: Map<string, {x: number; y: number}> | null = null;
 
             if (draggingDispatcherIdRef.current && dispatcherDragStartRef.current) {
@@ -417,19 +581,21 @@ const useWorkflowEditorCanvas = ({
                 const currentNodes = useWorkflowDataStore.getState().nodes;
 
                 setNodes(
-                    currentNodes.map((node) => {
-                        const newPosition = childPositions!.get(node.id);
+                    resizeChangedGraphFrames(
+                        currentNodes.map((node) => {
+                            const newPosition = childPositions!.get(node.id);
 
-                        if (newPosition) {
-                            return {...node, position: newPosition};
-                        }
+                            if (newPosition) {
+                                return {...node, position: newPosition};
+                            }
 
-                        if (placeholderPosition && node.id === placeholderPosition.id) {
-                            return {...node, position: placeholderPosition.position};
-                        }
+                            if (placeholderPosition && node.id === placeholderPosition.id) {
+                                return {...node, position: placeholderPosition.position};
+                            }
 
-                        return node;
-                    })
+                            return node;
+                        })
+                    )
                 );
             } else {
                 const allChanges: NodeChange<Node>[] = [...changes];
@@ -443,10 +609,26 @@ const useWorkflowEditorCanvas = ({
                 }
 
                 onNodesChange(allChanges);
+
+                if (resizingGraphIds.size > 0) {
+                    const nodesAfterChanges = useWorkflowDataStore.getState().nodes;
+                    const resizedNodes = resizeChangedGraphFrames(nodesAfterChanges);
+
+                    if (resizedNodes !== nodesAfterChanges) {
+                        setNodes(resizedNodes);
+                    }
+                }
             }
         },
         [onNodesChange, setNodes]
     );
+
+    const resetDragTracking = useCallback(() => {
+        draggingDispatcherIdRef.current = null;
+        dispatcherDragStartRef.current = null;
+        childDragStartRef.current = new Map();
+        draggingPlaceholderRef.current = null;
+    }, []);
 
     const handleNodeDragStop = useCallback(
         (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
@@ -460,6 +642,39 @@ const useWorkflowEditorCanvas = ({
                         updateWorkflowMutation,
                     });
                 }
+
+                return;
+            }
+
+            const draggedGraphId = getGraphIdFromFrameNodeId(draggedNode.parentId);
+
+            // A frame child's position is frame-relative, so the cross-axis compensation below —
+            // which exists for the outer flow's saved positions — must not touch it either way.
+            if (draggedGraphId) {
+                // Only a DIRECT member has a position in the graph model. A member's subtree is
+                // also parented to the frame but is placed by the layout relative to its member,
+                // and unlike the member it carries neither `draggable` nor an extent, so it moves
+                // only on an unlocked canvas. Persisting a frame-relative coordinate for one would
+                // write a `nodePosition` nothing reads, and would start being read the moment that
+                // task left the frame — as an absolute pin, off by the header band.
+                const isGraphMember = (draggedNode.data as NodeDataType).graphData?.graphId === draggedGraphId;
+
+                if (isGraphMember && updateWorkflowMutation) {
+                    saveWorkflowNodesPosition({
+                        draggedNodeId: draggedNode.id,
+                        nodePositions: buildGraphMemberDragStopPositions({
+                            // Taken, not read: the same channel every other graph interaction
+                            // flushes through, so a drop cannot leave entries an add or a connect
+                            // would then write a second time.
+                            autoPlacedPositions: takeAutoPlacedGraphPositions(draggedGraphId),
+                            draggedNodeId: draggedNode.id,
+                            draggedNodePosition: draggedNode.position,
+                        }),
+                        updateWorkflowMutation,
+                    });
+                }
+
+                resetDragTracking();
 
                 return;
             }
@@ -522,37 +737,22 @@ const useWorkflowEditorCanvas = ({
                 });
             }
 
-            draggingDispatcherIdRef.current = null;
-            dispatcherDragStartRef.current = null;
-            childDragStartRef.current = new Map();
-            draggingPlaceholderRef.current = null;
+            resetDragTracking();
         },
-        [layoutDirection, setIsNodeDragging, updateWorkflowMutation]
+        [layoutDirection, resetDragTracking, setIsNodeDragging, updateWorkflowMutation]
     );
 
-    let canvasWidth = window.innerWidth - 120;
+    // Publishes the pre-pass's pending auto-placed positions for the interactions that persist a
+    // graph from outside React — a task appended deep inside `saveWorkflowDefinition` cannot reach
+    // a hook's ref. A read-only canvas never persists anything, so it stays off the channel rather
+    // than taking it over from the editable one.
+    useEffect(() => {
+        if (readOnlyWorkflow) {
+            return;
+        }
 
-    if (copilotPanelOpen) {
-        canvasWidth -= COPILOT_PANEL_WIDTH;
-    }
-
-    if (dataPillPanelOpen) {
-        canvasWidth -= DATA_PILL_PANEL_WIDTH;
-    }
-
-    if (leftSidebarOpen) {
-        canvasWidth -= PROJECT_LEFT_SIDEBAR_WIDTH;
-    }
-
-    if (rightSidebarOpen) {
-        canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
-    }
-
-    if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
-        canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
-    }
-
-    const canvasHeight = window.innerHeight - 60;
+        return registerAutoPlacedGraphPositions(autoPlacedGraphPositionsRef);
+    }, [autoPlacedGraphPositionsRef, readOnlyWorkflow]);
 
     useEffect(() => {
         if (!updateWorkflowMutation?.isPending && !isWorkflowMutating(workflowId)) {
@@ -586,16 +786,6 @@ const useWorkflowEditorCanvas = ({
         handleResetLayout();
         useWorkflowEditorStore.getState().setResetWorkflowLayout(false);
     }, [resetWorkflowLayout, updateWorkflowMutation?.isPending, handleResetLayout, workflowId]);
-
-    useLayout({
-        canvasHeight,
-        canvasWidth: customCanvasWidth || canvasWidth,
-        componentDefinitions,
-        copilotPanelOpen,
-        leftSidebarOpen,
-        readOnlyWorkflow: readOnlyWorkflow ? workflow : undefined,
-        taskDispatcherDefinitions,
-    });
 
     const workflowUuid = workflow.workflowUuid;
 
@@ -633,10 +823,15 @@ const useWorkflowEditorCanvas = ({
     return {
         edgeTypes,
         handleAddStickyNote,
+        handleConnect,
+        handleConnectEnd,
         handleNodeDragStart,
         handleNodeDragStop,
         handleNodesChange,
+        handleReconnect,
         handleResetLayout,
+        handleTransitionDeleteKeyDown,
+        isValidConnection,
         nodeTypes,
         onDragOver,
         onDrop,

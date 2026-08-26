@@ -6,6 +6,8 @@ import {MentionOptions} from '@tiptap/extension-mention';
 import {Editor, ReactRenderer} from '@tiptap/react';
 import tippy, {type Instance as TippyInstance} from 'tippy.js';
 
+import {setMentionSuggestionOpen} from './MentionStorage.extension';
+
 /**
  * Workaround for the current typing incompatibility between Tippy.js and Tiptap
  * Suggestion utility.
@@ -69,9 +71,18 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
             let popup: TippyInstance | undefined;
             let lastValidRect: DOMRect = DOM_RECT_FALLBACK;
             let wheelAbortController: AbortController | undefined;
+            // Held so `onExit` can clear the open flag. It has no props of its own, and it also runs
+            // for a suggestion `onStart` declined to show, where there is nothing to clear.
+            let openedEditor: Editor | undefined;
 
             return {
                 onExit() {
+                    if (openedEditor) {
+                        setMentionSuggestionOpen(openedEditor, false);
+
+                        openedEditor = undefined;
+                    }
+
                     wheelAbortController?.abort();
                     popup?.destroy();
                     component?.destroy();
@@ -133,6 +144,10 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                         passive: true,
                         signal: wheelAbortController.signal,
                     });
+
+                    openedEditor = props.editor;
+
+                    setMentionSuggestionOpen(props.editor, true);
                 },
 
                 onUpdate(props) {

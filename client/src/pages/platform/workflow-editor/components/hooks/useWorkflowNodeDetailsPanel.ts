@@ -58,6 +58,7 @@ import {
     BranchCaseType,
     ComponentPropertiesType,
     DataPillType,
+    GraphTransitionType,
     NodeDataType,
     PropertyAllType,
     TabNameType,
@@ -81,6 +82,7 @@ import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
 import getParametersWithDefaultValues from '../../utils/getParametersWithDefaultValues';
 import getWorkflowInputAndVariableDataPills from '../../utils/getWorkflowInputAndVariableDataPills';
+import {findGraphMembersPrecedingMember} from '../../utils/graph/graphReachability';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
@@ -874,6 +876,74 @@ export default function useWorkflowNodeDetailsPanel({
         [workflow.tasks]
     );
 
+    /**
+     * Drops the graph members that cannot have run on the way to `anchorNodeName`.
+     *
+     * The outputs query returns the members DECLARED before a node, which in a chain is the same
+     * thing as the ones that ran before it — but a graph is wired by transitions, so a sibling branch
+     * is declared earlier while never running at all. Everything outside the graph is kept: it ran
+     * before the graph was entered, whatever route the graph then took.
+     */
+    const filterNodeNamesForGraph = useCallback(
+        (nodeNames: string[], graphId: string, anchorNodeName: string) => {
+            const graphTask = getTaskDispatcherTask({taskDispatcherId: graphId, tasks: workflow.tasks || []});
+
+            // Fails OPEN. The other filters return null to mean "show nothing", which is right for a
+            // branch whose siblings are genuinely unreachable — but a graph this cannot resolve is a
+            // question it cannot answer, and answering it with an empty panel hid every pill the node
+            // legitimately had, including the ones from outside the graph.
+            if (!graphTask?.parameters) {
+                return nodeNames;
+            }
+
+            const memberNames = (Array.isArray(graphTask.parameters.nodes) ? graphTask.parameters.nodes : []).map(
+                (member: WorkflowTask) => member.name
+            );
+
+            const transitions: GraphTransitionType[] = Array.isArray(graphTask.parameters.transitions)
+                ? graphTask.parameters.transitions
+                : [];
+
+            const precedingMemberNames = findGraphMembersPrecedingMember(anchorNodeName, transitions);
+
+            if (!precedingMemberNames) {
+                return nodeNames;
+            }
+
+            return nodeNames.filter(
+                (nodeName) => !memberNames.includes(nodeName) || precedingMemberNames.has(nodeName)
+            );
+        },
+        [workflow.tasks]
+    );
+
+    /**
+     * Which member the graph filter is anchored at, and in which graph.
+     *
+     * A member's own panel is anchored at itself. `GraphTransitionPopover` points the panel at the
+     * graph CONTAINER — a transition is a parameter of the graph — and names the member its condition
+     * is resolved against, so the container's own name is the graph and the anchor rides alongside.
+     */
+    const graphPillContext = useMemo(() => {
+        // `workflowNodeName` first: it is what every node in the store is addressed by, and the graph
+        // container the transition popover points this slot at carries no `name` of its own.
+        const currentNodeName = currentNode?.workflowNodeName ?? currentNode?.name;
+
+        if (!currentNodeName) {
+            return undefined;
+        }
+
+        if (currentNode?.dataPillAnchorNodeName) {
+            return {anchorNodeName: currentNode.dataPillAnchorNodeName, graphId: currentNodeName};
+        }
+
+        if (currentNode?.graphData) {
+            return {anchorNodeName: currentNodeName, graphId: currentNode.graphData.graphId};
+        }
+
+        return undefined;
+    }, [currentNode?.dataPillAnchorNodeName, currentNode?.graphData, currentNode?.name, currentNode?.workflowNodeName]);
+
     const calculatedDataPills = useMemo(() => {
         if (!previousComponentDefinitions || !workflowNodeOutputs) {
             return [];
@@ -892,6 +962,20 @@ export default function useWorkflowNodeDetailsPanel({
         } else if (currentNode?.onErrorData) {
             const filtered = filterNodeNamesForOnError(filteredNodeNames, currentNode.onErrorData);
             if (filtered === null) return [];
+            filteredNodeNames = filtered;
+        }
+
+        // Applied alongside rather than instead of the branch filters above: a graph can sit inside a
+        // condition, and the two rule out different things.
+        if (graphPillContext) {
+            const filtered = filterNodeNamesForGraph(
+                filteredNodeNames,
+                graphPillContext.graphId,
+                graphPillContext.anchorNodeName
+            );
+
+            if (filtered === null) return [];
+
             filteredNodeNames = filtered;
         }
 
@@ -920,7 +1004,9 @@ export default function useWorkflowNodeDetailsPanel({
         currentNode?.onErrorData,
         filterNodeNamesForBranch,
         filterNodeNamesForCondition,
+        filterNodeNamesForGraph,
         filterNodeNamesForOnError,
+        graphPillContext,
         previousComponentDefinitions,
         variables,
         workflow.inputs,
