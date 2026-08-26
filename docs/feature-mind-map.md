@@ -1421,7 +1421,6 @@ mindmap
     Embedded API Keys
       API key CRUD settings UI client/src/ee/pages/settings/emb…
       EmbeddedApiKeyAuthenticationConverter/Token/Provider filt…
-      EmbeddedAutomationAuthorizationSkipFilter for automation-…
       Security configurer contributor pattern so EE security pl…
     JWT-Based Embedded Auth
       JWT verification against per-environment signing keys
@@ -1563,7 +1562,6 @@ mindmap
 - **Embedded API Keys** [EE] — Settings page (/embedded/settings/api-keys) for API keys that authenticate server-to-server calls to the embedded public APIs; enforced by EmbeddedApiKeySecurityConfigurer / EmbeddedApiKeyAuthenticationProvider in embedded-security-web.
     - API key CRUD settings UI (client/src/ee/pages/settings/embedded/api-keys)
     - EmbeddedApiKeyAuthenticationConverter/Token/Provider filter chain
-    - EmbeddedAutomationAuthorizationSkipFilter for automation-path exemptions
     - Security configurer contributor pattern so EE security plugs into the CE chain
 - **JWT-Based Embedded Auth** [EE] — Connected-user requests from the customer's frontend are authenticated by JWTs the customer signs with their signing key; JwtTokenServiceImpl verifies tokens and resolves the connected user (embedded-security / embedded-security-web).
     - JWT verification against per-environment signing keys
