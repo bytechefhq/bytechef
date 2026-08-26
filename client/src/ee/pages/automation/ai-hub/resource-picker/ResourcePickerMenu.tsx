@@ -6,6 +6,7 @@ import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCol
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {
     AiHubChatStatus,
+    useAiAgentsQuery,
     useAiHubChatsQuery,
     useDataTablesQuery,
     useGetAssetFilesQuery,
@@ -15,6 +16,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {
+    BotIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
     ClockIcon,
@@ -33,14 +35,14 @@ export interface ResourcePickerSelectionI {
     id: string;
     kind: ReferencedResourceKindType;
     name: string;
-    // Workflow-only: present so a caller can open a workflow tab. Undefined for the other 7 kinds.
+    // Workflow-only: present so a caller can open a workflow tab. Undefined for the other 8 kinds.
     projectId?: string;
     projectWorkflowId?: number;
 }
 
-// A caller-supplied branch. ResourcePickerMenu covers only the 8 reference kinds; anything else (Connectors,
+// A caller-supplied branch. ResourcePickerMenu covers only the 9 reference kinds; anything else (Connectors,
 // Skills, a context-specific Tools list) differs per caller, so each caller plugs its own. When omitted, the
-// menu shows only the 8 kinds.
+// menu shows only the 9 kinds.
 //
 // A list rather than one named slot: the menu wires each branch into three places (root item, path match,
 // branch body), so a second bespoke prop would triple those call sites again.
@@ -59,13 +61,18 @@ export interface ResourcePickerMenuPropsI {
     workspaceId: number;
     customBranches?: ResourcePickerCustomBranchI[];
     environmentId: number;
+    // Optional controlled open state. Omit it and the menu drives itself off its trigger, as before. Supply it
+    // and the menu becomes fully controlled, which is what lets a SECOND trigger living in another component
+    // (the composer's '@' key, handled in the textarea) open the same popover — the consumer holds the flag and
+    // this menu reports every open/close back through `onOpenChange`.
+    open?: boolean;
     // The Popover trigger (the composer's "+" button, the agent form's "Add" button).
     trigger: ReactNode;
     // Fired whenever the picker popover opens or closes (including an outside-click dismiss). A consumer
     // can use this to reset consumer-owned branch state — e.g. a Tools sub-flow's selected component or a
     // lazy-query `enabled` flag — that ResourcePickerMenu cannot reach because it lives in the consumer.
     onOpenChange?: (open: boolean) => void;
-    // Fired when the user picks one of the 8 reference-kind resources. The menu closes itself after.
+    // Fired when the user picks one of the 9 reference-kind resources. The menu closes itself after.
     onSelect: (selection: ResourcePickerSelectionI) => void;
 }
 
@@ -136,6 +143,7 @@ type MenuPathType =
     | ['workflowExecutions']
     | ['mcpServers']
     | ['apiCollections']
+    | ['aiAgents']
     | ['chats'];
 
 const ResourcePickerMenu = ({
@@ -143,10 +151,13 @@ const ResourcePickerMenu = ({
     environmentId,
     onOpenChange,
     onSelect,
+    open: controlledOpen,
     trigger,
     workspaceId,
 }: ResourcePickerMenuPropsI) => {
-    const [open, setOpen] = useState(false);
+    const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+
+    const open = controlledOpen ?? uncontrolledOpen;
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [menuPath, setMenuPath] = useState<MenuPathType>([]);
@@ -157,6 +168,7 @@ const ResourcePickerMenu = ({
     const [mcpServersShowCount, setMcpServersShowCount] = useState(SECTION_INITIAL_CAP);
     const [apiCollectionsShowCount, setApiCollectionsShowCount] = useState(SECTION_INITIAL_CAP);
     const [chatsShowCount, setChatsShowCount] = useState(SECTION_INITIAL_CAP);
+    const [aiAgentsShowCount, setAiAgentsShowCount] = useState(SECTION_INITIAL_CAP);
 
     const {data: filesData} = useGetAssetFilesQuery({
         mimeTypePrefix: null,
@@ -173,9 +185,9 @@ const ResourcePickerMenu = ({
         workspaceId: String(workspaceId),
     });
 
-    // Lazy-load the four extra resource kinds: only fetch when the user enters that branch (or types
-    // into search). Workflow-executions and previous-chats lists can be heavy; api-collections and
-    // mcp-servers are usually small but still gated for symmetry. The `enabled` flag keeps first-paint
+    // Lazy-load the five extra resource kinds: only fetch when the user enters that branch (or types
+    // into search). Workflow-executions and previous-chats lists can be heavy; api-collections, mcp-servers
+    // and ai-agents are usually small but still gated for symmetry. The `enabled` flag keeps first-paint
     // cheap when the user only wants to attach files / data tables / workflows.
     const isPickerActive = open;
 
@@ -205,6 +217,14 @@ const ResourcePickerMenu = ({
             status: AiHubChatStatus.Active,
             workspaceId: String(workspaceId ?? ''),
         },
+        {enabled: isPickerActive && workspaceId != null}
+    );
+
+    // Workspace-scoped, not environment-scoped: an agent belongs to the workspace and the server already
+    // filters the list by the caller's visibility reach (see useAiAgentVisibility), so the picker shows exactly
+    // the agents this user may open.
+    const {data: aiAgentsData} = useAiAgentsQuery(
+        {workspaceId: String(workspaceId ?? '')},
         {enabled: isPickerActive && workspaceId != null}
     );
 
@@ -283,6 +303,15 @@ const ResourcePickerMenu = ({
         });
     }, [chatsData, lowerSearch]);
 
+    const filteredAiAgents = useMemo(() => {
+        const aiAgents = aiAgentsData?.aiAgents?.filter(Boolean) ?? [];
+
+        // `title` is the agent's display name everywhere else in the product (the agents list, the left
+        // sidebar nav, the detail header) — `name` is the slug-ish internal handle. Matching on title keeps
+        // the picker's search consistent with what the user reads on screen.
+        return aiAgents.filter((aiAgent) => aiAgent != null && aiAgent.title.toLowerCase().includes(lowerSearch));
+    }, [aiAgentsData, lowerSearch]);
+
     // Workflows drill down by project so the menu mirrors the natural mental model — "find the project,
     // then the workflow inside it" — instead of dumping all workflows into a flat list where two workflows
     // with similar names from different projects look indistinguishable. Preserves source-order of
@@ -319,32 +348,13 @@ const ResourcePickerMenu = ({
         filteredWorkflowExecutions.length > 0 ||
         filteredMcpServers.length > 0 ||
         filteredApiCollections.length > 0 ||
+        filteredAiAgents.length > 0 ||
         filteredChats.length > 0;
 
-    const handleSelect = (id: string, kind: ReferencedResourceKindType, name: string) => {
-        onSelect({id, kind, name});
-
-        setOpen(false);
-        setSearch('');
-        setDebouncedSearch('');
-    };
-
-    const handleSelectWorkflow = (workflow: WorkflowItemI) => {
-        onSelect({
-            id: workflow.id,
-            kind: 'workflow',
-            name: workflow.name,
-            projectId: workflow.projectId,
-            projectWorkflowId: workflow.projectWorkflowId,
-        });
-
-        setOpen(false);
-        setSearch('');
-        setDebouncedSearch('');
-    };
-
     const handleOpenChange = (nextOpen: boolean) => {
-        setOpen(nextOpen);
+        // Always written, even when controlled — harmless there (the resolved `open` ignores it) and it keeps
+        // the two modes from diverging if a consumer stops passing `open`.
+        setUncontrolledOpen(nextOpen);
 
         if (!nextOpen) {
             setMenuPath([]);
@@ -357,11 +367,34 @@ const ResourcePickerMenu = ({
             setMcpServersShowCount(SECTION_INITIAL_CAP);
             setApiCollectionsShowCount(SECTION_INITIAL_CAP);
             setChatsShowCount(SECTION_INITIAL_CAP);
+            setAiAgentsShowCount(SECTION_INITIAL_CAP);
         }
 
         // Notify the consumer after ResourcePickerMenu resets its own state so a consumer-owned branch
         // (e.g. the composer's Tools sub-flow) can clear its lingering state on close too.
         onOpenChange?.(nextOpen);
+    };
+
+    // Closing through `handleOpenChange` rather than by setting the open flag directly: Radix only fires its own
+    // onOpenChange for interactions it mediates (outside click, Escape), so a close triggered by picking a row
+    // would otherwise never reach the consumer — leaving a controlled consumer's flag stuck at true and the
+    // popover unable to reopen. It also resets the menu path and show-counts, which the old inline close skipped.
+    const handleSelect = (id: string, kind: ReferencedResourceKindType, name: string) => {
+        onSelect({id, kind, name});
+
+        handleOpenChange(false);
+    };
+
+    const handleSelectWorkflow = (workflow: WorkflowItemI) => {
+        onSelect({
+            id: workflow.id,
+            kind: 'workflow',
+            name: workflow.name,
+            projectId: workflow.projectId,
+            projectWorkflowId: workflow.projectWorkflowId,
+        });
+
+        handleOpenChange(false);
     };
 
     const visibleFiles = filteredFiles.slice(0, filesShowCount);
@@ -374,6 +407,7 @@ const ResourcePickerMenu = ({
     const visibleMcpServers = filteredMcpServers.slice(0, mcpServersShowCount);
     const visibleApiCollections = filteredApiCollections.slice(0, apiCollectionsShowCount);
     const visibleChats = filteredChats.slice(0, chatsShowCount);
+    const visibleAiAgents = filteredAiAgents.slice(0, aiAgentsShowCount);
 
     return (
         <Popover onOpenChange={handleOpenChange} open={open}>
@@ -683,6 +717,50 @@ const ResourcePickerMenu = ({
                                     </CommandGroup>
                                 )}
 
+                                {filteredAiAgents.length > 0 && (
+                                    <CommandGroup heading="AI Agents">
+                                        {visibleAiAgents.map((aiAgent) => {
+                                            if (aiAgent == null) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <CommandItem
+                                                    key={`aiAgent-${aiAgent.id}`}
+                                                    onSelect={() =>
+                                                        handleSelect(String(aiAgent.id), 'aiAgent', aiAgent.title)
+                                                    }
+                                                    value={`aiAgent-${aiAgent.id}-${aiAgent.title}`}
+                                                >
+                                                    <BotIcon className="mr-2 size-3.5" />
+
+                                                    <span className="flex-1 truncate">{aiAgent.title}</span>
+
+                                                    {aiAgent.unpublishedChanges && (
+                                                        <span className="ml-2 text-xs text-muted-foreground">
+                                                            draft
+                                                        </span>
+                                                    )}
+                                                </CommandItem>
+                                            );
+                                        })}
+
+                                        {filteredAiAgents.length > aiAgentsShowCount && (
+                                            <CommandItem
+                                                key="ai-agents-show-more"
+                                                onSelect={() =>
+                                                    setAiAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                }
+                                                value="ai-agents-show-more"
+                                            >
+                                                <span className="text-xs text-muted-foreground">
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAiAgents.length - aiAgentsShowCount)} more…`}
+                                                </span>
+                                            </CommandItem>
+                                        )}
+                                    </CommandGroup>
+                                )}
+
                                 {filteredChats.length > 0 && (
                                     <CommandGroup heading="Previous Chats">
                                         {visibleChats.map((chat) => {
@@ -753,6 +831,14 @@ const ResourcePickerMenu = ({
                                     <VectorSquareIcon className="mr-2 size-3.5" />
 
                                     <span className="flex-1">Knowledge Bases</span>
+
+                                    <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+                                </CommandItem>
+
+                                <CommandItem onSelect={() => setMenuPath(['aiAgents'])} value="root-ai-agents">
+                                    <BotIcon className="mr-2 size-3.5" />
+
+                                    <span className="flex-1">AI Agents</span>
 
                                     <ChevronRightIcon className="size-3.5 text-muted-foreground" />
                                 </CommandItem>
@@ -1157,6 +1243,52 @@ const ResourcePickerMenu = ({
                                             >
                                                 <span className="text-xs text-muted-foreground">
                                                     {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredApiCollections.length - apiCollectionsShowCount)} more…`}
+                                                </span>
+                                            </CommandItem>
+                                        )}
+                                    </CommandGroup>
+                                )}
+
+                                {menuPath[0] === 'aiAgents' && (
+                                    <CommandGroup heading="AI Agents">
+                                        {visibleAiAgents.length === 0 && <CommandEmpty>No AI agents.</CommandEmpty>}
+
+                                        {visibleAiAgents.map((aiAgent) => {
+                                            if (aiAgent == null) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <CommandItem
+                                                    key={`aiAgent-${aiAgent.id}`}
+                                                    onSelect={() =>
+                                                        handleSelect(String(aiAgent.id), 'aiAgent', aiAgent.title)
+                                                    }
+                                                    value={`aiAgent-${aiAgent.id}-${aiAgent.title}`}
+                                                >
+                                                    <BotIcon className="mr-2 size-3.5" />
+
+                                                    <span className="flex-1 truncate">{aiAgent.title}</span>
+
+                                                    {aiAgent.unpublishedChanges && (
+                                                        <span className="ml-2 text-xs text-muted-foreground">
+                                                            draft
+                                                        </span>
+                                                    )}
+                                                </CommandItem>
+                                            );
+                                        })}
+
+                                        {filteredAiAgents.length > aiAgentsShowCount && (
+                                            <CommandItem
+                                                key="ai-agents-show-more"
+                                                onSelect={() =>
+                                                    setAiAgentsShowCount((count) => count + SECTION_EXPAND_INCREMENT)
+                                                }
+                                                value="ai-agents-show-more"
+                                            >
+                                                <span className="text-xs text-muted-foreground">
+                                                    {`Show ${Math.min(SECTION_EXPAND_INCREMENT, filteredAiAgents.length - aiAgentsShowCount)} more…`}
                                                 </span>
                                             </CommandItem>
                                         )}

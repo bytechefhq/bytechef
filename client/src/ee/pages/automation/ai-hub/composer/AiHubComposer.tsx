@@ -17,20 +17,28 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ChevronRightIcon, HexagonIcon, PlugIcon, PlusIcon} from 'lucide-react';
 
-// The "+" menu is the composer's single picker: the 8 reference kinds (files, workflows, data tables,
-// knowledge bases, executions, …) plus two caller-supplied branches, Connectors and Skills. Those two were
-// standalone toolbar buttons — a plug icon and a '/' icon — until the toolbar's four coordinate affordances
-// were folded into one; only the paperclip stayed out, because uploading a file is not referencing one.
-// AI Agents are deliberately absent: they are reachable from the model picker's Agent Chats cascade, which
-// starts a chat with the agent rather than just mentioning it.
+// The "+" menu is the composer's single picker: the 9 reference kinds (files, workflows, data tables,
+// knowledge bases, executions, AI agents, …) plus two caller-supplied branches, Connectors and Skills. Those
+// two were standalone toolbar buttons — a plug icon and a '/' icon — until the toolbar's four coordinate
+// affordances were folded into one; only the paperclip stayed out, because uploading a file is not
+// referencing one.
+//
+// AI Agents were once deliberately excluded here, on the grounds that the model picker's Agent Chats cascade
+// already reached them. That cascade STARTS A CHAT with the agent; it never lets you look at how the agent is
+// configured. Referencing one instead opens its detail in the resource panel (AiHubAiAgentViewer) and hands
+// the LLM the agent as context — a different job, so the branch belongs here too.
 const AiHubComposer = () => {
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
+    // The picker's open state is store-held so the textarea's '@' key can raise it — see the field's doc in
+    // useAiHubComposerStore. The "+" button still opens it the ordinary way, through the same flag.
+    const resourcePickerOpen = useAiHubComposerStore((state) => state.resourcePickerOpen);
+    const setResourcePickerOpen = useAiHubComposerStore((state) => state.setResourcePickerOpen);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     /*
-     * Selecting a resource in the composer's @-mention popover does TWO things:
+     * Selecting a resource in the picker (opened by the "+" button or by typing '@') does TWO things:
      *   1. Adds the resource to `aiHubComposerStore.referencedResources` so the LLM sees it as
      *      part of the next prompt's state.
      *   2. Opens it as a tab in the right panel via `aiHubTabsStore` — "if I @-mention a file, I should be
@@ -50,6 +58,8 @@ const AiHubComposer = () => {
             tabsStore.openDataTableTab(id, name);
         } else if (kind === 'knowledgeBase') {
             tabsStore.openKnowledgeBaseTab(id, name);
+        } else if (kind === 'aiAgent') {
+            tabsStore.openAiAgentTab(id, name);
         } else if (kind === 'workflowExecution') {
             // ResourcePickerMenu stringifies execution.id at the call site (handleSelect(String(execution.id), ...));
             // openWorkflowExecutionTab expects a numeric workflowExecutionId because the tab type and the
@@ -109,7 +119,9 @@ const AiHubComposer = () => {
             <ResourcePickerMenu
                 customBranches={customBranches}
                 environmentId={environmentId ?? DEVELOPMENT_ENVIRONMENT}
+                onOpenChange={setResourcePickerOpen}
                 onSelect={handleResourceSelect}
+                open={resourcePickerOpen}
                 trigger={
                     <TooltipTrigger asChild>
                         <button

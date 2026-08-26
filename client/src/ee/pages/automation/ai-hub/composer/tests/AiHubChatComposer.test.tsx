@@ -3,7 +3,7 @@ import {
     type ReferencedResourceI,
     aiHubComposerStore,
 } from '@/ee/pages/automation/ai-hub/composer/stores/useAiHubComposerStore';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -130,7 +130,7 @@ const renderComposer = async () => {
 };
 
 beforeEach(() => {
-    aiHubComposerStore.setState({referencedResources: [], selectedSkills: []});
+    aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false, selectedSkills: []});
 
     currentChatIdRef.current = undefined;
     chatsQueryRef.current = undefined;
@@ -253,5 +253,127 @@ describe('AiHubChatComposer channel-born agent chat input gating', () => {
 
         expect(screen.getByLabelText('Message input')).toBeInTheDocument();
         expect(screen.queryByTestId('channel-born-readonly-notice')).not.toBeInTheDocument();
+    });
+});
+
+describe("AiHubChatComposer '@' resource-picker trigger", () => {
+    // The '@' key is the composer's second way into the resource picker (the "+" button being the first).
+    // It raises the picker by flipping a store flag AiHubComposer carries down — a keystroke in this
+    // textarea cannot otherwise reach a popover owned by a sibling component.
+    const pressAt = (caret: number, value = '') => {
+        const textarea = screen.getByLabelText('Message input') as HTMLTextAreaElement;
+
+        textarea.value = value;
+        textarea.selectionStart = caret;
+        textarea.selectionEnd = caret;
+
+        return fireEvent.keyDown(textarea, {key: '@'});
+    };
+
+    it('opens the picker when @ is typed at the start of an empty composer', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        pressAt(0);
+
+        expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(true);
+    });
+
+    it('opens the picker when @ follows a space mid-sentence', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        pressAt(5, 'look ');
+
+        expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(true);
+    });
+
+    // Without the word-boundary rule, typing an email address would pop the picker open mid-word and
+    // swallow the '@' — the address would come out as "supportbytechef.io".
+    it('leaves @ as ordinary text mid-word, so an email address still types through', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        const defaultNotPrevented = pressAt(7, 'support');
+
+        expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(false);
+        // fireEvent returns false when preventDefault was called; the '@' must reach the textarea here.
+        expect(defaultNotPrevented).toBe(true);
+    });
+
+    it('consumes the @ keystroke when it opens the picker', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        expect(pressAt(0)).toBe(false);
+    });
+
+    // Radix hands focus back to the popover trigger — the "+" button — on close. After a '@' the user was
+    // mid-sentence, so the caret has to come back to the textarea or their next keystroke is swallowed by a
+    // button. This is the half of the flow that makes '@' usable rather than merely functional.
+    it('returns focus to the textarea when a picker raised by @ closes', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        const textarea = screen.getByLabelText('Message input') as HTMLTextAreaElement;
+
+        pressAt(0);
+        textarea.blur();
+
+        act(() => {
+            aiHubComposerStore.getState().setResourcePickerOpen(false);
+        });
+
+        await waitFor(() => {
+            expect(textarea).toHaveFocus();
+        });
+    });
+
+    // The "+" button must keep Radix's ordinary trigger-restore behaviour: nobody was typing, so stealing
+    // the caret into the textarea would be the surprising move.
+    it('leaves focus alone when the picker was opened without @', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{id: 7, kind: 'STANDARD'}];
+
+        await renderComposer();
+
+        const textarea = screen.getByLabelText('Message input') as HTMLTextAreaElement;
+
+        act(() => {
+            aiHubComposerStore.getState().setResourcePickerOpen(true);
+        });
+
+        textarea.blur();
+
+        act(() => {
+            aiHubComposerStore.getState().setResourcePickerOpen(false);
+        });
+
+        await waitFor(() => {
+            expect(textarea).not.toHaveFocus();
+        });
+    });
+
+    // A workflow chat forwards messages to a webhook rather than an agent, so it renders no picker at all
+    // (see the attachment-gating suite above). '@' must not open one that isn't there.
+    it('stays inert for a workflow chat, which has no resource picker', async () => {
+        currentChatIdRef.current = 7;
+        chatsQueryRef.current = [{aiAgentId: null, id: 7, kind: 'WORKFLOW_CHAT', workflowExecutionId: 'exec-1'}];
+
+        await renderComposer();
+
+        pressAt(0);
+
+        expect(aiHubComposerStore.getState().resourcePickerOpen).toBe(false);
     });
 });

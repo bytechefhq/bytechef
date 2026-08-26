@@ -3,7 +3,7 @@ import {aiHubComposerStore} from '@/ee/pages/automation/ai-hub/composer/stores/u
 import {type ResourcePickerSelectionI} from '@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu';
 import {aiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render} from '@testing-library/react';
+import {act, render, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -19,15 +19,25 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 // vi.hoisted is the only place top-level refs can live and still be referenced inside vi.mock factories —
 // vi.mock calls hoist above module-scope `const` declarations, so a plain const would not be initialised yet.
-const {resourcePickerOnSelectRef} = vi.hoisted(() => ({
+const {resourcePickerOnSelectRef, resourcePickerOpenRef} = vi.hoisted(() => ({
     resourcePickerOnSelectRef: {current: null as ((selection: ResourcePickerSelectionI) => void) | null},
+    resourcePickerOpenRef: {current: undefined as boolean | undefined},
 }));
 
 // Capture the props the composer passes to ResourcePickerMenu. Render only the trigger so the composer
 // tree mounts cleanly without the real popover/command machinery.
 vi.mock('@/ee/pages/automation/ai-hub/resource-picker/ResourcePickerMenu', () => ({
-    default: ({onSelect, trigger}: {onSelect: (selection: ResourcePickerSelectionI) => void; trigger: ReactNode}) => {
+    default: ({
+        onSelect,
+        open,
+        trigger,
+    }: {
+        onSelect: (selection: ResourcePickerSelectionI) => void;
+        open?: boolean;
+        trigger: ReactNode;
+    }) => {
         resourcePickerOnSelectRef.current = onSelect;
+        resourcePickerOpenRef.current = open;
 
         return <div data-testid="resource-picker-menu">{trigger}</div>;
     },
@@ -71,7 +81,7 @@ const renderComposer = async () => {
 };
 
 beforeEach(() => {
-    aiHubComposerStore.setState({referencedResources: []});
+    aiHubComposerStore.setState({referencedResources: [], resourcePickerOpen: false});
 
     aiHubTabsStore.setState({
         activeChatId: undefined,
@@ -82,6 +92,7 @@ beforeEach(() => {
     });
 
     resourcePickerOnSelectRef.current = null;
+    resourcePickerOpenRef.current = undefined;
 });
 
 describe('AiHubComposer ResourcePickerMenu wiring', () => {
@@ -151,5 +162,42 @@ describe('AiHubComposer ResourcePickerMenu wiring', () => {
 
         expect(openTabs).toHaveLength(1);
         expect(openTabs[0]).toMatchObject({kind: 'workflowExecution', name: 'agent2', workflowExecutionId: 101});
+    });
+
+    it('opens an AI Agent tab when the picker selects an aiAgent', async () => {
+        await renderComposer();
+
+        expect(resourcePickerOnSelectRef.current).not.toBeNull();
+
+        resourcePickerOnSelectRef.current!({id: 'agent-2', kind: 'aiAgent', name: 'Scheduled2'});
+
+        const {referencedResources} = aiHubComposerStore.getState();
+
+        expect(referencedResources).toContainEqual({id: 'agent-2', kind: 'aiAgent', name: 'Scheduled2'});
+
+        // Without the tab open the reference would register with the LLM but show the user nothing — the
+        // whole point of referencing an agent is seeing how it is configured.
+        const {openTabs} = aiHubTabsStore.getState();
+
+        expect(openTabs).toHaveLength(1);
+        expect(openTabs[0]).toMatchObject({aiAgentId: 'agent-2', kind: 'aiAgent', name: 'Scheduled2'});
+    });
+
+    // The '@' key sets this store flag from inside the textarea, a sibling component. The composer is the
+    // half of that path that carries the flag down to the menu.
+    it('passes the store-held picker open flag down to ResourcePickerMenu', async () => {
+        await renderComposer();
+
+        expect(resourcePickerOpenRef.current).toBe(false);
+
+        // The composer subscribes to the flag through a selector, so flipping it in the store is enough —
+        // no rerender by hand. If this ever needed one, the '@' key would open nothing in the real app.
+        act(() => {
+            aiHubComposerStore.getState().setResourcePickerOpen(true);
+        });
+
+        await waitFor(() => {
+            expect(resourcePickerOpenRef.current).toBe(true);
+        });
     });
 });

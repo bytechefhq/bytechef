@@ -40,6 +40,7 @@ import {KeyboardEvent, ReactNode, useCallback, useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
+    aiAgent: 'AI Agent',
     apiCollection: 'API Collection',
     chat: 'Previous Chat',
     dataTable: 'Data Table',
@@ -51,6 +52,7 @@ const KIND_LABELS: Record<ReferencedResourceKindType, string> = {
 };
 
 const KIND_BADGE_CLASSES: Record<ReferencedResourceKindType, string> = {
+    aiAgent: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300',
     apiCollection: 'bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300',
     chat: 'bg-slate-100 text-slate-700 dark:bg-slate-950 dark:text-slate-300',
     dataTable: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300',
@@ -75,8 +77,13 @@ interface AiHubChatComposerPropsI {
 const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const previousChatIdRef = useRef<string | undefined>(undefined);
+    // The textarea a '@' was last typed into, held so focus can be handed back when the picker it raised
+    // closes. Null whenever the picker was opened some other way (the "+" button), which must keep Radix's
+    // ordinary behaviour of restoring focus to its trigger.
+    const atMentionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const referencedResources = useAiHubComposerStore((state) => state.referencedResources);
+    const resourcePickerOpen = useAiHubComposerStore((state) => state.resourcePickerOpen);
     const selectedSkills = useAiHubComposerStore((state) => state.selectedSkills);
     const mode = useAiHubStore((state) => state.mode);
     const setMode = useAiHubStore((state) => state.setMode);
@@ -250,31 +257,72 @@ const AiHubChatComposer = ({modelPicker}: AiHubChatComposerPropsI) => {
         previousChatIdRef.current = chatId;
     }, [aui, chatId]);
 
-    const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.key === 'Enter' && event.altKey && !event.shiftKey) {
-            event.preventDefault();
-
-            const textarea = event.currentTarget;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const currentValue = textarea.value;
-
-            const newValue = currentValue.substring(0, start) + '\n' + currentValue.substring(end);
-
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                window.HTMLTextAreaElement.prototype,
-                'value'
-            )?.set;
-
-            nativeInputValueSetter?.call(textarea, newValue);
-            textarea.dispatchEvent(new Event('input', {bubbles: true}));
-
-            requestAnimationFrame(() => {
-                textarea.selectionStart = start + 1;
-                textarea.selectionEnd = start + 1;
-            });
+    // Radix restores focus to the popover's trigger on close — the "+" button. That is right when the "+"
+    // button is what opened it, and wrong when '@' did: the user was mid-sentence, and handing them back a
+    // button means the next thing they type goes nowhere. Reclaim the caret for the textarea instead.
+    useEffect(() => {
+        if (resourcePickerOpen || atMentionTextareaRef.current == null) {
+            return;
         }
-    }, []);
+
+        const textarea = atMentionTextareaRef.current;
+
+        atMentionTextareaRef.current = null;
+
+        // After Radix's own close-focus pass, or it simply overwrites this.
+        requestAnimationFrame(() => textarea.focus());
+    }, [resourcePickerOpen]);
+
+    const handleKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLTextAreaElement>) => {
+            // '@' raises the resource picker — the affordance the home panel's subtitle ("Ask anything, mention
+            // files / workflows / data tables…") has always promised. Only at a word boundary: an address like
+            // support@bytechef.io must stay ordinary text, and its '@' follows a letter rather than a space.
+            // The keystroke is consumed rather than inserted, because here '@' is a command and not content —
+            // the same bargain '/' makes in most chat composers. Workflow chats have no picker at all (their
+            // messages go to a webhook, not an agent), so the key stays inert there.
+            if (event.key === '@' && !isWorkflowChat) {
+                const textarea = event.currentTarget;
+                const caret = textarea.selectionStart;
+                const atWordBoundary = caret === 0 || /\s/.test(textarea.value.charAt(caret - 1));
+
+                if (atWordBoundary) {
+                    event.preventDefault();
+
+                    atMentionTextareaRef.current = textarea;
+
+                    aiHubComposerStore.getState().setResourcePickerOpen(true);
+
+                    return;
+                }
+            }
+
+            if (event.key === 'Enter' && event.altKey && !event.shiftKey) {
+                event.preventDefault();
+
+                const textarea = event.currentTarget;
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const currentValue = textarea.value;
+
+                const newValue = currentValue.substring(0, start) + '\n' + currentValue.substring(end);
+
+                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                    window.HTMLTextAreaElement.prototype,
+                    'value'
+                )?.set;
+
+                nativeInputValueSetter?.call(textarea, newValue);
+                textarea.dispatchEvent(new Event('input', {bubbles: true}));
+
+                requestAnimationFrame(() => {
+                    textarea.selectionStart = start + 1;
+                    textarea.selectionEnd = start + 1;
+                });
+            }
+        },
+        [isWorkflowChat]
+    );
 
     const hasChips = referencedResources.length > 0 || selectedSkills.length > 0 || uploads.length > 0;
 

@@ -44,6 +44,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
 
     return {
         ...actual,
+        useAiAgentsQuery: vi.fn(),
         useAiHubChatsQuery: vi.fn(),
         useDataTablesQuery: vi.fn(),
         useGetAssetFilesQuery: vi.fn(),
@@ -79,6 +80,7 @@ vi.mock('use-debounce', () => ({
 // ── Resolve mocked modules ────────────────────────────────────────────────────
 
 const {
+    useAiAgentsQuery,
     useAiHubChatsQuery,
     useDataTablesQuery,
     useGetAssetFilesQuery,
@@ -92,6 +94,7 @@ const {useGetApiCollectionsQuery} = await import('@/ee/shared/mutations/automati
 const {useInfiniteWorkspaceProjectWorkflowExecutionsQuery} =
     await import('@/shared/queries/automation/workflowExecutions.queries');
 
+const mockUseAiAgentsQuery = vi.mocked(useAiAgentsQuery);
 const mockUseAiHubChatsQuery = vi.mocked(useAiHubChatsQuery);
 const mockUseDataTablesQuery = vi.mocked(useDataTablesQuery);
 const mockUseGetAssetFilesQuery = vi.mocked(useGetAssetFilesQuery);
@@ -110,6 +113,13 @@ const FILES_FIXTURE = [
     {id: 'file-2', name: 'brand-guide.png'},
 ];
 
+// `title` is the display name and `name` the internal handle — they differ here on purpose, so a renderer
+// that reached for `name` would fail these tests rather than passing on a fixture where both read alike.
+const AI_AGENTS_FIXTURE = [
+    {id: 'agent-1', name: 'support_agent', title: 'Support Agent', unpublishedChanges: false},
+    {id: 'agent-2', name: 'scheduled_two', title: 'Scheduled2', unpublishedChanges: true},
+];
+
 // ── Setup helper ──────────────────────────────────────────────────────────────
 
 const setupMocks = () => {
@@ -126,6 +136,7 @@ const setupMocks = () => {
     mockUseGetApiCollectionsQuery.mockReturnValue(mockQuerySuccess([]));
     mockUseAiHubChatsQuery.mockReturnValue(mockQuerySuccess({aiHubChats: []}));
     mockUseWorkspaceProjectWorkflowsQuery.mockReturnValue(mockQuerySuccess({workspaceProjectWorkflows: []}));
+    mockUseAiAgentsQuery.mockReturnValue(mockQuerySuccess({aiAgents: AI_AGENTS_FIXTURE}));
 };
 
 const renderMenu = async (extraProps?: Record<string, unknown>) => {
@@ -156,7 +167,7 @@ describe('ResourcePickerMenu', () => {
         setupMocks();
     });
 
-    it('shows the 8 reference-kind entries in the root menu', async () => {
+    it('shows the 9 reference-kind entries in the root menu', async () => {
         await renderMenu();
         await openMenu();
 
@@ -168,7 +179,76 @@ describe('ResourcePickerMenu', () => {
             expect(screen.getByText('Workflow Executions')).toBeInTheDocument();
             expect(screen.getByText('MCP Servers')).toBeInTheDocument();
             expect(screen.getByText('API Collections')).toBeInTheDocument();
+            expect(screen.getByText('AI Agents')).toBeInTheDocument();
             expect(screen.getByText('Previous Chats')).toBeInTheDocument();
+        });
+    });
+
+    describe('AI Agents branch', () => {
+        it("lists the workspace's agents by title after drilling into the branch", async () => {
+            await renderMenu();
+            await openMenu();
+
+            await userEvent.click(await screen.findByText('AI Agents'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Support Agent')).toBeInTheDocument();
+                expect(screen.getByText('Scheduled2')).toBeInTheDocument();
+            });
+
+            // The internal handle must never be what the user reads.
+            expect(screen.queryByText('support_agent')).not.toBeInTheDocument();
+        });
+
+        it('fires onSelect with kind=aiAgent and the agent id after picking one', async () => {
+            const {onSelect} = await renderMenu();
+            await openMenu();
+
+            await userEvent.click(await screen.findByText('AI Agents'));
+            await userEvent.click(await screen.findByText('Scheduled2'));
+
+            await waitFor(() => {
+                expect(onSelect).toHaveBeenCalledWith({id: 'agent-2', kind: 'aiAgent', name: 'Scheduled2'});
+            });
+        });
+
+        it('shows a matching agent in search-mode results', async () => {
+            await renderMenu();
+            await openMenu();
+
+            await userEvent.type(screen.getByPlaceholderText('Search resources…'), 'scheduled');
+
+            await waitFor(() => {
+                expect(screen.getByText('Scheduled2')).toBeInTheDocument();
+                expect(screen.queryByText('Support Agent')).not.toBeInTheDocument();
+            });
+        });
+    });
+
+    // The picker is the composer's second trigger surface: '@' in the textarea sets a store flag that arrives
+    // here as `open`. Without a controlled mode the keystroke has no way in, which is what left '@' inert.
+    describe('controlled open state', () => {
+        it('renders the menu body when open is true without the trigger being clicked', async () => {
+            await renderMenu({open: true});
+
+            await waitFor(() => {
+                expect(screen.getByText('Files')).toBeInTheDocument();
+            });
+        });
+
+        it('reports the close back through onOpenChange when a resource is picked', async () => {
+            const onOpenChange = vi.fn();
+
+            await renderMenu({onOpenChange, open: true});
+
+            await userEvent.click(await screen.findByText('Files'));
+            await userEvent.click(await screen.findByText('annual-report.pdf'));
+
+            // Radix never mediates a close-by-selection, so without the explicit report a controlled
+            // consumer's flag would stay true and the popover could never be reopened.
+            await waitFor(() => {
+                expect(onOpenChange).toHaveBeenCalledWith(false);
+            });
         });
     });
 

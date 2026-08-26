@@ -2,7 +2,15 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 export type ReferencedResourceKindType =
-    'apiCollection' | 'dataTable' | 'file' | 'knowledgeBase' | 'mcpServer' | 'chat' | 'workflow' | 'workflowExecution';
+    | 'aiAgent'
+    | 'apiCollection'
+    | 'dataTable'
+    | 'file'
+    | 'knowledgeBase'
+    | 'mcpServer'
+    | 'chat'
+    | 'workflow'
+    | 'workflowExecution';
 
 export interface ReferencedResourceI {
     id: string;
@@ -24,6 +32,14 @@ export interface SelectedSkillI {
 
 interface AiHubComposerStateI {
     referencedResources: ReferencedResourceI[];
+    /**
+     * Whether the resource picker popover is showing. Lives in the store rather than inside
+     * {@link ResourcePickerMenu} because the picker has two triggers that sit in different components: the "+"
+     * button (rendered by AiHubComposer, which owns the menu) and the '@' key (pressed in the textarea, which
+     * AiHubChatComposer owns). A keystroke in a sibling component has no other way to reach the menu's own
+     * state, which is why '@' was inert for as long as it was.
+     */
+    resourcePickerOpen: boolean;
     selectedSkills: SelectedSkillI[];
 
     addReference: (resource: ReferencedResourceI) => void;
@@ -31,12 +47,14 @@ interface AiHubComposerStateI {
     clear: () => void;
     removeReference: (id: string, kind: ReferencedResourceKindType) => void;
     removeSkill: (id: string) => void;
+    setResourcePickerOpen: (open: boolean) => void;
 }
 
 /* eslint-disable sort-keys */
 export const aiHubComposerStore = create<AiHubComposerStateI>()(
     devtools((set) => ({
         referencedResources: [],
+        resourcePickerOpen: false,
         selectedSkills: [],
 
         addReference: (resource) =>
@@ -63,7 +81,8 @@ export const aiHubComposerStore = create<AiHubComposerStateI>()(
                 return {...state, selectedSkills: [...state.selectedSkills, skill]};
             }),
 
-        clear: () => set((state) => ({...state, referencedResources: [], selectedSkills: []})),
+        clear: () =>
+            set((state) => ({...state, referencedResources: [], resourcePickerOpen: false, selectedSkills: []})),
 
         removeReference: (id, kind) =>
             set((state) => ({
@@ -78,6 +97,8 @@ export const aiHubComposerStore = create<AiHubComposerStateI>()(
                 ...state,
                 selectedSkills: state.selectedSkills.filter((skill) => skill.id !== id),
             })),
+
+        setResourcePickerOpen: (open) => set((state) => ({...state, resourcePickerOpen: open})),
     }))
 );
 
