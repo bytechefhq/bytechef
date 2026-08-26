@@ -1,8 +1,9 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
 import getSkillColor from '@/pages/automation/ai/skills/utils/getSkillColor';
 import {AiSkill} from '@/shared/middleware/graphql';
 import {useCallback, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 interface UseAiSkillListItemPropsI {
     deleteSkill: (id: string) => Promise<void>;
@@ -17,13 +18,14 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, s
 
     const {openSkillDetail} = useAiSkillsStore();
 
+    const location = useLocation();
     const navigate = useNavigate();
 
     const handleClick = useCallback(() => {
         openSkillDetail(skill.id, skill.name);
 
-        navigate(`/automation/ai/skills/${skill.id}`);
-    }, [navigate, openSkillDetail, skill.id, skill.name]);
+        navigate(`${getAiSkillsBasePath(location.pathname)}/${skill.id}`);
+    }, [location.pathname, navigate, openSkillDetail, skill.id, skill.name]);
 
     const handleDeleteClick = useCallback(async () => {
         try {

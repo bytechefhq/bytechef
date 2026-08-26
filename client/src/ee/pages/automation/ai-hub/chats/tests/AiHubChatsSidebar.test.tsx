@@ -306,13 +306,16 @@ describe('AiHubChatsSidebar "More" menu', () => {
 
         expect(await screen.findByRole('menuitem', {name: /memories/i})).toHaveAttribute(
             'href',
-            '/automation/ai/memories'
+            '/automation/settings/ai/memories'
         );
         expect(screen.getByRole('menuitem', {name: /connectors/i})).toHaveAttribute(
             'href',
             '/automation/settings/ai-hub/connectors'
         );
-        expect(screen.getByRole('menuitem', {name: /skills/i})).toHaveAttribute('href', '/automation/ai/skills');
+        expect(screen.getByRole('menuitem', {name: /skills/i})).toHaveAttribute(
+            'href',
+            '/automation/settings/ai/skills'
+        );
     });
 
     it('closes the menu again when dismissed with Escape', async () => {

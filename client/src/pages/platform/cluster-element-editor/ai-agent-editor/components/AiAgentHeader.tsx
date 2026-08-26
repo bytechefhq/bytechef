@@ -56,7 +56,7 @@ export default function AiAgentHeader({
                         <TooltipTrigger asChild>
                             <a
                                 className="relative inline-flex size-9 items-center justify-center rounded-md text-content-neutral-secondary hover:bg-surface-neutral-primary"
-                                href="/automation/ai/skills"
+                                href="/automation/settings/ai/skills"
                                 rel="noreferrer"
                                 target="_blank"
                             >

@@ -2,13 +2,14 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import AiSkillUploadDialog from '@/pages/automation/ai/skills/components/AiSkillUploadDialog';
 import AiSkillWriteDialog from '@/pages/automation/ai/skills/components/AiSkillWriteDialog';
+import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
 import useOpenCopilot from '@/shared/components/copilot/hooks/useOpenCopilot';
 import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 interface AiSkillsCreateDropdownProps {
     trigger?: ReactNode;
@@ -20,13 +21,14 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
+    const location = useLocation();
     const navigate = useNavigate();
     const openCopilot = useOpenCopilot();
     const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
 
     const handleCreated = (createdSkillId: string | null) => {
         if (createdSkillId) {
-            navigate(`/automation/ai/skills/${createdSkillId}`);
+            navigate(`${getAiSkillsBasePath(location.pathname)}/${createdSkillId}`);
         }
     };
 

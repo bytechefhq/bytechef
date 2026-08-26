@@ -12,10 +12,10 @@ import {
 import {Input} from '@/components/ui/input';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import FilterBadges from '@/shared/components/filters/FilterBadges';
+import FilterMenu, {type FilterGroupI} from '@/shared/components/filters/FilterMenu';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import LeftSidebarToggle from '@/shared/layout/LeftSidebarToggle';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {formatDistanceToNow} from 'date-fns';
@@ -176,7 +176,44 @@ const Memories = () => {
 
     const memoryType = activeFilter === 'ALL' ? undefined : activeFilter;
 
-    const activeFilterLabel = FILTER_ITEMS.find((item) => item.value === activeFilter)?.label ?? 'All';
+    // Owner and Type are independent facets, so one selection in EACH is legitimately active at once.
+    const filterGroups = useMemo<FilterGroupI[]>(() => {
+        const groups: FilterGroupI[] = [];
+
+        if (principals && principals.length > 0) {
+            groups.push({
+                allValue: ALL_OWNERS,
+                key: 'owner',
+                label: 'Owner',
+                onChange: (value) => setSelectedPrincipalKey(value === ALL_OWNERS ? null : value),
+                // Sending no principal is the server's All scope: every owner the caller may address, which
+                // for a non-admin is just their own memories. It leads the list because it is the default the
+                // page opens on.
+                options: [
+                    {label: 'All', value: ALL_OWNERS},
+                    // The label is resolved server-side ("My memories" for the caller, the deployment's name
+                    // otherwise) and rendered verbatim — a client-derived label would read "User", which in
+                    // this menu already means a memory CATEGORY.
+                    ...principals.map((principal) => ({
+                        label: principal.label,
+                        value: principalKey(principal),
+                    })),
+                ],
+                value: selectedPrincipalKey ?? ALL_OWNERS,
+            });
+        }
+
+        groups.push({
+            allValue: 'ALL',
+            key: 'type',
+            label: 'Type',
+            onChange: (value) => setActiveFilter(value as FilterValueType),
+            options: FILTER_ITEMS,
+            value: activeFilter,
+        });
+
+        return groups;
+    }, [activeFilter, principals, selectedPrincipalKey]);
 
     // Resolved against the CURRENT owner list rather than trusted from state: switching environment replaces the
     // owners, and a selection that no longer exists has to fall back to "no principal" (the signed-in user) instead
@@ -214,25 +251,29 @@ const Memories = () => {
 
     return (
         <LayoutContainer
-            // The header surfaces the active Type filter as the page title (echoes the sidebar selection so the
-            // user can confirm what's being shown), with the env selector and search input on the right —
-            // matching the AssetFiles toolbar order so the search affordance lives in the same screen region
-            // across automation pages.
             header={
-                <div className="flex w-full items-center gap-2 px-6 py-3">
-                    <LeftSidebarToggle />
+                <Header
+                    description="Facts the agent has stored while working in this workspace."
+                    position="main"
+                    right={
+                        <div className="flex items-center gap-1">
+                            <FilterMenu groups={filterGroups} title="Filter Memories" />
 
-                    <h1 className="text-base font-semibold">{activeFilterLabel}</h1>
+                            <EnvironmentSelect />
+                        </div>
+                    }
+                    title="AI Memories"
+                />
+            }
+            leftSidebarOpen={false}
+        >
+            <PageLoader className="min-h-full" loading={isLoading}>
+                <div className="flex w-full flex-1 flex-col">
+                    {/* Search and the active-filter chips sit above the results and OUTSIDE the empty-state
+                        branch: filtering down to nothing is exactly when the chip that emptied the page has to
+                        stay reachable. */}
 
-                    {totalCount > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                            {totalCount} {totalCount === 1 ? 'memory' : 'memories'}
-                        </span>
-                    )}
-
-                    <div className="ml-auto flex items-center gap-2">
-                        <EnvironmentSelect />
-
+                    <div className="flex flex-wrap items-center gap-2 px-6 pt-4">
                         <div className="relative w-64">
                             <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
@@ -243,132 +284,71 @@ const Memories = () => {
                                 value={searchTerm}
                             />
                         </div>
+
+                        <FilterBadges groups={filterGroups} />
                     </div>
-                </div>
-            }
-            leftSidebarBody={
-                <>
-                    {principals && principals.length > 0 && (
-                        <LeftSidebarNav
-                            body={[
-                                // Sending no principal is the server's All scope: every owner the caller may
-                                // address, which for a non-admin is just their own memories. It leads the group
-                                // because it is the default the page opens on.
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: !selectedPrincipalKey,
-                                        id: ALL_OWNERS,
-                                        name: 'All',
-                                        onItemClick: () => setSelectedPrincipalKey(null),
-                                    }}
-                                    key={ALL_OWNERS}
-                                />,
-                                ...principals.map((principal) => (
-                                    <LeftSidebarNavItem
-                                        item={{
-                                            current: selectedPrincipalKey === principalKey(principal),
-                                            id: principalKey(principal),
-                                            // The label is resolved server-side ("My memories" for the caller, the
-                                            // deployment's name otherwise) and rendered verbatim — a client-derived
-                                            // label would read "User", which in this sidebar already means a memory
-                                            // CATEGORY.
-                                            name: principal.label,
-                                            onItemClick: (id) => setSelectedPrincipalKey(String(id)),
-                                        }}
-                                        key={principalKey(principal)}
-                                    />
-                                )),
-                            ]}
-                            title="Owner"
-                        />
+
+                    {totalCount === 0 ? (
+                        <div className="flex flex-1 items-center justify-center">
+                            <MemoriesEmptyState />
+                        </div>
+                    ) : (
+                        <div className="flex w-full flex-1 flex-col gap-4 p-6">
+                            {filteredMemories.length === 0 ? (
+                                <p className="p-8 text-center text-sm text-muted-foreground">
+                                    No memories match your search.
+                                </p>
+                            ) : (
+                                <div className="overflow-x-auto rounded-md border">
+                                    <table className="w-full">
+                                        <thead>
+                                            <tr className="border-b bg-muted/50 text-left">
+                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                    Title
+                                                </th>
+
+                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                    Type
+                                                </th>
+
+                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                    Description
+                                                </th>
+
+                                                <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                    Updated
+                                                </th>
+
+                                                {/* w-px collapses the column to its content: the cell holds one icon
+                                                    button, so the header text is what would otherwise size it. */}
+
+                                                <th className="w-px px-4 py-2 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                                                    Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            {filteredMemories.map((memory) => (
+                                                <MemoriesTableRow
+                                                    key={memory.id}
+                                                    memory={memory}
+                                                    // A USER-owned row is always the caller's own (the server only
+                                                    // ever addresses the caller under USER); anything else is
+                                                    // deployment-owned and admin-only to mutate.
+                                                    mutable={memory.principalType === 'USER' || isAdmin}
+                                                    onDelete={setDeleteTarget}
+                                                    onEdit={setEditTarget}
+                                                    onView={setViewTarget}
+                                                />
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
                     )}
-
-                    {/* Owner and Type are independent facets, so one item in EACH is legitimately active at once.
-                        Without a divider the two groups read as a single single-select list and the two highlights
-                        look like a bug, so the Type group is ruled off from the Owner group above it. */}
-
-                    <LeftSidebarNav
-                        body={FILTER_ITEMS.map((item) => (
-                            <LeftSidebarNavItem
-                                item={{
-                                    current: activeFilter === item.value,
-                                    id: item.value,
-                                    name: item.label,
-                                    onItemClick: (id) => setActiveFilter(id as FilterValueType),
-                                }}
-                                key={item.value}
-                            />
-                        ))}
-                        className={principals && principals.length > 0 ? 'mt-2 border-t border-border/50 pt-4' : ''}
-                        title="Type"
-                    />
-                </>
-            }
-            leftSidebarHeader={<Header position="sidebar" title="Memories" />}
-            leftSidebarWidth="64"
-        >
-            <PageLoader className="min-h-full" loading={isLoading}>
-                {/* EmptyList centers on its parent's CROSS axis, so it only lands mid-page as a direct child
-                    of the layout's flex ROW; inside the padded flex COLUMN below it would pin to the top. */}
-
-                {totalCount === 0 ? (
-                    <MemoriesEmptyState />
-                ) : (
-                    <div className="flex w-full flex-1 flex-col gap-4 p-6">
-                        {filteredMemories.length === 0 ? (
-                            <p className="p-8 text-center text-sm text-muted-foreground">
-                                No memories match your search.
-                            </p>
-                        ) : (
-                            <div className="overflow-x-auto rounded-md border">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="border-b bg-muted/50 text-left">
-                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                Title
-                                            </th>
-
-                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                Type
-                                            </th>
-
-                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                Description
-                                            </th>
-
-                                            <th className="px-4 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                Updated
-                                            </th>
-
-                                            {/* w-px collapses the column to its content: the cell holds one icon
-                                                button, so the header text is what would otherwise size it. */}
-
-                                            <th className="w-px px-4 py-2 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        {filteredMemories.map((memory) => (
-                                            <MemoriesTableRow
-                                                key={memory.id}
-                                                memory={memory}
-                                                // A USER-owned row is always the caller's own (the server only ever
-                                                // addresses the caller under USER); anything else is
-                                                // deployment-owned and admin-only to mutate.
-                                                mutable={memory.principalType === 'USER' || isAdmin}
-                                                onDelete={setDeleteTarget}
-                                                onEdit={setEditTarget}
-                                                onView={setViewTarget}
-                                            />
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                )}
+                </div>
             </PageLoader>
 
             <MemoryDetailDialog memory={viewTarget} onClose={() => setViewTarget(null)} open={viewTarget !== null} />

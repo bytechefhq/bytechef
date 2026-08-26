@@ -1,5 +1,6 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import downloadAiSkill from '@/pages/automation/ai/skills/utils/downloadAiSkill';
+import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
 import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
 import {
     useAiSkillFileContentQuery,
@@ -13,7 +14,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
 interface FileTreeNodeI {
@@ -93,6 +94,7 @@ export default function useAiSkillDetail() {
 
     const {closeSkillDetail, selectedSkillId} = useAiSkillsStore();
 
+    const location = useLocation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -219,7 +221,7 @@ export default function useAiSkillDetail() {
         const idToDelete = selectedSkillId;
 
         closeSkillDetail();
-        navigate('/automation/ai/skills');
+        navigate(getAiSkillsBasePath(location.pathname));
 
         try {
             await deleteAiSkill({id: idToDelete});
@@ -241,7 +243,7 @@ export default function useAiSkillDetail() {
                 description: error instanceof Error ? error.message : 'An unexpected error occurred',
             });
         }
-    }, [closeSkillDetail, deleteAiSkill, navigate, queryClient, selectedSkillId]);
+    }, [closeSkillDetail, deleteAiSkill, location.pathname, navigate, queryClient, selectedSkillId]);
 
     const handleRemoveFile = useCallback(
         async (path: string) => {
