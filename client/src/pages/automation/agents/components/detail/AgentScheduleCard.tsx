@@ -3,7 +3,11 @@ import AgentScheduleDialog, {
     AgentSchedulePropertiesI,
 } from '@/pages/automation/agents/components/detail/AgentScheduleDialog';
 import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
-import {CADENCE_PARAMETER_KEYS} from '@/pages/automation/agents/utils/agentScheduleCron';
+import {
+    CADENCE_PARAMETER_KEYS,
+    describeCadence,
+    fromCadenceParameters,
+} from '@/pages/automation/agents/utils/agentScheduleCron';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {
     AiAgentChannel,
@@ -100,6 +104,26 @@ const AgentScheduleCard = ({agentId, channels}: AgentScheduleCardProps) => {
         return properties;
     };
 
+    /**
+     * What the row shows instead of the stored cron: "Daily at 09:00" reads, "0 9 * * ?" does not. A row written by
+     * hand or before the picker existed carries no cadence fields, and describeCadence falls back to the expression
+     * itself — the only thing certainly true about when such a row runs. The timezone is appended only when it is not
+     * UTC, since a bare time is ambiguous the moment it is not.
+     */
+    const describeSchedule = (channel: AiAgentChannel): string => {
+        const parameters = (channel.parameters ?? {}) as Record<string, unknown>;
+
+        const summary = describeCadence(fromCadenceParameters(parameters));
+
+        if (!summary) {
+            return 'No schedule set';
+        }
+
+        const timezone = String(parameters.timezone || 'UTC');
+
+        return timezone === 'UTC' ? summary : `${summary} (${timezone})`;
+    };
+
     return (
         <AgentSection
             action={
@@ -132,7 +156,7 @@ const AgentScheduleCard = ({agentId, channels}: AgentScheduleCardProps) => {
                                     <span className="truncate font-medium">{schedule.name || 'Schedule'}</span>
 
                                     <span className="truncate text-xs text-muted-foreground">
-                                        {schedule.expression || 'No cron expression'}
+                                        {describeSchedule(channel)}
                                     </span>
                                 </div>
 

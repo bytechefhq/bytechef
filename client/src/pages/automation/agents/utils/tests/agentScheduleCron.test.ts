@@ -1,4 +1,5 @@
 import {
+    describeCadence,
     fromCadenceParameters,
     toCadenceParameters,
     toCronExpression,
@@ -80,5 +81,36 @@ describe('cadence parameter round-trip', () => {
             minuteOfHour: null,
             timeOfDay: null,
         });
+    });
+});
+
+describe('describeCadence', () => {
+    it('names each picker cadence', () => {
+        expect(describeCadence({frequencyKind: 'EVERY_X_MINUTES', intervalMinutes: 15})).toBe('Every 15 minutes');
+        expect(describeCadence({frequencyKind: 'EVERY_X_MINUTES', intervalMinutes: 1})).toBe('Every minute');
+        expect(describeCadence({frequencyKind: 'HOURLY', minuteOfHour: 5})).toBe('Hourly at :05');
+        expect(describeCadence({frequencyKind: 'DAILY', timeOfDay: '09:00'})).toBe('Daily at 09:00');
+        expect(describeCadence({dayOfWeek: 1, frequencyKind: 'WEEKLY', timeOfDay: '09:00'})).toBe(
+            'Weekly on Monday at 09:00'
+        );
+        expect(describeCadence({dayOfMonth: 3, frequencyKind: 'MONTHLY', timeOfDay: '09:00'})).toBe(
+            'Monthly on day 3 at 09:00'
+        );
+    });
+
+    it('reads back what the picker stored', () => {
+        const parameters = toCadenceParameters({dayOfWeek: 7, frequencyKind: 'WEEKLY', timeOfDay: '18:30'});
+
+        expect(describeCadence(fromCadenceParameters(parameters))).toBe('Weekly on Sunday at 18:30');
+    });
+
+    it('falls back to the expression of a hand-written row', () => {
+        expect(describeCadence(fromCadenceParameters({expression: '0 9 * * ?'}))).toBe('0 9 * * ?');
+    });
+
+    // A kind whose fields never made it into the row: there is nothing truthful to say about its cadence,
+    // so the caller — not a half-built sentence like "Daily at " — decides what to show.
+    it('says nothing for a cadence missing its own fields', () => {
+        expect(describeCadence({frequencyKind: 'DAILY'})).toBe('');
     });
 });

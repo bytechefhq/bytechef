@@ -204,3 +204,49 @@ export const fromCadenceParameters = (parameters: Record<string, unknown>): Agen
         timeOfDay: toText(parameters.timeOfDay),
     };
 };
+
+/** ISO day of week, matching AgentScheduleFrequencyFields' picker. */
+const DAY_OF_WEEK_LABELS: Record<number, string> = {
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday',
+    7: 'Sunday',
+};
+
+/**
+ * A one-line, human reading of a cadence — "Daily at 09:00" rather than "0 9 * * ?".
+ *
+ * Built from the picker fields the dialog stored, never by parsing the cron string back: the expression is
+ * six fields once ScheduleCronTrigger prepends seconds, and reversing it would have to re-derive a cadence
+ * the row already carries. A kind whose fields are absent (a row written by hand, or before the picker
+ * existed) therefore has no summary — the caller falls back to the expression itself, which is the only
+ * thing that is certainly true about when such a row runs.
+ */
+export const describeCadence = (cadence: AgentScheduleCadenceI): string => {
+    const timeOfDay = cadence.timeOfDay;
+
+    if (cadence.frequencyKind === 'EVERY_X_MINUTES' && cadence.intervalMinutes != null) {
+        return cadence.intervalMinutes === 1 ? 'Every minute' : `Every ${cadence.intervalMinutes} minutes`;
+    }
+
+    if (cadence.frequencyKind === 'HOURLY' && cadence.minuteOfHour != null) {
+        return `Hourly at :${String(cadence.minuteOfHour).padStart(2, '0')}`;
+    }
+
+    if (cadence.frequencyKind === 'DAILY' && timeOfDay) {
+        return `Daily at ${timeOfDay}`;
+    }
+
+    if (cadence.frequencyKind === 'WEEKLY' && timeOfDay && cadence.dayOfWeek != null) {
+        return `Weekly on ${DAY_OF_WEEK_LABELS[cadence.dayOfWeek] ?? `day ${cadence.dayOfWeek}`} at ${timeOfDay}`;
+    }
+
+    if (cadence.frequencyKind === 'MONTHLY' && timeOfDay && cadence.dayOfMonth != null) {
+        return `Monthly on day ${cadence.dayOfMonth} at ${timeOfDay}`;
+    }
+
+    return cadence.cronExpression?.trim() ?? '';
+};

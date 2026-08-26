@@ -143,4 +143,58 @@ describe('AgentScheduleCard', () => {
 
         expect(screen.getAllByRole('listitem')).toHaveLength(1);
     });
+
+    // The row shows the cadence the picker stored, not the cron it compiled to: "Daily at 17:38" reads and
+    // "38 17 * * ?" does not.
+    it('renders a picker-built schedule in words rather than as its cron expression', () => {
+        const channel = {
+            ...scheduleChannel,
+            parameters: {
+                expression: '38 17 * * ?',
+                frequencyKind: 'DAILY',
+                name: 'Scheduled2',
+                prompt: 'Summarize',
+                timeOfDay: '17:38',
+                timezone: 'UTC',
+            },
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        wrap(<AgentScheduleCard agentId="agent-1" channels={[channel] as any} />);
+
+        expect(screen.getByText('Daily at 17:38')).toBeInTheDocument();
+        expect(screen.queryByText('38 17 * * ?')).not.toBeInTheDocument();
+    });
+
+    it('appends the timezone when it is not UTC, since a bare time is ambiguous', () => {
+        const channel = {
+            ...scheduleChannel,
+            parameters: {
+                expression: '38 17 * * ?',
+                frequencyKind: 'DAILY',
+                name: 'Scheduled2',
+                timeOfDay: '17:38',
+                timezone: 'Europe/Zagreb',
+            },
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        wrap(<AgentScheduleCard agentId="agent-1" channels={[channel] as any} />);
+
+        expect(screen.getByText('Daily at 17:38 (Europe/Zagreb)')).toBeInTheDocument();
+    });
+
+    // A row written by hand or before the picker existed carries no cadence fields; the expression is then the
+    // only thing certainly true about when it runs, so it is what gets shown.
+    it('falls back to the raw expression for a hand-written cron', () => {
+        const channel = {
+            ...scheduleChannel,
+            parameters: {expression: '*/5 8-17 * * MON-FRI', name: 'Scheduled2', timezone: 'UTC'},
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        wrap(<AgentScheduleCard agentId="agent-1" channels={[channel] as any} />);
+
+        expect(screen.getByText('*/5 8-17 * * MON-FRI')).toBeInTheDocument();
+    });
 });
