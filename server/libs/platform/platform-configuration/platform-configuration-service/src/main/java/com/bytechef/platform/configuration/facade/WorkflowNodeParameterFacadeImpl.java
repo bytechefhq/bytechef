@@ -43,6 +43,7 @@ import com.bytechef.platform.configuration.dto.ParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -764,8 +765,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Workflow workflow, String workflowNodeName,
         WorkflowNodeStructure.OperationType operationType, long environmentId) {
 
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflow.getId(), environmentId);
+            workflow.getId(), effectiveEnvironmentId);
 
         Map<String, ?> previousOutputs = Map.of();
 
@@ -777,7 +780,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (workflowTask != null) {
                 previousOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                    workflow.getId(), workflowTask.getName(), environmentId);
+                    workflow.getId(), workflowTask.getName(), effectiveEnvironmentId);
             }
         }
 
