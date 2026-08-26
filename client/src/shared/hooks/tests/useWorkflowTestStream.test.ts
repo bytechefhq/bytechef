@@ -313,7 +313,7 @@ describe('useWorkflowTestStream', () => {
         });
     });
 
-    it('should reset node states on start event', () => {
+    it('should reset node states on start event, scoped to the workflow that is running', () => {
         renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
 
         /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -323,7 +323,7 @@ describe('useWorkflowTestStream', () => {
             eventHandlers.start({jobId: 'job-123'});
         });
 
-        expect(mockResetWorkflowTestNodeStates).toHaveBeenCalled();
+        expect(mockResetWorkflowTestNodeStates).toHaveBeenCalledWith('workflow-123');
     });
 
     it('should handle task_started event', () => {

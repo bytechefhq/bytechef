@@ -4,10 +4,7 @@ import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
 import ExecutionAccordionButton from '@/shared/components/workflow-executions/ExecutionAccordionButton';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
-import {
-    groupGraphChildTaskExecutions,
-    isGraphTaskExecution,
-} from '@/shared/components/workflow-executions/util/groupGraphChildTaskExecutions';
+import {isGraphTaskExecution, toGraphNodeVisits} from '@/shared/components/workflow-executions/util/toGraphNodeVisits';
 import {
     TaskExecution,
     TaskExecutionFromJSON,
@@ -64,7 +61,7 @@ const WorkflowExecutionsAccordionItem = ({
             return [];
         }
 
-        return groupGraphChildTaskExecutions(taskExecution.children ?? []);
+        return toGraphNodeVisits(taskExecution.children ?? []);
     }, [hasIterations, taskExecution]);
     const hasGraphNodeVisits = graphNodeVisits.length > 0;
 
@@ -239,54 +236,30 @@ const WorkflowExecutionsAccordionItem = ({
                             </span>
                         </div>
 
+                        {/* One row per visit, not per task: a graph node IS one task, so the
+                            timeline is flat and a node revisited by a cycle appears once per visit,
+                            numbered. The row is a plain child row like every other nested execution
+                            here — selecting it opens that visit's own input and output. */}
                         <Accordion className="space-y-2" defaultValue={defaultValue} type="multiple">
-                            {graphNodeVisits.map((graphNodeVisit, graphNodeVisitIndex) => {
-                                const graphNodeVisitValue = `${taskExecution.id}-node-${graphNodeVisitIndex}`;
+                            {graphNodeVisits.map((graphNodeVisit, graphNodeVisitIndex) => (
+                                <WorkflowExecutionsAccordionItem
+                                    defaultValue={defaultValue}
+                                    execution={graphNodeVisit.taskExecution}
+                                    key={
+                                        graphNodeVisit.taskExecution.id ?? `${taskExecution.id}-${graphNodeVisitIndex}`
+                                    }
+                                    onExecutionClick={onExecutionClick}
+                                    selectedExecutionId={selectedExecutionId}
+                                >
+                                    <div className="flex w-full min-w-0 items-center justify-between gap-x-2">
+                                        <WorkflowTaskExecutionItem taskExecution={graphNodeVisit.taskExecution} />
 
-                                return (
-                                    <AccordionItem
-                                        className="border-b-0"
-                                        key={graphNodeVisitValue}
-                                        value={graphNodeVisitValue}
-                                    >
-                                        <AccordionTrigger className="flex w-full min-w-0 items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors [&_svg]:size-5">
-                                            <div className="flex w-full items-center justify-between">
-                                                <span className="text-sm font-medium text-content-neutral-primary">
-                                                    {graphNodeVisit.nodeName} (visit {graphNodeVisit.visitNumber})
-                                                </span>
-
-                                                <div className="mr-2 flex items-center gap-x-1 text-xs text-content-neutral-secondary">
-                                                    <span>{graphNodeVisit.taskExecutions.length}</span>
-
-                                                    <span>
-                                                        {graphNodeVisit.taskExecutions.length > 1 ? 'tasks' : 'task'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </AccordionTrigger>
-
-                                        <AccordionContent className="border-l border-stroke-neutral-secondary p-0 pl-4">
-                                            <Accordion
-                                                className="mt-2 space-y-2"
-                                                defaultValue={defaultValue}
-                                                type="multiple"
-                                            >
-                                                {graphNodeVisit.taskExecutions.map((childTaskExecution) => (
-                                                    <WorkflowExecutionsAccordionItem
-                                                        defaultValue={defaultValue}
-                                                        execution={childTaskExecution}
-                                                        key={childTaskExecution.id}
-                                                        onExecutionClick={onExecutionClick}
-                                                        selectedExecutionId={selectedExecutionId}
-                                                    >
-                                                        <WorkflowTaskExecutionItem taskExecution={childTaskExecution} />
-                                                    </WorkflowExecutionsAccordionItem>
-                                                ))}
-                                            </Accordion>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                );
-                            })}
+                                        <span className="mr-2 shrink-0 text-xs text-content-neutral-secondary">
+                                            {graphNodeVisit.nodeName} (visit {graphNodeVisit.visitNumber})
+                                        </span>
+                                    </div>
+                                </WorkflowExecutionsAccordionItem>
+                            ))}
                         </Accordion>
                     </>
                 ) : (
