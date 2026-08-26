@@ -438,6 +438,21 @@ Servers, Context Store) and "Data" (Data Tables, Knowledge Base, Files); embedde
 "Configurations" (Integration Configurations, MCP Servers). Feature-flag filtering runs before
 grouping, so a group renders with whatever members survive their flags.
 
+### Graph dispatcher canvas (Client)
+
+A `graph/v1` dispatcher renders as a free-form `graphFrame` box, not as a chain. `layoutGraphFrames`
+is a PRE-PASS: it lays each frame's members out first, hands the outer engine one sized leaf node,
+and re-appends members and their routes afterwards — so nothing the outer layout does can disturb
+them, and a nested graph must be processed innermost-first. Member positions are FRAME-relative
+(`metadata.ui.nodePosition`); `toFrameChildPosition`/`fromFrameChildPosition` in `graphFrameGeometry`
+are the only sanctioned crossing to canvas coordinates — open-coding the header offset flings the
+group. Routing is an explicit `parameters.transitions: [{from, to, condition?}]` list, never a
+per-node `next`: declaration order within a `from` IS conditional priority, so a transition's index
+is its identity. `graphTransition`/`graphStart` edges are free-form routes, not chain links — a
+cyclic pair would corrupt dagre's and ELK's ranking, so both engines strip them, and chain walkers
+(`collectChainSuccessorNodes`) must skip them. `onConnect` is scoped by handle suffix
+(`resolveGraphConnection`): only graph transition handles connect, and only within one graph.
+
 ### Vitest mock factory hoisting (Client)
 
 `vi.mock(...)` calls hoist to the top of the file, so module-scope `const` declarations are NOT yet
@@ -506,6 +521,14 @@ These are the parts that apply outside their own area, so they stay here:
 - **Never add notification, admission, or approval logic under `server/libs/atlas/`** — the engine
   stays agnostic; those concerns live in `platform-coordinator` and the platform modules.
 - **Enum ordinals are persisted as INT** — append new values at the end, never reorder.
+- **A new task dispatcher must be registered in three places, not one.** Its own `@Bean`s cover the
+  production coordinator, which autowires `List<TaskDispatcherResolverFactory>` — but
+  `WorkflowTestConfiguration` (the editor's Test button) and `WebhookConfiguration` each build their
+  chain from a literal `List.of(...)`. An unregistered type matches no resolver, falls through to the
+  worker, and surfaces as `Component definition with name '<type>' ... not found`. Adding the Gradle
+  dependency is not enough — `WorkflowTestConfigurationTest`/`WebhookConfigurationTest` scan
+  `com.bytechef.task.dispatcher` and fail when a dispatcher or completion handler on the classpath is
+  missing from either list.
 - **A specialist subagent is for multi-step reasoning over a domain**, not for hiding the number of
   CRUD tools in one. Self-contained CRUD goes flat (pinned or catalog-demoted).
 

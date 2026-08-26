@@ -35,58 +35,70 @@ Once released, **Condition** and **Branch** will return the last task's output f
 
 > **Coming soon.** The Graph flow control is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
-Where Loop repeats a fixed body and Condition/Branch pick one of a small, fixed set of paths, **Graph** is a state machine: a set of named nodes, each with its own task list, wired together by expressions that decide which node runs next. A node's transition can point forward, sideways, or back to a node that already ran - the shape you'd otherwise hand-build out of nested Loop and Condition steps for a "retry until it passes" or "send it back for another pass" flow.
+Where Loop repeats a fixed body and Condition/Branch pick one of a small, fixed set of paths, **Graph** is a state machine: a set of named nodes wired together by transitions that decide which node runs next. A transition can point forward, sideways, or back to a node that already ran - the shape you'd otherwise hand-build out of nested Loop and Condition steps for a "retry until it passes" or "send it back for another pass" flow.
 
 #### Nodes and transitions
 
-A graph's `nodes` list is its state list. Each node has:
+A graph's `nodes` list is an ordinary task list - each node **is** one task, and its `name` is the same task name you'd give any step elsewhere in the workflow, unique across the whole workflow. A node can be any task, including another flow control or a nested graph.
 
-- **`name`** - unique within the graph. This is the vocabulary every node's `next` expression targets, including its own.
-- **`tasks`** - an ordinary task list, run in order once the node is entered. A node can contain any other flow control, and a graph can itself be nested inside a Condition, Loop, Fork/Join, or another graph, exactly like every other flow control.
-- **`next`** - a formula-mode expression, evaluated against the accumulated run context once the node's tasks finish, that resolves to the *name* of the node to run next.
+The `transitions` list is separate from `nodes` and holds the graph's edges. Each transition has:
+
+- **`from`** - the node the transition leaves.
+- **`to`** - the node the transition enters. Either a plain node name (a static edge) or a formula-mode expression that resolves to one, evaluated against the accumulated run context (a dynamic edge - see the LLM-routed example below).
+- **`condition`** - an optional formula-mode expression evaluated against the accumulated run context. Blank or absent means the transition is unconditional. The expression must evaluate to an actual boolean - a truthy non-boolean value such as a number or a non-empty string (other than the literal `"true"`) is treated as false, so `condition: "=${count}"` does not do what it looks like; compare it explicitly instead, e.g. `condition: "=${count} > 0"`.
 
 ```yaml
 - name: triage
   type: graph/v1
   parameters:
-    startNode: classify          # optional; defaults to the first declared node
-    maxTransitions: 100          # optional; default 100
-    nodes:
+    startNode: classify            # optional; defaults to the first declared node
+    maxTransitions: 100            # optional; default 100
+    nodes:                         # a plain task list - every entry is an ordinary task
       - name: classify
-        tasks: [ ... ]
-        next: "=${score.value} > 0.8 ? 'approve' : 'review'"
+        type: aiAgent/v1/chat
+        parameters: { ... }
       - name: review
-        tasks: [ ... ]
-        next: "=${review.verdict} == 'REDO' ? 'classify' : 'approve'"   # jumps back
+        type: ...
       - name: approve
-        tasks: [ ... ]
-        # no `next` - this node is terminal, the graph completes here
+        type: ...
+    transitions:                   # the edges between nodes
+      - from: classify
+        to: approve
+        condition: "=${classify.score} > 0.8"
+      - from: classify
+        to: review                 # no condition -> the node's default transition
+      - from: review
+        to: classify
+        condition: "=${review.verdict} == 'REDO'"
+      - from: review
+        to: approve
 ```
 
-A run starts at `startNode` (or the first declared node, if omitted) and keeps following `next` until it lands on a node with **no `next` expression** - that omission is what marks a node terminal; there's no separate "end" step to add. An expression that evaluates to a blank or null value has the same effect. An expression that resolves to a name that isn't one of the graph's nodes fails the run with an error naming the offending node and the value it produced, so a typo in a node name is caught at run time instead of silently dead-ending the graph.
+**Evaluation rule:** on node completion, take that node's outgoing transitions; evaluate the conditional ones in declared order, first truthy `condition` wins; if none matched take the first unconditional one; if there is none the node is terminal. If a node has more than one unconditional transition, the first declared one is taken - the editor warns about this, but it's also the runtime rule.
 
-A node can also declare an **empty task list** - a pure router. Its `next` is evaluated immediately on entry, with no work of its own in between; it still counts as one transition against the budget below.
+A dynamic `to` that resolves blank counts as "did not match" and evaluation continues to the next candidate - the same as a `condition` that evaluates false. Once a transition is chosen, though, its resolved target must name a real node: if `to` evaluates to a non-blank value that isn't one of the graph's declared node names, the run fails - the error names the source node and the value that was produced (`Unknown graph transition target node: '<to>' resolved from node '<from>'`) rather than the graph silently stalling.
+
+A run starts at `startNode` if set, otherwise the first declared node.
 
 #### Cycles and the transition budget
 
-Because `next` can point at a node that already ran - including the node it's declared on - a graph can express review loops and retry-until-done flows directly: `review` jumping back to `classify` above is a normal transition, not an error. To keep a routing expression that never resolves to a terminal node from running forever, every graph carries a **transition budget**, `maxTransitions` (default 100). Every node-to-node hop, including a router node's immediate `next`, counts against it; once the budget is used up the run fails cleanly instead of looping indefinitely.
+Because a transition can target a node that already ran - including the node it leaves from - a graph can express review loops and retry-until-done flows directly: `review` transitioning back to `classify` above is a normal edge, not an error. To keep a cycling graph from running forever, every graph carries a **transition budget**, `maxTransitions` (default 100). Every node-to-node hop counts against it; once the budget is used up the run fails cleanly instead of looping indefinitely.
 
-Context accumulates across the whole run the normal way: a node that runs a second time (after a cycle back to it) sees everything produced so far, including its own earlier run, and a data pill referencing a step inside that node resolves to that step's *most recent* execution.
+Context accumulates across the whole run the normal way: it is last-write-wins, so a node that runs a second time (after a cycle back to it) sees everything produced so far, including its own earlier run, and a data pill referencing a step inside that node resolves to that step's *most recent* execution.
 
 #### Outputs
 
-`${graphName}` resolves to the **terminal node's last-task output** - the same convention as Condition and Branch above. If the terminal node's task list is empty, or its last task produces no output, `${graphName}` is `null`.
+`${graphName}` resolves to the **terminal node's output** - the same convention as Condition and Branch above. When the terminal node produced no output, `${graphName}` is `null`.
 
 #### In the editor
 
-- Each node gets its own **lane** on the canvas, similar to Fork/Join's branch columns - including empty (router) nodes, which stay addressable rather than collapsing away.
-- A node's name is an inline-editable chip above its lane; names must stay unique and non-empty within the graph.
-- Selecting the graph container shows every node's `next` expression as a field in the properties panel, so transitions can be reviewed and edited without opening each node individually.
-- Where a `next` expression contains plain quoted node names (e.g. `'approve'`, `'review'`), the editor draws **routed transition edges** between the corresponding lanes, plus a small badge on the node listing its possible next steps - available under the **experimental** layout engine. An expression whose target can't be read directly off the text - like the LLM-routed example below - renders as a **dynamic** badge instead of a fixed edge, since the actual destination is only known once the run reaches it. Under the **standard** layout engine, transitions always show as badges only; routed edges appear only with the experimental engine.
+The graph's canvas is a free-form box: drag nodes to arrange them however makes sense for the flow, drag from a node's transition handle to another node to connect them with a transition, and click an edge to set its `condition`. The box header carries **Add node**, which picks a component to add to the graph, and **Auto-arrange**, which lays every node and edge out automatically when you'd rather not position them by hand.
+
+A **Start** pill marks where the run begins; drag the edge leaving it onto a different node to change `startNode`. Selecting the graph node itself lists every **transition** in its Properties tab, grouped by the node each one leaves. Some things only that list can show: the declared order within a group, which is the priority conditions are evaluated in; a warning when a node has more than one unconditional transition; and a transition whose `from` or `to` names a node the graph no longer declares, which cannot be drawn on the canvas at all.
 
 #### An LLM-routed example: ticket triage
 
-A common use of Graph is letting an AI Agent step choose the next node itself instead of hand-writing the routing logic. Give the agent a **structured output** schema with an enum of the possible next states, and point `next` straight at the field the model fills in.
+A common use of Graph is letting an AI Agent node choose the next node itself instead of hand-writing the routing logic. Give the agent a **structured output** schema with an enum of the possible next states, and point a transition's `to` straight at the field the model fills in.
 
 Take a support-ticket triage flow: an AI Agent node classifies an incoming ticket, and the graph routes to whichever node handles that outcome.
 
@@ -98,50 +110,53 @@ Take a support-ticket triage flow: an AI Agent node classifies an incoming ticke
     maxTransitions: 20
     nodes:
       - name: classify
-        tasks:
-          - name: classifyTicket
-            type: aiAgent/v1/chat
-            parameters:
-              format: SIMPLE
-              systemPrompt: >-
-                You triage incoming support tickets. Choose exactly one category and say
-                how confident you are in that choice.
-              userPrompt: "Subject: ${trigger_1.subject}\n\n${trigger_1.body}"
-              response:
-                responseFormat: JSON
-                responseSchema: |
-                  {
-                    "type": "object",
-                    "properties": {
-                      "decision": {
-                        "type": "string",
-                        "enum": ["refund", "technical", "escalate", "resolved"]
-                      },
-                      "confidence": { "type": "number" }
-                    },
-                    "required": ["decision", "confidence"]
-                  }
-        next: "=${classifyTicket.decision} ?: 'escalate'"
+        type: aiAgent/v1/chat
+        parameters:
+          format: SIMPLE
+          systemPrompt: >-
+            You triage incoming support tickets. Choose exactly one category and say
+            how confident you are in that choice.
+          userPrompt: "Subject: ${trigger.subject}\n\n${trigger.body}"
+          response:
+            responseFormat: JSON
+            responseSchema: |
+              {
+                "type": "object",
+                "properties": {
+                  "decision": {
+                    "type": "string",
+                    "enum": ["refund", "technical", "escalate", "resolved"]
+                  },
+                  "confidence": { "type": "number" }
+                },
+                "required": ["decision", "confidence"]
+              }
       - name: refund
-        tasks: [ ... ]
+        type: ...
       - name: technical
-        tasks: [ ... ]
+        type: ...
       - name: escalate
-        tasks: [ ... ]
+        type: ...
       - name: resolved
-        tasks: [ ... ]
+        type: ...
+    transitions:
+      - from: classify
+        to: "=${classify.decision} ?: 'escalate'"
 ```
 
-Setting `response.responseFormat` to `JSON` (with a `response.responseSchema` describing the shape) is what turns the AI Agent's reply from free text into a structured object - the model's answer is parsed against the schema, and its properties become data pills exactly like any other step's output: `${classifyTicket.decision}`, `${classifyTicket.confidence}`. The `next` expression then does nothing more than forward the model's own `decision` as the target node name, falling back to `'escalate'` with the Elvis operator (`?:`) if the model produced no usable answer at all - a parsing failure or an empty response - so a bad turn from the model routes to a safe node instead of failing the whole run.
+Setting `response.responseFormat` to `JSON` (with a `response.responseSchema` describing the shape) is what turns the AI Agent's reply from free text into a structured object - the model's answer is parsed against the schema, and its properties become data pills exactly like any other step's output: `${classify.decision}`, `${classify.confidence}`. The transition's `to` expression then does nothing more than forward the model's own `decision` as the target node name, falling back to `'escalate'` with the Elvis operator (`?:`) if the model produced no usable answer at all - a parsing failure or an empty response - so a bad turn from the model routes to a safe node instead of failing the whole run.
 
 Because the schema's enum only ever produces one of `refund`, `technical`, `escalate`, or `resolved`, every value the model *can* return already names a real node in the graph - the fallback exists for "the model produced nothing," not for an out-of-vocabulary answer.
 
-**Gating on confidence.** A router doesn't have to trust the model outright. Combine the ternary and comparison operators to defer to a human whenever confidence is low, regardless of what the model decided:
+**Gating on confidence.** A dynamic `to` doesn't have to trust the model outright. Declare two transitions off the same node and let `condition` pick between them:
 
 ```yaml
-next: "=${classifyTicket.confidence} > 0.7 ? ${classifyTicket.decision} : 'human_review'"
+transitions:
+  - from: classify
+    to: "=${classify.decision}"
+    condition: "=${classify.confidence} > 0.7"
+  - from: classify
+    to: human_review
 ```
 
-Here the model's `decision` is used as the target only above the confidence threshold; anything less certain always lands on a `human_review` node instead - worth adding to the graph with tasks that notify a person and let them pick a category before the graph continues.
-
-Both variants read the model's own output to pick the next state, so neither one has a node name the editor can read directly off the expression text - both render as a **dynamic** badge on the `classify` node rather than fixed edges to `refund`/`technical`/`escalate`/`resolved`/`human_review`.
+The first transition, whose `to` reads the model's own `decision`, only matches when confidence clears the threshold; anything less certain falls through to the second, unconditional transition and lands on a `human_review` node instead - worth adding to the graph with a task that notifies a person and lets them pick a category before the graph continues.
