@@ -303,7 +303,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 transformedValue = transformValueForObjectAccess(transformedValue);
 
-                if (isFormulaMode && !transformedValue.startsWith('=')) {
+                // An empty formula field is NOT the expression `=`. Prefixing it anyway persisted a bare
+                // `=`, which reads downstream as a condition that is present but never true - a graph
+                // transition carrying one was skipped by the conditional pass for evaluating falsy and
+                // by the unconditional pass for having a condition at all, and its node quietly
+                // stranded. Nothing typed means nothing saved.
+                if (isFormulaMode && transformedValue !== '' && !transformedValue.startsWith('=')) {
                     transformedValue = `=${transformedValue}`;
                 }
             }
