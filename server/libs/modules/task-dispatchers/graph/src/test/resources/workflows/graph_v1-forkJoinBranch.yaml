@@ -14,12 +14,10 @@ tasks:
         type: "graph/v1"
         parameters:
           nodes:
-          - name: "A"
-            tasks:
-            - name: "graphTask"
-              type: "var/v1/set"
-              parameters:
-                value: "graph branch output"
+          - name: "graphTask"
+            type: "var/v1/set"
+            parameters:
+              value: "graph branch output"
     - - name: "lastTask1"
         type: "var/v1/set"
         parameters:

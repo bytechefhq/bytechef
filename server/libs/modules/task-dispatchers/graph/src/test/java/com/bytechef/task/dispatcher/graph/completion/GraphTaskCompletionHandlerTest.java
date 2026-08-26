@@ -16,13 +16,13 @@
 
 package com.bytechef.task.dispatcher.graph.completion;
 
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.CONDITION;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.FROM;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.MAX_TRANSITIONS;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NAME;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NEXT;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODE;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODES;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.ROUTER_NODE;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TASKS;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TO;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TRANSITIONS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -58,11 +59,11 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -93,26 +94,16 @@ public class GraphTaskCompletionHandlerTest {
     // (a) canHandle
 
     @Test
-    public void testCanHandleReturnsTrueForNormalNodeSubTaskCompletion() {
+    public void testCanHandleReturnsTrueForNodeCompletion() {
         TaskExecution graphTaskExecution = graphTaskExecution(
-            1L, List.of(node("classify", List.of(printTask("classifyTask")), null)), null);
+            1L, List.of(printTask("classify")), List.of(), null);
 
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(graphTaskExecution);
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
 
         assertTrue(handler().canHandle(completedChild));
-    }
-
-    @Test
-    public void testCanHandleReturnsTrueForRouterHandOff() {
-        TaskExecution routerTaskExecution = routerHandOffTaskExecution(
-            1L, List.of(node("route", List.of(), "approve")), "route", null);
-
-        assertTrue(handler().canHandle(routerTaskExecution));
-
-        verify(taskExecutionService, never()).getTaskExecution(anyLong());
     }
 
     @Test
@@ -123,7 +114,7 @@ public class GraphTaskCompletionHandlerTest {
             .parentId(1L)
             .priority(5)
             .taskNumber(1)
-            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "classifyTask", "type", "print")))
+            .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "classify", "type", "print")))
             .build();
 
         assertFalse(handler().canHandle(unstampedChild));
@@ -141,64 +132,19 @@ public class GraphTaskCompletionHandlerTest {
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(nonGraphParent);
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
 
         assertFalse(handler().canHandle(completedChild));
     }
 
-    // (b) mid-node advancement
+    // (b) transition to target node
 
     @Test
-    public void testHandleDispatchesNextTaskWithinSameNode() {
+    public void testHandleTransitionsToTargetNodeAndDecrementsCounter() {
         TaskExecution graphTaskExecution = graphTaskExecution(
             1L,
-            List.of(node("classify", List.of(printTask("task1"), printTask("task2")), "approve")),
-            null);
-
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(graphTaskExecution);
-        when(contextService.peek(eq(1L), any()))
-            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-        when(taskExecutionService.update(any()))
-            .thenAnswer(invocation -> invocation.getArgument(0));
-        when(taskExecutionService.create(any()))
-            .thenReturn(
-                TaskExecution.builder()
-                    .id(3L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "task2", "type", "print")))
-                    .build());
-
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "task1", null);
-
-        handler().handle(completedChild);
-
-        assertEquals(TaskExecution.Status.COMPLETED, completedChild.getStatus());
-
-        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
-
-        verify(taskExecutionService, times(1)).create(createCaptor.capture());
-
-        TaskExecution createdSubTaskExecution = createCaptor.getValue();
-
-        assertEquals("classify", createdSubTaskExecution.getParameters()
-            .get(NODE));
-        assertEquals(2, createdSubTaskExecution.getTaskNumber());
-        assertEquals(1L, createdSubTaskExecution.getParentId());
-
-        verify(taskDispatcher, times(1)).dispatch(any());
-        verify(counterService, never()).decrement(anyLong());
-        verify(taskCompletionHandler, never()).handle(any());
-    }
-
-    // (c) node exhaustion + next -> target's first task dispatched with new __node, counter decremented
-
-    @Test
-    public void testHandleTransitionsToTargetNodesFirstTaskAndDecrementsCounter() {
-        TaskExecution graphTaskExecution = graphTaskExecution(
-            1L,
-            List.of(
-                node("classify", List.of(printTask("classifyTask")), "approve"),
-                node("approve", List.of(printTask("approveTask")), null)),
+            List.of(printTask("classify"), printTask("approve")),
+            List.of(transition("classify", "approve", null)),
             null);
 
         when(taskExecutionService.getTaskExecution(1L))
@@ -213,10 +159,10 @@ public class GraphTaskCompletionHandlerTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(5L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "approveTask", "type", "print")))
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "approve", "type", "print")))
                     .build());
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
 
         handler().handle(completedChild);
 
@@ -236,16 +182,94 @@ public class GraphTaskCompletionHandlerTest {
         verify(taskCompletionHandler, never()).handle(any());
     }
 
-    // (d) budget exhausted -> run fails with the pinned message
+    @Test
+    public void testHandleTakesFirstTruthyConditionalBeforeDefault() {
+        TaskExecution graphTaskExecution = graphTaskExecution(
+            1L,
+            List.of(printTask("classify"), printTask("reject"), printTask("review"), printTask("approve")),
+            List.of(
+                transition("classify", "reject", "=false"),
+                transition("classify", "review", "=true"),
+                transition("classify", "approve", null)),
+            null);
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(graphTaskExecution);
+        when(contextService.peek(eq(1L), any()))
+            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+        when(taskExecutionService.update(any()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(counterService.decrement(1L))
+            .thenReturn(99L);
+        when(taskExecutionService.create(any()))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(5L)
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "review", "type", "print")))
+                    .build());
+
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
+
+        handler().handle(completedChild);
+
+        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
+
+        verify(taskExecutionService, times(1)).create(createCaptor.capture());
+
+        assertEquals(
+            "review", createCaptor.getValue()
+                .getParameters()
+                .get(NODE));
+    }
+
+    @Test
+    public void testHandleFallsBackToDefaultWhenNoConditionMatches() {
+        TaskExecution graphTaskExecution = graphTaskExecution(
+            1L,
+            List.of(printTask("classify"), printTask("review"), printTask("approve")),
+            List.of(
+                transition("classify", "review", "=false"),
+                transition("classify", "approve", null)),
+            null);
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(graphTaskExecution);
+        when(contextService.peek(eq(1L), any()))
+            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
+        when(taskExecutionService.update(any()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(counterService.decrement(1L))
+            .thenReturn(99L);
+        when(taskExecutionService.create(any()))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(5L)
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "approve", "type", "print")))
+                    .build());
+
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
+
+        handler().handle(completedChild);
+
+        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
+
+        verify(taskExecutionService, times(1)).create(createCaptor.capture());
+
+        assertEquals(
+            "approve", createCaptor.getValue()
+                .getParameters()
+                .get(NODE));
+    }
+
+    // (c) budget exhausted -> run fails with the pinned message
 
     @Test
     public void testHandleThrowsWhenTransitionBudgetExhausted() {
         TaskExecution graphTaskExecution = graphTaskExecution(
             1L,
-            List.of(
-                node("classify", List.of(printTask("classifyTask")), "approve"),
-                node("approve", List.of(printTask("approveTask")), null)),
-            5);
+            List.of(printTask("classify"), printTask("approve")),
+            List.of(transition("classify", "approve", null)),
+            1);
 
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(graphTaskExecution);
@@ -256,24 +280,24 @@ public class GraphTaskCompletionHandlerTest {
         when(counterService.decrement(1L))
             .thenReturn(-1L);
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
 
         IllegalStateException exception = assertThrows(
             IllegalStateException.class, () -> handler().handle(completedChild));
 
-        assertEquals("graph transition budget exhausted (maxTransitions=5)", exception.getMessage());
+        assertEquals("graph transition budget exhausted (maxTransitions=1)", exception.getMessage());
 
         verify(taskExecutionService, never()).create(any());
         verify(taskDispatcher, never()).dispatch(any());
         verify(taskCompletionHandler, never()).handle(any());
     }
 
-    // (e) unknown target -> fails naming node + resolved value
+    // (d) unknown target -> fails naming node + resolved value
 
     @Test
     public void testHandleThrowsWhenTransitionTargetUnknown() {
         TaskExecution graphTaskExecution = graphTaskExecution(
-            1L, List.of(node("classify", List.of(printTask("classifyTask")), "missingNode")), null);
+            1L, List.of(printTask("classify")), List.of(transition("classify", "missingNode", null)), null);
 
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(graphTaskExecution);
@@ -282,26 +306,25 @@ public class GraphTaskCompletionHandlerTest {
         when(taskExecutionService.update(any()))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class, () -> handler().handle(completedChild));
 
-        assertTrue(exception.getMessage()
-            .contains("missingNode"));
-        assertTrue(exception.getMessage()
-            .contains("classify"));
+        assertEquals(
+            "Unknown graph transition target node: 'missingNode' resolved from node 'classify'",
+            exception.getMessage());
 
         verify(counterService, never()).decrement(anyLong());
         verify(taskDispatcher, never()).dispatch(any());
     }
 
-    // (f) terminal -> parent gets the child's output re-stored under its own id
+    // (e) terminal -> parent gets the child's output re-stored under its own id
 
     @Test
     public void testHandleCompletesGraphWithTerminalNodeOutput() {
         TaskExecution graphTaskExecution = graphTaskExecution(
-            1L, List.of(node("approve", List.of(printTask("approveTask")), null)), null);
+            1L, List.of(printTask("approve")), List.of(), null);
 
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(graphTaskExecution);
@@ -312,7 +335,7 @@ public class GraphTaskCompletionHandlerTest {
 
         FileEntry childOutput = taskFileStorage.storeTaskExecutionOutput(100L, 2L, "approved!");
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "approve", "approveTask", childOutput);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "approve", "approve", childOutput);
 
         handler().handle(completedChild);
 
@@ -330,107 +353,12 @@ public class GraphTaskCompletionHandlerTest {
         verify(taskDispatcher, never()).dispatch(any());
     }
 
-    @Test
-    public void testHandleRouterHandOffTransitionsToTargetNode() {
-        TaskExecution routerTaskExecution = routerHandOffTaskExecution(
-            1L,
-            List.of(
-                node("route", List.of(), "approve"),
-                node("approve", List.of(printTask("approveTask")), null)),
-            "route", null);
-
-        when(contextService.peek(eq(1L), any()))
-            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-        when(counterService.decrement(1L))
-            .thenReturn(99L);
-        when(taskExecutionService.create(any()))
-            .thenReturn(
-                TaskExecution.builder()
-                    .id(6L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "approveTask", "type", "print")))
-                    .build());
-
-        handler().handle(routerTaskExecution);
-
-        verify(taskExecutionService, never()).getTaskExecution(anyLong());
-        verify(counterService, times(1)).decrement(1L);
-
-        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
-
-        verify(taskExecutionService, times(1)).create(createCaptor.capture());
-
-        assertEquals(
-            "approve", createCaptor.getValue()
-                .getParameters()
-                .get(NODE));
-
-        verify(taskDispatcher, times(1)).dispatch(any());
-    }
+    // (e2) terminal -> the graph's own transition-budget counter row is released
 
     @Test
-    public void testHandleNestedRouterHandOffFiresWithInnerStartNodeAndPreservesOuterNodeStamp() {
-        TaskExecution nestedRouterTaskExecution = nestedRouterHandOffTaskExecution(
-            1L,
-            List.of(
-                node("innerRoute", List.of(), "innerApprove"),
-                node("innerApprove", List.of(printTask("innerApproveTask")), null)),
-            "outerNodeA", "innerRoute", null);
-
-        // the router branch is detected on __routerNode alone -- no parent-type lookup, even though this graph's
-        // parent (id 50L) IS itself a graph/v1, which the old "parent is not a graph" heuristic would have rejected
-        assertTrue(handler().canHandle(nestedRouterTaskExecution));
-
-        when(contextService.peek(eq(1L), any()))
-            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-        when(counterService.decrement(1L))
-            .thenReturn(99L);
-        when(taskExecutionService.create(any()))
-            .thenReturn(
-                TaskExecution.builder()
-                    .id(7L)
-                    .workflowTask(
-                        new WorkflowTask(Map.of(WorkflowConstants.NAME, "innerApproveTask", "type", "print")))
-                    .build());
-
-        handler().handle(nestedRouterTaskExecution);
-
-        // fired directly off the event-carried execution -- never consulted taskExecutionService for the parent
-        verify(taskExecutionService, never()).getTaskExecution(anyLong());
-        verify(counterService, times(1)).decrement(1L);
-
-        // the outer graph's own __node stamp survived the inner router hand-off untouched
-        assertEquals(
-            "outerNodeA", nestedRouterTaskExecution.getParameters()
-                .get(NODE));
-        assertEquals(
-            "innerRoute", nestedRouterTaskExecution.getParameters()
-                .get(ROUTER_NODE));
-
-        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
-
-        verify(taskExecutionService, times(1)).create(createCaptor.capture());
-
-        // transitioned using the INNER graph's own node ("innerApprove"), resolved from its own start node
-        assertEquals(
-            "innerApprove", createCaptor.getValue()
-                .getParameters()
-                .get(NODE));
-
-        verify(taskDispatcher, times(1)).dispatch(any());
-    }
-
-    // (g) router chain: empty nodes hop in a loop, one budget unit per hop
-
-    @Test
-    public void testHandleRouterChainHopsThroughEmptyNodesToRealNode() {
+    public void testHandleReleasesTransitionBudgetCounterOnCompletion() {
         TaskExecution graphTaskExecution = graphTaskExecution(
-            1L,
-            List.of(
-                node("classify", List.of(printTask("classifyTask")), "r1"),
-                node("r1", List.of(), "r2"),
-                node("r2", List.of(), "approve"),
-                node("approve", List.of(printTask("approveTask")), null)),
-            null);
+            1L, List.of(printTask("approve")), List.of(), null);
 
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(graphTaskExecution);
@@ -438,78 +366,34 @@ public class GraphTaskCompletionHandlerTest {
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.update(any()))
             .thenAnswer(invocation -> invocation.getArgument(0));
-        when(counterService.decrement(1L))
-            .thenReturn(2L, 1L, 0L);
-        when(taskExecutionService.create(any()))
-            .thenReturn(
-                TaskExecution.builder()
-                    .id(9L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "approveTask", "type", "print")))
-                    .build());
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "approve", "approve", null);
 
         handler().handle(completedChild);
 
-        verify(counterService, times(3)).decrement(1L);
+        // The row is keyed by the GRAPH's own execution id, and is released before the parent chain
+        // is re-entered: a nested graph's completion advances the OUTER graph through that chain,
+        // and the outer graph's budget is a different counter row entirely.
+        InOrder inOrder = inOrder(counterService, taskCompletionHandler);
 
-        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
+        inOrder.verify(counterService)
+            .delete(1L);
+        inOrder.verify(taskCompletionHandler)
+            .handle(any());
 
-        verify(taskExecutionService, times(1)).create(createCaptor.capture());
-
-        assertEquals(
-            "approve", createCaptor.getValue()
-                .getParameters()
-                .get(NODE));
-
-        verify(taskDispatcher, times(1)).dispatch(any());
-        verify(taskCompletionHandler, never()).handle(any());
+        verify(counterService, never()).delete(2L);
     }
 
-    @Test
-    public void testHandlePureRouterCycleDiesByBudgetInsteadOfHanging() {
-        TaskExecution graphTaskExecution = graphTaskExecution(
-            1L,
-            List.of(
-                node("classify", List.of(printTask("classifyTask")), "loopA"),
-                node("loopA", List.of(), "loopB"),
-                node("loopB", List.of(), "loopA")),
-            3);
-
-        when(taskExecutionService.getTaskExecution(1L))
-            .thenReturn(graphTaskExecution);
-        when(contextService.peek(eq(1L), any()))
-            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-        when(taskExecutionService.update(any()))
-            .thenAnswer(invocation -> invocation.getArgument(0));
-        when(counterService.decrement(1L))
-            .thenReturn(2L, 1L, 0L, -1L);
-
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
-
-        IllegalStateException exception = assertThrows(
-            IllegalStateException.class, () -> handler().handle(completedChild));
-
-        assertEquals("graph transition budget exhausted (maxTransitions=3)", exception.getMessage());
-
-        // one decrement per hop: classify->loopA, loopA->loopB, loopB->loopA, loopA->loopB(exhausted)
-        verify(counterService, times(4)).decrement(1L);
-        verify(taskExecutionService, never()).create(any());
-        verify(taskDispatcher, never()).dispatch(any());
-    }
-
-    // (h) `next` evaluation reuses the hardened, injected Evaluator
+    // (f) condition evaluation reuses the hardened, injected Evaluator
 
     @Test
-    public void testHandleEvaluatesNextThroughInjectedEvaluator() {
+    public void testHandleEvaluatesConditionThroughInjectedEvaluator() {
         Evaluator spiedEvaluator = spy(EVALUATOR);
 
         TaskExecution graphTaskExecution = graphTaskExecution(
             1L,
-            List.of(
-                node("classify", List.of(printTask("classifyTask")), "=${score} > 0.5 ? 'review' : 'approve'"),
-                node("review", List.of(printTask("reviewTask")), null),
-                node("approve", List.of(printTask("approveTask")), null)),
+            List.of(printTask("classify"), printTask("review"), printTask("approve")),
+            List.of(transition("classify", "review", "=${score} > 0.5")),
             null);
 
         when(taskExecutionService.getTaskExecution(1L))
@@ -525,10 +409,10 @@ public class GraphTaskCompletionHandlerTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(9L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "reviewTask", "type", "print")))
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "review", "type", "print")))
                     .build());
 
-        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classifyTask", null);
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
 
         GraphTaskCompletionHandler handler = new GraphTaskCompletionHandler(
             contextService, counterService, spiedEvaluator, taskCompletionHandler, taskDispatcher,
@@ -548,16 +432,59 @@ public class GraphTaskCompletionHandlerTest {
                 .get(NODE));
     }
 
+    // (g) dynamic `to` expression resolves the target node name
+
+    @Test
+    public void testHandleResolvesDynamicTargetExpression() {
+        TaskExecution graphTaskExecution = graphTaskExecution(
+            1L,
+            List.of(printTask("classify"), printTask("review"), printTask("approve")),
+            List.of(transition("classify", "=${score} > 0.5 ? 'review' : 'approve'", null)),
+            null);
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(graphTaskExecution);
+        when(contextService.peek(eq(1L), any()))
+            .thenReturn(
+                taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of("score", 0.9)));
+        when(taskExecutionService.update(any()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(counterService.decrement(1L))
+            .thenReturn(99L);
+        when(taskExecutionService.create(any()))
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(9L)
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "review", "type", "print")))
+                    .build());
+
+        TaskExecution completedChild = childTaskExecution(2L, 1L, 1, "classify", "classify", null);
+
+        handler().handle(completedChild);
+
+        ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
+
+        verify(taskExecutionService, times(1)).create(createCaptor.capture());
+
+        assertEquals(
+            "review", createCaptor.getValue()
+                .getParameters()
+                .get(NODE));
+    }
+
     private GraphTaskCompletionHandler handler() {
         return new GraphTaskCompletionHandler(
             contextService, counterService, EVALUATOR, taskCompletionHandler, taskDispatcher, taskExecutionService,
             taskFileStorage);
     }
 
-    private static TaskExecution graphTaskExecution(long id, List<Map<String, ?>> nodes, Integer maxTransitions) {
+    private static TaskExecution graphTaskExecution(
+        long id, List<Map<String, ?>> nodes, List<Map<String, ?>> transitions, Integer maxTransitions) {
+
         Map<String, Object> parameters = new HashMap<>();
 
         parameters.put(NODES, nodes);
+        parameters.put(TRANSITIONS, transitions);
 
         if (maxTransitions != null) {
             parameters.put(MAX_TRANSITIONS, maxTransitions);
@@ -577,63 +504,17 @@ public class GraphTaskCompletionHandlerTest {
             .build();
     }
 
-    private static TaskExecution routerHandOffTaskExecution(
-        long id, List<Map<String, ?>> nodes, String routerNodeName, Integer maxTransitions) {
+    private static Map<String, ?> transition(String from, String to, String condition) {
+        Map<String, Object> transition = new HashMap<>();
 
-        Map<String, Object> parameters = new HashMap<>();
+        transition.put(FROM, from);
+        transition.put(TO, to);
 
-        parameters.put(NODES, nodes);
-        parameters.put(ROUTER_NODE, routerNodeName);
-
-        if (maxTransitions != null) {
-            parameters.put(MAX_TRANSITIONS, maxTransitions);
+        if (condition != null) {
+            transition.put(CONDITION, condition);
         }
 
-        return TaskExecution.builder()
-            .id(id)
-            .jobId(100L)
-            .priority(5)
-            .status(TaskExecution.Status.STARTED)
-            .workflowTask(
-                new WorkflowTask(
-                    Map.of(
-                        WorkflowConstants.NAME, "graphTask",
-                        WorkflowConstants.TYPE, "graph/v1",
-                        WorkflowConstants.PARAMETERS, parameters)))
-            .build();
-    }
-
-    /**
-     * A router hand-off for a graph nested inside another graph's node: {@code __node} (stamped by the OUTER graph when
-     * it dispatched this graph as one of its node's tasks) and {@code __routerNode} (self-stamped by THIS graph's own
-     * empty-start-node router hand-off) both live on the same parameters map, at the same time.
-     */
-    private static TaskExecution nestedRouterHandOffTaskExecution(
-        long id, List<Map<String, ?>> nodes, String outerNodeName, String routerNodeName, Integer maxTransitions) {
-
-        Map<String, Object> parameters = new HashMap<>();
-
-        parameters.put(NODES, nodes);
-        parameters.put(NODE, outerNodeName);
-        parameters.put(ROUTER_NODE, routerNodeName);
-
-        if (maxTransitions != null) {
-            parameters.put(MAX_TRANSITIONS, maxTransitions);
-        }
-
-        return TaskExecution.builder()
-            .id(id)
-            .jobId(100L)
-            .parentId(50L)
-            .priority(5)
-            .status(TaskExecution.Status.STARTED)
-            .workflowTask(
-                new WorkflowTask(
-                    Map.of(
-                        WorkflowConstants.NAME, "innerGraphTask",
-                        WorkflowConstants.TYPE, "graph/v1",
-                        WorkflowConstants.PARAMETERS, parameters)))
-            .build();
+        return transition;
     }
 
     private static TaskExecution childTaskExecution(
@@ -661,19 +542,6 @@ public class GraphTaskCompletionHandlerTest {
                 WorkflowConstants.NAME, name,
                 WorkflowConstants.TYPE, type,
                 WorkflowConstants.PARAMETERS, Map.of(NODE, nodeName)));
-    }
-
-    private static Map<String, ?> node(String name, List<Map<String, ?>> tasks, String next) {
-        Map<String, Object> node = new LinkedHashMap<>();
-
-        node.put(NAME, name);
-        node.put(TASKS, tasks);
-
-        if (next != null) {
-            node.put(NEXT, next);
-        }
-
-        return node;
     }
 
     private static Map<String, ?> printTask(String name) {

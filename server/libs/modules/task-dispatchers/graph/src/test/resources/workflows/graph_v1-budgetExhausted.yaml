@@ -6,17 +6,16 @@ tasks:
   parameters:
     maxTransitions: 3
     nodes:
-    - name: "X"
-      tasks:
-      - name: "xTask"
-        type: "var/v1/set"
-        parameters:
-          value: "x"
-      next: "Y"
-    - name: "Y"
-      tasks:
-      - name: "yTask"
-        type: "var/v1/set"
-        parameters:
-          value: "y"
-      next: "X"
+    - name: "xTask"
+      type: "var/v1/set"
+      parameters:
+        value: "x"
+    - name: "yTask"
+      type: "var/v1/set"
+      parameters:
+        value: "y"
+    transitions:
+    - from: "xTask"
+      to: "yTask"
+    - from: "yTask"
+      to: "xTask"

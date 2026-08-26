@@ -1,0 +1,27 @@
+---
+label: "Graph Duplicate Default Transition"
+outputs:
+- name: "result"
+  value: "${graph_1}"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "aTask"
+      type: "var/v1/set"
+      parameters:
+        value: "a"
+    - name: "first"
+      type: "var/v1/set"
+      parameters:
+        value: "first output"
+    - name: "second"
+      type: "var/v1/set"
+      parameters:
+        value: "second output"
+    transitions:
+    - from: "aTask"
+      to: "first"
+    - from: "aTask"
+      to: "second"

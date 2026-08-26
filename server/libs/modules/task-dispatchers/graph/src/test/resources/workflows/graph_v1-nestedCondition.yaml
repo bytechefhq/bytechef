@@ -8,23 +8,21 @@ tasks:
   type: "graph/v1"
   parameters:
     nodes:
-    - name: "A"
-      tasks:
-      - name: "condition_1"
-        type: "condition/v1"
-        parameters:
-          conditions:
-          - - type: "boolean"
-              value1: "true"
-              operation: "EQUALS"
-              value2: "true"
-          caseTrue:
-          - name: "lastTask"
-            type: "var/v1/set"
-            parameters:
-              value: "nested condition output"
-          caseFalse:
-          - name: "lastTask"
-            type: "var/v1/set"
-            parameters:
-              value: "false branch"
+    - name: "condition_1"
+      type: "condition/v1"
+      parameters:
+        conditions:
+        - - type: "boolean"
+            value1: "true"
+            operation: "EQUALS"
+            value2: "true"
+        caseTrue:
+        - name: "lastTask"
+          type: "var/v1/set"
+          parameters:
+            value: "nested condition output"
+        caseFalse:
+        - name: "lastTask"
+          type: "var/v1/set"
+          parameters:
+            value: "false branch"

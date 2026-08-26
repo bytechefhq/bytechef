@@ -1,0 +1,39 @@
+---
+label: "Graph Conditional Fan-Out"
+inputs:
+- name: "score"
+  type: "integer"
+  required: true
+outputs:
+- name: "result"
+  value: "${graph_1}"
+tasks:
+- name: "graph_1"
+  type: "graph/v1"
+  parameters:
+    nodes:
+    - name: "classify"
+      type: "var/v1/set"
+      parameters:
+        value: "=score"
+    - name: "high"
+      type: "var/v1/set"
+      parameters:
+        value: "high"
+    - name: "medium"
+      type: "var/v1/set"
+      parameters:
+        value: "medium"
+    - name: "low"
+      type: "var/v1/set"
+      parameters:
+        value: "low"
+    transitions:
+    - from: "classify"
+      to: "high"
+      condition: "=classify > 80"
+    - from: "classify"
+      to: "medium"
+      condition: "=classify > 40"
+    - from: "classify"
+      to: "low"

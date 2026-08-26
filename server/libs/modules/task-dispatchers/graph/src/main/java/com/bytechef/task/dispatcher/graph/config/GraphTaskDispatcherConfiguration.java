@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.graph.config;
 
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.GRAPH;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODES;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TRANSITIONS;
 
 import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
@@ -36,11 +37,12 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Registers the {@code graph/v1} dispatcher and completion handler with the atlas coordinator, mirroring
- * {@code ConditionTaskDispatcherConfiguration} exactly. {@code nodes} is registered as a deferred-evaluation parameter
- * key so the {@code tasks}/{@code next} expressions nested inside each node keep their original, unevaluated form until
- * the owning node is actually dispatched -- evaluating them eagerly (e.g. when the graph task itself is evaluated as
- * somebody else's sub-task) could resolve a {@code next} expression against a context that doesn't have the variables
- * it references yet.
+ * {@code ConditionTaskDispatcherConfiguration} exactly. Both {@code nodes} and {@code transitions} are registered as
+ * deferred-evaluation parameter keys so their nested expressions keep their original, unevaluated form until the owning
+ * node is actually dispatched or its outgoing transitions are actually evaluated -- evaluating a transition's
+ * {@code condition} or {@code to} eagerly (e.g. when the graph task itself is evaluated as somebody else's sub-task)
+ * would resolve it against a context that doesn't yet contain the node outputs it references; the completion handler
+ * evaluates each transition at transition time instead, once those outputs exist.
  *
  * @author Ivica Cardic
  */
@@ -48,7 +50,7 @@ import org.springframework.context.annotation.Configuration;
 public class GraphTaskDispatcherConfiguration {
 
     static {
-        DeferredEvaluationParameterKeys.register(GRAPH + "/", NODES);
+        DeferredEvaluationParameterKeys.register(GRAPH + "/", NODES, TRANSITIONS);
     }
 
     @Autowired

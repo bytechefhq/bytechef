@@ -19,14 +19,10 @@ package com.bytechef.task.dispatcher.graph;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.DEFAULT_MAX_TRANSITIONS;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.GRAPH;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.MAX_TRANSITIONS;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NAME;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODES;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.START_NODE;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TASKS;
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.ErrorHandlingTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
@@ -42,30 +38,23 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
-import tools.jackson.core.type.TypeReference;
 
 /**
  * Dispatches the start node of a {@code graph/v1} state-machine container.
  *
  * <p>
- * A graph is a set of named nodes, each holding an ordinary task list, wired together by per-node {@code next}
- * expressions evaluated at node exhaustion (owned by {@code GraphTaskCompletionHandler}, not this class). Cycles are
- * legal; a total transition budget (seeded here via {@link CounterService}) bounds them.
+ * A graph is a plain list of task nodes ({@code nodes}, one task per node, node name == task name) wired together by a
+ * sibling {@code transitions} edge list, evaluated at node completion (owned by {@code GraphTaskCompletionHandler}, not
+ * this class). Cycles are legal; a total transition budget (seeded here via {@link CounterService}) bounds them.
  * </p>
  *
  * <p>
- * On dispatch, the start node's first task is created with {@code parameters.__node} stamped to the start node's name
- * so the completion handler can find its way back to the owning node. A start node with an empty task list acts as a
- * pure router: nothing is dispatched, and this class completes itself immediately (still after seeding the transition
- * budget) with a distinct {@code parameters.__routerNode} stamp (not {@code __node}) -- so the router hand-off never
- * clobbers an outer graph's own {@code __node} stamp when this graph is itself nested inside another graph's node --
- * handing router-chaining off entirely to the completion handler, which keys its router-hand-off detection on
- * {@code __routerNode} alone.
+ * On dispatch, the start node's task is created with {@code parameters.__node} stamped to the start node's name so the
+ * completion handler can find its way back to the owning node.
  * </p>
  *
  * @author Ivica Cardic
@@ -75,7 +64,6 @@ public class GraphTaskDispatcher extends ErrorHandlingTaskDispatcher implements 
     private final ContextService contextService;
     private final CounterService counterService;
     private final Evaluator evaluator;
-    private final ApplicationEventPublisher eventPublisher;
     private final TaskDispatcher<? super Task> taskDispatcher;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
@@ -91,7 +79,6 @@ public class GraphTaskDispatcher extends ErrorHandlingTaskDispatcher implements 
         this.contextService = contextService;
         this.counterService = counterService;
         this.evaluator = evaluator;
-        this.eventPublisher = eventPublisher;
         this.taskDispatcher = taskDispatcher;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -99,12 +86,13 @@ public class GraphTaskDispatcher extends ErrorHandlingTaskDispatcher implements 
 
     @Override
     public void doDispatch(TaskExecution taskExecution) {
-        List<Map<String, ?>> nodes = getNodes(taskExecution);
+        List<WorkflowTask> nodes = GraphTaskUtils.getNodes(taskExecution.getParameters());
+
+        Validate.isTrue(!nodes.isEmpty(), "graph must define at least one node");
 
         validateUniqueNodeNames(nodes);
 
-        Map<String, ?> startNode = resolveStartNode(taskExecution, nodes);
-        String startNodeName = MapUtils.getRequiredString(startNode, NAME);
+        WorkflowTask startNode = resolveStartNode(taskExecution, nodes);
 
         taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
@@ -118,15 +106,9 @@ public class GraphTaskDispatcher extends ErrorHandlingTaskDispatcher implements 
 
         counterService.set(taskExecutionId, maxTransitions);
 
-        List<WorkflowTask> nodeWorkflowTasks = getNodeWorkflowTasks(startNode);
-
-        if (nodeWorkflowTasks.isEmpty()) {
-            dispatchRouterNode(taskExecution, startNodeName);
-        } else {
-            GraphTaskUtils.dispatchNodeTask(
-                contextService, evaluator, taskDispatcher, taskExecutionService, taskFileStorage, taskExecution,
-                nodeWorkflowTasks.getFirst(), 1, startNodeName);
-        }
+        GraphTaskUtils.dispatchNodeTask(
+            contextService, evaluator, taskDispatcher, taskExecutionService, taskFileStorage, taskExecution,
+            startNode, startNode.getName());
     }
 
     @Override
@@ -138,34 +120,11 @@ public class GraphTaskDispatcher extends ErrorHandlingTaskDispatcher implements 
         return null;
     }
 
-    private void dispatchRouterNode(TaskExecution taskExecution, String startNodeName) {
-        taskExecution.setWorkflowTask(
-            GraphTaskUtils.stampRouterNode(
-                taskExecution.getWorkflowTask()
-                    .toMap(),
-                startNodeName));
-
-        taskExecution.setStartDate(Instant.now());
-        taskExecution.setEndDate(Instant.now());
-        taskExecution.setExecutionTime(0);
-
-        eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
-    }
-
-    private static List<Map<String, ?>> getNodes(TaskExecution taskExecution) {
-        List<Map<String, ?>> nodes = MapUtils.getList(
-            taskExecution.getParameters(), NODES, new TypeReference<Map<String, ?>>() {}, List.of());
-
-        Validate.isTrue(!nodes.isEmpty(), "graph must define at least one node");
-
-        return nodes;
-    }
-
-    private static void validateUniqueNodeNames(List<Map<String, ?>> nodes) {
+    private static void validateUniqueNodeNames(List<WorkflowTask> nodes) {
         Set<String> nodeNames = new HashSet<>();
 
-        for (Map<String, ?> node : nodes) {
-            String name = MapUtils.getRequiredString(node, NAME);
+        for (WorkflowTask node : nodes) {
+            String name = Validate.notBlank(node.getName(), "graph node name");
 
             if (!nodeNames.add(name)) {
                 throw new IllegalArgumentException("Duplicate graph node name: '" + name + "'");
@@ -173,23 +132,14 @@ public class GraphTaskDispatcher extends ErrorHandlingTaskDispatcher implements 
         }
     }
 
-    private static Map<String, ?> resolveStartNode(TaskExecution taskExecution, List<Map<String, ?>> nodes) {
+    private static WorkflowTask resolveStartNode(TaskExecution taskExecution, List<WorkflowTask> nodes) {
         String startNodeName = MapUtils.getString(taskExecution.getParameters(), START_NODE);
 
-        if (startNodeName == null) {
+        if (startNodeName == null || startNodeName.isBlank()) {
             return nodes.getFirst();
         }
 
-        return nodes.stream()
-            .filter(node -> Objects.equals(MapUtils.getString(node, NAME), startNodeName))
-            .findFirst()
+        return GraphTaskUtils.findNode(nodes, startNodeName)
             .orElseThrow(() -> new IllegalArgumentException("Unknown graph start node: '" + startNodeName + "'"));
-    }
-
-    private static List<WorkflowTask> getNodeWorkflowTasks(Map<String, ?> node) {
-        return MapUtils.getList(node, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
-            .stream()
-            .map(WorkflowTask::new)
-            .toList();
     }
 }

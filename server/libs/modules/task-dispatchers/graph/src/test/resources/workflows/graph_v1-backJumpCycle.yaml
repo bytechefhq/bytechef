@@ -12,23 +12,23 @@ tasks:
   type: "graph/v1"
   parameters:
     nodes:
-    - name: "A"
-      tasks:
-      - name: "counter"
-        type: "var/v1/set"
-        parameters:
-          value: "=counter + 1"
-      next: "B"
-    - name: "B"
-      tasks:
-      - name: "bVisit"
-        type: "var/v1/set"
-        parameters:
-          value: "=counter"
-      next: "=counter < 2 ? 'A' : 'C'"
-    - name: "C"
-      tasks:
-      - name: "cResult"
-        type: "var/v1/set"
-        parameters:
-          value: "=counter"
+    - name: "counter"
+      type: "var/v1/set"
+      parameters:
+        value: "=counter + 1"
+    - name: "bVisit"
+      type: "var/v1/set"
+      parameters:
+        value: "=counter"
+    - name: "cResult"
+      type: "var/v1/set"
+      parameters:
+        value: "=counter"
+    transitions:
+    - from: "counter"
+      to: "bVisit"
+    - from: "bVisit"
+      to: "counter"
+      condition: "=counter < 2"
+    - from: "bVisit"
+      to: "cResult"

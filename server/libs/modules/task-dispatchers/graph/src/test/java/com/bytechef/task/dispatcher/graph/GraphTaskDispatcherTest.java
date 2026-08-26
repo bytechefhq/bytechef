@@ -17,12 +17,9 @@
 package com.bytechef.task.dispatcher.graph;
 
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.MAX_TRANSITIONS;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NAME;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODE;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODES;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.ROUTER_NODE;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.START_NODE;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TASKS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
@@ -32,9 +29,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
+import com.bytechef.atlas.configuration.domain.DeferredEvaluationParameterKeys;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.execution.domain.Context;
@@ -52,6 +49,7 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -84,15 +82,12 @@ public class GraphTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatchStartsFirstTaskOfExplicitStartNode() {
+    public void testDispatchStartsExplicitStartNode() {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
 
         TaskExecution graphTaskExecution = graphTaskExecution(
-            List.of(
-                node("classify", List.of(printTask("classifyTask"))),
-                node("approve", List.of(printTask("approveTask")))),
-            "classify", null);
+            List.of(printTask("classify"), printTask("approve")), "approve", null);
 
         when(taskExecutionService.update(any()))
             .thenReturn(graphTaskExecution);
@@ -100,7 +95,7 @@ public class GraphTaskDispatcherTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(2L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "classifyTask", "type", "print")))
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "approve", "type", "print")))
                     .build());
 
         GraphTaskDispatcher dispatcher = new GraphTaskDispatcher(
@@ -110,7 +105,6 @@ public class GraphTaskDispatcherTest {
         dispatcher.dispatch(graphTaskExecution);
 
         verify(counterService, times(1)).set(1L, 100);
-        verify(contextService, times(1)).push(anyLong(), any(), any());
         verify(eventPublisher, never()).publishEvent(any());
 
         ArgumentCaptor<TaskExecution> createCaptor = ArgumentCaptor.forClass(TaskExecution.class);
@@ -119,13 +113,11 @@ public class GraphTaskDispatcherTest {
 
         TaskExecution createdSubTaskExecution = createCaptor.getValue();
 
-        Assertions.assertEquals("classify", createdSubTaskExecution.getParameters()
+        Assertions.assertEquals("approve", createdSubTaskExecution.getParameters()
             .get(NODE));
-        Assertions.assertEquals("classifyTask", createdSubTaskExecution.getName());
+        Assertions.assertEquals("approve", createdSubTaskExecution.getName());
         Assertions.assertEquals(1L, createdSubTaskExecution.getParentId());
         Assertions.assertEquals(1, createdSubTaskExecution.getTaskNumber());
-        Assertions.assertEquals(5, createdSubTaskExecution.getPriority());
-        Assertions.assertEquals(2L, createdSubTaskExecution.getJobId());
 
         verify(taskDispatcher, times(1)).dispatch(any());
     }
@@ -136,10 +128,7 @@ public class GraphTaskDispatcherTest {
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
 
         TaskExecution graphTaskExecution = graphTaskExecution(
-            List.of(
-                node("first", List.of(printTask("firstTask"))),
-                node("second", List.of(printTask("secondTask")))),
-            null, null);
+            List.of(printTask("classify"), printTask("approve")), null, null);
 
         when(taskExecutionService.update(any()))
             .thenReturn(graphTaskExecution);
@@ -147,7 +136,7 @@ public class GraphTaskDispatcherTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(2L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "firstTask", "type", "print")))
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "classify", "type", "print")))
                     .build());
 
         GraphTaskDispatcher dispatcher = new GraphTaskDispatcher(
@@ -162,7 +151,7 @@ public class GraphTaskDispatcherTest {
 
         TaskExecution createdSubTaskExecution = createCaptor.getValue();
 
-        Assertions.assertEquals("first", createdSubTaskExecution.getParameters()
+        Assertions.assertEquals("classify", createdSubTaskExecution.getParameters()
             .get(NODE));
 
         verify(eventPublisher, never()).publishEvent(any());
@@ -173,8 +162,7 @@ public class GraphTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
 
-        TaskExecution graphTaskExecution = graphTaskExecution(
-            List.of(node("classify", List.of(printTask("classifyTask")))), null, 7);
+        TaskExecution graphTaskExecution = graphTaskExecution(List.of(printTask("classify")), null, 7);
 
         when(taskExecutionService.update(any()))
             .thenReturn(graphTaskExecution);
@@ -182,7 +170,7 @@ public class GraphTaskDispatcherTest {
             .thenReturn(
                 TaskExecution.builder()
                     .id(2L)
-                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "classifyTask", "type", "print")))
+                    .workflowTask(new WorkflowTask(Map.of(WorkflowConstants.NAME, "classify", "type", "print")))
                     .build());
 
         GraphTaskDispatcher dispatcher = new GraphTaskDispatcher(
@@ -195,47 +183,8 @@ public class GraphTaskDispatcherTest {
     }
 
     @Test
-    public void testDispatchStartsRouterHandOffForEmptyStartNode() {
-        when(contextService.peek(anyLong(), any()))
-            .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
-
-        TaskExecution graphTaskExecution = graphTaskExecution(
-            List.of(
-                node("route", List.of()),
-                node("approve", List.of(printTask("approveTask")))),
-            "route", null);
-
-        when(taskExecutionService.update(any()))
-            .thenReturn(graphTaskExecution);
-
-        GraphTaskDispatcher dispatcher = new GraphTaskDispatcher(
-            contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
-            taskFileStorage);
-
-        dispatcher.dispatch(graphTaskExecution);
-
-        verify(counterService, times(1)).set(1L, 100);
-
-        ArgumentCaptor<TaskExecutionCompleteEvent> eventCaptor =
-            ArgumentCaptor.forClass(TaskExecutionCompleteEvent.class);
-
-        verify(eventPublisher, times(1)).publishEvent(eventCaptor.capture());
-
-        TaskExecutionCompleteEvent taskExecutionCompleteEvent = eventCaptor.getValue();
-
-        TaskExecution completedTaskExecution = taskExecutionCompleteEvent.getTaskExecution();
-
-        Assertions.assertEquals("route", completedTaskExecution.getParameters()
-            .get(ROUTER_NODE));
-
-        verify(taskExecutionService, never()).create(any());
-        verify(taskDispatcher, never()).dispatch(any());
-    }
-
-    @Test
     public void testDispatchWhenStartNodeUnknownFails() {
-        TaskExecution graphTaskExecution = graphTaskExecution(
-            List.of(node("classify", List.of(printTask("classifyTask")))), "missing", null);
+        TaskExecution graphTaskExecution = graphTaskExecution(List.of(printTask("classify")), "missing", null);
 
         dispatcher().dispatch(graphTaskExecution);
 
@@ -258,10 +207,7 @@ public class GraphTaskDispatcherTest {
     @Test
     public void testDispatchWhenDuplicateNodeNamesFails() {
         TaskExecution graphTaskExecution = graphTaskExecution(
-            List.of(
-                node("classify", List.of(printTask("classifyTask"))),
-                node("classify", List.of(printTask("otherTask")))),
-            null, null);
+            List.of(printTask("classify"), printTask("classify")), null, null);
 
         dispatcher().dispatch(graphTaskExecution);
 
@@ -290,6 +236,17 @@ public class GraphTaskDispatcherTest {
         verify(taskDispatcher, never()).dispatch(any());
     }
 
+    @Test
+    public void testDeferredKeysCoverNodesAndTransitions() throws ClassNotFoundException {
+        // force the static initializer
+        Class.forName("com.bytechef.task.dispatcher.graph.config.GraphTaskDispatcherConfiguration");
+
+        Set<String> deferredKeys = DeferredEvaluationParameterKeys.forTaskType("graph/v1");
+
+        Assertions.assertTrue(deferredKeys.contains("nodes"));
+        Assertions.assertTrue(deferredKeys.contains("transitions"));
+    }
+
     private GraphTaskDispatcher dispatcher() {
         return new GraphTaskDispatcher(
             contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher, taskExecutionService,
@@ -311,7 +268,7 @@ public class GraphTaskDispatcherTest {
             parameters.put(MAX_TRANSITIONS, maxTransitions);
         }
 
-        TaskExecution taskExecution = TaskExecution.builder()
+        return TaskExecution.builder()
             .id(1L)
             .jobId(2L)
             .priority(5)
@@ -322,12 +279,6 @@ public class GraphTaskDispatcherTest {
                         WorkflowConstants.TYPE, "graph/v1",
                         WorkflowConstants.PARAMETERS, parameters)))
             .build();
-
-        return taskExecution;
-    }
-
-    private static Map<String, ?> node(String name, List<Map<String, ?>> tasks) {
-        return Map.of(NAME, name, TASKS, tasks);
     }
 
     private static Map<String, ?> printTask(String name) {

@@ -16,12 +16,12 @@
 
 package com.bytechef.task.dispatcher.graph.util;
 
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NAME;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NEXT;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.CONDITION;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.FROM;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODE;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODES;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.ROUTER_NODE;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TASKS;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TO;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TRANSITIONS;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Task;
@@ -34,7 +34,6 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,7 +42,7 @@ import org.apache.commons.lang3.Validate;
 import tools.jackson.core.type.TypeReference;
 
 /**
- * Shared helpers for stamping, node lookup, {@code next} expression evaluation, and node-task dispatch used by both
+ * Shared helpers for stamping, node lookup, transition resolution and node dispatch used by both
  * {@link com.bytechef.task.dispatcher.graph.GraphTaskDispatcher} and
  * {@link com.bytechef.task.dispatcher.graph.completion.GraphTaskCompletionHandler} -- transition resolution and node
  * dispatch live in exactly one place so the two classes cannot drift apart.
@@ -51,6 +50,11 @@ import tools.jackson.core.type.TypeReference;
  * @author Ivica Cardic
  */
 public class GraphTaskUtils {
+
+    /**
+     * What the property editor writes for a formula field with nothing in it -- the mode's prefix and no expression.
+     */
+    private static final String FORMULA_PREFIX = "=";
 
     private GraphTaskUtils() {
     }
@@ -66,119 +70,88 @@ public class GraphTaskUtils {
     }
 
     /**
-     * Stamps {@code parameters.__routerNode} (a distinct key from {@link #stampNode}'s {@code __node}) onto a copy of
-     * the given workflow task map, for {@code GraphTaskDispatcher}'s router hand-off of an empty start node. Using a
-     * separate key -- rather than reusing {@code __node} -- means the router hand-off never clobbers an outer graph's
-     * {@code __node} stamp when this graph is itself nested inside another graph's node; every other parameter,
-     * including any existing {@code __node}, is preserved.
-     */
-    public static WorkflowTask stampRouterNode(Map<String, ?> workflowTaskMap, String nodeName) {
-        return new WorkflowTask(
-            MapUtils.append(workflowTaskMap, WorkflowConstants.PARAMETERS, Map.of(ROUTER_NODE, nodeName)));
-    }
-
-    /**
-     * Removes {@code parameters.__routerNode} from a copy of the given workflow task map, leaving every other parameter
-     * (including any {@code __node}) untouched. A no-op copy when {@code __routerNode} is already absent.
-     *
-     * <p>
-     * Used by {@code GraphTaskCompletionHandler#completeGraph} before persisting a terminal resolution that was reached
-     * directly from the router hand-off entry point (an all-router graph, e.g. two empty nodes chained straight to
-     * terminal, that never dispatches a single real task). In that shape {@code completeGraph} is called with the SAME
-     * in-memory task execution {@code GraphTaskDispatcher#dispatchRouterNode} stamped -- without stripping the stamp
-     * first, persisting and re-entering the completion chain on that same, still-stamped execution would make
-     * {@code isRouterHandOff} match again on re-entry, recursing back into transition resolution instead of completing
-     * (and eventually exhausting the transition budget instead of finishing cleanly).
-     * </p>
-     */
-    public static WorkflowTask stripRouterNode(Map<String, ?> workflowTaskMap) {
-        Map<String, ?> parameters = MapUtils.getMap(workflowTaskMap, WorkflowConstants.PARAMETERS, Map.of());
-
-        if (!parameters.containsKey(ROUTER_NODE)) {
-            return new WorkflowTask(workflowTaskMap);
-        }
-
-        Map<String, Object> newParameters = new LinkedHashMap<>(parameters);
-
-        newParameters.remove(ROUTER_NODE);
-
-        Map<String, Object> newWorkflowTaskMap = new LinkedHashMap<>(workflowTaskMap);
-
-        newWorkflowTaskMap.put(WorkflowConstants.PARAMETERS, newParameters);
-
-        return new WorkflowTask(newWorkflowTaskMap);
-    }
-
-    /**
-     * Reads the {@code nodes} list out of a graph task's (already resolved) parameters, without validation -- the
+     * Reads the {@code nodes} task list out of a graph task's (already resolved) parameters, without validation -- the
      * dispatcher is the only place non-empty/unique-name validation is enforced, at dispatch time.
      */
-    public static List<Map<String, ?>> getNodes(Map<String, ?> parameters) {
-        return MapUtils.getList(parameters, NODES, new TypeReference<Map<String, ?>>() {}, List.of());
-    }
-
-    public static Optional<Map<String, ?>> findNode(List<Map<String, ?>> nodes, String name) {
-        return nodes.stream()
-            .filter(node -> Objects.equals(MapUtils.getString(node, NAME), name))
-            .findFirst();
-    }
-
-    public static List<WorkflowTask> getNodeWorkflowTasks(Map<String, ?> node) {
-        return MapUtils.getList(node, TASKS, new TypeReference<Map<String, ?>>() {}, List.of())
+    public static List<WorkflowTask> getNodes(Map<String, ?> parameters) {
+        return MapUtils.getList(parameters, NODES, new TypeReference<Map<String, ?>>() {}, List.of())
             .stream()
             .map(WorkflowTask::new)
             .toList();
     }
 
-    /**
-     * Evaluates a node's {@code next} expression against the accumulated context, through the same injected
-     * {@link Evaluator} used to evaluate ordinary task parameters (the {@code branch} dispatcher's {@code resolveCase}
-     * is the precedent for evaluating a single raw expression value this way, rather than re-deriving a bespoke SpEL
-     * parser like {@code ConditionTaskUtils} does for boolean conditions).
-     *
-     * @return the resolved node name, or {@code null} when {@code next} is absent, blank, or evaluates to a null/blank
-     *         value -- all of which mean "terminal".
-     */
-    public static String resolveNext(Evaluator evaluator, Map<String, ?> node, Map<String, ?> context) {
-        String nextExpression = MapUtils.getString(node, NEXT);
+    public static Optional<WorkflowTask> findNode(List<WorkflowTask> nodes, String name) {
+        return nodes.stream()
+            .filter(node -> Objects.equals(node.getName(), name))
+            .findFirst();
+    }
 
-        if (nextExpression == null || nextExpression.isBlank()) {
-            return null;
-        }
-
-        Map<String, ?> evaluated = evaluator.evaluate(Map.of(NEXT, nextExpression), context);
-
-        Object nextValue = evaluated.get(NEXT);
-
-        if (nextValue == null) {
-            return null;
-        }
-
-        String next = String.valueOf(nextValue)
-            .trim();
-
-        return next.isEmpty() ? null : next;
+    public static List<Map<String, ?>> getTransitions(Map<String, ?> parameters) {
+        return MapUtils.getList(parameters, TRANSITIONS, new TypeReference<Map<String, ?>>() {}, List.of());
     }
 
     /**
-     * Creates, evaluates, persists, and dispatches the given node's task as {@code taskNumber} within {@code nodeName},
-     * stamped with a fresh {@code __node} value -- the single dispatch path shared by the dispatcher's start-node
-     * dispatch, mid-node advancement, and post-transition dispatch of a target node's first task.
+     * Resolves which node, if any, {@code fromNodeName} transitions to: its CONDITIONAL transitions in declared order,
+     * the first whose {@code condition} evaluates truthy wins; if none matched, its first UNCONDITIONAL transition; if
+     * there is none the node is terminal. A {@code to} that is an expression is evaluated against the context; one that
+     * resolves to null/blank counts as "did not match" and evaluation continues with the next candidate. The returned
+     * name is NOT validated against the node list -- the completion handler does that so the error can name the source.
+     */
+    public static Optional<String> resolveTransition(
+        Evaluator evaluator, List<Map<String, ?>> transitions, String fromNodeName, Map<String, ?> context) {
+
+        List<Map<String, ?>> outgoingTransitions = transitions.stream()
+            .filter(transition -> Objects.equals(MapUtils.getString(transition, FROM), fromNodeName))
+            .toList();
+
+        for (Map<String, ?> transition : outgoingTransitions) {
+            if (!isConditional(transition)) {
+                continue;
+            }
+
+            if (evaluatesTruthy(evaluator, fromNodeName, MapUtils.getRequiredString(transition, CONDITION), context)) {
+                String target = resolveTarget(evaluator, transition, context);
+
+                if (target != null) {
+                    return Optional.of(target);
+                }
+            }
+        }
+
+        for (Map<String, ?> transition : outgoingTransitions) {
+            if (isConditional(transition)) {
+                continue;
+            }
+
+            String target = resolveTarget(evaluator, transition, context);
+
+            if (target != null) {
+                return Optional.of(target);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Creates, evaluates, persists, and dispatches {@code nodeTask} as the single task of {@code nodeName}, stamped
+     * with {@code __node} -- the one dispatch path shared by the dispatcher's start-node dispatch and the completion
+     * handler's post-transition dispatch.
      */
     public static void dispatchNodeTask(
         ContextService contextService, Evaluator evaluator, TaskDispatcher<? super Task> taskDispatcher,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
-        TaskExecution graphTaskExecution, WorkflowTask workflowTask, int taskNumber, String nodeName) {
+        TaskExecution graphTaskExecution, WorkflowTask nodeTask, String nodeName) {
 
         long graphTaskExecutionId = Validate.notNull(graphTaskExecution.getId(), "id");
 
         TaskExecution subTaskExecution = TaskExecution.builder()
             .jobId(graphTaskExecution.getJobId())
-            .maxRetries(workflowTask.getMaxRetries())
+            .maxRetries(nodeTask.getMaxRetries())
             .parentId(graphTaskExecutionId)
             .priority(graphTaskExecution.getPriority())
-            .taskNumber(taskNumber)
-            .workflowTask(stampNode(workflowTask.toMap(), nodeName))
+            .taskNumber(1)
+            .workflowTask(stampNode(nodeTask.toMap(), nodeName))
             .build();
 
         Map<String, ?> context = taskFileStorage.readContextValue(
@@ -195,5 +168,78 @@ public class GraphTaskUtils {
             taskFileStorage.storeContextValue(subTaskExecutionId, Context.Classname.TASK_EXECUTION, context));
 
         taskDispatcher.dispatch(subTaskExecution);
+    }
+
+    /**
+     * Whether {@code transition} carries a condition at all.
+     *
+     * A bare formula prefix does not. The editor saves a cleared formula field as {@code "="} rather than as an empty
+     * string, and that is not blank -- so it counted as conditional, evaluated falsy (there is no expression to be
+     * true), and was then skipped by the unconditional pass as well. A node whose every outgoing transition looked like
+     * that simply stopped the graph, with nothing to show why.
+     */
+    private static boolean isConditional(Map<String, ?> transition) {
+        String condition = MapUtils.getString(transition, CONDITION);
+
+        if (condition == null) {
+            return false;
+        }
+
+        String trimmedCondition = condition.trim();
+
+        return !trimmedCondition.isEmpty() && !Objects.equals(trimmedCondition, FORMULA_PREFIX);
+    }
+
+    /**
+     * Whether {@code conditionExpression} evaluates to true.
+     *
+     * A condition that does not evaluate to a boolean at all is an error, not a false. The evaluator hands back the
+     * expression unchanged when it cannot parse it, and reading that as "false" made a broken condition
+     * indistinguishable from one that simply did not match -- so a node whose only outgoing transition carried a
+     * half-typed expression ended the run with nothing said. Failing here names the condition instead.
+     */
+    private static boolean evaluatesTruthy(
+        Evaluator evaluator, String fromNodeName, String conditionExpression, Map<String, ?> context) {
+
+        Map<String, ?> evaluated = evaluator.evaluate(Map.of(CONDITION, conditionExpression), context);
+
+        Object value = evaluated.get(CONDITION);
+
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+
+        String stringValue = value == null ? null : String.valueOf(value);
+
+        if (stringValue != null &&
+            (stringValue.equalsIgnoreCase("true") || stringValue.equalsIgnoreCase("false"))) {
+
+            return Boolean.parseBoolean(stringValue);
+        }
+
+        throw new IllegalArgumentException(
+            "Transition from node '" + fromNodeName + "' has a condition that did not evaluate to true or false: " +
+                conditionExpression);
+    }
+
+    private static String resolveTarget(Evaluator evaluator, Map<String, ?> transition, Map<String, ?> context) {
+        String toExpression = MapUtils.getString(transition, TO);
+
+        if (toExpression == null || toExpression.isBlank()) {
+            return null;
+        }
+
+        Map<String, ?> evaluated = evaluator.evaluate(Map.of(TO, toExpression), context);
+
+        Object toValue = evaluated.get(TO);
+
+        if (toValue == null) {
+            return null;
+        }
+
+        String target = String.valueOf(toValue)
+            .trim();
+
+        return target.isEmpty() ? null : target;
     }
 }

@@ -5,10 +5,10 @@ tasks:
   type: "graph/v1"
   parameters:
     nodes:
-    - name: "A"
-      tasks:
-      - name: "aTask"
-        type: "var/v1/set"
-        parameters:
-          value: "a"
-      next: "missingNode"
+    - name: "aTask"
+      type: "var/v1/set"
+      parameters:
+        value: "a"
+    transitions:
+    - from: "aTask"
+      to: "missingNode"
