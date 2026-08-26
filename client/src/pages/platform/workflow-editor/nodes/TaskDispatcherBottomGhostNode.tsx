@@ -6,7 +6,8 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import {mapHandlePosition} from '../utils/directionUtils';
 import styles from './NodeTypes.module.css';
-import useTaskDispatcherGhostStatus from './useTaskDispatcherGhostStatus';
+import TaskDispatcherGhostBarHalves from './TaskDispatcherGhostBarHalves';
+import useTaskDispatcherGhostBarStatuses from './useTaskDispatcherGhostBarStatuses';
 
 // ELK's iteration rings flip their content to the TOP edge in LR (see
 // getRingContentSign in elkLayoutUtils): the rail returns into the bar's
@@ -28,21 +29,28 @@ const TaskDispatcherBottomGhostNode = ({data, id}: {data?: unknown; id: string})
     const isHorizontal = layoutDirection === 'LR';
     const isFlippedRingBar = isHorizontal && lastAppliedLayoutEngine === 'elk' && LR_FLIPPED_RING_BAR_PATTERN.test(id);
 
-    const dispatcherStatus = useTaskDispatcherGhostStatus(data);
+    const {leftStatus, rightStatus} = useTaskDispatcherGhostBarStatuses(id, data, true);
+
     const isGraphBar = GRAPH_GHOST_BAR_PATTERN.test(id);
 
     return (
         <div
             className={twMerge(
-                'nodrag',
-                isHorizontal ? 'h-[72px] w-0.5' : 'h-0.5 w-[72px]',
-                isGraphBar ? 'bg-transparent' : 'bg-stroke-neutral-tertiary',
-                dispatcherStatus === 'COMPLETED' && 'bg-green-500',
-                dispatcherStatus === 'FAILED' && 'bg-red-500'
+                'nodrag flex',
+                isHorizontal ? 'h-[72px] w-0.5 flex-col' : 'h-0.5 w-[72px]',
+                isGraphBar ? 'bg-transparent' : 'bg-stroke-neutral-tertiary'
             )}
             data-nodetype="taskDispatcherBottomGhostNode"
             key={id}
         >
+            {!isGraphBar && (
+                <TaskDispatcherGhostBarHalves
+                    isFlippedRingBar={isFlippedRingBar}
+                    leftStatus={leftStatus}
+                    rightStatus={rightStatus}
+                />
+            )}
+
             <Handle
                 className={twMerge(styles.handle)}
                 id={`${id}-top`}
