@@ -67,7 +67,7 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private final AutomationWorkflowProjectFacadeImpl facade = new AutomationWorkflowProjectFacadeImpl(
         categoryService, connectedUserService, embeddedPermissionEvaluator, projectCodeWorkflowService,
         projectService, projectWorkflowFacade, projectWorkflowService, tagService, workflowComponentResolver,
-        workflowNodeTestOutputService, workflowService, workflowTestConfigurationService);
+        workflowNodeTestOutputService, workflowService, workflowTestConfigurationService, List.of());
 
     @Test
     void testGetPublishedProjectsHidesProjectWhenExpressionIsFalse() {

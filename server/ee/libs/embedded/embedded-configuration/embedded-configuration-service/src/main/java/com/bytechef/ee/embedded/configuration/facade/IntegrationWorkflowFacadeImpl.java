@@ -26,6 +26,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -51,6 +52,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowCacheManager workflowCacheManager;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowFacade workflowFacade;
     private final WorkflowValidatorFacade workflowValidatorFacade;
@@ -64,7 +66,8 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
         WorkflowCacheManager workflowCacheManager, WorkflowService workflowService, WorkflowFacade workflowFacade,
         WorkflowValidatorFacade workflowValidatorFacade,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowTestConfigurationService workflowTestConfigurationService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.environmentService = environmentService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -73,6 +76,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         this.integrationWorkflowService = integrationWorkflowService;
         this.workflowCacheManager = workflowCacheManager;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowFacade = workflowFacade;
         this.workflowValidatorFacade = workflowValidatorFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -128,6 +132,10 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
             integration.getId(), integration.getLastIntegrationVersion(), workflowId);
 
         workflowTestConfigurationService.delete(workflowId);
+
+        for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+            workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+        }
 
         workflowService.delete(workflowId);
     }

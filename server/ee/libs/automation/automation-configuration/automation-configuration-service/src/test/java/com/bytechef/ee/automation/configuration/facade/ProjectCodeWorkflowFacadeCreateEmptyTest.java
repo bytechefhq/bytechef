@@ -43,6 +43,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -121,7 +122,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class), List.of());
 
         Project project = projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", Language.JAVASCRIPT);
 
@@ -156,7 +157,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class), List.of());
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, "my-code-project", language))
             .isInstanceOf(ConfigurationException.class)
@@ -184,7 +185,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class), List.of());
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(
             1L, "my-code-project", Language.JAVASCRIPT))
@@ -235,7 +236,7 @@ class ProjectCodeWorkflowFacadeCreateEmptyTest {
         ProjectCodeWorkflowFacadeImpl projectCodeWorkflowFacade = new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, mock(CodeWorkflowContainerService.class),
-            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class));
+            mock(CodeWorkflowFileStorage.class), mock(TagService.class), mock(WorkflowService.class), List.of());
 
         assertThatThrownBy(() -> projectCodeWorkflowFacade.createEmptyCodeWorkflow(1L, name, Language.JAVASCRIPT))
             .isInstanceOf(ConfigurationException.class)

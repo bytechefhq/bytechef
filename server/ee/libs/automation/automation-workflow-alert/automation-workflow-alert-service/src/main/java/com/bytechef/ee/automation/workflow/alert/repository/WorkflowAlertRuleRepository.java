@@ -27,6 +27,8 @@ public interface WorkflowAlertRuleRepository extends ListCrudRepository<Workflow
 
     List<WorkflowAlertRule> findAllByRuleTypeAndEnabledTrue(int ruleType);
 
+    List<WorkflowAlertRule> findAllByWorkflowId(String workflowId);
+
     List<WorkflowAlertRule> findAllByWorkspaceId(long workspaceId);
 
     /**

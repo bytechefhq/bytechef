@@ -39,6 +39,7 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSource;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseSourceStatus;
@@ -101,6 +102,7 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TaskExecutor taskExecutor;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkspaceKnowledgeBaseSourceService workspaceKnowledgeBaseSourceService;
 
@@ -112,7 +114,8 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
         TaskExecutor taskExecutor, WorkflowService workflowService,
-        WorkspaceKnowledgeBaseSourceService workspaceKnowledgeBaseSourceService) {
+        WorkspaceKnowledgeBaseSourceService workspaceKnowledgeBaseSourceService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.knowledgeBaseSourceService = knowledgeBaseSourceService;
@@ -124,6 +127,7 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
         this.projectWorkflowService = projectWorkflowService;
         this.taskExecutor = taskExecutor;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workspaceKnowledgeBaseSourceService = workspaceKnowledgeBaseSourceService;
     }
 
@@ -359,6 +363,10 @@ public class WorkspaceKnowledgeBaseSourceFacadeImpl implements WorkspaceKnowledg
                     .delete(projectDeploymentWorkflow.getId()));
 
             projectWorkflowService.delete(projectId, projectVersion, workflowId);
+
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+            }
 
             workflowService.delete(workflowId);
         }

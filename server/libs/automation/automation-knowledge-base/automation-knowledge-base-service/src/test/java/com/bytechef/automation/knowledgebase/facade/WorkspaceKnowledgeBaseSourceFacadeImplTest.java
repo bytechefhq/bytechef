@@ -121,7 +121,7 @@ class WorkspaceKnowledgeBaseSourceFacadeImplTest {
         facade = new WorkspaceKnowledgeBaseSourceFacadeImpl(
             componentDefinitionService, knowledgeBaseSourceService, principalJobFacade, projectDeploymentFacade,
             projectDeploymentService, projectDeploymentWorkflowService, projectService, projectWorkflowService,
-            new SyncTaskExecutor(), workflowService, workspaceKnowledgeBaseSourceService);
+            new SyncTaskExecutor(), workflowService, workspaceKnowledgeBaseSourceService, List.of());
 
         // Default: hubspot v1 has a single ItemReader cluster element named "searchContacts".
         ComponentDefinition hubspotDefinition = componentDefinitionWithItemReader("searchContacts");

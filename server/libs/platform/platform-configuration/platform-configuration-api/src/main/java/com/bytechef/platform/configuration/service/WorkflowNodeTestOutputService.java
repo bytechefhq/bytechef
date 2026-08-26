@@ -31,6 +31,8 @@ public interface WorkflowNodeTestOutputService {
 
     void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
 
+    void deleteWorkflowNodeTestOutputs(String workflowId);
+
     boolean checkWorkflowNodeTestOutputExists(
         String workflowId, String workflowNodeName, @Nullable Instant createdDate, long environmentId);
 

@@ -351,7 +351,7 @@ class IntegrationCodeWorkflowFacadeDraftTest {
         return new IntegrationCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
-            codeWorkflowContainerService, codeWorkflowFileStorage, mock(TagService.class), workflowService);
+            codeWorkflowContainerService, codeWorkflowFileStorage, mock(TagService.class), workflowService, List.of());
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

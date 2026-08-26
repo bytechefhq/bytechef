@@ -42,6 +42,8 @@ public interface KnowledgeBaseSourceRepository
 
     List<KnowledgeBaseSource> findAllByIdInAndEnabled(List<Long> ids, boolean enabled);
 
+    List<KnowledgeBaseSource> findAllByWorkflowId(String workflowId);
+
     List<KnowledgeBaseSource> findAllByWorkspaceId(long workspaceId);
 
     List<KnowledgeBaseSource> findAllByWorkspaceIdAndEnabled(long workspaceId, boolean enabled);

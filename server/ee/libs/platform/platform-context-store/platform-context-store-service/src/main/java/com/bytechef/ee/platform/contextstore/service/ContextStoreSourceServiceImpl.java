@@ -106,6 +106,12 @@ public class ContextStoreSourceServiceImpl implements ContextStoreSourceService 
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ContextStoreSource> findAllByWorkflowId(String workflowId) {
+        return contextStoreSourceRepository.findAllByWorkflowId(workflowId);
+    }
+
+    @Override
     public void updateStatus(
         Long id, ContextStoreSourceStatus status, @Nullable Instant lastSyncRunAt, @Nullable Long jobExecutionId) {
 

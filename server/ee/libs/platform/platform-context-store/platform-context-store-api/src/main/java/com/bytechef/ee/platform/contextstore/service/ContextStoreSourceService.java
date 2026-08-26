@@ -53,6 +53,11 @@ public interface ContextStoreSourceService {
      */
     List<ContextStoreSource> findAllByContextStoreId(Long contextStoreId);
 
+    /**
+     * Every source whose generated sync workflow is {@code workflowId}. Used by the workflow-delete cascade.
+     */
+    List<ContextStoreSource> findAllByWorkflowId(String workflowId);
+
     void updateStatus(
         Long id, ContextStoreSourceStatus status, @Nullable Instant lastSyncRunAt, @Nullable Long jobExecutionId);
 

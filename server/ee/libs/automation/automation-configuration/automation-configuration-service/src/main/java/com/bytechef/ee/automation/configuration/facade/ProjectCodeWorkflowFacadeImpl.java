@@ -29,6 +29,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
@@ -79,6 +80,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private final CodeWorkflowContainerService codeWorkflowContainerService;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final TagService tagService;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final boolean javaEnabled;
     private final ProjectHandlerLoader.JavaLoader javaLoader;
@@ -89,7 +91,8 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         ProjectWorkflowService projectWorkflowService, CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService,
         CodeWorkflowContainerService codeWorkflowContainerService,
-        CodeWorkflowFileStorage codeWorkflowFileStorage, TagService tagService, WorkflowService workflowService) {
+        CodeWorkflowFileStorage codeWorkflowFileStorage, TagService tagService, WorkflowService workflowService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.cacheManager = cacheManager;
         this.projectService = projectService;
@@ -100,6 +103,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
         this.tagService = tagService;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.javaEnabled = applicationProperties.getWorkflow()
             .getCodeWorkflow()
             .isJavaEnabled();
@@ -425,6 +429,11 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             .values()) {
 
             projectWorkflowService.delete(projectId, draftProjectVersion, workflowId);
+
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+            }
+
             workflowService.delete(workflowId);
         }
     }

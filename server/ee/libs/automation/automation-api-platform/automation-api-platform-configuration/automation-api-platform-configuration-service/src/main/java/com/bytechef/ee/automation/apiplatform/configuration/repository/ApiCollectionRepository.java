@@ -34,5 +34,7 @@ public interface ApiCollectionRepository
         """)
     List<Long> findAllApiCollectionProjectIds(@Param("workspaceId") long workspaceId);
 
+    List<ApiCollection> findAllByProjectDeploymentId(long projectDeploymentId);
+
     Optional<ApiCollection> findByContextPath(String contextPath);
 }

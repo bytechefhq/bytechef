@@ -94,7 +94,7 @@ class IntegrationFacadeImplCodeWorkflowFlagTest {
             categoryService, codeWorkflowContainerService, componentDefinitionService,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             integrationInstanceConfigurationFacade, integrationInstanceConfigurationService, tagService,
-            workflowService, workflowTestConfigurationService, workflowNodeTestOutputService);
+            workflowService, workflowTestConfigurationService, workflowNodeTestOutputService, List.of());
 
         integration = Integration.builder()
             .id(INTEGRATION_ID)

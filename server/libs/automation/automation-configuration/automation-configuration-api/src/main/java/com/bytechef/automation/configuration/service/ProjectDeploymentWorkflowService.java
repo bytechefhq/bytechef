@@ -55,6 +55,16 @@ public interface ProjectDeploymentWorkflowService {
 
     List<ProjectDeploymentWorkflow> getProjectDeploymentWorkflows(List<Long> projectDeploymentIds);
 
+    /**
+     * Gets every project deployment workflow referencing the given workflow, regardless of whether the deployment
+     * owning it is a regular deployment or one of the synthetic deployments hidden from the deployments list.
+     *
+     * @param workflowId the id of the workflow
+     * @return the project deployment workflows referencing the given workflow
+     */
+    @Transactional(readOnly = true)
+    List<ProjectDeploymentWorkflow> getWorkflowProjectDeploymentWorkflows(String workflowId);
+
     boolean isConnectionUsed(long connectionId);
 
     List<ProjectDeploymentWorkflow> getProjectDeploymentWorkflowsByConnectionIds(List<Long> connectionIds);

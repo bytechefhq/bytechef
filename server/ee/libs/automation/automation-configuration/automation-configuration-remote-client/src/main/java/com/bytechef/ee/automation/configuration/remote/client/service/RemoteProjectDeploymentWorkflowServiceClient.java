@@ -137,6 +137,11 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     }
 
     @Override
+    public List<ProjectDeploymentWorkflow> getWorkflowProjectDeploymentWorkflows(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isConnectionUsed(long connectionId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder

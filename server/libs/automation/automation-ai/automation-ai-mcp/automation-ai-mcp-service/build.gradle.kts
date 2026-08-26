@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))

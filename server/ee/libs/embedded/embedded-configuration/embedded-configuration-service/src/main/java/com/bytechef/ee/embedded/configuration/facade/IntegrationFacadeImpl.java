@@ -30,6 +30,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -63,6 +64,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final TagService tagService;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -77,7 +79,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.categoryService = categoryService;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
@@ -89,6 +92,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.tagService = tagService;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
     }
@@ -128,6 +132,12 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(id);
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(integrationWorkflow.getWorkflowId());
+            }
+        }
 
         workflowService.delete(
             integrationWorkflows.stream()

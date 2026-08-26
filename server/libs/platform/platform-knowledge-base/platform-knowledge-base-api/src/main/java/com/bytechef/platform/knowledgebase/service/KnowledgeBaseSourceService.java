@@ -55,6 +55,11 @@ public interface KnowledgeBaseSourceService {
     List<KnowledgeBaseSource> findAllByKnowledgeBaseId(Long knowledgeBaseId);
 
     /**
+     * Every source whose generated sync workflow is {@code workflowId}. Used by the workflow-delete cascade.
+     */
+    List<KnowledgeBaseSource> findAllByWorkflowId(String workflowId);
+
+    /**
      * Returns every enabled source across all knowledge bases. Used by the background sync scheduler; not workspace
      * scoped — callers that need workspace scoping go through the automation-side
      * {@code WorkspaceKnowledgeBaseSourceService} instead.

@@ -175,7 +175,7 @@ public class ContextStoreSchedulingIntTestConfiguration {
             clickHouseTableProvisionerProvider, componentDefinitionService, contextStoreSourceAuditPublisher,
             contextStoreSourceService, principalJobFacade, projectDeploymentFacade, projectDeploymentService,
             projectDeploymentWorkflowService, projectService, projectWorkflowService, new SyncTaskExecutor(),
-            workflowService, workspaceContextStoreService);
+            workflowService, workspaceContextStoreService, List.of());
     }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")

@@ -63,6 +63,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
@@ -205,6 +206,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
@@ -227,7 +229,8 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, TagService tagService,
         PrincipalJobService principalJobService, JobService jobService, UserService userService,
-        @Value("${bytechef.webhook-url}") String webhookUrl) {
+        @Value("${bytechef.webhook-url}") String webhookUrl,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.agentService = agentService;
         this.agentChannelResolver = agentChannelResolver;
@@ -241,6 +244,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.tagService = tagService;
@@ -335,6 +339,11 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
 
             for (String workflowId : projectWorkflowService.getProjectWorkflowIds(projectId, version)) {
                 projectWorkflowService.delete(projectId, version, workflowId);
+
+                for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                    workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+                }
+
                 workflowService.delete(workflowId);
             }
         }

@@ -81,6 +81,12 @@ public class A2aProjectServiceImpl implements A2aProjectService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<A2aProject> getProjectDeploymentA2aProjects(long projectDeploymentId) {
+        return a2aProjectRepository.findAllByProjectDeploymentId(projectDeploymentId);
+    }
+
+    @Override
     public A2aProject update(A2aProject a2aProject) {
         A2aProject currentA2aProject = a2aProjectRepository.findById(a2aProject.getId())
             .orElseThrow(

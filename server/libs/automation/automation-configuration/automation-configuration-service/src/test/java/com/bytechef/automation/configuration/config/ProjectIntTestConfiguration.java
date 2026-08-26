@@ -34,10 +34,12 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.event.WorkflowNodeTestOutputPreDeleteListener;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
+import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -111,6 +113,13 @@ public class ProjectIntTestConfiguration {
     @Bean
     WebhookTriggerTestFacade webhookTriggerTestFacade() {
         return mock(WebhookTriggerTestFacade.class);
+    }
+
+    @Bean
+    WorkflowNodeTestOutputPreDeleteListener workflowNodeTestOutputPreDeleteListener(
+        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+
+        return new WorkflowNodeTestOutputPreDeleteListener(workflowNodeTestOutputService);
     }
 
     @Bean

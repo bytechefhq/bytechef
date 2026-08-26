@@ -77,6 +77,12 @@ public class WorkflowAlertRuleServiceImpl implements WorkflowAlertRuleService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<WorkflowAlertRule> getWorkflowWorkflowAlertRules(String workflowId) {
+        return workflowAlertRuleRepository.findAllByWorkflowId(workflowId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Long> getWorkflowAlertRuleIds(long workspaceId) {
         return workflowAlertRuleRepository.findAllIdsByWorkspaceId(workspaceId);
     }

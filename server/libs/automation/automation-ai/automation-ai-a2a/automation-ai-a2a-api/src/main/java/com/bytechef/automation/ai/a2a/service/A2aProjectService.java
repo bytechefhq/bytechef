@@ -41,5 +41,7 @@ public interface A2aProjectService {
 
     List<A2aProject> getA2aServerA2aProjects(long a2aServerId);
 
+    List<A2aProject> getProjectDeploymentA2aProjects(long projectDeploymentId);
+
     A2aProject update(A2aProject a2aProject);
 }

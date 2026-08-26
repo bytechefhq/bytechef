@@ -38,6 +38,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.service.TagService;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -407,7 +408,7 @@ class ProjectCodeWorkflowFacadeSourceTest {
         return new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage, mock(TagService.class), workflowService);
+            codeWorkflowFileStorage, mock(TagService.class), workflowService, List.of());
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

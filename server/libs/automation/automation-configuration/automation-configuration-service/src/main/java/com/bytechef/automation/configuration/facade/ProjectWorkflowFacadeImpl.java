@@ -36,7 +36,6 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
@@ -178,38 +177,56 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(project.getId());
-
-        for (ProjectDeployment projectDeployment : projectDeployments) {
-            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
-                .getProjectDeploymentWorkflows(Validate.notNull(projectDeployment.getId(), "id"));
-
-            if (CollectionUtils.anyMatch(
-                projectDeploymentWorkflows,
-                projectDeploymentWorkflow -> Objects.equals(projectDeploymentWorkflow.getWorkflowId(), workflowId))) {
-
-                projectDeploymentWorkflows.stream()
-                    .filter(
-                        projectDeploymentWorkflow -> Objects.equals(
-                            projectDeploymentWorkflow.getWorkflowId(), workflowId))
-                    .findFirst()
-                    .ifPresent(
-                        projectDeploymentWorkflow -> projectDeploymentWorkflowService.delete(
-                            projectDeploymentWorkflow.getId()));
-            }
-        }
-
         for (ProjectVersion projectVersion : project.getProjectVersions()) {
             projectWorkflowService.delete(project.getId(), projectVersion.getVersion(), workflowId);
         }
 
+        // Listeners first, then the sweep. Each feature listener deletes its own grandchild rows
+        // (api_collection_endpoint / mcp_project_workflow / a2a_project_workflow) and only then the
+        // project_deployment_workflow row they hang off, guarded by an ownership check. Sweeping first would try to
+        // delete a synthetic deployment's row while its grandchildren still point at it.
         for (WorkflowPreDeleteListener listener : workflowPreDeleteListeners) {
             listener.onWorkflowPreDelete(workflowId);
         }
 
+        deleteProjectDeploymentWorkflows(project, workflowId);
+
         workflowTestConfigurationService.delete(workflowId);
 
         workflowService.delete(workflowId);
+    }
+
+    /**
+     * Deletes every remaining {@code project_deployment_workflow} row pointing at the workflow, across ALL of the
+     * project's deployments.
+     *
+     * <p>
+     * {@code getAllProjectDeployments} rather than {@code getProjectDeployments}: the latter runs the list query, which
+     * hides deployments whose own name carries an API-collection / MCP / A2A marker AND deployments belonging to a
+     * system-named project ({@code __EMBEDDED_AUTOMATION__}, {@code __AI_AGENT__}, …). That filter exists so system
+     * rows stay out of the UI's deployment list; driving a delete cascade from it meant a workflow under a system-named
+     * project kept its mapping rows forever, with nothing to key on — the feature listeners cannot reach those either,
+     * because an ordinary workflow under a system project has no feature grandchild to own it.
+     * </p>
+     *
+     * <p>
+     * Safe to run unfiltered only because it runs AFTER the listeners: whatever row survives their ownership-guarded
+     * cleanup has no feature grandchild left pointing at it.
+     * </p>
+     */
+    private void deleteProjectDeploymentWorkflows(Project project, String workflowId) {
+        for (ProjectDeployment projectDeployment : projectDeploymentService.getAllProjectDeployments(
+            Validate.notNull(project.getId(), "id"))) {
+
+            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
+                .getProjectDeploymentWorkflows(Validate.notNull(projectDeployment.getId(), "id"));
+
+            for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+                if (Objects.equals(projectDeploymentWorkflow.getWorkflowId(), workflowId)) {
+                    projectDeploymentWorkflowService.delete(projectDeploymentWorkflow.getId());
+                }
+            }
+        }
     }
 
     @Override

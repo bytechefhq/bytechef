@@ -40,6 +40,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -96,6 +97,7 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TaskExecutor taskExecutor;
+    private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkspaceContextStoreService workspaceContextStoreService;
 
@@ -109,7 +111,8 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService,
         TaskExecutor taskExecutor, WorkflowService workflowService,
-        WorkspaceContextStoreService workspaceContextStoreService) {
+        WorkspaceContextStoreService workspaceContextStoreService,
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
 
         this.clickHouseTableProvisionerProvider = clickHouseTableProvisionerProvider;
         this.componentDefinitionService = componentDefinitionService;
@@ -123,6 +126,7 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
         this.projectWorkflowService = projectWorkflowService;
         this.taskExecutor = taskExecutor;
         this.workflowService = workflowService;
+        this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workspaceContextStoreService = workspaceContextStoreService;
     }
 
@@ -393,6 +397,10 @@ public class WorkspaceContextStoreSourceFacadeImpl implements WorkspaceContextSt
                     .delete(projectDeploymentWorkflow.getId()));
 
             projectWorkflowService.delete(projectId, projectVersion, workflowId);
+
+            for (WorkflowPreDeleteListener workflowPreDeleteListener : workflowPreDeleteListeners) {
+                workflowPreDeleteListener.onWorkflowPreDelete(workflowId);
+            }
 
             workflowService.delete(workflowId);
         }

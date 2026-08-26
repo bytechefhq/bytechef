@@ -42,6 +42,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,7 +123,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(TagService.class), mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class), List.of());
 
         Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(
             "my-integration", Language.JAVASCRIPT);
@@ -159,7 +160,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(TagService.class), mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class), List.of());
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow("my-integration", language))
@@ -199,7 +200,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(TagService.class), mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class), List.of());
 
         // A component backs as many integrations as the user wants; they are told apart by name.
         Integration integration = integrationCodeWorkflowFacade.createEmptyCodeWorkflow(
@@ -240,7 +241,7 @@ class IntegrationCodeWorkflowFacadeCreateEmptyTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(TagService.class), mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class), List.of());
 
         assertThatThrownBy(
             () -> integrationCodeWorkflowFacade.createEmptyCodeWorkflow(componentName, Language.JAVASCRIPT))

@@ -170,7 +170,7 @@ class IntegrationCodeWorkflowFacadeListTest {
             applicationProperties(true), mock(CacheManager.class), mock(CodeWorkflowContainerFacade.class),
             integrationCodeWorkflowService, integrationService, mock(IntegrationWorkflowService.class),
             codeWorkflowContainerService, mock(CodeWorkflowFileStorage.class), mock(TagService.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), List.of());
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

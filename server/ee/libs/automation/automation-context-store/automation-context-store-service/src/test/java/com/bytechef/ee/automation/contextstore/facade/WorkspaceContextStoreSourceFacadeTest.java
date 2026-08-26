@@ -105,7 +105,7 @@ class WorkspaceContextStoreSourceFacadeTest {
             clickHouseTableProvisionerProvider, componentDefinitionService, contextStoreSourceAuditPublisher,
             contextStoreSourceService, principalJobFacade, projectDeploymentFacade, projectDeploymentService,
             projectDeploymentWorkflowService, projectService, projectWorkflowService, taskExecutor,
-            workflowService, workspaceContextStoreService);
+            workflowService, workspaceContextStoreService, List.of());
 
         when(project.getId()).thenReturn(PROJECT_ID);
         when(project.getLastProjectVersion()).thenReturn(PROJECT_VERSION);

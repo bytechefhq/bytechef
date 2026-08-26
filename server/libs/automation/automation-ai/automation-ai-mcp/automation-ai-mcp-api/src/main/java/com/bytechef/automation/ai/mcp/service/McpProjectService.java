@@ -72,4 +72,12 @@ public interface McpProjectService {
      * @return a list of MCP projects for the specified server
      */
     List<McpProject> getMcpServerMcpProjects(long mcpServerId);
+
+    /**
+     * Gets all MCP projects backed by a specific project deployment.
+     *
+     * @param projectDeploymentId the ID of the project deployment
+     * @return a list of MCP projects backed by the specified project deployment
+     */
+    List<McpProject> getProjectDeploymentMcpProjects(long projectDeploymentId);
 }

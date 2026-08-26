@@ -343,7 +343,7 @@ class ProjectCodeWorkflowFacadeDraftTest {
         return new ProjectCodeWorkflowFacadeImpl(
             applicationProperties(true), mock(CacheManager.class), projectService, projectWorkflowService,
             codeWorkflowContainerFacade, projectCodeWorkflowService, codeWorkflowContainerService,
-            codeWorkflowFileStorage, mock(TagService.class), workflowService);
+            codeWorkflowFileStorage, mock(TagService.class), workflowService, List.of());
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

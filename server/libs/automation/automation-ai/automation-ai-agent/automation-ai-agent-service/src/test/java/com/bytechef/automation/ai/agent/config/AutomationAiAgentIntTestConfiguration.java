@@ -41,6 +41,7 @@ import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.EnvironmentServiceImpl;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputServiceImpl;
@@ -246,6 +247,15 @@ public class AutomationAiAgentIntTestConfiguration {
     @Bean
     CacheManager cacheManager() {
         return new ConcurrentMapCacheManager();
+    }
+
+    // Collaborator of the imported WorkflowNodeTestOutputServiceImpl, which evicts the workflow-scoped output caches
+    // when node test outputs are deleted. Mocked for the same reason as the beans above: the real
+    // WorkflowCacheManagerImpl lives in a package this slice does not scan, and eviction is not what these tests
+    // assert on.
+    @Bean
+    WorkflowCacheManager workflowCacheManager() {
+        return Mockito.mock(WorkflowCacheManager.class);
     }
 
     @Bean

@@ -34,6 +34,8 @@ public interface ContextStoreSourceRepository
 
     List<ContextStoreSource> findAllByContextStoreId(Long contextStoreId);
 
+    List<ContextStoreSource> findAllByWorkflowId(String workflowId);
+
     List<ContextStoreSource> findAllByWorkspaceId(long workspaceId);
 
     List<ContextStoreSource> findAllByWorkspaceIdAndEnabled(long workspaceId, boolean enabled);

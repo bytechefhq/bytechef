@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-plan:platform-plan-api"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
@@ -22,8 +23,18 @@ dependencies {
         project(":server:ee:libs:automation:automation-workflow-execution-cost:automation-workflow-execution-cost-api"))
 
     testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.postgresql:postgresql")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(project(":server:libs:config:jackson-config"))
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    // workflow_alert_rule_notification carries an FK to the notification table, so its changelog has to be on
+    // the test classpath or the schema build fails partway through.
+    testImplementation(project(":server:libs:platform:platform-notification:platform-notification-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:libs:test:test-support"))
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }

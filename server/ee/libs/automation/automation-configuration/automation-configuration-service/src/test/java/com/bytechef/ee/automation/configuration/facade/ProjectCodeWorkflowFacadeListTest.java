@@ -115,7 +115,7 @@ class ProjectCodeWorkflowFacadeListTest {
             applicationProperties(true), mock(CacheManager.class), projectService, mock(ProjectWorkflowService.class),
             mock(CodeWorkflowContainerFacade.class), projectCodeWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class),
-            mock(TagService.class), mock(WorkflowService.class));
+            mock(TagService.class), mock(WorkflowService.class), List.of());
     }
 
     private static ApplicationProperties applicationProperties(boolean javaEnabled) {

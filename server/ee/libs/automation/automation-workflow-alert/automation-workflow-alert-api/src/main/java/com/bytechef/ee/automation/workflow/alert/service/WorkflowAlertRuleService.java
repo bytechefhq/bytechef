@@ -36,6 +36,12 @@ public interface WorkflowAlertRuleService {
 
     List<WorkflowAlertRule> getWorkflowAlertRules(long workspaceId);
 
+    /**
+     * Every rule scoped to {@code workflowId}. Used by the workflow-delete cascade; a rule left pointing at a deleted
+     * workflow matches no run again and is silently dead.
+     */
+    List<WorkflowAlertRule> getWorkflowWorkflowAlertRules(String workflowId);
+
     List<Long> getWorkflowAlertRuleIds(long workspaceId);
 
     List<WorkflowAlertRule> getEnabledWorkflowAlertRules(long workspaceId);

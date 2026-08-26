@@ -43,4 +43,17 @@ public interface A2aProjectRepository extends ListCrudRepository<A2aProject, Lon
         ORDER BY id ASC
         """)
     List<A2aProject> findAllByA2aServerId(@Param("a2aServerId") Long a2aServerId);
+
+    /**
+     * Finds all A2A projects backed by the specified project deployment.
+     *
+     * @param projectDeploymentId the ID of the project deployment to filter by
+     * @return a list of A2A projects with the specified project deployment ID
+     */
+    @Query("""
+        SELECT * FROM a2a_project
+        WHERE project_deployment_id = :projectDeploymentId
+        ORDER BY id ASC
+        """)
+    List<A2aProject> findAllByProjectDeploymentId(@Param("projectDeploymentId") Long projectDeploymentId);
 }

@@ -111,7 +111,7 @@ class ProjectFacadeImplCodeWorkflowFlagTest {
             mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), tagService,
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
-            mock(WorkflowNodeTestOutputService.class));
+            mock(WorkflowNodeTestOutputService.class), List.of());
 
         when(project.getId()).thenReturn(PROJECT_ID);
         when(projectService.getProject(PROJECT_ID)).thenReturn(project);

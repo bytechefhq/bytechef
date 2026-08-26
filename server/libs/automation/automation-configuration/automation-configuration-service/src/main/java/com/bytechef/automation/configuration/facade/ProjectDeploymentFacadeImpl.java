@@ -31,6 +31,7 @@ import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
+import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
 import com.bytechef.automation.configuration.security.ProjectVisibilityFilter;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -71,6 +72,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -81,6 +83,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -106,6 +109,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
     private final JobService jobService;
+    private final List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
@@ -124,6 +128,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ApplicationEventPublisher applicationEventPublisher, ConnectionService connectionService, Evaluator evaluator,
         EnvironmentService environmentService, PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
+        List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners,
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectVisibilityFilter projectVisibilityFilter, ProjectWorkflowService projectWorkflowService,
@@ -140,6 +145,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
+        this.projectDeploymentDeleteEventListeners = projectDeploymentDeleteEventListeners;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -255,6 +261,10 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')")
     public void deleteProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
+
+        for (ProjectDeploymentDeleteEventListener deleteEventListener : projectDeploymentDeleteEventListeners) {
+            deleteEventListener.onBeforeDeleteProjectDeployment(id);
+        }
 
         if (projectDeployment.isEnabled()) {
             enableProjectDeployment(projectDeployment.getId(), false);
@@ -743,12 +753,71 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         projectDeploymentService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
+    /**
+     * The gate authorizes {@code projectDeploymentId}, but the write is keyed by {@code id} -- a DIFFERENT field of the
+     * same caller-supplied object. {@code ProjectDeploymentWorkflowServiceImpl.update} loads the row by {@code getId()}
+     * and overwrites its connections, enabled flag, inputs and workflowId, and that service carries no
+     * {@code @PreAuthorize} of its own, so without the binding check below nothing tied the row being written to the
+     * deployment being authorized.
+     *
+     * <p>
+     * Directly expressible rather than theoretical:
+     * {@code ProjectDeploymentApiController.updateProjectDeploymentWorkflow} binds the first path segment to
+     * {@code projectDeploymentId} and the second to {@code id}, and the two are independent. A caller holding
+     * {@code DEPLOYMENT_EDIT} on ANY one deployment could therefore name their own deployment in segment one and any
+     * {@code project_deployment_workflow} row in the tenant in segment two -- including a tenant admin's production
+     * row. {@code validateProjectDeploymentWorkflow} is no obstacle: it short-circuits entirely when {@code enabled} is
+     * false, so disabling somebody else's workflow was unvalidated.
+     *
+     * <p>
+     * This is the only one of the nine {@code 'ProjectDeployment'} gates on this class with that shape; the other eight
+     * act solely on the deployment they name.
+     *
+     * <p>
+     * The check is here rather than in the {@code @PreAuthorize} expression so it holds for every caller of this facade
+     * rather than for one controller, and so the gate and the binding it depends on are read together. An unknown
+     * {@code id} is denied with the SAME message as a mismatched one, so this does not become an existence oracle for
+     * rows the caller cannot see.
+     */
     @Override
     @PreAuthorize("hasPermission(#projectDeploymentWorkflow.projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')")
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        validateProjectDeploymentWorkflowBinding(projectDeploymentWorkflow);
+
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
         projectDeploymentWorkflowService.update(projectDeploymentWorkflow);
+    }
+
+    /**
+     * Asserts that the persisted {@code ProjectDeploymentWorkflow} named by {@code id} really does belong to the
+     * {@code projectDeploymentId} the {@code @PreAuthorize} on {@link #updateProjectDeploymentWorkflow} authorized. See
+     * that method for why the two can otherwise disagree.
+     */
+    private void validateProjectDeploymentWorkflowBinding(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        Long projectDeploymentId = projectDeploymentWorkflow.getProjectDeploymentId();
+        Long id = projectDeploymentWorkflow.getId();
+
+        if (id == null) {
+            throw new AccessDeniedException(toProjectDeploymentWorkflowBindingMessage(null, projectDeploymentId));
+        }
+
+        ProjectDeploymentWorkflow curProjectDeploymentWorkflow;
+
+        try {
+            curProjectDeploymentWorkflow = projectDeploymentWorkflowService.getProjectDeploymentWorkflow(id);
+        } catch (NoSuchElementException exception) {
+            throw new AccessDeniedException(toProjectDeploymentWorkflowBindingMessage(id, projectDeploymentId));
+        }
+
+        if (!Objects.equals(curProjectDeploymentWorkflow.getProjectDeploymentId(), projectDeploymentId)) {
+            throw new AccessDeniedException(toProjectDeploymentWorkflowBindingMessage(id, projectDeploymentId));
+        }
+    }
+
+    private static String toProjectDeploymentWorkflowBindingMessage(Long id, Long projectDeploymentId) {
+        return "Project deployment workflow %s does not belong to project deployment %s".formatted(
+            id, projectDeploymentId);
     }
 
     private void checkProjectDeploymentWorkflows(
