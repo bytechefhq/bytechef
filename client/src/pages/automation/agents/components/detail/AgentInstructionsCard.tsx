@@ -1,9 +1,9 @@
-import {Textarea} from '@/components/ui/textarea';
 import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
+import MarkdownEditor from '@/shared/components/markdown-editor/MarkdownEditor';
 import {useUpdateAiAgentMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {toast} from 'sonner';
 
 interface AgentInstructionsCardProps {
@@ -14,6 +14,8 @@ interface AgentInstructionsCardProps {
 const AgentInstructionsCard = ({agentId, instructions}: AgentInstructionsCardProps) => {
     const [value, setValue] = useState(instructions ?? '');
 
+    const dirtyRef = useRef(false);
+
     const queryClient = useQueryClient();
 
     const updateAgentMutation = useUpdateAiAgentMutation({
@@ -23,21 +25,30 @@ const AgentInstructionsCard = ({agentId, instructions}: AgentInstructionsCardPro
         onSuccess: () => invalidateAgentQueries(queryClient),
     });
 
-    const handleBlur = () => {
-        if (value === (instructions ?? '')) {
+    const handleBlur = (markdown: string) => {
+        if (!dirtyRef.current) {
             return;
         }
 
-        updateAgentMutation.mutate({input: {id: agentId, instructions: value}});
+        dirtyRef.current = false;
+
+        updateAgentMutation.mutate({input: {id: agentId, instructions: markdown}});
+    };
+
+    const handleChange = (markdown: string) => {
+        dirtyRef.current = true;
+
+        setValue(markdown);
     };
 
     return (
         <AgentSection title="Instructions">
             <fieldset className="border-0 p-0">
-                <Textarea
+                <MarkdownEditor
+                    ariaLabel="Instructions"
                     className="min-h-32"
                     onBlur={handleBlur}
-                    onChange={(event) => setValue(event.target.value)}
+                    onChange={handleChange}
                     placeholder="Describe how this agent should behave…"
                     value={value}
                 />
