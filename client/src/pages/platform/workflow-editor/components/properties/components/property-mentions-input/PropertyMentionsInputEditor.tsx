@@ -590,14 +590,27 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             editor.storage.FunctionSuggestion.functionDefinitions = evaluatorFunctionDefinitions;
         }, [editor, evaluatorFunctionDefinitions]);
 
-        // Update editor content when editorValue changes (but not during local updates)
+        // Applies what the sync effect above decided, and inherits its rule: never replace the
+        // document the user is working in.
+        //
+        // `setContent` rebuilds the doc from scratch, so it drops the match the `$` and `=` suggestion
+        // plugins track, taking the popup down mid-keystroke, and it repaints the field from
+        // `editorValue`, which is empty whenever this reruns against a value the panel has not caught
+        // up with yet. `isLocalUpdate` alone did not cover it: it says the last change came from here,
+        // not that the user is still in the field.
         useEffect(() => {
-            if (editor && !isLocalUpdate && memoizedContent !== undefined) {
-                editor.commands.setContent(memoizedContent, {
-                    emitUpdate: false,
-                    parseOptions: {preserveWhitespace: 'full'},
-                });
+            if (!editor || isLocalUpdate || memoizedContent === undefined) {
+                return;
             }
+
+            if (editor.isFocused || isFocusedRef.current || editor.storage.MentionStorage?.suggestionOpen) {
+                return;
+            }
+
+            editor.commands.setContent(memoizedContent, {
+                emitUpdate: false,
+                parseOptions: {preserveWhitespace: 'full'},
+            });
         }, [editor, memoizedContent, isLocalUpdate]);
 
         // Sync formula mode state with editor storage
