@@ -24,6 +24,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.WEB_SEARCH;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
@@ -39,6 +40,7 @@ import org.springframework.ai.anthropic.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
+import org.springframework.ai.anthropic.AnthropicWebSearchTool;
 
 /**
  * @author Marko Kriskovic
@@ -63,6 +65,15 @@ public class AnthropicChatAction {
                 AnthropicCacheOptions.builder()
                     .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
                     .build());
+
+        // Anthropic's own server-side search — the model searches inside the completion and never emits a tool
+        // call, so nothing needs a connection or a tool callback. Attached only when asked for: an always-present
+        // web_search tool would be billed per search and would change answers for every agent.
+        if (inputParameters.getBoolean(WEB_SEARCH, false)) {
+            optionsBuilder.webSearchTool(
+                AnthropicWebSearchTool.builder()
+                    .build());
+        }
 
         // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
         Double temperature = inputParameters.getDouble(TEMPERATURE);
