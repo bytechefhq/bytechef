@@ -1741,6 +1741,132 @@ class AiAgentWorkflowGeneratorTest {
         return clusterElements;
     }
 
+    // --- thinking / maxToolCalls -----------------------------------------------------------------------------------
+
+    /**
+     * Thinking is a property of the model call, not a tool, so it lands on the {@code model} cluster element beside
+     * {@code model} itself — the same shape native web search uses.
+     */
+    @Test
+    void testThinkingSetsTheModelThinkingAndReasoningEffortParameters() {
+        AiAgentElement model = new AiAgentElement(1L, AiAgentElement.KIND_MODEL);
+
+        model.setId(1L);
+        model.setPosition(0);
+        model.setParameters(Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"));
+
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("thinking", true, "reasoningEffort", "HIGH"));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of(model));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> modelElement = (Map<String, Object>) clusterElements.get("model");
+
+        assertThat(parameters(modelElement))
+            .isEqualTo(Map.of("thinking", true, "reasoningEffort", "high", "model", "claude-sonnet-4-5"));
+    }
+
+    /**
+     * An agent that stored {@code thinking} without an effort reads the documented default rather than emitting no
+     * effort at all — a thinking model with no budget would be the provider's choice, not the agent's.
+     */
+    @Test
+    void testThinkingWithNoStoredEffortEmitsMedium() {
+        AiAgentElement model = new AiAgentElement(1L, AiAgentElement.KIND_MODEL);
+
+        model.setId(1L);
+        model.setPosition(0);
+        model.setParameters(Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"));
+
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("thinking", true));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of(model));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> modelElement = (Map<String, Object>) clusterElements.get("model");
+
+        assertThat(parameters(modelElement)).containsEntry("reasoningEffort", "medium");
+    }
+
+    /**
+     * The settings map is free-form JSON, so a typo must degrade to the documented default rather than make an
+     * otherwise valid agent ungeneratable — the same contract webSearchProvider has.
+     */
+    @Test
+    void testUnknownReasoningEffortFallsBackToMedium() {
+        AiAgentElement model = new AiAgentElement(1L, AiAgentElement.KIND_MODEL);
+
+        model.setId(1L);
+        model.setPosition(0);
+        model.setParameters(Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"));
+
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("thinking", true, "reasoningEffort", "ludicrous"));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of(model));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> modelElement = (Map<String, Object>) clusterElements.get("model");
+
+        assertThat(parameters(modelElement)).containsEntry("reasoningEffort", "medium");
+    }
+
+    /**
+     * Turning thinking off must leave neither key behind — every save regenerates the whole definition, so a stale
+     * effort would keep an agent reasoning after the user switched it off.
+     */
+    @Test
+    void testModelThinkingParametersAreAbsentWhenThinkingIsOff() {
+        AiAgentElement model = new AiAgentElement(1L, AiAgentElement.KIND_MODEL);
+
+        model.setId(1L);
+        model.setPosition(0);
+        model.setParameters(Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"));
+
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("thinking", false, "reasoningEffort", "HIGH"));
+
+        Map<String, Object> clusterElements = generateClusterElements(agent, List.of(model));
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> modelElement = (Map<String, Object>) clusterElements.get("model");
+
+        assertThat(parameters(modelElement)).doesNotContainKeys("thinking", "reasoningEffort");
+    }
+
+    @Test
+    void testMaxToolCallsIsWrittenOntoTheAiAgentNode() {
+        AiAgent agent = newAgent();
+
+        agent.setSettings(Map.of("maxToolCalls", 30));
+
+        assertThat(parameters(generateAiAgentNode(agent))).containsEntry("maxToolCalls", 30);
+    }
+
+    /**
+     * Absent means the platform default applies. Emitting a number here instead would pin every agent that never
+     * configured a cap to whatever this generator happened to choose.
+     */
+    @Test
+    void testMaxToolCallsIsAbsentWhenUnset() {
+        assertThat(parameters(generateAiAgentNode(newAgent()))).doesNotContainKey("maxToolCalls");
+    }
+
+    private static Map<String, Object> generateAiAgentNode(AiAgent agent) {
+        String definition = AiAgentWorkflowGenerator.generate(
+            agent, twoChannelFixtureChannels(), List.of(), NO_SUB_AGENTS, null, CHANNEL_RESOLVER);
+
+        Map<String, Object> parsed = JsonUtils.read(definition, new TypeReference<>() {});
+
+        return tasks(parsed).get(1);
+    }
+
     private static Map<String, Object> generateClusterElements(List<AiAgentElement> elements) {
         return generateClusterElements(newAgent(), elements);
     }

@@ -725,6 +725,65 @@ class AiAgentFacadeIntTest {
     }
 
     @Test
+    void testPublishAgentWithThinkingPublishesOnASupportedModelProvider() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null,
+            Map.of("provider", "anthropic", "model", "claude-sonnet-4-5"), null);
+        agentFacade.updateAgentSettings(agent.getId(), Map.of("thinking", true, "reasoningEffort", "HIGH"));
+
+        assertThatCode(() -> agentFacade.publishAgent(agent.getId(), "First release")).doesNotThrowAnyException();
+    }
+
+    /**
+     * A provider whose model cluster element does not declare {@code thinking} would silently ignore the parameter,
+     * publishing an agent that looks like it reasons and never does — the same failure native web search is rejected
+     * for.
+     */
+    @Test
+    void testPublishAgentWithThinkingOnAnUnsupportedModelProviderThrows() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openRouter", "model", "gpt-4"), null);
+        agentFacade.updateAgentSettings(agent.getId(), Map.of("thinking", true));
+
+        assertThatThrownBy(() -> agentFacade.publishAgent(agent.getId(), "First release"))
+            .isInstanceOf(ConfigurationException.class)
+            .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorKey())
+                .isEqualTo(AiAgentErrorType.THINKING_UNSUPPORTED.getErrorKey()));
+    }
+
+    /**
+     * Thinking off must not be validated at all — an agent on any provider stays publishable while the key is absent or
+     * false, which is what every agent predating the key reads.
+     */
+    @Test
+    void testPublishAgentWithThinkingOffIsNotProviderChecked() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.addAgentElement(
+            agent.getId(), AiAgentElement.KIND_MODEL, null, Map.of("provider", "openRouter", "model", "gpt-4"), null);
+        agentFacade.updateAgentSettings(agent.getId(), Map.of("thinking", false));
+
+        assertThatCode(() -> agentFacade.publishAgent(agent.getId(), "First release")).doesNotThrowAnyException();
+    }
+
+    @Test
+    void testUpdateAgentSettingsWithMaxToolCallsRegeneratesDefinitionWithIt() {
+        AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
+        AiAgent agent = agentDTO.agent();
+
+        agentFacade.updateAgentSettings(agent.getId(), Map.of("maxToolCalls", 30));
+
+        assertThat(draftDefinition(agent.getProjectId())).contains("\"maxToolCalls\":30");
+    }
+
+    @Test
     void testDeleteScheduleChannelRegeneratesDefinitionWithoutIt() {
         AiAgentDTO agentDTO = agentFacade.createAgent("Support Bot", null, workspaceId);
         AiAgent agent = agentDTO.agent();

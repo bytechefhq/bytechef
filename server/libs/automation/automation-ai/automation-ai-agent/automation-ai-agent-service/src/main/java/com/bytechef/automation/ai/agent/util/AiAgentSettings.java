@@ -30,7 +30,8 @@ import org.jspecify.annotations.Nullable;
  * the same key.
  *
  * <p>
- * Shape: {@code {streamResponse?: bool, builtInTools: {askUserQuestion: bool, autoMemory: bool,
+ * Shape: {@code {streamResponse?: bool, thinking?: bool, reasoningEffort?: "LOW"|"MEDIUM"|"HIGH",
+ * maxToolCalls?: int, builtInTools: {askUserQuestion: bool, autoMemory: bool,
  * skillManagement: bool, webSearch: bool, webSearchProvider?: "BRAVE"|"NATIVE", webSearchConnectionId?: number}}}.
  * Absence of the {@code builtInTools} key, of any individual key inside it, or of a top-level key means that key's
  * documented default below applies — there is no separate "explicitly unset" state.
@@ -53,6 +54,38 @@ public final class AiAgentSettings {
      * still resolves to an unnamed {@code string()} and {@code __AGENT_OUTPUT__} stays the bare {@code ${aiAgent_1}}.
      */
     public static final String STREAM_RESPONSE = "streamResponse";
+
+    /**
+     * Extended reasoning, written onto the {@code MODEL} cluster element's parameters exactly like
+     * {@link WebSearchProvider#NATIVE} web search is — it is a property of the model call, not a tool, so it sits
+     * beside {@link #BUILT_IN_TOOLS} rather than inside it. Default OFF, which is also what every agent predating this
+     * key reads.
+     */
+    public static final String THINKING = "thinking";
+
+    /**
+     * How hard the model thinks when {@link #THINKING} is on — {@code LOW}, {@code MEDIUM} (the default) or
+     * {@code HIGH}. Unparseable values fall back to {@code MEDIUM} for the same reason {@link #WEB_SEARCH_PROVIDER}
+     * falls back to {@code BRAVE}: the settings map is free-form JSON and a typo must not make an otherwise valid agent
+     * ungeneratable.
+     */
+    public static final String REASONING_EFFORT = "reasoningEffort";
+
+    /**
+     * Caps the tool calls one agent run may make in total, written onto {@code aiAgent_1}'s own parameters. Absent
+     * means the platform default applies ({@code DefaultToolCallingManager.DEFAULT_MAX_TOTAL_TOOL_CALLS}, currently
+     * 150) — there is no "unlimited" value, because an agent that can loop forever is a billing incident, not a
+     * feature.
+     */
+    public static final String MAX_TOOL_CALLS = "maxToolCalls";
+
+    /**
+     * Model providers whose {@code model} cluster element declares {@code LLMConstants.THINKING_PROPERTY}. Every other
+     * provider would silently ignore the setting, so selecting it against one of those is rejected at publish time —
+     * the same contract, and the same reason, as {@link #NATIVE_WEB_SEARCH_MODEL_PROVIDERS}. Add a provider here in the
+     * same commit that wires its model element's {@code thinking} property.
+     */
+    public static final Set<String> THINKING_MODEL_PROVIDERS = Set.of("anthropic", "openAi");
 
     /** {@code aiAgentUtils/v1/askUserQuestionTool} — default ON. */
     public static final String ASK_USER_QUESTION = "askUserQuestion";
@@ -103,6 +136,20 @@ public final class AiAgentSettings {
     public static final Set<String> NATIVE_WEB_SEARCH_MODEL_PROVIDERS = Set.of("anthropic");
 
     /**
+     * How hard the model thinks when {@link #THINKING} is on. Deliberately an effort word rather than a token budget:
+     * only Anthropic expresses the setting as a budget and every other provider takes an effort string, so each
+     * provider's model element maps these three values onto its own knob.
+     */
+    public enum ReasoningEffort {
+
+        LOW, MEDIUM, HIGH;
+
+        public String toParameterValue() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
+
+    /**
      * Where the {@link #WEB_SEARCH} built-in gets its results.
      *
      * <ul>
@@ -132,6 +179,28 @@ public final class AiAgentSettings {
 
     public static boolean isStreamResponseEnabled(Map<String, ?> settings) {
         return MapUtils.getBoolean(settings, STREAM_RESPONSE, true);
+    }
+
+    public static boolean isThinkingEnabled(Map<String, ?> settings) {
+        return MapUtils.getBoolean(settings, THINKING, false);
+    }
+
+    public static ReasoningEffort getReasoningEffort(Map<String, ?> settings) {
+        String value = MapUtils.getString(settings, REASONING_EFFORT);
+
+        if (value == null) {
+            return ReasoningEffort.MEDIUM;
+        }
+
+        try {
+            return ReasoningEffort.valueOf(value.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return ReasoningEffort.MEDIUM;
+        }
+    }
+
+    public static @Nullable Integer getMaxToolCalls(Map<String, ?> settings) {
+        return MapUtils.getInteger(settings, MAX_TOOL_CALLS);
     }
 
     public static boolean isAskUserQuestionEnabled(Map<String, ?> settings) {

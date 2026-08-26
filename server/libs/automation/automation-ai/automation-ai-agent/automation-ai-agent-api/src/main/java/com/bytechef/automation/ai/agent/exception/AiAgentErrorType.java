@@ -106,6 +106,15 @@ public class AiAgentErrorType extends AbstractErrorType {
      */
     public static final AiAgentErrorType NATIVE_WEB_SEARCH_UNSUPPORTED = new AiAgentErrorType(116);
 
+    /**
+     * Publishing an agent whose {@code settings.thinking} is on while its {@code MODEL} element names a provider with
+     * no extended reasoning — the same failure shape as {@link #NATIVE_WEB_SEARCH_UNSUPPORTED}: the generated model
+     * element would carry a {@code thinking} parameter that provider's model cluster element does not declare, so the
+     * agent would publish looking like it reasons and then never do so. See
+     * {@code AiAgentSettings#THINKING_MODEL_PROVIDERS}.
+     */
+    public static final AiAgentErrorType THINKING_UNSUPPORTED = new AiAgentErrorType(117);
+
     public AiAgentErrorType(int errorKey) {
         super(AiAgentFacade.class, errorKey);
     }

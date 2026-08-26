@@ -25,6 +25,7 @@ import com.bytechef.automation.ai.agent.channel.ResolvedAgentChannel.Binding;
 import com.bytechef.automation.ai.agent.domain.AiAgent;
 import com.bytechef.automation.ai.agent.domain.AiAgentChannel;
 import com.bytechef.automation.ai.agent.domain.AiAgentElement;
+import com.bytechef.automation.ai.agent.util.AiAgentSettings.ReasoningEffort;
 import com.bytechef.automation.ai.agent.util.AiAgentSettings.WebSearchProvider;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
@@ -691,6 +692,14 @@ public final class AiAgentWorkflowGenerator {
 
         parameters.put(FIELD_ATTACHMENTS, "${" + BRANCH_IN_NAME + "." + FIELD_ATTACHMENTS + "}");
 
+        // Emitted only when set, so an agent that never configured a cap keeps whatever
+        // DefaultToolCallingManager defaults to rather than being pinned to a number this generator invented.
+        Integer maxToolCalls = AiAgentSettings.getMaxToolCalls(agent.getSettings());
+
+        if (maxToolCalls != null) {
+            parameters.put(AiAgentSettings.MAX_TOOL_CALLS, maxToolCalls);
+        }
+
         Map<String, Object> aiAgentNode = new LinkedHashMap<>();
 
         boolean streamResponse = AiAgentSettings.isStreamResponseEnabled(agent.getSettings());
@@ -752,6 +761,8 @@ public final class AiAgentWorkflowGenerator {
      * against, so a provider that would ignore this key never reaches generation with it set.
      */
     private static final String MODEL_PARAM_WEB_SEARCH = "webSearch";
+    private static final String MODEL_PARAM_THINKING = "thinking";
+    private static final String MODEL_PARAM_REASONING_EFFORT = "reasoningEffort";
 
     /**
      * Nested map of the model node's remaining properties (temperature, maxTokens, …), mirroring
@@ -978,7 +989,8 @@ public final class AiAgentWorkflowGenerator {
                 CLUSTER_KEY_MODEL,
                 buildModelElement(
                     modelElements.get(0), AiAgentSettings.isNativeWebSearchEnabled(agent.getSettings()),
-                    nodeCounters));
+                    AiAgentSettings.isThinkingEnabled(agent.getSettings()),
+                    AiAgentSettings.getReasoningEffort(agent.getSettings()), nodeCounters));
         }
 
         List<Map<String, Object>> tools = buildTools(
@@ -1029,7 +1041,8 @@ public final class AiAgentWorkflowGenerator {
      * </p>
      */
     private static Map<String, Object> buildModelElement(
-        AiAgentElement element, boolean nativeWebSearch, Map<String, Integer> nodeCounters) {
+        AiAgentElement element, boolean nativeWebSearch, boolean thinking, ReasoningEffort reasoningEffort,
+        Map<String, Integer> nodeCounters) {
 
         Map<String, ?> parameters = element.getParameters();
 
@@ -1046,6 +1059,13 @@ public final class AiAgentWorkflowGenerator {
         // regeneration dropping anything not re-emitted).
         if (nativeWebSearch) {
             modelParameters.put(MODEL_PARAM_WEB_SEARCH, true);
+        }
+
+        // Same regeneration contract as web search above, with one addition: the effort is written only alongside
+        // thinking, so turning thinking off leaves no orphaned effort behind for the next generation to read.
+        if (thinking) {
+            modelParameters.put(MODEL_PARAM_THINKING, true);
+            modelParameters.put(MODEL_PARAM_REASONING_EFFORT, reasoningEffort.toParameterValue());
         }
 
         modelParameters.put(MODEL_PARAM_MODEL, model);

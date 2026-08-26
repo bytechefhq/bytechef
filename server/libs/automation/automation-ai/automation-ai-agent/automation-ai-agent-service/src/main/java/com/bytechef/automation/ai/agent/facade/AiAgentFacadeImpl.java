@@ -1080,6 +1080,10 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
         if (AiAgentSettings.isNativeWebSearchEnabled(settings)) {
             validateNativeWebSearchSupported(agent, elements);
         }
+
+        if (AiAgentSettings.isThinkingEnabled(settings)) {
+            validateThinkingSupported(agent, elements);
+        }
     }
 
     /**
@@ -1088,13 +1092,7 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
      * parameter the provider silently ignores.
      */
     private void validateNativeWebSearchSupported(AiAgent agent, List<AiAgentElement> elements) {
-        // Exactly one MODEL element is guaranteed by the modelCount check at the top of validateForPublish.
-        AiAgentElement modelElement = elements.stream()
-            .filter(element -> AiAgentElement.KIND_MODEL.equals(element.getKind()))
-            .findFirst()
-            .orElseThrow();
-
-        String provider = MapUtils.getString(modelElement.getParameters(), "provider", "");
+        String provider = getModelProvider(elements);
 
         if (!AiAgentSettings.NATIVE_WEB_SEARCH_MODEL_PROVIDERS.contains(provider)) {
             throw new ConfigurationException(
@@ -1103,6 +1101,32 @@ public class AiAgentFacadeImpl implements AiAgentFacade {
                     + AiAgentSettings.NATIVE_WEB_SEARCH_MODEL_PROVIDERS,
                 AiAgentErrorType.NATIVE_WEB_SEARCH_UNSUPPORTED);
         }
+    }
+
+    /**
+     * Thinking is switched on through the model element, so it only works for a provider whose model cluster element
+     * declares the {@code thinking} property — same contract, and same reason, as
+     * {@link #validateNativeWebSearchSupported}.
+     */
+    private void validateThinkingSupported(AiAgent agent, List<AiAgentElement> elements) {
+        String provider = getModelProvider(elements);
+
+        if (!AiAgentSettings.THINKING_MODEL_PROVIDERS.contains(provider)) {
+            throw new ConfigurationException(
+                "Agent " + agent.getId() + " uses thinking, which model provider '" + provider
+                    + "' does not support — supported providers: " + AiAgentSettings.THINKING_MODEL_PROVIDERS,
+                AiAgentErrorType.THINKING_UNSUPPORTED);
+        }
+    }
+
+    private static String getModelProvider(List<AiAgentElement> elements) {
+        // Exactly one MODEL element is guaranteed by the modelCount check at the top of validateForPublish.
+        AiAgentElement modelElement = elements.stream()
+            .filter(element -> AiAgentElement.KIND_MODEL.equals(element.getKind()))
+            .findFirst()
+            .orElseThrow();
+
+        return MapUtils.getString(modelElement.getParameters(), "provider", "");
     }
 
     /**
