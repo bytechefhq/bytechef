@@ -51,6 +51,7 @@ interface PropertyMentionsInputEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
     controlType?: string;
     dataPills: DataPillType[];
+    disableAutoSave?: boolean;
     elementId?: string;
     expressionEnabled?: boolean;
     handleFromAiClick?: (fromAi: boolean) => void;
@@ -78,6 +79,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             componentDefinitions,
             controlType,
             dataPills,
+            disableAutoSave,
             elementId,
             expressionEnabled,
             handleFromAiClick,
@@ -268,6 +270,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         ]);
 
         const saveMentionInputValue = useDebouncedCallback((editorValue: string | number) => {
+            if (disableAutoSave) {
+                return;
+            }
+
             if (
                 !workflow.id ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
@@ -667,7 +673,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     />
                 )}
 
-                {handleFromAiClick && expressionEnabled !== false && currentNode?.clusterElementType === 'tools' && (
+                {handleFromAiClick && expressionEnabled !== false && toolProperty && (
                     <FromAiToggleButton isFromAi={isFromAi} onToggle={handleFromAiClick} />
                 )}
 
