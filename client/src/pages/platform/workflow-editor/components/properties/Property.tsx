@@ -230,6 +230,7 @@ const Property = ({
                     required={required}
                     setIsFormulaMode={setIsFormulaMode}
                     showInputTypeSwitchButton={showInputTypeSwitchButton}
+                    toolProperty={isToolsClusterElement}
                     type={type}
                     validateBeforeSave={validatePropertyValue}
                     value={mentionInputValue}
