@@ -294,7 +294,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         className="flex-1"
                         data-testid="project-item"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-h-8 items-center gap-2">
                             {project.projectWorkflowIds &&
                             project.projectWorkflowIds.length > 0 &&
                             !javaCodeWorkflow ? (
@@ -360,7 +360,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             )}
                         </div>
 
-                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="relative mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                             {/* min-h matches the xs workflow-creation button so code-project rows (which hide it)
                                 keep the same row height and vertical alignment as visual-project rows. */}
 
@@ -512,8 +512,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex flex-col items-end gap-y-4">
-                            <div className="flex items-center space-x-2">
+                        <div className="flex flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center space-x-2">
                                 {project.lastPublishedDate && project.lastProjectVersion ? (
                                     <>
                                         <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
@@ -555,7 +555,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <div className="flex items-center text-sm text-muted-foreground sm:mt-0">
+                                    <div className="flex min-h-7 items-center text-sm text-muted-foreground sm:mt-0">
                                         {project.lastPublishedDate ? (
                                             <span className="text-xs">
                                                 {`Published at ${project.lastPublishedDate?.toLocaleDateString()} ${project.lastPublishedDate?.toLocaleTimeString()}`}

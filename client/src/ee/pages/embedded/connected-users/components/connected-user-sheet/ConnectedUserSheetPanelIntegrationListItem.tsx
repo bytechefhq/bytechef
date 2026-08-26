@@ -80,7 +80,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                 <div className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
-                            <div className="flex flex-1 items-center gap-1">
+                            <div className="flex min-h-8 flex-1 items-center gap-1">
                                 <InlineSVG
                                     className="size-5 flex-none"
                                     key={componentDefinition.name!}
@@ -103,7 +103,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex min-h-7 items-center gap-4">
                                 <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                                     <CredentialsStatus
                                         enabled={connectedUserIntegrationInstance.credentialStatus === 'VALID'}
@@ -142,7 +142,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             )}
 
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
-                                <div className="relative flex items-center">
+                                <div className="relative flex min-h-8 items-center">
                                     {enableIntegrationInstanceMutation.isPending && (
                                         <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                     )}
@@ -160,7 +160,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
 
                                 <Tooltip>
-                                    <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                    <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                         {integrationInstance && integrationInstance.lastExecutionDate ? (
                                             <span className="text-xs">
                                                 {`Executed at ${integrationInstance.lastExecutionDate?.toLocaleDateString()} ${integrationInstance.lastExecutionDate?.toLocaleTimeString()}`}

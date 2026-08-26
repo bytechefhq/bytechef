@@ -39,7 +39,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
         <Collapsible className="mb-2 w-full rounded border border-border/50 px-3 py-4 hover:bg-surface-neutral-primary-hover">
             <div className="flex items-center justify-between">
                 <div className="flex-1">
-                    <div className="flex items-center justify-between">
+                    <div className="flex min-h-8 items-center justify-between">
                         <div className="flex w-full items-center justify-between">
                             {apiConnector.description ? (
                                 <Tooltip>
@@ -67,7 +67,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                         </div>
                     </div>
 
-                    <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                    <div className="mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                         <div className="flex items-center">
                             <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-content-neutral-secondary">
                                 <span className="mr-1">
@@ -83,11 +83,13 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                 </div>
 
                 <div className="flex items-center justify-end gap-x-6">
-                    <div className="flex flex-col items-end gap-y-4">
-                        <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
+                    <div className="flex flex-col items-end gap-y-2">
+                        <div className="flex min-h-8 items-center">
+                            <Switch checked={apiConnector.enabled ?? false} onCheckedChange={handleOnCheckedChange} />
+                        </div>
 
                         <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                            <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                 {lastModifiedDate ? (
                                     <span className="text-xs">
                                         {`Modified at ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}

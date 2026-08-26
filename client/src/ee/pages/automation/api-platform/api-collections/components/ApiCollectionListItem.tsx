@@ -141,7 +141,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-h-8 items-center justify-between">
                             <div className="flex w-full items-center justify-between">
                                 {apiCollection.description ? (
                                     <Tooltip>
@@ -157,7 +157,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger
                                     className="group mr-4 flex text-xs font-semibold text-content-neutral-secondary"
@@ -208,11 +208,13 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                             <TooltipContent>The project version</TooltipContent>
                         </Tooltip>
 
-                        <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />
+                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center">
+                                <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />
+                            </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                     {apiCollection.lastModifiedDate ? (
                                         <span className="text-xs">
                                             {`Modified at ${apiCollection.lastModifiedDate?.toLocaleDateString()} ${apiCollection.lastModifiedDate?.toLocaleTimeString()}`}

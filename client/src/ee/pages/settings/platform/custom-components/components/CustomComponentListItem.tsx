@@ -145,7 +145,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                         )}
 
                         <div className="flex-1">
-                            <div className="flex items-center justify-between">
+                            <div className="flex min-h-8 items-center justify-between">
                                 <div className="flex w-full items-center justify-between">
                                     {customComponent.description ? (
                                         <Tooltip>
@@ -194,14 +194,16 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             )}
                         </div>
 
-                        <div className="flex flex-col items-end gap-y-4">
-                            <Switch
-                                checked={customComponent.enabled ?? false}
-                                onCheckedChange={handleOnCheckedChange}
-                            />
+                        <div className="flex flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center">
+                                <Switch
+                                    checked={customComponent.enabled ?? false}
+                                    onCheckedChange={handleOnCheckedChange}
+                                />
+                            </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                     {customComponent.lastModifiedDate ? (
                                         <span className="text-xs">
                                             {`Modified at ${new Date(customComponent.lastModifiedDate).toLocaleDateString()} ${new Date(customComponent.lastModifiedDate).toLocaleTimeString()}`}

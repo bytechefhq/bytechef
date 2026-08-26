@@ -133,9 +133,11 @@ const AgentDeploymentListItem = ({deployment, remainingTags}: AgentDeploymentLis
             >
                 <div className="flex flex-1 items-center py-3">
                     <div className="flex-1">
-                        <span className="text-base font-semibold">{deployment.agentTitle}</span>
+                        <span className="flex min-h-8 items-center text-base font-semibold">
+                            {deployment.agentTitle}
+                        </span>
 
-                        <div className="mt-2 flex items-center">
+                        <div className="mt-2 flex min-h-7 items-center">
                             <CollapsibleTrigger
                                 className="group mr-4 flex text-xs font-semibold text-muted-foreground"
                                 data-interactive
@@ -180,8 +182,8 @@ const AgentDeploymentListItem = ({deployment, remainingTags}: AgentDeploymentLis
                         {/* The min-w column is what puts the toggle above its caption and keeps both right-aligned,
                             matching ProjectDeploymentListItem. */}
 
-                        <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <div className="flex items-center">
+                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center">
                                 {enableAgentDeploymentMutation.isPending && <LoadingIcon />}
 
                                 <Switch
@@ -192,7 +194,7 @@ const AgentDeploymentListItem = ({deployment, remainingTags}: AgentDeploymentLis
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                     <span className="text-xs">
                                         {lastExecutionDate
                                             ? `Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`

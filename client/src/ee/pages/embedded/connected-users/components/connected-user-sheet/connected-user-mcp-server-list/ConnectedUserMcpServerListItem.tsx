@@ -53,14 +53,14 @@ const ConnectedUserMcpServerListItem = ({
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div
                                 className={twMerge(
-                                    'text-base font-semibold',
+                                    'flex min-h-8 items-center text-base font-semibold',
                                     !mcpServer.enabled && 'text-muted-foreground'
                                 )}
                             >
                                 {mcpServer.name}
                             </div>
 
-                            <div className="text-xs font-semibold text-muted-foreground">
+                            <div className="flex min-h-7 items-center text-xs font-semibold text-muted-foreground">
                                 {toolCount === 1 ? `${toolCount} tool` : `${toolCount} tools`}
                             </div>
                         </div>
@@ -68,7 +68,7 @@ const ConnectedUserMcpServerListItem = ({
 
                     <div className="flex items-center gap-x-2">
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="relative flex items-center">
+                            <div className="relative flex min-h-8 items-center">
                                 {enableConnectedUserMcpServerMutation.isPending && (
                                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                 )}
@@ -87,7 +87,7 @@ const ConnectedUserMcpServerListItem = ({
 
                             {lastModifiedDate && (
                                 <Tooltip>
-                                    <TooltipTrigger className="text-xs text-muted-foreground">
+                                    <TooltipTrigger className="flex min-h-7 items-center text-xs text-muted-foreground">
                                         {`Updated ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
                                     </TooltipTrigger>
 

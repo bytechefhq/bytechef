@@ -47,7 +47,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-h-8 items-center justify-between">
                             <CollapsibleTrigger className="text-base font-semibold">
                                 <div className="flex items-center">
                                     <ServerIcon className="mr-2 size-4 text-content-neutral-secondary" />
@@ -57,7 +57,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                             </CollapsibleTrigger>
                         </div>
 
-                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger
                                     className="group mr-4 flex text-xs font-semibold text-muted-foreground"
@@ -103,8 +103,8 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <div className="flex items-center">
+                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center">
                                 {isEnablePending && <LoadingIcon />}
 
                                 <Switch
@@ -115,7 +115,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                     {mcpServer.lastModifiedDate ? (
                                         <span className="text-xs">
                                             {`Modified at ${new Date(mcpServer.lastModifiedDate).toLocaleDateString()} ${new Date(mcpServer.lastModifiedDate).toLocaleTimeString()}`}

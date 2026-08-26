@@ -244,6 +244,15 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Always import icons with the `Icon` suffix: `SearchIcon`, `DatabaseIcon`, `Loader2Icon`
 - Not: `Search`, `Database`, `Loader2`
 
+### List row rhythm (Client)
+
+Every `*ListItem` row is two columns (title/tags on the left, version-or-switch + date on the right)
+centred against each other with `items-center`. The two columns only line up if they are the **same
+height**, so all 16 of them share one rhythm: first row `min-h-8`, an 8px gap (`gap-y-2` on the right
+column, the left column's long-standing `mt-2`), second row `min-h-7`. Changing one column's gap or
+dropping a `min-h` silently offsets that list's second row against its neighbour — the failure is
+invisible in the file you edited and only shows on screen.
+
 ### CSS Class Merging (Client)
 - Use `twMerge` from `tailwind-merge` for conditional class merging
 - Do not use `cn()` utility

@@ -46,7 +46,7 @@ const ConnectedUserProjectWorkflowListItem = ({
     return (
         <>
             <li className="mb-2 flex items-center justify-between rounded border border-border/50 p-3 hover:bg-destructive-foreground">
-                <div className="flex min-w-0 flex-1 items-center">
+                <div className="flex min-h-8 min-w-0 flex-1 items-center">
                     <span className="truncate text-sm font-semibold">
                         {connectedUserProjectWorkflow.workflow.label}
                     </span>
@@ -67,7 +67,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                         </Tooltip>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
-                            <div className="relative flex items-center">
+                            <div className="relative flex min-h-8 items-center">
                                 {enableConnectedUserProjectWorkflowMutation.isPending && (
                                     <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                 )}
@@ -84,7 +84,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm">
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm">
                                     {lastExecutionDate ? (
                                         <span className="text-xs">
                                             {`Executed at ${lastExecutionDate.toLocaleDateString()} ${lastExecutionDate.toLocaleTimeString()}`}

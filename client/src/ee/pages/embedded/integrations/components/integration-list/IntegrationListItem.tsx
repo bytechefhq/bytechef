@@ -171,7 +171,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-h-8 items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {integration?.integrationWorkflowIds &&
                                 integration?.integrationWorkflowIds.length > 0 &&
@@ -212,7 +212,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                             </div>
                         </div>
 
-                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="relative mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 <CollapsibleTrigger
                                     className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground"
@@ -249,24 +249,30 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                     <div className="flex items-center justify-end gap-x-6">
                         {integration.lastIntegrationVersion && (
-                            <div className="flex flex-col items-end gap-y-4">
-                                {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
-                                    <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
-                                        <span>V{integration.lastIntegrationVersion - 1}</span>
+                            <div className="flex flex-col items-end gap-y-2">
+                                <div className="flex min-h-8 items-center">
+                                    {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
+                                        <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
+                                            <span>V{integration.lastIntegrationVersion - 1}</span>
 
-                                        <span>PUBLISHED</span>
-                                    </Badge>
-                                ) : (
-                                    <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
-                                        <span>V{integration.lastIntegrationVersion}</span>
+                                            <span>PUBLISHED</span>
+                                        </Badge>
+                                    ) : (
+                                        <Badge
+                                            className="flex space-x-1"
+                                            styleType="secondary-filled"
+                                            weight="semibold"
+                                        >
+                                            <span>V{integration.lastIntegrationVersion}</span>
 
-                                        <span>{integration.lastStatus}</span>
-                                    </Badge>
-                                )}
+                                            <span>{integration.lastStatus}</span>
+                                        </Badge>
+                                    )}
+                                </div>
 
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
+                                        <div className="flex min-h-7 items-center text-sm text-content-neutral-secondary sm:mt-0">
                                             {integration.lastPublishedDate ? (
                                                 <span className="text-xs">
                                                     {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
