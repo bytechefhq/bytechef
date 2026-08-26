@@ -36,7 +36,7 @@ test.describe('Projects', () => {
         });
 
         await test.step('Assert that the project is created', async () => {
-            const projectItem = page.getByLabel(projectId);
+            const projectItem = page.getByLabel(projectId, {exact: true});
 
             await expect(projectItem).toBeVisible({timeout: 20000});
         });
@@ -53,7 +53,7 @@ test.describe('Projects', () => {
         await test.step('Create a new project', async () => {
             projectId = await projectsPage.createProject(projectName);
 
-            projectItem = page.getByLabel(projectId);
+            projectItem = page.getByLabel(projectId, {exact: true});
 
             await expect(projectItem).toBeVisible({timeout: 10000});
         });

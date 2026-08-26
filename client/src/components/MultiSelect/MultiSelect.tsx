@@ -213,14 +213,16 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                                     {option?.label ?? option?.value}
                                                 </span>
 
-                                                <XIcon
+                                                <span
                                                     aria-label="remove-option"
-                                                    className="ml-2 size-4 cursor-pointer text-content-neutral-secondary hover:text-destructive"
+                                                    className="ml-2 flex cursor-pointer items-center text-content-neutral-secondary hover:text-destructive"
                                                     onClick={(event) => {
                                                         event.stopPropagation();
                                                         toggleOption(value);
                                                     }}
-                                                />
+                                                >
+                                                    <XIcon className="size-4" />
+                                                </span>
                                             </Badge>
                                         );
                                     })}
@@ -233,14 +235,16 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                         >
                                             {`+ ${selectedValues.length - maxCount} more`}
 
-                                            <XIcon
+                                            <span
                                                 aria-label="clear-extra-options"
-                                                className="ml-2 size-4 cursor-pointer text-content-neutral-secondary hover:text-destructive"
+                                                className="ml-2 flex cursor-pointer items-center text-content-neutral-secondary hover:text-destructive"
                                                 onClick={(event) => {
                                                     event.stopPropagation();
                                                     clearExtraOptions();
                                                 }}
-                                            />
+                                            >
+                                                <XIcon className="size-4" />
+                                            </span>
                                         </Badge>
                                     )}
                                 </div>

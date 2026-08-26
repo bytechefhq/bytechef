@@ -9,6 +9,10 @@ export function propertyTestingParametersSavePromise(page: Page, valueInBody?: s
     return nodeParametersSavePromise({nodeName: 'propertyTesting_1', page, valueInBody});
 }
 
+export function propertyTestingParametersDeletePromise(page: Page) {
+    return nodeParametersSavePromise({method: 'DELETE', nodeName: 'propertyTesting_1', page});
+}
+
 interface FillInputAndWaitForSaveProps {
     input: Locator;
     page: Page;
