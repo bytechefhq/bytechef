@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
@@ -21,6 +22,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ResourceMembershipResolver;
+import com.bytechef.automation.configuration.security.ResourceMembershipResolver.Decision;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
@@ -42,6 +45,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.web.context.request.RequestContextHolder;
 
 /**
@@ -87,7 +91,7 @@ class PermissionServiceTest {
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(projectOwnershipResolver(), workflowOwnershipResolver()), List.of(),
-            permissiveResolver(), List.of());
+            permissiveResolver(), List.of(), mock(ObjectProvider.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -400,6 +404,44 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testIsTenantAdminFalseUnderSkipModeWithoutAdminAuthority() throws Throwable {
+        // isTenantAdmin() on this class never consulted the skip state at all -- it only ever reads the real
+        // authority. Pinned because the SpEL built-in of the same name does short-circuit under skip mode, so the
+        // two are easy to conflate.
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            permissionService::isTenantAdmin);
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testIsCurrentUserGrantedUnderFullSkip() throws Throwable {
+        // Control: full skip mode (the AI-copilot delegation) must keep granting this exactly as before, even for a
+        // mismatched id.
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.isCurrentUser(USER_ID + 1));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
+    void testHasWorkspaceRoleGrantedUnderFullSkip() throws Throwable {
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER"));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
+    void testHasWorkspaceScopeGrantedUnderFullSkip() throws Throwable {
+        // Control: full skip mode (the AI-copilot delegation) must keep granting this exactly as before.
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_DELETE"));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
     void testHasResourceScopeUsesWorkspaceScope() {
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("CONNECTION_DELETE"));
@@ -432,6 +474,17 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testIsResourceOwnerGrantedUnderFullSkipForNonOwner() throws Throwable {
+        // Control: full skip mode (the AI-copilot delegation) must keep granting this exactly as before.
+        PermissionServiceImpl service = createService(resolver("Connection", ResourceOwner.ofUser(USER_ID + 1)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.isResourceOwner("Connection", 1L));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
     void testHasResourceRoleChecksWorkspaceRole() {
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
@@ -447,6 +500,151 @@ class PermissionServiceTest {
         PermissionServiceImpl service = createService(resolver("KnowledgeBase", ResourceOwner.unknown()));
 
         assertThat(service.hasResourceRole(1L, "KnowledgeBase", "VIEWER")).isFalse();
+    }
+
+    @Test
+    void testHasResourceRoleGrantedUnderFullSkip() throws Throwable {
+        PermissionServiceImpl service = createService(
+            resolver("KnowledgeBase", ResourceOwner.ofWorkspace(WORKSPACE_ID)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasResourceRole(1L, "KnowledgeBase", "ADMIN"));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
+    void testHasResourceScopeWorkspaceTypeGrantedUnderFullSkip() throws Throwable {
+        PermissionServiceImpl service = createService(resolver("Workspace", ResourceOwner.ofWorkspace(WORKSPACE_ID)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasResourceScope(WORKSPACE_ID, "Workspace", "CONNECTION_VIEW"));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
+    void testGovernedGrantedGrants() {
+        PermissionServiceImpl service = createService(
+            governedProvider(1L, "Connection", "CONNECTION_VIEW", Decision.GRANTED),
+            resolver("Connection", ResourceOwner.unknown()));
+
+        assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_VIEW")).isTrue();
+    }
+
+    @Test
+    void testGovernedDeniedIsNotRescuedByFullSkip() throws Throwable {
+        PermissionServiceImpl service = createService(
+            governedProvider(1L, "Connection", "CONNECTION_VIEW", Decision.DENIED),
+            resolver("Connection", ResourceOwner.unknown()));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"));
+
+        assertThat(granted).isFalse();
+    }
+
+    /**
+     * Rule 5: a governed principal asking about a resource type the resolver has no predicate for is denied, not handed
+     * to the ordinary path -- even under full skip, which would otherwise grant it.
+     */
+    @Test
+    void testGovernedNotApplicableDeniesEvenUnderFullSkip() throws Throwable {
+        PermissionServiceImpl service = createService(
+            governedProvider(1L, "Connection", "CONNECTION_VIEW", Decision.NOT_APPLICABLE),
+            resolver("Connection", ResourceOwner.ofWorkspace(WORKSPACE_ID)));
+
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"));
+
+        assertThat(granted).isFalse();
+    }
+
+    /**
+     * Rule 2, the blast-radius containment: a principal the resolver does not govern is never resolved and gets
+     * byte-for-byte the answer it got before this seam existed, under skip mode and outside it alike.
+     */
+    @Test
+    void testUngovernedPrincipalGetsThePreSeamAnswer() throws Throwable {
+        ResourceMembershipResolver resourceMembershipResolver = mock(ResourceMembershipResolver.class);
+
+        when(resourceMembershipResolver.governsCurrentPrincipal()).thenReturn(false);
+
+        ObjectProvider<ResourceMembershipResolver> presentProvider = mock(ObjectProvider.class);
+
+        when(presentProvider.getIfAvailable()).thenReturn(resourceMembershipResolver);
+
+        PermissionServiceImpl withResolver = createService(
+            presentProvider, resolver("Connection", ResourceOwner.unknown()));
+        PermissionServiceImpl withoutResolver = createService(resolver("Connection", ResourceOwner.unknown()));
+
+        boolean grantedWithResolver = AutomationAuthorizationContext.callSkippingChecks(
+            () -> withResolver.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"));
+        boolean grantedWithoutResolver = AutomationAuthorizationContext.callSkippingChecks(
+            () -> withoutResolver.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"));
+
+        assertThat(grantedWithResolver).isEqualTo(grantedWithoutResolver);
+        assertThat(grantedWithResolver).isTrue();
+
+        assertThat(withResolver.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"))
+            .isEqualTo(withoutResolver.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"))
+            .isFalse();
+
+        // any(), not anyLong(): the parameter is Serializable, so anyLong() would not match a stray
+        // resolve("workflow-1", ...) and the assertion would pass while the resolver was in fact consulted.
+        verify(resourceMembershipResolver, never()).resolve(any(), anyString(), anyString());
+    }
+
+    /**
+     * Rule 1, the Community Edition case: no resolver bean, so nothing about the pre-seam path changes.
+     */
+    @Test
+    void testAbsentResolverKeepsSkipModeGranting() throws Throwable {
+        ObjectProvider<ResourceMembershipResolver> emptyProvider = mock(ObjectProvider.class);
+
+        when(emptyProvider.getIfAvailable()).thenReturn(null);
+
+        PermissionServiceImpl service = createService(
+            emptyProvider, resolver("Connection", ResourceOwner.unknown()));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasResourceScope(1L, "Connection", "CONNECTION_VIEW"));
+
+        assertThat(granted).isTrue();
+    }
+
+    /**
+     * hasWorkflowScope(...) delegates to hasResourceScope(...), so a governed denial reaches it too -- that delegation
+     * is why the resolver is wired at hasResourceScope rather than at each caller.
+     */
+    @Test
+    void testGovernedDenialReachesHasWorkflowScopeThroughDelegation() throws Throwable {
+        PermissionServiceImpl service = createService(
+            governedProvider("workflow-1", "Workflow", "WORKFLOW_EDIT", Decision.DENIED),
+            resolver("Workflow", ResourceOwner.unknown()));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasWorkflowScope("workflow-1", "WORKFLOW_EDIT"));
+
+        assertThat(granted).isFalse();
+    }
+
+    private static ObjectProvider<ResourceMembershipResolver> governedProvider(
+        Serializable id, String resourceType, String scope, Decision decision) {
+
+        ResourceMembershipResolver resourceMembershipResolver = mock(ResourceMembershipResolver.class);
+
+        when(resourceMembershipResolver.governsCurrentPrincipal()).thenReturn(true);
+        when(resourceMembershipResolver.resolve(id, resourceType, scope)).thenReturn(decision);
+
+        ObjectProvider<ResourceMembershipResolver> objectProvider = mock(ObjectProvider.class);
+
+        when(objectProvider.getIfAvailable()).thenReturn(resourceMembershipResolver);
+
+        return objectProvider;
     }
 
     @Test
@@ -477,9 +675,17 @@ class PermissionServiceTest {
     }
 
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
+        return createService(mock(ObjectProvider.class), resolvers);
+    }
+
+    private PermissionServiceImpl createService(
+        ObjectProvider<ResourceMembershipResolver> resourceMembershipResolverProvider,
+        ResourceOwnershipResolver... resolvers) {
+
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of());
+            workspaceUserRepository, List.of(resolvers), List.of(), permissiveResolver(), List.of(),
+            resourceMembershipResolverProvider);
     }
 
     /**

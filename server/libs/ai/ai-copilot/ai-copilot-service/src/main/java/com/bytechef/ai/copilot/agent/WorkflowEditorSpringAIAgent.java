@@ -29,7 +29,6 @@ import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.util.CopilotToolContextUtils;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
@@ -170,6 +169,12 @@ public class WorkflowEditorSpringAIAgent extends CopilotSpringAIAgent {
         Long userId = NumberUtils.asLong(state.get(CopilotConstants.STATE_AUTHENTICATED_USER_ID));
 
         if (userId == null) {
+            // An embedded connected-user run. Returning without a check here is deliberate, not an omission: the
+            // workflow was already resolved against this user's own ConnectedUserProjectWorkflow row by
+            // ConnectedUserProjectFacadeImpl#prepareCopilotChat before the agent was invoked, keyed on the
+            // authenticated external id and failing closed if that row does not exist. The workflowId in state comes
+            // from that authorized lookup -- the controller overwrites whatever the client sent -- so there is nothing
+            // client-supplied left to re-check on this branch.
             if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication) {
                 return;
             }
@@ -193,20 +198,15 @@ public class WorkflowEditorSpringAIAgent extends CopilotSpringAIAgent {
         }
 
         if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication authentication) {
-            return SecurityUtils.runAs(authentication, () -> callSkippingChecks(action));
+            // The embedded connected-user branch by construction. Nothing is skipped: CopilotSpringAIAgent.run binds
+            // the caller's tenant for the whole run, so ConnectedUserResourceMembershipResolver recognises this
+            // principal on this worker and ResourceMembershipDecider answers every resource-scoped check from the
+            // connected user's own membership. This used to arm a resource-scoped skip mode instead, for the single
+            // reason that the tenant did not reach here and the resolver therefore could not answer.
+            return SecurityUtils.runAs(authentication, action);
         }
 
         return action.get();
-    }
-
-    private static <T> T callSkippingChecks(Supplier<T> action) {
-        try {
-            return AutomationAuthorizationContext.callSkippingChecks(action::get);
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
-        }
     }
 
     private String getSampleOutputs(List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs) {

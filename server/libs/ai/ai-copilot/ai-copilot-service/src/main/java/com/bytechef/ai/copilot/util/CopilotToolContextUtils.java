@@ -67,12 +67,14 @@ public final class CopilotToolContextUtils {
         Authentication authentication = state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
-        // An embedded run carries a connected-user Authentication (no backing platform user) and is authorized by the
-        // embedded request layer, so its @PreAuthorize-gated tools must skip the platform automation RBAC check. This
-        // mirrors WorkflowEditorSpringAIAgent, which bypasses the workflow-scope gate on the same STATE_AUTHENTICATION
-        // signal — but the request thread's skip-checks ThreadLocal does not reach the tool-execution worker threads,
-        // so the flag is carried through the tool context and re-armed by RehydrateContextToolCallback.
-        boolean skipAutomationAuthorization = authentication != null;
+        // The carried Authentication is an embedded connected-user principal (no backing platform user); both
+        // producers of STATE_AUTHENTICATION -- the embedded connected-user copilot controller and
+        // CopilotWorkflowGeneratorImpl, itself reached only from ConnectedUserProjectFacadeImpl -- are the embedded
+        // path. It is carried so RehydrateContextToolCallback can restore it on the tool worker, NOT so anything can
+        // be skipped there: paired with the tenantId below it lets ConnectedUserResourceMembershipResolver recognise
+        // the caller on that worker, and ResourceMembershipDecider then answers each resource-scoped check from the
+        // connected user's own membership. An earlier revision also carried a resource-scoped skip mode alongside it,
+        // needed only while the tenant failed to reach those threads and the resolver could not answer at all.
 
         String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
         String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
@@ -96,7 +98,6 @@ public final class CopilotToolContextUtils {
                 .environmentId(environmentId)
                 .tenantId(tenantId)
                 .authentication(authentication)
-                .skipAutomationAuthorization(skipAutomationAuthorization)
                 .llmProvider(llmProvider)
                 .llmModel(llmModel)
                 .build()

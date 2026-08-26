@@ -25,6 +25,7 @@ import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.util.TestAttachmentUtils;
@@ -40,12 +41,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -102,6 +105,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      * @return an {@link SseEmitter} instance that streams events such as start, error, and result to the client
      */
     @GetMapping(value = "/workflow-tests/{jobId}/attach", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     @SuppressFBWarnings(
         value = "CRLF_INJECTION_LOGS",
         justification = "jobId is Long (no CRLF), exception messages sanitized with StringUtils.sanitize")
@@ -180,8 +184,15 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      */
     @Override
     @PostMapping(value = "/workflow-tests/{jobId}/stop")
+    @PreAuthorize("hasPermission(T(org.apache.commons.lang3.math.NumberUtils).toLong(#jobId, -1L), 'Job', "
+        + "'EXECUTION_VIEW')")
     public ResponseEntity<Void> stopWorkflowTest(@PathVariable String jobId) {
-        if (!jobId.matches("\\d+")) {
+        // Genuinely reachable, not defense in depth: the @PreAuthorize gate above resolves a malformed/overflowing
+        // jobId to -1 via NumberUtils.toLong(#jobId, -1L) and calls hasPermission with that fallback, not with the
+        // original string. For a tenant admin, hasResourceScope short-circuits on isTenantAdmin() before resolving
+        // an owner, so it permits -1 just like any other id. This guard is what turns that permitted-but-unparseable
+        // jobId into a clean 400 instead of Long.parseLong(jobId) throwing NumberFormatException below.
+        if (NumberUtils.toLong(jobId, -1L) < 0) {
             return ResponseEntity.badRequest()
                 .build();
         }
@@ -219,9 +230,30 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     @PostMapping(
         value = "/workflows/{id}/tests", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    // Gates the environment the caller asked to run in, not just the workflow. A workflow has no environment of its
+    // own, so hasPermission(#id, 'Workflow', ...) unions the environments the caller can reach and would let a member
+    // who is editor in Development start a run against Production by changing this request parameter alone.
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#id, 'WORKFLOW_EDIT', #environmentId)")
     public SseEmitter startWorkflowTest(
         @PathVariable String id, @RequestParam("environmentId") Long environmentId,
         @Nullable @RequestBody TestWorkflowRequest testWorkflowRequest) {
+
+        // The environment the run ACTUALLY happens in, resolved the same way hasWorkflowScopeInEnvironment above
+        // resolved the one it authorised. For an api-key principal -- an embedded connected user, an embedded MCP
+        // caller -- the request parameter is inert and the principal's own environment wins; for a session principal
+        // the parameter is honoured unchanged. Gating one environment and executing in another is the bug, so these
+        // two must not be able to disagree.
+        //
+        // Resolved HERE, on the request thread, not inside executeAsync's worker: the SecurityContext does not travel
+        // to it, so resolving there would read an empty context, silently fall back to the parameter, and reinstate
+        // exactly the hole this closes.
+        // Required by the @RequestParam contract, so Spring rejects a missing one before this runs -- checked
+        // explicitly all the same, because the alternative is an unboxing NPE surfacing as a 500 if that ever changes.
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
 
         Map<String, Object> inputs = getInputs(testWorkflowRequest);
 
@@ -252,7 +284,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         SseEmitter emitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         testWorkflowExecutor.executeAsync(
-            id, inputs, environmentId, (key) -> registerEmitter(key, emitter), WebhookSseStreamBridge::new,
+            id, inputs, effectiveEnvironmentId, (key) -> registerEmitter(key, emitter), WebhookSseStreamBridge::new,
             workflowExecutions::put, this::whenComplete);
 
         return emitter;

@@ -17,7 +17,6 @@
 package com.bytechef.ai.copilot.tool;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -121,26 +120,17 @@ public final class RehydrateContextToolCallback implements ToolCallback {
     }
 
     private String withSecurityContext(AgentToolInvocationContext invocationContext, Supplier<String> action) {
-        Supplier<String> guardedAction = invocationContext.skipAutomationAuthorization()
-            ? () -> callSkippingChecks(action)
-            : action;
-
+        // Nothing is skipped here. An embedded connected user's tools are authorized for real on this worker: the
+        // tenant bound by withTenant above lets ConnectedUserResourceMembershipResolver recognise the restored
+        // principal, and ResourceMembershipDecider then answers each resource-scoped check from that user's own
+        // membership. A carried resource-scoped skip mode used to be re-armed at this point, needed only while the
+        // tenant did not reach here and the resolver could not answer.
         Authentication authentication = invocationContext.authentication();
 
         if (authentication != null) {
-            return SecurityUtils.runAs(authentication, guardedAction);
+            return SecurityUtils.runAs(authentication, action);
         }
 
-        return securityContextRehydrator.withUserSecurityContext(invocationContext.userId(), guardedAction);
-    }
-
-    private static String callSkippingChecks(Supplier<String> action) {
-        try {
-            return AutomationAuthorizationContext.callSkippingChecks(action::get);
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
-        }
+        return securityContextRehydrator.withUserSecurityContext(invocationContext.userId(), action);
     }
 }

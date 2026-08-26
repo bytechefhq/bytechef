@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.web.context.request.RequestContextHolder;
 
 /**
@@ -70,7 +72,8 @@ class PermissionServiceEnvironmentTest {
 
         permissionService = new PermissionServiceImpl(
             new CurrentUserResolver(userService), permissionScopeRegistry, projectRepository,
-            workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(), permissiveResolver(), List.of());
+            workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(), permissiveResolver(),
+            List.of(), mock(ObjectProvider.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -193,12 +196,31 @@ class PermissionServiceEnvironmentTest {
     }
 
     @Test
+    void testHasWorkspaceScopeInEnvironmentGrantedUnderSkipMode() throws Throwable {
+        // Left unstubbed on purpose: a real evaluation denies (no scope granted), so this only stays true because
+        // skip mode short-circuits it. Skip mode is the @SkipAutomationAuthorization delegation, which
+        // SkipAutomationAuthorizationAspect declines to arm for an embedded connected user.
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceScope(WORKSPACE_ID, "WORKFLOW_EDIT", Environment.PRODUCTION));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
+    void testHasWorkspaceScopeInEveryEnvironmentGrantedUnderSkipMode() throws Throwable {
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
     void testByIdCheckUsesTheResourcesOwnEnvironment() {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
-            List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)));
+            List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)), mock(ObjectProvider.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_VIEW"));
@@ -218,7 +240,7 @@ class PermissionServiceEnvironmentTest {
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()), List.of(), permissiveResolver(),
-            List.of(deploymentEnvironmentResolver(null)));
+            List.of(deploymentEnvironmentResolver(null)), mock(ObjectProvider.class));
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));

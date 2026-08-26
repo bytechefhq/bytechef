@@ -17,6 +17,7 @@
 package com.bytechef.ai.copilot.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
@@ -139,7 +140,12 @@ class RehydrateContextToolCallbackTest {
     }
 
     @Test
-    void testReArmsSkipChecksInsideCallThenRestores() {
+    void testNeverArmsSkipChecksForACarriedConnectedUserAuthentication() {
+        // Ticket 1051 Stage 4. This wrapper used to re-arm a resource-scoped skip mode carried from the request
+        // thread, because TenantContext did not reach the tool worker and ConnectedUserResourceMembershipResolver
+        // therefore could not recognise the connected user here. withTenant above now binds it, so the resolver
+        // governs and ResourceMembershipDecider answers each check from the caller's own membership -- there is
+        // nothing left for a skip mode to do, and arming one would hand a connected user grants membership refuses.
         TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
         SecurityContextHolder.clearContext();
 
@@ -147,18 +153,46 @@ class RehydrateContextToolCallbackTest {
 
         ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken("captured-user", "");
+        Authentication authentication = new UsernamePasswordAuthenticationToken("connected-user", "");
 
         Map<String, Object> map =
-            new AgentToolInvocationContext(null, null, null, null, "acme", authentication, true).toToolContext();
+            new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext();
 
         String result = wrapped.call("{}", new ToolContext(map));
 
         assertThat(result).isEqualTo("ok");
-        // The embedded skip-authorization flag is re-armed on the worker thread for the duration of the delegate call.
-        assertThat(probe.skipChecksSeenInside).isTrue();
-        // ... and the ThreadLocal returns to its fail-closed default afterward.
+        assertThat(probe.authenticationSeenInside).isSameAs(authentication);
+        assertThat(probe.tenantSeenInside).isEqualTo("acme");
+
+        // Nothing is skipped on the worker, for this principal or any other.
+        assertThat(probe.skipChecksSeenInside).isFalse();
         assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+    }
+
+    @Test
+    void testDoesNotInheritAnOuterSkipModeFromTheDispatchingThread() {
+        // The thread-local does not propagate to a worker, and this wrapper adds nothing back: a caller that happened
+        // to be inside callSkippingChecks when it built the tool context grants the delegate nothing.
+        TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
+        SecurityContextHolder.clearContext();
+
+        ProbeToolCallback probe = new ProbeToolCallback();
+
+        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken("connected-user", "");
+
+        Map<String, Object> map =
+            new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext();
+
+        Thread thread = new Thread(() -> wrapped.call("{}", new ToolContext(map)));
+
+        assertThatCode(() -> {
+            thread.start();
+            thread.join();
+        }).doesNotThrowAnyException();
+
+        assertThat(probe.skipChecksSeenInside).isFalse();
     }
 
     @Test

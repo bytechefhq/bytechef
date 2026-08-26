@@ -32,6 +32,7 @@ import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import java.util.ArrayList;
@@ -140,17 +141,31 @@ class WorkflowEditorSpringAIAgentTest {
     }
 
     @Test
-    void testCreateSystemMessageBypassesScopeCheckForEmbeddedRun() throws Exception {
+    void testCreateSystemMessageSkipsNothingForEmbeddedRun() throws Exception {
         Workflow workflow = mock(Workflow.class);
 
         when(workflow.getDefinition()).thenReturn("{}");
         when(workflowService.getWorkflow("wf-1")).thenReturn(workflow);
-        when(workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs("wf-1", null, 0)).thenReturn(List.of());
+
+        // Ticket 1051 Stage 4. This branch used to arm a resource-scoped skip mode around the delegated read,
+        // because TenantContext did not reach the agent worker and ConnectedUserResourceMembershipResolver could not
+        // recognise the connected user. CopilotSpringAIAgent.run now binds the tenant for the whole run, so the
+        // resolver governs and the WORKFLOW_VIEW gate on getPreviousWorkflowNodeOutputs is answered from the
+        // connected user's own membership. Probing from inside the read is what pins that nothing is armed.
+        AtomicBoolean skipInside = new AtomicBoolean(true);
+
+        when(workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs("wf-1", null, 0))
+            .thenAnswer(invocation -> {
+                skipInside.set(AutomationAuthorizationContext.isSkipChecks());
+
+                return List.of();
+            });
 
         WorkflowEditorSpringAIAgent agent = newAgent();
 
         // Embedded run: no platform user id, but the full Authentication is carried in STATE_AUTHENTICATION. The
-        // embedded request layer already authorized the connected user, so the platform scope gate is bypassed.
+        // embedded request layer already resolved this workflow against the connected user's own
+        // ConnectedUserProjectWorkflow row, so the agent's own hasWorkflowScope gate does not re-derive it.
         Map<String, Object> stateMap = new HashMap<>();
 
         stateMap.put("workflowId", "wf-1");
@@ -163,6 +178,8 @@ class WorkflowEditorSpringAIAgentTest {
 
         verify(permissionService, never()).hasWorkflowScope(anyString(), anyString());
         verify(workflowService).getWorkflow("wf-1");
+
+        assertThat(skipInside).isFalse();
     }
 
     @Test

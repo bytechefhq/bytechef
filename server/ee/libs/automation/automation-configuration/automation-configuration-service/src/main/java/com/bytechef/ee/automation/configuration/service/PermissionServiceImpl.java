@@ -11,6 +11,9 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
+import com.bytechef.automation.configuration.security.ResourceMembershipDecider;
+import com.bytechef.automation.configuration.security.ResourceMembershipDecider.Outcome;
+import com.bytechef.automation.configuration.security.ResourceMembershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -34,6 +37,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +62,7 @@ public class PermissionServiceImpl implements PermissionService {
     private final Map<String, ResourceEnvironmentResolver> resourceEnvironmentResolvers;
     private final Map<String, ResourceOwnershipResolver> resourceOwnershipResolvers;
     private final Map<String, ResourceVisibilityProvider> resourceVisibilityProviders;
+    private final ObjectProvider<ResourceMembershipResolver> resourceMembershipResolverProvider;
     private final ResourceVisibilityResolver resourceVisibilityResolver;
 
     @SuppressFBWarnings({
@@ -70,7 +75,8 @@ public class PermissionServiceImpl implements PermissionService {
         List<ResourceOwnershipResolver> resourceOwnershipResolvers,
         List<ResourceVisibilityProvider> resourceVisibilityProviders,
         ResourceVisibilityResolver resourceVisibilityResolver,
-        List<ResourceEnvironmentResolver> resourceEnvironmentResolvers) {
+        List<ResourceEnvironmentResolver> resourceEnvironmentResolvers,
+        ObjectProvider<ResourceMembershipResolver> resourceMembershipResolverProvider) {
 
         this.currentUserResolver = currentUserResolver;
         this.permissionScopeRegistry = permissionScopeRegistry;
@@ -82,6 +88,7 @@ public class PermissionServiceImpl implements PermissionService {
         this.resourceVisibilityProviders = resourceVisibilityProviders.stream()
             .collect(Collectors.toMap(ResourceVisibilityProvider::resourceType, Function.identity()));
         this.resourceVisibilityResolver = resourceVisibilityResolver;
+        this.resourceMembershipResolverProvider = resourceMembershipResolverProvider;
 
         this.resourceEnvironmentResolvers = resourceEnvironmentResolvers.stream()
             .collect(Collectors.toMap(ResourceEnvironmentResolver::resourceType, Function.identity()));
@@ -217,6 +224,18 @@ public class PermissionServiceImpl implements PermissionService {
      */
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
+        // Ticket 1051: like the hasWorkflowScope(..., Environment) overload, this one inlines its check rather than
+        // delegating to hasResourceScope, so the decider wired there does not reach it. Its only caller today is
+        // AutomationPermissionEvaluator's ProjectDeploymentDTO branch, which consults the decider first -- but nothing
+        // enforces that it stays the only caller, and a skip granting a Project-keyed check to a connected user is
+        // exactly what this stage exists to close. Idempotent for that caller, since it will already have returned.
+        Outcome outcome = ResourceMembershipDecider.decide(
+            resourceMembershipResolverProvider, projectId, "Project", scope);
+
+        if (outcome != Outcome.NOT_GOVERNED) {
+            return outcome == Outcome.GRANT;
+        }
+
         if (isAutomationAuthorizationSkipped()) {
             return true;
         }
@@ -242,6 +261,24 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasResourceScope(Serializable id, String resourceType, String scope) {
+        // Ticket 1051: a principal ResourceMembershipResolver governs is answered from its own membership, ahead of
+        // the skip check, the tenant-admin check and the RBAC path below -- @SkipAutomationAuthorization grants such a
+        // principal nothing. This delegation point covers every caller that reaches hasResourceScope, including
+        // hasWorkflowScope(...) and the two-argument hasWorkspaceScopeForProject(...) overload. See
+        // ResourceMembershipDecider for the precedence rule; rules 1 and 2 there keep Community Edition and every
+        // non-connected-user principal on exactly the path below.
+        //
+        // NOT a coverage guarantee for this class: hasWorkflowScope(String, String, Environment) and
+        // hasWorkspaceScopeForProject(long, String, Environment) deliberately do not route through here (delegating
+        // would discard the explicit environment), so each consults the decider on its own account. A new
+        // Environment-taking overload must do the same.
+        Outcome outcome = ResourceMembershipDecider.decide(
+            resourceMembershipResolverProvider, id, resourceType, scope);
+
+        if (outcome != Outcome.NOT_GOVERNED) {
+            return outcome == Outcome.GRANT;
+        }
+
         if (isAutomationAuthorizationSkipped()) {
             return true;
         }
@@ -315,6 +352,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isResourceOwner(String resourceType, long id) {
+        // Ownership gates sharing/ownership management (connection credential replacement, connection/project
+        // access grants, signing-key ownership). An embedded connected user has none of it and never reaches this
+        // short circuit: SkipAutomationAuthorizationAspect arms nothing for a principal the membership seam governs.
         if (isAutomationAuthorizationSkipped()) {
             return true;
         }
@@ -337,6 +377,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasResourceRole(long id, String resourceType, String minimumRole) {
+        // Resolves to hasWorkspaceRole(...) below. It is the other half of the isResourceOwner(...) ||
+        // hasResourceRole(..., 'ADMIN') sharing gates used across the connection/project facades, so it must be
+        // exactly as hard to reach as isResourceOwner above.
         if (isAutomationAuthorizationSkipped()) {
             return true;
         }
@@ -366,6 +409,53 @@ public class PermissionServiceImpl implements PermissionService {
         // A workflow-keyed check is a resource-scope check on the workflow: routing through hasResourceScope gives it
         // the visibility precondition, and WorkflowVisibilityProvider redirects the lookup to the owning project.
         return hasResourceScope(workflowId, "Workflow", scope);
+    }
+
+    /**
+     * Mirrors the environment-unaware overload — same check kind, same short circuits, same visibility precondition —
+     * and differs only in checking the caller's role for {@code environment} instead of unioning every environment they
+     * can reach. A tenant admin is deliberately not subject to per-environment roles.
+     */
+    @Override
+    public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
+        // Ticket 1051: this overload deliberately does NOT delegate to hasResourceScope (that would discard the
+        // explicit environment), so the decider wired there does not cover it. Consulted here too, so the direct
+        // @permissionService.hasWorkflowScope(...) bean path is governed even when
+        // AutomationMethodSecurityExpressionRoot -- which consults the decider on its own account -- is not the caller.
+        // Idempotent when it is: the root will already have returned for a governed principal.
+        Outcome outcome = ResourceMembershipDecider.decide(
+            resourceMembershipResolverProvider, workflowId, "Workflow", scope);
+
+        if (outcome != Outcome.NOT_GOVERNED) {
+            return outcome == Outcome.GRANT;
+        }
+
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        if (!isResourceVisible(workflowId, "Workflow")) {
+            return false;
+        }
+
+        ResourceOwnershipResolver resourceOwnershipResolver = resourceOwnershipResolvers.get("Workflow");
+
+        if (resourceOwnershipResolver == null) {
+            return false;
+        }
+
+        OptionalLong workspaceId = resourceOwnershipResolver.resolveOwner(workflowId)
+            .workspaceId();
+
+        if (workspaceId.isEmpty()) {
+            return false;
+        }
+
+        return hasWorkspaceScope(workspaceId.getAsLong(), scope, environment);
     }
 
     @Override

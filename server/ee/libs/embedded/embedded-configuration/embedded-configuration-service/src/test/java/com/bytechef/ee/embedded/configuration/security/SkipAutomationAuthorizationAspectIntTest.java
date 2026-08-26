@@ -31,6 +31,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.springframework.test.context.TestPropertySource;
 
+/**
+ * {@code SkipAutomationAuthorizationAspect} in a context with NO {@code ResourceMembershipResolver} bean — Community
+ * Edition, and any deployment whose resolver is unavailable. The aspect must arm full skip exactly as it always did.
+ * {@code SkipAutomationAuthorizationAspectGovernedPrincipalIntTest} covers the resolver-present contexts.
+ */
 @SpringBootTest(classes = SkipAutomationAuthorizationAspectIntTest.Config.class)
 @TestPropertySource(properties = "bytechef.edition=ee")
 class SkipAutomationAuthorizationAspectIntTest {

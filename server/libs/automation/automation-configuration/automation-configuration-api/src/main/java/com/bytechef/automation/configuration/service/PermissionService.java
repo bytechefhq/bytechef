@@ -26,8 +26,10 @@ import java.util.Set;
  * root built-ins {@code isCurrentUser}/{@code isTenantAdmin}/{@code isResourceOwner} and the {@code hasPermission(...)}
  * scope/role tokens). The EE implementation enforces real workspace-role, scope and ownership checks; the CE
  * implementation is a permissive pass-through (except {@link #isTenantAdmin()}). EE checks short-circuit to
- * {@code true} when {@code AutomationAuthorizationContext.isSkipChecks()} is set or the user is a tenant admin, and
- * otherwise fail closed.
+ * {@code true} when the user is a tenant admin, or when {@code AutomationAuthorizationContext} skip mode is active,
+ * which bypasses every check for the duration of a delegation. An embedded connected user reaches neither
+ * short-circuit: every resource-scoped check for such a principal is answered by {@code ResourceMembershipDecider}
+ * ahead of both. See {@code AutomationAuthorizationContext}'s Javadoc.
  *
  * @author Ivica Cardic
  */
@@ -174,6 +176,25 @@ public interface PermissionService {
      * @return {@code true} if the current user holds {@code scope} in the workflow's workspace
      */
     boolean hasWorkflowScope(String workflowId, String scope);
+
+    /**
+     * Returns whether the current user has {@code scope} in the workflow's owning workspace <em>for the environment the
+     * operation acts on</em>, and may see the project the workflow belongs to.
+     * <p>
+     * A workflow does not live in an environment — the environment is a parameter of the operation, not a property of
+     * the resource — so no {@code ResourceEnvironmentResolver} can supply it and the environment-unaware overload
+     * necessarily unions the environments the caller can reach. Use this overload wherever the caller supplies the
+     * environment to run in, so that a member who is editor in one environment cannot act in another.
+     * <p>
+     * The environment must come from the guarded method's own arguments, never from {@code EnvironmentContext}, which
+     * holds the source environment during a promotion and is lost on worker threads.
+     *
+     * @param workflowId  the workflow whose owning workspace is checked
+     * @param scope       the scope name the user must hold in that workspace
+     * @param environment the environment the operation acts on
+     * @return {@code true} if the current user holds {@code scope} in the workflow's workspace for {@code environment}
+     */
+    boolean hasWorkflowScope(String workflowId, String scope, Environment environment);
 
     /**
      * Returns the scope names the current user holds in the workspace (all registered scopes for a tenant admin).
