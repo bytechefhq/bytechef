@@ -20,6 +20,8 @@ import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/prop
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
+import {reconstructControlledExpressionValue} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/controlledExpressionValue';
+import {getMentionsInputPlaceholder} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/mentionsInputPlaceholder';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
@@ -135,7 +137,6 @@ const Property = ({
         propertyParameterValue,
         required,
         selectValue,
-        setDataPillPanelOpen,
         setIsFormulaMode,
         setLookupDependsOnValues,
         setSelectValue,
@@ -332,62 +333,44 @@ const Property = ({
                                     isToolsClusterElement &&
                                     (controlledFromAi !== undefined ? controlledFromAi : valueIsFromAi);
 
-                                const isExpressionMode = displayValue.startsWith('=');
-                                const strippedDisplayValue = isExpressionMode
-                                    ? displayValue.substring(1)
-                                    : displayValue;
-                                const strippedFromAiValue = fromAiExpression.startsWith('=')
-                                    ? fromAiExpression.substring(1)
-                                    : fromAiExpression;
-
-                                const {onChange: fieldOnChange, ...fieldRest} = field;
+                                const {onChange: fieldOnChange} = field;
 
                                 return (
-                                    <PropertyInput
-                                        {...fieldRest}
+                                    <PropertyMentionsInput
+                                        controlType={controlType || 'TEXT'}
                                         deletePropertyButton={deletePropertyButton}
                                         description={description}
-                                        disabled={isFieldFromAi}
+                                        disableAutoSave
                                         error={hasError}
                                         errorMessage={errorMessage}
-                                        expressionPrefix
+                                        expressionEnabled={expressionEnabled}
+                                        handleFromAiClick={
+                                            isToolsClusterElement
+                                                ? (fromAi) => handleFromAiToggle(fromAi, fieldOnChange)
+                                                : undefined
+                                        }
                                         handleInputTypeSwitchButtonClick={() => {
                                             fieldOnChange('');
                                             handleControlledModeSwitch(false);
                                         }}
-                                        inputOverlay={
-                                            isFieldFromAi ? (
-                                                <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
-                                                    Automatically defined by the model
-                                                </span>
-                                            ) : undefined
-                                        }
+                                        isFormulaMode
+                                        isFromAi={isFieldFromAi}
                                         label={label || name}
-                                        leadingIcon={
-                                            isExpressionMode || isFieldFromAi ? (
-                                                <SquareFunctionIcon className="size-4" />
-                                            ) : (
-                                                typeIcon
-                                            )
+                                        leadingIcon={typeIcon}
+                                        onValueChange={(value) =>
+                                            fieldOnChange(reconstructControlledExpressionValue(value))
                                         }
-                                        mentionInput
-                                        onChange={(event) => {
-                                            fieldOnChange(resolveExpressionValue(event.target.value, field.value));
-                                        }}
-                                        onFocus={() => setDataPillPanelOpen(true)}
-                                        placeholder="Use '=' for an expression"
+                                        path={calculatedPath}
+                                        placeholder={getMentionsInputPlaceholder({
+                                            expressionEnabled,
+                                            toolProperty: isToolsClusterElement,
+                                        })}
                                         required={required}
+                                        setIsFormulaMode={() => {}}
                                         showInputTypeSwitchButton
-                                        trailingAction={
-                                            isToolsClusterElement && expressionEnabled !== false ? (
-                                                <FromAiToggleButton
-                                                    isFromAi={!!isFieldFromAi}
-                                                    onToggle={(fromAi) => handleFromAiToggle(fromAi, fieldOnChange)}
-                                                />
-                                            ) : undefined
-                                        }
-                                        type={hidden ? 'hidden' : 'text'}
-                                        value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
+                                        toolProperty={isToolsClusterElement}
+                                        type={type}
+                                        value={displayValue}
                                     />
                                 );
                             }}
@@ -493,88 +476,120 @@ const Property = ({
 
                                     return (
                                         <>
-                                            <PropertyInput
-                                                {...fieldRest}
-                                                deletePropertyButton={deletePropertyButton}
-                                                description={description}
-                                                disabled={isFieldFromAi}
-                                                error={!!fieldState.error || !!controlledBlurError}
-                                                errorMessage={fieldState.error?.message || controlledBlurError}
-                                                expressionPrefix={showFromAi}
-                                                fieldsetClassName={objectName && arrayName && 'ml-2'}
-                                                handleInputTypeSwitchButtonClick={
-                                                    showControlledSwitch
-                                                        ? () => {
-                                                              fieldOnChange('=');
-                                                              handleControlledModeSwitch(true);
-                                                          }
-                                                        : undefined
-                                                }
-                                                inputOverlay={
-                                                    isFieldFromAi ? (
-                                                        <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
-                                                            Automatically defined by the model
-                                                        </span>
-                                                    ) : undefined
-                                                }
-                                                label={label || name}
-                                                leadingIcon={
-                                                    isExpressionMode || isFieldFromAi ? (
-                                                        <SquareFunctionIcon className="size-4" />
-                                                    ) : (
-                                                        typeIcon
-                                                    )
-                                                }
-                                                max={maxValue}
-                                                maxLength={maxLength}
-                                                min={minValue}
-                                                minLength={minLength}
-                                                onBlur={() => {
-                                                    field.onBlur();
+                                            {showFromAi && (isExpressionMode || isFieldFromAi) ? (
+                                                <PropertyMentionsInput
+                                                    controlType={controlType || 'TEXT'}
+                                                    deletePropertyButton={deletePropertyButton}
+                                                    description={description}
+                                                    disableAutoSave
+                                                    error={!!fieldState.error || !!controlledBlurError}
+                                                    errorMessage={fieldState.error?.message || controlledBlurError}
+                                                    expressionEnabled={expressionEnabled}
+                                                    handleFromAiClick={(fromAi) =>
+                                                        handleFromAiToggle(fromAi, fieldOnChange)
+                                                    }
+                                                    isFormulaMode
+                                                    isFromAi={isFieldFromAi}
+                                                    label={label || name}
+                                                    leadingIcon={typeIcon}
+                                                    onValueChange={(value) =>
+                                                        fieldOnChange(reconstructControlledExpressionValue(value))
+                                                    }
+                                                    path={calculatedPath}
+                                                    placeholder={getMentionsInputPlaceholder({
+                                                        expressionEnabled,
+                                                        toolProperty: true,
+                                                    })}
+                                                    required={required}
+                                                    setIsFormulaMode={() => {}}
+                                                    toolProperty
+                                                    type={type}
+                                                    value={displayValue}
+                                                />
+                                            ) : (
+                                                <PropertyInput
+                                                    {...fieldRest}
+                                                    deletePropertyButton={deletePropertyButton}
+                                                    description={description}
+                                                    disabled={isFieldFromAi}
+                                                    error={!!fieldState.error || !!controlledBlurError}
+                                                    errorMessage={fieldState.error?.message || controlledBlurError}
+                                                    expressionPrefix={showFromAi}
+                                                    fieldsetClassName={objectName && arrayName && 'ml-2'}
+                                                    handleInputTypeSwitchButtonClick={
+                                                        showControlledSwitch
+                                                            ? () => {
+                                                                  fieldOnChange('=');
+                                                                  handleControlledModeSwitch(true);
+                                                              }
+                                                            : undefined
+                                                    }
+                                                    inputOverlay={
+                                                        isFieldFromAi ? (
+                                                            <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
+                                                                Automatically defined by the model
+                                                            </span>
+                                                        ) : undefined
+                                                    }
+                                                    label={label || name}
+                                                    leadingIcon={
+                                                        isExpressionMode || isFieldFromAi ? (
+                                                            <SquareFunctionIcon className="size-4" />
+                                                        ) : (
+                                                            typeIcon
+                                                        )
+                                                    }
+                                                    max={maxValue}
+                                                    maxLength={maxLength}
+                                                    min={minValue}
+                                                    minLength={minLength}
+                                                    onBlur={() => {
+                                                        field.onBlur();
 
-                                                    handleControlledBlur(field.value);
-                                                }}
-                                                onChange={(event) => {
-                                                    if (!showFromAi) {
-                                                        if (isNumericalInput && event.target.value !== '') {
-                                                            fieldOnChange(
-                                                                type === 'INTEGER'
-                                                                    ? parseInt(event.target.value, 10)
-                                                                    : parseFloat(event.target.value)
-                                                            );
-                                                        } else {
-                                                            fieldOnChange(event);
+                                                        handleControlledBlur(field.value);
+                                                    }}
+                                                    onChange={(event) => {
+                                                        if (!showFromAi) {
+                                                            if (isNumericalInput && event.target.value !== '') {
+                                                                fieldOnChange(
+                                                                    type === 'INTEGER'
+                                                                        ? parseInt(event.target.value, 10)
+                                                                        : parseFloat(event.target.value)
+                                                                );
+                                                            } else {
+                                                                fieldOnChange(event);
+                                                            }
+
+                                                            return;
                                                         }
 
-                                                        return;
+                                                        fieldOnChange(
+                                                            resolveExpressionValue(event.target.value, field.value)
+                                                        );
+                                                    }}
+                                                    placeholder={
+                                                        isNumericalInput && minValue && maxValue
+                                                            ? `From ${minValue} to ${maxValue}`
+                                                            : placeholder ||
+                                                              `Type ${isNumericalInput ? 'a number' : 'something'}...`
                                                     }
-
-                                                    fieldOnChange(
-                                                        resolveExpressionValue(event.target.value, field.value)
-                                                    );
-                                                }}
-                                                placeholder={
-                                                    isNumericalInput && minValue && maxValue
-                                                        ? `From ${minValue} to ${maxValue}`
-                                                        : placeholder ||
-                                                          `Type ${isNumericalInput ? 'a number' : 'something'}...`
-                                                }
-                                                required={required}
-                                                showInputTypeSwitchButton={showControlledSwitch}
-                                                title={type}
-                                                trailingAction={
-                                                    showFromAi && expressionEnabled !== false ? (
-                                                        <FromAiToggleButton
-                                                            isFromAi={!!isFieldFromAi}
-                                                            onToggle={(fromAi) =>
-                                                                handleFromAiToggle(fromAi, fieldOnChange)
-                                                            }
-                                                        />
-                                                    ) : undefined
-                                                }
-                                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                                value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
-                                            />
+                                                    required={required}
+                                                    showInputTypeSwitchButton={showControlledSwitch}
+                                                    title={type}
+                                                    trailingAction={
+                                                        showFromAi && expressionEnabled !== false ? (
+                                                            <FromAiToggleButton
+                                                                isFromAi={!!isFieldFromAi}
+                                                                onToggle={(fromAi) =>
+                                                                    handleFromAiToggle(fromAi, fieldOnChange)
+                                                                }
+                                                            />
+                                                        ) : undefined
+                                                    }
+                                                    type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                                    value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
+                                                />
+                                            )}
 
                                             {!!options?.length && (
                                                 <PropertySelect
