@@ -16,6 +16,7 @@ import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -75,6 +76,20 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
 
     @Override
     public PropertyCopilotResult generate(PropertyCopilotRequest request) {
+        // PropertyCopilotFacadeImpl's guard is hasWorkspaceScopeForProject(projectId, 'WORKFLOW_VIEW') --
+        // environment-agnostic (the two-argument overload, not the one that takes an Environment) -- so the
+        // client-supplied request.environmentId() is never checked. Resolved here, on the request thread, and
+        // substituted into the request used for the rest of this call (EnvironmentContext, the @Cacheable
+        // getPreviousWorkflowNode{Outputs,SampleOutputs} reads below) so a confined principal cannot read another
+        // environment's previous-step outputs by naming it. See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(request.environmentId());
+
+        if (effectiveEnvironmentId != request.environmentId()) {
+            request = new PropertyCopilotRequest(
+                request.prompt(), request.mode(), request.workflowId(), request.workflowNodeName(),
+                request.propertyPath(), request.propertyType(), request.dynamic(), effectiveEnvironmentId);
+        }
+
         Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
 
         EnvironmentContext.set((int) request.environmentId());

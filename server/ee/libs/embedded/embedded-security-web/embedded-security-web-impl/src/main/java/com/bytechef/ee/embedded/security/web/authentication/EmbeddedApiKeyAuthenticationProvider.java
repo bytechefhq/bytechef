@@ -54,7 +54,12 @@ public class EmbeddedApiKeyAuthenticationProvider implements AuthenticationProvi
         ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)
             .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
-        return new EmbeddedApiKeyAuthenticationToken(createSpringSecurityUser(externalUserId, connectedUser));
+        // Carries environmentId and externalUserId into the authenticated token. ApiKeyAuthenticationFilter stores
+        // THIS token in the SecurityContext, not the converter's, so anything downstream that needs the caller's
+        // environment can only get it from here -- and dropping it left the principal silently claiming ordinal 0
+        // (DEVELOPMENT) for every connected user in every environment.
+        return new EmbeddedApiKeyAuthenticationToken(
+            environmentId, createSpringSecurityUser(externalUserId, connectedUser));
     }
 
     @Override

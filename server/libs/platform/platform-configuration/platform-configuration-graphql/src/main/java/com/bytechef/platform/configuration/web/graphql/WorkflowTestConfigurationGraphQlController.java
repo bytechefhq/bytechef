@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,9 +44,12 @@ class WorkflowTestConfigurationGraphQlController {
         @Argument String clusterElementWorkflowNodeName, @Argument String workflowConnectionKey,
         @Argument long connectionId, @Argument long environmentId) {
 
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         workflowTestConfigurationFacade.saveClusterElementTestConfigurationConnection(
             workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, workflowConnectionKey,
-            connectionId, environmentId);
+            connectionId, effectiveEnvironmentId);
 
         return true;
     }
@@ -56,8 +60,12 @@ class WorkflowTestConfigurationGraphQlController {
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String workflowConnectionKey,
         @Argument long connectionId, @Argument long environmentId) {
 
+        // Same gap as saveClusterElementTestConfigurationConnection above: neither gate checks environmentId. See
+        // PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, connectionId, environmentId);
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, effectiveEnvironmentId);
 
         return true;
     }

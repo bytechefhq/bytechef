@@ -44,6 +44,17 @@ public class EmbeddedMcpServerOAuth2AuthenticationToken extends AbstractApiKeyAu
         super(user);
     }
 
+    /**
+     * The authenticated form. Carries the environment forward: this token lands in the {@code SecurityContext}, and
+     * ticket 1051's {@code ConnectedUserResourceMembershipResolver} decides whether a principal is a connected user --
+     * and in which environment -- from exactly that. Built with the {@code User}-only constructor above it would report
+     * ordinal 0 (DEVELOPMENT) for every caller.
+     */
+    @SuppressFBWarnings("EI")
+    public EmbeddedMcpServerOAuth2AuthenticationToken(long environmentId, User user) {
+        super(environmentId, user);
+    }
+
     public String getExternalUserId() {
         return externalUserId;
     }

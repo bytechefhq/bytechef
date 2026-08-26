@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.dto.WorkflowNodeTestOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -44,12 +45,16 @@ class WorkflowNodeTestOutputGraphQlController {
         @Argument String clusterElementWorkflowNodeName, @Argument long environmentId,
         @Argument Map<String, Object> inputParameters) {
 
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         WorkflowNodeTestOutput workflowNodeTestOutput = inputParameters != null
             ? workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                 workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, inputParameters,
-                environmentId)
+                effectiveEnvironmentId)
             : workflowNodeTestOutputFacade.saveClusterElementTestOutput(
-                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName, environmentId);
+                workflowId, workflowNodeName, clusterElementType, clusterElementWorkflowNodeName,
+                effectiveEnvironmentId);
 
         if (workflowNodeTestOutput == null) {
             return null;

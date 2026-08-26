@@ -10,6 +10,7 @@ dependencies {
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-tool"))

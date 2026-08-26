@@ -7,6 +7,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-graphql"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 

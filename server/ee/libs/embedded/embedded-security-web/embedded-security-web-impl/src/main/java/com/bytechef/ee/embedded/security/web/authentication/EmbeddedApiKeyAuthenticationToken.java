@@ -35,6 +35,23 @@ public class EmbeddedApiKeyAuthenticationToken extends AbstractApiKeyAuthenticat
         super(user);
     }
 
+    /**
+     * The authenticated form, produced by {@code EmbeddedApiKeyAuthenticationProvider} once the pre-authentication
+     * token has been checked. Carries the environment forward rather than dropping it: this is the token that ends up
+     * in the {@code SecurityContext} (see {@code ApiKeyAuthenticationFilter}, which stores the provider's result, not
+     * the converter's), so anything downstream asking "which environment is this caller in" has only this to ask.
+     * Ticket 1051's {@code ConnectedUserResourceMembershipResolver} is the first such caller.
+     *
+     * <p>
+     * The external user id is deliberately not carried: it is already the {@code User}'s username, which is what
+     * {@code SecurityUtils.fetchCurrentUserLogin()} reads, so a second copy on the token would be written and never
+     * read.
+     */
+    @SuppressFBWarnings("EI")
+    public EmbeddedApiKeyAuthenticationToken(long environmentId, User user) {
+        super(environmentId, user);
+    }
+
     public String getExternalUserId() {
         return externalUserId;
     }

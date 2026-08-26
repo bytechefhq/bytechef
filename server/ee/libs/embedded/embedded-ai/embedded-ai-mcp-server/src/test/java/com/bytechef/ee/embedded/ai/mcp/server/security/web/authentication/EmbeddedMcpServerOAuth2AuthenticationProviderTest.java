@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +18,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import com.bytechef.platform.security.web.mcp.McpAnonymousAuthenticationToken;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,7 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
 
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final long ENVIRONMENT_ID = 0L;
+    private static final long PRODUCTION_ENVIRONMENT_ID = 2L;
     private static final String MCP_SERVER_SECRET_KEY = "server-secret";
 
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
@@ -65,6 +68,33 @@ class EmbeddedMcpServerOAuth2AuthenticationProviderTest {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList()).containsExactly("ROLE_EDITOR");
+    }
+
+    /**
+     * Ticket 1051, same as the api-key provider: the AUTHENTICATED token lands in the SecurityContext and
+     * {@code ConnectedUserResourceMembershipResolver} reads the caller's environment off it. Built with the
+     * {@code User}-only constructor it carried none, so the ordinal read as 0 -- DEVELOPMENT, a valid environment
+     * rather than an absent one -- for every caller. Uses a non-zero environment so the fabricated and real values do
+     * not coincide.
+     */
+    @Test
+    void testAuthenticatedTokenCarriesTheRequestEnvironment() {
+        mockMcpServer(true);
+
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        when(connectedUser.isEnabled()).thenReturn(true);
+        when(connectedUser.getExternalId()).thenReturn(EXTERNAL_USER_ID);
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, PRODUCTION_ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser));
+
+        Authentication authentication = provider.authenticate(
+            new EmbeddedMcpServerOAuth2AuthenticationToken(
+                PRODUCTION_ENVIRONMENT_ID, EXTERNAL_USER_ID, "public", MCP_SERVER_SECRET_KEY, List.of()));
+
+        assertThat(authentication)
+            .asInstanceOf(type(AbstractApiKeyAuthenticationToken.class))
+            .satisfies(token -> assertThat(token.fetchEnvironmentId()).contains(PRODUCTION_ENVIRONMENT_ID));
     }
 
     @Test

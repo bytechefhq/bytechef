@@ -67,7 +67,8 @@ public class EmbeddedMcpServerApiKeyAuthenticationProvider implements Authentica
         ConnectedUser connectedUser = connectedUserService.fetchConnectedUser(externalUserId, environmentId)
             .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
-        return new EmbeddedMcpServerApiKeyAuthenticationToken(createSpringSecurityUser(externalUserId, connectedUser));
+        return new EmbeddedMcpServerApiKeyAuthenticationToken(
+            environmentId, createSpringSecurityUser(externalUserId, connectedUser));
     }
 
     private McpServer getMcpServer(String mcpServerSecretKey) {

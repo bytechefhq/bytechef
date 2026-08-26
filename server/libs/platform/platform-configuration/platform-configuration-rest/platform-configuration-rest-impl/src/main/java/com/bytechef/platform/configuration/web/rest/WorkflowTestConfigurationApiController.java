@@ -20,11 +20,11 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.web.rest.model.DeleteWorkflowTestConfigurationConnectionRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.SaveWorkflowTestConfigurationInputsRequestModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationConnectionModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTestConfigurationModel;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -41,25 +41,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowTestConfigurationApiController implements WorkflowTestConfigurationApi {
 
     private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
-    private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public WorkflowTestConfigurationApiController(
-        WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
-        WorkflowTestConfigurationService workflowTestConfigurationService, ConversionService conversionService) {
+        WorkflowTestConfigurationFacade workflowTestConfigurationFacade, ConversionService conversionService) {
 
         this.workflowTestConfigurationFacade = workflowTestConfigurationFacade;
-        this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<WorkflowTestConfigurationModel> getWorkflowTestConfiguration(
         String workflowId, Long environmentId) {
+
+        // Previously called WorkflowTestConfigurationService directly, which carries no @PreAuthorize -- any
+        // authenticated caller could read any workflow's test configuration. Routed through the facade instead, so
+        // a gate exists at all; the facade's hasPermission(#workflowId, 'Workflow', ...) is itself
+        // environment-agnostic, so the caller-supplied environmentId is resolved here first. See PrincipalEnvironment.
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         return ResponseEntity.ok(
             conversionService.convert(
-                workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId)
+                workflowTestConfigurationFacade.fetchWorkflowTestConfiguration(workflowId, effectiveEnvironmentId)
                     .orElse(null),
                 WorkflowTestConfigurationModel.class));
     }
@@ -68,10 +72,14 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
     public ResponseEntity<List<WorkflowTestConfigurationConnectionModel>> getWorkflowTestConfigurationConnections(
         String workflowId, String workflowNodeName, Long environmentId) {
 
+        // Same gap as getWorkflowTestConfiguration above: routed through the facade so a gate exists, environmentId
+        // resolved here first. See PrincipalEnvironment.
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         return ResponseEntity.ok(
             CollectionUtils.map(
-                workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                    workflowId, workflowNodeName, environmentId),
+                workflowTestConfigurationFacade.getWorkflowTestConfigurationConnections(
+                    workflowId, workflowNodeName, effectiveEnvironmentId),
                 workflowTestConfigurationConnection -> conversionService.convert(
                     workflowTestConfigurationConnection, WorkflowTestConfigurationConnectionModel.class)));
     }
@@ -114,5 +122,16 @@ public class WorkflowTestConfigurationApiController implements WorkflowTestConfi
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    // Required by the OpenAPI contract (@NotNull, required = true) on every caller of this method, so Spring
+    // rejects a missing environmentId before any of them run -- checked explicitly all the same, because the
+    // alternative is an unboxing NPE surfacing as a 500 if that ever changes.
+    private static long resolveRequiredEnvironmentId(Long environmentId) {
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        return PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
     }
 }

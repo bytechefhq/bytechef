@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,7 +76,20 @@ class AiAgentTestApiController {
         value = "/ai-agent-tests",
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    // Gates the environment the caller asked to run in, not just the workflow -- the request body's environmentId is
+    // what EnvironmentContext is bound to below, so authorising the workflow alone would let a member who is editor in
+    // Development run an agent node with Production credentials.
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#aiAgentTestRequest.workflowId(), 'WORKFLOW_EDIT', "
+        + "#aiAgentTestRequest.environmentId())")
     public SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
+        // Resolved on the REQUEST thread and captured, because the SecurityContext does not travel into the
+        // CompletableFuture.runAsync body below -- resolving there would read an empty context, fall back to the
+        // request body silently, and undo this. See PrincipalEnvironment: for an api-key principal the body's
+        // environmentId is inert and the principal's own environment wins; for a session principal it is honoured.
+        // Must match what hasWorkflowScopeInEnvironment authorised above, or the gate and the run disagree.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(
+            aiAgentTestRequest.environmentId());
+
         SseEmitter sseEmitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         String testId = String.valueOf(UUID.randomUUID());
@@ -86,22 +101,21 @@ class AiAgentTestApiController {
         sseEmitter.onError(throwable -> activeTests.invalidate(testId));
 
         CompletableFuture.runAsync(() -> {
-            long environmentId = aiAgentTestRequest.environmentId();
-
             Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
-            boolean environmentBound = environmentId >= 0 && environmentId < Environment.values().length;
+            boolean environmentBound =
+                effectiveEnvironmentId >= 0 && effectiveEnvironmentId < Environment.values().length;
 
             if (environmentBound) {
-                EnvironmentContext.set((int) environmentId);
+                EnvironmentContext.set((int) effectiveEnvironmentId);
             }
 
             try {
                 sendEvent(sseEmitter, "start", Map.of("testId", testId));
 
                 Object result = aiAgentTestFacade.executeAiAgentAction(
-                    aiAgentTestRequest.workflowId(), aiAgentTestRequest.workflowNodeName(),
-                    aiAgentTestRequest.environmentId(), aiAgentTestRequest.conversationId(),
-                    aiAgentTestRequest.message(), aiAgentTestRequest.attachments());
+                    aiAgentTestRequest.workflowId(), aiAgentTestRequest.workflowNodeName(), effectiveEnvironmentId,
+                    aiAgentTestRequest.conversationId(), aiAgentTestRequest.message(),
+                    aiAgentTestRequest.attachments());
 
                 if (result instanceof ActionDefinition.SseEmitterHandler sseEmitterHandler) {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);
@@ -149,6 +163,17 @@ class AiAgentTestApiController {
         return sseEmitter;
     }
 
+    /**
+     * Deliberately carries no {@code @PreAuthorize}: {@code testId} is a server-minted {@code UUID.randomUUID()} (122
+     * bits of randomness) held only in {@link #activeTests}, an in-memory, per-instance cache with no owning
+     * workflow/workspace recorded anywhere it could be resolved against. There is nothing to key a
+     * {@code hasPermission(...)} check on without adding a side table mapping {@code testId} back to {@code workflowId}
+     * purely to authorize this one stop call. Worst case for an attacker who guesses another tenant's in-flight
+     * {@code testId} is aborting that one SSE stream early -- not reading its output (the SSE response went to the
+     * original caller's own connection) and not running anything. Listed in
+     * {@code WorkflowTestModuleAuthorizationCoverageTest}'s named opt-out with this same rationale; if a resolvable id
+     * is ever introduced here, gate it and remove the opt-out entry.
+     */
     @PostMapping(value = "/ai-agent-tests/{testId}/stop")
     public ResponseEntity<Void> stopAiAgentTest(@PathVariable String testId) {
         SseEmitter sseEmitter = activeTests.getIfPresent(testId);

@@ -23,6 +23,7 @@ import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeOutputModel;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -89,12 +90,25 @@ public class WorkflowNodeOutputApiController implements WorkflowNodeOutputApi {
     public ResponseEntity<List<WorkflowNodeOutputModel>> getPreviousWorkflowNodeOutputs(
         String workflowId, Long environmentId, String lastWorkflowNodeName) {
 
-        workflowNodeOutputFacade.checkWorkflowCache(workflowId, lastWorkflowNodeName, environmentId);
+        // getPreviousWorkflowNodeOutputs is @Cacheable, keyed from the raw method arguments before the method body
+        // runs -- resolving inside it would be too late (see the comment there). Resolved once here instead, and the
+        // SAME effective value passed to both the cache eviction below and the cached read, so the two never
+        // disagree about which environment's entry they touch. See PrincipalEnvironment.
+        // Required by the OpenAPI contract (@NotNull, required = true), so Spring rejects a missing one before this
+        // runs -- checked explicitly all the same, because the alternative is an unboxing NPE surfacing as a 500 if
+        // that ever changes.
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
+
+        workflowNodeOutputFacade.checkWorkflowCache(workflowId, lastWorkflowNodeName, effectiveEnvironmentId);
 
         return ResponseEntity.ok(
             CollectionUtils.map(
                 workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
-                    workflowId, lastWorkflowNodeName, environmentId),
+                    workflowId, lastWorkflowNodeName, effectiveEnvironmentId),
                 workflowNodeOutputDTO -> conversionService.convert(
                     workflowNodeOutputDTO, WorkflowNodeOutputModel.class)));
     }

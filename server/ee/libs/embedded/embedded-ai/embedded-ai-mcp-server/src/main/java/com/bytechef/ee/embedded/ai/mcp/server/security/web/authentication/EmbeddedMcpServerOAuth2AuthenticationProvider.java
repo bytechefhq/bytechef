@@ -66,6 +66,7 @@ public class EmbeddedMcpServerOAuth2AuthenticationProvider implements Authentica
             .orElseGet(() -> connectedUserService.createConnectedUser(externalUserId, environmentId));
 
         return new EmbeddedMcpServerOAuth2AuthenticationToken(
+            environmentId,
             createSpringSecurityUser(
                 externalUserId, connectedUser, embeddedMcpServerOAuth2AuthenticationToken.getMappedAuthorities()));
     }

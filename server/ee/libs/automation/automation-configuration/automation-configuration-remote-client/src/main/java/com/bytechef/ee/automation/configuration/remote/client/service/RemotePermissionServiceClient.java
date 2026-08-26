@@ -127,6 +127,13 @@ public class RemotePermissionServiceClient implements PermissionService {
     }
 
     @Override
+    public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
+        logError("hasWorkflowScope");
+
+        return false;
+    }
+
+    @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
         logError("getMyWorkspaceScopes");
 
