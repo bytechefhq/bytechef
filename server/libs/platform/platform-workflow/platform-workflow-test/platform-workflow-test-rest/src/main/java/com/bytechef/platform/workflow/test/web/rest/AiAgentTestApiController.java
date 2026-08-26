@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -76,6 +77,9 @@ class AiAgentTestApiController {
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter testAiAgent(@RequestBody AiAgentTestRequest aiAgentTestRequest) {
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(
+            aiAgentTestRequest.environmentId());
+
         SseEmitter sseEmitter = new SseEmitter(TimeUnit.MINUTES.toMillis(30));
 
         String testId = String.valueOf(UUID.randomUUID());
@@ -88,22 +92,21 @@ class AiAgentTestApiController {
 
         // Run with the caller's SecurityContext, so the guard on the facade sees who asked for the test.
         CompletableFuture.runAsync(new DelegatingSecurityContextRunnable(() -> {
-            long environmentId = aiAgentTestRequest.environmentId();
-
             Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
-            boolean environmentBound = environmentId >= 0 && environmentId < Environment.values().length;
+            boolean environmentBound =
+                effectiveEnvironmentId >= 0 && effectiveEnvironmentId < Environment.values().length;
 
             if (environmentBound) {
-                EnvironmentContext.set((int) environmentId);
+                EnvironmentContext.set((int) effectiveEnvironmentId);
             }
 
             try {
                 sendEvent(sseEmitter, "start", Map.of("testId", testId));
 
                 Object result = aiAgentTestFacade.executeAiAgentAction(
-                    aiAgentTestRequest.workflowId(), aiAgentTestRequest.workflowNodeName(),
-                    aiAgentTestRequest.environmentId(), aiAgentTestRequest.conversationId(),
-                    aiAgentTestRequest.message(), aiAgentTestRequest.attachments());
+                    aiAgentTestRequest.workflowId(), aiAgentTestRequest.workflowNodeName(), effectiveEnvironmentId,
+                    aiAgentTestRequest.conversationId(), aiAgentTestRequest.message(),
+                    aiAgentTestRequest.attachments());
 
                 if (result instanceof ActionDefinition.SseEmitterHandler sseEmitterHandler) {
                     AiAgentSseEmitterBridge bridge = new AiAgentSseEmitterBridge(sseEmitter, testId);

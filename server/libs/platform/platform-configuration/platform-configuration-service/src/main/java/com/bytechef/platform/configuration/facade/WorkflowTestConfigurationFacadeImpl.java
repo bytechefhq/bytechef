@@ -29,6 +29,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -71,8 +73,10 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
 
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         workflowTestConfigurationService.deleteWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, environmentId);
+            workflowId, workflowNodeName, workflowConnectionKey, effectiveEnvironmentId);
     }
 
     @Override
@@ -97,10 +101,38 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
+    public Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId) {
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
+        return workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, effectiveEnvironmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)")
+    public List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
+        String workflowId, String workflowNodeName, long environmentId) {
+
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
+        return workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            workflowId, workflowNodeName, effectiveEnvironmentId);
+    }
+
+    @Override
     @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowTestConfiguration.workflowId, "
         + "'WORKFLOW_EDIT', #workflowTestConfiguration.environmentId)")
     public WorkflowTestConfiguration saveWorkflowTestConfiguration(
         WorkflowTestConfiguration workflowTestConfiguration) {
+
+        Long environmentId = workflowTestConfiguration.getEnvironmentId();
+
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        workflowTestConfiguration.setEnvironmentId(
+            PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue()));
 
         Workflow workflow = workflowService.getWorkflow(workflowTestConfiguration.getWorkflowId());
 
@@ -119,7 +151,9 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
 
-        checkConnectionUsage(workflowId, connectionId, environmentId);
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
+        checkConnectionUsage(workflowId, connectionId, effectiveEnvironmentId);
 
         Connection connection = connectionService.getConnection(connectionId);
 
@@ -133,7 +167,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         }
 
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, connectionId, false, environmentId);
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, false, effectiveEnvironmentId);
     }
 
     @Override
@@ -142,15 +176,18 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
 
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        validateConnection(workflowNodeName, workflowConnectionKey, connectionId, workflow, environmentId);
+        validateConnection(workflowNodeName, workflowConnectionKey, connectionId, workflow, effectiveEnvironmentId);
 
         boolean workflowNodeTrigger = WorkflowTrigger.fetch(workflow, workflowNodeName)
             .isPresent();
 
         workflowTestConfigurationService.saveWorkflowTestConfigurationConnection(
-            workflowId, workflowNodeName, workflowConnectionKey, connectionId, workflowNodeTrigger, environmentId);
+            workflowId, workflowNodeName, workflowConnectionKey, connectionId, workflowNodeTrigger,
+            effectiveEnvironmentId);
     }
 
     @Override
@@ -158,7 +195,10 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     public void saveWorkflowTestConfigurationInputs(String workflowId, String key, Object value, long environmentId) {
         Validate.notEmpty(key, "Missing required param: " + key);
 
-        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value, environmentId);
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(
+            workflowId, key, value, effectiveEnvironmentId);
     }
 
     private static Map<String, Object> getInputs(
