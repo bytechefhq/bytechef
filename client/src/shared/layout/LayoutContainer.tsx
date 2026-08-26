@@ -3,7 +3,7 @@ import {XIcon} from 'lucide-react';
 import {PropsWithChildren, ReactNode, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import LeftSidebarToggleContext from './LeftSidebarToggleContext';
+import LeftSidebarToggleContext, {useLeftSidebarToggle} from './LeftSidebarToggleContext';
 
 interface SidebarContentLayoutProps {
     className?: string;
@@ -75,6 +75,8 @@ const LayoutContainer = ({
 }: PropsWithChildren<SidebarContentLayoutProps>) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    const parentLeftSidebarToggle = useLeftSidebarToggle();
+
     // Uncontrolled by default so the header's toggle works on any page with a sidebar without that page
     // owning the state. A page that passes leftSidebarOpen keeps full control — the ones that drive it from
     // their own logic (the AI Hub peek, the agent detail page) must not have it toggled out from under them.
@@ -83,7 +85,7 @@ const LayoutContainer = ({
     const isLeftSidebarControlled = leftSidebarOpen !== undefined;
     const leftSidebarIsOpen = isLeftSidebarControlled ? leftSidebarOpen : uncontrolledLeftSidebarOpen;
 
-    const leftSidebarToggle = useMemo(
+    const ownLeftSidebarToggle = useMemo(
         () => ({
             hasLeftSidebar: !!leftSidebarBody && !isLeftSidebarControlled,
             leftSidebarOpen: leftSidebarIsOpen,
@@ -91,6 +93,13 @@ const LayoutContainer = ({
         }),
         [isLeftSidebarControlled, leftSidebarBody, leftSidebarIsOpen]
     );
+
+    // A LayoutContainer with no sidebar of its own must not SHADOW an outer one's toggle — it has nothing to
+    // offer in its place. Every Settings page is exactly this shape: the Settings layout owns the sidebar and
+    // renders each page into its Outlet, and each page wraps itself in a LayoutContainer with
+    // `leftSidebarOpen={false}` for the padding. Providing a fresh `hasLeftSidebar: false` there is what left
+    // the whole Settings area with no way to collapse its nav.
+    const leftSidebarToggle = leftSidebarBody ? ownLeftSidebarToggle : parentLeftSidebarToggle;
 
     // Keep the left sidebar mounted for 300ms after it closes so it can slide out (translate) before
     // unmounting, mirroring the slide-in on open. Pages that never toggle leftSidebarOpen keep this
