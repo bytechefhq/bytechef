@@ -451,9 +451,15 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public CopilotChatContextDTO prepareCopilotChat(
         String externalUserId, String workflowUuid, Environment environment) {
 
-        getConnectedUserProjectWorkflow(externalUserId, workflowUuid, (long) environment.ordinal());
+        // Take the workflow id from the row the ownership check just validated, rather than re-fetching it globally.
+        // The check is project-scoped (getLastProjectWorkflow(projectId, uuid)) while getLastWorkflowId(uuid) is not;
+        // the two agree today only because project_workflow.uuid is per-lineage, which is a property no caller here
+        // states or enforces. Reading the validated row removes the divergence instead of relying on it.
+        ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO = getConnectedUserProjectWorkflow(
+            externalUserId, workflowUuid, (long) environment.ordinal());
 
-        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+        String workflowId = connectedUserProjectWorkflowDTO.workflow()
+            .getId();
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 

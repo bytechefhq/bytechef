@@ -163,9 +163,25 @@ public class WebhookBridgeAgent extends LocalAgent {
             .build();
     }
 
+    /**
+     * Binds the caller's tenant for the whole bridged run before any of it executes.
+     *
+     * <p>
+     * This agent has the same defect as {@link AiHubSpringAIAgent} for the same reason and needs the same fix: it
+     * extends {@code LocalAgent} directly, {@code AiHubRoutingAgent} routes every webhook-bridged chat to it, and
+     * {@code LocalAgent.runAgent} dispatches {@link #runBridge} through a bare {@code CompletableFuture.runAsync}. The
+     * very first statement of the bridged body is {@code chatService.findByThreadId(...)}, followed by chat-memory
+     * writes and {@code jobFacade} calls — all of which would otherwise run against the {@code public} schema. The
+     * router forwards the same {@code RunAgentParameters} the controller built, so the verified tenant id is present in
+     * {@code input.state()} here exactly as it is for the LLM agent.
+     */
     @Override
-    @SuppressWarnings("checkstyle:methodlength")
     protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+        AiHubAgentTenantBinder.runWithTenant(getAgentId(), input.state(), () -> runBridge(input, subscriber));
+    }
+
+    @SuppressWarnings("checkstyle:methodlength")
+    private void runBridge(RunAgentInput input, AgentSubscriber subscriber) {
         // RUN_STARTED MUST be the first event the client sees — the AG-UI runtime's Zod schema validates the
         // SSE event stream and rejects the whole run with "First event must be 'RUN_STARTED'" if anything
         // else arrives first. Mirroring SpringAIAgent / LangchainAgent which fire this immediately after

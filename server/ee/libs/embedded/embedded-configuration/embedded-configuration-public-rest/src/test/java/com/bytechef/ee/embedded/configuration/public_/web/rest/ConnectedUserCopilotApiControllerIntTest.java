@@ -141,8 +141,81 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(stateMap).containsEntry("autonomous", false);
         assertThat(stateMap).containsKey(CopilotConstants.STATE_TENANT_ID);
         assertThat(stateMap).containsKey(CopilotConstants.STATE_AUTHENTICATION);
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_ENVIRONMENT_ID,
+            (long) Environment.PRODUCTION.ordinal());
         assertThat(stateMap.get(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY))
             .isEqualTo(Set.of("slack"));
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedAuthenticatedUserId() throws Exception {
+        SseEmitter completedEmitter = new SseEmitter();
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(completedEmitter);
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"threadId\":\"thread-1\",\"state\":{\"" + CopilotConstants.STATE_AUTHENTICATED_USER_ID
+                            + "\":999}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        // A connected user has no platform user id: a client-supplied authenticatedUserId must never reach the
+        // agent, since WorkflowEditorSpringAIAgent gives a non-null userId precedence over the carried
+        // Authentication and would rehydrate that user's real SecurityContext.
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedWorkspaceId() throws Exception {
+        SseEmitter completedEmitter = new SseEmitter();
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(completedEmitter);
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"threadId\":\"thread-1\",\"state\":{\"" + CopilotConstants.STATE_WORKSPACE_ID
+                            + "\":999}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        // Embedded connected-user runs have no workspace; a client-supplied workspaceId must never reach the
+        // agent's tool context.
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_WORKSPACE_ID);
     }
 
     @Test
@@ -214,6 +287,72 @@ public class ConnectedUserCopilotApiControllerIntTest {
             .hasSize(CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
     }
 
+    /**
+     * Ticket 1051: containment for the {@code project_build} agent's tool set, whose
+     * {@code ProjectTools.publishProject} takes a caller-supplied {@code projectId} and is guarded only by
+     * {@code ProjectServiceImpl.publishProject}'s own {@code hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')} gate --
+     * the gate {@code ConnectedUserResourceMembershipResolver.CATALOG_PROVISIONABLE_PROJECT_SCOPES} now answers GRANTED
+     * for on a visible catalog project. If a connected user could drive that agent, they could publish a new version of
+     * the tenant admin's catalog project.
+     *
+     * <p>
+     * What this test proves, precisely: the ONE embedded connected-user copilot surface selects its agent SERVER-SIDE
+     * and hardcoded ({@code Source.WORKFLOW_EDITOR} + {@code Mode.BUILD}), so no client state can steer it to another
+     * agent, {@code project_build} included. Both other {@code LocalAgent} resolution sites are outside the embedded
+     * surface: {@code CopilotWorkflowGeneratorImpl} hardcodes the same id, and {@code CopilotChatFacadeImpl} takes a
+     * client-supplied {@code agentId} but is the platform copilot REST surface.
+     *
+     * <p>
+     * What it deliberately does NOT prove: that a connected user reaching {@code CopilotChatFacadeImpl} would be
+     * refused. It would not be refused there by a gate -- that facade lets any authenticated caller name an
+     * {@code agentId}, and its {@code authorizeWorkflowAccess} no-ops when the state carries no {@code workflowId}.
+     * What actually stops the tools today is that {@code CopilotChatFacadeImpl} never sets
+     * {@code CopilotConstants.STATE_AUTHENTICATION}, so the agent's worker threads inherit no principal and RBAC denies
+     * -- containment by WIRING, not by a gate. This test pins the half that is structural. A change to
+     * {@code SecurityContextRehydrator}, or to who populates {@code STATE_AUTHENTICATION}, would not turn it red, so
+     * that half still needs reading rather than trusting.
+     */
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatCannotBeSteeredToTheProjectBuildAgent() throws Exception {
+        SseEmitter completedEmitter = new SseEmitter();
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(completedEmitter);
+
+        // Every key a client might plausibly reach for to name a different agent, all in one request.
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"threadId\":\"thread-1\",\"state\":{\"agentId\":\"project_build\","
+                            + "\"source\":\"PROJECT\",\"mode\":\"ASK\"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<LocalAgent> agentCaptor = ArgumentCaptor.forClass(LocalAgent.class);
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(agentCaptor.capture(), parametersCaptor.capture());
+
+        assertThat(agentCaptor.getValue()
+            .getAgentId()).isEqualTo("workflow_editor_build");
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        // The mode is server-set too, so the client cannot even downgrade the run it gets.
+        assertThat(stateMap).containsEntry("mode", "BUILD");
+        assertThat(stateMap).doesNotContainKey("agentId");
+        assertThat(stateMap).doesNotContainKey("source");
+    }
+
     @Test
     @WithMockUser(username = "ext-user-1")
     public void testCopilotChatBlocksAccessForForeignWorkflowUuid() throws Exception {
@@ -264,6 +403,20 @@ public class ConnectedUserCopilotApiControllerIntTest {
             LocalAgent agent = mock(LocalAgent.class);
 
             when(agent.getAgentId()).thenReturn("workflow_editor_build");
+
+            return agent;
+        }
+
+        /**
+         * Registered so {@code testCopilotChatCannotBeSteeredToTheProjectBuildAgent} has something to steer TOWARDS.
+         * Without it that test would pass on the agent simply being absent from the map, which proves nothing about how
+         * the controller selects one.
+         */
+        @Bean
+        public LocalAgent projectBuildAgent() {
+            LocalAgent agent = mock(LocalAgent.class);
+
+            when(agent.getAgentId()).thenReturn("project_build");
 
             return agent;
         }

@@ -10,14 +10,17 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -32,14 +35,34 @@ class ConnectedUserProjectFacadeCopilotChatTest {
     void testPrepareCopilotChatResolvesWorkflowIdAndAllowedComponents() {
         ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
-        when(projectWorkflowService.getLastWorkflowId(eq("uuid-1"))).thenReturn("wf-99");
-
-        ConnectedUserProjectFacadeImpl facade = buildFacadeSpy(projectWorkflowService, Set.of("slack", "gmail"));
+        ConnectedUserProjectFacadeImpl facade = buildFacadeSpy(
+            projectWorkflowService, Set.of("slack", "gmail"), "wf-99");
 
         CopilotChatContextDTO context = facade.prepareCopilotChat("ext-1", "uuid-1", Environment.PRODUCTION);
 
         assertThat(context.workflowId()).isEqualTo("wf-99");
         assertThat(context.allowedComponentNames()).containsExactlyInAnyOrder("slack", "gmail");
+    }
+
+    @Test
+    void testPrepareCopilotChatTakesTheWorkflowIdFromTheOwnershipCheckedRow() {
+        // The ownership check is project-scoped (getLastProjectWorkflow(projectId, uuid)) while getLastWorkflowId(uuid)
+        // is global. They agree today only because project_workflow.uuid happens to be per-lineage -- a property
+        // nothing here states or enforces. Stub the two to DISAGREE: the id handed to the copilot must be the one from
+        // the row ownership actually validated, never the global lookup.
+        ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
+
+        lenient().when(projectWorkflowService.getLastWorkflowId(eq("uuid-1")))
+            .thenReturn("wf-FROM-GLOBAL-LOOKUP");
+
+        ConnectedUserProjectFacadeImpl facade = buildFacadeSpy(
+            projectWorkflowService, Set.of("slack"), "wf-FROM-VALIDATED-ROW");
+
+        CopilotChatContextDTO context = facade.prepareCopilotChat("ext-1", "uuid-1", Environment.PRODUCTION);
+
+        assertThat(context.workflowId()).isEqualTo("wf-FROM-VALIDATED-ROW");
+
+        verify(projectWorkflowService, never()).getLastWorkflowId(eq("uuid-1"));
     }
 
     /**
@@ -48,7 +71,7 @@ class ConnectedUserProjectFacadeCopilotChatTest {
      * {@code getConnectedUserProjectWorkflow} methods are stubbed so the test does not need a Spring context.
      */
     private static ConnectedUserProjectFacadeImpl buildFacadeSpy(
-        ProjectWorkflowService projectWorkflowService, Set<String> allowedComponentNames) {
+        ProjectWorkflowService projectWorkflowService, Set<String> allowedComponentNames, String workflowId) {
 
         ConnectedUserProjectFacadeImpl impl = new ConnectedUserProjectFacadeImpl(
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
@@ -57,6 +80,13 @@ class ConnectedUserProjectFacadeCopilotChatTest {
         ConnectedUserProjectFacadeImpl facadeSpy = spy(impl);
 
         ConnectedUserProjectWorkflowDTO stubWorkflow = mock(ConnectedUserProjectWorkflowDTO.class);
+
+        WorkflowDTO workflowDTO = mock(WorkflowDTO.class);
+
+        lenient().when(workflowDTO.getId())
+            .thenReturn(workflowId);
+        lenient().when(stubWorkflow.workflow())
+            .thenReturn(workflowDTO);
 
         doReturn(stubWorkflow)
             .when(facadeSpy)

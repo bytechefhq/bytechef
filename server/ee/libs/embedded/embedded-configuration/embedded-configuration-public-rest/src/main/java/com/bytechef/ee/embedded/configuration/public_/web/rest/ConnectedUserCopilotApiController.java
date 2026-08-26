@@ -92,10 +92,28 @@ public class ConnectedUserCopilotApiController {
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
 
+        // Rebuilt from scratch rather than overwritten in place: a connected user's JWT reaches this state map
+        // directly, so every key this run needs must be an explicit, reviewed grant. Overwriting a fixed list of
+        // keys instead would fail open for any key nobody thought to name here -- STATE_AUTHENTICATED_USER_ID once
+        // slipped through exactly that way, and WorkflowEditorSpringAIAgent gives a non-null userId precedence over
+        // the carried Authentication, so a client-supplied id there is a full privilege swap, not merely a forged id
+        // reaching a check. A connected user has no platform user id and no workspace, so neither
+        // STATE_AUTHENTICATED_USER_ID nor STATE_WORKSPACE_ID is ever accepted from, or derivable for, this surface.
+        String additionalSystemPrompt = sanitizeAdditionalSystemPrompt(
+            stateMap.get(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT));
+
+        stateMap.clear();
+
         stateMap.put("workflowId", context.workflowId());
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", false);
         stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+
+        // Scopes the agent's environment context (CopilotSpringAIAgent#runWithEnvironment) and AI provider
+        // resolution (CopilotChatClientResolver, WorkflowEditorSpringAIAgent#advisorParams) to the environment this
+        // request was authorized against -- resolved server-side from the X-Environment header above, never from
+        // client state.
+        stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, (long) environment.ordinal());
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();
@@ -104,16 +122,8 @@ public class ConnectedUserCopilotApiController {
             stateMap.put(CopilotConstants.STATE_AUTHENTICATION, authentication);
         }
 
-        Object additionalSystemPromptValue = stateMap.remove(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
-
-        if (additionalSystemPromptValue instanceof String additionalSystemPrompt && !additionalSystemPrompt.isBlank()) {
-            String trimmed = additionalSystemPrompt.strip();
-
-            if (trimmed.length() > CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
-                trimmed = trimmed.substring(0, CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
-            }
-
-            stateMap.put(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, trimmed);
+        if (additionalSystemPrompt != null) {
+            stateMap.put(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, additionalSystemPrompt);
         }
 
         Set<String> allowedComponentNames = context.allowedComponentNames();
@@ -140,5 +150,26 @@ public class ConnectedUserCopilotApiController {
 
     private Environment getEnvironment(@Nullable EnvironmentModel xEnvironment) {
         return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
+    }
+
+    /**
+     * Trims and length-caps the client-supplied additional system prompt. The result is rendered by
+     * {@code WorkflowEditorSpringAIAgent} as an advisory block that is explicitly subordinated to the agent's build
+     * rules, so a hostile value cannot escalate beyond steering the conversation.
+     */
+    private static @Nullable String sanitizeAdditionalSystemPrompt(@Nullable Object additionalSystemPromptValue) {
+        if (!(additionalSystemPromptValue instanceof String additionalSystemPrompt)
+            || additionalSystemPrompt.isBlank()) {
+
+            return null;
+        }
+
+        String trimmed = additionalSystemPrompt.strip();
+
+        if (trimmed.length() > CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
+            trimmed = trimmed.substring(0, CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
+        }
+
+        return trimmed;
     }
 }

@@ -159,10 +159,23 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected void run(RunAgentInput input, AgentSubscriber subscriber) {
-        // Bind the verified environment for the whole turn so the fallback default ChatModel (the catalog-backed
-        // @Primary CatalogChatModel, resolved per environment from EnvironmentContext) picks the right environment's
-        // API key. The override resolver passes the environment explicitly and so does not depend on this.
+        AiHubAgentTenantBinder.runWithTenant(
+            getAgentId(), input.state(), () -> runWithEnvironment(input, subscriber));
+    }
+
+    /**
+     * Binds the verified environment for the whole turn so the fallback default ChatModel (the catalog-backed
+     * {@code @Primary CatalogChatModel}, resolved per environment from {@link EnvironmentContext}) picks the right
+     * environment's API key. The override resolver passes the environment explicitly and so does not depend on this.
+     *
+     * <p>
+     * Restores the thread's previous environment rather than clearing it, matching the tenant binding this nests
+     * inside: the common pool is shared, so a worker that arrives already bound must leave as it arrived.
+     */
+    private void runWithEnvironment(RunAgentInput input, AgentSubscriber subscriber) {
         Integer environmentOrdinal = environmentOrdinal(input);
+
+        Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
 
         if (environmentOrdinal != null) {
             EnvironmentContext.set(environmentOrdinal);
@@ -174,7 +187,11 @@ public class AiHubSpringAIAgent extends SpringAIAgent {
                 () -> SubagentProgressEmitter.runWithSubscriber(subscriber, () -> super.run(input, subscriber)));
         } finally {
             if (environmentOrdinal != null) {
-                EnvironmentContext.clear();
+                if (previousEnvironment == null) {
+                    EnvironmentContext.clear();
+                } else {
+                    EnvironmentContext.set(previousEnvironment);
+                }
             }
         }
     }

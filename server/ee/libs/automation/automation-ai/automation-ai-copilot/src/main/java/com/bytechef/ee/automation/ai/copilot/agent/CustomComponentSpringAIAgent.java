@@ -13,6 +13,7 @@ import com.agui.core.message.BaseMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.copilot.agent.CopilotSpringAIAgent;
 import com.bytechef.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,10 @@ import org.springframework.ai.tool.ToolCallback;
  *
  * @author Ivica Cardic
  */
-public class CustomComponentSpringAIAgent extends SpringAIAgent {
+public class CustomComponentSpringAIAgent extends CopilotSpringAIAgent {
 
     protected CustomComponentSpringAIAgent(final Builder builder) throws AGUIException {
-        super(builder);
+        super(builder, null);
     }
 
     public static Builder builder() {
