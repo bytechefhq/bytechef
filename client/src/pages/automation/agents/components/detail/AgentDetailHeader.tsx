@@ -105,11 +105,14 @@ const AgentDetailHeader = ({
         },
     });
 
-    // Mirrors the project header's V{n} {STATUS} pill. An agent carries `lastPublishedVersion` plus an
-    // `unpublishedChanges` flag rather than a status column, so the draft version is the next one up —
-    // and a never-published agent is V1 DRAFT, not V0.
-    const isDraft = lastPublishedVersion === 0;
-    const displayVersion = isDraft ? 1 : lastPublishedVersion;
+    // Mirrors the project header's pill, which names the version the editor WRITES into and is therefore
+    // always the draft: Project.publish() stamps the current version PUBLISHED and appends a fresh draft in
+    // the same call, and getLastStatus() reads that newest version — so ProjectTitle renders DRAFT for the
+    // whole life of a project, publishes included. An agent's backing project does exactly the same thing
+    // (see AiAgentFacadeImpl.publishProjectVersion), and every agent mutation regenerates that draft's
+    // workflow, so the draft here is always the version above the last published one — which makes a
+    // never-published agent V1, not V0. The published version is what Deploy and the agent LIST pill report;
+    // this one deliberately does not.
 
     // Only a published version has a workflow a ProjectDeployment can reference.
     const deployable = lastPublishedVersion > 0;
@@ -254,12 +257,12 @@ const AgentDetailHeader = ({
 
                         <Badge
                             className="flex space-x-1 bg-surface-neutral-primary"
-                            styleType={isDraft ? 'outline-outline' : 'success-outline'}
+                            styleType="outline-outline"
                             weight="semibold"
                         >
-                            <span>V{displayVersion}</span>
+                            <span>V{lastPublishedVersion + 1}</span>
 
-                            <span>{isDraft ? 'DRAFT' : 'PUBLISHED'}</span>
+                            <span>DRAFT</span>
                         </Badge>
                     </div>
                 }
