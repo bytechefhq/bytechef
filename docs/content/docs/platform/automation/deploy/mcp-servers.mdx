@@ -241,3 +241,19 @@ Send an API key with every request as an `Authorization: Bearer` header, or [ena
 ## How requests are handled
 
 When a client connects, ByteChef authenticates the caller's credential, identifies the server from the secret key in the URL, and returns **only** the tools that server exposes - the enabled actions and workflows you selected, in that server's environment. Disabling the server, disabling a tool, removing a tool, or regenerating the secret key takes effect immediately for new requests.
+
+---
+
+## Promote to another environment
+
+Promoting to another environment is an **Enterprise Edition** feature, and the menu item is hidden until your workspace has at least two environments. Open a server's row menu and choose **Promote to environment…** to create or update a matching server in another environment.
+
+**First promotion** copies the server's name, **Require authentication** setting, per-component tool-authorization enforcement, and tags, plus every exposed project (its pinned version and the workflow-tool mapping — tool name, description, and `fromAi` inputs) and every exposed component with its tools and per-input parameters. The new server is created **disabled** and mints its **own secret key** — the promoted server has a different connect URL from the source, shown once the promotion completes. Which components a caller is authorized to reach is not copied; that's environment-local security posture you set again in the target.
+
+**Re-promoting** — after a project version bump, or after you add or remove tools — only syncs the exposed surface: the pinned project version, and the set of exposed workflows, components, and tools, matched by project, workflow, component, and tool name. Everything the target already owns is left alone: name, tags, every enabled flag, **Require authentication**, the secret key, and any connection binding already set there.
+
+A source connection maps automatically to the target environment when exactly one visible connection there matches it on component, connection version, and name; otherwise it's left **Unresolved** for you to pick, or to leave unresolved — an unresolved connection doesn't block promotion, it just keeps a newly created server disabled until you bind it.
+
+<Callout type="info">
+If a server happens to expose the same project more than once — not something the UI itself can produce, but not prevented either — the preview warns about the ambiguity, and each project is paired with its existing counterpart in the order they were added.
+</Callout>

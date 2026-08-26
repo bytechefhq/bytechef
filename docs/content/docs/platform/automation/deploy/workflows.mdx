@@ -239,6 +239,19 @@ Choose the new connection.
 </Steps>
 
 
+## Promote to another environment
+
+Promoting to another environment is an **Enterprise Edition** feature, and the menu item is hidden until your workspace has at least two environments. It applies to plain project deployments only — a deployment created behind an API collection, MCP server, or A2A server has no promote option of its own; promote the owning collection or server from its own page instead.
+
+1. Click on the three dots next to the name of the project deployment you want to promote.
+2. Click on **Promote to environment…**.
+3. Choose the **target environment**.
+4. Review the preview: create vs. update, and the project version move.
+5. For any connection listed as **Unresolved**, pick a match in the target environment, or leave it unresolved.
+6. Click on **Promote**.
+
+The first promotion creates a new deployment in the target environment, pinned to the same project version with the same connection bindings — created **disabled**. Re-promoting only moves the target's pinned project version and refreshes connections for workflows new to that version; the target's own name, description, tags, and enabled state are left alone. Unlike API collections, MCP servers, and A2A servers, a plain deployment has no exposed URL or secret key of its own to mint, so promoting it never changes how it's reached.
+
 ## Delete Project Deployment
 
 <Steps>

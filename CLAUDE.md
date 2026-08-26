@@ -428,6 +428,14 @@ variables as their own **Variables** section in the Data Pill Panel (`DataPillPa
 
 Spec: `docs/superpowers/specs/2026-08-17-custom-variables-design.md`.
 
+### Environment promotion (EE)
+
+`server/ee/libs/automation/automation-promotion` promotes an API collection, MCP server, A2A server or
+plain project deployment to its counterpart in another environment, matched by a lineage `uuid` rather
+than by name. **Monolith only** (`server-app`). Re-promotion syncs ONLY the exposed surface; name, tags,
+enabled flags, auth settings, secret keys and existing connection bindings are environment-local. A
+created counterpart is always disabled. See `.agents/environment-promotion.md`.
+
 ### Sidebar navigation groups (Client)
 
 `AppSidebarNavItemI` has an optional `group` field; `AppSidebar` folds CONSECUTIVE items sharing
@@ -500,6 +508,7 @@ relevant file before working in that area** — each records invariants whose vi
 | `.agents/agentic-ai-component.md` | Embabel GOAP component (opt-in) |
 | `.agents/code-artifacts.md` | Custom components & code workflows: draft/publish, perform context, declared connections |
 | `.agents/mcp-a2a-servers.md` | MCP workflows-as-tools (fromAi), A2A servers |
+| `.agents/environment-promotion.md` | Promoting API collections / MCP / A2A / deployments across environments |
 | `.agents/embedded-bridge.md` | Embedded automation code workflow bridge |
 | `.agents/api-connectors.md` | API connectors (spec-as-source-of-truth) |
 | `.agents/resource-visibility.md` | Workspace scoping, visibility/sharing, per-environment roles |

@@ -95,9 +95,10 @@ Key files:
 
 ## 3. Non-goals
 
-- Agent/MCP tools for promotion (`promoteApiCollection`, `promoteMcpServer`, …) — follow-up once the
-  facade exists; the existing `cloneApiCollection`/`cloneMcpProject`/`promoteWorkflow` tools are left
-  as they are except for the doc fix in §7.7.
+- ~~Agent/MCP tools for promotion~~ — **built as a follow-up; see §16.** Four catalog-tier tools
+  (`promoteApiCollection`, `promoteMcpServer`, `promoteA2aServer`, `promoteProjectDeployment`) landed
+  once the facade existed. `cloneApiCollection` was retired with them; `cloneMcpProject` and
+  `promoteWorkflow` are unchanged.
 - Promotion-status badges on list rows ("promoted to STAGING v3 ✓") — the lineage uuid enables it;
   not built here.
 - Workspace scoping for A2A servers (they are tenant-global today; unchanged).
@@ -654,3 +655,235 @@ centrally); the dialog only adds inline handling for `TARGET_CONNECTION_INVALID`
 | 12 | Surface create paths mint target deployments; promoter only syncs | promoter creates via `createProjectDeployment` | one creation path per surface; core is one reconciliation routine; the published/non-draft rule is an explicit up-front check instead |
 | 10 | Guards mirror each create path | one shared `PROMOTE` scope | no new permission scope; `PermissionAuditAspect` covers audit |
 | 11 | Fix A2A hardcoded DEVELOPMENT as prerequisite | leave | promotion is meaningless for A2A otherwise |
+
+---
+
+## 15. Amendment (2026-08-18): plain project deployments become a fourth resource type
+
+**Status:** approved by the user on 2026-08-18, mid-execution (Tasks 1-6 already landed).
+
+§3 previously listed "promoting plain project deployments (non-synthetic)" as a non-goal and §13
+carried it as a follow-up. The user has moved it into scope. This amendment supersedes both entries;
+everything else in this document stands unchanged.
+
+### 15.1 Why it is cheap now
+
+`ProjectDeploymentPromoter` (§7.2) already *is* the deployment promoter — moving the pinned version,
+re-binding connections through `ConnectionEnvironmentMapper`, and reconciling
+`project_deployment_workflow` rows in place by `project_workflow.uuid`. The three existing handlers
+are thin wrappers that mint their surface's synthetic deployment and then hand it to that routine.
+
+A plain deployment is the *simplest* of the four callers, because it is the only one with **no
+mapping rows to reconcile afterwards** — there is no `api_collection_endpoint`,
+`mcp_project_workflow` or `a2a_project_workflow` child set. It needs no
+`ProjectWorkflowMappingReconciler` (pre-flight ruling R7) at all.
+
+### 15.2 What exists today, and why it is not enough
+
+The `promoteWorkflow` AI tool (`PromoteWorkflowToolCallback`, CE) builds a `ProjectDeploymentDTO`
+with only `projectId`, `projectVersion`, `environment`, `name`, `description`, `enabled(false)` and
+calls `createProjectDeployment`. It wires **no connections and no workflow inputs**, is not
+idempotent (running it twice creates two deployments), carries no lineage, and re-syncs nothing when
+the project version moves. There is no client affordance at all. The tool stays as it is; it is a
+one-shot convenience for the LLM, not a promotion surface.
+
+### 15.3 Lineage — `project_deployment.uuid`
+
+`ProjectDeployment` has no uuid today (verified). It gets one, exactly as `api_collection`,
+`mcp_server` and `a2a_server` did:
+
+```
+addColumn uuid UUID                     -- backfill gen_random_uuid()
+addNotNullConstraint uuid
+addUniqueConstraint uk_project_deployment_uuid_environment (uuid, environment)
+```
+
+`project_deployment` is long released (it predates `v1.1.5`, having been renamed from
+`project_instance` in changelog `20240604153081`), so this is a NEW changeset — never an init edit.
+
+A `(uuid, environment)` unique constraint is safe here in a way it was not for `api_collection`:
+`project_deployment` carries `environment` on the row. Matching by `(projectId, environment)` was
+rejected — `ProjectDeploymentService.fetchProjectDeployment(projectId, environment)` assumes one
+deployment per project+environment, an assumption the embedded automation bridge already had to work
+around with `fetchProjectDeploymentByName`, so it is not a safe identity.
+
+### 15.4 Prerequisite: `__A2A_SERVER__` deployments leak into the deployments list
+
+`CustomProjectDeploymentRepositoryImpl` excludes `__API_COLLECTION__` and `__MCP_SERVER__` deployment
+names from the Project Deployments listing but **not** `__A2A_SERVER__` — `A2aProjectFacadeImpl`
+defines its own private `A2A_SERVER_NAME_PREFIX` constant instead of adding one to `SystemProjects`,
+so the shared filter never learned about it. This is a pre-existing bug (A2A synthetic deployments
+are visible in the Project Deployments list today), and it becomes actively harmful the moment the
+list grows a "Promote…" item: a user could promote an A2A server's synthetic deployment directly,
+producing a second deployment shell that its owning `a2a_server` row knows nothing about.
+
+Fix as a prerequisite: add `A2A_SERVER_DEPLOYMENT_NAME_PREFIX` to `SystemProjects`, have
+`A2aProjectFacadeImpl` use it, and add the third `notLikePredicate` to the listing query.
+
+### 15.5 Synthetic deployments are refused at the handler, not only hidden
+
+The listing filter is a UI concern and not an authorization boundary. `ProjectDeploymentPromotionHandler`
+independently REJECTS any source deployment whose name starts with a synthetic prefix, with a new
+`EnvironmentPromotionErrorType.SYNTHETIC_DEPLOYMENT_NOT_PROMOTABLE` (key 106), so a direct GraphQL
+call cannot do what the hidden menu item cannot. The correct action for those rows is to promote the
+owning API collection / MCP server / A2A server, and the error message says so.
+
+### 15.6 Semantics
+
+Identical to §6.1-§6.4, with the surface-specific parts collapsing:
+
+- **create**: `ProjectDeploymentFacade.createProjectDeployment(dto)` — the surface's own create path,
+  per decision 12, which also enforces the published/non-draft rule of decision 10 — with `name`,
+  `description`, `projectId`, `projectVersion`, `uuid = source.uuid`, `enabled = false`, and the
+  per-workflow connections/inputs/enabled produced by `ProjectDeploymentPromoter.sync`
+  (`targetIsNew = true`).
+- **update**: `promoter.sync(source, target, requested, suggested, targetIsNew = false)` and nothing
+  else. Per §4 ⚑3, `name`, `description`, tags and every `enabled` flag stay environment-local.
+- **no mapping-row reconciliation**, and therefore no ordering constraint around
+  `updateProjectDeployment`'s pdw deletion — the reason that ordering matters for MCP and A2A
+  (pre-flight ruling R6) simply does not arise.
+- **name conflict**: the handler rejects with `TARGET_NAME_CONFLICT` when a *different* lineage
+  already owns `(name, projectId, targetEnvironment)`. Whether a database constraint already
+  enforces deployment-name uniqueness at that grain must be VERIFIED during implementation rather
+  than assumed; the handler check is required either way.
+
+### 15.7 Authorization
+
+`@PreAuthorize("hasPermission(@promotionAuthorizer.projectIdOfProjectDeployment(#sourceId), 'Project', 'DEPLOYMENT_PUSH')")`
+— the same guard as API collections (§4 ⚑9, as revised by pre-flight ruling R5), and exactly the
+permission `ProjectDeploymentServiceImpl.create` already demands. `promotionAuthorizer` gains a third
+lookup method.
+
+### 15.8 Surface
+
+`PromotionResourceType` gains `PROJECT_DEPLOYMENT`, **appended last** so no existing constant moves.
+The enum is a GraphQL enum and a Java enum only — it is not persisted as an ordinal — but appending
+keeps it consistent with the repo's enum discipline. The generic
+`environmentPromotionPreview` / `promoteToEnvironment` pair (§4 ⚑8) needs no schema change beyond the
+new enum value, which is the payoff of having chosen one generic surface over three typed pairs.
+
+Client: a "Promote to environment…" item on the Project Deployments page's list-item dropdown,
+reusing the same `EnvironmentPromotionDialog` through the same `<EEVersion hidden>` + `React.lazy`
+seam as the MCP and A2A pages, and hidden when fewer than two environments exist.
+
+### 15.9 Not in scope even now
+
+- Promoting a deployment to a project that does not exist in the target environment. Projects are
+  workspace-scoped, not environment-scoped, so this cannot arise.
+- Bulk promotion of every deployment in a project.
+- Retiring or rewriting `promoteWorkflow`.
+
+## 16. As built
+
+Recorded after implementation (Tasks 1-22). Where the design assumed something that turned out to need a
+different shape, the assumption is corrected here rather than quietly dropped.
+
+- **Promotion ships in `server-app` only.** `automation-promotion-graphql`/`-service` are wired into
+  `server/apps/server-app/build.gradle.kts`, not into `configuration-app` or any other distributed EE app.
+  §7.1 asked the plan to "verify" whether `configuration-app` hosts the MCP/API-collection GraphQL surface
+  and wire the module there too; it does not carry `automation-api-platform-configuration-service` or
+  `automation-ai-a2a-service` at all, so the handlers' collaborators (`ApiCollectionService`,
+  `A2aServerService`, …) don't exist in that app's context — there is nothing to wire in. Distributed EE
+  deployments therefore have no promotion surface at all, in the same spirit as orphaned-job recovery and
+  the embedded-automation error-workflow handler being monolith-only. A future distributed rollout needs
+  either remote-client stubs for every collaborator the handlers touch, or a dedicated promotion
+  microservice — neither is attempted here.
+- **Authorization goes through a separate `promotionAuthorizer` bean**
+  (`com.bytechef.ee.automation.promotion.security.PromotionAuthorizer`), not the self-referencing
+  `@apiCollectionPromotionHandler.projectIdOf(...)` form §7.2 sketched. A `@PreAuthorize` expression that
+  calls back into the very bean the annotation guards makes that bean invoke itself through its own
+  freshly-entered security proxy — the guard is still being evaluated, so the call either deadlocks the
+  proxy or bypasses the check depending on proxy mode. `PromotionAuthorizer` exposes one
+  `<ownerKind>Of<ResourceKind>(id)` lookup per resource type instead. Because every lookup runs *before*
+  any authorization verdict exists, it cannot distinguish "no such resource" from "a resource this caller
+  may not see" without creating an id-enumeration oracle, so an unresolvable id throws
+  `AccessDeniedException` (403) rather than a typed `SOURCE_NOT_FOUND` — a real typo or a concurrently
+  deleted resource is reported the same way as "not yours to promote."
+- **`ConnectionEnvironmentMapper.suggest` diverges from §7.2's signature.** It is
+  `Map<Long, Long> suggest(long workspaceId, Set<Long> sourceConnectionIds, Environment targetEnvironment)`
+  — three parameters, no `existingTargetBindings` map, returning a plain id-to-id map — rather than the
+  spec's `List<PromotionConnectionMapping>` built from four parameters. Resolving which target connection
+  a source connection maps to, and assembling the `PromotionConnectionMapping` preview DTO (with
+  `sourceConnectionName`, `usedBy` labels, etc.) for the client, turned out to be different jobs done at
+  different times; the latter moved into a new `PromotionPreviews` helper that each handler's `preview()`
+  calls after resolving ids. "Existing target wins over name match" is handled by each handler passing its
+  own `existingTargetBindings` into that assembly step, not by the mapper.
+- **§6.5's duplicate-project matching is per-`projectId` deque pairing (i-th source project to i-th
+  target project), not first-wins.** A first-wins scheme is monotonically corrupting across repeated
+  re-promotions: once a target project is claimed by an earlier source project in the iteration, a later
+  source project with the same `projectId` would never find it, mint a fresh target project every time,
+  and never delete the one that lost the race (a skipped target is never recorded as matched, so nothing
+  ever marks it stale). Grouping each side's projects by `projectId` into an `ArrayDeque` (target side
+  ordered by ascending `mcp_project`/`a2a_project` id, per §6.5) and polling one target per source project
+  keeps the pairing stable run over run, and any target left over after all source projects are paired is
+  deleted as genuinely orphaned.
+- **Name-conflict guards differ per surface, by design, not by oversight.** `api_collection`
+  (`(workspace, environment)`, app-level check) and `mcp_server` (`(name, environment)`, a real DB unique
+  constraint) both convert a collision with a *different* lineage's row into
+  `EnvironmentPromotionErrorType.TARGET_NAME_CONFLICT` before creating a counterpart. `a2a_server` carries
+  no name-uniqueness constraint at all, so `A2aServerPromotionHandler` adds no such guard — there is
+  nothing to collide with. `project_deployment` also carries no name constraint, but
+  `ProjectDeploymentPromotionHandler` adds the check anyway (§15.6): `fetchProjectDeploymentByName` is a
+  real disambiguation path elsewhere in the codebase (the embedded automation bridge depends on being able
+  to find "the" deployment for a project+environment by name), and the same bridge can legitimately produce
+  more than one deployment per `(project, environment)` — so a plain deployment promotion silently creating
+  a second same-named row would poison that lookup in a way the other three surfaces can't reproduce.
+- **`api_collection`'s app-level name check is a known, accepted check-then-insert race.** Dropping
+  `uk_api_collection_name` (§5.1) removes the database backstop the old constraint gave; no partial unique
+  index replaces it because `environment` is not a column on `api_collection` — it is read through the
+  joined `project_deployment` (⚑5/⚑6), which a partial index cannot express. Two concurrent creates for the
+  same `(workspace, environment, name)` can therefore both pass the read and both insert, producing a
+  duplicate name pair the old global constraint would have rejected. Ruled ACCEPTED RISK rather than fixed
+  (progress log, Task 2) — rare in practice, and no worse than the app-level checks other resources already
+  rely on elsewhere in the codebase.
+- **Two user-facing REST behavior changes shipped as prerequisites, not as promotion features per se:**
+  - `ApiCollectionEndpointServiceImpl.update` previously copied only `httpMethod`, `name`, and `path` onto
+    the re-read row, silently dropping any `projectDeploymentWorkflowId` the caller supplied — editing an
+    endpoint's workflow in the UI compiled, saved, and toasted success, but the endpoint kept calling the
+    old workflow. Promotion's own endpoint reconciliation (§6.2, "update `name`/`workflowUuid` on
+    existing") needed this to actually work, so `update` now copies `projectDeploymentWorkflowId` when the
+    caller supplies one (a DTO-converted entity supplies none, so a plain re-save is unaffected).
+  - A stale or foreign workflow uuid on that same update path used to succeed as a silent no-op (the
+    lookup failure was swallowed); it now throws a typed `ApiCollectionErrorType.WORKFLOW_NOT_FOUND` (400).
+    Both are pinned by `ApiCollectionFacadeTest`.
+
+### 16.x Agent tools (follow-up, landed after the main feature)
+
+**Topology correction to §13.** §13 said the tools go "on the respective specialists", written when
+`AiHubAgentType` was believed to hold them. It does not, and never did — the automation-owned
+specialists live in a **separate enum**, `AutomationSubAgentType` (`MCP_AGENT`,
+`PROJECT_DEPLOYMENT_AGENT`, `API_COLLECTION_AGENT`). Nothing had been dissolved; two enums were being
+read as one.
+
+They were still the wrong home. There is no `a2a_agent`, so A2A would have had nowhere to live, and
+promotion is one capability across four resource types rather than four resource-specific features.
+All four tools are registered in the **AI Hub BUILD searchable catalog** instead.
+
+**Principal propagation was already solved by that placement.** The concern was real — agent tools run
+on worker threads with no `SecurityContext`, and every handler is `@PreAuthorize`-guarded — but
+`ToolSearchAdvisorConfiguration` already wraps every catalog tool in
+`AiHubToolCallbackWrappers.wrap(...)`, which includes `RehydrateContextToolCallback`. Choosing the
+catalog tier for token-cost reasons happened to be the same choice that supplies the principal.
+
+**Four concrete verbs, one implementation.** `PromoteToEnvironmentToolCallback` is constructed once per
+`PromotionResourceType`. Concrete names rather than one generic tool taking a type argument: ids are
+per-table, so a generic tool that paired a correct `sourceId` with the wrong `resourceType` would
+usually find a real row of the other type and promote something the user never named. Four names make
+that unrepresentable for the cost of four catalog entries.
+
+**One shot, previewed internally.** The tool calls `preview` before `promote` purely to enrich its own
+result with the handler's warnings, then promotes. No separate dry-run tool to keep in sync. The result
+states explicitly that a created counterpart is DISABLED, and lists `unresolvedConnectionIds` — the
+prompt requires the model to relay both.
+
+**Distributed deployments (ruling R4).** Registered through `ObjectProvider<EnvironmentPromotionFacade>
+.ifAvailable`. This is load-bearing, not defensive: `ai-hub-service` also ships in `ai-copilot-app`,
+which does not carry `automation-promotion-service`, so the bean is genuinely absent there and the
+tools are simply not registered rather than failing startup.
+
+**`cloneApiCollection` retired.** It copied five fields, set endpoints to `List.of()` deliberately, and
+called the same facade method `createApiCollection` calls — its whole marginal value was saving one
+lookup, while its cross-environment case produced the half-configured shell that `promoteApiCollection`
+now produces properly. Eight references removed, not the three the plan listed: the plan missed the
+copilot `ApiCollectionToolCallbacksFactory`, that factory's test, and both prompt files.
+`cloneMcpProject` is unchanged — its axis is the MCP server, not the environment.

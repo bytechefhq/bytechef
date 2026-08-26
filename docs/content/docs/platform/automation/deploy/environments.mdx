@@ -81,6 +81,24 @@ where it is enabled - a cron trigger being present in a Development deployment d
 in Production. Webhook URLs are issued per deployment for the same reason, so each environment's
 deployment has its own URL.
 
+### Promoting between environments
+
+Each promotable resource type — project deployments, API collections, MCP servers, A2A servers — carries a
+**Promote to environment…** item on its row menu (Enterprise Edition; hidden below two environments).
+Choosing it opens a dialog that previews the move before you commit to it: a **Will create** or **Will
+update `<name>`** badge, the project version move (`v17 → v19`), any warnings (a context-path/version
+mismatch, an ambiguous project match, a newly minted secret key and URL), and a connection section listing
+every connection the resource uses — each pre-filled with a suggested match in the target environment, or
+**Unresolved** when none is unambiguous. Clicking **Promote** applies it; a success toast confirms the
+result with a **View in `<environment>`** action that switches your workspace to the target environment.
+
+A promotion moves the pinned version and re-binds connections — no recompilation, no service restart, no
+database migration — which is why promotions are safe to run mid-day. Per resource type, see
+[Deploy Workflows](/automation/workflows#promote-to-another-environment),
+[API Platform](/automation/api-platform#promote-to-another-environment),
+[MCP Servers](/automation/mcp-servers#promote-to-another-environment), and
+[A2A Servers](/automation/a2a-servers#promote-to-another-environment).
+
 ---
 
 ## Environments in the API

@@ -78,6 +78,18 @@ one shows its secret key **once**; it cannot be viewed again, so store it before
 each client's name, created date, and last-used date, and a client can be renamed or deleted independently of the
 others.
 
+## Promote to another environment
+
+Use a collection's row menu → **Promote to environment…** to create or update a matching collection in another environment (Development, Staging, or Production). The menu item is hidden until your workspace has at least two environments. The source collection's project must be **published** and pinned to a real version — one still tracking the current draft can't be promoted.
+
+**First promotion** copies everything: name, description, context path, collection version, tags, the project and its pinned version, every endpoint (method, path, name, enabled, workflow), and connection bindings resolved for the target environment. The new collection's deployment is created **disabled**, so nothing runs until you've reviewed it.
+
+**Re-promoting** — after a version bump, or after endpoints changed — only syncs the exposed surface: the pinned project version, context path, collection version, and the set of endpoints (added, updated, or removed to match the source). Everything the target environment already owns is left alone: name, description, tags, every enabled flag, and any connection binding already set there.
+
+Each source connection maps automatically when exactly one connection in the target environment matches it on component, connection version, and name; otherwise it's left **Unresolved** for you to pick — or to leave unresolved, since an unresolved connection doesn't block promotion. It just keeps a newly created collection disabled until you bind it.
+
+API collections have no secret key of their own, so promoting never changes a URL — a collection is always reached by `(environment, contextPath, collectionVersion, path)`; switch environments through the caller's API key, not a different endpoint.
+
 ## Reference
 
 - [Subflows](/platform/automation/build/workflows/subflows) - the same trigger-in/response-out model, for workflow-to-workflow calls instead of HTTP.

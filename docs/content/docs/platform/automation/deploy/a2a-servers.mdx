@@ -82,3 +82,24 @@ The secret key doubles as the tenant anchor, so a request is always scoped to th
 An AI Agent can delegate a task to any A2A server (yours or a third party's) with the **Agent Client Tool**
 (`sendTaskToRemoteAgent`) from the AI Agent Utils component: point it at the remote agent's base URL, and it resolves
 the agent card, sends the task, and returns the response.
+
+---
+
+## Promote to another environment
+
+Promoting to another environment is an **Enterprise Edition** feature, and the menu item is hidden until your
+workspace has at least two environments. Open a server's menu and choose **Promote to environment…** to create or
+update a matching server in another environment.
+
+**First promotion** copies the server's name, description, type, and **require authentication** setting, plus every
+exposed project and its skills (skill name, description, tags). The new server is created **disabled** and mints its
+**own secret key** — the promoted server has a different agent-card URL and JSON-RPC endpoint from the source,
+shown once the promotion completes.
+
+**Re-promoting** only syncs the exposed surface: the pinned project version and the set of exposed skills, matched by
+project and workflow. The target's own name, description, authentication setting, enabled state, and secret key are
+never touched.
+
+As with MCP servers, a source connection maps automatically to a matching `(component, connection version, name)`
+connection in the target, or is left **Unresolved** for you to resolve — an unresolved connection doesn't block
+promotion, it just keeps a newly created server disabled until you bind it.
