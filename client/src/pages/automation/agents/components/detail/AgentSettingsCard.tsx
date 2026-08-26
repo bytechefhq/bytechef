@@ -1,8 +1,9 @@
+import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import Switch from '@/components/Switch/Switch';
-import {Label} from '@/components/ui/label';
 import AgentApprovalSettings from '@/pages/automation/agents/components/detail/AgentApprovalSettings';
 import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
+import AgentSettingRow from '@/pages/automation/agents/components/detail/AgentSettingRow';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
@@ -55,13 +56,54 @@ const WEB_SEARCH_PROVIDERS: Record<WebSearchProviderType, {componentName: string
 // exists to say so before the user hits publish, not to enforce it.
 const NATIVE_WEB_SEARCH_MODEL_PROVIDERS = ['anthropic'];
 
-// Sits beside `builtInTools` rather than inside it: it is not a tool, it picks which aiAgent action the
-// generated workflow runs — streamChat when on, chat when off — the same choice the workflow editor's AI
-// Agent panel offers as "Stream response". Default ON, matching every agent written before the key existed.
-const DEFAULT_STREAM_RESPONSE = true;
+// Mirrors AiAgentSettings.THINKING_MODEL_PROVIDERS. Only a provider whose model cluster element declares the
+// `thinking` property can act on it, so publishing against any other is rejected server-side — this list exists
+// to say so before the user hits publish, not to enforce it.
+const THINKING_MODEL_PROVIDERS = ['anthropic', 'openAi'];
 
-const resolveStreamResponse = (settings: unknown): boolean =>
-    (settings as {streamResponse?: boolean} | null | undefined)?.streamResponse ?? DEFAULT_STREAM_RESPONSE;
+const REASONING_EFFORTS: ReasoningEffortType[] = ['LOW', 'MEDIUM', 'HIGH'];
+
+// Spring AI's DefaultToolCallingManager.DEFAULT_MAX_TOTAL_TOOL_CALLS — what applies when maxToolCalls is unset.
+// Shown rather than sent: the field stays empty, so the agent keeps following the platform default even if that
+// default later changes.
+const DEFAULT_MAX_TOOL_CALLS = 150;
+
+type ReasoningEffortType = 'HIGH' | 'LOW' | 'MEDIUM';
+
+// The keys that sit beside `builtInTools` rather than inside it, because none of them is a tool: `streamResponse`
+// picks which aiAgent action the generated workflow runs (streamChat when on, chat when off — the same choice the
+// workflow editor's AI Agent panel offers), `thinking`/`reasoningEffort` are written onto the MODEL cluster
+// element, and `maxToolCalls` onto the aiAgent node itself.
+interface TopLevelSettingsI {
+    maxToolCalls: number | null;
+    reasoningEffort: ReasoningEffortType;
+    streamResponse: boolean;
+    thinking: boolean;
+}
+
+// maxToolCalls alone has no default to pin: absent means the platform's own cap applies, and inventing a number
+// here would silently pin every agent to it.
+const DEFAULT_TOP_LEVEL_SETTINGS: TopLevelSettingsI = {
+    maxToolCalls: null,
+    reasoningEffort: 'MEDIUM',
+    streamResponse: true,
+    thinking: false,
+};
+
+const resolveTopLevelSettings = (settings: unknown): TopLevelSettingsI => {
+    const record = ((settings as Record<string, unknown> | null | undefined) ?? {}) as Record<string, unknown>;
+
+    const reasoningEffort = String(record.reasoningEffort ?? '').toUpperCase() as ReasoningEffortType;
+
+    return {
+        maxToolCalls: record.maxToolCalls != null ? Number(record.maxToolCalls) : null,
+        reasoningEffort: REASONING_EFFORTS.includes(reasoningEffort)
+            ? reasoningEffort
+            : DEFAULT_TOP_LEVEL_SETTINGS.reasoningEffort,
+        streamResponse: (record.streamResponse as boolean | undefined) ?? DEFAULT_TOP_LEVEL_SETTINGS.streamResponse,
+        thinking: (record.thinking as boolean | undefined) ?? DEFAULT_TOP_LEVEL_SETTINGS.thinking,
+    };
+};
 
 const resolveBuiltInTools = (settings: unknown): BuiltInToolsSettingsI => {
     const builtInTools = ((settings as {builtInTools?: Record<string, unknown>} | null | undefined)?.builtInTools ??
@@ -94,7 +136,9 @@ interface AgentSettingsCardProps {
 
 const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSettingsCardProps) => {
     const [builtInTools, setBuiltInTools] = useState<BuiltInToolsSettingsI>(() => resolveBuiltInTools(settings));
-    const [streamResponse, setStreamResponse] = useState<boolean>(() => resolveStreamResponse(settings));
+    const [topLevelSettings, setTopLevelSettings] = useState<TopLevelSettingsI>(() =>
+        resolveTopLevelSettings(settings)
+    );
 
     // Chat memory sits in this toggle list beside the built-in tools, but it is not one of them: it is a
     // CHAT_MEMORY AiAgentElement row, added and deleted rather than flipped in the settings map. The two
@@ -155,16 +199,16 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
         }
     };
 
-    // nextStreamResponse defaults to the current value so the built-in-tool call sites stay one argument —
-    // but it is still SENT on every commit, because updateAiAgentSettings replaces the whole map and an
-    // omitted key would silently reset the toggle to its default.
-    const commit = (next: BuiltInToolsSettingsI, nextStreamResponse: boolean = streamResponse) => {
+    // nextTopLevel defaults to the current value so the built-in-tool call sites stay one argument — but its
+    // keys are still SENT on every commit, because updateAiAgentSettings replaces the whole map and an omitted
+    // key would silently reset that setting to its default.
+    const commit = (next: BuiltInToolsSettingsI, nextTopLevel: TopLevelSettingsI = topLevelSettings) => {
         setBuiltInTools(next);
-        setStreamResponse(nextStreamResponse);
+        setTopLevelSettings(nextTopLevel);
 
         // The four booleans and the provider are always sent explicitly (replace-whole semantics — see
-        // this file's top comment); webSearchConnectionId is included only when set, since it has no
-        // default to pin.
+        // this file's top comment); webSearchConnectionId and maxToolCalls are included only when set, since
+        // neither has a default to pin.
         updateAiAgentSettingsMutation.mutate({
             id: agentId,
             settings: {
@@ -176,13 +220,39 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
                     webSearchProvider: next.webSearchProvider,
                     ...(next.webSearchConnectionId != null ? {webSearchConnectionId: next.webSearchConnectionId} : {}),
                 },
-                streamResponse: nextStreamResponse,
+                reasoningEffort: nextTopLevel.reasoningEffort,
+                streamResponse: nextTopLevel.streamResponse,
+                thinking: nextTopLevel.thinking,
+                ...(nextTopLevel.maxToolCalls != null ? {maxToolCalls: nextTopLevel.maxToolCalls} : {}),
             },
         });
     };
 
     const handleStreamResponseToggle = (checked: boolean) => {
-        commit(builtInTools, checked);
+        commit(builtInTools, {...topLevelSettings, streamResponse: checked});
+    };
+
+    const handleThinkingToggle = (checked: boolean) => {
+        commit(builtInTools, {...topLevelSettings, thinking: checked});
+    };
+
+    const handleReasoningEffortChange = (value: string) => {
+        commit(builtInTools, {...topLevelSettings, reasoningEffort: value as ReasoningEffortType});
+    };
+
+    // Committed on blur rather than per keystroke: every commit is a mutation, and a three-digit cap typed one
+    // digit at a time would fire three of them, the first two carrying a number the user never meant (1, then 15,
+    // then 150). An empty field clears the cap back to the platform default.
+    const handleMaxToolCallsBlur = (value: string) => {
+        const trimmed = value.trim();
+        const parsed = trimmed === '' ? null : Number(trimmed);
+        const maxToolCalls = parsed != null && Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : null;
+
+        if (maxToolCalls === topLevelSettings.maxToolCalls) {
+            return;
+        }
+
+        commit(builtInTools, {...topLevelSettings, maxToolCalls});
     };
 
     const handleToggle =
@@ -210,40 +280,75 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
     return (
         <AgentSection title="Settings">
             <fieldset className="space-y-4 border-0 p-0">
-                <Switch
-                    checked={streamResponse}
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Stream response"
+                            checked={topLevelSettings.streamResponse}
+                            id="agent-settings-stream-response"
+                            onCheckedChange={handleStreamResponseToggle}
+                        />
+                    }
+                    controlId="agent-settings-stream-response"
                     description="Send the response back token by token instead of once it is complete."
                     label="Stream response"
-                    onCheckedChange={handleStreamResponseToggle}
                 />
 
-                <Switch
-                    checked={builtInTools.askUserQuestion}
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Ask user question"
+                            checked={builtInTools.askUserQuestion}
+                            id="agent-settings-ask-user-question"
+                            onCheckedChange={handleToggle('askUserQuestion')}
+                        />
+                    }
+                    controlId="agent-settings-ask-user-question"
                     description="Lets the agent pause a run to ask the user a clarifying question."
                     label="Ask user question"
-                    onCheckedChange={handleToggle('askUserQuestion')}
                 />
 
-                <Switch
-                    checked={!!chatMemoryElement}
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Chat memory"
+                            checked={!!chatMemoryElement}
+                            disabled={isChatMemoryBusy}
+                            id="agent-settings-chat-memory"
+                            onCheckedChange={handleChatMemoryToggle}
+                        />
+                    }
+                    controlId="agent-settings-chat-memory"
                     description="Remembers prior turns within a session."
-                    disabled={isChatMemoryBusy}
                     label="Chat memory"
-                    onCheckedChange={handleChatMemoryToggle}
                 />
 
-                <Switch
-                    checked={builtInTools.autoMemory}
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Auto memory"
+                            checked={builtInTools.autoMemory}
+                            id="agent-settings-auto-memory"
+                            onCheckedChange={handleToggle('autoMemory')}
+                        />
+                    }
+                    controlId="agent-settings-auto-memory"
                     description="Lets the agent persist facts across conversations automatically."
                     label="Auto memory"
-                    onCheckedChange={handleToggle('autoMemory')}
                 />
 
-                <Switch
-                    checked={builtInTools.skillManagement}
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Skill management"
+                            checked={builtInTools.skillManagement}
+                            id="agent-settings-skill-management"
+                            onCheckedChange={handleToggle('skillManagement')}
+                        />
+                    }
+                    controlId="agent-settings-skill-management"
                     description="Lets the agent create, update, and delete its own skills."
                     label="Skill management"
-                    onCheckedChange={handleToggle('skillManagement')}
                 />
 
                 {/* Element-backed rather than settings-backed, like Chat memory above — see the component's
@@ -252,72 +357,146 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
 
                 <AgentApprovalSettings agentId={agentId} channels={channels} elements={elements} />
 
-                <Switch
-                    checked={builtInTools.webSearch}
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Web search"
+                            checked={builtInTools.webSearch}
+                            id="agent-settings-web-search"
+                            onCheckedChange={handleToggle('webSearch')}
+                        />
+                    }
+                    controlId="agent-settings-web-search"
                     description="Lets the agent search the web."
                     label="Web search"
-                    onCheckedChange={handleToggle('webSearch')}
                 />
 
                 {builtInTools.webSearch && (
-                    <div className="ml-0 space-y-4 sm:ml-11">
-                        <div className="space-y-1">
-                            <Label htmlFor="agent-settings-web-search-provider">Search provider</Label>
-
-                            <Select
-                                disabled={isWebSearchConnectionBusy}
-                                onValueChange={handleProviderChange}
-                                value={builtInTools.webSearchProvider}
-                            >
-                                <SelectTrigger className="sm:w-64" id="agent-settings-web-search-provider">
-                                    <SelectValue />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    <SelectItem value="BRAVE">Brave</SelectItem>
-
-                                    <SelectItem value="FIRECRAWL">Firecrawl</SelectItem>
-
-                                    <SelectItem value="NATIVE">Model provider (native)</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {webSearchProvider.componentName ? (
-                            <div className="space-y-1">
-                                <Label htmlFor="agent-settings-web-search-connection">
-                                    {webSearchProvider.title} connection
-                                </Label>
-
+                    <div className="ml-1 space-y-4 border-l border-stroke-neutral-secondary pl-4">
+                        <AgentSettingRow
+                            control={
                                 <Select
                                     disabled={isWebSearchConnectionBusy}
-                                    onValueChange={handleConnectionChange}
-                                    value={builtInTools.webSearchConnectionId?.toString() ?? 'no-connection'}
+                                    onValueChange={handleProviderChange}
+                                    value={builtInTools.webSearchProvider}
                                 >
-                                    <SelectTrigger className="sm:w-64" id="agent-settings-web-search-connection">
-                                        <SelectValue placeholder="Choose a connection…" />
+                                    <SelectTrigger className="w-56" id="agent-settings-web-search-provider">
+                                        <SelectValue />
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        <SelectItem value="no-connection">No connection</SelectItem>
+                                        <SelectItem value="BRAVE">Brave</SelectItem>
 
-                                        {connections.map((connection) => (
-                                            <SelectItem key={connection.id} value={String(connection.id)}>
-                                                {connection.name}
-                                            </SelectItem>
-                                        ))}
+                                        <SelectItem value="FIRECRAWL">Firecrawl</SelectItem>
+
+                                        <SelectItem value="NATIVE">Model provider (native)</SelectItem>
                                     </SelectContent>
                                 </Select>
-                            </div>
+                            }
+                            controlId="agent-settings-web-search-provider"
+                            label="Search provider"
+                        />
+
+                        {webSearchProvider.componentName ? (
+                            <AgentSettingRow
+                                control={
+                                    <Select
+                                        disabled={isWebSearchConnectionBusy}
+                                        onValueChange={handleConnectionChange}
+                                        value={builtInTools.webSearchConnectionId?.toString() ?? 'no-connection'}
+                                    >
+                                        <SelectTrigger className="w-56" id="agent-settings-web-search-connection">
+                                            <SelectValue placeholder="Choose a connection…" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectItem value="no-connection">No connection</SelectItem>
+
+                                            {connections.map((connection) => (
+                                                <SelectItem key={connection.id} value={String(connection.id)}>
+                                                    {connection.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                }
+                                controlId="agent-settings-web-search-connection"
+                                label={`${webSearchProvider.title} connection`}
+                            />
                         ) : (
                             <p className="text-sm text-muted-foreground">
                                 {modelProvider && !NATIVE_WEB_SEARCH_MODEL_PROVIDERS.includes(modelProvider)
-                                    ? `The model provider ${modelProvider} has no built-in web search, so this agent cannot be published with it. Supported: ${NATIVE_WEB_SEARCH_MODEL_PROVIDERS.join(', ')}.`
+                                    ? `${modelProvider} has no built-in web search. Supported: ${NATIVE_WEB_SEARCH_MODEL_PROVIDERS.join(', ')}.`
                                     : 'The model searches the web itself. No connection needed.'}
                             </p>
                         )}
                     </div>
                 )}
+
+                <AgentSettingRow
+                    control={
+                        <Switch
+                            aria-label="Thinking"
+                            checked={topLevelSettings.thinking}
+                            id="agent-settings-thinking"
+                            onCheckedChange={handleThinkingToggle}
+                        />
+                    }
+                    controlId="agent-settings-thinking"
+                    description="Let the model reason before responding."
+                    label="Thinking"
+                />
+
+                {topLevelSettings.thinking && (
+                    <div className="ml-1 space-y-4 border-l border-stroke-neutral-secondary pl-4">
+                        <AgentSettingRow
+                            control={
+                                <Select
+                                    onValueChange={handleReasoningEffortChange}
+                                    value={topLevelSettings.reasoningEffort}
+                                >
+                                    <SelectTrigger className="w-56" id="agent-settings-reasoning-effort">
+                                        <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="LOW">Low</SelectItem>
+
+                                        <SelectItem value="MEDIUM">Medium</SelectItem>
+
+                                        <SelectItem value="HIGH">High</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            }
+                            controlId="agent-settings-reasoning-effort"
+                            label="Reasoning effort"
+                        />
+
+                        {modelProvider && !THINKING_MODEL_PROVIDERS.includes(modelProvider) && (
+                            <p className="text-sm text-muted-foreground">
+                                {`${modelProvider} has no extended reasoning. Supported: ${THINKING_MODEL_PROVIDERS.join(', ')}.`}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                <AgentSettingRow
+                    control={
+                        <Input
+                            className="w-56"
+                            defaultValue={topLevelSettings.maxToolCalls ?? ''}
+                            id="agent-settings-max-tool-calls"
+                            max={1000}
+                            min={1}
+                            onBlur={(event) => handleMaxToolCallsBlur(event.target.value)}
+                            placeholder={String(DEFAULT_MAX_TOOL_CALLS)}
+                            type="number"
+                        />
+                    }
+                    controlId="agent-settings-max-tool-calls"
+                    description={`Across all tools in one run. Leave empty for ${DEFAULT_MAX_TOOL_CALLS}.`}
+                    label="Max tool calls"
+                />
             </fieldset>
         </AgentSection>
     );

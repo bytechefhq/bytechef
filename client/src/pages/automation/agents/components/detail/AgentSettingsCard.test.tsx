@@ -112,7 +112,9 @@ describe('AgentSettingsCard', () => {
                     webSearch: false,
                     webSearchProvider: 'BRAVE',
                 },
+                reasoningEffort: 'MEDIUM',
                 streamResponse: true,
+                thinking: false,
             },
         });
     });
@@ -148,7 +150,9 @@ describe('AgentSettingsCard', () => {
                     webSearch: false,
                     webSearchProvider: 'BRAVE',
                 },
+                reasoningEffort: 'MEDIUM',
                 streamResponse: false,
+                thinking: false,
             },
         });
     });
@@ -172,7 +176,9 @@ describe('AgentSettingsCard', () => {
                     webSearch: false,
                     webSearchProvider: 'BRAVE',
                 },
+                reasoningEffort: 'MEDIUM',
                 streamResponse: false,
+                thinking: false,
             },
         });
     });
@@ -196,7 +202,9 @@ describe('AgentSettingsCard', () => {
                     webSearch: true,
                     webSearchProvider: 'BRAVE',
                 },
+                reasoningEffort: 'MEDIUM',
                 streamResponse: true,
+                thinking: false,
             },
         });
         expect(await screen.findByLabelText('Brave connection')).toBeInTheDocument();
@@ -233,7 +241,9 @@ describe('AgentSettingsCard', () => {
                     webSearch: true,
                     webSearchProvider: 'FIRECRAWL',
                 },
+                reasoningEffort: 'MEDIUM',
                 streamResponse: true,
+                thinking: false,
             },
         });
         expect(await screen.findByLabelText('Firecrawl connection')).toBeInTheDocument();
@@ -325,5 +335,178 @@ describe('AgentSettingsCard', () => {
 
         expect(deleteAgentElementMutate).toHaveBeenCalledWith({id: 'element-1'});
         expect(updateAiAgentSettingsMutate).not.toHaveBeenCalled();
+    });
+
+    // Thinking is written onto the MODEL cluster element, so it defaults OFF — every agent written before the key
+    // existed generated a model element with no thinking parameter at all.
+    it('renders thinking off by default and keeps the reasoning effort select hidden', () => {
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={null} />);
+
+        expect(screen.getByRole('switch', {name: 'Thinking'})).not.toBeChecked();
+        expect(screen.queryByLabelText('Reasoning effort')).not.toBeInTheDocument();
+    });
+
+    it('sends thinking and reveals the reasoning effort select when thinking is turned on', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={null} />);
+
+        await user.click(screen.getByRole('switch', {name: 'Thinking'}));
+
+        expect(updateAiAgentSettingsMutate).toHaveBeenLastCalledWith({
+            id: 'agent-1',
+            settings: {
+                builtInTools: {
+                    askUserQuestion: true,
+                    autoMemory: true,
+                    skillManagement: true,
+                    webSearch: false,
+                    webSearchProvider: 'BRAVE',
+                },
+                reasoningEffort: 'MEDIUM',
+                streamResponse: true,
+                thinking: true,
+            },
+        });
+        expect(await screen.findByLabelText('Reasoning effort')).toBeInTheDocument();
+    });
+
+    it('sends the chosen reasoning effort', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={{thinking: true}} />);
+
+        await user.click(screen.getByLabelText('Reasoning effort'));
+        await user.click(await screen.findByRole('option', {name: 'High'}));
+
+        expect(updateAiAgentSettingsMutate).toHaveBeenLastCalledWith(
+            expect.objectContaining({settings: expect.objectContaining({reasoningEffort: 'HIGH', thinking: true})})
+        );
+    });
+
+    // An unparseable effort must not make an otherwise valid agent unreadable — it falls back to MEDIUM, the same
+    // way AiAgentSettings.getReasoningEffort does server-side.
+    it('falls back to medium effort for an unrecognised stored value', () => {
+        wrap(
+            <AgentSettingsCard
+                agentId="agent-1"
+                channels={[]}
+                elements={[]}
+                settings={{reasoningEffort: 'ludicrous', thinking: true}}
+            />
+        );
+
+        expect(screen.getByLabelText('Reasoning effort')).toHaveTextContent('Medium');
+    });
+
+    // Only a provider whose model cluster element declares the `thinking` property can act on it, and publish
+    // rejects the rest — say so here rather than letting the user find out at publish time.
+    it('warns when thinking is on for a model provider that has none', () => {
+        wrap(
+            <AgentSettingsCard
+                agentId="agent-1"
+                channels={[]}
+                elements={[
+                    {
+                        connectionId: null,
+                        id: 'element-1',
+                        kind: 'MODEL',
+                        parameters: {model: 'gpt-4', provider: 'openRouter'},
+                        position: 0,
+                        referenceId: null,
+                    },
+                ]}
+                settings={{thinking: true}}
+            />
+        );
+
+        expect(screen.getByText(/openRouter has no extended reasoning/)).toBeInTheDocument();
+    });
+
+    it('does not warn when thinking is on for a provider that supports it', () => {
+        wrap(
+            <AgentSettingsCard
+                agentId="agent-1"
+                channels={[]}
+                elements={[
+                    {
+                        connectionId: null,
+                        id: 'element-1',
+                        kind: 'MODEL',
+                        parameters: {model: 'claude-sonnet-5', provider: 'anthropic'},
+                        position: 0,
+                        referenceId: null,
+                    },
+                ]}
+                settings={{thinking: true}}
+            />
+        );
+
+        expect(screen.queryByText(/has no extended reasoning/)).not.toBeInTheDocument();
+    });
+
+    // maxToolCalls has no default to pin: absent means the platform cap applies, so it is the one key the commit
+    // omits rather than sending explicitly.
+    it('omits maxToolCalls from the payload while it is unset', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={null} />);
+
+        await user.click(screen.getByRole('switch', {name: 'Auto memory'}));
+
+        const [call] = updateAiAgentSettingsMutate.mock.calls.at(-1) as [{settings: Record<string, unknown>}];
+
+        expect(call.settings).not.toHaveProperty('maxToolCalls');
+    });
+
+    it('commits max tool calls on blur, and clears it back to the default when emptied', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={{maxToolCalls: 30}} />);
+
+        const input = screen.getByLabelText('Max tool calls');
+
+        expect(input).toHaveValue(30);
+
+        await user.clear(input);
+        await user.type(input, '80');
+        await user.tab();
+
+        expect(updateAiAgentSettingsMutate).toHaveBeenLastCalledWith(
+            expect.objectContaining({settings: expect.objectContaining({maxToolCalls: 80})})
+        );
+
+        await user.clear(input);
+        await user.tab();
+
+        const [call] = updateAiAgentSettingsMutate.mock.calls.at(-1) as [{settings: Record<string, unknown>}];
+
+        expect(call.settings).not.toHaveProperty('maxToolCalls');
+    });
+
+    // Typing fires no mutation of its own: a three-digit cap entered one digit at a time would otherwise commit
+    // 1, then 15, then 150 — the first two being numbers the user never meant.
+    it('does not commit while max tool calls is being typed', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={null} />);
+
+        await user.type(screen.getByLabelText('Max tool calls'), '150');
+
+        expect(updateAiAgentSettingsMutate).not.toHaveBeenCalled();
+    });
+
+    // updateAiAgentSettings replaces the whole map, so a built-in-tool flip that omitted maxToolCalls would
+    // silently reset the cap to the platform default.
+    it('preserves an explicit maxToolCalls when a built-in tool is toggled', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={{maxToolCalls: 30}} />);
+
+        await user.click(screen.getByRole('switch', {name: 'Auto memory'}));
+
+        expect(updateAiAgentSettingsMutate).toHaveBeenLastCalledWith(
+            expect.objectContaining({settings: expect.objectContaining({maxToolCalls: 30})})
+        );
     });
 });

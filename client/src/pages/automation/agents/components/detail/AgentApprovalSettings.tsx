@@ -1,6 +1,6 @@
 import {Input} from '@/components/Input/Input';
 import Switch from '@/components/Switch/Switch';
-import {Label} from '@/components/ui/label';
+import AgentSettingRow from '@/pages/automation/agents/components/detail/AgentSettingRow';
 import {useAiAgentChannelDefinitions} from '@/pages/automation/agents/hooks/useAiAgentChannelDefinitions';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {
@@ -126,39 +126,57 @@ const AgentApprovalSettings = ({agentId, channels, elements}: AgentApprovalSetti
 
     return (
         <>
-            <Switch
-                checked={!!approvalToolElement}
+            <AgentSettingRow
+                control={
+                    <Switch
+                        aria-label="Agent may request approval"
+                        checked={!!approvalToolElement}
+                        disabled={isBusy}
+                        id="agent-approval-request"
+                        onCheckedChange={handleRequestApprovalToggle}
+                    />
+                }
+                controlId="agent-approval-request"
                 description="Adds a tool the agent's LLM can call mid-turn to ask a human a question."
-                disabled={isBusy}
                 label="Agent may request approval"
-                onCheckedChange={handleRequestApprovalToggle}
             />
 
-            <Switch
-                checked={!!gateElement}
+            <AgentSettingRow
+                control={
+                    <Switch
+                        aria-label="Tool approval"
+                        checked={!!gateElement}
+                        disabled={isBusy}
+                        id="agent-approval-gate"
+                        onCheckedChange={handleToolApprovalToggle}
+                    />
+                }
+                controlId="agent-approval-gate"
                 description="Pauses tools marked “Requires approval” until a human approves them."
-                disabled={isBusy}
                 label="Tool approval"
-                onCheckedChange={handleToolApprovalToggle}
             />
 
             {gateElement && (
-                <div className="ml-0 space-y-1 sm:ml-11">
-                    <Label htmlFor="agent-approval-gate-expiry">Approval expires after (days)</Label>
-
-                    <Input
-                        className="sm:w-64"
-                        defaultValue={
-                            gateElement.parameters?.approvalExpiresIn != null
-                                ? String(gateElement.parameters.approvalExpiresIn)
-                                : ''
+                <div className="ml-1 space-y-4 border-l border-stroke-neutral-secondary pl-4">
+                    <AgentSettingRow
+                        control={
+                            <Input
+                                className="w-56"
+                                defaultValue={
+                                    gateElement.parameters?.approvalExpiresIn != null
+                                        ? String(gateElement.parameters.approvalExpiresIn)
+                                        : ''
+                                }
+                                disabled={isBusy}
+                                id="agent-approval-gate-expiry"
+                                min={1}
+                                onBlur={(event) => handleGateExpiryBlur(event.target.value)}
+                                placeholder="4"
+                                type="number"
+                            />
                         }
-                        disabled={isBusy}
-                        id="agent-approval-gate-expiry"
-                        min={1}
-                        onBlur={(event) => handleGateExpiryBlur(event.target.value)}
-                        placeholder="4"
-                        type="number"
+                        controlId="agent-approval-gate-expiry"
+                        label="Approval expires after (days)"
                     />
                 </div>
             )}
@@ -168,7 +186,7 @@ const AgentApprovalSettings = ({agentId, channels, elements}: AgentApprovalSetti
                 same way, so this belongs to neither toggle alone. */}
 
             {(approvalToolElement || gateElement) && (
-                <p className="ml-0 text-sm text-muted-foreground sm:ml-11">
+                <p className="text-sm text-muted-foreground">
                     {deliveryChannelLabels.length > 0
                         ? `Approvals are delivered to the agent's channels: ${deliveryChannelLabels.join(', ')}.`
                         : 'This agent has no channel that can carry an approval, so approvals fall back to the chat channel — invisible on a webhook or schedule-only agent.'}
