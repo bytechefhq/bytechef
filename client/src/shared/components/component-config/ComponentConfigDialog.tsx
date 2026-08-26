@@ -99,6 +99,19 @@ interface ComponentConfigDialogPropsI {
      * defaults. This is what lets an add flow set properties up front instead of forcing add-then-configure.
      */
     picker?: ReactNode;
+    /**
+     * Property names the caller owns outside the tabs and does not want a second editor for. The agent's
+     * model dialog excludes `model`, which it picks in its own combobox: the model cluster element declares
+     * `model` among its own properties, so without this the Properties tab showed a second Model field
+     * carrying the schema default rather than the chosen model.
+     *
+     * <p>
+     * Excluded names are withheld from the rendered tree AND from the submitted parameters — including a
+     * value inherited through {@code initialValues} — since anything left in the map would keep writing back
+     * over the value the caller owns.
+     * </p>
+     */
+    excludedPropertyNames?: string[];
     target: ComponentConfigDialogTargetI | null;
     title?: string;
     description?: string;
@@ -132,6 +145,7 @@ interface ComponentConfigDialogPropsI {
  */
 const ComponentConfigDialog = ({
     description,
+    excludedPropertyNames,
     initialValues,
     onClose,
     onSubmit,
@@ -148,6 +162,7 @@ const ComponentConfigDialog = ({
 
     const {connections, connectionsLoading, form, handleFormSubmit, properties, propertiesLoading} =
         useComponentConfigForm({
+            excludedPropertyNames,
             initialValues,
             onSubmit,
             target,
@@ -403,6 +418,7 @@ const ComponentConfigDialog = ({
 export default ComponentConfigDialog;
 
 interface UseComponentConfigFormPropsI {
+    excludedPropertyNames?: string[];
     initialValues?: ComponentConfigDialogInitialValuesI;
     onSubmit: (values: ComponentConfigDialogValuesI) => Promise<void> | void;
     target: ComponentConfigDialogTargetI | null;
@@ -428,7 +444,13 @@ interface UseComponentConfigFormPropsI {
  * to handle the persistence layer.
  * </p>
  */
-function useComponentConfigForm({initialValues, onSubmit, target, workspaceId}: UseComponentConfigFormPropsI) {
+function useComponentConfigForm({
+    excludedPropertyNames,
+    initialValues,
+    onSubmit,
+    target,
+    workspaceId,
+}: UseComponentConfigFormPropsI) {
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const isTriggerTarget = target?.kind === 'TRIGGER';
@@ -462,17 +484,25 @@ function useComponentConfigForm({initialValues, onSubmit, target, workspaceId}: 
         target != null
     );
 
+    // Compared by content rather than by array identity: callers pass this inline, and a fresh array each
+    // render would recompute the memos below, whose changing identity re-runs the form reset effect — an
+    // infinite render loop rather than a wasted render.
+    const excludedPropertyNamesKey = (excludedPropertyNames ?? []).join(',');
+
     const properties = useMemo(() => {
-        if (isTriggerTarget) {
-            return (triggerDefinition?.properties ?? []) as unknown as PropertyAllType[];
+        const targetProperties = isTriggerTarget
+            ? ((triggerDefinition?.properties ?? []) as unknown as PropertyAllType[])
+            : ((clusterElementDefinition?.clusterElementDefinition?.properties ?? []) as unknown as PropertyAllType[]);
+
+        if (!excludedPropertyNamesKey) {
+            return targetProperties;
         }
 
-        if (!clusterElementDefinition?.clusterElementDefinition?.properties) {
-            return [];
-        }
+        const excluded = new Set(excludedPropertyNamesKey.split(','));
 
-        return clusterElementDefinition.clusterElementDefinition.properties as unknown as PropertyAllType[];
-    }, [clusterElementDefinition, isTriggerTarget, triggerDefinition]);
+        // A nameless property cannot be addressed by name, so it can never be one of the excluded.
+        return targetProperties.filter((property) => !property.name || !excluded.has(property.name));
+    }, [clusterElementDefinition, excludedPropertyNamesKey, isTriggerTarget, triggerDefinition]);
 
     const defaultParameters = useMemo(() => {
         const seeded: Record<string, unknown> = {};
@@ -518,12 +548,20 @@ function useComponentConfigForm({initialValues, onSubmit, target, workspaceId}: 
     // edit flow shows what the user previously configured (their values win over schema defaults). For the
     // chat attach flow, initialValues is null so seeded defaults stand alone.
     const mergedDefaultParameters = useMemo(() => {
-        if (!initialValues?.parameters) {
-            return defaultParameters;
+        const merged = initialValues?.parameters
+            ? {...defaultParameters, ...initialValues.parameters}
+            : defaultParameters;
+
+        if (!excludedPropertyNamesKey) {
+            return merged;
         }
 
-        return {...defaultParameters, ...initialValues.parameters};
-    }, [defaultParameters, initialValues?.parameters]);
+        // `defaultParameters` is already clear of these — it is derived from the filtered property list — but
+        // `initialValues` is the caller's own previously saved map and can still carry one.
+        const excluded = new Set(excludedPropertyNamesKey.split(','));
+
+        return Object.fromEntries(Object.entries(merged).filter(([name]) => !excluded.has(name)));
+    }, [defaultParameters, excludedPropertyNamesKey, initialValues?.parameters]);
 
     const form = useForm<{
         connectionId?: string;
