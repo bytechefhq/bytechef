@@ -253,7 +253,7 @@ class ProjectFacadeVisibilityTest {
             mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), tagService,
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
-            mock(WorkflowNodeTestOutputService.class));
+            mock(WorkflowNodeTestOutputService.class), List.of());
     }
 
     private static Project withId(Project project, long id) {

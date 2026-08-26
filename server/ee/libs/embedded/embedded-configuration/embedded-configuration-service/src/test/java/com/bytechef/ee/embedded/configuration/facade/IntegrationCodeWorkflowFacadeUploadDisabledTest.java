@@ -25,6 +25,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowC
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.tag.service.TagService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.cache.CacheManager;
 
@@ -59,7 +60,7 @@ class IntegrationCodeWorkflowFacadeUploadDisabledTest {
             applicationProperties(true), mock(CacheManager.class), codeWorkflowContainerFacade,
             integrationCodeWorkflowService, integrationService, integrationWorkflowService,
             mock(CodeWorkflowContainerService.class), mock(CodeWorkflowFileStorage.class), mock(TagService.class),
-            mock(WorkflowService.class));
+            mock(WorkflowService.class), List.of());
 
         assertThatThrownBy(() -> integrationCodeWorkflowFacade.save(new byte[0], Language.RUBY))
             .isInstanceOf(ConfigurationException.class)

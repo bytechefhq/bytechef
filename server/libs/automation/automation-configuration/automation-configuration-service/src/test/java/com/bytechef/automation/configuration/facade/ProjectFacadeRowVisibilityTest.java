@@ -212,7 +212,7 @@ class ProjectFacadeRowVisibilityTest {
      */
     private boolean isByIdReadPermitted(long projectId) {
         AutomationPermissionEvaluator automationPermissionEvaluator =
-            new AutomationPermissionEvaluator(permissionService);
+            new AutomationPermissionEvaluator(permissionService, mock(ObjectProvider.class));
 
         return automationPermissionEvaluator.hasPermission(
             null, projectId, PROJECT_RESOURCE_TYPE, WORKFLOW_VIEW_SCOPE);
@@ -326,7 +326,7 @@ class ProjectFacadeRowVisibilityTest {
             projectVisibilityFilter, mock(ResourceVisibilityPolicyRegistry.class), mock(ProjectDeploymentFacade.class),
             mock(ProjectWorkflowFacade.class), mock(SharedTemplateFileStorage.class),
             mock(SharedTemplateService.class), mock(TagService.class), mock(WorkflowService.class),
-            mock(WorkflowTestConfigurationService.class), mock(WorkflowNodeTestOutputService.class));
+            mock(WorkflowTestConfigurationService.class), mock(WorkflowNodeTestOutputService.class), List.of());
     }
 
     private static boolean isVisible(Project project) {

@@ -164,7 +164,7 @@ class ProjectDeploymentFacadeChatWorkflowTest {
      */
     private ProjectDeploymentFacadeImpl createProjectDeploymentFacade(ResourceVisibility lowestVisibleRung) {
         return new ProjectDeploymentFacadeImpl(
-            null, null, null, environmentService, null, null, null, null, projectDeploymentService,
+            null, null, null, environmentService, null, null, null, null, List.of(), projectDeploymentService,
             projectDeploymentWorkflowService, projectService, createProjectVisibilityFilter(lowestVisibleRung),
             projectWorkflowService, null, triggerDefinitionService, null, null, applicationProperties, null,
             workflowService);

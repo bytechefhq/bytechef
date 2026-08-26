@@ -115,7 +115,7 @@ class AiAgentFacadeVisibilityFilterTest {
             mock(ProjectDeploymentWorkflowService.class), mock(TriggerDefinitionService.class),
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
             mock(WorkflowNodeTestOutputService.class), tagService, mock(PrincipalJobService.class),
-            mock(JobService.class), mock(UserService.class), "http://localhost/webhooks/{id}");
+            mock(JobService.class), mock(UserService.class), "http://localhost/webhooks/{id}", List.of());
     }
 
     @Test

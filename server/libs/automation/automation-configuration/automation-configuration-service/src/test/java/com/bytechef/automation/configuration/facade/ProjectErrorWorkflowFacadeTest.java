@@ -85,7 +85,7 @@ class ProjectErrorWorkflowFacadeTest {
             mock(ProjectDeploymentFacade.class), mock(ProjectWorkflowFacade.class),
             mock(SharedTemplateFileStorage.class), mock(SharedTemplateService.class), mock(TagService.class),
             mock(WorkflowService.class), mock(WorkflowTestConfigurationService.class),
-            mock(WorkflowNodeTestOutputService.class));
+            mock(WorkflowNodeTestOutputService.class), List.of());
     }
 
     @Test

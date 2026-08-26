@@ -91,7 +91,7 @@ class IntegrationWorkflowFacadeReservedNameValidationTest {
             environmentService, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationService, integrationWorkflowService,
             workflowCacheManager, workflowService, workflowFacade, noDuplicatesWorkflowValidatorFacade(),
-            workflowTestConfigurationService);
+            workflowTestConfigurationService, List.of());
     }
 
     @Test
