@@ -38,7 +38,7 @@ if (project.hasProperty("prod")) {
         "developmentOnly"("org.springframework.boot:spring-boot-devtools:${libs.findVersion("spring-boot").get()}")
     }
 
-    profiles = "dev"
+    profiles = "dev,local"
 
     configure<org.springframework.boot.gradle.dsl.SpringBootExtension> {
         buildInfo {
