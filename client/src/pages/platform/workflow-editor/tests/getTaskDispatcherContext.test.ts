@@ -193,12 +193,15 @@ describe('getContextFromPlaceholderNode', () => {
         });
 
         // The id carries no index, so the generic trailing-segment parse would yield NaN — the
-        // graph branch sets `index` to 0 explicitly instead (exactly as fork-join's does). The
-        // real append position is resolved downstream, in insertTaskDispatcherSubtask.ts's own
-        // `graph` branch (see that file's comment), which keys off `index === 0`.
+        // graph branch clears it rather than substituting a number, because the frame header's
+        // add-node button can only mean "add to this graph". `insertTaskDispatcherSubtask` reads
+        // the absence of an index as an append; any number here would instead read as a genuine
+        // insert-at-that-position, and 0 in particular would make every added member the graph's
+        // implicit entry point.
+        expect(getContextFromPlaceholderNode(node)?.index).toBeUndefined();
+
         expect(getContextFromPlaceholderNode(node)).toMatchObject({
             graphId: 'graph_1',
-            index: 0,
             taskDispatcherId: 'graph_1',
         });
     });

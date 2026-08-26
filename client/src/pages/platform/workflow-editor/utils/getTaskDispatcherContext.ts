@@ -136,11 +136,14 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
     } else if (isGraphPlaceholder) {
         const graphId = placeholderNode.data?.graphId as string;
 
-        // A graph's add-node placeholder is a bare `<graphId>-graph-placeholder` carrying no
-        // index, so the generic trailing-segment parse above yields NaN — pin it to 0 the way
-        // fork-join's branch does. `insertTaskDispatcherSubtask` keys its append correction off
-        // `index === 0` and resolves the real position from the current `nodes` length.
-        context.index = 0;
+        // A graph's add-node placeholder is a bare `<graphId>-graph-placeholder` carrying no index,
+        // so the generic trailing-segment parse above yields NaN. Cleared rather than pinned to a
+        // number: the frame header can only mean "add to this graph", never "insert before member
+        // N", and NO index is what `insertTaskDispatcherSubtask` reads as an append. Pinning 0 made
+        // that indistinguishable from a genuine insert-at-0 and needed a second, correcting branch
+        // downstream to undo it — one that only ran when the caller also forwarded a
+        // `placeholderId`, which the task-dispatcher popover does not.
+        context.index = undefined;
         context.graphId = graphId;
         context.taskDispatcherId = graphId;
     } else if (isOnErrorPlaceholder) {

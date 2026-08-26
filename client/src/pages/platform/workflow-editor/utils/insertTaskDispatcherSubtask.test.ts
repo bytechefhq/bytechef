@@ -1,8 +1,11 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
+import {TaskDispatcherContextType} from '@/shared/types';
+import {Node} from '@xyflow/react';
 import {afterEach, beforeEach, describe, expect, it} from 'vitest';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import {getContextFromPlaceholderNode} from './getTaskDispatcherContext';
 import {AutoPlacedGraphPositionsRefType, registerAutoPlacedGraphPositions} from './graph/autoPlacedGraphPositions';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 
@@ -25,6 +28,30 @@ function placedAt(newTask: WorkflowTask, nodePosition: {x: number; y: number}): 
  */
 function placedAtFreeSpot(newTask: WorkflowTask): WorkflowTask {
     return placedAt(newTask, {x: 112, y: 0});
+}
+
+/** The frame header's add-node anchor, exactly as `createGraphNode` mints it. */
+function graphAddPlaceholderNode(): Node {
+    return {
+        data: {graphId: 'graph_1', taskDispatcherId: 'graph_1'},
+        id: 'graph_1-graph-placeholder',
+        position: {x: 0, y: 0},
+        type: 'placeholder',
+    };
+}
+
+/**
+ * The context the frame header's add-node button raises, resolved exactly as the editor resolves it.
+ * Deliberately not a literal — carrying no insertion index IS this placeholder's contract.
+ */
+function graphAddPlaceholderContext(): TaskDispatcherContextType {
+    const context = getContextFromPlaceholderNode(graphAddPlaceholderNode());
+
+    if (!context) {
+        throw new Error('The graph add-node placeholder must resolve a context');
+    }
+
+    return context;
 }
 
 function graphTask(nodes: WorkflowTask[] = []): WorkflowTask {
@@ -53,20 +80,17 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         useWorkflowEditorStore.getState().setGraphPendingConnection(undefined);
     });
 
-    // The real caller (saveWorkflowDefinition.ts) always supplies BOTH `placeholderId` and a
-    // `taskDispatcherContext` whose `index` the graph branch of getContextFromPlaceholderNode.ts
-    // pins to 0 (the bare `<graphId>-graph-placeholder` id carries no index to parse — see
-    // getTaskDispatcherContext.test.ts). Omitting `placeholderId` here would skip the
-    // `context.index === 0` correction branch entirely and fall straight into the unconditional-
-    // append path below, which would pass even if the add-node insertion path itself prepended —
-    // so these reproduce the real shape.
+    // These build their context through the REAL `getContextFromPlaceholderNode` rather than a
+    // literal, because the add-node placeholder's contract IS that it resolves no insertion index —
+    // the frame header can only mean "add to this graph", never "insert before member N". A literal
+    // here would let that contract change underneath these tests without one of them failing.
     it('should append a task onto an empty graph via the add-node placeholder', () => {
         const newTask = task({name: 'httpClient_1', type: 'httpClient/v1/get'});
 
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask,
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask([])],
         });
 
@@ -80,11 +104,32 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask,
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask([existingTask])],
         });
 
         expect(updatedTasks[0].parameters?.nodes).toEqual([existingTask, placedAtFreeSpot(newTask)]);
+    });
+
+    // The task-dispatcher popover forwards NO `placeholderId` once the context names a dispatcher
+    // (handleTaskDispatcherClick.tsx), so an add-node context is the whole of what this has to go
+    // on — appending has to follow from the context alone. Landing at index 0 is not a cosmetic
+    // ordering slip: with `parameters.startNode` unset, both `createGraphEdges` and the runtime's
+    // `GraphTaskDispatcher.resolveStartNode` enter at the FIRST declared node, so a prepended
+    // member silently becomes the graph's entry point.
+    it('should append a task dispatcher added through the add-node placeholder, which forwards no placeholderId', () => {
+        const existingTask = task({name: 'existing_action'});
+        const newDispatcher = task({name: 'condition_1', type: 'condition/v1'});
+
+        const updatedTasks = insertTaskDispatcherSubtask({
+            newTask: newDispatcher,
+            taskDispatcherContext: graphAddPlaceholderContext(),
+            tasks: [graphTask([existingTask])],
+        });
+
+        const nodes = updatedTasks[0].parameters?.nodes as WorkflowTask[];
+
+        expect(nodes.map((node) => node.name)).toEqual(['existing_action', 'condition_1']);
     });
 
     it('should land a task added through the add-node placeholder at nodes.length', () => {
@@ -98,7 +143,7 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask,
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask(existingTasks)],
         });
 
@@ -190,7 +235,7 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask,
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask([existingTask])],
         });
 
@@ -214,7 +259,7 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask,
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask([])],
         });
 
@@ -235,7 +280,7 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask,
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask([])],
         });
 
@@ -257,7 +302,7 @@ describe('insertTaskDispatcherSubtask — graph', () => {
         const updatedTasks = insertTaskDispatcherSubtask({
             newTask: task({name: 'httpClient_7', type: 'httpClient/v1/get'}),
             placeholderId: 'graph_1-graph-placeholder',
-            taskDispatcherContext: {index: 0, taskDispatcherId: 'graph_1'},
+            taskDispatcherContext: graphAddPlaceholderContext(),
             tasks: [graphTask([task({name: 'existing_action'})])],
         });
 

@@ -424,11 +424,10 @@ export const TASK_DISPATCHER_CONFIG = {
         contextIdentifier: 'graphId',
         dataKey: 'graphData',
         extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
-            // Minted as a bare `<graphId>-graph-placeholder` (createGraphNode.ts). This function
-            // deliberately resolves no index — `graph`'s append index is instead resolved in
-            // insertTaskDispatcherSubtask.ts's own `graph` branch (mirroring `parallel`'s), which
-            // reads the CURRENT `nodes` length rather than trusting anything parsed from a
-            // placeholder id that may already be stale by the time it's clicked.
+            // Minted as a bare `<graphId>-graph-placeholder` (createGraphNode.ts). Resolving no
+            // index is the whole point and not an omission: a graph member is appended, and
+            // `insertTaskDispatcherSubtask` reads the absence of an index as exactly that. An
+            // index parsed from a placeholder id could only be stale by the time it is clicked.
             const parts = placeholderId.split('-');
 
             return {taskDispatcherId: parts[0]};

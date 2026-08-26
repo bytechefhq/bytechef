@@ -60,18 +60,6 @@ export default function insertTaskDispatcherSubtask({
                 ...context,
                 index: targetTaskDispatcher.parameters?.tasks?.length,
             };
-        } else if (componentName === 'graph') {
-            // Mirrors the `parallel` branch above: `graph`'s single add-node placeholder is a
-            // bare `<graphId>-graph-placeholder` carrying no index at all, so
-            // `getContextFromPlaceholderNode`'s graph branch pins `context.index` to 0 (the
-            // generic trailing-segment parse would yield NaN) and the real append position is
-            // read straight off the CURRENT `nodes` length here. That pinned 0 is what makes
-            // this branch reachable — if it ever stops being set, adding a graph node silently
-            // becomes `splice(NaN, 0, task)`.
-            context = {
-                ...context,
-                index: targetTaskDispatcher.parameters?.nodes?.length,
-            };
         } else if (componentName === 'each') {
             context = {
                 ...context,
@@ -100,6 +88,11 @@ export default function insertTaskDispatcherSubtask({
 
     let updatedSubtasks: Array<WorkflowTask>;
 
+    // `graph` reaches this with no index by design — its add-node placeholder resolves none
+    // (getTaskDispatcherContext.ts), so a member added from the frame header appends here on the
+    // strength of the context alone, whether or not the caller forwarded a `placeholderId`. A
+    // numeric index still means what it says: pasting onto a member inserts at that declaration
+    // position.
     if (context.index === undefined || context.index === -1 || typeof context.index !== 'number') {
         updatedSubtasks = [...subtasks, newTask];
     } else {
