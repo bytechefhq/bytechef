@@ -117,34 +117,6 @@ class McpProjectWorkflowGraphQlControllerIntTest {
     }
 
     @Test
-    void testGetAllMcpProjectWorkflows() {
-        // Given
-        List<McpProjectWorkflow> mockWorkflows = List.of(
-            createMockMcpProjectWorkflow(1L, 1L, 123L),
-            createMockMcpProjectWorkflow(2L, 2L, 456L));
-
-        when(mcpProjectWorkflowService.getMcpProjectWorkflows()).thenReturn(mockWorkflows);
-
-        // When & Then
-        this.graphQlTester
-            .document("""
-                query {
-                    mcpProjectWorkflows {
-                        id
-                        mcpProjectId
-                        projectDeploymentWorkflowId
-                    }
-                }
-                """)
-            .execute()
-            .path("mcpProjectWorkflows")
-            .entityList(Object.class)
-            .hasSize(2);
-
-        verify(mcpProjectWorkflowService).getMcpProjectWorkflows();
-    }
-
-    @Test
     void testGetMcpProjectWorkflowsByMcpProjectId() {
         // Given
         Long mcpProjectId = 1L;
@@ -171,36 +143,6 @@ class McpProjectWorkflowGraphQlControllerIntTest {
             .hasSize(2);
 
         verify(mcpProjectWorkflowService).getMcpProjectMcpProjectWorkflows(mcpProjectId);
-    }
-
-    @Test
-    void testGetMcpProjectWorkflowsByProjectDeploymentWorkflowId() {
-        // Given
-        Long projectDeploymentWorkflowId = 123L;
-        List<McpProjectWorkflow> mockWorkflows = List.of(
-            createMockMcpProjectWorkflow(1L, 1L, projectDeploymentWorkflowId),
-            createMockMcpProjectWorkflow(2L, 2L, projectDeploymentWorkflowId));
-
-        when(mcpProjectWorkflowService.getProjectDeploymentWorkflowMcpProjectWorkflows(projectDeploymentWorkflowId))
-            .thenReturn(mockWorkflows);
-
-        // When & Then
-        this.graphQlTester
-            .document("""
-                query {
-                    mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: "123") {
-                        id
-                        mcpProjectId
-                        projectDeploymentWorkflowId
-                    }
-                }
-                """)
-            .execute()
-            .path("mcpProjectWorkflowsByProjectDeploymentWorkflowId")
-            .entityList(Object.class)
-            .hasSize(2);
-
-        verify(mcpProjectWorkflowService).getProjectDeploymentWorkflowMcpProjectWorkflows(projectDeploymentWorkflowId);
     }
 
     @Test

@@ -51,6 +51,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -87,24 +88,28 @@ public class McpProjectWorkflowGraphQlController {
             .orElse(null);
     }
 
+    /**
+     * Deliberately {@code public}: proxy-based method security is only guaranteed to intercept public methods, so a
+     * package-private guard here could silently never run.
+     */
     @QueryMapping
-    List<McpProjectWorkflow> mcpProjectWorkflows() {
-        return mcpProjectWorkflowService.getMcpProjectWorkflows();
-    }
-
-    @QueryMapping
-    List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_VIEW')")
+    public List<McpProjectWorkflow> mcpProjectWorkflowsByMcpProjectId(@Argument long mcpProjectId) {
         return mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
     }
 
+    /**
+     * Reads an arbitrary project's workflows, so it carries the project's own view scope — without it any caller could
+     * enumerate the workflow ids and labels of any project in the installation by guessing a numeric id.
+     * <p>
+     * Deliberately {@code public}, like {@link #mcpProjectWorkflowsByMcpProjectId(long)}: proxy-based method security
+     * is only guaranteed to intercept public methods.
+     * </p>
+     */
     @QueryMapping
-    List<McpProjectWorkflow>
-        mcpProjectWorkflowsByProjectDeploymentWorkflowId(@Argument long projectDeploymentWorkflowId) {
-        return mcpProjectWorkflowService.getProjectDeploymentWorkflowMcpProjectWorkflows(projectDeploymentWorkflowId);
-    }
-
-    @QueryMapping
-    List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(@Argument long projectId, @Argument int projectVersion) {
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
+    public List<ProjectWorkflow> toolEligibleProjectVersionWorkflows(
+        @Argument long projectId, @Argument int projectVersion) {
         return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
             .stream()
             .filter(projectWorkflow -> {

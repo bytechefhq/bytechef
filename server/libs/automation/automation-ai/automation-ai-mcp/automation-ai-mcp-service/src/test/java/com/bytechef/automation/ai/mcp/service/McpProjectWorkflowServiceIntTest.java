@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
@@ -40,6 +41,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Optional;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +57,9 @@ import org.springframework.context.annotation.Import;
 @Import(PostgreSQLContainerConfiguration.class)
 @McpProjectIntTestConfigurationSharedMocks
 public class McpProjectWorkflowServiceIntTest {
+
+    private static final String INVALID_PROJECT_DEPLOYMENT_WORKFLOW =
+        "Invalid projectDeploymentWorkflowId for the given MCP project";
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -83,6 +88,7 @@ public class McpProjectWorkflowServiceIntTest {
     @Autowired
     private McpServerRepository mcpServerRepository;
 
+    private ProjectDeploymentWorkflow foreignProjectDeploymentWorkflow;
     private McpProject mcpProject;
     private McpProject mcpProject2;
     private ProjectDeploymentWorkflow projectDeploymentWorkflow;
@@ -121,6 +127,7 @@ public class McpProjectWorkflowServiceIntTest {
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeployment = projectDeploymentRepository.save(projectDeployment);
 
@@ -128,6 +135,25 @@ public class McpProjectWorkflowServiceIntTest {
         projectDeploymentWorkflow.setProjectDeploymentId(projectDeployment.getId());
         projectDeploymentWorkflow.setWorkflowId("test-workflow");
         projectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(projectDeploymentWorkflow);
+
+        ProjectDeployment foreignProjectDeployment = new ProjectDeployment();
+
+        foreignProjectDeployment.setName("test-foreign-deployment");
+        foreignProjectDeployment.setDescription("test foreign deployment");
+        foreignProjectDeployment.setEnabled(true);
+        foreignProjectDeployment.setEnvironment(Environment.STAGING);
+        foreignProjectDeployment.setProjectId(project.getId());
+        foreignProjectDeployment.setProjectVersion(1);
+        foreignProjectDeployment.setUuid(UUID.randomUUID());
+
+        foreignProjectDeployment = projectDeploymentRepository.save(foreignProjectDeployment);
+
+        foreignProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        foreignProjectDeploymentWorkflow.setProjectDeploymentId(foreignProjectDeployment.getId());
+        foreignProjectDeploymentWorkflow.setWorkflowId("test-foreign-workflow");
+
+        foreignProjectDeploymentWorkflow = projectDeploymentWorkflowRepository.save(foreignProjectDeploymentWorkflow);
 
         mcpProject = new McpProject(projectDeployment.getId(), mcpServerId);
         mcpProject = mcpProjectRepository.save(mcpProject);
@@ -220,15 +246,6 @@ public class McpProjectWorkflowServiceIntTest {
     }
 
     @Test
-    public void testGetMcpProjectWorkflows() {
-        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
-
-        assertThat(mcpProjectWorkflowService.getMcpProjectWorkflows()).hasSize(1);
-        assertThat(mcpProjectWorkflowService.getMcpProjectWorkflows()
-            .get(0)).isEqualTo(mcpProjectWorkflow);
-    }
-
-    @Test
     public void testGetMcpProjectMcpProjectWorkflows() {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
 
@@ -254,6 +271,47 @@ public class McpProjectWorkflowServiceIntTest {
         // Test with non-existing workflow
         assertThat(mcpProjectWorkflowService.getProjectDeploymentWorkflowMcpProjectWorkflows(Long.MAX_VALUE))
             .hasSize(0);
+    }
+
+    @Test
+    public void testCreateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
+        Long mcpProjectId = mcpProject.getId();
+        Long foreignProjectDeploymentWorkflowId = foreignProjectDeploymentWorkflow.getId();
+
+        assertThatThrownBy(() -> mcpProjectWorkflowService.create(mcpProjectId, foreignProjectDeploymentWorkflowId))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
+
+        assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void testCreateRejectsUnknownProjectDeploymentWorkflowIndistinguishably() {
+        Long mcpProjectId = mcpProject.getId();
+
+        assertThatThrownBy(() -> mcpProjectWorkflowService.create(mcpProjectId, Long.MAX_VALUE))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
+
+        assertThat(mcpProjectWorkflowRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    public void testUpdateRejectsProjectDeploymentWorkflowOfAnotherDeployment() {
+        McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowRepository.save(getMcpProjectWorkflow());
+
+        long mcpProjectWorkflowId = Validate.notNull(mcpProjectWorkflow.getId(), "id");
+        Long foreignProjectDeploymentWorkflowId = foreignProjectDeploymentWorkflow.getId();
+
+        assertThatThrownBy(
+            () -> mcpProjectWorkflowService.update(mcpProjectWorkflowId, null, foreignProjectDeploymentWorkflowId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
+
+        assertThat(mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId))
+            .get()
+            .extracting(McpProjectWorkflow::getProjectDeploymentWorkflowId)
+            .isEqualTo(projectDeploymentWorkflow.getId());
     }
 
     private McpProjectWorkflow getMcpProjectWorkflow() {

@@ -24,9 +24,7 @@ type Query {
 
     # McpProjectWorkflow queries
     mcpProjectWorkflow(id: ID): McpProjectWorkflow
-    mcpProjectWorkflows: [McpProjectWorkflow]
     mcpProjectWorkflowsByMcpProjectId(mcpProjectId: ID): [McpProjectWorkflow]
-    mcpProjectWorkflowsByProjectDeploymentWorkflowId(projectDeploymentWorkflowId: ID): [McpProjectWorkflow]
     toolEligibleProjectVersionWorkflows(projectId: ID!, projectVersion: Int!): [ProjectWorkflow!]!
     mcpProjectWorkflowProperties(mcpProjectWorkflowId: ID!): [Property]
 }

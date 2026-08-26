@@ -33,6 +33,8 @@ public interface McpProjectWorkflowService {
      *
      * @param mcpProjectWorkflow the MCP project workflow to create
      * @return the created MCP project workflow
+     * @throws IllegalArgumentException if the project deployment workflow does not belong to the MCP project's own
+     *                                  project deployment
      */
     McpProjectWorkflow create(McpProjectWorkflow mcpProjectWorkflow);
 
@@ -42,6 +44,8 @@ public interface McpProjectWorkflowService {
      * @param mcpProjectId                the ID of the MCP project
      * @param projectDeploymentWorkflowId the ID of the project deployment workflow
      * @return the created MCP project workflow
+     * @throws IllegalArgumentException if the project deployment workflow does not belong to the MCP project's own
+     *                                  project deployment
      */
     McpProjectWorkflow create(Long mcpProjectId, Long projectDeploymentWorkflowId);
 
@@ -59,13 +63,6 @@ public interface McpProjectWorkflowService {
      * @return the MCP project workflow, or empty if not found
      */
     Optional<McpProjectWorkflow> fetchMcpProjectWorkflow(long mcpProjectWorkflowId);
-
-    /**
-     * Gets all MCP project workflows.
-     *
-     * @return a list of all MCP project workflows
-     */
-    List<McpProjectWorkflow> getMcpProjectWorkflows();
 
     /**
      * Gets MCP project workflows filtered by MCP project ID.
@@ -88,6 +85,8 @@ public interface McpProjectWorkflowService {
      *
      * @param mcpProjectWorkflow the MCP project workflow to update
      * @return the updated MCP project workflow
+     * @throws IllegalArgumentException if the project deployment workflow does not belong to the MCP project's own
+     *                                  project deployment
      */
     McpProjectWorkflow update(McpProjectWorkflow mcpProjectWorkflow);
 
@@ -98,7 +97,9 @@ public interface McpProjectWorkflowService {
      * @param mcpProjectId                the ID of the MCP project (can be null if not updating)
      * @param projectDeploymentWorkflowId the ID of the project deployment workflow (can be null if not updating)
      * @return the updated MCP project workflow
-     * @throws IllegalArgumentException if the MCP project workflow with the given ID is not found
+     * @throws IllegalArgumentException if the MCP project workflow with the given ID is not found, or if the resulting
+     *                                  project deployment workflow does not belong to the resulting MCP project's own
+     *                                  project deployment
      */
     McpProjectWorkflow update(long id, Long mcpProjectId, Long projectDeploymentWorkflowId);
 
