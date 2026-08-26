@@ -110,6 +110,7 @@ describe('AgentSettingsCard', () => {
                     autoMemory: true,
                     skillManagement: false,
                     webSearch: false,
+                    webSearchProvider: 'BRAVE',
                 },
             },
         });
@@ -132,10 +133,85 @@ describe('AgentSettingsCard', () => {
                     autoMemory: true,
                     skillManagement: true,
                     webSearch: true,
+                    webSearchProvider: 'BRAVE',
                 },
             },
         });
         expect(await screen.findByLabelText('Brave connection')).toBeInTheDocument();
+    });
+
+    it("queries the selected provider's own component for connections and clears a stale id on switching", async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(
+            <AgentSettingsCard
+                agentId="agent-1"
+                channels={[]}
+                elements={[]}
+                settings={{builtInTools: {webSearch: true, webSearchConnectionId: 42}}}
+            />
+        );
+
+        expect(getWorkspaceConnectionsQuery).toHaveBeenLastCalledWith(
+            {componentName: 'brave', environmentId: 123, id: 7},
+            true
+        );
+
+        await user.click(screen.getByLabelText('Search provider'));
+        await user.click(await screen.findByRole('option', {name: 'Firecrawl'}));
+
+        // The Brave connection id must not survive: it names a connection of the wrong component.
+        expect(updateAiAgentSettingsMutate).toHaveBeenLastCalledWith({
+            id: 'agent-1',
+            settings: {
+                builtInTools: {
+                    askUserQuestion: true,
+                    autoMemory: true,
+                    skillManagement: true,
+                    webSearch: true,
+                    webSearchProvider: 'FIRECRAWL',
+                },
+            },
+        });
+        expect(await screen.findByLabelText('Firecrawl connection')).toBeInTheDocument();
+        expect(getWorkspaceConnectionsQuery).toHaveBeenLastCalledWith(
+            {componentName: 'firecrawl', environmentId: 123, id: 7},
+            true
+        );
+    });
+
+    it('offers no connection for the native provider and disables the connections query', () => {
+        wrap(
+            <AgentSettingsCard
+                agentId="agent-1"
+                channels={[]}
+                elements={[]}
+                settings={{builtInTools: {webSearch: true, webSearchProvider: 'NATIVE'}}}
+            />
+        );
+
+        expect(screen.queryByLabelText('Brave connection')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Firecrawl connection')).not.toBeInTheDocument();
+        expect(screen.getByText('The model searches the web itself. No connection needed.')).toBeInTheDocument();
+        expect(getWorkspaceConnectionsQuery).toHaveBeenLastCalledWith(
+            {componentName: '', environmentId: 123, id: 7},
+            false
+        );
+    });
+
+    // Publishing is what actually rejects this (AiAgentErrorType.NATIVE_WEB_SEARCH_UNSUPPORTED); the panel says so
+    // first, so the choice is not silently accepted here and refused three clicks later.
+    it('warns when the native provider is picked against a model provider that has no built-in search', () => {
+        wrap(
+            <AgentSettingsCard
+                agentId="agent-1"
+                channels={[]}
+                elements={[{id: '1', kind: 'MODEL', parameters: {model: 'gpt-4o', provider: 'openai'}}] as never}
+                settings={{builtInTools: {webSearch: true, webSearchProvider: 'NATIVE'}}}
+            />
+        );
+
+        expect(screen.getByText(/openai has no built-in web search/)).toBeInTheDocument();
     });
 
     // The settings-map switches are optimistic — `commit` writes local state before firing the mutation — so

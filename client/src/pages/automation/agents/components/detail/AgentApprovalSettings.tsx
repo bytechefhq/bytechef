@@ -143,7 +143,7 @@ const AgentApprovalSettings = ({agentId, channels, elements}: AgentApprovalSetti
             />
 
             {gateElement && (
-                <div className="ml-0 space-y-1 sm:ml-8">
+                <div className="ml-0 space-y-1 sm:ml-11">
                     <Label htmlFor="agent-approval-gate-expiry">Approval expires after (days)</Label>
 
                     <Input
@@ -168,7 +168,7 @@ const AgentApprovalSettings = ({agentId, channels, elements}: AgentApprovalSetti
                 same way, so this belongs to neither toggle alone. */}
 
             {(approvalToolElement || gateElement) && (
-                <p className="ml-0 text-sm text-muted-foreground sm:ml-8">
+                <p className="ml-0 text-sm text-muted-foreground sm:ml-11">
                     {deliveryChannelLabels.length > 0
                         ? `Approvals are delivered to the agent's channels: ${deliveryChannelLabels.join(', ')}.`
                         : 'This agent has no channel that can carry an approval, so approvals fall back to the chat channel — invisible on a webhook or schedule-only agent.'}

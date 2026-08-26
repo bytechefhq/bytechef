@@ -22,12 +22,15 @@ import {toast} from 'sonner';
 // any individual key inside it, means that key's default below applies. There is no separate
 // "explicitly unset" state, so every commit sends every key explicitly (replace-whole semantics on
 // updateAiAgentSettings — see AiAgentFacadeImpl.updateAgentSettings).
+type WebSearchProviderType = 'BRAVE' | 'FIRECRAWL' | 'NATIVE';
+
 interface BuiltInToolsSettingsI {
     askUserQuestion: boolean;
     autoMemory: boolean;
     skillManagement: boolean;
     webSearch: boolean;
     webSearchConnectionId: number | null;
+    webSearchProvider: WebSearchProviderType;
 }
 
 const DEFAULT_BUILT_IN_TOOLS: BuiltInToolsSettingsI = {
@@ -36,7 +39,21 @@ const DEFAULT_BUILT_IN_TOOLS: BuiltInToolsSettingsI = {
     skillManagement: true,
     webSearch: false,
     webSearchConnectionId: null,
+    webSearchProvider: 'BRAVE',
 };
+
+// Mirrors AiAgentSettings.WebSearchProvider (automation-ai-agent-service). A null componentName marks the one
+// provider that is not a tool of its own: NATIVE runs inside the model call and so has no connection to pick.
+const WEB_SEARCH_PROVIDERS: Record<WebSearchProviderType, {componentName: string | null; title: string}> = {
+    BRAVE: {componentName: 'brave', title: 'Brave'},
+    FIRECRAWL: {componentName: 'firecrawl', title: 'Firecrawl'},
+    NATIVE: {componentName: null, title: 'Model provider'},
+};
+
+// Mirrors AiAgentSettings.NATIVE_WEB_SEARCH_MODEL_PROVIDERS. Spring AI 2.0.1 exposes a provider-side web search
+// on anthropic alone, so publishing NATIVE against any other model provider is rejected server-side — this list
+// exists to say so before the user hits publish, not to enforce it.
+const NATIVE_WEB_SEARCH_MODEL_PROVIDERS = ['anthropic'];
 
 const resolveBuiltInTools = (settings: unknown): BuiltInToolsSettingsI => {
     const builtInTools = ((settings as {builtInTools?: Record<string, unknown>} | null | undefined)?.builtInTools ??
@@ -51,6 +68,11 @@ const resolveBuiltInTools = (settings: unknown): BuiltInToolsSettingsI => {
         webSearch: (builtInTools.webSearch as boolean | undefined) ?? DEFAULT_BUILT_IN_TOOLS.webSearch,
         webSearchConnectionId:
             builtInTools.webSearchConnectionId != null ? Number(builtInTools.webSearchConnectionId) : null,
+        webSearchProvider:
+            builtInTools.webSearchProvider != null &&
+            Object.hasOwn(WEB_SEARCH_PROVIDERS, String(builtInTools.webSearchProvider))
+                ? (String(builtInTools.webSearchProvider) as WebSearchProviderType)
+                : DEFAULT_BUILT_IN_TOOLS.webSearchProvider,
     };
 };
 
@@ -73,9 +95,19 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const webSearchProvider = WEB_SEARCH_PROVIDERS[builtInTools.webSearchProvider];
+
+    // The MODEL element carries the agent's provider, which is what decides whether NATIVE can work at all.
+    const modelProvider = elements.find((element) => element.kind === 'MODEL')?.parameters?.provider as
+        string | undefined;
+
     const {data: connections = []} = useGetWorkspaceConnectionsQuery(
-        {componentName: 'brave', environmentId: currentEnvironmentId, id: currentWorkspaceId},
-        builtInTools.webSearch
+        {
+            componentName: webSearchProvider.componentName ?? '',
+            environmentId: currentEnvironmentId,
+            id: currentWorkspaceId,
+        },
+        builtInTools.webSearch && webSearchProvider.componentName != null
     );
 
     const queryClient = useQueryClient();
@@ -117,8 +149,8 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
     const commit = (next: BuiltInToolsSettingsI) => {
         setBuiltInTools(next);
 
-        // The five booleans are always sent explicitly (replace-whole semantics — see this file's
-        // top comment); webSearchConnectionId is included only when set, since it has no boolean
+        // The four booleans and the provider are always sent explicitly (replace-whole semantics — see
+        // this file's top comment); webSearchConnectionId is included only when set, since it has no
         // default to pin.
         updateAiAgentSettingsMutation.mutate({
             id: agentId,
@@ -128,20 +160,29 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
                     autoMemory: next.autoMemory,
                     skillManagement: next.skillManagement,
                     webSearch: next.webSearch,
+                    webSearchProvider: next.webSearchProvider,
                     ...(next.webSearchConnectionId != null ? {webSearchConnectionId: next.webSearchConnectionId} : {}),
                 },
             },
         });
     };
 
-    const handleToggle = (key: keyof Omit<BuiltInToolsSettingsI, 'webSearchConnectionId'>) => (checked: boolean) => {
-        commit({
-            ...builtInTools,
-            [key]: checked,
-            // Turning webSearch off drops the connection id along with it — a stale id sitting on a
-            // disabled built-in would otherwise silently linger in the map with no way to see it.
-            ...(key === 'webSearch' && !checked ? {webSearchConnectionId: null} : {}),
-        });
+    const handleToggle =
+        (key: keyof Omit<BuiltInToolsSettingsI, 'webSearchConnectionId' | 'webSearchProvider'>) =>
+        (checked: boolean) => {
+            commit({
+                ...builtInTools,
+                [key]: checked,
+                // Turning webSearch off drops the connection id along with it — a stale id sitting on a
+                // disabled built-in would otherwise silently linger in the map with no way to see it.
+                ...(key === 'webSearch' && !checked ? {webSearchConnectionId: null} : {}),
+            });
+        };
+
+    // A connection belongs to one component, so it cannot survive a provider change — a Brave connection id left
+    // behind on FIRECRAWL would resolve to a connection of the wrong component at deployment time.
+    const handleProviderChange = (value: string) => {
+        commit({...builtInTools, webSearchConnectionId: null, webSearchProvider: value as WebSearchProviderType});
     };
 
     const handleConnectionChange = (value: string) => {
@@ -188,34 +229,68 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
 
                 <Switch
                     checked={builtInTools.webSearch}
-                    description="Lets the agent search the web via Brave."
+                    description="Lets the agent search the web."
                     label="Web search"
                     onCheckedChange={handleToggle('webSearch')}
                 />
 
                 {builtInTools.webSearch && (
-                    <div className="ml-0 space-y-1 sm:ml-8">
-                        <Label htmlFor="agent-settings-web-search-connection">Brave connection</Label>
+                    <div className="ml-0 space-y-4 sm:ml-11">
+                        <div className="space-y-1">
+                            <Label htmlFor="agent-settings-web-search-provider">Search provider</Label>
 
-                        <Select
-                            disabled={isWebSearchConnectionBusy}
-                            onValueChange={handleConnectionChange}
-                            value={builtInTools.webSearchConnectionId?.toString() ?? 'no-connection'}
-                        >
-                            <SelectTrigger className="sm:w-64" id="agent-settings-web-search-connection">
-                                <SelectValue placeholder="Choose a connection…" />
-                            </SelectTrigger>
+                            <Select
+                                disabled={isWebSearchConnectionBusy}
+                                onValueChange={handleProviderChange}
+                                value={builtInTools.webSearchProvider}
+                            >
+                                <SelectTrigger className="sm:w-64" id="agent-settings-web-search-provider">
+                                    <SelectValue />
+                                </SelectTrigger>
 
-                            <SelectContent>
-                                <SelectItem value="no-connection">No connection</SelectItem>
+                                <SelectContent>
+                                    <SelectItem value="BRAVE">Brave</SelectItem>
 
-                                {connections.map((connection) => (
-                                    <SelectItem key={connection.id} value={String(connection.id)}>
-                                        {connection.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                                    <SelectItem value="FIRECRAWL">Firecrawl</SelectItem>
+
+                                    <SelectItem value="NATIVE">Model provider (native)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {webSearchProvider.componentName ? (
+                            <div className="space-y-1">
+                                <Label htmlFor="agent-settings-web-search-connection">
+                                    {webSearchProvider.title} connection
+                                </Label>
+
+                                <Select
+                                    disabled={isWebSearchConnectionBusy}
+                                    onValueChange={handleConnectionChange}
+                                    value={builtInTools.webSearchConnectionId?.toString() ?? 'no-connection'}
+                                >
+                                    <SelectTrigger className="sm:w-64" id="agent-settings-web-search-connection">
+                                        <SelectValue placeholder="Choose a connection…" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectItem value="no-connection">No connection</SelectItem>
+
+                                        {connections.map((connection) => (
+                                            <SelectItem key={connection.id} value={String(connection.id)}>
+                                                {connection.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">
+                                {modelProvider && !NATIVE_WEB_SEARCH_MODEL_PROVIDERS.includes(modelProvider)
+                                    ? `The model provider ${modelProvider} has no built-in web search, so this agent cannot be published with it. Supported: ${NATIVE_WEB_SEARCH_MODEL_PROVIDERS.join(', ')}.`
+                                    : 'The model searches the web itself. No connection needed.'}
+                            </p>
+                        )}
                     </div>
                 )}
             </fieldset>
