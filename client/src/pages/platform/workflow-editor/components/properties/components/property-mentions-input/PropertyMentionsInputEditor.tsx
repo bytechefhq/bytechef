@@ -4,10 +4,7 @@ import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/co
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {
-    escapeHtmlForParagraph,
-    transformValueForObjectAccess,
-} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {transformValueForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {
     ComponentDefinitionBasic,
@@ -42,6 +39,7 @@ import {
     PROPERTY_MENTION_CHIP_CLASS,
     PROPERTY_MENTION_LABEL_CLASS,
     PROPERTY_MENTION_ROOT_CLASS,
+    buildPropertyMentionsContent,
     replaceMentionNodesInHtmlWithVariables,
 } from './propertyMentionDom';
 import {useEvaluatorFunctionDefinitions} from './useEvaluatorFunctionDefinitions';
@@ -403,55 +401,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         );
 
         const getContent = useCallback(
-            (value?: string) => {
-                if (typeof value !== 'string') {
-                    return;
-                }
-
-                if (!value) {
-                    return '';
-                }
-
-                let content = value;
-                let contentIsDecodedHtml = false;
-
-                if (
-                    controlType === 'RICH_TEXT' &&
-                    (content.includes('&lt;') || content.includes('&gt;') || content.includes('&amp;'))
-                ) {
-                    content = decode(content);
-
-                    content = sanitizeHtml(content);
-
-                    contentIsDecodedHtml = true;
-                }
-
-                if (!contentIsDecodedHtml && content.includes('\n')) {
-                    const valueLines = content.split('\n');
-
-                    const paragraphedLines =
-                        controlType === 'TEXT_AREA' || controlType === 'TEXT' || controlType === 'FORMULA_MODE'
-                            ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
-                            : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
-
-                    content = paragraphedLines.join('');
-                }
-
-                const dataPillRegex = /\${([^}]+)}/g;
-
-                const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
-
-                if (matches) {
-                    for (const match of matches) {
-                        content = content.replace(
-                            `\${${match}}`,
-                            `<span data-type="mention" class="${PROPERTY_MENTION_ROOT_CLASS}" data-id="${match}"></span>`
-                        );
-                    }
-                }
-
-                return content;
-            },
+            (value?: string) => buildPropertyMentionsContent(value, controlType),
             [controlType]
         );
 
