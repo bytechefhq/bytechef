@@ -485,7 +485,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     'aria-multiline': 'true',
                     class: twMerge(
                         'w-full max-w-full min-w-0 border-none text-sm wrap-break-word break-all whitespace-pre-wrap ring-0 outline-hidden',
-                        controlType === 'RICH_TEXT' && 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl',
+                        controlType === 'RICH_TEXT' && 'prose prose-sm',
                         className
                     ),
                     id: elementId ?? '',
