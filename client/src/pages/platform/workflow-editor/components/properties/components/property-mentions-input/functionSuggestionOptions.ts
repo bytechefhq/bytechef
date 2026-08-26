@@ -4,6 +4,7 @@ import {SuggestionOptions} from '@tiptap/suggestion';
 import tippy, {type Instance as TippyInstance} from 'tippy.js';
 
 import FunctionSuggestionList, {FunctionSuggestionListRefType} from './FunctionSuggestionList';
+import {setMentionSuggestionOpen} from './MentionStorage.extension';
 import {
     buildFunctionInsertion,
     filterFunctionDefinitions,
@@ -51,9 +52,18 @@ export function getFunctionSuggestionOptions(): Omit<SuggestionOptions<Evaluator
             let popup: TippyInstance | undefined;
             let lastValidRect: DOMRect = DOM_RECT_FALLBACK;
             let wheelAbortController: AbortController | undefined;
+            // Held so `onExit` can clear the open flag. It has no props of its own, and it also runs
+            // for a suggestion `onStart` declined to show, where there is nothing to clear.
+            let openedEditor: Editor | undefined;
 
             return {
                 onExit() {
+                    if (openedEditor) {
+                        setMentionSuggestionOpen(openedEditor, false);
+
+                        openedEditor = undefined;
+                    }
+
                     wheelAbortController?.abort();
                     popup?.destroy();
                     component?.destroy();
@@ -115,6 +125,10 @@ export function getFunctionSuggestionOptions(): Omit<SuggestionOptions<Evaluator
                         passive: true,
                         signal: wheelAbortController.signal,
                     });
+
+                    openedEditor = props.editor;
+
+                    setMentionSuggestionOpen(props.editor, true);
                 },
 
                 onUpdate(props) {
