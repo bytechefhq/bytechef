@@ -64,6 +64,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -322,6 +323,7 @@ class AiAgentFacadeIntTest {
         projectDeployment.setProjectVersion(1);
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
         projectDeployment.setEnabled(true);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         projectDeploymentRepository.save(projectDeployment);
 
@@ -1160,6 +1162,7 @@ class AiAgentFacadeIntTest {
         projectDeployment.setProjectVersion(1);
         projectDeployment.setEnvironment(Environment.DEVELOPMENT);
         projectDeployment.setEnabled(deploymentEnabled);
+        projectDeployment.setUuid(UUID.randomUUID());
 
         ProjectDeployment savedProjectDeployment = projectDeploymentRepository.save(projectDeployment);
 

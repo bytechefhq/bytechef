@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -81,6 +82,9 @@ public class ProjectDeployment {
 
     @MappedCollection(idColumn = "project_deployment_id")
     private Set<ProjectDeploymentTag> projectDeploymentTags = Collections.emptySet();
+
+    @Column
+    private UUID uuid;
 
     @Version
     private int version;
@@ -163,6 +167,10 @@ public class ProjectDeployment {
             .toList();
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -215,6 +223,10 @@ public class ProjectDeployment {
         }
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -230,6 +242,7 @@ public class ProjectDeployment {
             ", projectVersion=" + projectVersion +
             ", description='" + description + '\'' +
             ", projectDeploymentTags=" + projectDeploymentTags +
+            ", uuid=" + uuid +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

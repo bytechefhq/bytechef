@@ -148,7 +148,7 @@ public class CreateApiCollectionToolCallback implements ToolCallback {
             ApiCollectionDTO dto = new ApiCollectionDTO(
                 collectionVersion, input.contextPath(), null, null, input.description(), false, List.of(),
                 environment, null, null, null, input.name(), null, projectId, null, 0, input.projectVersion(),
-                List.of(), 0);
+                List.of(), 0, null);
 
             ApiCollectionDTO created = apiCollectionFacade.createApiCollection(dto);
 

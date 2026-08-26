@@ -21,6 +21,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.domain.TenantKey;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -68,6 +69,9 @@ public final class A2aServer {
     @Column("secret_key")
     private String secretKey;
 
+    @Column
+    private UUID uuid;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -97,6 +101,7 @@ public final class A2aServer {
         this.name = name;
         this.secretKey = String.valueOf(TenantKey.of());
         this.type = type.ordinal();
+        this.uuid = UUID.randomUUID();
     }
 
     @Override
@@ -159,6 +164,10 @@ public final class A2aServer {
         return PlatformType.values()[type];
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -203,6 +212,10 @@ public final class A2aServer {
         this.type = type.ordinal();
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -217,6 +230,7 @@ public final class A2aServer {
             ", environment=" + environment +
             ", enabled=" + enabled +
             ", authenticationRequired=" + authenticationRequired +
+            ", uuid=" + uuid +
             ", version=" + version +
             '}';
     }

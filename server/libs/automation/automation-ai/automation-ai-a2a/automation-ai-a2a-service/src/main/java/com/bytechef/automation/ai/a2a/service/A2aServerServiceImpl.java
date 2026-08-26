@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,10 @@ public class A2aServerServiceImpl implements A2aServerService {
 
     @Override
     public A2aServer create(A2aServer a2aServer) {
+        if (a2aServer.getUuid() == null) {
+            a2aServer.setUuid(UUID.randomUUID());
+        }
+
         return a2aServerRepository.save(a2aServer);
     }
 
@@ -61,6 +66,12 @@ public class A2aServerServiceImpl implements A2aServerService {
     @Transactional(readOnly = true)
     public Optional<A2aServer> fetchA2aServer(long a2aServerId) {
         return a2aServerRepository.findById(a2aServerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<A2aServer> fetchA2aServer(UUID uuid, Environment environment) {
+        return a2aServerRepository.findByUuidAndEnvironment(uuid, environment.ordinal());
     }
 
     @Override

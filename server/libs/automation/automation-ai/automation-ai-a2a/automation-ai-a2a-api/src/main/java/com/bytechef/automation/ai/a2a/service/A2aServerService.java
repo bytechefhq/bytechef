@@ -21,6 +21,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service interface for managing {@link A2aServer} entities.
@@ -36,6 +37,16 @@ public interface A2aServerService {
     void delete(long a2aServerId);
 
     Optional<A2aServer> fetchA2aServer(long a2aServerId);
+
+    /**
+     * Retrieves an A2A server by its cross-environment lineage identifier and environment.
+     *
+     * @param uuid        the cross-environment lineage identifier shared by the server's counterparts in other
+     *                    environments
+     * @param environment the environment to look the server up in
+     * @return the A2A server matching the given uuid and environment, if one exists
+     */
+    Optional<A2aServer> fetchA2aServer(UUID uuid, Environment environment);
 
     A2aServer getA2aServer(long a2aServerId);
 

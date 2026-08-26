@@ -18,13 +18,15 @@ package com.bytechef.automation.ai.a2a.facade;
 
 import com.bytechef.automation.ai.a2a.domain.A2aProject;
 import com.bytechef.automation.ai.a2a.domain.A2aProjectWorkflow;
+import com.bytechef.automation.ai.a2a.domain.A2aServer;
 import com.bytechef.automation.ai.a2a.service.A2aProjectService;
 import com.bytechef.automation.ai.a2a.service.A2aProjectWorkflowService;
+import com.bytechef.automation.ai.a2a.service.A2aServerService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
-import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,21 +45,21 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
-    private static final String A2A_SERVER_NAME_PREFIX = "__A2A_SERVER__";
-
     private final A2aProjectService a2aProjectService;
     private final A2aProjectWorkflowService a2aProjectWorkflowService;
+    private final A2aServerService a2aServerService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public A2aProjectFacadeImpl(
         A2aProjectService a2aProjectService, A2aProjectWorkflowService a2aProjectWorkflowService,
-        ProjectDeploymentService projectDeploymentService,
+        A2aServerService a2aServerService, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
         this.a2aProjectService = a2aProjectService;
         this.a2aProjectWorkflowService = a2aProjectWorkflowService;
+        this.a2aServerService = a2aServerService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
@@ -66,12 +68,14 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
     public A2aProject createA2aProject(
         long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
+        A2aServer a2aServer = a2aServerService.getA2aServer(a2aServerId);
+
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
-        projectDeployment.setName(A2A_SERVER_NAME_PREFIX + projectId + "_v" + projectVersion);
+        projectDeployment.setName(SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX + projectId + "_v" + projectVersion);
         projectDeployment.setProjectId(projectId);
         projectDeployment.setProjectVersion(projectVersion);
-        projectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        projectDeployment.setEnvironment(a2aServer.getEnvironment());
         projectDeployment.setEnabled(true);
 
         projectDeployment = projectDeploymentService.create(projectDeployment);

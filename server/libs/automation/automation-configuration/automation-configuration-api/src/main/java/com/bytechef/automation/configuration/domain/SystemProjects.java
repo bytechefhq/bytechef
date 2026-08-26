@@ -36,9 +36,10 @@ import java.util.List;
  * <p>
  * {@link #projectNameNotLikePredicates(String)} is the single source of truth for excluding system projects from a
  * hand-built SQL query; repositories should build their {@code project.name} exclusions from it instead of hand-copying
- * the prefix list. {@link #API_COLLECTION_DEPLOYMENT_NAME_PREFIX} and {@link #MCP_SERVER_DEPLOYMENT_NAME_PREFIX} are a
- * related but distinct namespace — they mark {@code project_deployment.name}, not {@code project.name} — so they are
- * excluded from {@link #NAME_PREFIXES} and must be applied with {@link #notLikePredicate(String, String)} individually.
+ * the prefix list. {@link #API_COLLECTION_DEPLOYMENT_NAME_PREFIX}, {@link #MCP_SERVER_DEPLOYMENT_NAME_PREFIX} and
+ * {@link #A2A_SERVER_DEPLOYMENT_NAME_PREFIX} are a related but distinct namespace — they mark
+ * {@code project_deployment.name}, not {@code project.name} — so they are excluded from {@link #NAME_PREFIXES} and must
+ * be applied with {@link #notLikePredicate(String, String)} individually.
  *
  * @author Ivica Cardic
  */
@@ -85,6 +86,13 @@ public final class SystemProjects {
      * here rather than imported since automation-configuration does not depend on platform-mcp.
      */
     public static final String MCP_SERVER_DEPLOYMENT_NAME_PREFIX = "__MCP_SERVER__";
+
+    /**
+     * Marks a {@code project_deployment.name}, not a project name — set by {@code A2aProjectFacadeImpl} when it deploys
+     * the hidden project backing an A2A server. Duplicated here rather than imported since automation-configuration
+     * does not depend on automation-ai-a2a.
+     */
+    public static final String A2A_SERVER_DEPLOYMENT_NAME_PREFIX = "__A2A_SERVER__";
 
     private static final String LIKE_ESCAPE = "\\";
 

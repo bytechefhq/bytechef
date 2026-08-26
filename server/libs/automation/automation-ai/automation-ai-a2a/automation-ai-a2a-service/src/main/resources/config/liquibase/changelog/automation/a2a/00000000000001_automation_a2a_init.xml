@@ -43,6 +43,9 @@
             <column name="secret_key" type="VARCHAR(256)">
                 <constraints nullable="false"/>
             </column>
+            <column name="uuid" type="${uuid_type}">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_date" type="TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -61,6 +64,7 @@
         </createTable>
 
         <addUniqueConstraint constraintName="uk_a2a_server_secret_key" tableName="a2a_server" columnNames="secret_key" />
+        <addUniqueConstraint constraintName="uk_a2a_server_uuid_environment" tableName="a2a_server" columnNames="uuid,environment" />
 
         <createTable tableName="a2a_project">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">

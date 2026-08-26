@@ -63,11 +63,11 @@ public interface McpProjectFacade {
      * and clone reference the same project version but each has its own deployment row.
      *
      * <p>
-     * The MCP project's underlying deployment is implicitly bound to {@code Environment.DEVELOPMENT} by
-     * {@link #createMcpProject}, so this clone does not move across environments. The useful axis is the MCP server: an
-     * MCP server is per-tenant scoped, so duplicating an MCP project onto a different server lets the user expose the
-     * same workflow set under different MCP authority/auth without having to hand-rebuild the project + workflow
-     * bindings.
+     * The clone's deployment inherits the TARGET server's environment, so cloning onto a server in another environment
+     * does move the project across environments (without connection re-binding — use environment promotion for that).
+     * The useful axis is the MCP server: an MCP server is per-tenant scoped, so duplicating an MCP project onto a
+     * different server lets the user expose the same workflow set under different MCP authority/auth without having to
+     * hand-rebuild the project + workflow bindings.
      * </p>
      *
      * @param mcpProjectId      id of the source MCP project (must exist)

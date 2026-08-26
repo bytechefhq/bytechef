@@ -117,6 +117,8 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             "project_deployment.name", SystemProjects.API_COLLECTION_DEPLOYMENT_NAME_PREFIX);
         query += SystemProjects.notLikePredicate(
             "project_deployment.name", SystemProjects.MCP_SERVER_DEPLOYMENT_NAME_PREFIX);
+        query += SystemProjects.notLikePredicate(
+            "project_deployment.name", SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX);
         query += SystemProjects.projectNameNotLikePredicates("project.name");
 
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +

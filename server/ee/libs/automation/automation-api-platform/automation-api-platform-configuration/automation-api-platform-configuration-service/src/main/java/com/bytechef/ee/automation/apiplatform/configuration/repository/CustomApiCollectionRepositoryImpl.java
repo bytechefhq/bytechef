@@ -20,6 +20,9 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
@@ -32,6 +35,33 @@ public class CustomApiCollectionRepositoryImpl implements CustomApiCollectionRep
     @SuppressFBWarnings("EI")
     public CustomApiCollectionRepositoryImpl(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
+    }
+
+    @Override
+    public boolean existsByNameAndWorkspaceIdAndEnvironment(
+        String name, long workspaceId, int environment, @Nullable Long excludeId) {
+
+        List<Object> arguments = new ArrayList<>(List.of(name, workspaceId, environment));
+
+        String query = """
+            SELECT COUNT(api_collection.id) FROM api_collection
+            JOIN project_deployment ON api_collection.project_deployment_id = project_deployment.id
+            JOIN project ON project_deployment.project_id = project.id
+            WHERE api_collection.name = ? AND project.workspace_id = ? AND project_deployment.environment = ?
+            """;
+
+        if (excludeId != null) {
+            arguments.add(excludeId);
+
+            query += " AND api_collection.id <> ?";
+        }
+
+        Long count = jdbcClient.sql(query)
+            .params(arguments)
+            .query(Long.class)
+            .single();
+
+        return count > 0;
     }
 
     @Override
@@ -111,5 +141,21 @@ public class CustomApiCollectionRepositoryImpl implements CustomApiCollectionRep
         }
 
         return apiCollections;
+    }
+
+    @Override
+    public Optional<ApiCollection> findByUuidAndEnvironment(UUID uuid, int environment) {
+        List<ApiCollection> apiCollections = jdbcClient
+            .sql("""
+                SELECT api_collection.* FROM api_collection
+                JOIN project_deployment ON api_collection.project_deployment_id = project_deployment.id
+                WHERE api_collection.uuid = ? AND project_deployment.environment = ?
+                ORDER BY api_collection.id ASC
+                """)
+            .params(List.of(uuid, environment))
+            .query(ApiCollection.class)
+            .list();
+
+        return apiCollections.isEmpty() ? Optional.empty() : Optional.of(apiCollections.getFirst());
     }
 }
