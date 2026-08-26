@@ -1,8 +1,10 @@
+import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
 import {TemplateCard} from '@/pages/automation/templates/components/TemplateCard';
 import TemplatesLayoutContainer from '@/pages/automation/templates/components/layout-container/TemplatesLayoutContainer';
 import {useTemplatesStore} from '@/pages/automation/templates/stores/useTemplatesStore';
 import {usePreBuiltWorkflowTemplatesQuery} from '@/shared/middleware/graphql';
+import {LayoutTemplateIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowTemplates = () => {
@@ -18,19 +20,24 @@ const WorkflowTemplates = () => {
         query,
     });
 
+    const filtered = !!category || !!query;
+    const hasTemplates = !!preBuiltWorkflowTemplates?.length;
+
     return (
         <TemplatesLayoutContainer searchPlaceholder="Search workflows..." title="Explore Workflow Templates">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {isLoading ? (
-                    <>
-                        <Skeleton className="h-60 w-96" />
+            {isLoading && (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <Skeleton className="h-60 w-96" />
 
-                        <Skeleton className="h-60 w-96" />
+                    <Skeleton className="h-60 w-96" />
 
-                        <Skeleton className="h-60 w-96" />
-                    </>
-                ) : preBuiltWorkflowTemplates && preBuiltWorkflowTemplates.length > 0 ? (
-                    preBuiltWorkflowTemplates.map((template) => {
+                    <Skeleton className="h-60 w-96" />
+                </div>
+            )}
+
+            {!isLoading && hasTemplates && (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {preBuiltWorkflowTemplates!.map((template) => {
                         const icons = template.components.map((component) => component!.icon);
 
                         return (
@@ -44,11 +51,21 @@ const WorkflowTemplates = () => {
                                 title={template.workflow.label}
                             />
                         );
-                    })
-                ) : (
-                    <div className="text-muted-foreground">No workflow templates found.</div>
-                )}
-            </div>
+                    })}
+                </div>
+            )}
+
+            {!isLoading && !hasTemplates && (
+                <EmptyList
+                    icon={<LayoutTemplateIcon className="size-12 text-content-neutral-tertiary" />}
+                    message={
+                        filtered
+                            ? 'Try a different search term or category.'
+                            : 'There are no workflow templates available to import yet.'
+                    }
+                    title={filtered ? 'No matching workflow templates' : 'No workflow templates'}
+                />
+            )}
         </TemplatesLayoutContainer>
     );
 };
