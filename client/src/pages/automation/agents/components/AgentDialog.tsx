@@ -54,18 +54,36 @@ const INITIAL_CADENCE: AgentScheduleCadenceI = {frequencyKind: 'DAILY', timeOfDa
 interface AgentDialogProps {
     /** Present = edit an existing agent's name and description; absent = create a new one. */
     agent?: {description?: string | null; id: string; title: string};
+    /**
+     * Where a create lands. Defaults to the new agent's detail page — the AI Hub Scheduled page passes its
+     * own route instead, so creating a scheduled agent returns to the list the user started from.
+     */
+    createdRedirectPath?: string;
     onOpenChange?: (open: boolean) => void;
     open?: boolean;
+    /**
+     * Open the schedule fieldset from the start and validate it on submit, with no way to drop it. The
+     * "New Scheduled Agent" action promises a scheduled agent, so an agent without one is not a valid
+     * outcome of it — whereas the plain create action leaves the schedule optional.
+     */
+    scheduleRequired?: boolean;
     triggerNode?: ReactNode;
 }
 
-const AgentDialog = ({agent, onOpenChange, open: controlledOpen, triggerNode}: AgentDialogProps) => {
+const AgentDialog = ({
+    agent,
+    createdRedirectPath,
+    onOpenChange,
+    open: controlledOpen,
+    scheduleRequired = false,
+    triggerNode,
+}: AgentDialogProps) => {
     const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
     const [cadence, setCadence] = useState<AgentScheduleCadenceI>(INITIAL_CADENCE);
     const [cadenceErrors, setCadenceErrors] = useState<AgentScheduleCadenceErrorsI>({});
     const [schedulePrompt, setSchedulePrompt] = useState('');
     const [schedulePromptError, setSchedulePromptError] = useState<string | undefined>(undefined);
-    const [scheduleShown, setScheduleShown] = useState(false);
+    const [scheduleShown, setScheduleShown] = useState(scheduleRequired);
 
     // Controlled when opened from a menu item (which unmounts its own trigger on select), uncontrolled when it
     // owns a trigger node of its own.
@@ -76,7 +94,9 @@ const AgentDialog = ({agent, onOpenChange, open: controlledOpen, triggerNode}: A
         setCadenceErrors({});
         setSchedulePrompt('');
         setSchedulePromptError(undefined);
-        setScheduleShown(false);
+        // Back to shown — not hidden — when the schedule is required, so reopening the dialog after a close
+        // still presents the fieldset the action promised.
+        setScheduleShown(scheduleRequired);
     };
 
     // This component stays mounted alongside its trigger, so closing the dialog only unmounts Radix's content —
@@ -102,14 +122,23 @@ const AgentDialog = ({agent, onOpenChange, open: controlledOpen, triggerNode}: A
         resolver: zodResolver(formSchema),
     });
 
-    // Declared on the hook rather than passed to mutate(): the dialog navigates to the new agent as soon as it
-    // is created, and TanStack Query v5 drops mutate()-level callbacks once the observer unmounts. The request
-    // itself still completes, but without this the detail page would render an empty Schedules card.
+    // Declared on the hook rather than passed to mutate(): the dialog navigates away as soon as the agent is
+    // created, and TanStack Query v5 drops mutate()-level callbacks once the observer unmounts. The request
+    // itself still completes, but without this the detail page would render an empty Schedules card — and the
+    // AI Hub Scheduled list, which selects agents BY their schedule channel, would not show the new agent at
+    // all until something else refetched.
     const addAgentChannelMutation = useAddAiAgentChannelMutation({
         onSuccess: () => invalidateAgentQueries(queryClient),
     });
     const createAgentMutation = useCreateAiAgentMutation();
     const updateAgentMutation = useUpdateAiAgentMutation();
+
+    // Named for what the dialog will actually produce: opened from "New Scheduled Agent" it cannot produce an
+    // unscheduled one, and a generic "Create Agent" heading would read as the wrong form.
+    const createTitle = scheduleRequired ? 'Create Scheduled Agent' : 'Create Agent';
+    const createDescription = scheduleRequired
+        ? 'Create an agent that runs on its own schedule by filling out the form below.'
+        : 'Create a new agent by filling out the form below.';
 
     const onSubmit = (values: FormValuesType) => {
         if (agent) {
@@ -175,7 +204,7 @@ const AgentDialog = ({agent, onOpenChange, open: controlledOpen, triggerNode}: A
 
                     setOpen(false);
 
-                    navigate('/automation/agents/' + data.createAiAgent.id);
+                    navigate(createdRedirectPath ?? '/automation/agents/' + data.createAiAgent.id);
                 },
             }
         );
@@ -190,12 +219,10 @@ const AgentDialog = ({agent, onOpenChange, open: controlledOpen, triggerNode}: A
             <DialogContent>
                 <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                     <div className="flex flex-col space-y-1">
-                        <DialogTitle>{agent ? 'Edit Agent' : 'Create Agent'}</DialogTitle>
+                        <DialogTitle>{agent ? 'Edit Agent' : createTitle}</DialogTitle>
 
                         <DialogDescription>
-                            {agent
-                                ? "Change the agent's name and description."
-                                : 'Create a new agent by filling out the form below.'}
+                            {agent ? "Change the agent's name and description." : createDescription}
                         </DialogDescription>
                     </div>
 
@@ -242,13 +269,15 @@ const AgentDialog = ({agent, onOpenChange, open: controlledOpen, triggerNode}: A
                                     <div className="flex items-center justify-between">
                                         <Label htmlFor="agent-schedule-frequency-kind">Frequency</Label>
 
-                                        <Button
-                                            label="Remove schedule"
-                                            onClick={resetSchedule}
-                                            size="sm"
-                                            type="button"
-                                            variant="ghost"
-                                        />
+                                        {!scheduleRequired && (
+                                            <Button
+                                                label="Remove schedule"
+                                                onClick={resetSchedule}
+                                                size="sm"
+                                                type="button"
+                                                variant="ghost"
+                                            />
+                                        )}
                                     </div>
 
                                     <Select

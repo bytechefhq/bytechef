@@ -4,10 +4,18 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {addChannelMock, createAgentMock, updateAgentMock} = vi.hoisted(() => ({
+const {addChannelMock, createAgentMock, navigateMock, updateAgentMock} = vi.hoisted(() => ({
     addChannelMock: vi.fn(),
     createAgentMock: vi.fn(),
+    navigateMock: vi.fn(),
     updateAgentMock: vi.fn(),
+}));
+
+// Only useNavigate is replaced — MemoryRouter below is still the real one, so the dialog renders inside a
+// working router while the redirect it performs stays assertable.
+vi.mock('react-router-dom', async () => ({
+    ...(await vi.importActual<typeof import('react-router-dom')>('react-router-dom')),
+    useNavigate: () => navigateMock,
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -34,6 +42,7 @@ describe('AgentDialog', () => {
     beforeEach(() => {
         addChannelMock.mockReset();
         createAgentMock.mockReset();
+        navigateMock.mockReset();
         updateAgentMock.mockReset();
     });
 
@@ -125,5 +134,62 @@ describe('AgentDialog', () => {
 
         expect(screen.queryByRole('button', {name: 'Add a schedule'})).not.toBeInTheDocument();
         expect(addChannelMock).not.toHaveBeenCalled();
+    });
+});
+
+describe('AgentDialog with a required schedule', () => {
+    const renderRequiredDialog = () =>
+        render(
+            <QueryClientProvider client={new QueryClient()}>
+                <MemoryRouter>
+                    <AgentDialog
+                        createdRedirectPath="/automation/ai-hub/scheduled"
+                        onOpenChange={vi.fn()}
+                        open={true}
+                        scheduleRequired
+                    />
+                </MemoryRouter>
+            </QueryClientProvider>
+        );
+
+    beforeEach(() => {
+        addChannelMock.mockReset();
+        createAgentMock.mockReset();
+        navigateMock.mockReset();
+        updateAgentMock.mockReset();
+    });
+
+    it('opens with the schedule already shown and no way to drop it', () => {
+        renderRequiredDialog();
+
+        expect(screen.getByLabelText('Frequency')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Add a schedule'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Remove schedule'})).not.toBeInTheDocument();
+    });
+
+    it('does not create the agent while the schedule is incomplete', async () => {
+        renderRequiredDialog();
+
+        fireEvent.change(screen.getByPlaceholderText('Enter agent title'), {target: {value: 'Agent1'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(screen.getByText('Prompt is required')).toBeInTheDocument());
+
+        expect(createAgentMock).not.toHaveBeenCalled();
+    });
+
+    it('returns to the page it was opened from instead of the new agent', async () => {
+        createAgentMock.mockImplementation((_variables, options) => options?.onSuccess?.({createAiAgent: {id: '42'}}));
+
+        renderRequiredDialog();
+
+        fireEvent.change(screen.getByPlaceholderText('Enter agent title'), {target: {value: 'Agent1'}});
+        fireEvent.change(screen.getByLabelText('Prompt'), {target: {value: 'Summarise yesterday'}});
+        fireEvent.change(screen.getByLabelText('Time'), {target: {value: '09:30'}});
+        fireEvent.click(screen.getByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(addChannelMock).toHaveBeenCalled());
+
+        expect(navigateMock).toHaveBeenCalledWith('/automation/ai-hub/scheduled');
     });
 });

@@ -1,6 +1,5 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import TooltipTriggerIcon from '@/components/TooltipTriggerIcon/TooltipTriggerIcon';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,9 +7,9 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent} from '@/components/ui/tooltip';
 import AgentVisibilityCaveat from '@/pages/automation/agents/components/AgentVisibilityCaveat';
 import exportAgent from '@/pages/automation/agents/utils/agentImportExport';
+import {describeCadence, fromCadenceParameters} from '@/pages/automation/agents/utils/agentScheduleCron';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import isScheduledAgent from '@/pages/automation/agents/utils/isScheduledAgent';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
@@ -83,9 +82,12 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
             .filter((tag) => !attachedTagIds.has(tag.id));
     }, [agentTagsData?.aiAgentTags, agentTags]);
 
-    // The row shows only THAT the agent is scheduled; the cadence rides in the marker's tooltip. An agent may
-    // own several schedules, and each one reads as a cron string, so putting them on the title line would push
-    // the title around by whatever the agent happens to be scheduled for.
+    // When the agent runs, in words ("Daily at 17:38") rather than as the cron the trigger registers — the
+    // reader wants to know when, not to parse five fields. Shown as its own column beside the version badge
+    // rather than as a marker's tooltip: a schedule is one of the few things worth knowing about a row at a
+    // glance, and hover-to-reveal hides it from anyone scanning the list. Schedule NAMES are left out — they
+    // are almost always the agent's own title, which the row already carries. describeCadence falls back to
+    // the expression for a row written without the picker, which is the only truthful reading of such a row.
     const scheduleSummary = useMemo(
         () =>
             (agent.channels ?? [])
@@ -93,7 +95,7 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
                 .map((channel) => {
                     const parameters = (channel?.parameters ?? {}) as Record<string, unknown>;
 
-                    return [parameters.name, parameters.expression].filter(Boolean).join(' — ');
+                    return describeCadence(fromCadenceParameters(parameters)) || String(parameters.expression ?? '');
                 })
                 .filter(Boolean)
                 .join(', '),
@@ -168,8 +170,8 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
             className="flex cursor-pointer items-center justify-between rounded-md border border-border/50 bg-background p-3"
             onClick={handleClick}
         >
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <span className="flex items-center gap-1.5 font-semibold">
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <span className="flex min-h-8 items-center gap-1.5 font-semibold">
                     {agent.title}
 
                     {agentVisibility.enabled && (
@@ -208,24 +210,16 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
                             </DropdownMenu>
                         </span>
                     )}
-
-                    {isScheduledAgent(agent) && (
-                        <Tooltip>
-                            <TooltipTriggerIcon label="Scheduled">
-                                <CalendarClockIcon className="size-4 shrink-0 text-muted-foreground" />
-                            </TooltipTriggerIcon>
-
-                            <TooltipContent>{scheduleSummary || 'Scheduled'}</TooltipContent>
-                        </Tooltip>
-                    )}
                 </span>
 
                 {agent.description && <span className="text-sm text-muted-foreground">{agent.description}</span>}
 
                 {/* TagList centers itself, so a plain block wrapper would stretch and centre it — the extra
-                    flex box keeps it sized to its content and left-aligned under the title. */}
+                    flex box keeps it sized to its content and left-aligned under the title. w-fit is load
+                    bearing: without it the wrapper stretches across the whole column and its stopPropagation
+                    swallows every click in the empty space beside the tags. */}
 
-                <div className="flex" onClick={(event) => event.stopPropagation()}>
+                <div className="flex min-h-7 w-fit items-center" onClick={(event) => event.stopPropagation()}>
                     <TagList
                         getRequest={(id, tags) => ({
                             input: {
@@ -241,12 +235,25 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
                 </div>
             </div>
 
-            <div className="flex shrink-0 items-center gap-4">
-                {/* gap-y-4 matches ProjectListItem's right-hand column, so the published date sits the same
-                    distance below the version badge on both lists. */}
+            <div className="flex shrink-0 items-center gap-8">
+                {/* Its own column, ahead of the version badge: the schedule belongs with the row's other
+                    at-a-glance facts rather than beside the title, where it would move the title around by
+                    whatever the agent happens to be scheduled for. */}
 
-                <div className="flex flex-col items-end gap-y-4">
-                    <div className="flex items-center gap-2">
+                {isScheduledAgent(agent) && (
+                    <span className="flex items-center gap-1 text-sm whitespace-nowrap text-muted-foreground">
+                        <CalendarClockIcon className="size-4 shrink-0" />
+
+                        {scheduleSummary || 'Scheduled'}
+                    </span>
+                )}
+
+                {/* Both columns keep one rhythm — a 32px first row, an 8px gap, a 28px second row — so the
+                    two columns come out the same height and the row's items-center lands the published date
+                    level with the tags opposite it. Every other *ListItem carries the same three numbers. */}
+
+                <div className="flex flex-col items-end gap-y-2">
+                    <div className="flex min-h-8 items-center gap-2">
                         <Badge
                             className="flex space-x-1 bg-surface-neutral-primary"
                             styleType={isDraft ? 'outline-outline' : 'success-outline'}
@@ -267,7 +274,7 @@ const AgentListItem = ({agent}: AgentListItemProps) => {
                         />
                     </div>
 
-                    <span className="text-xs text-muted-foreground">
+                    <span className="flex min-h-7 items-center text-xs text-muted-foreground">
                         {agent.publishedDate
                             ? `Published at ${new Date(agent.publishedDate).toLocaleString()}`
                             : 'Not yet published'}

@@ -75,19 +75,35 @@ const renderItem = (agent: Partial<AiAgent>) => {
 };
 
 describe('AgentListItem', () => {
-    it('marks an agent that has a schedule channel', () => {
+    // In words and in the open — the cadence is one of the few things worth knowing about a row at a glance,
+    // so it is a column beside the version badge, not a marker the reader has to hover.
+    it('shows when a scheduled agent runs, in words rather than in cron', () => {
+        renderItem({
+            channels: [
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                {channelType: 'schedule', id: '1', parameters: {frequencyKind: 'DAILY', timeOfDay: '09:30'}} as any,
+            ],
+        });
+
+        expect(screen.getByText('Daily at 09:30')).toBeInTheDocument();
+        expect(screen.queryByText('30 9 * * ?')).not.toBeInTheDocument();
+    });
+
+    // A row written by hand (or before the cadence picker existed) carries no picker fields, and its cron is
+    // then the only truthful reading of when it runs.
+    it('falls back to the expression of a schedule that carries no cadence fields', () => {
         renderItem({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             channels: [{channelType: 'schedule', id: '1', parameters: {expression: '30 9 * * ?'}} as any],
         });
 
-        expect(screen.getByLabelText('Scheduled')).toBeInTheDocument();
+        expect(screen.getByText('30 9 * * ?')).toBeInTheDocument();
     });
 
-    it('renders no marker for an agent with no schedule channel', () => {
+    it('shows nothing about schedules for an agent with no schedule channel', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         renderItem({channels: [{channelType: 'chat', id: '1', parameters: {}} as any]});
 
-        expect(screen.queryByLabelText('Scheduled')).not.toBeInTheDocument();
+        expect(screen.queryByText('Scheduled')).not.toBeInTheDocument();
     });
 });
