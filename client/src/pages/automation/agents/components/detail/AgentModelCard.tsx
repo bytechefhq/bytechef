@@ -1,10 +1,9 @@
-import Button from '@/components/Button/Button';
 import {Label} from '@/components/ui/label';
-import AgentModelPicker, {AgentModelSelectionI} from '@/pages/automation/agents/components/detail/AgentModelPicker';
+import AgentModelDialog, {AgentModelDialogValuesI} from '@/pages/automation/agents/components/detail/AgentModelDialog';
+import AgentModelSummary from '@/pages/automation/agents/components/detail/AgentModelSummary';
 import AgentSection from '@/pages/automation/agents/components/detail/AgentSection';
 import invalidateAgentQueries from '@/pages/automation/agents/utils/invalidateAgentQueries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import ComponentConfigDialog from '@/shared/components/component-config/ComponentConfigDialog';
 import {
     AiAgentElement,
     useAddAiAgentElementMutation,
@@ -12,7 +11,6 @@ import {
     useUpdateAiAgentElementMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {SettingsIcon} from 'lucide-react';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
@@ -27,7 +25,7 @@ const AgentModelCard = ({agentId, elements}: AgentModelCardProps) => {
     const [provider, setProvider] = useState<string>((modelElement?.parameters?.provider as string) ?? '');
     const [model, setModel] = useState<string>((modelElement?.parameters?.model as string) ?? '');
     const [connectionId, setConnectionId] = useState<string | null>(modelElement?.connectionId ?? null);
-    const [showConfigDialog, setShowConfigDialog] = useState(false);
+    const [showModelDialog, setShowModelDialog] = useState(false);
 
     const nestedParameters = (modelElement?.parameters?.parameters ?? {}) as Record<string, unknown>;
 
@@ -166,89 +164,67 @@ const AgentModelCard = ({agentId, elements}: AgentModelCardProps) => {
         );
     };
 
-    // The picker reports provider and model together, so unlike the old provider-Select + model-Input pair
-    // there is no half-configured state to defer around — a pick always carries both.
-    const handlePickerChange = (selection: AgentModelSelectionI) => {
-        const providerChanged = selection.provider !== provider;
+    // The dialog gathers provider, model, connection and properties behind one Save, so a single submit is
+    // always a complete configuration — unlike the picker this replaced, which committed on every pick and
+    // had to deal with half-configured states between them.
+    const handleDialogSubmit = ({
+        connectionId: nextConnectionId,
+        model: nextModel,
+        parameters: nextParameters,
+        provider: nextProvider,
+    }: AgentModelDialogValuesI) => {
+        const providerChanged = nextProvider !== provider;
 
-        setProvider(selection.provider);
-        setModel(selection.model);
+        setProvider(nextProvider);
+        setModel(nextModel);
+        setConnectionId(nextConnectionId);
+        setShowModelDialog(false);
 
-        if (providerChanged) {
-            setConnectionId(null);
-        }
-
-        if (!selection.provider || !selection.model) {
+        if (!nextProvider || !nextModel) {
             return;
         }
 
         // A provider change always replaces rather than updates once a row exists, so neither the old
         // connectionId NOR the old provider's properties survive onto the new provider's model row --
-        // temperature and friends are that provider's model element's own properties, not portable ones.
+        // temperature and friends are that provider's model element's own properties, not portable ones. The
+        // dialog has already blanked both in what it hands back.
         if (providerChanged && elementId) {
             setIsSyncing(true);
-            replaceElement({...selection, connectionId: null}, {});
+
+            replaceElement({connectionId: nextConnectionId, model: nextModel, provider: nextProvider}, nextParameters);
 
             return;
         }
 
-        commit({...selection, connectionId: providerChanged ? null : connectionId});
+        commit({connectionId: nextConnectionId, model: nextModel, provider: nextProvider}, nextParameters);
     };
 
     return (
         <AgentSection title="Model">
             <fieldset className="space-y-2 border-0 p-0">
-                <Label htmlFor="agent-model-picker">LLM provider and model</Label>
+                <Label htmlFor="agent-model-summary">LLM provider and model</Label>
 
-                <div className="flex items-center gap-2">
-                    <div className="flex-1">
-                        <AgentModelPicker
-                            disabled={isBusy}
-                            model={model}
-                            onChange={handlePickerChange}
-                            provider={provider}
-                        />
-                    </div>
+                {/* One control rather than the dropdown-plus-gear pair this replaced: provider, model,
+                    connection and properties are four parts of one decision, and splitting them across two
+                    affordances meant a provider switch silently discarded what the gear had configured. */}
 
-                    {/* Connection and the model's own properties (temperature, maxTokens, …) are edited in the
-                        config dialog, the same one a tool row opens. The provider is deliberately NOT editable
-                        there: changing it replaces the element rather than updating it, so it stays with the
-                        picker above, which already owns that path. */}
-
-                    <Button
-                        aria-label="Configure model"
-                        disabled={isBusy || !provider}
-                        icon={<SettingsIcon />}
-                        onClick={() => setShowConfigDialog(true)}
-                        size="icon"
-                        variant="outline"
-                    />
-                </div>
+                <AgentModelSummary
+                    disabled={isBusy}
+                    model={model}
+                    onClick={() => setShowModelDialog(true)}
+                    provider={provider}
+                />
             </fieldset>
 
-            {showConfigDialog && currentWorkspaceId != null && provider && (
-                <ComponentConfigDialog
-                    initialValues={{connectionId, parameters: nestedParameters}}
-                    onClose={() => setShowConfigDialog(false)}
-                    onSubmit={({connectionId: nextConnectionId, parameters}) => {
-                        // Routed through commit rather than a direct mutation so the connection-clearing case
-                        // still replaces the row: updateAiAgentElement reads a null connectionId as "leave
-                        // unchanged", so clearing one cannot go through an update.
-                        setConnectionId(nextConnectionId);
-
-                        commit({connectionId: nextConnectionId, model, provider}, parameters);
-
-                        setShowConfigDialog(false);
-                    }}
-                    open
+            {showModelDialog && currentWorkspaceId != null && (
+                <AgentModelDialog
+                    connectionId={connectionId}
+                    model={model}
+                    onClose={() => setShowModelDialog(false)}
+                    onSubmit={handleDialogSubmit}
+                    parameters={nestedParameters}
                     pending={isBusy}
-                    target={{
-                        // Every LLM provider names its model cluster element "model" (MODEL_ELEMENT_NAME in
-                        // the generator), so the provider IS the component and the element name is fixed.
-                        clusterElementName: 'model',
-                        componentName: provider,
-                        componentVersion: 1,
-                    }}
+                    provider={provider}
                     workspaceId={Number(currentWorkspaceId)}
                 />
             )}
