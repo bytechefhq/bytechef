@@ -34,7 +34,9 @@ import com.bytechef.component.ai.llm.definition.Language;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientAsync;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
 import com.openai.models.audio.AudioModel;
 import com.openai.models.audio.AudioResponseFormat;
 import java.util.Map;
@@ -94,6 +96,51 @@ class OpenAiCreateTranscriptionActionTest {
             assertEquals(Language.HR.getCode(), openAiAudioTranscriptionModelOptions.getLanguage());
             assertEquals(AudioResponseFormat.of("json"), openAiAudioTranscriptionModelOptions.getResponseFormat());
             assertEquals(0.0F, openAiAudioTranscriptionModelOptions.getTemperature());
+        }
+    }
+
+    /**
+     * The async client must be built from the connection's own token. OpenAiAudioTranscriptionModel.Builder.build()
+     * silently falls back to OpenAiSetup.setupAsyncClient() when none is supplied, which reads its credential from the
+     * ambient environment - so an unset async client made the action ignore the configured token and fail outright on
+     * any host without an OPENAI_API_KEY environment variable.
+     */
+    @Test
+    void testCreateAudioTranscriptionModelBuildsBothClientsFromTheConnectionToken() {
+        ArgumentCaptor<String> asyncApiKeyArgumentCaptor = forClass(String.class);
+
+        try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class);
+            MockedStatic<OpenAIOkHttpClientAsync> openAIOkHttpClientAsyncMockedStatic = mockStatic(
+                OpenAIOkHttpClientAsync.class)) {
+
+            OpenAIOkHttpClient.Builder mockedOpenAIOkHttpClientBuilder = mock(OpenAIOkHttpClient.Builder.class);
+
+            openAIOkHttpClientMockedStatic.when(OpenAIOkHttpClient::builder)
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+
+            when(mockedOpenAIOkHttpClientBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+            when(mockedOpenAIOkHttpClientBuilder.build())
+                .thenReturn(mock(OpenAIClient.class));
+
+            OpenAIOkHttpClientAsync.Builder mockedOpenAIOkHttpClientAsyncBuilder = mock(
+                OpenAIOkHttpClientAsync.Builder.class);
+
+            openAIOkHttpClientAsyncMockedStatic.when(OpenAIOkHttpClientAsync::builder)
+                .thenReturn(mockedOpenAIOkHttpClientAsyncBuilder);
+
+            when(mockedOpenAIOkHttpClientAsyncBuilder.apiKey(asyncApiKeyArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientAsyncBuilder);
+            when(mockedOpenAIOkHttpClientAsyncBuilder.build())
+                .thenReturn(mock(OpenAIClientAsync.class));
+
+            Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> audioTranscriptionModel =
+                OpenAiCreateTranscriptionAction.AUDIO_TRANSCRIPTION.createAudioTranscriptionModel(
+                    mockedInputParameters, mockedConnectionParameters);
+
+            assertNotNull(audioTranscriptionModel);
+            assertEquals("TOKEN", stringArgumentCaptor.getValue());
+            assertEquals("TOKEN", asyncApiKeyArgumentCaptor.getValue());
         }
     }
 }
