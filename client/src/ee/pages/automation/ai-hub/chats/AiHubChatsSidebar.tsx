@@ -40,6 +40,7 @@ import {
     ArchiveRestoreIcon,
     BlocksIcon,
     BotIcon,
+    CalendarClockIcon,
     ChevronDownIcon,
     ChevronLeftIcon,
     HexagonIcon,
@@ -693,11 +694,12 @@ const AiHubChatsSidebar = () => {
     //   /automation/ai-hub/chats/<id> page, that chat's row in the list below already shows the active
     //   highlight — also lighting up "New Chat" would imply two simultaneous selections and visually
     //   conflate "start a fresh chat" with "currently on a chat".
-    // - Memories, Connectors, and Skills use exact prefix matches against their
+    // - Scheduled, Memories, Connectors, and Skills use exact prefix matches against their
     //   canonical routes.
     const isOnNewChat = pathname === '/automation/ai-hub';
     const isOnMemories = pathname.startsWith('/automation/ai/memories');
     const isOnConnectors = pathname.startsWith('/automation/settings/ai-hub/connectors');
+    const isOnScheduled = pathname.startsWith('/automation/ai-hub/scheduled');
     const isOnSkills = pathname.startsWith('/automation/ai/skills');
 
     const isOnMoreTarget = isOnMemories || isOnConnectors || isOnSkills;
@@ -725,8 +727,9 @@ const AiHubChatsSidebar = () => {
              * and is the single launcher for every kind of chat, so a separate destination for one of them
              * was a second way to do the same thing.
              *
-             * Scheduled (AI Hub tasks) used to sit here too, linking to its own full-page route. Scheduling
-             * now lives on the AI Agent itself, so the hub no longer owns a scheduling destination.
+             * Scheduled is back as a top-level row. Scheduling itself lives on the AI Agent, so its page is
+             * a roll-up of every agent's schedule rather than an editor — but it is a destination the user
+             * reaches for as readily as a new chat, which is what earns it a row instead of a menu entry.
              * Links here, not buttons setting state. Each row applies a `bg-accent` highlight when its route
              * is active so the user can see at a glance which destination they're on.
              */}
@@ -741,6 +744,7 @@ const AiHubChatsSidebar = () => {
             {/*
              * Icons match the rest of the AI Hub surface for visual continuity:
              *   - MessageSquarePlus signals "start a new chat" — same metaphor used in mainstream chat UIs.
+             *   - CalendarClock signals "runs on a clock" for Scheduled.
              * `text-muted-foreground` keeps the icons quiet so the label remains the primary anchor.
              */}
 
@@ -749,6 +753,16 @@ const AiHubChatsSidebar = () => {
                     <MessageSquarePlusIcon className="size-4 shrink-0 text-muted-foreground" />
 
                     <span>New Chat</span>
+                </Link>
+
+                {/* Scheduled sits beside New Chat rather than in "More": the two are the hub's ways of
+                    getting an agent to run — one by asking now, one by asking on a clock — whereas the
+                    "More" entries are resources a chat draws on. */}
+
+                <Link className={menuItemClass(isOnScheduled)} to="/automation/ai-hub/scheduled">
+                    <CalendarClockIcon className="size-4 shrink-0 text-muted-foreground" />
+
+                    <span>Scheduled</span>
                 </Link>
 
                 {/*

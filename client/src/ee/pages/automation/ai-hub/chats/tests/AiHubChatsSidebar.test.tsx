@@ -275,10 +275,12 @@ describe('AiHubChatsSidebar top menu', () => {
         expect(screen.getByText('More')).toBeInTheDocument();
     });
 
-    it('does not render a "Scheduled" nav item — scheduling lives on the AI Agent, not the hub', () => {
+    // A top-level row rather than a "More" entry: it is a way of getting an agent to run, like New Chat,
+    // not a resource a chat draws on.
+    it('renders "Scheduled" as a top-level link beside New Chat', () => {
         renderSidebar();
 
-        expect(screen.queryByText('Scheduled')).not.toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'Scheduled'})).toHaveAttribute('href', '/automation/ai-hub/scheduled');
     });
 });
 
