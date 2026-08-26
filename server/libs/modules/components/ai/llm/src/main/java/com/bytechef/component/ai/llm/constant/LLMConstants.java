@@ -70,6 +70,7 @@ public class LLMConstants {
     public static final String PROMPT = "prompt";
     public static final String PROVIDER = "provider";
     public static final String REASONING = "reasoning";
+    public static final String REASONING_EFFORT = "reasoningEffort";
     public static final String RESPONSE = "response";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESPONSE_SCHEMA = "responseSchema";
@@ -78,6 +79,7 @@ public class LLMConstants {
     public static final String STYLE = "style";
     public static final String SYSTEM_PROMPT = "systemPrompt";
     public static final String TEMPERATURE = "temperature";
+    public static final String THINKING = "thinking";
     public static final String TOP_P = "topP";
     public static final String TOP_K = "topK";
     public static final String USER = "user";
@@ -212,6 +214,33 @@ public class LLMConstants {
         .label("Web Search")
         .description("Let the model search the web itself, using the provider's own search tool.")
         .defaultValue(false)
+        .advancedOption(true);
+
+    /**
+     * Extended reasoning, declared only by the model cluster elements whose provider actually implements it. Keep the
+     * providers that declare this property in step with {@code AiAgentSettings#THINKING_MODEL_PROVIDERS}, which is what
+     * stops an agent from being published against a provider that would ignore it.
+     */
+    public static final ModifiableBooleanProperty THINKING_PROPERTY = bool(THINKING)
+        .label("Thinking")
+        .description("Let the model reason before responding.")
+        .defaultValue(false)
+        .advancedOption(true);
+
+    /**
+     * How hard the model thinks when {@link #THINKING_PROPERTY} is on. Deliberately an effort word rather than a token
+     * budget: only Anthropic expresses the setting as a budget, and every other provider takes an effort string, so a
+     * budget here would be the one shape that cannot be translated the other way. Each provider maps these three values
+     * onto its own knob (see {@code AnthropicChatAction} for the budget mapping).
+     */
+    public static final ModifiableStringProperty REASONING_EFFORT_PROPERTY = string(REASONING_EFFORT)
+        .label("Reasoning effort")
+        .description("How much the model reasons before responding. Higher effort costs more tokens and takes longer.")
+        .options(
+            option("low", "low"),
+            option("medium", "medium"),
+            option("high", "high"))
+        .defaultValue("medium")
         .advancedOption(true);
 
     public static final ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)

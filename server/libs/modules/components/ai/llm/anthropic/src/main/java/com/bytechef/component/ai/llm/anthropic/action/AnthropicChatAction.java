@@ -20,8 +20,10 @@ import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstant
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.WEB_SEARCH;
@@ -36,6 +38,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.Map;
 import org.springframework.ai.anthropic.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -55,12 +58,22 @@ public class AnthropicChatAction {
         .help("", "https://docs.bytechef.io/reference/components/anthropic_v1#ask")
         .perform(AnthropicChatAction::perform);
 
+    /**
+     * Anthropic expresses extended thinking as a token budget rather than an effort word, so the shared
+     * {@code reasoningEffort} property is translated here. The three values are the budgets Anthropic's own guidance
+     * suggests for light, ordinary and hard reasoning; they are a starting point per effort level, not a hard contract.
+     */
+    private static final Map<String, Integer> THINKING_BUDGET_TOKENS = Map.of(
+        "low", 2048, "medium", 8192, "high", 24576);
+
+    /** Anthropic rejects a thinking budget below this. */
+    private static final int MIN_THINKING_BUDGET_TOKENS = 1024;
+
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
         AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
             .model(inputParameters.getRequiredString(MODEL))
             .maxTokens(inputParameters.getInteger(MAX_TOKENS))
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .topK(inputParameters.getInteger(TOP_K))
             .cacheOptions(
                 AnthropicCacheOptions.builder()
                     .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
@@ -75,16 +88,26 @@ public class AnthropicChatAction {
                     .build());
         }
 
-        // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
-        Double temperature = inputParameters.getDouble(TEMPERATURE);
-
-        if (temperature != null) {
-            optionsBuilder.temperature(temperature);
+        // Extended thinking is mutually exclusive with the sampling knobs: Anthropic pins temperature to 1 and
+        // rejects `top_p`/`top_k` outright while thinking is on, so those are left unset rather than sent and
+        // refused. The budget must also stay under `max_tokens`, which is why it is clamped rather than passed
+        // through — an agent configured for high effort against a small completion budget should still run.
+        if (inputParameters.getBoolean(THINKING, false)) {
+            optionsBuilder.thinkingEnabled(resolveThinkingBudgetTokens(inputParameters));
         } else {
-            Double topP = inputParameters.getDouble(TOP_P);
+            optionsBuilder.topK(inputParameters.getInteger(TOP_K));
 
-            if (topP != null) {
-                optionsBuilder.topP(topP);
+            // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
+            Double temperature = inputParameters.getDouble(TEMPERATURE);
+
+            if (temperature != null) {
+                optionsBuilder.temperature(temperature);
+            } else {
+                Double topP = inputParameters.getDouble(TOP_P);
+
+                if (topP != null) {
+                    optionsBuilder.topP(topP);
+                }
             }
         }
 
@@ -104,6 +127,25 @@ public class AnthropicChatAction {
     };
 
     private AnthropicChatAction() {
+    }
+
+    private static long resolveThinkingBudgetTokens(Parameters inputParameters) {
+        int budgetTokens = THINKING_BUDGET_TOKENS.getOrDefault(
+            inputParameters.getString(REASONING_EFFORT, "medium"), THINKING_BUDGET_TOKENS.get("medium"));
+
+        Integer maxTokens = inputParameters.getInteger(MAX_TOKENS);
+
+        if (maxTokens == null) {
+            return budgetTokens;
+        }
+
+        if (maxTokens <= MIN_THINKING_BUDGET_TOKENS) {
+            throw new IllegalArgumentException(
+                "Thinking needs a Max Tokens above %d, so the reasoning budget can fit inside it, but Max Tokens is %d."
+                    .formatted(MIN_THINKING_BUDGET_TOKENS, maxTokens));
+        }
+
+        return Math.min(budgetTokens, maxTokens - 1);
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

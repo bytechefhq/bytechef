@@ -26,11 +26,13 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STORE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY;
@@ -47,6 +49,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
 import java.time.Duration;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatModel.ResponseFormat;
 import org.springframework.ai.openai.OpenAiChatModel.ResponseFormat.Type;
@@ -105,7 +108,7 @@ public class OpenAiChatAction {
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))
                     .user(inputParameters.getString(USER))
-                    .reasoningEffort(inputParameters.getString(REASONING))
+                    .reasoningEffort(resolveReasoningEffort(inputParameters))
                     .verbosity(inputParameters.getString(VERBOSITY))
                     .store(inputParameters.getBoolean(STORE))
                     .build())
@@ -113,6 +116,20 @@ public class OpenAiChatAction {
     };
 
     private OpenAiChatAction() {
+    }
+
+    /**
+     * OpenAI already exposes a {@code reasoning} effort on the Ask action, and the model cluster element the agent uses
+     * exposes the shared {@code thinking}/{@code reasoningEffort} pair instead. Only one of the two is ever present, so
+     * this resolves whichever it is. Thinking being off returns null rather than {@code "none"}: sending any effort at
+     * all to a non-reasoning model is an error, and null simply leaves the provider's own default in place.
+     */
+    private static @Nullable String resolveReasoningEffort(Parameters inputParameters) {
+        if (inputParameters.getBoolean(THINKING, false)) {
+            return inputParameters.getString(REASONING_EFFORT, "medium");
+        }
+
+        return inputParameters.getString(REASONING);
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

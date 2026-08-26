@@ -22,8 +22,10 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_COMPLETION
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.ai.llm.openai.action.OpenAiChatAction.CHAT_MODEL;
@@ -57,7 +59,9 @@ public class OpenAiChatModel {
                 PRESENCE_PENALTY_PROPERTY,
                 LOGIT_BIAS_PROPERTY,
                 STOP_PROPERTY,
-                USER_PROPERTY);
+                USER_PROPERTY,
+                THINKING_PROPERTY,
+                REASONING_EFFORT_PROPERTY);
 
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {

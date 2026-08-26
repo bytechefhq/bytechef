@@ -21,7 +21,9 @@ import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstant
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.WEB_SEARCH_PROPERTY;
 
@@ -49,7 +51,9 @@ public class AntropicChatModel {
                 TOP_P_PROPERTY,
                 TOP_K_PROPERTY,
                 STOP_PROPERTY,
-                WEB_SEARCH_PROPERTY);
+                WEB_SEARCH_PROPERTY,
+                THINKING_PROPERTY,
+                REASONING_EFFORT_PROPERTY);
 
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {
