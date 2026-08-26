@@ -18,7 +18,18 @@ export const FunctionSignature = Extension.create({
                 key: FunctionSignaturePluginKey,
                 view() {
                     let component: ReactRenderer | undefined;
+                    let isCreating = false;
                     let popup: TippyInstance | undefined;
+
+                    // Each editor gets its OWN detached reference node rather than sharing document.body.
+                    // tippy stamps the instance onto the reference as `reference._tippy` with no dedup
+                    // (createTippy overwrites it), so every property input on the page creating against `body`
+                    // clobbers the previous registration — and destroy() deletes `body._tippy`, leaving the
+                    // other instance's popper mounted with nothing able to reach it again. That orphan is what
+                    // showed as a signature tooltip surviving after its function text was deleted, and as two
+                    // tooltips stacked side by side. The node is never inserted into the document: positioning
+                    // comes entirely from getReferenceClientRect, and appendTo still puts the popper in <body>.
+                    const referenceElement = document.createElement('div');
 
                     const hide = () => {
                         popup?.destroy();
@@ -31,9 +42,7 @@ export const FunctionSignature = Extension.create({
                     // The tippy popper is appended to document.body, so it outlives the editor's own DOM and
                     // is torn down only when `hide` runs. The plugin's `update` only fires on ProseMirror
                     // transactions/selection changes — a plain blur (clicking another field) dispatches no
-                    // transaction, so without this listener the tooltip would orphan in <body> and stack up
-                    // behind the next field's tooltip (tippy('body') never dedups). Hiding on blur guarantees
-                    // the signature tooltip never persists past focus.
+                    // transaction, so without this listener the tooltip would persist past focus.
                     editor.on('blur', hide);
 
                     const update = () => {
@@ -93,16 +102,34 @@ export const FunctionSignature = Extension.create({
 
                             popup?.setProps({getReferenceClientRect});
                         } else {
-                            component = new ReactRenderer(FunctionSignatureTooltip, {editor, props});
+                            // `new ReactRenderer` renders through flushSync, which drains React's pending
+                            // effects — among them tiptap's own useEditor effect calling `editor.setOptions`,
+                            // which runs `view.setProps` -> `updatePluginViews` -> back into this `update`
+                            // before either assignment below has happened. That nested call would also find
+                            // `component` unset, create a second renderer and popper, and then have both
+                            // clobbered by the outer call's assignments — orphaning a popper in <body> with
+                            // no instance left to hide or destroy it. The nested call has nothing to add
+                            // over the creation already in flight, so it bails out here instead.
+                            if (isCreating) {
+                                return;
+                            }
 
-                            popup = tippy('body', {
-                                appendTo: () => document.body,
-                                content: component.element,
-                                getReferenceClientRect,
-                                placement: 'top-start',
-                                showOnCreate: true,
-                                trigger: 'manual',
-                            })[0];
+                            isCreating = true;
+
+                            try {
+                                component = new ReactRenderer(FunctionSignatureTooltip, {editor, props});
+
+                                popup = tippy(referenceElement, {
+                                    appendTo: () => document.body,
+                                    content: component.element,
+                                    getReferenceClientRect,
+                                    placement: 'top-start',
+                                    showOnCreate: true,
+                                    trigger: 'manual',
+                                });
+                            } finally {
+                                isCreating = false;
+                            }
                         }
                     };
 
