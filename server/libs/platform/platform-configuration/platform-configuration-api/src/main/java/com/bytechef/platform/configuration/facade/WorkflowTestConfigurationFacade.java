@@ -18,6 +18,9 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -27,6 +30,11 @@ public interface WorkflowTestConfigurationFacade {
     void deleteWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId);
+
+    Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId, long environmentId);
+
+    List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
+        String workflowId, String workflowNodeName, long environmentId);
 
     void removeUnusedWorkflowTestConfigurationConnections(Workflow workflow);
 

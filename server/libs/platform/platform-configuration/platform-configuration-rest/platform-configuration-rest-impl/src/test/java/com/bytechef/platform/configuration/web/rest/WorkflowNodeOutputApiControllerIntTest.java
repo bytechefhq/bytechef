@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
@@ -25,12 +26,23 @@ import com.bytechef.platform.configuration.dto.ClusterElementOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
+import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -45,10 +57,15 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 class WorkflowNodeOutputApiControllerIntTest {
 
     private static final long ENVIRONMENT_ID = 1L;
+    private static final long DEVELOPMENT_ENVIRONMENT_ID = 0L;
+    private static final long PRODUCTION_ENVIRONMENT_ID = 2L;
     private static final String WORKFLOW_ID = "workflow1";
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WorkflowNodeOutputApiController workflowNodeOutputApiController;
 
     @Autowired
     private WorkflowNodeOutputFacade workflowNodeOutputFacade;
@@ -59,6 +76,11 @@ class WorkflowNodeOutputApiControllerIntTest {
     void beforeEach() {
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -128,5 +150,52 @@ class WorkflowNodeOutputApiControllerIntTest {
 
         when(workflowNodeOutputFacade.getClusterElementOutput(
             WORKFLOW_ID, "aiAgent_1", "tools", "hubspot_1", ENVIRONMENT_ID)).thenReturn(clusterElementOutputDTO);
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsUsesTheConfinedPrincipalEnvironmentForEvictionAndRead() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        workflowNodeOutputApiController.getPreviousWorkflowNodeOutputs(
+            WORKFLOW_ID, DEVELOPMENT_ENVIRONMENT_ID, "node_1");
+
+        verify(workflowNodeOutputFacade).checkWorkflowCache(WORKFLOW_ID, "node_1", PRODUCTION_ENVIRONMENT_ID);
+        verify(workflowNodeOutputFacade).getPreviousWorkflowNodeOutputs(
+            WORKFLOW_ID, "node_1", PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testGetPreviousWorkflowNodeOutputsUsesTheSessionPrincipalRequestedEnvironmentForEvictionAndRead() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        workflowNodeOutputApiController.getPreviousWorkflowNodeOutputs(
+            WORKFLOW_ID, DEVELOPMENT_ENVIRONMENT_ID, "node_1");
+
+        verify(workflowNodeOutputFacade).checkWorkflowCache(WORKFLOW_ID, "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+        verify(workflowNodeOutputFacade).getPreviousWorkflowNodeOutputs(
+            WORKFLOW_ID, "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+    }
+
+    private static void authenticate(Authentication authentication) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+    }
+
+    private static final class TestApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+
+        private TestApiKeyAuthenticationToken(long environmentId) {
+            super(environmentId, new User("connected-user-1", "", List.of()));
+        }
+
+        @Override
+        public CredentialType getCredentialType() {
+            return CredentialType.PLATFORM_API_KEY;
+        }
+
+        @Override
+        public @Nullable PlatformType getPlatformType() {
+            return null;
+        }
     }
 }

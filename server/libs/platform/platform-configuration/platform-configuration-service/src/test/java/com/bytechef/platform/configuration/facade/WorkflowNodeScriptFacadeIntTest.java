@@ -46,13 +46,23 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -64,7 +74,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(classes = PlatformConfigurationIntTestConfiguration.class)
 class WorkflowNodeScriptFacadeIntTest {
 
+    private static final long DEVELOPMENT_ENVIRONMENT_ID = 0L;
     private static final long ENVIRONMENT_ID = 1L;
+    private static final long PRODUCTION_ENVIRONMENT_ID = 2L;
 
     private static final String CLUSTER_ELEMENT_SCRIPT_WORKFLOW_DEFINITION = """
         {
@@ -78,6 +90,22 @@ class WorkflowNodeScriptFacadeIntTest {
                             "name": "script_1",
                             "type": "script/v1/java",
                             "parameters": {}
+                        }
+                    }
+                }
+            ]
+        }
+        """;
+
+    private static final String SCRIPT_INPUT_WORKFLOW_DEFINITION = """
+        {
+            "tasks": [
+                {
+                    "name": "script_1",
+                    "type": "script/v1/java",
+                    "parameters": {
+                        "input": {
+                            "greeting": "${greeting}"
                         }
                     }
                 }
@@ -132,6 +160,8 @@ class WorkflowNodeScriptFacadeIntTest {
 
     @AfterEach
     void afterEach() {
+        SecurityContextHolder.clearContext();
+
         workflowNodeTestOutputRepository.deleteAll();
         workflowTestConfigurationRepository.deleteAll();
         jdbcWorkflowRepository.deleteAll();
@@ -301,6 +331,94 @@ class WorkflowNodeScriptFacadeIntTest {
         assertThat(scriptInput).isEqualTo(Map.of("key", "value"));
     }
 
+    @Test
+    void testGetWorkflowNodeScriptInputReadsTheConfinedPrincipalEnvironmentNotTheRequestedOne() {
+        Workflow workflow = createWorkflowWithGreetingPerEnvironment();
+
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        assertThat(workflowNodeScriptFacade.getWorkflowNodeScriptInput(
+            workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID))
+                .containsEntry("greeting", "production");
+    }
+
+    @Test
+    void testGetWorkflowNodeScriptInputReadsTheSessionPrincipalRequestedEnvironment() {
+        Workflow workflow = createWorkflowWithGreetingPerEnvironment();
+
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        assertThat(workflowNodeScriptFacade.getWorkflowNodeScriptInput(
+            workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID))
+                .containsEntry("greeting", "development");
+    }
+
+    @Test
+    void testTestWorkflowNodeScriptStoresTheOutputInTheConfinedPrincipalEnvironment() {
+        Workflow workflow = createWorkflow(WORKFLOW_NODE_SCRIPT_WORKFLOW_DEFINITION);
+
+        stubScriptPerform(Map.of("result", "ok"));
+
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        workflowNodeScriptFacade.testWorkflowNodeScript(workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID, null);
+
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", PRODUCTION_ENVIRONMENT_ID)).isPresent();
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID)).isEmpty();
+    }
+
+    @Test
+    void testTestWorkflowNodeScriptStoresTheOutputInTheSessionPrincipalRequestedEnvironment() {
+        Workflow workflow = createWorkflow(WORKFLOW_NODE_SCRIPT_WORKFLOW_DEFINITION);
+
+        stubScriptPerform(Map.of("result", "ok"));
+
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        workflowNodeScriptFacade.testWorkflowNodeScript(workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID, null);
+
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID)).isPresent();
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", PRODUCTION_ENVIRONMENT_ID)).isEmpty();
+    }
+
+    @Test
+    void testTestClusterElementScriptStoresTheOutputInTheConfinedPrincipalEnvironment() {
+        Workflow workflow = createWorkflow(CLUSTER_ELEMENT_SCRIPT_WORKFLOW_DEFINITION);
+
+        stubProcessorClusterElementType();
+        stubScriptPerform(Map.of("result", "ok"));
+
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        workflowNodeScriptFacade.testClusterElementScript(
+            workflow.getId(), "node_1", "processor", "script_1", DEVELOPMENT_ENVIRONMENT_ID, null);
+
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", PRODUCTION_ENVIRONMENT_ID)).isPresent();
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID)).isEmpty();
+    }
+
+    @Test
+    void testTestClusterElementScriptStoresTheOutputInTheSessionPrincipalRequestedEnvironment() {
+        Workflow workflow = createWorkflow(CLUSTER_ELEMENT_SCRIPT_WORKFLOW_DEFINITION);
+
+        stubProcessorClusterElementType();
+        stubScriptPerform(Map.of("result", "ok"));
+
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        workflowNodeScriptFacade.testClusterElementScript(
+            workflow.getId(), "node_1", "processor", "script_1", DEVELOPMENT_ENVIRONMENT_ID, null);
+
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", DEVELOPMENT_ENVIRONMENT_ID)).isPresent();
+        assertThat(fetchTestOutput(workflow.getId(), "script_1", PRODUCTION_ENVIRONMENT_ID)).isEmpty();
+    }
+
+    private static void authenticate(Authentication authentication) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+    }
+
     @SuppressWarnings("unchecked")
     private Map<String, Object> captureScriptInputParameters() {
         ArgumentCaptor<Map<String, Object>> inputParametersArgumentCaptor = ArgumentCaptor.forClass(Map.class);
@@ -317,8 +435,25 @@ class WorkflowNodeScriptFacadeIntTest {
         return workflowService.create(definition, Format.JSON, Workflow.SourceType.JDBC);
     }
 
+    private Workflow createWorkflowWithGreetingPerEnvironment() {
+        Workflow workflow = createWorkflow(SCRIPT_INPUT_WORKFLOW_DEFINITION);
+
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(
+            workflow.getId(), "greeting", "development", DEVELOPMENT_ENVIRONMENT_ID);
+        workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(
+            workflow.getId(), "greeting", "production", PRODUCTION_ENVIRONMENT_ID);
+
+        return workflow;
+    }
+
     private Optional<WorkflowNodeTestOutput> fetchTestOutput(String workflowId, String workflowNodeName) {
-        return workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowNodeName, ENVIRONMENT_ID);
+        return fetchTestOutput(workflowId, workflowNodeName, ENVIRONMENT_ID);
+    }
+
+    private Optional<WorkflowNodeTestOutput> fetchTestOutput(
+        String workflowId, String workflowNodeName, long environmentId) {
+
+        return workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowNodeName, environmentId);
     }
 
     private void stubProcessorClusterElementType() {
@@ -338,5 +473,22 @@ class WorkflowNodeScriptFacadeIntTest {
             eq("script"), eq(1), eq("java"), any(), any(), any(), any(), any(), anyMap(), anyMap(), anyMap(), any(),
             any(), anyBoolean(), any(), any(), any()))
                 .thenThrow(exception);
+    }
+
+    private static final class TestApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+
+        private TestApiKeyAuthenticationToken(long environmentId) {
+            super(environmentId, new User("connected-user-1", "", List.of()));
+        }
+
+        @Override
+        public CredentialType getCredentialType() {
+            return CredentialType.PLATFORM_API_KEY;
+        }
+
+        @Override
+        public @Nullable PlatformType getPlatformType() {
+            return null;
+        }
     }
 }
