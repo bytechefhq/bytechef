@@ -46,6 +46,7 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -188,6 +189,9 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     public void checkWorkflowCache(String workflowId, String lastWorkflowNodeName, long environmentId) {
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         boolean dynamicOutputDefined = false;
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -227,7 +231,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         if (dynamicOutputDefined) {
             for (String cacheName : WORKFLOW_CACHE_NAMES) {
-                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, environmentId);
+                workflowCacheManager.clearCacheForWorkflow(workflowId, cacheName, effectiveEnvironmentId);
             }
         }
     }

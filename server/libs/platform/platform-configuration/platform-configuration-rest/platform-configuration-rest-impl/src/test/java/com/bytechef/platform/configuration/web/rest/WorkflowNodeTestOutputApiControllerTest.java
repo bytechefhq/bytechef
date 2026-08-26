@@ -18,8 +18,11 @@ package com.bytechef.platform.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -27,31 +30,116 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 
 /**
+ * Both the facade's and the service's own hasPermission(#workflowId, 'Workflow', ...) gates are environment-agnostic,
+ * so the caller-supplied environmentId is never checked. These tests pin the execution side: for a confined (api-key)
+ * principal, the environment reaching the downstream call must be the principal's own, not the request argument. This
+ * is the REST twin of WorkflowNodeTestOutputGraphQlControllerTest -- reaches the same facade, but was missed by the
+ * original review because it only enumerated GraphQL controllers.
+ *
  * @author Ivica Cardic
  */
 class WorkflowNodeTestOutputApiControllerTest {
 
-    private static final long ENVIRONMENT_ID = 0L;
+    private static final long DEVELOPMENT_ORDINAL = 0L;
+    private static final long PRODUCTION_ORDINAL = 2L;
 
-    private final ConversionService conversionService = mock(ConversionService.class);
-    private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade = mock(WorkflowNodeTestOutputFacade.class);
-
-    private WorkflowNodeTestOutputApiController workflowNodeTestOutputApiController;
+    private ConversionService conversionService;
+    private WorkflowNodeTestOutputApiController controller;
+    private WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
+    private WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
     @BeforeEach
     void setUp() {
-        workflowNodeTestOutputApiController = new WorkflowNodeTestOutputApiController(
-            conversionService, workflowNodeTestOutputFacade, mock(WorkflowNodeTestOutputService.class));
+        conversionService = mock(ConversionService.class);
+        workflowNodeTestOutputFacade = mock(WorkflowNodeTestOutputFacade.class);
+        workflowNodeTestOutputService = mock(WorkflowNodeTestOutputService.class);
+        controller = new WorkflowNodeTestOutputApiController(
+            conversionService, workflowNodeTestOutputFacade, workflowNodeTestOutputService);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testDeleteWorkflowNodeTestOutputUsesConfinedPrincipalEnvironmentAtExecution() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ORDINAL, user()));
+
+        controller.deleteWorkflowNodeTestOutput("workflow-1", "node-1", DEVELOPMENT_ORDINAL);
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).deleteWorkflowNodeTestOutput(
+            eq("workflow-1"), eq("node-1"), environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(PRODUCTION_ORDINAL);
+    }
+
+    @Test
+    void testDeleteWorkflowNodeTestOutputHonoursSessionPrincipalRequestedEnvironment() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        controller.deleteWorkflowNodeTestOutput("workflow-1", "node-1", DEVELOPMENT_ORDINAL);
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).deleteWorkflowNodeTestOutput(
+            eq("workflow-1"), eq("node-1"), environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(DEVELOPMENT_ORDINAL);
+    }
+
+    @Test
+    void testSaveWorkflowNodeTestOutputUsesConfinedPrincipalEnvironmentAtExecution() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ORDINAL, user()));
+
+        when(workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(anyString(), anyString(), anyLong()))
+            .thenReturn(mock(WorkflowNodeTestOutput.class));
+
+        controller.saveWorkflowNodeTestOutput("workflow-1", "node-1", DEVELOPMENT_ORDINAL);
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(
+            eq("workflow-1"), eq("node-1"), environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(PRODUCTION_ORDINAL);
+    }
+
+    @Test
+    void testSaveWorkflowNodeTestOutputHonoursSessionPrincipalRequestedEnvironment() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        when(workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(anyString(), anyString(), anyLong()))
+            .thenReturn(mock(WorkflowNodeTestOutput.class));
+
+        controller.saveWorkflowNodeTestOutput("workflow-1", "node-1", DEVELOPMENT_ORDINAL);
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(
+            eq("workflow-1"), eq("node-1"), environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(DEVELOPMENT_ORDINAL);
     }
 
     @Test
@@ -59,14 +147,14 @@ class WorkflowNodeTestOutputApiControllerTest {
         WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
         WorkflowNodeTestOutputModel workflowNodeTestOutputModel = new WorkflowNodeTestOutputModel();
 
-        when(workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput("workflow-1", "dataStorage_1", ENVIRONMENT_ID))
-            .thenReturn(workflowNodeTestOutput);
+        when(
+            workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput("workflow-1", "dataStorage_1", DEVELOPMENT_ORDINAL))
+                .thenReturn(workflowNodeTestOutput);
         when(conversionService.convert(workflowNodeTestOutput, WorkflowNodeTestOutputModel.class))
             .thenReturn(workflowNodeTestOutputModel);
 
-        ResponseEntity<WorkflowNodeTestOutputModel> responseEntity =
-            workflowNodeTestOutputApiController.saveWorkflowNodeTestOutput(
-                "workflow-1", "dataStorage_1", ENVIRONMENT_ID);
+        ResponseEntity<WorkflowNodeTestOutputModel> responseEntity = controller.saveWorkflowNodeTestOutput(
+            "workflow-1", "dataStorage_1", DEVELOPMENT_ORDINAL);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isSameAs(workflowNodeTestOutputModel);
@@ -78,9 +166,8 @@ class WorkflowNodeTestOutputApiControllerTest {
             eq("workflow-1"), eq("dataStorage_1"), any(Long.class)))
                 .thenReturn(null);
 
-        ResponseEntity<WorkflowNodeTestOutputModel> responseEntity =
-            workflowNodeTestOutputApiController.saveWorkflowNodeTestOutput(
-                "workflow-1", "dataStorage_1", ENVIRONMENT_ID);
+        ResponseEntity<WorkflowNodeTestOutputModel> responseEntity = controller.saveWorkflowNodeTestOutput(
+            "workflow-1", "dataStorage_1", DEVELOPMENT_ORDINAL);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(responseEntity.getBody()).isNull();
@@ -96,16 +183,90 @@ class WorkflowNodeTestOutputApiControllerTest {
         WorkflowNodeTestOutputModel workflowNodeTestOutputModel = new WorkflowNodeTestOutputModel();
 
         when(workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
-            eq("workflow-1"), eq("awsS3_1"), eq("sample.csv"), any(InputStream.class), eq(ENVIRONMENT_ID)))
+            eq("workflow-1"), eq("awsS3_1"), eq("sample.csv"), any(InputStream.class), eq(DEVELOPMENT_ORDINAL)))
                 .thenReturn(workflowNodeTestOutput);
         when(conversionService.convert(workflowNodeTestOutput, WorkflowNodeTestOutputModel.class))
             .thenReturn(workflowNodeTestOutputModel);
 
         ResponseEntity<WorkflowNodeTestOutputModel> responseEntity =
-            workflowNodeTestOutputApiController.uploadWorkflowNodeSampleFile(
-                "workflow-1", "awsS3_1", ENVIRONMENT_ID, file);
+            controller.uploadWorkflowNodeSampleFile(
+                "workflow-1", "awsS3_1", DEVELOPMENT_ORDINAL, file);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isSameAs(workflowNodeTestOutputModel);
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleFileUsesConfinedPrincipalEnvironmentAtExecution() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ORDINAL, user()));
+
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "sample.csv", "text/csv", "a,b\n1,2".getBytes(StandardCharsets.UTF_8));
+
+        when(workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
+            anyString(), anyString(), anyString(), any(InputStream.class), anyLong()))
+                .thenReturn(mock(WorkflowNodeTestOutput.class));
+
+        controller.uploadWorkflowNodeSampleFile("workflow-1", "awsS3_1", DEVELOPMENT_ORDINAL, file);
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeSampleFile(
+            eq("workflow-1"), eq("awsS3_1"), eq("sample.csv"), any(InputStream.class),
+            environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(PRODUCTION_ORDINAL);
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleOutputUsesConfinedPrincipalEnvironmentAtExecution() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ORDINAL, user()));
+
+        when(workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(
+            anyString(), anyString(), any(), anyLong()))
+                .thenReturn(mock(WorkflowNodeTestOutput.class));
+
+        controller.uploadWorkflowNodeSampleOutput("workflow-1", "node-1", DEVELOPMENT_ORDINAL, "sample");
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeSampleOutput(
+            eq("workflow-1"), eq("node-1"), eq("sample"), environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(PRODUCTION_ORDINAL);
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleOutputHonoursSessionPrincipalRequestedEnvironment() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        when(workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(
+            anyString(), anyString(), any(), anyLong()))
+                .thenReturn(mock(WorkflowNodeTestOutput.class));
+
+        controller.uploadWorkflowNodeSampleOutput("workflow-1", "node-1", DEVELOPMENT_ORDINAL, "sample");
+
+        ArgumentCaptor<Long> environmentIdCaptor = ArgumentCaptor.forClass(Long.class);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeSampleOutput(
+            eq("workflow-1"), eq("node-1"), eq("sample"), environmentIdCaptor.capture());
+
+        assertThat(environmentIdCaptor.getValue()).isEqualTo(DEVELOPMENT_ORDINAL);
+    }
+
+    private static void authenticate(Authentication authentication) {
+        SecurityContextHolder.getContext()
+            .setAuthentication(authentication);
+    }
+
+    private static User user() {
+        return new User("connected-user-1", "", List.of());
+    }
+
+    private static final class TestApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+
+        private TestApiKeyAuthenticationToken(long environmentId, User user) {
+            super(environmentId, user);
+        }
     }
 }

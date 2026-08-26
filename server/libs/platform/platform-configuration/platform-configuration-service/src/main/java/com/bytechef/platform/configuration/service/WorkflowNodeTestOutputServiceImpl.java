@@ -63,10 +63,12 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
         String workflowId, String workflowNodeName, @Nullable Instant createdDate, long environmentId) {
 
         if (createdDate == null) {
-            return workflowNodeTestOutputRepository.existsByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName);
+            return workflowNodeTestOutputRepository.existsByWorkflowIdAndWorkflowNodeNameAndEnvironmentId(
+                workflowId, workflowNodeName, environmentId);
         } else {
-            return workflowNodeTestOutputRepository.existsByWorkflowIdAndWorkflowNodeNameAndLastModifiedDateAfter(
-                workflowId, workflowNodeName, createdDate);
+            return workflowNodeTestOutputRepository
+                .existsByWorkflowIdAndWorkflowNodeNameAndEnvironmentIdAndLastModifiedDateAfter(
+                    workflowId, workflowNodeName, environmentId, createdDate);
         }
     }
 

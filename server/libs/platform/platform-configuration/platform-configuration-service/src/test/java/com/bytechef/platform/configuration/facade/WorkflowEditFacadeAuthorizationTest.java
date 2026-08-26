@@ -107,6 +107,10 @@ class WorkflowEditFacadeAuthorizationTest {
                 WorkflowTestConfigurationFacadeImpl.class,
                 Map.of(
                     "deleteWorkflowTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT,
+                    "fetchWorkflowTestConfiguration",
+                    "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)",
+                    "getWorkflowTestConfigurationConnections",
+                    "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_VIEW', #environmentId)",
                     "saveClusterElementTestConfigurationConnection", IN_REQUESTED_ENVIRONMENT,
                     "saveWorkflowTestConfiguration",
                     "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowTestConfiguration.workflowId, "

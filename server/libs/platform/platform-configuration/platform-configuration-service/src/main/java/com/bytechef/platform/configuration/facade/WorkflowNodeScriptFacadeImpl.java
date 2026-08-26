@@ -37,6 +37,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
@@ -88,6 +89,9 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, long environmentId) {
 
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -105,12 +109,12 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         ClusterElement sourceClusterElement = sourceClusterElementOptional.get();
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowNodeName, environmentId);
+            workflowId, workflowNodeName, effectiveEnvironmentId);
 
         Map<String, ?> sourceInputParameters = evaluator.evaluate(sourceClusterElement.getParameters(), outputs);
 
         ComponentConnection sourceComponentConnection = getComponentConnection(
-            workflowId, sourceClusterElement.getWorkflowNodeName(), environmentId);
+            workflowId, sourceClusterElement.getWorkflowNodeName(), effectiveEnvironmentId);
 
         CodeEditorScriptInputProvider provider = codeEditorScriptInputProviders.stream()
             .filter(inputProvider -> Objects.equals(inputProvider.getRootComponentName(), workflowNodeType.name()))
@@ -138,10 +142,13 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     public Map<String, Object> getWorkflowNodeScriptInput(
         String workflowId, String workflowNodeName, long environmentId) {
 
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         if (log.isDebugEnabled()) {
             log.debug(
                 "getWorkflowNodeScriptInput called with workflowId={}, workflowNodeName={}, environmentId={}",
-                workflowId, workflowNodeName, environmentId);
+                workflowId, workflowNodeName, effectiveEnvironmentId);
         }
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -161,10 +168,10 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         }
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+            workflowId, effectiveEnvironmentId);
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowNodeName, environmentId);
+            workflowId, workflowNodeName, effectiveEnvironmentId);
 
         if (log.isDebugEnabled()) {
             log.debug("Context for evaluation - inputs: {}, outputs: {}", inputs, outputs);
@@ -187,16 +194,19 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, long environmentId, Map<String, Object> inputParameters) {
 
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         return executeTestAndBuildResult(() -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                     workflowId, workflowNodeName, clusterElementType.toUpperCase(Locale.ROOT),
-                    clusterElementWorkflowNodeName, environmentId);
+                    clusterElementWorkflowNodeName, effectiveEnvironmentId);
             }
 
             return workflowNodeTestOutputFacade.saveClusterElementTestOutput(
                 workflowId, workflowNodeName, clusterElementType.toUpperCase(Locale.ROOT),
-                clusterElementWorkflowNodeName, Map.of("input", inputParameters), environmentId);
+                clusterElementWorkflowNodeName, Map.of("input", inputParameters), effectiveEnvironmentId);
         });
     }
 
@@ -205,14 +215,17 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     public ScriptTestExecutionDTO testWorkflowNodeScript(
         String workflowId, String workflowNodeName, long environmentId, Map<String, Object> inputParameters) {
 
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         return executeTestAndBuildResult(() -> {
             if (inputParameters == null) {
                 return workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                    workflowId, workflowNodeName, environmentId);
+                    workflowId, workflowNodeName, effectiveEnvironmentId);
             }
 
             return workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-                workflowId, workflowNodeName, Map.of("input", inputParameters), environmentId);
+                workflowId, workflowNodeName, Map.of("input", inputParameters), effectiveEnvironmentId);
         });
     }
 

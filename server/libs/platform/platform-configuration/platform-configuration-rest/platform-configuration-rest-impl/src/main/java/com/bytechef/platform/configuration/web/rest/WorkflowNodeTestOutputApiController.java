@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,17 +60,35 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
         String id, String workflowNodeName, Long environmentId, OffsetDateTime createdDate) {
 
+        // The service's hasPermission(#workflowId, 'Workflow', ...) gate is environment-agnostic, so the
+        // caller-supplied environmentId is never checked. No @Cacheable/@WorkflowCacheEvict downstream, so
+        // resolving here (rather than deeper in the service) is a matter of following the established pattern in
+        // this controller, not a correctness requirement. See PrincipalEnvironment.
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         return ResponseEntity.ok(
             new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(
                 workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
-                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant(), environmentId)));
+                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant(),
+                    effectiveEnvironmentId)));
     }
 
     @Override
     public ResponseEntity<Void> deleteWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
-        workflowNodeTestOutputFacade.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId);
+        // Both the facade's and the service's own hasPermission(#workflowId, 'Workflow', ...) gates are
+        // environment-agnostic, so the caller-supplied environmentId is never checked. Resolved HERE, at the
+        // controller, rather than inside the gated methods below: deleteWorkflowNodeTestOutput and
+        // saveWorkflowNodeTestOutput/saveWorkflowNodeSampleOutput's downstream save() are annotated
+        // @WorkflowCacheEvict, whose aspect reads the environmentId argument via reflection off the ORIGINAL
+        // call-site arguments (AspectJ's JoinPoint#getArgs()) -- a local variable reassigned inside the target
+        // method is invisible to it. Resolving after entry would evict the requested environment's cache entry
+        // while the method itself read or wrote the confined principal's own environment, leaving the two
+        // permanently out of sync. See PrincipalEnvironment.
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
+        workflowNodeTestOutputFacade.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, effectiveEnvironmentId);
 
         return ResponseEntity
             .noContent()
@@ -80,8 +99,12 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<WorkflowNodeTestOutputModel> saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
+        // See the comment on deleteWorkflowNodeTestOutput above -- same @WorkflowCacheEvict constraint applies to
+        // the save() this facade method delegates to.
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         WorkflowNodeTestOutput workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-            workflowId, workflowNodeName, environmentId);
+            workflowId, workflowNodeName, effectiveEnvironmentId);
 
         if (workflowNodeTestOutput == null) {
             return ResponseEntity
@@ -96,11 +119,13 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleFile(
         String workflowId, String workflowNodeName, Long environmentId, MultipartFile file) {
 
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         try (InputStream inputStream = file.getInputStream()) {
             return ResponseEntity.ok(
                 conversionService.convert(
                     workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
-                        workflowId, workflowNodeName, file.getOriginalFilename(), inputStream, environmentId),
+                        workflowId, workflowNodeName, file.getOriginalFilename(), inputStream, effectiveEnvironmentId),
                     WorkflowNodeTestOutputModel.class));
         } catch (IOException ioException) {
             throw new UncheckedIOException(ioException);
@@ -111,10 +136,25 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
         String workflowId, String workflowNodeName, Long environmentId, Object body) {
 
+        // See the comment on deleteWorkflowNodeTestOutput above -- same @WorkflowCacheEvict constraint applies to
+        // the save() this facade method delegates to.
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(
-                    workflowId, workflowNodeName, body, environmentId),
+                    workflowId, workflowNodeName, body, effectiveEnvironmentId),
                 WorkflowNodeTestOutputModel.class));
+    }
+
+    // Required by the OpenAPI contract (@NotNull, required = true) on every caller of this method, so Spring
+    // rejects a missing environmentId before any of them run -- checked explicitly all the same, because the
+    // alternative is an unboxing NPE surfacing as a 500 if that ever changes.
+    private static long resolveRequiredEnvironmentId(Long environmentId) {
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        return PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
     }
 }

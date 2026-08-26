@@ -18,6 +18,7 @@ package com.bytechef.platform.security.web.authentication;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 
@@ -27,6 +28,7 @@ import org.springframework.security.core.userdetails.User;
 public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenticationToken {
 
     private long environmentId;
+    private boolean environmentIdPresent;
     private String tenantId;
     private User user;
 
@@ -38,6 +40,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
         super(List.of());
 
         this.environmentId = environmentId;
+        this.environmentIdPresent = true;
         this.tenantId = tenantId;
     }
 
@@ -46,6 +49,7 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
         super(user.getAuthorities());
 
         this.environmentId = environmentId;
+        this.environmentIdPresent = true;
         this.user = user;
 
         setAuthenticated(true);
@@ -69,5 +73,22 @@ public abstract class AbstractApiKeyAuthenticationToken extends AbstractAuthenti
 
     public long getEnvironmentId() {
         return environmentId;
+    }
+
+    /**
+     * The environment this token was actually built for, or empty when it was built by a constructor that carries none.
+     * {@link #getEnvironmentId()} cannot express that difference: it answers {@code 0} either way, and {@code 0} is a
+     * valid ordinal ({@code DEVELOPMENT}), so a token that never received an environment is indistinguishable from one
+     * genuinely in DEVELOPMENT.
+     *
+     * <p>
+     * That distinction matters to anything deciding who a principal IS from its environment. Reading
+     * {@link #getEnvironmentId()} there makes such a caller depend on every provider having remembered to carry the
+     * environment into its authenticated token — a provider that forgets yields a confident wrong answer rather than a
+     * missing one, and no reader can tell the two apart. Reading this instead makes a forgetful provider produce
+     * "unknown", which every such caller can fail safely on.
+     */
+    public Optional<Long> fetchEnvironmentId() {
+        return environmentIdPresent ? Optional.of(environmentId) : Optional.empty();
     }
 }
