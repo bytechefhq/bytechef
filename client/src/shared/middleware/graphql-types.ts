@@ -1476,6 +1476,7 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  createAdditionalFilesInSkill: AiSkill;
   createAiAgentEvalScenario: AiAgentEvalScenario;
   createAiAgentEvalTest: AiAgentEvalTest;
   createAiAgentJudge: AiAgentJudge;
@@ -1557,6 +1558,7 @@ export type Mutation = {
   inviteUser: Scalars['Boolean']['output'];
   publishAutomationWorkflowProject: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
+  removeFileInSkill: AiSkill;
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
@@ -1617,6 +1619,12 @@ export type MutationCancelAiAgentEvalRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationCreateAdditionalFilesInSkillArgs = {
+  additionalFiles: Scalars['Map']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2074,6 +2082,12 @@ export type MutationPublishAutomationWorkflowProjectArgs = {
 
 export type MutationRemoveDataTableColumnArgs = {
   input: RemoveColumnInput;
+};
+
+
+export type MutationRemoveFileInSkillArgs = {
+  id: Scalars['ID']['input'];
+  path: Scalars['String']['input'];
 };
 
 
