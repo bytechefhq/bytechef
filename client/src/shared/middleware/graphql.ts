@@ -248,6 +248,14 @@ export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any }> };
 
+export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
+  id: string | number;
+  additionalFiles: any;
+}>;
+
+
+export type CreateAdditionalFilesInSkillMutation = { createAdditionalFilesInSkill: { description: string | null, id: string, lastModifiedDate: any, name: string } };
+
 export type CreateAiSkillMutationVariables = Exact<{
   name: string;
   description?: string | null | undefined;
@@ -274,6 +282,14 @@ export type DeleteAiSkillMutationVariables = Exact<{
 
 export type DeleteAiSkillMutation = { deleteAiSkill: boolean };
 
+export type RemoveFileInSkillMutationVariables = Exact<{
+  id: string | number;
+  path: string;
+}>;
+
+
+export type RemoveFileInSkillMutation = { removeFileInSkill: { description: string | null, id: string, lastModifiedDate: any, name: string } };
+
 export type UpdateAiSkillMutationVariables = Exact<{
   id: string | number;
   name: string;
@@ -291,22 +307,6 @@ export type UpdateAiSkillContentMutationVariables = Exact<{
 
 
 export type UpdateAiSkillContentMutation = { updateAiSkillContent: { description: string | null, id: string, lastModifiedDate: any, name: string } };
-
-export type RemoveFileInSkillMutationVariables = Exact<{
-  id: string | number;
-  path: string;
-}>;
-
-
-export type RemoveFileInSkillMutation = { removeFileInSkill: { description: string | null, id: string, lastModifiedDate: any, name: string } };
-
-export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
-  id: string | number;
-  additionalFiles: any;
-}>;
-
-
-export type CreateAdditionalFilesInSkillMutation = { createAdditionalFilesInSkill: { description: string | null, id: string, lastModifiedDate: any, name: string } };
 
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
@@ -1854,7 +1854,7 @@ export const useAiAgentEvalResultQuery = <
       variables: AiAgentEvalResultQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentEvalResultQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalResultQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentEvalResultQuery, TError, TData>(
       {
     queryKey: ['aiAgentEvalResult', variables],
@@ -1876,7 +1876,7 @@ export const useAiAgentEvalResultTranscriptQuery = <
       variables: AiAgentEvalResultTranscriptQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentEvalResultTranscriptQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalResultTranscriptQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentEvalResultTranscriptQuery, TError, TData>(
       {
     queryKey: ['aiAgentEvalResultTranscript', variables],
@@ -1950,7 +1950,7 @@ export const useAiAgentEvalRunQuery = <
       variables: AiAgentEvalRunQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentEvalRunQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalRunQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentEvalRunQuery, TError, TData>(
       {
     queryKey: ['aiAgentEvalRun', variables],
@@ -1986,7 +1986,7 @@ export const useAiAgentEvalRunsQuery = <
       variables: AiAgentEvalRunsQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentEvalRunsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalRunsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentEvalRunsQuery, TError, TData>(
       {
     queryKey: ['aiAgentEvalRuns', variables],
@@ -2042,7 +2042,7 @@ export const useAiAgentEvalTestQuery = <
       variables: AiAgentEvalTestQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentEvalTestQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalTestQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentEvalTestQuery, TError, TData>(
       {
     queryKey: ['aiAgentEvalTest', variables],
@@ -2096,7 +2096,7 @@ export const useAiAgentEvalTestsQuery = <
       variables: AiAgentEvalTestsQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentEvalTestsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentEvalTestsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentEvalTestsQuery, TError, TData>(
       {
     queryKey: ['aiAgentEvalTests', variables],
@@ -2125,7 +2125,7 @@ export const useAiAgentJudgesQuery = <
       variables: AiAgentJudgesQueryVariables,
       options?: Omit<UseQueryOptions<AiAgentJudgesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAgentJudgesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiAgentJudgesQuery, TError, TData>(
       {
     queryKey: ['aiAgentJudges', variables],
@@ -2147,7 +2147,7 @@ export const useCancelAiAgentEvalRunMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CancelAiAgentEvalRunMutation, TError, CancelAiAgentEvalRunMutationVariables, TContext>) => {
-
+    
     return useMutation<CancelAiAgentEvalRunMutation, TError, CancelAiAgentEvalRunMutationVariables, TContext>(
       {
     mutationKey: ['cancelAiAgentEvalRun'],
@@ -2194,7 +2194,7 @@ export const useCreateAiAgentEvalScenarioMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiAgentEvalScenarioMutation, TError, CreateAiAgentEvalScenarioMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiAgentEvalScenarioMutation, TError, CreateAiAgentEvalScenarioMutationVariables, TContext>(
       {
     mutationKey: ['createAiAgentEvalScenario'],
@@ -2224,7 +2224,7 @@ export const useCreateAiAgentEvalTestMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiAgentEvalTestMutation, TError, CreateAiAgentEvalTestMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiAgentEvalTestMutation, TError, CreateAiAgentEvalTestMutationVariables, TContext>(
       {
     mutationKey: ['createAiAgentEvalTest'],
@@ -2256,7 +2256,7 @@ export const useCreateAiAgentJudgeMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiAgentJudgeMutation, TError, CreateAiAgentJudgeMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiAgentJudgeMutation, TError, CreateAiAgentJudgeMutationVariables, TContext>(
       {
     mutationKey: ['createAiAgentJudge'],
@@ -2287,7 +2287,7 @@ export const useCreateAiAgentScenarioJudgeMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiAgentScenarioJudgeMutation, TError, CreateAiAgentScenarioJudgeMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiAgentScenarioJudgeMutation, TError, CreateAiAgentScenarioJudgeMutationVariables, TContext>(
       {
     mutationKey: ['createAiAgentScenarioJudge'],
@@ -2316,7 +2316,7 @@ export const useCreateAiAgentScenarioToolSimulationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiAgentScenarioToolSimulationMutation, TError, CreateAiAgentScenarioToolSimulationMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiAgentScenarioToolSimulationMutation, TError, CreateAiAgentScenarioToolSimulationMutationVariables, TContext>(
       {
     mutationKey: ['createAiAgentScenarioToolSimulation'],
@@ -2335,7 +2335,7 @@ export const useDeleteAiAgentEvalScenarioMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAiAgentEvalScenarioMutation, TError, DeleteAiAgentEvalScenarioMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAiAgentEvalScenarioMutation, TError, DeleteAiAgentEvalScenarioMutationVariables, TContext>(
       {
     mutationKey: ['deleteAiAgentEvalScenario'],
@@ -2354,7 +2354,7 @@ export const useDeleteAiAgentEvalTestMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAiAgentEvalTestMutation, TError, DeleteAiAgentEvalTestMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAiAgentEvalTestMutation, TError, DeleteAiAgentEvalTestMutationVariables, TContext>(
       {
     mutationKey: ['deleteAiAgentEvalTest'],
@@ -2373,7 +2373,7 @@ export const useDeleteAiAgentJudgeMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAiAgentJudgeMutation, TError, DeleteAiAgentJudgeMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAiAgentJudgeMutation, TError, DeleteAiAgentJudgeMutationVariables, TContext>(
       {
     mutationKey: ['deleteAiAgentJudge'],
@@ -2392,7 +2392,7 @@ export const useDeleteAiAgentScenarioJudgeMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAiAgentScenarioJudgeMutation, TError, DeleteAiAgentScenarioJudgeMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAiAgentScenarioJudgeMutation, TError, DeleteAiAgentScenarioJudgeMutationVariables, TContext>(
       {
     mutationKey: ['deleteAiAgentScenarioJudge'],
@@ -2411,7 +2411,7 @@ export const useDeleteAiAgentScenarioToolSimulationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAiAgentScenarioToolSimulationMutation, TError, DeleteAiAgentScenarioToolSimulationMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAiAgentScenarioToolSimulationMutation, TError, DeleteAiAgentScenarioToolSimulationMutationVariables, TContext>(
       {
     mutationKey: ['deleteAiAgentScenarioToolSimulation'],
@@ -2444,7 +2444,7 @@ export const useStartAiAgentEvalRunMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<StartAiAgentEvalRunMutation, TError, StartAiAgentEvalRunMutationVariables, TContext>) => {
-
+    
     return useMutation<StartAiAgentEvalRunMutation, TError, StartAiAgentEvalRunMutationVariables, TContext>(
       {
     mutationKey: ['startAiAgentEvalRun'],
@@ -2490,7 +2490,7 @@ export const useUpdateAiAgentEvalScenarioMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiAgentEvalScenarioMutation, TError, UpdateAiAgentEvalScenarioMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiAgentEvalScenarioMutation, TError, UpdateAiAgentEvalScenarioMutationVariables, TContext>(
       {
     mutationKey: ['updateAiAgentEvalScenario'],
@@ -2515,7 +2515,7 @@ export const useUpdateAiAgentEvalTestMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiAgentEvalTestMutation, TError, UpdateAiAgentEvalTestMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiAgentEvalTestMutation, TError, UpdateAiAgentEvalTestMutationVariables, TContext>(
       {
     mutationKey: ['updateAiAgentEvalTest'],
@@ -2541,7 +2541,7 @@ export const useUpdateAiAgentJudgeMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiAgentJudgeMutation, TError, UpdateAiAgentJudgeMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiAgentJudgeMutation, TError, UpdateAiAgentJudgeMutationVariables, TContext>(
       {
     mutationKey: ['updateAiAgentJudge'],
@@ -2567,7 +2567,7 @@ export const useUpdateAiAgentScenarioJudgeMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiAgentScenarioJudgeMutation, TError, UpdateAiAgentScenarioJudgeMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiAgentScenarioJudgeMutation, TError, UpdateAiAgentScenarioJudgeMutationVariables, TContext>(
       {
     mutationKey: ['updateAiAgentScenarioJudge'],
@@ -2596,7 +2596,7 @@ export const useUpdateAiAgentScenarioToolSimulationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiAgentScenarioToolSimulationMutation, TError, UpdateAiAgentScenarioToolSimulationMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiAgentScenarioToolSimulationMutation, TError, UpdateAiAgentScenarioToolSimulationMutationVariables, TContext>(
       {
     mutationKey: ['updateAiAgentScenarioToolSimulation'],
@@ -2624,7 +2624,7 @@ export const useAiSkillQuery = <
       variables: AiSkillQueryVariables,
       options?: Omit<UseQueryOptions<AiSkillQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiSkillQuery, TError, TData>(
       {
     queryKey: ['aiSkill', variables],
@@ -2646,7 +2646,7 @@ export const useAiSkillFileContentQuery = <
       variables: AiSkillFileContentQueryVariables,
       options?: Omit<UseQueryOptions<AiSkillFileContentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillFileContentQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiSkillFileContentQuery, TError, TData>(
       {
     queryKey: ['aiSkillFileContent', variables],
@@ -2668,7 +2668,7 @@ export const useAiSkillFilePathsQuery = <
       variables: AiSkillFilePathsQueryVariables,
       options?: Omit<UseQueryOptions<AiSkillFilePathsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillFilePathsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiSkillFilePathsQuery, TError, TData>(
       {
     queryKey: ['aiSkillFilePaths', variables],
@@ -2696,11 +2696,35 @@ export const useAiSkillsQuery = <
       variables?: AiSkillsQueryVariables,
       options?: Omit<UseQueryOptions<AiSkillsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiSkillsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['aiSkills'] : ['aiSkills', variables],
     queryFn: fetcher<AiSkillsQuery, AiSkillsQueryVariables>(AiSkillsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAdditionalFilesInSkillDocument = new TypedDocumentString(`
+    mutation createAdditionalFilesInSkill($id: ID!, $additionalFiles: Map!) {
+  createAdditionalFilesInSkill(id: $id, additionalFiles: $additionalFiles) {
+    description
+    id
+    lastModifiedDate
+    name
+  }
+}
+    `);
+
+export const useCreateAdditionalFilesInSkillMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAdditionalFilesInSkillMutation, TError, CreateAdditionalFilesInSkillMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAdditionalFilesInSkillMutation, TError, CreateAdditionalFilesInSkillMutationVariables, TContext>(
+      {
+    mutationKey: ['createAdditionalFilesInSkill'],
+    mutationFn: (variables?: CreateAdditionalFilesInSkillMutationVariables) => fetcher<CreateAdditionalFilesInSkillMutation, CreateAdditionalFilesInSkillMutationVariables>(CreateAdditionalFilesInSkillDocument, variables)(),
     ...options
   }
     )};
@@ -2726,7 +2750,7 @@ export const useCreateAiSkillMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiSkillMutation, TError, CreateAiSkillMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiSkillMutation, TError, CreateAiSkillMutationVariables, TContext>(
       {
     mutationKey: ['createAiSkill'],
@@ -2755,7 +2779,7 @@ export const useCreateAiSkillFromInstructionsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAiSkillFromInstructionsMutation, TError, CreateAiSkillFromInstructionsMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAiSkillFromInstructionsMutation, TError, CreateAiSkillFromInstructionsMutationVariables, TContext>(
       {
     mutationKey: ['createAiSkillFromInstructions'],
@@ -2774,11 +2798,35 @@ export const useDeleteAiSkillMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAiSkillMutation, TError, DeleteAiSkillMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAiSkillMutation, TError, DeleteAiSkillMutationVariables, TContext>(
       {
     mutationKey: ['deleteAiSkill'],
     mutationFn: (variables?: DeleteAiSkillMutationVariables) => fetcher<DeleteAiSkillMutation, DeleteAiSkillMutationVariables>(DeleteAiSkillDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RemoveFileInSkillDocument = new TypedDocumentString(`
+    mutation removeFileInSkill($id: ID!, $path: String!) {
+  removeFileInSkill(id: $id, path: $path) {
+    description
+    id
+    lastModifiedDate
+    name
+  }
+}
+    `);
+
+export const useRemoveFileInSkillMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<RemoveFileInSkillMutation, TError, RemoveFileInSkillMutationVariables, TContext>) => {
+    
+    return useMutation<RemoveFileInSkillMutation, TError, RemoveFileInSkillMutationVariables, TContext>(
+      {
+    mutationKey: ['removeFileInSkill'],
+    mutationFn: (variables?: RemoveFileInSkillMutationVariables) => fetcher<RemoveFileInSkillMutation, RemoveFileInSkillMutationVariables>(RemoveFileInSkillDocument, variables)(),
     ...options
   }
     )};
@@ -2799,7 +2847,7 @@ export const useUpdateAiSkillMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiSkillMutation, TError, UpdateAiSkillMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiSkillMutation, TError, UpdateAiSkillMutationVariables, TContext>(
       {
     mutationKey: ['updateAiSkill'],
@@ -2823,59 +2871,11 @@ export const useUpdateAiSkillContentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiSkillContentMutation, TError, UpdateAiSkillContentMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiSkillContentMutation, TError, UpdateAiSkillContentMutationVariables, TContext>(
       {
     mutationKey: ['updateAiSkillContent'],
     mutationFn: (variables?: UpdateAiSkillContentMutationVariables) => fetcher<UpdateAiSkillContentMutation, UpdateAiSkillContentMutationVariables>(UpdateAiSkillContentDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const RemoveFileInSkillDocument = new TypedDocumentString(`
-    mutation removeFileInSkill($id: ID!, $path: String!) {
-  removeFileInSkill(id: $id, path: $path) {
-    description
-    id
-    lastModifiedDate
-    name
-  }
-}
-    `);
-
-export const useRemoveFileInSkillMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<RemoveFileInSkillMutation, TError, RemoveFileInSkillMutationVariables, TContext>) => {
-
-    return useMutation<RemoveFileInSkillMutation, TError, RemoveFileInSkillMutationVariables, TContext>(
-      {
-    mutationKey: ['removeFileInSkill'],
-    mutationFn: (variables?: RemoveFileInSkillMutationVariables) => fetcher<RemoveFileInSkillMutation, RemoveFileInSkillMutationVariables>(RemoveFileInSkillDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const CreateAdditionalFilesInSkillDocument = new TypedDocumentString(`
-    mutation createAdditionalFilesInSkill($id: ID!, $additionalFiles: Map!) {
-  createAdditionalFilesInSkill(id: $id, additionalFiles: $additionalFiles) {
-    description
-    id
-    lastModifiedDate
-    name
-  }
-}
-    `);
-
-export const useCreateAdditionalFilesInSkillMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateAdditionalFilesInSkillMutation, TError, CreateAdditionalFilesInSkillMutationVariables, TContext>) => {
-
-    return useMutation<CreateAdditionalFilesInSkillMutation, TError, CreateAdditionalFilesInSkillMutationVariables, TContext>(
-      {
-    mutationKey: ['createAdditionalFilesInSkill'],
-    mutationFn: (variables?: CreateAdditionalFilesInSkillMutationVariables) => fetcher<CreateAdditionalFilesInSkillMutation, CreateAdditionalFilesInSkillMutationVariables>(CreateAdditionalFilesInSkillDocument, variables)(),
     ...options
   }
     )};
@@ -2907,7 +2907,7 @@ export const useApprovalTaskQuery = <
       variables: ApprovalTaskQueryVariables,
       options?: Omit<UseQueryOptions<ApprovalTaskQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApprovalTaskQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApprovalTaskQuery, TError, TData>(
       {
     queryKey: ['approvalTask', variables],
@@ -2943,7 +2943,7 @@ export const useApprovalTasksQuery = <
       variables?: ApprovalTasksQueryVariables,
       options?: Omit<UseQueryOptions<ApprovalTasksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApprovalTasksQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApprovalTasksQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['approvalTasks'] : ['approvalTasks', variables],
@@ -2969,7 +2969,7 @@ export const useCreateApprovalTaskMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApprovalTaskMutation, TError, CreateApprovalTaskMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateApprovalTaskMutation, TError, CreateApprovalTaskMutationVariables, TContext>(
       {
     mutationKey: ['createApprovalTask'],
@@ -2988,7 +2988,7 @@ export const useDeleteApprovalTaskMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApprovalTaskMutation, TError, DeleteApprovalTaskMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteApprovalTaskMutation, TError, DeleteApprovalTaskMutationVariables, TContext>(
       {
     mutationKey: ['deleteApprovalTask'],
@@ -3016,7 +3016,7 @@ export const useUpdateApprovalTaskMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApprovalTaskMutation, TError, UpdateApprovalTaskMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateApprovalTaskMutation, TError, UpdateApprovalTaskMutationVariables, TContext>(
       {
     mutationKey: ['updateApprovalTask'],
@@ -3040,7 +3040,7 @@ export const useCreateMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpProjectMutation, TError, CreateMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['createMcpProject'],
@@ -3063,7 +3063,7 @@ export const useCreateWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateWorkspaceApiKeyMutation, TError, CreateWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['createWorkspaceApiKey'],
@@ -3088,7 +3088,7 @@ export const useCreateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpServerMutation, TError, CreateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['createMcpServer'],
@@ -3107,7 +3107,7 @@ export const useDeleteMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpProjectMutation, TError, DeleteMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpProject'],
@@ -3126,7 +3126,7 @@ export const useDeleteMcpProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpProjectWorkflowMutation, TError, DeleteMcpProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpProjectWorkflowMutation, TError, DeleteMcpProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpProjectWorkflow'],
@@ -3145,7 +3145,7 @@ export const useDeleteSharedProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteSharedProjectMutation, TError, DeleteSharedProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteSharedProject'],
@@ -3164,7 +3164,7 @@ export const useDeleteSharedWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteSharedWorkflowMutation, TError, DeleteSharedWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteSharedWorkflow'],
@@ -3183,7 +3183,7 @@ export const useDeleteWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteWorkspaceApiKeyMutation, TError, DeleteWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['deleteWorkspaceApiKey'],
@@ -3202,7 +3202,7 @@ export const useDeleteWorkspaceMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteWorkspaceMcpServerMutation, TError, DeleteWorkspaceMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['deleteWorkspaceMcpServer'],
@@ -3221,7 +3221,7 @@ export const useDisconnectConnectionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>) => {
-
+    
     return useMutation<DisconnectConnectionMutation, TError, DisconnectConnectionMutationVariables, TContext>(
       {
     mutationKey: ['DisconnectConnection'],
@@ -3240,7 +3240,7 @@ export const useExportSharedProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<ExportSharedProjectMutation, TError, ExportSharedProjectMutationVariables, TContext>(
       {
     mutationKey: ['exportSharedProject'],
@@ -3259,7 +3259,7 @@ export const useExportSharedWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<ExportSharedWorkflowMutation, TError, ExportSharedWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['exportSharedWorkflow'],
@@ -3282,7 +3282,7 @@ export const useImportProjectTemplateMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportProjectTemplateMutation, TError, ImportProjectTemplateMutationVariables, TContext>(
       {
     mutationKey: ['importProjectTemplate'],
@@ -3305,7 +3305,7 @@ export const useImportWorkflowTemplateMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportWorkflowTemplateMutation, TError, ImportWorkflowTemplateMutationVariables, TContext>(
       {
     mutationKey: ['importWorkflowTemplate'],
@@ -3372,7 +3372,7 @@ export const useMcpProjectWorkflowPropertiesQuery = <
       variables: McpProjectWorkflowPropertiesQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectWorkflowPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpProjectWorkflowPropertiesQuery, TError, TData>(
       {
     queryKey: ['mcpProjectWorkflowProperties', variables],
@@ -3401,7 +3401,7 @@ export const useMcpProjectsQuery = <
       variables?: McpProjectsQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpProjectsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['mcpProjects'] : ['mcpProjects', variables],
@@ -3473,7 +3473,7 @@ export const useMcpProjectsByServerIdQuery = <
       variables: McpProjectsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpProjectsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpProjectsByServerId', variables],
@@ -3522,7 +3522,7 @@ export const usePreBuiltProjectTemplatesQuery = <
       variables?: PreBuiltProjectTemplatesQueryVariables,
       options?: Omit<UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltProjectTemplatesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<PreBuiltProjectTemplatesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['preBuiltProjectTemplates'] : ['preBuiltProjectTemplates', variables],
@@ -3564,7 +3564,7 @@ export const usePreBuiltWorkflowTemplatesQuery = <
       variables?: PreBuiltWorkflowTemplatesQueryVariables,
       options?: Omit<UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<PreBuiltWorkflowTemplatesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<PreBuiltWorkflowTemplatesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['preBuiltWorkflowTemplates'] : ['preBuiltWorkflowTemplates', variables],
@@ -3589,7 +3589,7 @@ export const useProjectByIdQuery = <
       variables: ProjectByIdQueryVariables,
       options?: Omit<UseQueryOptions<ProjectByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectByIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ProjectByIdQuery, TError, TData>(
       {
     queryKey: ['projectById', variables],
@@ -3635,7 +3635,7 @@ export const useProjectTemplateQuery = <
       variables: ProjectTemplateQueryVariables,
       options?: Omit<UseQueryOptions<ProjectTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ProjectTemplateQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ProjectTemplateQuery, TError, TData>(
       {
     queryKey: ['projectTemplate', variables],
@@ -3662,7 +3662,7 @@ export const useSharedProjectQuery = <
       variables: SharedProjectQueryVariables,
       options?: Omit<UseQueryOptions<SharedProjectQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedProjectQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<SharedProjectQuery, TError, TData>(
       {
     queryKey: ['sharedProject', variables],
@@ -3689,7 +3689,7 @@ export const useSharedWorkflowQuery = <
       variables: SharedWorkflowQueryVariables,
       options?: Omit<UseQueryOptions<SharedWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SharedWorkflowQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<SharedWorkflowQuery, TError, TData>(
       {
     queryKey: ['sharedWorkflow', variables],
@@ -3720,7 +3720,7 @@ export const useToolEligibleProjectVersionWorkflowsQuery = <
       variables: ToolEligibleProjectVersionWorkflowsQueryVariables,
       options?: Omit<UseQueryOptions<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ToolEligibleProjectVersionWorkflowsQuery, TError, TData>(
       {
     queryKey: ['toolEligibleProjectVersionWorkflows', variables],
@@ -3744,7 +3744,7 @@ export const useUpdateMcpProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpProjectMutation, TError, UpdateMcpProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpProjectMutation, TError, UpdateMcpProjectMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpProject'],
@@ -3768,7 +3768,7 @@ export const useUpdateMcpProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpProjectWorkflowMutation, TError, UpdateMcpProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpProjectWorkflowMutation, TError, UpdateMcpProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpProjectWorkflow'],
@@ -3791,7 +3791,7 @@ export const useUpdateMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerMutation, TError, UpdateMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServer'],
@@ -3812,7 +3812,7 @@ export const useUpdateMcpServerTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerTagsMutation, TError, UpdateMcpServerTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerTags'],
@@ -3831,7 +3831,7 @@ export const useUpdateWorkspaceApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateWorkspaceApiKeyMutation, TError, UpdateWorkspaceApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['updateWorkspaceApiKey'],
@@ -3860,7 +3860,7 @@ export const useWorkflowChatProjectDeploymentWorkflowQuery = <
       variables: WorkflowChatProjectDeploymentWorkflowQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowChatProjectDeploymentWorkflowQuery, TError, TData>(
       {
     queryKey: ['workflowChatProjectDeploymentWorkflow', variables],
@@ -3899,7 +3899,7 @@ export const useWorkflowTemplateQuery = <
       variables: WorkflowTemplateQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowTemplateQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowTemplateQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowTemplateQuery, TError, TData>(
       {
     queryKey: ['workflowTemplate', variables],
@@ -3930,7 +3930,7 @@ export const useWorkspaceApiKeysQuery = <
       variables: WorkspaceApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkspaceApiKeysQuery, TError, TData>(
       {
     queryKey: ['workspaceApiKeys', variables],
@@ -3958,7 +3958,7 @@ export const useWorkspaceChatWorkflowsQuery = <
       variables: WorkspaceChatWorkflowsQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceChatWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceChatWorkflowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkspaceChatWorkflowsQuery, TError, TData>(
       {
     queryKey: ['workspaceChatWorkflows', variables],
@@ -3999,7 +3999,7 @@ export const useWorkspaceMcpServersQuery = <
       variables: WorkspaceMcpServersQueryVariables,
       options?: Omit<UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceMcpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkspaceMcpServersQuery, TError, TData>(
       {
     queryKey: ['workspaceMcpServers', variables],
@@ -4018,7 +4018,7 @@ export const useAddDataTableColumnMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>) => {
-
+    
     return useMutation<AddDataTableColumnMutation, TError, AddDataTableColumnMutationVariables, TContext>(
       {
     mutationKey: ['addDataTableColumn'],
@@ -4037,7 +4037,7 @@ export const useCreateDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateDataTableMutation, TError, CreateDataTableMutationVariables, TContext>(
       {
     mutationKey: ['createDataTable'],
@@ -4062,7 +4062,7 @@ export const useDataTableRowsQuery = <
       variables: DataTableRowsQueryVariables,
       options?: Omit<UseQueryOptions<DataTableRowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableRowsQuery, TError, TData>(
       {
     queryKey: ['dataTableRows', variables],
@@ -4096,7 +4096,7 @@ export const useDataTableRowsPageQuery = <
       variables: DataTableRowsPageQueryVariables,
       options?: Omit<UseQueryOptions<DataTableRowsPageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableRowsPageQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableRowsPageQuery, TError, TData>(
       {
     queryKey: ['dataTableRowsPage', variables],
@@ -4121,7 +4121,7 @@ export const useDataTableTagsQuery = <
       variables?: DataTableTagsQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['dataTableTags'] : ['dataTableTags', variables],
@@ -4149,7 +4149,7 @@ export const useDataTableTagsByTableQuery = <
       variables?: DataTableTagsByTableQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsByTableQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsByTableQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableTagsByTableQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['dataTableTagsByTable'] : ['dataTableTagsByTable', variables],
@@ -4180,7 +4180,7 @@ export const useDataTablesQuery = <
       variables: DataTablesQueryVariables,
       options?: Omit<UseQueryOptions<DataTablesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTablesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTablesQuery, TError, TData>(
       {
     queryKey: ['dataTables', variables],
@@ -4199,7 +4199,7 @@ export const useDeleteDataTableRowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteDataTableRowMutation, TError, DeleteDataTableRowMutationVariables, TContext>(
       {
     mutationKey: ['deleteDataTableRow'],
@@ -4218,7 +4218,7 @@ export const useDropDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<DropDataTableMutation, TError, DropDataTableMutationVariables, TContext>(
       {
     mutationKey: ['dropDataTable'],
@@ -4237,7 +4237,7 @@ export const useDuplicateDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<DuplicateDataTableMutation, TError, DuplicateDataTableMutationVariables, TContext>(
       {
     mutationKey: ['duplicateDataTable'],
@@ -4259,7 +4259,7 @@ export const useExportDataTableCsvQuery = <
       variables: ExportDataTableCsvQueryVariables,
       options?: Omit<UseQueryOptions<ExportDataTableCsvQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ExportDataTableCsvQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ExportDataTableCsvQuery, TError, TData>(
       {
     queryKey: ['exportDataTableCsv', variables],
@@ -4278,7 +4278,7 @@ export const useImportDataTableCsvMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportDataTableCsvMutation, TError, ImportDataTableCsvMutationVariables, TContext>(
       {
     mutationKey: ['importDataTableCsv'],
@@ -4300,7 +4300,7 @@ export const useInsertDataTableRowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>) => {
-
+    
     return useMutation<InsertDataTableRowMutation, TError, InsertDataTableRowMutationVariables, TContext>(
       {
     mutationKey: ['insertDataTableRow'],
@@ -4319,7 +4319,7 @@ export const useRemoveDataTableColumnMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>) => {
-
+    
     return useMutation<RemoveDataTableColumnMutation, TError, RemoveDataTableColumnMutationVariables, TContext>(
       {
     mutationKey: ['removeDataTableColumn'],
@@ -4338,7 +4338,7 @@ export const useRenameDataTableMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>) => {
-
+    
     return useMutation<RenameDataTableMutation, TError, RenameDataTableMutationVariables, TContext>(
       {
     mutationKey: ['renameDataTable'],
@@ -4357,7 +4357,7 @@ export const useRenameDataTableColumnMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>) => {
-
+    
     return useMutation<RenameDataTableColumnMutation, TError, RenameDataTableColumnMutationVariables, TContext>(
       {
     mutationKey: ['renameDataTableColumn'],
@@ -4379,7 +4379,7 @@ export const useUpdateDataTableRowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateDataTableRowMutation, TError, UpdateDataTableRowMutationVariables, TContext>(
       {
     mutationKey: ['updateDataTableRow'],
@@ -4398,7 +4398,7 @@ export const useUpdateDataTableTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateDataTableTagsMutation, TError, UpdateDataTableTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateDataTableTags'],
@@ -4424,7 +4424,7 @@ export const useCreateKnowledgeBaseMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateKnowledgeBaseMutation, TError, CreateKnowledgeBaseMutationVariables, TContext>(
       {
     mutationKey: ['createKnowledgeBase'],
@@ -4443,7 +4443,7 @@ export const useDeleteKnowledgeBaseMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteKnowledgeBaseMutation, TError, DeleteKnowledgeBaseMutationVariables, TContext>(
       {
     mutationKey: ['deleteKnowledgeBase'],
@@ -4462,7 +4462,7 @@ export const useDeleteKnowledgeBaseDocumentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteKnowledgeBaseDocumentMutation, TError, DeleteKnowledgeBaseDocumentMutationVariables, TContext>(
       {
     mutationKey: ['deleteKnowledgeBaseDocument'],
@@ -4481,7 +4481,7 @@ export const useDeleteKnowledgeBaseDocumentChunkMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteKnowledgeBaseDocumentChunkMutation, TError, DeleteKnowledgeBaseDocumentChunkMutationVariables, TContext>(
       {
     mutationKey: ['deleteKnowledgeBaseDocumentChunk'],
@@ -4529,7 +4529,7 @@ export const useKnowledgeBaseQuery = <
       variables: KnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseQuery, TError, TData>(
       {
     queryKey: ['knowledgeBase', variables],
@@ -4556,7 +4556,7 @@ export const useKnowledgeBaseDocumentChunksQuery = <
       variables: KnowledgeBaseDocumentChunksQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentChunksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentChunksQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentChunksQuery, TError, TData>(
       {
     queryKey: ['knowledgeBaseDocumentChunks', variables],
@@ -4583,7 +4583,7 @@ export const useKnowledgeBaseDocumentStatusQuery = <
       variables: KnowledgeBaseDocumentStatusQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentStatusQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentStatusQuery, TError, TData>(
       {
     queryKey: ['knowledgeBaseDocumentStatus', variables],
@@ -4605,7 +4605,7 @@ export const useKnowledgeBaseDocumentTagsQuery = <
       variables?: KnowledgeBaseDocumentTagsQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseDocumentTags'] : ['knowledgeBaseDocumentTags', variables],
@@ -4630,7 +4630,7 @@ export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
       variables?: KnowledgeBaseDocumentTagsByDocumentQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseDocumentTagsByDocumentQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseDocumentTagsByDocument'] : ['knowledgeBaseDocumentTagsByDocument', variables],
@@ -4652,7 +4652,7 @@ export const useKnowledgeBaseEmbeddingActiveQuery = <
       variables: KnowledgeBaseEmbeddingActiveQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseEmbeddingActiveQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseEmbeddingActiveQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseEmbeddingActiveQuery, TError, TData>(
       {
     queryKey: ['knowledgeBaseEmbeddingActive', variables],
@@ -4677,7 +4677,7 @@ export const useKnowledgeBaseTagsQuery = <
       variables?: KnowledgeBaseTagsQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseTags'] : ['knowledgeBaseTags', variables],
@@ -4705,7 +4705,7 @@ export const useKnowledgeBaseTagsByKnowledgeBaseQuery = <
       variables?: KnowledgeBaseTagsByKnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseTagsByKnowledgeBaseQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['knowledgeBaseTagsByKnowledgeBase'] : ['knowledgeBaseTagsByKnowledgeBase', variables],
@@ -4736,7 +4736,7 @@ export const useKnowledgeBasesQuery = <
       variables: KnowledgeBasesQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBasesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBasesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBasesQuery, TError, TData>(
       {
     queryKey: ['knowledgeBases', variables],
@@ -4764,7 +4764,7 @@ export const useSearchKnowledgeBaseQuery = <
       variables: SearchKnowledgeBaseQueryVariables,
       options?: Omit<UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<SearchKnowledgeBaseQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<SearchKnowledgeBaseQuery, TError, TData>(
       {
     queryKey: ['searchKnowledgeBase', variables],
@@ -4790,7 +4790,7 @@ export const useUpdateKnowledgeBaseMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseMutation, TError, UpdateKnowledgeBaseMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBase'],
@@ -4817,7 +4817,7 @@ export const useUpdateKnowledgeBaseDocumentChunkMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseDocumentChunkMutation, TError, UpdateKnowledgeBaseDocumentChunkMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBaseDocumentChunk'],
@@ -4836,7 +4836,7 @@ export const useUpdateKnowledgeBaseDocumentTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseDocumentTagsMutation, TError, UpdateKnowledgeBaseDocumentTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBaseDocumentTags'],
@@ -4855,7 +4855,7 @@ export const useUpdateKnowledgeBaseTagsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateKnowledgeBaseTagsMutation, TError, UpdateKnowledgeBaseTagsMutationVariables, TContext>(
       {
     mutationKey: ['updateKnowledgeBaseTags'],
@@ -4896,7 +4896,7 @@ export const useAutomationSearchQuery = <
       variables: AutomationSearchQueryVariables,
       options?: Omit<UseQueryOptions<AutomationSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationSearchQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AutomationSearchQuery, TError, TData>(
       {
     queryKey: ['automationSearch', variables],
@@ -4921,7 +4921,7 @@ export const useAutomationWorkflowProjectCategoriesQuery = <
       variables?: AutomationWorkflowProjectCategoriesQueryVariables,
       options?: Omit<UseQueryOptions<AutomationWorkflowProjectCategoriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectCategoriesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AutomationWorkflowProjectCategoriesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['automationWorkflowProjectCategories'] : ['automationWorkflowProjectCategories', variables],
@@ -4946,7 +4946,7 @@ export const useAutomationWorkflowProjectTagsQuery = <
       variables?: AutomationWorkflowProjectTagsQueryVariables,
       options?: Omit<UseQueryOptions<AutomationWorkflowProjectTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AutomationWorkflowProjectTagsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['automationWorkflowProjectTags'] : ['automationWorkflowProjectTags', variables],
@@ -4972,7 +4972,7 @@ export const useAutomationWorkflowProjectVersionsQuery = <
       variables: AutomationWorkflowProjectVersionsQueryVariables,
       options?: Omit<UseQueryOptions<AutomationWorkflowProjectVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectVersionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AutomationWorkflowProjectVersionsQuery, TError, TData>(
       {
     queryKey: ['automationWorkflowProjectVersions', variables],
@@ -5019,7 +5019,7 @@ export const useAutomationWorkflowProjectsQuery = <
       variables?: AutomationWorkflowProjectsQueryVariables,
       options?: Omit<UseQueryOptions<AutomationWorkflowProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AutomationWorkflowProjectsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['automationWorkflowProjects'] : ['automationWorkflowProjects', variables],
@@ -5043,7 +5043,7 @@ export const useCreateAutomationWorkflowProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAutomationWorkflowProjectMutation, TError, CreateAutomationWorkflowProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAutomationWorkflowProjectMutation, TError, CreateAutomationWorkflowProjectMutationVariables, TContext>(
       {
     mutationKey: ['createAutomationWorkflowProject'],
@@ -5068,7 +5068,7 @@ export const useUpdateAutomationWorkflowProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectMutation, TError, UpdateAutomationWorkflowProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAutomationWorkflowProjectMutation, TError, UpdateAutomationWorkflowProjectMutationVariables, TContext>(
       {
     mutationKey: ['updateAutomationWorkflowProject'],
@@ -5087,7 +5087,7 @@ export const useDeleteAutomationWorkflowProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAutomationWorkflowProjectMutation, TError, DeleteAutomationWorkflowProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAutomationWorkflowProjectMutation, TError, DeleteAutomationWorkflowProjectMutationVariables, TContext>(
       {
     mutationKey: ['deleteAutomationWorkflowProject'],
@@ -5109,7 +5109,7 @@ export const useCreateAutomationWorkflowProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateAutomationWorkflowProjectWorkflowMutation, TError, CreateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateAutomationWorkflowProjectWorkflowMutation, TError, CreateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['createAutomationWorkflowProjectWorkflow'],
@@ -5128,7 +5128,7 @@ export const useDeleteAutomationWorkflowProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteAutomationWorkflowProjectWorkflowMutation, TError, DeleteAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteAutomationWorkflowProjectWorkflowMutation, TError, DeleteAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteAutomationWorkflowProjectWorkflow'],
@@ -5147,7 +5147,7 @@ export const usePublishAutomationWorkflowProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<PublishAutomationWorkflowProjectMutation, TError, PublishAutomationWorkflowProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<PublishAutomationWorkflowProjectMutation, TError, PublishAutomationWorkflowProjectMutationVariables, TContext>(
       {
     mutationKey: ['publishAutomationWorkflowProject'],
@@ -5183,7 +5183,7 @@ export const useConnectedUserMcpServersQuery = <
       variables: ConnectedUserMcpServersQueryVariables,
       options?: Omit<UseQueryOptions<ConnectedUserMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserMcpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ConnectedUserMcpServersQuery, TError, TData>(
       {
     queryKey: ['connectedUserMcpServers', variables],
@@ -5237,7 +5237,7 @@ export const useConnectedUserProjectsQuery = <
       variables?: ConnectedUserProjectsQueryVariables,
       options?: Omit<UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserProjectsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ConnectedUserProjectsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['connectedUserProjects'] : ['connectedUserProjects', variables],
@@ -5262,7 +5262,7 @@ export const useCreateEmbeddedMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateEmbeddedMcpServerMutation, TError, CreateEmbeddedMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateEmbeddedMcpServerMutation, TError, CreateEmbeddedMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['createEmbeddedMcpServer'],
@@ -5285,7 +5285,7 @@ export const useCreateMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpIntegrationInstanceConfigurationMutation, TError, CreateMcpIntegrationInstanceConfigurationMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpIntegrationInstanceConfigurationMutation, TError, CreateMcpIntegrationInstanceConfigurationMutationVariables, TContext>(
       {
     mutationKey: ['createMcpIntegrationInstanceConfiguration'],
@@ -5307,7 +5307,7 @@ export const useDeleteConnectedUserMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteConnectedUserMcpServerMutation, TError, DeleteConnectedUserMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteConnectedUserMcpServerMutation, TError, DeleteConnectedUserMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['deleteConnectedUserMcpServer'],
@@ -5326,7 +5326,7 @@ export const useDeleteConnectedUserProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteConnectedUserProjectWorkflowMutation, TError, DeleteConnectedUserProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteConnectedUserProjectWorkflowMutation, TError, DeleteConnectedUserProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteConnectedUserProjectWorkflow'],
@@ -5345,7 +5345,7 @@ export const useDeleteEmbeddedMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteEmbeddedMcpServerMutation, TError, DeleteEmbeddedMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteEmbeddedMcpServerMutation, TError, DeleteEmbeddedMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['deleteEmbeddedMcpServer'],
@@ -5364,7 +5364,7 @@ export const useDeleteMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpIntegrationInstanceConfigurationMutation, TError, DeleteMcpIntegrationInstanceConfigurationMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpIntegrationInstanceConfigurationMutation, TError, DeleteMcpIntegrationInstanceConfigurationMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpIntegrationInstanceConfiguration'],
@@ -5383,7 +5383,7 @@ export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, TError, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, TError, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpIntegrationInstanceConfigurationWorkflow'],
@@ -5402,7 +5402,7 @@ export const useDuplicateAutomationWorkflowProjectMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DuplicateAutomationWorkflowProjectMutation, TError, DuplicateAutomationWorkflowProjectMutationVariables, TContext>) => {
-
+    
     return useMutation<DuplicateAutomationWorkflowProjectMutation, TError, DuplicateAutomationWorkflowProjectMutationVariables, TContext>(
       {
     mutationKey: ['duplicateAutomationWorkflowProject'],
@@ -5421,7 +5421,7 @@ export const useDuplicateAutomationWorkflowProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DuplicateAutomationWorkflowProjectWorkflowMutation, TError, DuplicateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<DuplicateAutomationWorkflowProjectWorkflowMutation, TError, DuplicateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['duplicateAutomationWorkflowProjectWorkflow'],
@@ -5471,7 +5471,7 @@ export const useEmbeddedMcpServersQuery = <
       variables?: EmbeddedMcpServersQueryVariables,
       options?: Omit<UseQueryOptions<EmbeddedMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedMcpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EmbeddedMcpServersQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['embeddedMcpServers'] : ['embeddedMcpServers', variables],
@@ -5494,7 +5494,7 @@ export const useEnableConnectedUserMcpServerMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableConnectedUserMcpServerMutation, TError, EnableConnectedUserMcpServerMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableConnectedUserMcpServerMutation, TError, EnableConnectedUserMcpServerMutationVariables, TContext>(
       {
     mutationKey: ['enableConnectedUserMcpServer'],
@@ -5513,7 +5513,7 @@ export const useEnableConnectedUserMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableConnectedUserMcpToolMutation, TError, EnableConnectedUserMcpToolMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableConnectedUserMcpToolMutation, TError, EnableConnectedUserMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['enableConnectedUserMcpTool'],
@@ -5532,7 +5532,7 @@ export const useEnableConnectedUserProjectWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableConnectedUserProjectWorkflowMutation, TError, EnableConnectedUserProjectWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableConnectedUserProjectWorkflowMutation, TError, EnableConnectedUserProjectWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['enableConnectedUserProjectWorkflow'],
@@ -5566,7 +5566,7 @@ export const useIntegrationWorkflowsQuery = <
       variables?: IntegrationWorkflowsQueryVariables,
       options?: Omit<UseQueryOptions<IntegrationWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationWorkflowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IntegrationWorkflowsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['integrationWorkflows'] : ['integrationWorkflows', variables],
@@ -5600,7 +5600,7 @@ export const useIntegrationWorkflowsByIntegrationIdQuery = <
       variables: IntegrationWorkflowsByIntegrationIdQueryVariables,
       options?: Omit<UseQueryOptions<IntegrationWorkflowsByIntegrationIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationWorkflowsByIntegrationIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IntegrationWorkflowsByIntegrationIdQuery, TError, TData>(
       {
     queryKey: ['integrationWorkflowsByIntegrationId', variables],
@@ -5629,7 +5629,7 @@ export const useMcpComponentDefinitionsQuery = <
       variables?: McpComponentDefinitionsQueryVariables,
       options?: Omit<UseQueryOptions<McpComponentDefinitionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentDefinitionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpComponentDefinitionsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['mcpComponentDefinitions'] : ['mcpComponentDefinitions', variables],
@@ -5698,7 +5698,7 @@ export const useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery = <
       variables: McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables,
       options?: Omit<UseQueryOptions<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpIntegrationInstanceConfigurationWorkflowPropertiesQuery, TError, TData>(
       {
     queryKey: ['mcpIntegrationInstanceConfigurationWorkflowProperties', variables],
@@ -5733,7 +5733,7 @@ export const useMcpIntegrationInstanceConfigurationsQuery = <
       variables?: McpIntegrationInstanceConfigurationsQueryVariables,
       options?: Omit<UseQueryOptions<McpIntegrationInstanceConfigurationsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationInstanceConfigurationsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpIntegrationInstanceConfigurationsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['mcpIntegrationInstanceConfigurations'] : ['mcpIntegrationInstanceConfigurations', variables],
@@ -5790,7 +5790,7 @@ export const useMcpIntegrationInstanceConfigurationsByServerIdQuery = <
       variables?: McpIntegrationInstanceConfigurationsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpIntegrationInstanceConfigurationsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpIntegrationInstanceConfigurationsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpIntegrationInstanceConfigurationsByServerIdQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['mcpIntegrationInstanceConfigurationsByServerId'] : ['mcpIntegrationInstanceConfigurationsByServerId', variables],
@@ -5818,7 +5818,7 @@ export const useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = <
       variables: ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables,
       options?: Omit<UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery, TError, TData>(
       {
     queryKey: ['toolEligibleIntegrationInstanceConfigurationWorkflows', variables],
@@ -5847,7 +5847,7 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
       variables: ToolEligibleIntegrationVersionWorkflowsQueryVariables,
       options?: Omit<UseQueryOptions<ToolEligibleIntegrationVersionWorkflowsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ToolEligibleIntegrationVersionWorkflowsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ToolEligibleIntegrationVersionWorkflowsQuery, TError, TData>(
       {
     queryKey: ['toolEligibleIntegrationVersionWorkflows', variables],
@@ -5870,7 +5870,7 @@ export const useUpdateMcpIntegrationInstanceConfigurationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpIntegrationInstanceConfigurationMutation, TError, UpdateMcpIntegrationInstanceConfigurationMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpIntegrationInstanceConfigurationMutation, TError, UpdateMcpIntegrationInstanceConfigurationMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpIntegrationInstanceConfiguration'],
@@ -5889,7 +5889,7 @@ export const useUpdateMcpIntegrationInstanceConfigurationVersionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpIntegrationInstanceConfigurationVersionMutation, TError, UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpIntegrationInstanceConfigurationVersionMutation, TError, UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpIntegrationInstanceConfigurationVersion'],
@@ -5913,7 +5913,7 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, TError, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, TError, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpIntegrationInstanceConfigurationWorkflow'],
@@ -5938,7 +5938,7 @@ export const useAiDefaultModelQuery = <
       variables: AiDefaultModelQueryVariables,
       options?: Omit<UseQueryOptions<AiDefaultModelQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiDefaultModelQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiDefaultModelQuery, TError, TData>(
       {
     queryKey: ['aiDefaultModel', variables],
@@ -5970,7 +5970,7 @@ export const useAiProviderCatalogQuery = <
       variables: AiProviderCatalogQueryVariables,
       options?: Omit<UseQueryOptions<AiProviderCatalogQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiProviderCatalogQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiProviderCatalogQuery, TError, TData>(
       {
     queryKey: ['aiProviderCatalog', variables],
@@ -6014,7 +6014,7 @@ export const useApiConnectorQuery = <
       variables: ApiConnectorQueryVariables,
       options?: Omit<UseQueryOptions<ApiConnectorQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApiConnectorQuery, TError, TData>(
       {
     queryKey: ['apiConnector', variables],
@@ -6058,7 +6058,7 @@ export const useApiConnectorsQuery = <
       variables?: ApiConnectorsQueryVariables,
       options?: Omit<UseQueryOptions<ApiConnectorsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiConnectorsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApiConnectorsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['apiConnectors'] : ['apiConnectors', variables],
@@ -6077,7 +6077,7 @@ export const useCancelGenerationJobMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>) => {
-
+    
     return useMutation<CancelGenerationJobMutation, TError, CancelGenerationJobMutationVariables, TContext>(
       {
     mutationKey: ['cancelGenerationJob'],
@@ -6118,7 +6118,7 @@ export const useCreateApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateApiConnectorMutation, TError, CreateApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['createApiConnector'],
@@ -6137,7 +6137,7 @@ export const useDeleteApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteApiConnectorMutation, TError, DeleteApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['deleteApiConnector'],
@@ -6156,7 +6156,7 @@ export const useEnableApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableApiConnectorMutation, TError, EnableApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['enableApiConnector'],
@@ -6177,7 +6177,7 @@ export const useGenerateSpecificationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>) => {
-
+    
     return useMutation<GenerateSpecificationMutation, TError, GenerateSpecificationMutationVariables, TContext>(
       {
     mutationKey: ['generateSpecification'],
@@ -6204,7 +6204,7 @@ export const useGenerationJobStatusQuery = <
       variables: GenerationJobStatusQueryVariables,
       options?: Omit<UseQueryOptions<GenerationJobStatusQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<GenerationJobStatusQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<GenerationJobStatusQuery, TError, TData>(
       {
     queryKey: ['generationJobStatus', variables],
@@ -6245,7 +6245,7 @@ export const useImportOpenApiSpecificationMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>) => {
-
+    
     return useMutation<ImportOpenApiSpecificationMutation, TError, ImportOpenApiSpecificationMutationVariables, TContext>(
       {
     mutationKey: ['importOpenApiSpecification'],
@@ -6269,7 +6269,7 @@ export const useStartGenerateFromDocumentationPreviewMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>) => {
-
+    
     return useMutation<StartGenerateFromDocumentationPreviewMutation, TError, StartGenerateFromDocumentationPreviewMutationVariables, TContext>(
       {
     mutationKey: ['startGenerateFromDocumentationPreview'],
@@ -6310,7 +6310,7 @@ export const useUpdateApiConnectorMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateApiConnectorMutation, TError, UpdateApiConnectorMutationVariables, TContext>(
       {
     mutationKey: ['updateApiConnector'],
@@ -6350,7 +6350,7 @@ export const useEditorJobFileLogsQuery = <
       variables: EditorJobFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<EditorJobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EditorJobFileLogsQuery, TError, TData>(
       {
     queryKey: ['editorJobFileLogs', variables],
@@ -6372,7 +6372,7 @@ export const useEditorJobFileLogsExistQuery = <
       variables: EditorJobFileLogsExistQueryVariables,
       options?: Omit<UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorJobFileLogsExistQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EditorJobFileLogsExistQuery, TError, TData>(
       {
     queryKey: ['editorJobFileLogsExist', variables],
@@ -6404,7 +6404,7 @@ export const useEditorTaskExecutionFileLogsQuery = <
       variables: EditorTaskExecutionFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EditorTaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EditorTaskExecutionFileLogsQuery, TError, TData>(
       {
     queryKey: ['editorTaskExecutionFileLogs', variables],
@@ -6444,7 +6444,7 @@ export const useJobFileLogsQuery = <
       variables: JobFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<JobFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<JobFileLogsQuery, TError, TData>(
       {
     queryKey: ['jobFileLogs', variables],
@@ -6466,7 +6466,7 @@ export const useJobFileLogsExistQuery = <
       variables: JobFileLogsExistQueryVariables,
       options?: Omit<UseQueryOptions<JobFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<JobFileLogsExistQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<JobFileLogsExistQuery, TError, TData>(
       {
     queryKey: ['jobFileLogsExist', variables],
@@ -6498,7 +6498,7 @@ export const useTaskExecutionFileLogsQuery = <
       variables: TaskExecutionFileLogsQueryVariables,
       options?: Omit<UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TaskExecutionFileLogsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<TaskExecutionFileLogsQuery, TError, TData>(
       {
     queryKey: ['taskExecutionFileLogs', variables],
@@ -6529,7 +6529,7 @@ export const useAdminApiKeysQuery = <
       variables: AdminApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<AdminApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AdminApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AdminApiKeysQuery, TError, TData>(
       {
     queryKey: ['adminApiKeys', variables],
@@ -6560,7 +6560,7 @@ export const useApiKeysQuery = <
       variables: ApiKeysQueryVariables,
       options?: Omit<UseQueryOptions<ApiKeysQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ApiKeysQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ApiKeysQuery, TError, TData>(
       {
     queryKey: ['apiKeys', variables],
@@ -6593,7 +6593,7 @@ export const useClusterElementComponentConnectionsQuery = <
       variables: ClusterElementComponentConnectionsQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementComponentConnectionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementComponentConnectionsQuery, TError, TData>(
       {
     queryKey: ['clusterElementComponentConnections', variables],
@@ -6925,7 +6925,7 @@ export const useClusterElementDefinitionQuery = <
       variables: ClusterElementDefinitionQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementDefinitionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementDefinitionQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementDefinitionQuery, TError, TData>(
       {
     queryKey: ['clusterElementDefinition', variables],
@@ -6952,7 +6952,7 @@ export const useClusterElementMissingRequiredPropertiesQuery = <
       variables: ClusterElementMissingRequiredPropertiesQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementMissingRequiredPropertiesQuery, TError, TData>(
       {
     queryKey: ['ClusterElementMissingRequiredProperties', variables],
@@ -7254,7 +7254,7 @@ export const useClusterElementDynamicPropertiesQuery = <
       variables: ClusterElementDynamicPropertiesQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementDynamicPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementDynamicPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementDynamicPropertiesQuery, TError, TData>(
       {
     queryKey: ['clusterElementDynamicProperties', variables],
@@ -7288,7 +7288,7 @@ export const useClusterElementOptionsQuery = <
       variables: ClusterElementOptionsQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementOptionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementOptionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementOptionsQuery, TError, TData>(
       {
     queryKey: ['clusterElementOptions', variables],
@@ -7316,7 +7316,7 @@ export const useClusterElementScriptInputQuery = <
       variables: ClusterElementScriptInputQueryVariables,
       options?: Omit<UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementScriptInputQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ClusterElementScriptInputQuery, TError, TData>(
       {
     queryKey: ['clusterElementScriptInput', variables],
@@ -7367,7 +7367,7 @@ export const useComponentDefinitionSearchQuery = <
       variables: ComponentDefinitionSearchQueryVariables,
       options?: Omit<UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentDefinitionSearchQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ComponentDefinitionSearchQuery, TError, TData>(
       {
     queryKey: ['ComponentDefinitionSearch', variables],
@@ -7386,7 +7386,7 @@ export const useCreateApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateApiKeyMutation, TError, CreateApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['createApiKey'],
@@ -7412,7 +7412,7 @@ export const useCreateMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpComponentMutation, TError, CreateMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponent'],
@@ -7443,7 +7443,7 @@ export const useCreateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpComponentWithToolsMutation, TError, CreateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['createMcpComponentWithTools'],
@@ -7467,7 +7467,7 @@ export const useCreateMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateMcpToolMutation, TError, CreateMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['createMcpTool'],
@@ -7486,7 +7486,7 @@ export const useDeleteApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteApiKeyMutation, TError, DeleteApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['deleteApiKey'],
@@ -7505,7 +7505,7 @@ export const useDeleteMcpComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpComponentMutation, TError, DeleteMcpComponentMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpComponent'],
@@ -7524,7 +7524,7 @@ export const useDeleteMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteMcpToolMutation, TError, DeleteMcpToolMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteMcpToolMutation, TError, DeleteMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['deleteMcpTool'],
@@ -7549,7 +7549,7 @@ export const useEnvironmentsQuery = <
       variables?: EnvironmentsQueryVariables,
       options?: Omit<UseQueryOptions<EnvironmentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EnvironmentsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<EnvironmentsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['environments'] : ['environments', variables],
@@ -7571,7 +7571,7 @@ export const useManagementMcpServerUrlQuery = <
       variables?: ManagementMcpServerUrlQueryVariables,
       options?: Omit<UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerUrlQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ManagementMcpServerUrlQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['managementMcpServerUrl'] : ['managementMcpServerUrl', variables],
@@ -7610,7 +7610,7 @@ export const useMcpComponentsByServerIdQuery = <
       variables: McpComponentsByServerIdQueryVariables,
       options?: Omit<UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpComponentsByServerIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpComponentsByServerIdQuery, TError, TData>(
       {
     queryKey: ['mcpComponentsByServerId', variables],
@@ -7635,7 +7635,7 @@ export const useMcpServerTagsQuery = <
       variables: McpServerTagsQueryVariables,
       options?: Omit<UseQueryOptions<McpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServerTagsQuery, TError, TData>(
       {
     queryKey: ['mcpServerTags', variables],
@@ -7676,7 +7676,7 @@ export const useMcpServersQuery = <
       variables: McpServersQueryVariables,
       options?: Omit<UseQueryOptions<McpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpServersQuery, TError, TData>(
       {
     queryKey: ['mcpServers', variables],
@@ -7705,7 +7705,7 @@ export const useMcpToolsByComponentIdQuery = <
       variables: McpToolsByComponentIdQueryVariables,
       options?: Omit<UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpToolsByComponentIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<McpToolsByComponentIdQuery, TError, TData>(
       {
     queryKey: ['mcpToolsByComponentId', variables],
@@ -7732,7 +7732,7 @@ export const useSaveClusterElementTestConfigurationConnectionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>) => {
-
+    
     return useMutation<SaveClusterElementTestConfigurationConnectionMutation, TError, SaveClusterElementTestConfigurationConnectionMutationVariables, TContext>(
       {
     mutationKey: ['saveClusterElementTestConfigurationConnection'],
@@ -7762,7 +7762,7 @@ export const useSaveClusterElementTestOutputMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<SaveClusterElementTestOutputMutation, TError, SaveClusterElementTestOutputMutationVariables, TContext>) => {
-
+    
     return useMutation<SaveClusterElementTestOutputMutation, TError, SaveClusterElementTestOutputMutationVariables, TContext>(
       {
     mutationKey: ['saveClusterElementTestOutput'],
@@ -7787,7 +7787,7 @@ export const useSaveWorkflowTestConfigurationConnectionMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>) => {
-
+    
     return useMutation<SaveWorkflowTestConfigurationConnectionMutation, TError, SaveWorkflowTestConfigurationConnectionMutationVariables, TContext>(
       {
     mutationKey: ['saveWorkflowTestConfigurationConnection'],
@@ -7819,7 +7819,7 @@ export const useTestClusterElementScriptMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>) => {
-
+    
     return useMutation<TestClusterElementScriptMutation, TError, TestClusterElementScriptMutationVariables, TContext>(
       {
     mutationKey: ['testClusterElementScript'],
@@ -7849,7 +7849,7 @@ export const useTestWorkflowNodeScriptMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>) => {
-
+    
     return useMutation<TestWorkflowNodeScriptMutation, TError, TestWorkflowNodeScriptMutationVariables, TContext>(
       {
     mutationKey: ['testWorkflowNodeScript'],
@@ -7868,7 +7868,7 @@ export const useUpdateApiKeyMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateApiKeyMutation, TError, UpdateApiKeyMutationVariables, TContext>(
       {
     mutationKey: ['updateApiKey'],
@@ -7887,7 +7887,7 @@ export const useUpdateManagementMcpServerUrlMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateManagementMcpServerUrlMutation, TError, UpdateManagementMcpServerUrlMutationVariables, TContext>(
       {
     mutationKey: ['updateManagementMcpServerUrl'],
@@ -7918,7 +7918,7 @@ export const useUpdateMcpComponentWithToolsMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpComponentWithToolsMutation, TError, UpdateMcpComponentWithToolsMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpComponentWithTools'],
@@ -7937,7 +7937,7 @@ export const useUpdateMcpServerUrlMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpServerUrlMutation, TError, UpdateMcpServerUrlMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpServerUrlMutation, TError, UpdateMcpServerUrlMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpServerUrl'],
@@ -7962,7 +7962,7 @@ export const useUpdateMcpToolMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateMcpToolMutation, TError, UpdateMcpToolMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateMcpToolMutation, TError, UpdateMcpToolMutationVariables, TContext>(
       {
     mutationKey: ['updateMcpTool'],
@@ -7987,7 +7987,7 @@ export const useValidateWorkflowQuery = <
       variables: ValidateWorkflowQueryVariables,
       options?: Omit<UseQueryOptions<ValidateWorkflowQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ValidateWorkflowQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ValidateWorkflowQuery, TError, TData>(
       {
     queryKey: ['ValidateWorkflow', variables],
@@ -8012,7 +8012,7 @@ export const useValidateWorkflowByIdQuery = <
       variables: ValidateWorkflowByIdQueryVariables,
       options?: Omit<UseQueryOptions<ValidateWorkflowByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ValidateWorkflowByIdQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<ValidateWorkflowByIdQuery, TError, TData>(
       {
     queryKey: ['ValidateWorkflowById', variables],
@@ -8043,7 +8043,7 @@ export const useWorkflowNodeComponentConnectionsQuery = <
       variables: WorkflowNodeComponentConnectionsQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeComponentConnectionsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowNodeComponentConnectionsQuery, TError, TData>(
       {
     queryKey: ['workflowNodeComponentConnections', variables],
@@ -8068,7 +8068,7 @@ export const useWorkflowNodeMissingRequiredPropertiesQuery = <
       variables: WorkflowNodeMissingRequiredPropertiesQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>(
       {
     queryKey: ['WorkflowNodeMissingRequiredProperties', variables],
@@ -8094,7 +8094,7 @@ export const useWorkflowNodeScriptInputQuery = <
       variables: WorkflowNodeScriptInputQueryVariables,
       options?: Omit<UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeScriptInputQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<WorkflowNodeScriptInputQuery, TError, TData>(
       {
     queryKey: ['workflowNodeScriptInput', variables],
@@ -8130,7 +8130,7 @@ export const useCustomComponentQuery = <
       variables: CustomComponentQueryVariables,
       options?: Omit<UseQueryOptions<CustomComponentQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<CustomComponentQuery, TError, TData>(
       {
     queryKey: ['customComponent', variables],
@@ -8163,7 +8163,7 @@ export const useCustomComponentDefinitionQuery = <
       variables: CustomComponentDefinitionQueryVariables,
       options?: Omit<UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentDefinitionQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<CustomComponentDefinitionQuery, TError, TData>(
       {
     queryKey: ['customComponentDefinition', variables],
@@ -8199,7 +8199,7 @@ export const useCustomComponentsQuery = <
       variables?: CustomComponentsQueryVariables,
       options?: Omit<UseQueryOptions<CustomComponentsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<CustomComponentsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<CustomComponentsQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['customComponents'] : ['customComponents', variables],
@@ -8218,7 +8218,7 @@ export const useDeleteCustomComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteCustomComponentMutation, TError, DeleteCustomComponentMutationVariables, TContext>(
       {
     mutationKey: ['deleteCustomComponent'],
@@ -8237,7 +8237,7 @@ export const useEnableCustomComponentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>) => {
-
+    
     return useMutation<EnableCustomComponentMutation, TError, EnableCustomComponentMutationVariables, TContext>(
       {
     mutationKey: ['enableCustomComponent'],
@@ -8259,7 +8259,7 @@ export const useAuthoritiesQuery = <
       variables?: AuthoritiesQueryVariables,
       options?: Omit<UseQueryOptions<AuthoritiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AuthoritiesQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AuthoritiesQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['authorities'] : ['authorities', variables],
@@ -8299,7 +8299,7 @@ export const useCreateIdentityProviderMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<CreateIdentityProviderMutation, TError, CreateIdentityProviderMutationVariables, TContext>) => {
-
+    
     return useMutation<CreateIdentityProviderMutation, TError, CreateIdentityProviderMutationVariables, TContext>(
       {
     mutationKey: ['createIdentityProvider'],
@@ -8318,7 +8318,7 @@ export const useDeleteIdentityProviderMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteIdentityProviderMutation, TError, DeleteIdentityProviderMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteIdentityProviderMutation, TError, DeleteIdentityProviderMutationVariables, TContext>(
       {
     mutationKey: ['deleteIdentityProvider'],
@@ -8337,7 +8337,7 @@ export const useDeleteUserMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>) => {
-
+    
     return useMutation<DeleteUserMutation, TError, DeleteUserMutationVariables, TContext>(
       {
     mutationKey: ['deleteUser'],
@@ -8380,7 +8380,7 @@ export const useIdentityProviderQuery = <
       variables: IdentityProviderQueryVariables,
       options?: Omit<UseQueryOptions<IdentityProviderQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IdentityProviderQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IdentityProviderQuery, TError, TData>(
       {
     queryKey: ['identityProvider', variables],
@@ -8423,7 +8423,7 @@ export const useIdentityProvidersQuery = <
       variables?: IdentityProvidersQueryVariables,
       options?: Omit<UseQueryOptions<IdentityProvidersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IdentityProvidersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<IdentityProvidersQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['identityProviders'] : ['identityProviders', variables],
@@ -8442,7 +8442,7 @@ export const useInviteUserMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<InviteUserMutation, TError, InviteUserMutationVariables, TContext>) => {
-
+    
     return useMutation<InviteUserMutation, TError, InviteUserMutationVariables, TContext>(
       {
     mutationKey: ['inviteUser'],
@@ -8482,7 +8482,7 @@ export const useUpdateIdentityProviderMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateIdentityProviderMutation, TError, UpdateIdentityProviderMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateIdentityProviderMutation, TError, UpdateIdentityProviderMutationVariables, TContext>(
       {
     mutationKey: ['updateIdentityProvider'],
@@ -8509,7 +8509,7 @@ export const useUpdateUserMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateUserMutation, TError, UpdateUserMutationVariables, TContext>(
       {
     mutationKey: ['updateUser'],
@@ -8545,7 +8545,7 @@ export const useUsersQuery = <
       variables?: UsersQueryVariables,
       options?: Omit<UseQueryOptions<UsersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<UsersQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<UsersQuery, TError, TData>(
       {
     queryKey: variables === undefined ? ['users'] : ['users', variables],
