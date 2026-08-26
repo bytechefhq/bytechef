@@ -185,8 +185,8 @@ public class ApiCollectionAgentConfiguration {
     /**
      * The one of the three flat API-collection CRUD tools that reads
      * {@code AutomationToolInvocationContext.workspaceId()} (see {@link #apiCollectionFlatCrudMcpContributor}'s
-     * javadoc). {@code createApiCollection}/{@code cloneApiCollection} resolve everything from an id already in their
-     * own input and need no wrapping.
+     * javadoc). {@code createApiCollection} resolve everything from an id already in their own input and need no
+     * wrapping.
      */
     private static final Set<String> WORKSPACE_SCOPED_API_COLLECTION_TOOL_NAMES = Set.of("listApiCollections");
 
@@ -197,16 +197,16 @@ public class ApiCollectionAgentConfiguration {
      * {@code ApiCollectionSubAgentMcpContributorConfiguration} in {@code automation-ai-tool}. This surface has no
      * schema-count pressure (MCP clients page {@code tools/list}), so all three of
      * {@link ApiCollectionToolCallbacksFactory#writeToolCallbacks()} are registered flat — {@code listApiCollections},
-     * {@code createApiCollection}, {@code cloneApiCollection}.
+     * {@code createApiCollection}.
      *
      * <p>
      * Unlike the AI Hub chat surface, no {@code ToolContext} exists here to carry
      * {@code AutomationToolInvocationContext}'s workspace scope, so the one tool that reads it
      * ({@code listApiCollections}, see {@link #WORKSPACE_SCOPED_API_COLLECTION_TOOL_NAMES}) is wrapped in
      * {@link WorkspaceScopedFlatToolCallback}, which merges an optional {@code workspaceId}/{@code environment} into
-     * its existing schema without discarding its other field. {@code createApiCollection}/{@code cloneApiCollection}
-     * need no wrapping — they resolve everything from an id already in their own input, a pre-existing property of
-     * these tool classes unaffected by dissolving the delegate that used to wrap them (see this class's own javadoc).
+     * its existing schema without discarding its other field. {@code createApiCollection} need no wrapping — they
+     * resolve everything from an id already in their own input, a pre-existing property of these tool classes
+     * unaffected by dissolving the delegate that used to wrap them (see this class's own javadoc).
      * </p>
      */
     @Bean

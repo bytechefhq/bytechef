@@ -78,7 +78,10 @@ import com.bytechef.ee.ai.hub.toolsearch.ToolSearchCatalogFeeder;
 import com.bytechef.ee.ai.hub.util.Mode;
 import com.bytechef.ee.ai.hub.util.Source;
 import com.bytechef.ee.automation.ai.tool.ApiCollectionToolCallbacksFactory;
+import com.bytechef.ee.automation.ai.tool.PromoteToEnvironmentToolCallback;
 import com.bytechef.ee.automation.ai.tool.contextstore.ContextStoreToolCallbacksFactory;
+import com.bytechef.ee.automation.promotion.PromotionResourceType;
+import com.bytechef.ee.automation.promotion.facade.EnvironmentPromotionFacade;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrailMetrics;
 import com.bytechef.ee.platform.ai.guardrails.AiGuardrails;
 import com.bytechef.ee.platform.ai.llm.usage.LlmUsageRecorder;
@@ -96,6 +99,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -684,7 +688,9 @@ public class AiHubConfiguration {
         ObjectProvider<DataTableToolCallbacksFactory> dataTableToolCallbacksFactoryProvider,
         ObjectProvider<KnowledgeBaseToolCallbacksFactory> knowledgeBaseToolCallbacksFactoryProvider,
         ObjectProvider<ContextStoreToolCallbacksFactory> contextStoreToolCallbacksFactoryProvider,
-        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider) {
+        ObjectProvider<AiAgentToolCallbacksFactory> aiAgentToolCallbacksFactoryProvider,
+        ObjectProvider<EnvironmentPromotionFacade> environmentPromotionFacadeProvider,
+        EnvironmentService environmentService) {
 
         // cloneAssetFile is pinned flat on the BUILD agent (see assetFileFlatCrudToolCallbacks), not catalog-
         // demoted — it rides with the other six asset-file tools as one coherent CRUD surface.
@@ -714,6 +720,19 @@ public class AiHubConfiguration {
         // AI-Agent-builder mutations are catalog-demoted rather than pinned (ticket 732, Task 8 of the
         // CRUD-delegate unwind, the LAST delegate) — see aiAgentCatalogToolCallbacks' javadoc.
         toolCallbacks.addAll(aiAgentCatalogToolCallbacks(aiAgentToolCallbacksFactoryProvider));
+
+        // Environment promotion: catalog rather than pinned, because promoting is rare and every pinned tool pays
+        // schema tokens on every model iteration. Catalog tools are security-context-rehydration-wrapped by
+        // ToolSearchAdvisorConfiguration, which is also what lets them reach the facade's @PreAuthorize guards from
+        // a worker thread. ObjectProvider because promotion is wired into server-app only: in a distributed EE
+        // deployment the facade bean is absent and the tools are simply not registered, rather than failing startup.
+        environmentPromotionFacadeProvider.ifAvailable(environmentPromotionFacade -> {
+            for (PromotionResourceType promotionResourceType : PromotionResourceType.values()) {
+                toolCallbacks.add(
+                    new PromoteToEnvironmentToolCallback(
+                        promotionResourceType, environmentPromotionFacade, environmentService));
+            }
+        });
 
         return new AiHubGlobalToolCatalog(ToolSearchCatalogFeeder.GLOBAL_BUILD_SESSION_ID, toolCallbacks);
     }
@@ -966,10 +985,10 @@ public class AiHubConfiguration {
     /**
      * The three API-collection CRUD tools flattened onto this surface (ticket 732, Task 2 of the CRUD-delegate unwind),
      * replacing the dissolved {@code api_collection_agent} delegate: {@code listApiCollections} on both agents, plus
-     * (write-only) {@code createApiCollection}, {@code cloneApiCollection} on BUILD — mirroring how every other flat
-     * domain in this class splits its read/write leg between ASK and BUILD. An absent factory bean (Copilot disabled,
-     * or the api-platform facade not on the classpath) resolves to an empty list — the same silent-skip degrade every
-     * other Copilot-domain registration in this class already follows.
+     * (write-only) {@code createApiCollection} on BUILD — mirroring how every other flat domain in this class splits
+     * its read/write leg between ASK and BUILD. An absent factory bean (Copilot disabled, or the api-platform facade
+     * not on the classpath) resolves to an empty list — the same silent-skip degrade every other Copilot-domain
+     * registration in this class already follows.
      *
      * <p>
      * All three are pinned rather than catalog-demoted — a departure from {@code listApiCollections}'s PRE-dissolution
@@ -986,9 +1005,9 @@ public class AiHubConfiguration {
      * every tool call routed through {@link AiHubSpringAIAgent#toolContext} already carries
      * {@link com.bytechef.automation.ai.tool.AutomationToolInvocationContext}-compatible keys — the exact family
      * {@code listApiCollections} reads — for every registered pinned tool, not just API-collection ones.
-     * {@code createApiCollection}/{@code cloneApiCollection} never read that context at all (they resolve everything
-     * from an id already in their own input), a pre-existing property of these tool classes unaffected by dissolving
-     * the delegate that used to wrap them.
+     * {@code createApiCollection} never read that context at all (they resolve everything from an id already in their
+     * own input), a pre-existing property of these tool classes unaffected by dissolving the delegate that used to wrap
+     * them.
      * </p>
      *
      * <p>

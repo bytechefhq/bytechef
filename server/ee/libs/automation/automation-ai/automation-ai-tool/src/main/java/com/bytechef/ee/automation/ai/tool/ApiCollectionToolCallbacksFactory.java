@@ -50,7 +50,6 @@ public class ApiCollectionToolCallbacksFactory {
         List<ToolCallback> toolCallbacks = new ArrayList<>(readToolCallbacks());
 
         toolCallbacks.add(new CreateApiCollectionToolCallback(apiCollectionFacade));
-        toolCallbacks.add(new CloneApiCollectionToolCallback(apiCollectionFacade));
 
         return toolCallbacks;
     }

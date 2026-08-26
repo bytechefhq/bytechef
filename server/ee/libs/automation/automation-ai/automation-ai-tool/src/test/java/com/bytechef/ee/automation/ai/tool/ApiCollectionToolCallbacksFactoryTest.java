@@ -37,7 +37,7 @@ final class ApiCollectionToolCallbacksFactoryTest {
         List<String> names = toolNames(factory.writeToolCallbacks());
 
         assertThat(names).containsExactlyInAnyOrder(
-            "listApiCollections", "createApiCollection", "cloneApiCollection");
+            "listApiCollections", "createApiCollection");
     }
 
     private static List<String> toolNames(List<ToolCallback> toolCallbacks) {

@@ -33,7 +33,7 @@ class AiHubConfigurationApiCollectionFlatCrudToolCallbacksTest {
     private static final Set<String> EXPECTED_READ_NAMES = Set.of("listApiCollections");
 
     private static final Set<String> EXPECTED_WRITE_NAMES = Set.of(
-        "listApiCollections", "createApiCollection", "cloneApiCollection");
+        "listApiCollections", "createApiCollection");
 
     @Test
     void testReadModeReturnsExactlyTheOneReadName() {

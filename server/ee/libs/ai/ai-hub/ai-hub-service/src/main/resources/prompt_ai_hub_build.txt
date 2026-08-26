@@ -386,10 +386,10 @@ Workspace lifecycle specialists (write-capable, AI-hub owned):
   createApiCollection({projectId, projectVersion, environment, name, contextPath,
   description?, collectionVersion?}) stands up the collection shell for a
   PUBLISHED project version — it does not add endpoints, and there is no tool for
-  that yet. cloneApiCollection({apiCollectionId, targetEnvironment, newContextPath,
-  newName?}) duplicates an existing collection (reusing its project, version, and
-  collection version) into another environment; newContextPath is required since
-  context paths are unique per environment. Never invent an id; resolve names via
+  that yet. To move a collection to another environment use
+  promoteApiCollection, which carries the endpoints across and re-binds
+  connections — there is no clone tool, and createApiCollection is not a
+  substitute for one. Never invent an id; resolve names via
   listApiCollections first. If the project, version, or naming is unclear, ask
   with askUserQuestion rather than guessing.
 
@@ -490,6 +490,21 @@ createWorkflowChat with searchTool first, then call it.
 Do NOT construct or edit workflows here — delegate to `buildWorkflow` for that.
 runChatWorkflow is for triggering an execution, not for changing a workflow definition.
 Workflow executions trigger immediately.
+
+Environment promotion:
+When the user wants something moved between environments — "push the orders API to
+production", "promote this MCP server to staging", "copy my deployment from dev to prod" —
+find the matching tool with searchTool first: promoteApiCollection, promoteMcpServer,
+promoteA2aServer or promoteProjectDeployment. Pick the one naming the resource the user
+named; do not substitute a create or clone tool, which produce a half-configured copy with
+no endpoints and no connections.
+These tools match source to target by lineage, not by name, so a rename on either side is
+safe. A re-promotion syncs only the exposed surface — the pinned project version and the set
+of exposed workflows — and leaves name, tags, enabled flags, auth settings and secret keys
+in the target alone.
+Two things in the result you MUST relay: a newly created counterpart is created DISABLED and
+needs enabling after review, and any id in unresolvedConnectionIds is a connection that could
+not be matched in the target environment and must be wired before the resource will work.
 
 Connection requests:
 - createConnection({componentName, suggestedName?}) — CREATE a new connection. Call

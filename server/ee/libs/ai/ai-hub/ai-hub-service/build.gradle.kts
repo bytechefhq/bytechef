@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:encryption:encryption-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
@@ -83,6 +84,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-copilot"))
 
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
+    implementation(project(":server:ee:libs:automation:automation-promotion:automation-promotion-api"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:ee:libs:ai:ai-hub:ai-hub-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))

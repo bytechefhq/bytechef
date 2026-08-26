@@ -36,7 +36,9 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
@@ -51,6 +53,7 @@ import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
@@ -59,6 +62,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -70,6 +74,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 /**
  * @author Ivica Cardic
@@ -274,6 +279,51 @@ public class ProjectDeploymentFacadeIntTest {
             true);
 
         assertThat(workspaceProjectDeployments).hasSize(0);
+    }
+
+    /**
+     * Needs a principal because {@code filterOutSystemProjectDeployments} runs the project visibility filter as well as
+     * the system-name filter, and the resolver reads the current user's login. Scoped to this method rather than the
+     * class so the other tests here keep running without one.
+     */
+    @Test
+    @WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
+    public void testGetWorkspaceProjectDeploymentsExcludesSyntheticDeployments() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+        ProjectDeploymentDTO visibleProjectDeploymentDTO =
+            projectDeploymentFacadeHelper.createProjectDeployment(workspace.getId(), projectDTO);
+
+        saveSyntheticProjectDeployment(
+            SystemProjects.API_COLLECTION_DEPLOYMENT_NAME_PREFIX, projectDTO.id(),
+            visibleProjectDeploymentDTO.projectVersion());
+        saveSyntheticProjectDeployment(
+            SystemProjects.MCP_SERVER_DEPLOYMENT_NAME_PREFIX, projectDTO.id(),
+            visibleProjectDeploymentDTO.projectVersion());
+        saveSyntheticProjectDeployment(
+            SystemProjects.A2A_SERVER_DEPLOYMENT_NAME_PREFIX, projectDTO.id(),
+            visibleProjectDeploymentDTO.projectVersion());
+
+        List<ProjectDeploymentDTO> workspaceProjectDeployments = projectDeploymentFacade.getWorkspaceProjectDeployments(
+            workspace.getId(), (long) Environment.DEVELOPMENT.ordinal(), projectDTO.id(), null, true);
+
+        assertThat(workspaceProjectDeployments)
+            .hasSize(1)
+            .first()
+            .satisfies(
+                projectDeployment -> assertThat(projectDeployment.id()).isEqualTo(visibleProjectDeploymentDTO.id()));
+    }
+
+    private void saveSyntheticProjectDeployment(String namePrefix, long projectId, int projectVersion) {
+        ProjectDeployment syntheticProjectDeployment = new ProjectDeployment();
+
+        syntheticProjectDeployment.setName(namePrefix + projectId + "_v" + projectVersion);
+        syntheticProjectDeployment.setProjectId(projectId);
+        syntheticProjectDeployment.setProjectVersion(projectVersion);
+        syntheticProjectDeployment.setEnvironment(Environment.DEVELOPMENT);
+        syntheticProjectDeployment.setEnabled(true);
+        syntheticProjectDeployment.setUuid(UUID.randomUUID());
+
+        projectDeploymentRepository.save(syntheticProjectDeployment);
     }
 
     @Test

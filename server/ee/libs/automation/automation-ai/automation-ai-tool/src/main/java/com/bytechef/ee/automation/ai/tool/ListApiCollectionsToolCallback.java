@@ -23,9 +23,9 @@ import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Spring AI {@link ToolCallback} that lists API collections in the current workspace. Read leg paired with the existing
- * {@link CreateApiCollectionToolCallback} / {@link CloneApiCollectionToolCallback}: those tools require a collection or
- * project id, and without this tool the LLM has no discoverable way to resolve a name like "the staging customers API"
- * to a numeric id — it would either invent one or have to ask the user to read it from the UI.
+ * {@link CreateApiCollectionToolCallback}: that tool requires a collection or project id, and without this tool the LLM
+ * has no discoverable way to resolve a name like "the staging customers API" to a numeric id — it would either invent
+ * one or have to ask the user to read it from the UI.
  *
  * <p>
  * Returns a compact summary per collection: {@code id}, {@code name}, {@code description}, {@code contextPath},
@@ -43,7 +43,7 @@ public class ListApiCollectionsToolCallback implements ToolCallback {
 
     private static final String DESCRIPTION = """
         List the API collections belonging to the current workspace. Use this before createApiCollection or
-        cloneApiCollection when the user references a collection by name ("the staging customers API",
+        promoteApiCollection when the user references a collection by name ("the staging customers API",
         "my main collection") so you can resolve the name to a numeric id without inventing one. Returns a
         JSON array of {id, name, description, contextPath, projectId, projectDeploymentId, environment,
         enabled} entries. Optional projectId filters to a single project's collections.""";

@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:ee:libs:automation:automation-promotion:automation-promotion-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))

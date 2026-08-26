@@ -59,7 +59,7 @@ final class ApiCollectionAgentConfigurationTest {
             configuration.buildToolCallbacks(securityContextRehydrator, apiCollectionToolCallbacksFactory));
 
         assertThat(buildToolNames).containsExactlyInAnyOrder(
-            "listApiCollections", "createApiCollection", "cloneApiCollection");
+            "listApiCollections", "createApiCollection");
     }
 
     @Test
@@ -78,7 +78,7 @@ final class ApiCollectionAgentConfigurationTest {
         List<String> toolNames = toolNames(contributor.getToolCallbacks());
 
         assertThat(toolNames).containsExactlyInAnyOrder(
-            "listApiCollections", "createApiCollection", "cloneApiCollection");
+            "listApiCollections", "createApiCollection");
     }
 
     @Test
@@ -100,10 +100,6 @@ final class ApiCollectionAgentConfigurationTest {
                 .inputSchema()).contains("workspaceId");
         assertThat(
             toolCallbacksByName.get("createApiCollection")
-                .getToolDefinition()
-                .inputSchema()).doesNotContain("workspaceId");
-        assertThat(
-            toolCallbacksByName.get("cloneApiCollection")
                 .getToolDefinition()
                 .inputSchema()).doesNotContain("workspaceId");
     }

@@ -30,6 +30,7 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -177,6 +178,9 @@ public class ProjectDeploymentServiceSystemProjectIntTest {
         projectDeployment.setName(deploymentName);
         projectDeployment.setProjectId(project.getId());
         projectDeployment.setProjectVersion(1);
+        // Saved through the repository rather than the service, so nothing mints the lineage uuid for us and the
+        // NOT NULL column would reject the insert.
+        projectDeployment.setUuid(UUID.randomUUID());
 
         return Validate.notNull(
             projectDeploymentRepository.save(projectDeployment)
