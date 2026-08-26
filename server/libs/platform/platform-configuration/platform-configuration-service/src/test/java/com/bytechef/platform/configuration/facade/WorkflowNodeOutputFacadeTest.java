@@ -401,9 +401,7 @@ class WorkflowNodeOutputFacadeTest {
                 "name", "graph1", "type", "graph/v1", "parameters",
                 Map.of(
                     "nodes", List.of(
-                        Map.of(
-                            "name", "node1",
-                            "tasks", List.of(Map.of("name", "nested1", "type", "component/v1/action1")))))));
+                        Map.of("name", "nested1", "type", "component/v1/action1")))));
 
         Workflow workflow = mock(Workflow.class);
 

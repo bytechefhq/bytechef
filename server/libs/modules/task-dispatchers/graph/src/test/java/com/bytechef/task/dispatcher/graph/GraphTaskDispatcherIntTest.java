@@ -55,11 +55,14 @@ import org.springframework.context.ApplicationEventPublisher;
  * dispatcher/handler are constructed directly, mirroring every sibling {@code *TaskDispatcherIntTest}) -- but
  * {@code TaskDispatcherIntTestConfiguration} force-loads that configuration class (and every other
  * {@code *TaskDispatcherConfiguration} on the classpath) via {@code DeferredEvaluationParameterKeysLoader}, so its
- * static {@code DeferredEvaluationParameterKeys.register(...)} call for {@code graph/}'s {@code nodes} key still runs.
- * Without it, a graph's own {@code TaskExecution#evaluate} would eagerly resolve every expression nested inside
- * {@code nodes} (task parameter values AND {@code next} transitions) against whatever context exists at the graph's OWN
- * dispatch time, baking a stale evaluated value into node definitions that are meant to be evaluated once per visit --
- * see {@code testDispatchBackJumpCycle}, which would otherwise loop forever on a frozen {@code next}.
+ * static {@code DeferredEvaluationParameterKeys.register(...)} call for {@code graph/}'s {@code nodes} AND
+ * {@code transitions} keys still runs. Without it, a graph's own {@code TaskExecution#evaluate} would eagerly resolve
+ * every expression nested inside {@code nodes} (each node task's own parameter values) AND {@code transitions} (each
+ * transition's {@code condition}/{@code to}) against whatever context exists at the graph's OWN dispatch time, baking a
+ * stale evaluated value into definitions that are meant to be evaluated once per node visit and once per transition --
+ * see {@code testDispatchBackJumpCycle}, whose {@code bVisit -> counter} transition condition ({@code counter < 2})
+ * would otherwise be resolved once, up front, against the pre-dispatch context and frozen permanently true, looping the
+ * graph forever instead of terminating after two revisits.
  * </p>
  *
  * @author Ivica Cardic
@@ -164,50 +167,6 @@ public class GraphTaskDispatcherIntTest {
     }
 
     @Test
-    public void testDispatchRouterNodes() {
-        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("graph_v1-router"), this::getGraphTaskCompletionHandlerFactories,
-            this::getGraphTaskDispatcherResolverFactories, this::getTaskHandlerMap);
-
-        // the router-as-start-node hand-off reached the real node behind it
-        Assertions.assertEquals("reached afterStart", testVarTaskHandler.get("afterStartTask"));
-
-        // the mid-graph router hand-off chained through to the final node
-        Assertions.assertEquals("reached finalNode", testVarTaskHandler.get("finalTask"));
-
-        Job job = jobExecution.job();
-
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
-
-        Assertions.assertEquals("reached finalNode", outputs.get("result"));
-    }
-
-    /**
-     * A top-level graph whose entire router chain resolves to terminal WITHOUT ever dispatching a real task (both
-     * {@code r1} and {@code r2} are empty router nodes; {@code r2} has no {@code next}) is a legal shape per the spec
-     * (empty node = router; a terminal resolution with no completed task output resolves null).
-     * {@code maxTransitions: 1} is exactly enough for the single {@code r1 -> r2} hop -- pinning that the router
-     * hand-off's terminal resolution does not re-trigger itself (the degenerate-shape recursion this regression-tests):
-     * if it did, a second budget decrement would be attempted and the job would fail with budget exhaustion instead of
-     * completing.
-     */
-    @Test
-    public void testDispatchPureRouterGraphCompletesCleanly() {
-        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("graph_v1-pureRouter"), this::getGraphTaskCompletionHandlerFactories,
-            this::getGraphTaskDispatcherResolverFactories, this::getTaskHandlerMap);
-
-        Job job = jobExecution.job();
-
-        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
-
-        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
-
-        Assertions.assertTrue(outputs.containsKey("result"), "workflow output key must be present, value null");
-        Assertions.assertNull(outputs.get("result"));
-    }
-
-    @Test
     public void testDispatchUnknownTargetFails() {
         ExecutionException executionException = Assertions.assertThrows(
             ExecutionException.class,
@@ -217,8 +176,52 @@ public class GraphTaskDispatcherIntTest {
                 this::getTaskHandlerMap));
 
         Assertions.assertEquals(
-            "Unknown graph transition target node: 'missingNode' resolved from node 'A'",
+            "Unknown graph transition target node: 'missingNode' resolved from node 'aTask'",
             executionException.getMessage());
+    }
+
+    @Test
+    public void testDispatchConditionalFanOut() {
+        assertConditionalFanOutBranch(90, "high");
+        assertConditionalFanOutBranch(50, "medium");
+        assertConditionalFanOutBranch(10, "low");
+    }
+
+    @Test
+    public void testDispatchDynamicTarget() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("graph_v1-dynamicTarget"), Map.of("nextNode", "review"),
+            this::getGraphTaskCompletionHandlerFactories, this::getGraphTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("review", testVarTaskHandler.get("router"));
+        Assertions.assertEquals("review output", testVarTaskHandler.get("review"));
+        Assertions.assertNull(testVarTaskHandler.get("approve"), "approve must not run when nextNode routes to review");
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("review output", outputs.get("result"));
+    }
+
+    @Test
+    public void testDispatchDuplicateDefaultTakesFirstDeclared() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("graph_v1-duplicateDefault"),
+            this::getGraphTaskCompletionHandlerFactories, this::getGraphTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("first output", testVarTaskHandler.get("first"));
+        Assertions.assertNull(
+            testVarTaskHandler.get("second"),
+            "the second unconditional transition must never fire once the first has matched");
+
+        Job job = jobExecution.job();
+
+        Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+        Assertions.assertEquals("first output", outputs.get("result"));
     }
 
     @Test
@@ -256,13 +259,14 @@ public class GraphTaskDispatcherIntTest {
     }
 
     @Test
-    public void testDispatchNestedGraphWithNonEmptyInnerStart() {
+    public void testDispatchNestedGraph() {
         TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("graph_v1-nestedGraphNonEmptyStart"),
-            this::getGraphTaskCompletionHandlerFactories, this::getGraphTaskDispatcherResolverFactories,
-            this::getTaskHandlerMap);
+            EncodingUtils.base64EncodeToString("graph_v1-nestedGraph"), this::getGraphTaskCompletionHandlerFactories,
+            this::getGraphTaskDispatcherResolverFactories, this::getTaskHandlerMap);
 
-        Assertions.assertEquals("inner graph output", testVarTaskHandler.get("innerTask"));
+        Assertions.assertEquals("inner first output", testVarTaskHandler.get("innerFirstTask"));
+        Assertions.assertEquals("inner graph output", testVarTaskHandler.get("innerLastTask"));
+        Assertions.assertEquals("outer final output", testVarTaskHandler.get("outerFinalTask"));
 
         Job job = jobExecution.job();
 
@@ -270,30 +274,32 @@ public class GraphTaskDispatcherIntTest {
 
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertEquals("inner graph output", outputs.get("result"));
+        Assertions.assertEquals("outer final output", outputs.get("result"));
     }
 
-    /**
-     * The inner graph's own start node ({@code innerRouterStart}) is empty, so its {@code __routerNode} hand-off fires.
-     * This pins that the hand-off's deliberately-not-persisted self-stamp does not corrupt the outer graph's own
-     * {@code __node} stamp: the composed output still reaches the outer graph's output correctly.
-     */
-    @Test
-    public void testDispatchNestedGraphWithEmptyInnerStart() {
-        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
-            EncodingUtils.base64EncodeToString("graph_v1-nestedGraphEmptyStart"),
-            this::getGraphTaskCompletionHandlerFactories, this::getGraphTaskDispatcherResolverFactories,
-            this::getTaskHandlerMap);
+    private void assertConditionalFanOutBranch(int score, String expectedBranch) {
+        TestVarTaskHandler<Object, Object> branchTaskHandler = new TestVarTaskHandler<>(Map::put);
 
-        Assertions.assertEquals("inner graph via router output", testVarTaskHandler.get("innerTask"));
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString("graph_v1-conditionalFanOut"), Map.of("score", score),
+            this::getGraphTaskCompletionHandlerFactories, this::getGraphTaskDispatcherResolverFactories,
+            () -> Map.of("var/v1/set", branchTaskHandler));
+
+        Assertions.assertEquals(expectedBranch, branchTaskHandler.get(expectedBranch));
+
+        for (String branchName : List.of("high", "medium", "low")) {
+            if (!branchName.equals(expectedBranch)) {
+                Assertions.assertNull(
+                    branchTaskHandler.get(branchName),
+                    branchName + " must not run when score selects " + expectedBranch);
+            }
+        }
 
         Job job = jobExecution.job();
 
-        Assertions.assertEquals(Job.Status.COMPLETED, job.getStatus());
-
         Map<String, ?> outputs = taskFileStorage.readJobOutputs(job.getOutputs());
 
-        Assertions.assertEquals("inner graph via router output", outputs.get("result"));
+        Assertions.assertEquals(expectedBranch, outputs.get("result"));
     }
 
     @SuppressWarnings("PMD")

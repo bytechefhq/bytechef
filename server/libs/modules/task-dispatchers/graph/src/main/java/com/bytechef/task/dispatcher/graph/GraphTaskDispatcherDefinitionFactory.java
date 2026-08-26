@@ -24,26 +24,30 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.taskDispatcher;
 import static com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource.ENVIRONMENT_ID;
 import static com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource.WORKFLOW_ID;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.CONDITION;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.DEFAULT_MAX_TRANSITIONS;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.FROM;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.GRAPH;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.MAX_TRANSITIONS;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NAME;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NEXT;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.NODES;
 import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.START_NODE;
-import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TASKS;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TO;
+import static com.bytechef.task.dispatcher.graph.constant.GraphTaskDispatcherConstants.TRANSITIONS;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableValueProperty;
 import com.bytechef.platform.workflow.task.dispatcher.output.TaskListOutputDataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
 
@@ -59,7 +63,7 @@ public class GraphTaskDispatcherDefinitionFactory implements TaskDispatcherDefin
         this.taskDispatcherDefinition = taskDispatcher(GRAPH)
             .title("Graph")
             .description(
-                "Directs execution across a set of named nodes connected by dynamic transitions, executing each node's tasks in sequence until a node with no next transition is reached.")
+                "Runs a set of task nodes wired by transitions: after a node completes, its conditional transitions are checked in order, then its default one; a node with no matching transition ends the graph. Cycles are allowed and bounded by a transition budget.")
             .icon("path:assets/graph.svg")
             .properties(
                 string(START_NODE)
@@ -70,36 +74,40 @@ public class GraphTaskDispatcherDefinitionFactory implements TaskDispatcherDefin
                     .label("Max Transitions")
                     .description(
                         "The maximum number of node-to-node transitions allowed before the graph is halted, to guard against infinite loops.")
-                    .defaultValue(DEFAULT_MAX_TRANSITIONS))
+                    .defaultValue(DEFAULT_MAX_TRANSITIONS),
+                array(TRANSITIONS)
+                    .label("Transitions")
+                    .description(
+                        "The edges between nodes. Conditional transitions are checked in declared order, then the unconditional one.")
+                    .items(
+                        object()
+                            .properties(
+                                string(FROM)
+                                    .label("From")
+                                    .description("The name of the node this transition leaves.")
+                                    .required(true),
+                                string(TO)
+                                    .label("To")
+                                    .description(
+                                        "The name of the node to transition to, or an expression resolving to one.")
+                                    .required(true),
+                                string(CONDITION)
+                                    .label("Condition")
+                                    .description(
+                                        "An expression that must evaluate to true for this transition to be taken. Absent or blank means unconditional.")
+                                    .controlType(Property.ControlType.FORMULA_MODE))))
             .output(inputParameters -> taskListOutputDataSource
                 .map(dataSource -> output(inputParameters, dataSource))
                 .orElse(null))
             .taskProperties(
                 array(NODES)
-                    .description("The list of nodes that make up the graph.")
-                    .items(nodeProperty()));
+                    .description("The task nodes that make up the graph; each entry is one task.")
+                    .items(task()));
     }
 
     @Override
     public TaskDispatcherDefinition getDefinition() {
         return taskDispatcherDefinition;
-    }
-
-    private static ModifiableObjectProperty nodeProperty() {
-        return object()
-            .properties(
-                string(NAME)
-                    .label("Name")
-                    .description("The unique name of this node within the graph.")
-                    .required(true),
-                string(NEXT)
-                    .label("Next")
-                    .description(
-                        "An expression resolving to the name of the node to transition to next. Absent or blank marks this node as terminal.")
-                    .controlType(Property.ControlType.FORMULA_MODE),
-                array(TASKS)
-                    .description("The list of tasks to execute sequentially for this node.")
-                    .items(task()));
     }
 
     protected static OutputResponse output(
@@ -108,58 +116,59 @@ public class GraphTaskDispatcherDefinitionFactory implements TaskDispatcherDefin
         String workflowId = MapUtils.getString(inputParameters, WORKFLOW_ID);
         long environmentId = MapUtils.getLong(inputParameters, ENVIRONMENT_ID, 0L);
 
-        List<Map<String, ?>> nodes = MapUtils.getList(
-            inputParameters, NODES, new TypeReference<>() {}, List.of());
+        List<Map<String, ?>> nodes = MapUtils.getList(inputParameters, NODES, new TypeReference<>() {}, List.of());
+        List<Map<String, ?>> transitions = MapUtils.getList(
+            inputParameters, TRANSITIONS, new TypeReference<>() {}, List.of());
 
-        Map<String, ?> terminalNode = findFirstTerminalNode(nodes);
+        Map<String, ?> terminalNode = findFirstTerminalNode(nodes, transitions);
 
         if (terminalNode == null) {
             return null;
         }
 
-        List<Map<String, ?>> terminalNodeTasks = MapUtils.getList(
-            terminalNode, TASKS, new TypeReference<>() {}, List.of());
+        String terminalNodeName = MapUtils.getString(terminalNode, NAME);
+        String terminalNodeType = MapUtils.getString(terminalNode, "type");
 
-        if (terminalNodeTasks.isEmpty()) {
+        if (terminalNodeType == null) {
             return null;
         }
 
-        Map<String, ?> lastTask = terminalNodeTasks.getLast();
+        OutputResponse terminalNodeOutput = taskListOutputDataSource.getLastTaskOutput(
+            workflowId, terminalNodeName, terminalNodeType, environmentId);
 
-        String lastTaskName = MapUtils.getString(lastTask, "name");
-        String lastTaskType = MapUtils.getString(lastTask, "type");
-
-        if (lastTaskType == null) {
+        if (terminalNodeOutput == null) {
             return null;
         }
 
-        OutputResponse lastTaskOutput = taskListOutputDataSource.getLastTaskOutput(
-            workflowId, lastTaskName, lastTaskType, environmentId);
+        ModifiableValueProperty<?, ?> terminalNodeSchema =
+            (ModifiableValueProperty<?, ?>) terminalNodeOutput.getOutputSchema();
 
-        if (lastTaskOutput == null) {
-            return null;
+        Object terminalNodeSampleOutput = terminalNodeOutput.getSampleOutput();
+
+        if (terminalNodeSampleOutput != null) {
+            return OutputResponse.of(terminalNodeSchema, terminalNodeSampleOutput);
         }
 
-        ModifiableValueProperty<?, ?> lastTaskSchema = (ModifiableValueProperty<?, ?>) lastTaskOutput.getOutputSchema();
-
-        Object lastTaskSampleOutput = lastTaskOutput.getSampleOutput();
-
-        if (lastTaskSampleOutput != null) {
-            return OutputResponse.of(lastTaskSchema, lastTaskSampleOutput);
-        }
-
-        return OutputResponse.of(lastTaskSchema);
+        return OutputResponse.of(terminalNodeSchema);
     }
 
     /**
-     * Returns the first node whose {@code next} is absent or blank -- the first node declared, in list order, as
-     * terminal -- or {@code null} when every node declares a transition.
+     * Returns the first declared node that has no outgoing transition (no {@code transitions[].from} equal to its
+     * name), or {@code null} when every node has one -- a documented approximation, since which node actually ends a
+     * run is undecidable statically.
      */
-    private static Map<String, ?> findFirstTerminalNode(List<Map<String, ?>> nodes) {
-        for (Map<String, ?> node : nodes) {
-            String next = MapUtils.getString(node, NEXT);
+    private static Map<String, ?> findFirstTerminalNode(
+        List<Map<String, ?>> nodes, List<Map<String, ?>> transitions) {
 
-            if (next == null || next.isBlank()) {
+        Set<String> sourceNodeNames = transitions.stream()
+            .map(transition -> MapUtils.getString(transition, FROM))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+        for (Map<String, ?> node : nodes) {
+            String nodeName = MapUtils.getString(node, NAME);
+
+            if (nodeName != null && !sourceNodeNames.contains(nodeName)) {
                 return node;
             }
         }
