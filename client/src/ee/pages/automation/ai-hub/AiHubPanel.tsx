@@ -121,12 +121,16 @@ const AiHubPanel = () => {
              * EnvironmentSelect both live here next to the per-thread action affordances.
              */}
 
-            <div className="flex items-center justify-between gap-4 px-3 py-3">
-                <div className="flex min-w-0 flex-1 items-center gap-2">
+            <div className="flex items-center justify-between gap-4 px-4 py-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2 self-start">
                     {/* Same place the shared Header puts the sidebar toggle on other pages: first in the
-                     * title row. See AiHubChatsSidebarToggle for why the AI Hub renders its own. */}
+                     * title row, at px-4 and inside an h-header-height box. That is the shared Header's
+                     * exact geometry — see AiHubChatsSidebarToggle for why the AI Hub renders its own
+                     * control rather than reusing LeftSidebarToggle. */}
 
-                    <AiHubChatsSidebarToggle />
+                    <div className="flex h-header-height items-center">
+                        <AiHubChatsSidebarToggle />
+                    </div>
 
                     <h2 className="min-w-0 truncate text-base font-medium" title={chatTitle}>
                         {chatTitle}

@@ -878,8 +878,8 @@ const AiHubChatsSidebar = () => {
                 <ChatsSidebarSkeleton />
             ) : filteredChats.length === 0 ? (
                 <div className="px-2 py-4">
-                    <span className="text-xs text-muted-foreground">
-                        {isViewingArchived ? 'No archived chats yet' : 'No chats yet'}
+                    <span className="px-3 text-xs text-muted-foreground">
+                        {isViewingArchived ? 'No archived chats yet.' : 'No chats yet.'}
                     </span>
                 </div>
             ) : (

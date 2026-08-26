@@ -56,12 +56,17 @@ const AiHubHomePanel = () => {
              * one click away regardless of whether the user has an active chat.
              */}
 
-            <div className="flex items-center justify-between px-3 py-3">
+            {/* px-4 py-3 with the toggle in an h-header-height box: the shared `Header`'s exact geometry,
+                so the toggle lands in the same place here as on every page that uses it. */}
+
+            <div className="flex items-center justify-between px-4 py-3">
                 {/* Sidebar toggle first in the row, where the chat panel header (and every other page's
                  * header) puts it — otherwise a user who hid the sidebar and came home would have no way
                  * to bring it back from here. */}
 
-                <AiHubChatsSidebarToggle />
+                <div className="flex h-header-height items-center self-start">
+                    <AiHubChatsSidebarToggle />
+                </div>
 
                 <EnvironmentSelect
                     onChange={() => {
