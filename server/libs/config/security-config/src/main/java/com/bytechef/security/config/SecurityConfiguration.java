@@ -75,10 +75,27 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 /**
+ * {@code proxyTargetClass = true} is explicit rather than relying on Spring Boot's {@code AopAutoConfiguration} default
+ * ({@code spring.aop.proxy-target-class=true}, which nothing in this repository overrides): at least one
+ * {@code @PreAuthorize}-annotated controller (ticket 1051's {@code WorkflowTestApiController}) declares methods that
+ * are not present on the interface it implements, so a JDK dynamic proxy would silently make those methods unreachable
+ * through the interface type and invisible to the method-security interceptor. Forcing class proxying here removes the
+ * dependency on that autoconfiguration default ever staying as-is; see
+ * {@code WorkflowTestApiControllerProductionProxyModeTest} in {@code platform-workflow-test-rest} for the empirical
+ * proof that this setting is a no-op against today's actual behavior and a real guard against tomorrow's.
+ *
+ * <p>
+ * Blast radius is wider than method security: {@code @EnableMethodSecurity}'s {@code proxyTargetClass} attribute is
+ * wired through {@code MethodSecuritySelector} -> {@code AutoProxyRegistrar} ->
+ * {@code AopConfigUtils.forceAutoProxyCreatorToUseClassProxying}, which mutates the SHARED auto-proxy-creator bean
+ * definition application-wide, not a security-scoped one. If {@code spring.aop.proxy-target-class=false} is ever set
+ * anywhere in this application's configuration, this annotation silently overrides that intent for EVERY AOP proxy
+ * created here, not only the security ones.
+ *
  * @author Ivica Cardic
  */
 @Configuration
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity(securedEnabled = true, proxyTargetClass = true)
 @Profile("!liquibase")
 public class SecurityConfiguration {
 

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -77,6 +78,7 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public List<ComponentConnection> getClusterElementComponentConnections(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName) {
@@ -153,6 +155,7 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public List<ComponentConnection> getWorkflowNodeComponentConnections(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 

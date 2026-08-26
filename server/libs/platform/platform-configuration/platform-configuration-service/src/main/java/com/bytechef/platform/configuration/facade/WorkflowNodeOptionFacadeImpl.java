@@ -35,6 +35,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -42,9 +43,42 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
+ * Both methods require {@code WORKFLOW_VIEW} rather than {@code WORKFLOW_EDIT}, and the choice is forced rather than
+ * merely defensible: most of this class was ALREADY transitively gated at {@code WORKFLOW_VIEW} on this same
+ * {@code workflowId}, through {@code WorkflowNodeOutputFacadeImpl#getPreviousWorkflowNodeSampleOutputs}. Gating the
+ * entry point at {@code WORKFLOW_EDIT} would have made one facade demand two different scopes for one request, and a
+ * caller holding {@code WORKFLOW_EDIT} without {@code WORKFLOW_VIEW} would pass the outer gate and then 403 on the
+ * inner one.
+ *
+ * <p>
+ * That is also what bounds the genuinely new denial surface, which is the fact worth having before touching this: it is
+ * exactly two branches, both in {@code getWorkflowNodeOptions}. The trigger branch never reaches
+ * {@code WorkflowNodeOutputFacade} at all, and the task-dispatcher branch
+ * ({@code workflowNodeType.operation() == null}) returns before it does. Everything else --
+ * {@code getClusterElementNodeOptions} in full, and the action branch -- already answered to a {@code WORKFLOW_VIEW}
+ * check, just later than it should have: after the test-configuration connection ids and the {@code vars} merge had
+ * already been read.
+ *
+ * <p>
+ * Independently, {@code WORKFLOW_VIEW} is what this package uses for a method of this shape.
+ * {@link WorkflowNodeDynamicPropertiesFacadeImpl} is structurally the same method -- same test-configuration connection
+ * resolution, same evaluation inputs, same sample outputs, and the same kind of live outbound call through a resolved
+ * {@code connectionId} ({@code executeDynamicProperties} in place of {@code executeOptions}) -- and carries
+ * {@code WORKFLOW_VIEW}. The discriminator across this package is mutation of stored state, not whether a call leaves
+ * the process: {@code WorkflowNodeScriptFacadeImpl} splits {@code getWorkflowNodeScriptInput} ({@code WORKFLOW_VIEW})
+ * from {@code testWorkflowNodeScript} ({@code WORKFLOW_EDIT}), and {@code WorkflowTestConfigurationFacadeImpl} splits
+ * its reads from its writes the same way. Neither method here writes anything.
+ *
+ * <p>
+ * {@code WORKFLOW_EDIT} would also deny a legitimate caller: {@code WORKFLOW_VIEW} is granted from {@code VIEWER} and
+ * {@code WORKFLOW_EDIT} only from {@code EDITOR}, so a workspace viewer opening a workflow read-only would get empty
+ * dropdowns and 403s beside a dynamic-properties call that still succeeds -- for no gain, since the outbound call is
+ * already reachable at {@code WORKFLOW_VIEW} through that adjacent method.
+ *
  * @author Ivica Cardic
  */
 @Service
@@ -86,13 +120,21 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
     @Override
     @SuppressWarnings("unchecked")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public List<Option> getClusterElementNodeOptions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         @Nullable String searchText, long environmentId) {
 
+        // hasPermission(#workflowId, 'Workflow', ...) above is environment-agnostic, so the caller-supplied
+        // environmentId is never checked by it. The value reaching getEvaluationInputs (the `vars` merge point), the
+        // @Cacheable getPreviousWorkflowNodeSampleOutputs, and the test-configuration connection lookups below must
+        // still be the caller's own environment, not an arbitrary one it names -- executeOptions ultimately makes a
+        // live outbound call using whatever connectionId those lookups resolve. See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         List<WorkflowTestConfigurationConnection> connections = workflowTestConfigurationService
-            .fetchWorkflowTestConfiguration(workflowId, environmentId)
+            .fetchWorkflowTestConfiguration(workflowId, effectiveEnvironmentId)
             .stream()
             .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
                 workflowTestConfiguration.getConnections()))
@@ -104,13 +146,13 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 WorkflowTestConfigurationConnection::getConnectionId,
                 (existing, ignored) -> existing));
 
-        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, effectiveEnvironmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+            workflowId, workflowTask.getName(), effectiveEnvironmentId);
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
@@ -189,11 +231,18 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
 
     @Override
     @SuppressWarnings("unchecked")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public List<Option> getWorkflowNodeOptions(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         @Nullable String searchText, long environmentId) {
 
-        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, environmentId);
+        // Same as getClusterElementNodeOptions above: the gate is environment-agnostic, so the environmentId reaching
+        // evaluation, cache, and connection lookups below must still be resolved to the caller's own. The trigger
+        // branch below never reaches WorkflowNodeOutputFacade, so before this gate existed it ran entirely ungated.
+        // See PrincipalEnvironment.
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
+        Map<String, ?> inputs = workflowEvaluationInputsFacade.getEvaluationInputs(workflowId, effectiveEnvironmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger
@@ -202,7 +251,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
                 Long connectionId = workflowTestConfigurationService
-                    .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName, environmentId)
+                    .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName, effectiveEnvironmentId)
                     .orElse(null);
 
                 return triggerDefinitionFacade.executeOptions(
@@ -225,10 +274,10 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                     }
 
                     Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                        workflowId, workflowTask.getName(), environmentId);
+                        workflowId, workflowTask.getName(), effectiveEnvironmentId);
 
                     Map<String, Long> connectionIds = workflowTestConfigurationService
-                        .fetchWorkflowTestConfiguration(workflowId, environmentId)
+                        .fetchWorkflowTestConfiguration(workflowId, effectiveEnvironmentId)
                         .stream()
                         .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
                             workflowTestConfiguration.getConnections()))
