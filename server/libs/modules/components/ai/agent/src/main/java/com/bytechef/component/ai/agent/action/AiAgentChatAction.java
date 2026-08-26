@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -52,7 +53,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
@@ -62,28 +62,28 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     public static ChatActionDefinitionWrapper of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager,
+        AgentToolCallingManagers agentToolCallingManagers,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         return new AiAgentChatAction(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
             workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider).build();
     }
 
     private AiAgentChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager,
+        AgentToolCallingManagers agentToolCallingManagers,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         super(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
             workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
     }

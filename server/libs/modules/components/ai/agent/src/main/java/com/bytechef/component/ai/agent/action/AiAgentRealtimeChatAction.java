@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -41,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Subscription;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
-import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.beans.factory.ObjectProvider;
 import reactor.core.publisher.Flux;
 
@@ -93,26 +93,26 @@ public class AiAgentRealtimeChatAction extends AbstractAiAgentChatAction {
 
     public static ActionDefinition of(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager,
+        AgentToolCallingManagers agentToolCallingManagers,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
         return new AiAgentRealtimeChatAction(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
             workspaceSystemPromptAdvisorProviderObjectProvider).build();
     }
 
     private AiAgentRealtimeChatAction(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager,
+        AgentToolCallingManagers agentToolCallingManagers,
         @Nullable ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         @Nullable ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         @Nullable ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
         super(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
             toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
             workspaceSystemPromptAdvisorProviderObjectProvider);
     }

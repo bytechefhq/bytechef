@@ -27,6 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.Parameters;
@@ -266,7 +267,7 @@ class AbstractAiAgentChatActionWorkspaceSystemPromptTest {
             ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider) {
 
             super(
-                aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+                aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager),
                 toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
                 workspaceSystemPromptAdvisorProviderObjectProvider);
         }

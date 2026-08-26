@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -86,7 +87,8 @@ class AbstractAiAgentChatActionResumeGateTest {
     private final ToolCallback toolCallback = mock(ToolCallback.class);
 
     private final AbstractAiAgentChatAction action = new AbstractAiAgentChatAction(
-        aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class)) {};
+        aiAgentToolFacade, clusterElementDefinitionService,
+        new AgentToolCallingManagers(mock(ToolCallingManager.class))) {};
 
     private final ActionContextAware context = mock(
         ActionContextAware.class, withSettings().extraInterfaces(ActionContext.class));
@@ -242,8 +244,8 @@ class AbstractAiAgentChatActionResumeGateTest {
         when(toolExecutionRecorderObjectProvider.getIfAvailable()).thenReturn(toolExecutionRecorder);
 
         return new AbstractAiAgentChatAction(
-            aiAgentToolFacade, clusterElementDefinitionService, mock(ToolCallingManager.class),
-            toolExecutionRecorderObjectProvider) {};
+            aiAgentToolFacade, clusterElementDefinitionService,
+            new AgentToolCallingManagers(mock(ToolCallingManager.class)), toolExecutionRecorderObjectProvider) {};
     }
 
     private static Parameters continueParameters(String gatedToolName) {

@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.action.AiAgentChatAction;
 import com.bytechef.component.ai.agent.action.AiAgentRealtimeChatAction;
 import com.bytechef.component.ai.agent.action.AiAgentStreamChatAction;
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.tool.AiAgentChatTool;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
@@ -35,7 +36,6 @@ import com.bytechef.platform.component.definition.AbstractComponentDefinitionWra
 import com.bytechef.platform.component.definition.AiAgentComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.tool.execution.ToolExecutionRecorder;
-import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +49,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
 
     public AiAgentComponentHandler(
         AiAgentToolFacade aiAgentToolFacade, ClusterElementDefinitionService clusterElementDefinitionService,
-        ToolCallingManager toolCallingManager,
+        AgentToolCallingManagers agentToolCallingManagers,
         ObjectProvider<ToolExecutionRecorder> toolExecutionRecorderObjectProvider,
         ObjectProvider<AiGuardrailsAdvisorProvider> aiGuardrailsAdvisorProviderObjectProvider,
         ObjectProvider<WorkspaceSystemPromptAdvisorProvider> workspaceSystemPromptAdvisorProviderObjectProvider,
@@ -57,7 +57,7 @@ public class AiAgentComponentHandler implements ComponentHandler {
 
         final ActionDefinition aiAgentChatActionDefinition =
             AiAgentChatAction.of(
-                aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+                aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
                 toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
                 workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider);
 
@@ -70,11 +70,11 @@ public class AiAgentComponentHandler implements ComponentHandler {
                 .actions(
                     aiAgentChatActionDefinition,
                     AiAgentStreamChatAction.of(
-                        aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+                        aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
                         toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
                         workspaceSystemPromptAdvisorProviderObjectProvider, agentConversationRecorderObjectProvider),
                     AiAgentRealtimeChatAction.of(
-                        aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+                        aiAgentToolFacade, clusterElementDefinitionService, agentToolCallingManagers,
                         toolExecutionRecorderObjectProvider, aiGuardrailsAdvisorProviderObjectProvider,
                         workspaceSystemPromptAdvisorProviderObjectProvider))
                 .clusterElements(AiAgentChatTool.of(aiAgentChatActionDefinition)));

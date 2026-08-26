@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -140,7 +141,7 @@ class AbstractAiAgentChatActionAgentConversationRecorderTest {
     @Test
     void testNoRecorderProviderAtAllMeansNoCall() {
         AbstractAiAgentChatAction action = new AbstractAiAgentChatAction(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager) {};
+            aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager)) {};
         ActionContext context = mock(ActionContext.class);
 
         assertDoesNotThrow(
@@ -262,7 +263,7 @@ class AbstractAiAgentChatActionAgentConversationRecorderTest {
         ObjectProvider<AgentConversationRecorder> agentConversationRecorderObjectProvider) {
 
         return new AbstractAiAgentChatAction(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager,
+            aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager),
             (ObjectProvider<ToolExecutionRecorder>) null, (ObjectProvider<AiGuardrailsAdvisorProvider>) null,
             (ObjectProvider<WorkspaceSystemPromptAdvisorProvider>) null,
             agentConversationRecorderObjectProvider) {};

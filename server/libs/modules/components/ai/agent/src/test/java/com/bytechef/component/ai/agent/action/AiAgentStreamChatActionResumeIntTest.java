@@ -25,6 +25,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionContext;
@@ -416,7 +417,7 @@ class AiAgentStreamChatActionResumeIntTest {
             ClusterElementDefinitionService clusterElementDefinitionService,
             ToolCallingManager toolCallingManager) {
 
-            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+            super(aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager));
         }
 
         public SseEmitterHandler performStream(

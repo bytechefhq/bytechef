@@ -30,6 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsApprovalGateTool;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
@@ -460,7 +461,7 @@ class AiAgentStreamChatActionResumeGateIntTest {
             ClusterElementDefinitionService clusterElementDefinitionService,
             ToolCallingManager toolCallingManager) {
 
-            super(aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+            super(aiAgentToolFacade, clusterElementDefinitionService, new AgentToolCallingManagers(toolCallingManager));
         }
 
         @SuppressWarnings("PMD.SignatureDeclareThrowsException")

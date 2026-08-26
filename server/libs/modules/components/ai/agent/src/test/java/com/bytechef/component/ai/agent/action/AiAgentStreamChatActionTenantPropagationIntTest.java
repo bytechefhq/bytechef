@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.agent.tool.AgentToolCallingManagers;
 import com.bytechef.component.ai.llm.facade.AiAgentToolFacade;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ActionDefinition.SseEmitterHandler;
@@ -145,9 +146,10 @@ class AiAgentStreamChatActionTenantPropagationIntTest {
 
         ActionDefinition actionDefinition = AiAgentStreamChatAction.of(
             mock(AiAgentToolFacade.class), buildClusterElementDefinitionService(),
-            DefaultToolCallingManager.builder()
-                .toolCallbackResolver(new DelegatingToolCallbackResolver(List.of()))
-                .build(),
+            new AgentToolCallingManagers(
+                DefaultToolCallingManager.builder()
+                    .toolCallbackResolver(new DelegatingToolCallbackResolver(List.of()))
+                    .build()),
             (ObjectProvider<ToolExecutionRecorder>) null, (ObjectProvider<AiGuardrailsAdvisorProvider>) null,
             (ObjectProvider<WorkspaceSystemPromptAdvisorProvider>) null, presentProvider(agentConversationRecorder));
 
