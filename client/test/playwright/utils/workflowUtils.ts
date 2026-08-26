@@ -76,16 +76,22 @@ export function formatPropertyValue(value: unknown, propertyName: string): strin
 }
 
 interface WaitForNodeParametersSaveProps {
+    method?: 'DELETE' | 'PATCH';
     nodeName: string;
     page: Page;
     valueInBody?: string;
 }
 
-export function nodeParametersSavePromise({nodeName, page, valueInBody}: WaitForNodeParametersSaveProps) {
+export function nodeParametersSavePromise({
+    method = 'PATCH',
+    nodeName,
+    page,
+    valueInBody,
+}: WaitForNodeParametersSaveProps) {
     return page.waitForResponse((response) => {
         const request = response.request();
 
-        if (request.method() !== 'PATCH' || !response.url().includes(`/workflow-nodes/${nodeName}/parameters`)) {
+        if (request.method() !== method || !response.url().includes(`/workflow-nodes/${nodeName}/parameters`)) {
             return false;
         }
 

@@ -3,26 +3,31 @@
 Snapshot of Playwright coverage for the workflow-editor Property feature, cross-referenced with
 [bytechefhq/bytechef#3932](https://github.com/bytechefhq/bytechef/issues/3932) and its sub-issues.
 
-Date: 2026-07-23
+Date: 2026-07-29
 
 ## Existing specs
 
-All live in `client/test/playwright/tests/properties/` (~2050 lines total).
+All live in `client/test/playwright/tests/properties/` (~2950 lines, 106 tests total).
 
-| Spec                                | Node exercised         | Sub-issue     |
-| ----------------------------------- | ---------------------- | ------------- |
-| `propertyPersistence.spec.ts`       | `var_1` (`var/v1/set`) | #3933 closed  |
-| `propertyValidation.spec.ts`        | `propertyTesting_1`    | #3935 closed  |
-| `objectProperty.spec.ts`            | `var_1`                | #4149 closed  |
-| `arrayProperty.spec.ts`             | `var_1`                | #4150 closed  |
-| `propertyDisplayConditions.spec.ts` | `propertyTesting_1`    | #3937 / #4151 |
+| Spec                                | Node exercised         | Tests | Sub-issue            |
+| ----------------------------------- | ---------------------- | ----- | -------------------- |
+| `propertyPersistence.spec.ts`       | `var_1` (`var/v1/set`) | 12    | #3933 closed         |
+| `propertyValidation.spec.ts`        | `propertyTesting_1`    | 25    | #3935 closed         |
+| `objectProperty.spec.ts`            | `var_1`                | 13    | #4149 closed         |
+| `arrayProperty.spec.ts`             | `var_1`                | 17    | #4150 closed         |
+| `propertyDisplayConditions.spec.ts` | `propertyTesting_1`    | 8     | #3937 / #4151 closed |
+| `propertyDynamicProperties.spec.ts` | `propertyTesting_1`    | 9     | #4152                |
+| `propertyOptions.spec.ts`           | `propertyTesting_1`    | 22    | untracked            |
 
 Open sub-issues:
 
-- **#3937** display conditions — covered by `propertyDisplayConditions.spec.ts`, except nested conditions
-- **#4151** displayCondition properties — same spec; the `[index]` replacement case is still uncovered
-- **#4152** dynamic properties
+- **#4152** dynamic properties — covered by `propertyDynamicProperties.spec.ts`; close once merged
 - **#3938** E2E integration flows — low value, existing specs already cover reload/reopen persistence
+
+Closed but partially covered:
+
+- **#3937** display conditions — nested conditions still uncovered
+- **#4151** displayCondition properties — the `[index]` replacement case is still uncovered
 
 ### Still missing for #3937 / #4151
 
@@ -41,14 +46,13 @@ to the test component would unblock all three.
 ## Test component is underused
 
 `server/libs/modules/components/property-testing/.../PropertyTestingAction.java` defines 31 properties.
-14 of them are never referenced by any spec:
+8 of them are never referenced by any spec:
 
 ```
-arrayDefaultValues           objectDefaultValues            optionsMultiselect
-arrayNoDefaultValues         objectNoDefaultValues          optionsNoMultiselect
-arrayPredefinedProperties    objectNoPredefinedProperties   optionsLookupDependsOn
-arrayNoPredefinedProperties  objectPredefinedProperties     setForOptionsLookup
-displayCondition             dynamicPropertiesLookup
+arrayDefaultValues           objectDefaultValues
+arrayNoDefaultValues         objectNoDefaultValues
+arrayPredefinedProperties    objectNoPredefinedProperties
+arrayNoPredefinedProperties  objectPredefinedProperties
 ```
 
 The object and array specs only exercise `var_1`'s dynamic (user-added) properties. The
@@ -67,11 +71,8 @@ input-type switch. Only Vitest slice tests exist for its pieces. This is the lar
 
 ### `!control` half — untested branches
 
-- `PropertyComboBox` with `optionsLookupDependsOn` (`Property.tsx:824`)
-- `PropertyMultiSelect` (`Property.tsx:888`)
-- static-options `PropertySelect` (`Property.tsx:795`)
-- `DYNAMIC_PROPERTIES` (`Property.tsx:913`) — #4152
-- displayCondition skeleton and hide branches (`Property.tsx:171-183`) — #3937 / #4151
+- static-options `PropertySelect` (`Property.tsx:795`) — only the BOOLEAN variant is exercised, via the
+  `bool` property in `propertyDisplayConditions.spec.ts`
 - `PropertyMentionsInput` (`Property.tsx:211`) — data pills, `=` expression mode, formula mode
 - input-type-switch button, TIME clear button, description tooltip, `RequiredMark`
 - `CODE_EDITOR`, `JSON_SCHEMA_BUILDER`, `TEXT_AREA`, `NULL` control types
@@ -95,12 +96,19 @@ property.
 ## Suggested order of work
 
 1. ~~**`propertyDisplayConditions.spec.ts`** — merges #3937 and #4151.~~ Done, 8 tests.
-2. **`propertyDynamicProperties.spec.ts`** — #4152. `dynamicPropertiesLookup` → `dynamicProperty` is
-   wired against the real backend, no mocks needed.
-3. **`propertyOptions.spec.ts`** — not tracked by any sub-issue. Covers combobox, multiselect, and
-   options lookup dependencies. Large untracked gap.
+2. ~~**`propertyDynamicProperties.spec.ts`** — #4152.~~ Done, 9 tests.
+3. ~~**`propertyOptions.spec.ts`** — combobox, multiselect, options lookup dependencies.~~ Done,
+   22 tests.
 4. **`propertyDefaults.spec.ts`** — default-value and predefined-properties array/object variants.
 5. **Cluster-element / tools-mode spec** — the `control` half. Needs an AI-agent workflow fixture;
    the biggest gap but also the most expensive to set up.
 
 #3938 can be closed as covered.
+
+## Behaviour uncovered by `propertyOptions.spec.ts`
+
+- Clearing every multiselect option removes the parameter from the workflow definition rather than
+  storing an empty array. The spec asserts the current behaviour (`toBeUndefined()`).
+- The per-badge remove and "+ N more" clear buttons in `MultiSelect.tsx` were inert: the icons were
+  direct `svg` children of `Badge`, whose base style sets `[&>svg]:pointer-events-none`, which beat the
+  `[&_svg]:pointer-events-auto` on the trigger button. Both icons are now wrapped in a clickable `span`.
