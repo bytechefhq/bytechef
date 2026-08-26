@@ -38,6 +38,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
 /**
+ * Test sources share the scanned {@code com.bytechef.ee.embedded.configuration} tree with production ones, so the
+ * exclude filters keep test-only classes out of this context. The {@code IntTest$} pattern covers the classes nested
+ * inside a sibling integration test -- {@code ConnectedUserResourceMembershipEnforcementIntTest.Config} and the two
+ * {@code SkipAutomationAuthorizationAspect*IntTest.Config}s -- whose mocks otherwise land here alongside the real beans
+ * they shadow and make this context unloadable.
+ *
  * @author Ivica Cardic
  */
 @ComponentScan(
@@ -47,7 +53,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
     },
     excludeFilters = @Filter(
         type = FilterType.REGEX,
-        pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration"))
+        pattern = {
+            "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration",
+            ".*IntTest\\$.*"
+        }))
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)

@@ -35,7 +35,9 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -301,7 +303,16 @@ public class ConnectionApiControllerIntTest {
             .build();
     }
 
-    @ComponentScan(basePackages = "com.bytechef.ee.embedded.configuration.web.rest")
+    /**
+     * Spring hands this nested class to the enclosing test directly, as its detected default configuration class, so
+     * the exclude filter does not affect that. It keeps the classes nested inside a sibling test -- notably
+     * {@code WebhookTriggerTestApiControllerAuthorizationTest.Config}, whose own
+     * {@code WebhookTriggerTestApiController} bean would leave the request mapping ambiguous -- from being scanned into
+     * this context, the same way {@code EmbeddedConfigurationRestTestConfiguration} keeps them out of its own.
+     */
+    @ComponentScan(
+        basePackages = "com.bytechef.ee.embedded.configuration.web.rest",
+        excludeFilters = @Filter(type = FilterType.REGEX, pattern = ".*Test\\$.*"))
     @Configuration
     public static class ConnectionRestTestConfiguration {
     }
