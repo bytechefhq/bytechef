@@ -1,6 +1,7 @@
 import {
     McpServer,
     useDeleteWorkspaceMcpServerMutation,
+    useEnvironmentsQuery,
     useUpdateMcpServerMutation,
     useUpdateMcpServerTagsMutation,
 } from '@/shared/middleware/graphql';
@@ -11,6 +12,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showMcpComponentDialog, setShowMcpComponentDialog] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
@@ -20,6 +22,10 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const mcpServerTagIds = mcpServer.tags?.map((tag) => tag?.id);
 
     const queryClient = useQueryClient();
+
+    const environmentsQuery = useEnvironmentsQuery();
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const updateMcpServerMutation = useUpdateMcpServerMutation();
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
@@ -110,10 +116,13 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         setShowDeleteDialog,
         setShowEditDialog,
         setShowMcpComponentDialog,
+        setShowPromotionDialog,
         setShowWorkflowDialog,
         showDeleteDialog,
         showEditDialog,
         showMcpComponentDialog,
+        showPromoteToEnvironment,
+        showPromotionDialog,
         showWorkflowDialog,
         toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,

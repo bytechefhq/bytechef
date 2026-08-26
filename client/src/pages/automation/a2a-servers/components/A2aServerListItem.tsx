@@ -7,13 +7,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {A2aServer, useDeleteA2aServerMutation} from '@/shared/middleware/graphql';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import EEVersion from '@/shared/edition/EEVersion';
+import {
+    A2aServer,
+    PromotionResourceType,
+    useDeleteA2aServerMutation,
+    useEnvironmentsQuery,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
-import {useState} from 'react';
+import {Suspense, lazy, useState} from 'react';
 
 import A2aServerDialog from './A2aServerDialog';
 import A2aServerWorkflowDialog from './A2aServerWorkflowDialog';
+
+const EnvironmentPromotionDialog = lazy(
+    () => import('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog')
+);
 
 interface A2aServerListItemProps {
     a2aServer: A2aServer;
@@ -21,11 +32,18 @@ interface A2aServerListItemProps {
 
 const A2aServerListItem = ({a2aServer}: A2aServerListItemProps) => {
     const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [showPromotionDialog, setShowPromotionDialog] = useState(false);
     const [skillsDialogOpen, setSkillsDialogOpen] = useState(false);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const queryClient = useQueryClient();
 
     const deleteA2aServerMutation = useDeleteA2aServerMutation();
+
+    const environmentsQuery = useEnvironmentsQuery();
+
+    const showPromoteToEnvironment = (environmentsQuery.data?.environments?.length ?? 0) >= 2;
 
     const agentCardUrl = `${window.location.origin}/api/automation/a2a/${a2aServer.secretKey}/.well-known/agent-card.json`;
 
@@ -69,6 +87,14 @@ const A2aServerListItem = ({a2aServer}: A2aServerListItemProps) => {
 
                     <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>Edit</DropdownMenuItem>
 
+                    {showPromoteToEnvironment && (
+                        <EEVersion hidden={true}>
+                            <DropdownMenuItem onClick={() => setShowPromotionDialog(true)}>
+                                Promote to environment…
+                            </DropdownMenuItem>
+                        </EEVersion>
+                    )}
+
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem onClick={handleDeleteClick} variant="destructive">
@@ -85,6 +111,24 @@ const A2aServerListItem = ({a2aServer}: A2aServerListItemProps) => {
             />
 
             <A2aServerWorkflowDialog a2aServer={a2aServer} onOpenChange={setSkillsDialogOpen} open={skillsDialogOpen} />
+
+            {showPromotionDialog && (
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <EnvironmentPromotionDialog
+                            onClose={() => setShowPromotionDialog(false)}
+                            onPromoted={() => {
+                                queryClient.invalidateQueries({queryKey: ['a2aServers']});
+                            }}
+                            resourceType={PromotionResourceType.A2AServer}
+                            sourceEnvironmentId={+a2aServer.environmentId}
+                            sourceId={a2aServer.id}
+                            sourceName={a2aServer.name}
+                            workspaceId={currentWorkspaceId!}
+                        />
+                    </Suspense>
+                </EEVersion>
+            )}
         </div>
     );
 };

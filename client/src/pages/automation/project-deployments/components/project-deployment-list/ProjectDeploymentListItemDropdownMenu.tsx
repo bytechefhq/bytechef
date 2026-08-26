@@ -7,7 +7,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
+import EEVersion from '@/shared/edition/EEVersion';
+import {ArrowUpRightIcon, EditIcon, EllipsisVerticalIcon, RefreshCcwIcon, Trash2Icon} from 'lucide-react';
 
 interface ProjectDeploymentListItemDropdownMenuProps {
     /**
@@ -18,6 +19,12 @@ interface ProjectDeploymentListItemDropdownMenuProps {
     onChangeProjectVersionClick: () => void;
     onDeleteClick: () => void;
     onEditClick: () => void;
+    /**
+     * Not passed by the agent deployments list — an agent deployment's underlying ProjectDeployment is
+     * promoted through its owning agent, not directly, so the item stays hidden there.
+     */
+    onPromoteClick?: () => void;
+    showPromoteToEnvironment?: boolean;
 }
 
 const ProjectDeploymentListItemDropdownMenu = ({
@@ -25,6 +32,8 @@ const ProjectDeploymentListItemDropdownMenu = ({
     onChangeProjectVersionClick,
     onDeleteClick,
     onEditClick,
+    onPromoteClick,
+    showPromoteToEnvironment = false,
 }: ProjectDeploymentListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -40,6 +49,14 @@ const ProjectDeploymentListItemDropdownMenu = ({
                 <DropdownMenuItem className="dropdown-menu-item" onClick={onChangeProjectVersionClick}>
                     <RefreshCcwIcon /> {changeVersionLabel}
                 </DropdownMenuItem>
+
+                {showPromoteToEnvironment && onPromoteClick && (
+                    <EEVersion hidden={true}>
+                        <DropdownMenuItem className="dropdown-menu-item" onClick={onPromoteClick}>
+                            <ArrowUpRightIcon /> Promote to environment…
+                        </DropdownMenuItem>
+                    </EEVersion>
+                )}
 
                 <DropdownMenuSeparator className="m-0" />
 

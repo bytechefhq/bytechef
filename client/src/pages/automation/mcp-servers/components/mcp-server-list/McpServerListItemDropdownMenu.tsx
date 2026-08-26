@@ -6,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import EEVersion from '@/shared/edition/EEVersion';
 import {McpServer} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
@@ -15,6 +16,8 @@ interface McpServerListItemDropdownMenuProps {
     onEditClick: () => void;
     onAddComponentClick: () => void;
     onAddWorkflowsClick: () => void;
+    onPromoteClick: () => void;
+    showPromoteToEnvironment: boolean;
 }
 
 const McpServerListItemDropdownMenu = ({
@@ -22,6 +25,8 @@ const McpServerListItemDropdownMenu = ({
     onAddWorkflowsClick,
     onDeleteClick,
     onEditClick,
+    onPromoteClick,
+    showPromoteToEnvironment,
 }: McpServerListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -37,6 +42,12 @@ const McpServerListItemDropdownMenu = ({
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
+
+                {showPromoteToEnvironment && (
+                    <EEVersion hidden={true}>
+                        <DropdownMenuItem onClick={onPromoteClick}>Promote to environment…</DropdownMenuItem>
+                    </EEVersion>
+                )}
 
                 <DropdownMenuSeparator />
 

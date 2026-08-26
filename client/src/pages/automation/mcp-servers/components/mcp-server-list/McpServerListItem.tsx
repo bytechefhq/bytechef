@@ -7,12 +7,20 @@ import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
-import {McpServer, Tag} from '@/shared/middleware/graphql';
+import EEVersion from '@/shared/edition/EEVersion';
+import {McpServer, PromotionResourceType, Tag} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDown, ServerIcon} from 'lucide-react';
+import {Suspense, lazy} from 'react';
 
 import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
 import useMcpServerListItem from './hooks/useMcpServerListItem';
+
+const EnvironmentPromotionDialog = lazy(
+    () => import('@/ee/shared/components/environment-promotion/EnvironmentPromotionDialog')
+);
 
 interface McpServerListItemProps {
     mcpServer: McpServer;
@@ -21,6 +29,8 @@ interface McpServerListItemProps {
 }
 
 const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {
         handleDeleteClick,
         handleMcpServerListItemClick,
@@ -30,14 +40,19 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
         setShowDeleteDialog,
         setShowEditDialog,
         setShowMcpComponentDialog,
+        setShowPromotionDialog,
         setShowWorkflowDialog,
         showDeleteDialog,
         showEditDialog,
         showMcpComponentDialog,
+        showPromoteToEnvironment,
+        showPromotionDialog,
         showWorkflowDialog,
         toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     } = useMcpServerListItem(mcpServer);
+
+    const queryClient = useQueryClient();
 
     return (
         <>
@@ -135,6 +150,8 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                             onAddWorkflowsClick={() => setShowWorkflowDialog(true)}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
+                            onPromoteClick={() => setShowPromotionDialog(true)}
+                            showPromoteToEnvironment={showPromoteToEnvironment}
                         />
                     </div>
                 </div>
@@ -165,6 +182,24 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
 
             {showWorkflowDialog && (
                 <McpProjectWorkflowDialog mcpServer={mcpServer} onClose={() => setShowWorkflowDialog(false)} />
+            )}
+
+            {showPromotionDialog && (
+                <EEVersion hidden={true}>
+                    <Suspense fallback={null}>
+                        <EnvironmentPromotionDialog
+                            onClose={() => setShowPromotionDialog(false)}
+                            onPromoted={() => {
+                                queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+                            }}
+                            resourceType={PromotionResourceType.McpServer}
+                            sourceEnvironmentId={+mcpServer.environmentId}
+                            sourceId={mcpServer.id}
+                            sourceName={mcpServer.name}
+                            workspaceId={currentWorkspaceId!}
+                        />
+                    </Suspense>
+                </EEVersion>
             )}
         </>
     );
