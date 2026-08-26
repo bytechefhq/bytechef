@@ -122,8 +122,10 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
                         trigger: 'manual',
                     })[0];
 
-                    popup.popper.style.pointerEvents = 'auto';
-
+                    // Inside a Radix modal dialog, react-remove-scroll blocks wheel events outside the
+                    // dialog content. Intercept them on the popup before they reach the document
+                    // listener that would preventDefault on them. Pointer events are re-enabled by the
+                    // menu's own stylesheet, since tippy resets the popper's inline value on setProps.
                     wheelAbortController = new AbortController();
 
                     popup.popper.addEventListener('wheel', (event) => event.stopPropagation(), {
