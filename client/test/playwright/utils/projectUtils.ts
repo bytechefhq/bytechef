@@ -38,7 +38,7 @@ export async function createWorkflow(page: Page, projectId: string, workflowName
 
     await projectsPage.waitForPageLoad();
 
-    const projectItem = page.getByLabel(projectId);
+    const projectItem = page.getByLabel(projectId, {exact: true});
 
     await expect(projectItem).toBeVisible({timeout: 60000});
 
@@ -86,7 +86,7 @@ export async function importWorkflow({page, projectId, workflowFilePath}: Import
 
     await projectsPage.waitForPageLoad();
 
-    const projectItem = page.getByLabel(projectId);
+    const projectItem = page.getByLabel(projectId, {exact: true});
 
     await expect(projectItem).toBeVisible({timeout: 60000});
 

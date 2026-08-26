@@ -35,7 +35,7 @@ test.describe('Reading from Workflow Definition', () => {
         });
 
         await test.step('Verify all properties are rendered', async () => {
-            const propertiesTabButton = configurationPanel.getByRole('button', {name: 'Properties'});
+            const propertiesTabButton = configurationPanel.getByRole('button', {exact: true, name: 'Properties'});
 
             const typeProperty = configurationPanel.getByLabel('type property');
 
@@ -165,7 +165,7 @@ test.describe('Saving to Workflow Definition', () => {
         });
 
         await test.step('Switch to the Properties tab', async () => {
-            const propertiesTabButton = configurationPanel.getByRole('button', {name: 'Properties'});
+            const propertiesTabButton = configurationPanel.getByRole('button', {exact: true, name: 'Properties'});
 
             const typeProperty = configurationPanel.getByLabel('type property');
 
