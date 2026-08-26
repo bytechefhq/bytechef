@@ -26,6 +26,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -70,9 +71,15 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     public String getClusterElementWorkflowNodeDescription(
         String workflowId, String workflowNodeName, String clusterElementName, Long environmentId) {
 
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+            workflowId, effectiveEnvironmentId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
@@ -87,9 +94,11 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
     @Override
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId) {
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+            workflowId, effectiveEnvironmentId);
 
         String description;
 

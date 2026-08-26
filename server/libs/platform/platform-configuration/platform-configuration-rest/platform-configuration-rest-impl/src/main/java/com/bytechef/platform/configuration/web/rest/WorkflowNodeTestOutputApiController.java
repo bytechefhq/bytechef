@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.web.rest.model.CheckWorkflowNodeTestOutputExists200ResponseModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowNodeTestOutputModel;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,17 +60,22 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<CheckWorkflowNodeTestOutputExists200ResponseModel> checkWorkflowNodeTestOutputExists(
         String id, String workflowNodeName, Long environmentId, OffsetDateTime createdDate) {
 
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         return ResponseEntity.ok(
             new CheckWorkflowNodeTestOutputExists200ResponseModel().exists(
                 workflowNodeTestOutputService.checkWorkflowNodeTestOutputExists(
-                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant(), environmentId)));
+                    id, workflowNodeName, createdDate == null ? null : createdDate.toInstant(),
+                    effectiveEnvironmentId)));
     }
 
     @Override
     public ResponseEntity<Void> deleteWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
-        workflowNodeTestOutputFacade.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId);
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
+        workflowNodeTestOutputFacade.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, effectiveEnvironmentId);
 
         return ResponseEntity
             .noContent()
@@ -80,8 +86,10 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<WorkflowNodeTestOutputModel> saveWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Long environmentId) {
 
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         WorkflowNodeTestOutput workflowNodeTestOutput = workflowNodeTestOutputFacade.saveWorkflowNodeTestOutput(
-            workflowId, workflowNodeName, environmentId);
+            workflowId, workflowNodeName, effectiveEnvironmentId);
 
         if (workflowNodeTestOutput == null) {
             return ResponseEntity
@@ -96,11 +104,13 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleFile(
         String workflowId, String workflowNodeName, Long environmentId, MultipartFile file) {
 
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         try (InputStream inputStream = file.getInputStream()) {
             return ResponseEntity.ok(
                 conversionService.convert(
                     workflowNodeTestOutputFacade.saveWorkflowNodeSampleFile(
-                        workflowId, workflowNodeName, file.getOriginalFilename(), inputStream, environmentId),
+                        workflowId, workflowNodeName, file.getOriginalFilename(), inputStream, effectiveEnvironmentId),
                     WorkflowNodeTestOutputModel.class));
         } catch (IOException ioException) {
             throw new UncheckedIOException(ioException);
@@ -111,10 +121,20 @@ public class WorkflowNodeTestOutputApiController implements WorkflowNodeTestOutp
     public ResponseEntity<WorkflowNodeTestOutputModel> uploadWorkflowNodeSampleOutput(
         String workflowId, String workflowNodeName, Long environmentId, Object body) {
 
+        long effectiveEnvironmentId = resolveRequiredEnvironmentId(environmentId);
+
         return ResponseEntity.ok(
             conversionService.convert(
                 workflowNodeTestOutputFacade.saveWorkflowNodeSampleOutput(
-                    workflowId, workflowNodeName, body, environmentId),
+                    workflowId, workflowNodeName, body, effectiveEnvironmentId),
                 WorkflowNodeTestOutputModel.class));
+    }
+
+    private static long resolveRequiredEnvironmentId(Long environmentId) {
+        if (environmentId == null) {
+            throw new IllegalArgumentException("environmentId is required");
+        }
+
+        return PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId.longValue());
     }
 }

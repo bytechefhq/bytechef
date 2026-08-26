@@ -27,9 +27,15 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.rest.config.PlatformConfigurationRestTestConfiguration;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.CredentialType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,6 +44,12 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,9 +65,14 @@ import org.springframework.web.reactive.function.BodyInserters;
 class WorkflowNodeTestOutputApiControllerIntTest {
 
     private static final long ENVIRONMENT_ID = 0L;
+    private static final long DEVELOPMENT_ENVIRONMENT_ID = 0L;
+    private static final long PRODUCTION_ENVIRONMENT_ID = 2L;
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WorkflowNodeTestOutputApiController workflowNodeTestOutputApiController;
 
     @Autowired
     private WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
@@ -66,6 +83,11 @@ class WorkflowNodeTestOutputApiControllerIntTest {
     void beforeEach() {
         webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -167,5 +189,108 @@ class WorkflowNodeTestOutputApiControllerIntTest {
         workflowNodeTestOutput.setWorkflowNodeName(workflowNodeName);
 
         return workflowNodeTestOutput;
+    }
+
+    @Test
+    void testDeleteWorkflowNodeTestOutputUsesTheConfinedPrincipalEnvironment() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        workflowNodeTestOutputApiController.deleteWorkflowNodeTestOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+
+        verify(workflowNodeTestOutputFacade).deleteWorkflowNodeTestOutput(
+            "workflow-1", "node_1", PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testDeleteWorkflowNodeTestOutputUsesTheSessionPrincipalRequestedEnvironment() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        workflowNodeTestOutputApiController.deleteWorkflowNodeTestOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+
+        verify(workflowNodeTestOutputFacade).deleteWorkflowNodeTestOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testSaveWorkflowNodeTestOutputUsesTheConfinedPrincipalEnvironment() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        workflowNodeTestOutputApiController.saveWorkflowNodeTestOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(
+            "workflow-1", "node_1", PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testSaveWorkflowNodeTestOutputUsesTheSessionPrincipalRequestedEnvironment() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        workflowNodeTestOutputApiController.saveWorkflowNodeTestOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeTestOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleFileUsesTheConfinedPrincipalEnvironment() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(
+            "file", "sample.csv", "text/csv", "a,b\n1,2".getBytes(StandardCharsets.UTF_8));
+
+        workflowNodeTestOutputApiController.uploadWorkflowNodeSampleFile(
+            "workflow-1", "awsS3_1", DEVELOPMENT_ENVIRONMENT_ID, mockMultipartFile);
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeSampleFile(
+            eq("workflow-1"), eq("awsS3_1"), eq("sample.csv"), any(InputStream.class), eq(PRODUCTION_ENVIRONMENT_ID));
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleOutputUsesTheConfinedPrincipalEnvironment() {
+        authenticate(new TestApiKeyAuthenticationToken(PRODUCTION_ENVIRONMENT_ID));
+
+        workflowNodeTestOutputApiController.uploadWorkflowNodeSampleOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID, "sample");
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeSampleOutput(
+            "workflow-1", "node_1", "sample", PRODUCTION_ENVIRONMENT_ID);
+    }
+
+    @Test
+    void testUploadWorkflowNodeSampleOutputUsesTheSessionPrincipalRequestedEnvironment() {
+        authenticate(new UsernamePasswordAuthenticationToken("admin@localhost.com", "n/a", List.of()));
+
+        workflowNodeTestOutputApiController.uploadWorkflowNodeSampleOutput(
+            "workflow-1", "node_1", DEVELOPMENT_ENVIRONMENT_ID, "sample");
+
+        verify(workflowNodeTestOutputFacade).saveWorkflowNodeSampleOutput(
+            "workflow-1", "node_1", "sample", DEVELOPMENT_ENVIRONMENT_ID);
+    }
+
+    private static void authenticate(Authentication authentication) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(authentication);
+    }
+
+    private static final class TestApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+
+        private TestApiKeyAuthenticationToken(long environmentId) {
+            super(environmentId, new User("connected-user-1", "", List.of()));
+        }
+
+        @Override
+        public CredentialType getCredentialType() {
+            return CredentialType.PLATFORM_API_KEY;
+        }
+
+        @Override
+        public @Nullable PlatformType getPlatformType() {
+            return null;
+        }
     }
 }

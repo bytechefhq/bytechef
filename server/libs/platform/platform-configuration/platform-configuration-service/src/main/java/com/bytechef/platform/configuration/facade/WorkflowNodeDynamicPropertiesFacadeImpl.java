@@ -37,6 +37,7 @@ import com.bytechef.platform.configuration.facade.ComponentOperationConnectionRe
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -95,8 +96,10 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId) {
 
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
         List<WorkflowTestConfigurationConnection> connections = workflowTestConfigurationService
-            .fetchWorkflowTestConfiguration(workflowId, environmentId)
+            .fetchWorkflowTestConfiguration(workflowId, effectiveEnvironmentId)
             .stream()
             .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
                 workflowTestConfiguration.getConnections()))
@@ -115,7 +118,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             .orElse(null);
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+            workflowId, effectiveEnvironmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
@@ -123,7 +126,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName(), environmentId);
+            workflowId, workflowTask.getName(), effectiveEnvironmentId);
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(workflowTask.getExtensions());
 
@@ -208,9 +211,11 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId) {
 
-        Long connectionId = getConnectionId(workflowId, workflowNodeName, environmentId);
+        long effectiveEnvironmentId = PrincipalEnvironment.resolveEffectiveEnvironmentId(environmentId);
+
+        Long connectionId = getConnectionId(workflowId, workflowNodeName, effectiveEnvironmentId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
-            workflowId, environmentId);
+            workflowId, effectiveEnvironmentId);
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger
@@ -238,7 +243,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
                 }
 
                 Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
-                    workflowId, workflowTask.getName(), environmentId);
+                    workflowId, workflowTask.getName(), effectiveEnvironmentId);
 
                 return actionDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
