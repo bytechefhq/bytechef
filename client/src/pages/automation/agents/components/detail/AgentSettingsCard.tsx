@@ -18,10 +18,10 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {toast} from 'sonner';
 
-// Mirrors AiAgentSettings (automation-ai-agent-service) — absence of the `builtInTools` key, or of
-// any individual key inside it, means that key's default below applies. There is no separate
-// "explicitly unset" state, so every commit sends every key explicitly (replace-whole semantics on
-// updateAiAgentSettings — see AiAgentFacadeImpl.updateAgentSettings).
+// Mirrors AiAgentSettings (automation-ai-agent-service) — absence of the `builtInTools` key, of any
+// individual key inside it, or of a top-level key means that key's default below applies. There is no
+// separate "explicitly unset" state, so every commit sends every key explicitly (replace-whole semantics
+// on updateAiAgentSettings — see AiAgentFacadeImpl.updateAgentSettings).
 type WebSearchProviderType = 'BRAVE' | 'FIRECRAWL' | 'NATIVE';
 
 interface BuiltInToolsSettingsI {
@@ -55,6 +55,14 @@ const WEB_SEARCH_PROVIDERS: Record<WebSearchProviderType, {componentName: string
 // exists to say so before the user hits publish, not to enforce it.
 const NATIVE_WEB_SEARCH_MODEL_PROVIDERS = ['anthropic'];
 
+// Sits beside `builtInTools` rather than inside it: it is not a tool, it picks which aiAgent action the
+// generated workflow runs — streamChat when on, chat when off — the same choice the workflow editor's AI
+// Agent panel offers as "Stream response". Default ON, matching every agent written before the key existed.
+const DEFAULT_STREAM_RESPONSE = true;
+
+const resolveStreamResponse = (settings: unknown): boolean =>
+    (settings as {streamResponse?: boolean} | null | undefined)?.streamResponse ?? DEFAULT_STREAM_RESPONSE;
+
 const resolveBuiltInTools = (settings: unknown): BuiltInToolsSettingsI => {
     const builtInTools = ((settings as {builtInTools?: Record<string, unknown>} | null | undefined)?.builtInTools ??
         {}) as Record<string, unknown>;
@@ -86,6 +94,7 @@ interface AgentSettingsCardProps {
 
 const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSettingsCardProps) => {
     const [builtInTools, setBuiltInTools] = useState<BuiltInToolsSettingsI>(() => resolveBuiltInTools(settings));
+    const [streamResponse, setStreamResponse] = useState<boolean>(() => resolveStreamResponse(settings));
 
     // Chat memory sits in this toggle list beside the built-in tools, but it is not one of them: it is a
     // CHAT_MEMORY AiAgentElement row, added and deleted rather than flipped in the settings map. The two
@@ -146,8 +155,12 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
         }
     };
 
-    const commit = (next: BuiltInToolsSettingsI) => {
+    // nextStreamResponse defaults to the current value so the built-in-tool call sites stay one argument —
+    // but it is still SENT on every commit, because updateAiAgentSettings replaces the whole map and an
+    // omitted key would silently reset the toggle to its default.
+    const commit = (next: BuiltInToolsSettingsI, nextStreamResponse: boolean = streamResponse) => {
         setBuiltInTools(next);
+        setStreamResponse(nextStreamResponse);
 
         // The four booleans and the provider are always sent explicitly (replace-whole semantics — see
         // this file's top comment); webSearchConnectionId is included only when set, since it has no
@@ -163,8 +176,13 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
                     webSearchProvider: next.webSearchProvider,
                     ...(next.webSearchConnectionId != null ? {webSearchConnectionId: next.webSearchConnectionId} : {}),
                 },
+                streamResponse: nextStreamResponse,
             },
         });
+    };
+
+    const handleStreamResponseToggle = (checked: boolean) => {
+        commit(builtInTools, checked);
     };
 
     const handleToggle =
@@ -192,6 +210,13 @@ const AgentSettingsCard = ({agentId, channels, elements, settings}: AgentSetting
     return (
         <AgentSection title="Settings">
             <fieldset className="space-y-4 border-0 p-0">
+                <Switch
+                    checked={streamResponse}
+                    description="Send the response back token by token instead of once it is complete."
+                    label="Stream response"
+                    onCheckedChange={handleStreamResponseToggle}
+                />
+
                 <Switch
                     checked={builtInTools.askUserQuestion}
                     description="Lets the agent pause a run to ask the user a clarifying question."

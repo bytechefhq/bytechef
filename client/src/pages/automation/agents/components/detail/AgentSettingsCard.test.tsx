@@ -112,6 +112,67 @@ describe('AgentSettingsCard', () => {
                     webSearch: false,
                     webSearchProvider: 'BRAVE',
                 },
+                streamResponse: true,
+            },
+        });
+    });
+
+    // streamResponse picks the generated workflow's aiAgent action (streamChat vs chat), so it must default
+    // ON — every agent written before the key existed generated streamChat.
+    it('renders stream response on by default and off when the stored setting says so', () => {
+        const {unmount} = wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={null} />);
+
+        expect(screen.getByRole('switch', {name: 'Stream response'})).toBeChecked();
+
+        unmount();
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={{streamResponse: false}} />);
+
+        expect(screen.getByRole('switch', {name: 'Stream response'})).not.toBeChecked();
+    });
+
+    it('sends builtInTools alongside streamResponse when stream response is toggled off', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={null} />);
+
+        await user.click(screen.getByRole('switch', {name: 'Stream response'}));
+
+        expect(updateAiAgentSettingsMutate).toHaveBeenCalledWith({
+            id: 'agent-1',
+            settings: {
+                builtInTools: {
+                    askUserQuestion: true,
+                    autoMemory: true,
+                    skillManagement: true,
+                    webSearch: false,
+                    webSearchProvider: 'BRAVE',
+                },
+                streamResponse: false,
+            },
+        });
+    });
+
+    // updateAiAgentSettings replaces the whole map, so a built-in-tool flip that omitted streamResponse would
+    // silently switch streaming back on.
+    it('preserves an explicit streamResponse when a built-in tool is toggled', async () => {
+        const user = userEvent.setup({pointerEventsCheck: 0});
+
+        wrap(<AgentSettingsCard agentId="agent-1" channels={[]} elements={[]} settings={{streamResponse: false}} />);
+
+        await user.click(screen.getByRole('switch', {name: 'Auto memory'}));
+
+        expect(updateAiAgentSettingsMutate).toHaveBeenCalledWith({
+            id: 'agent-1',
+            settings: {
+                builtInTools: {
+                    askUserQuestion: true,
+                    autoMemory: false,
+                    skillManagement: true,
+                    webSearch: false,
+                    webSearchProvider: 'BRAVE',
+                },
+                streamResponse: false,
             },
         });
     });
@@ -135,6 +196,7 @@ describe('AgentSettingsCard', () => {
                     webSearch: true,
                     webSearchProvider: 'BRAVE',
                 },
+                streamResponse: true,
             },
         });
         expect(await screen.findByLabelText('Brave connection')).toBeInTheDocument();
@@ -171,6 +233,7 @@ describe('AgentSettingsCard', () => {
                     webSearch: true,
                     webSearchProvider: 'FIRECRAWL',
                 },
+                streamResponse: true,
             },
         });
         expect(await screen.findByLabelText('Firecrawl connection')).toBeInTheDocument();
