@@ -168,14 +168,33 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
         validateAdditionalFilePaths(additionalFiles);
 
+        String skillName = name;
+        String skillDescription = description;
+
+        Map<String, String> frontmatter = parseFrontmatter(instructions);
+
+        if (frontmatter != null) {
+            String frontmatterName = frontmatter.get("name");
+
+            if (frontmatterName != null && !frontmatterName.isBlank()) {
+                skillName = frontmatterName;
+            }
+
+            String frontmatterDescription = frontmatter.get("description");
+
+            if (frontmatterDescription != null && !frontmatterDescription.isBlank()) {
+                skillDescription = frontmatterDescription;
+            }
+        }
+
         String body = stripLeadingFrontmatter(instructions);
 
         Map<String, String> resolvedAdditionalFiles =
             additionalFiles != null ? additionalFiles : Collections.emptyMap();
 
-        byte[] zipBytes = createSkillZip(name, description, body, resolvedAdditionalFiles);
+        byte[] zipBytes = createSkillZip(skillName, skillDescription, body, resolvedAdditionalFiles);
 
-        return createAiSkill(name, description, name + ".skill", zipBytes);
+        return createAiSkill(skillName, skillDescription, skillName + ".skill", zipBytes);
     }
 
     @Override

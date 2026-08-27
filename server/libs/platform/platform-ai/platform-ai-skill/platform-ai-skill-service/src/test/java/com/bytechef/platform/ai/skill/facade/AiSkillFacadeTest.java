@@ -172,6 +172,63 @@ class AiSkillFacadeTest {
     }
 
     @Test
+    void testCreateAiSkillFromInstructionsAdoptsFrontmatter() throws IOException {
+        FileEntry fileEntry = new FileEntry("customer-refunds.skill", "file:///storage/customer-refunds.skill");
+
+        AiSkill expectedAiSkill = new AiSkill();
+
+        expectedAiSkill.setId(1L);
+        expectedAiSkill.setName("customer-refunds");
+        expectedAiSkill.setSkillFile(fileEntry);
+
+        when(aiSkillFileStorage.storeAiSkillFile(eq("customer-refunds.skill"), any(byte[].class)))
+            .thenReturn(fileEntry);
+        when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
+
+        String instructions = """
+            ---
+            name: customer-refunds
+            description: Rules for issuing refunds. Use when a customer asks for one.
+            ---
+
+            # Refund Policy
+
+            Escalate anything over 500.
+            """;
+
+        AiSkill result = aiSkillFacade.createAiSkillFromInstructions("refund-policy", null, instructions);
+
+        assertEquals(expectedAiSkill, result);
+
+        verify(aiSkillService)
+            .createAiSkill(argThat(aiSkill -> "customer-refunds".equals(aiSkill.getName())
+                && "Rules for issuing refunds. Use when a customer asks for one.".equals(aiSkill.getDescription())));
+
+        verify(aiSkillFileStorage).storeAiSkillFile(eq("customer-refunds.skill"), argThat(zipBytes -> {
+            try (ZipInputStream zipInputStream =
+                new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+
+                ZipEntry zipEntry = zipInputStream.getNextEntry();
+
+                if (zipEntry == null || !"SKILL.md".equals(zipEntry.getName())) {
+                    return false;
+                }
+
+                String content = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+                return content.contains("name: \"customer-refunds\"") &&
+                    content.contains(
+                        "description: \"Rules for issuing refunds. Use when a customer asks for one.\"")
+                    &&
+                    content.contains("# Refund Policy") &&
+                    !content.contains("name: customer-refunds");
+            } catch (IOException ioException) {
+                return false;
+            }
+        }));
+    }
+
+    @Test
     void testCreateAiSkillWithSpacesAndUppercaseInNameSucceeds() {
         FileEntry fileEntry = new FileEntry("test.skill", "file:///storage/test.skill");
 
