@@ -31,7 +31,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class BrowserUseConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.browser-use.com/api/v3")
+        .baseUri((connectionParameters, context) -> "https://api.browser-use.com")
         .help("", "https://docs.bytechef.io/reference/components/browser-use_v1#connection-setup")
         .version(1)
         .authorizations(

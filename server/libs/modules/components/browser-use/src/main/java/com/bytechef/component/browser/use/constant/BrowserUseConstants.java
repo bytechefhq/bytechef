@@ -40,6 +40,7 @@ public class BrowserUseConstants {
     public static final String OUTPUT_SCHEMA = "outputSchema";
     public static final String PAGE = "page";
     public static final String PAGE_SIZE = "page_size";
+    public static final String RUN_ID = "runId";
     public static final String SCHEMA = "schema";
     public static final String SESSION_ID = "sessionId";
     public static final String SKILLS = "skills";
@@ -119,6 +120,62 @@ public class BrowserUseConstants {
                 .description("URL of the latest browser screenshot."),
             string("agentmailEmail")
                 .description("Temporary email address provisioned for this session (via AgentMail)."));
+
+    public static final ModifiableObjectProperty RUN_CREATE_RESPONSE_PROPERTY = object()
+        .properties(
+            string(ID)
+                .description("Unique run identifier."),
+            string("status")
+                .description("Current run status."),
+            string(MODEL)
+                .description("Model used for the run."),
+            string(SESSION_ID)
+                .description("Conversation session used by the run."),
+            string("workspaceId")
+                .description("Workspace used by the run."),
+            string("eventsUrl")
+                .description("Relative URL for the run event stream."),
+            array("missingFileIds")
+                .items(string())
+                .description("Attached file IDs that were not found."));
+
+    public static final ModifiableObjectProperty RUN_RESPONSE_PROPERTY = object()
+        .properties(
+            string(ID)
+                .description("Unique run identifier."),
+            string(TASK)
+                .description("Natural-language task sent to the agent."),
+            string("title")
+                .description("Auto-generated run title."),
+            string(MODEL)
+                .description("Model used for the run."),
+            integer("contextLimit")
+                .description("Maximum model context available to the run."),
+            string("status")
+                .description("Current run status."),
+            string("result")
+                .description("Final result after the run completes."),
+            string("error")
+                .description("Error message when the run fails."),
+            string(SESSION_ID)
+                .description("Conversation session used by the run."),
+            string("workspaceId")
+                .description("Workspace used by the run."),
+            array("attachedFileIds")
+                .items(string())
+                .description("File IDs attached to the run."),
+            object("judgement")
+                .description("Optional judge result for the run."),
+            integer("totalInputTokens")
+                .description("Total LLM input tokens consumed by the run."),
+            integer("totalOutputTokens")
+                .description("Total LLM output tokens consumed by the run."),
+            string("totalCostUsd")
+                .description("Total run cost in USD."),
+            dateTime("createdAt")
+                .description("When the run was created."),
+            dateTime("updatedAt")
+                .description("When the run was last updated."));
 
     private BrowserUseConstants() {
     }
