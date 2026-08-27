@@ -51,7 +51,7 @@ public class BrowserUseUtils {
         Map<String, Object> body;
 
         do {
-            body = context.http(http -> http.get("/sessions"))
+            body = context.http(http -> http.get("/api/v3/sessions"))
                 .queryParameters(PAGE, pageNumber, PAGE_SIZE, defaultPageSize)
                 .configuration(responseType(ResponseType.JSON))
                 .execute()

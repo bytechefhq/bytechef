@@ -20,7 +20,9 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.browser.use.action.BrowserUseCreateRunAction;
 import com.bytechef.component.browser.use.action.BrowserUseCreateSessionAction;
+import com.bytechef.component.browser.use.action.BrowserUseGetRunAction;
 import com.bytechef.component.browser.use.action.BrowserUseGetSessionAction;
 import com.bytechef.component.browser.use.connection.BrowserUseConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -44,10 +46,14 @@ public class BrowserUseComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(BrowserUseConnection.CONNECTION_DEFINITION)
         .actions(
+            BrowserUseCreateRunAction.ACTION_DEFINITION,
             BrowserUseCreateSessionAction.ACTION_DEFINITION,
+            BrowserUseGetRunAction.ACTION_DEFINITION,
             BrowserUseGetSessionAction.ACTION_DEFINITION)
         .clusterElements(
+            tool(BrowserUseCreateRunAction.ACTION_DEFINITION),
             tool(BrowserUseCreateSessionAction.ACTION_DEFINITION),
+            tool(BrowserUseGetRunAction.ACTION_DEFINITION),
             tool(BrowserUseGetSessionAction.ACTION_DEFINITION))
         .version(1);
 

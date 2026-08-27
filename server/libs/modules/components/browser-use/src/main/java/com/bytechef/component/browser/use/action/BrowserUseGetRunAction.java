@@ -16,44 +16,41 @@
 
 package com.bytechef.component.browser.use.action;
 
-import static com.bytechef.component.browser.use.constant.BrowserUseConstants.SESSION_ID;
-import static com.bytechef.component.browser.use.constant.BrowserUseConstants.SESSION_RESPONSE_PROPERTY;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.RUN_ID;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.RUN_RESPONSE_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.browser.use.util.BrowserUseUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Marija Horvat
+ * @author Magnus Müller
  */
-public class BrowserUseGetSessionAction {
+public class BrowserUseGetRunAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getSession")
-        .title("Get Session")
-        .description("Get session details.")
-        .help("", "https://docs.bytechef.io/reference/components/browser-use_v1#get-session")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getRun")
+        .title("Get Run")
+        .description("Get a Browser Use V4 run and its final result.")
+        .help("", "https://docs.bytechef.io/reference/components/browser-use_v1#get-run")
         .properties(
-            string(SESSION_ID)
-                .label("Session ID")
-                .description("ID of an existing idle session.")
-                .options((OptionsFunction<String>) BrowserUseUtils::getSessionIdOptions)
+            string(RUN_ID)
+                .label("Run ID")
+                .description("ID returned by Create Run.")
                 .required(true))
-        .output(outputSchema(SESSION_RESPONSE_PROPERTY))
-        .perform(BrowserUseGetSessionAction::perform);
+        .output(outputSchema(RUN_RESPONSE_PROPERTY))
+        .perform(BrowserUseGetRunAction::perform);
 
-    private BrowserUseGetSessionAction() {
+    private BrowserUseGetRunAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
-            .http(http -> http.get("/api/v3/sessions/%s".formatted(inputParameters.getRequiredString(SESSION_ID))))
+            .http(http -> http.get("/api/v4/runs/%s".formatted(inputParameters.getRequiredString(RUN_ID))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody();

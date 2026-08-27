@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.browser.use.util;
+package com.bytechef.component.browser.use.action;
 
-import static com.bytechef.component.browser.use.constant.BrowserUseConstants.ID;
-import static com.bytechef.component.browser.use.constant.BrowserUseConstants.PAGE;
-import static com.bytechef.component.browser.use.constant.BrowserUseConstants.PAGE_SIZE;
-import static com.bytechef.component.definition.ComponentDsl.option;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.RUN_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
@@ -35,58 +31,44 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Marija Horvat
+ * @author Magnus Müller
  */
 @ExtendWith(MockContextSetupExtension.class)
-class BrowserUseUtilsTest {
+class BrowserUseGetRunActionTest {
 
-    private final List<Option<String>> expectedOptions = List.of(
-        option("s1", "s1"), option("s2", "s2"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(RUN_ID, "run-1"));
 
     @Test
-    void testGetSessionIdOptions(
-        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("sessions", List.of(Map.of(ID, "s1"), Map.of(ID, "s2")), "total", 2));
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
-        List<Option<String>> result = BrowserUseUtils.getSessionIdOptions(
-            null, null, null, null, mockedContext);
+        Object result = BrowserUseGetRunAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(expectedOptions, result);
+        assertEquals(mockedObject, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/api/v3/sessions", stringArgumentCaptor.getValue());
-
-        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
-
-        Object[] objects = {
-            PAGE, 1, PAGE_SIZE, 20
-        };
-
-        assertEquals(1, objectsArgumentCaptorAllValues.size());
-        assertArrayEquals(objects, objectsArgumentCaptorAllValues.getFirst());
+        assertEquals("/api/v4/runs/run-1", stringArgumentCaptor.getValue());
     }
 }

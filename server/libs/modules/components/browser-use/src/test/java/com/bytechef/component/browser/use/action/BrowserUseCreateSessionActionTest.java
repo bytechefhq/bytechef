@@ -84,7 +84,7 @@ class BrowserUseCreateSessionActionTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/sessions", stringArgumentCaptor.getValue());
+        assertEquals("/api/v3/sessions", stringArgumentCaptor.getValue());
         assertEquals(
             Body.of(
                 Map.of(
