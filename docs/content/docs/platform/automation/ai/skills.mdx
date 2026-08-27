@@ -92,7 +92,7 @@ Each skill in the list has a **⋮ menu** with the following actions:
 | Action | Description |
 |---|---|
 | **Download** | Download the skill as a `.skill` file (ZIP archive). |
-| **Rename** | Edit the skill's name and description through a dialog. |
+| **Edit** | Change the skill's name and description through a dialog. |
 | **Delete** | Permanently remove the skill (confirmation dialog). |
 
 The same actions are available on the detail page header - **Download** and **Delete** live under the **⋮ menu** next to **Save** and **Open Copilot**.
@@ -113,7 +113,7 @@ The simplest way to create a skill. A dialog opens where you enter a name, descr
 
 | Field | Description |
 |---|---|
-| **Name** | A descriptive name for the skill. Must match the [agentskills.io format](#skill-file-format) - lowercase letters, digits, and single hyphens, 1–64 characters. |
+| **Name** | A descriptive name for the skill. Must match the [agentskills.io format](#skill-file-format) - letters, digits, and single hyphens or spaces as separators, 1–64 characters. |
 | **Description** | A short summary (max 1024 characters) of what the skill covers - helps agents decide when to use it. |
 | **Instructions** | The full skill content in markdown format. Include guidelines, examples, rules, and any context the agent needs. |
 
@@ -202,8 +202,10 @@ ByteChef validates the frontmatter against the agentskills.io spec on every crea
 
 | Field | Rule |
 |---|---|
-| `name` | 1–64 characters; lowercase `a-z` / `0-9` / single hyphens only. No leading, trailing, or consecutive hyphens. |
+| `name` | 1–64 characters; letters (`a-z`, `A-Z`) and digits (`0-9`), with single hyphens or single spaces as separators. No leading, trailing, or consecutive separators. |
 | `description` | Optional. Max 1024 characters when present. |
+
+Both fields are read from the frontmatter wherever it is present, and the frontmatter wins over any name or description supplied alongside it - so a `.md` file whose frontmatter says `name: customer-refunds` becomes `customer-refunds`, not `refund-policy`, however the file happens to be named.
 
 When two skills end up with the same name, ByteChef auto-disambiguates with a `-N` suffix (e.g. `email-triage-rules-2`) so the result still passes spec validation.
 
