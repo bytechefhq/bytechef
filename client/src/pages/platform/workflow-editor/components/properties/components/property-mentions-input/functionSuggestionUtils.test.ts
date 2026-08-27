@@ -170,6 +170,14 @@ describe('findEnclosingFunctionCall', () => {
     it('shows the inner call when the caret is inside it', () => {
         expect(findEnclosingFunctionCall('contains(contains(x', ', true))')).toEqual({argIndex: 0, name: 'contains'});
     });
+
+    it('ignores parens opened and closed again after the caret', () => {
+        expect(findEnclosingFunctionCall('contains(', '(a))')).toEqual({argIndex: 0, name: 'contains'});
+    });
+
+    it('skips an unnamed grouping paren and reports the call enclosing it', () => {
+        expect(findEnclosingFunctionCall('contains((', '))')).toEqual({argIndex: 0, name: 'contains'});
+    });
 });
 
 describe('formatFunctionSignatureParts', () => {
