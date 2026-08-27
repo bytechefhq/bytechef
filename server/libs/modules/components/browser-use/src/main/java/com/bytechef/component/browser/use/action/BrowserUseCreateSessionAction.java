@@ -100,7 +100,7 @@ public class BrowserUseCreateSessionAction {
             outputSchema = context.json(json -> json.read(output.get("schema")));
         }
 
-        return context.http(http -> http.post("/sessions"))
+        return context.http(http -> http.post("/api/v3/sessions"))
             .body(
                 Body.of(
                     TASK, inputParameters.getRequiredString(TASK),
