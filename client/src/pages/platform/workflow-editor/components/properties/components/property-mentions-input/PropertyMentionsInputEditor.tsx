@@ -596,7 +596,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         // Keep the function suggestion catalog in editor storage so the suggestion items callback can read it
         // without recreating the editor.
         useEffect(() => {
-            if (!editor || editor.storage.FunctionSuggestion === undefined) {
+            if (editor?.storage.FunctionSuggestion === undefined) {
                 return;
             }
 

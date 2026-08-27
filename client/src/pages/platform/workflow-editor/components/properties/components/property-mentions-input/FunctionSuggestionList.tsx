@@ -1,22 +1,20 @@
 import './PropertyMentionsInputEditorSuggestionList.css';
 
 import {EvaluatorFunctionDefinition} from '@/shared/middleware/graphql';
-import {SuggestionKeyDownProps, SuggestionProps} from '@tiptap/suggestion';
-import {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
+import {SuggestionProps} from '@tiptap/suggestion';
+import {forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {formatFunctionSignature} from './functionSuggestionUtils';
+import {SuggestionListRefType} from './suggestionPopupRenderer';
+import {useSuggestionListNavigation} from './useSuggestionListNavigation';
 
-export type FunctionSuggestionListRefType = {
-    onKeyDown: (props: SuggestionKeyDownProps) => boolean;
-};
+export type FunctionSuggestionListRefType = SuggestionListRefType;
 
 type FunctionSuggestionListPropsType = SuggestionProps<EvaluatorFunctionDefinition>;
 
 const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, FunctionSuggestionListPropsType>(
     ({command, items}, ref) => {
-        const [selectedIndex, setSelectedIndex] = useState(0);
-
         const selectItem = (index: number) => {
             const item = items[index];
 
@@ -25,37 +23,7 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
             }
         };
 
-        const upHandler = () => setSelectedIndex((selectedIndex + items.length - 1) % items.length);
-
-        const downHandler = () => setSelectedIndex((selectedIndex + 1) % items.length);
-
-        const enterHandler = () => selectItem(selectedIndex);
-
-        useEffect(() => setSelectedIndex(0), [items]);
-
-        useImperativeHandle(ref, () => ({
-            onKeyDown: ({event}: {event: KeyboardEvent}) => {
-                if (event.key === 'ArrowUp') {
-                    upHandler();
-
-                    return true;
-                }
-
-                if (event.key === 'ArrowDown') {
-                    downHandler();
-
-                    return true;
-                }
-
-                if (event.key === 'Enter') {
-                    enterHandler();
-
-                    return true;
-                }
-
-                return false;
-            },
-        }));
+        const selectedIndex = useSuggestionListNavigation(items, ref, selectItem);
 
         return (
             <ul className="property-mentions-suggestion-menu max-h-96 gap-y-1 overflow-y-auto">
@@ -65,6 +33,7 @@ const FunctionSuggestionList = forwardRef<FunctionSuggestionListRefType, Functio
                             <button
                                 className={twMerge('flex-col items-start', index === selectedIndex && 'is-selected')}
                                 onClick={() => selectItem(index)}
+                                type="button"
                             >
                                 <span className="font-mono">
                                     <span className="text-primary">{item.name}</span>
