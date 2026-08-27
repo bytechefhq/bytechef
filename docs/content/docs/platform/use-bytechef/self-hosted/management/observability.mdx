@@ -113,6 +113,29 @@ traceable across every hop:
 - **JVM metrics follow OpenTelemetry naming**, so they line up with the rest of your telemetry rather
   than needing per-name translation.
 
+## What the EE module installs
+
+Everything above is standard Spring Boot - Actuator, Micrometer, Micrometer Tracing. The Enterprise
+`observability-config` module supplies the parts that make those signals OpenTelemetry-shaped and keep
+them correlated:
+
+- **The Logback OTLP appender.** `OpenTelemetryAppender.install(...)` runs at startup. This is what
+  puts log records onto the OTLP pipeline - the appender is not wired by autoconfiguration, so log
+  export depends on this bean existing.
+- **OpenTelemetry semantic conventions for meters.** Micrometer's default naming is replaced with the
+  OpenTelemetry conventions for HTTP server requests, CPU, memory, threads and class loading, so the
+  meters arrive under the names an OTLP backend expects rather than Micrometer's own.
+- **Trace context across thread pools.** A `ContextPropagatingTaskDecorator` carries the active trace
+  onto work handed to an executor, which is what keeps one trace whole when a request fans out to a
+  background thread.
+- **The `X-Trace-Id` response header.** A servlet filter copies the current trace id onto every HTTP
+  response.
+- **Request headers at DEBUG.** A second filter logs each request's incoming headers, which costs
+  nothing until you turn that logger up.
+
+Without the module the platform still starts and still serves metrics through Actuator; the signals
+are plainer, and log export does not happen at all.
+
 ## Actuator endpoints
 
 Observability also exposes the Spring Boot Actuator surface. Health probes are split into Kubernetes-friendly `liveness` and `readiness` groups. Note which endpoints are open:
