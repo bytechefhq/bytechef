@@ -60,4 +60,35 @@ describe('FunctionSuggestion wiring', () => {
         // FormulaMode extension is not registered here, so the flag is absent -> dormant.
         expect(options.allow!({editor, isActive: false, range: {from: 0, to: 0}} as never)).toBe(false);
     });
+
+    it('shouldShow() only activates the suggestion when a function matches the query', () => {
+        editor.storage.FunctionSuggestion.functionDefinitions = [
+            {
+                category: 'STRING',
+                description: '',
+                example: '',
+                name: 'concat',
+                parameters: [],
+                returnType: 'STRING',
+                title: 'concat',
+            },
+        ] as never;
+
+        const options = getFunctionSuggestionOptions();
+
+        expect(options.shouldShow!({editor, query: 'conc'} as never)).toBe(true);
+        expect(options.shouldShow!({editor, query: 'true'} as never)).toBe(false);
+    });
+
+    it('command() inserts the call and parks the caret between the parentheses', () => {
+        editor.commands.insertContent('con');
+
+        const options = getFunctionSuggestionOptions();
+
+        options.command!({editor, props: {name: 'concat'}, range: {from: 1, to: 4}} as never);
+
+        expect(editor.state.doc.textContent).toBe('concat()');
+        // from + 'concat'.length + 1 -> inside the parentheses.
+        expect(editor.state.selection.from).toBe(8);
+    });
 });
