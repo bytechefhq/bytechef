@@ -76,4 +76,30 @@ describe('FunctionSuggestionList', () => {
 
         expect(command).toHaveBeenCalledWith(items[1]);
     });
+
+    it('wraps to the last item on ArrowUp and ignores keys it does not handle', () => {
+        const command = vi.fn();
+        const items = [definition('concat'), definition('contains')];
+        const ref = createRef<FunctionSuggestionListRefType>();
+
+        renderFunctionSuggestionList(items, command, ref);
+
+        let handled = false;
+
+        act(() => {
+            handled = ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'a'})} as never);
+        });
+
+        expect(handled).toBe(false);
+
+        act(() => {
+            ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'ArrowUp'})} as never);
+        });
+
+        act(() => {
+            ref.current!.onKeyDown({event: new KeyboardEvent('keydown', {key: 'Enter'})} as never);
+        });
+
+        expect(command).toHaveBeenCalledWith(items[1]);
+    });
 });
