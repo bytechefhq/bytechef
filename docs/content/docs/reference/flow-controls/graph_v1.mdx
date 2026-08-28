@@ -1,6 +1,6 @@
 ---
 title: "Graph"
-description: "Directs execution across a set of named nodes connected by dynamic transitions, executing each node's tasks in sequence until a node with no next transition is reached."
+description: "Runs a set of task nodes wired by transitions: after a node completes, its conditional transitions are checked in order, then its default one; a node with no matching transition ends the graph. Cycles are allowed and bounded by a transition budget."
 ---
 
 
@@ -16,6 +16,7 @@ Type: graph/v1
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | startNode | Start Node | STRING | The name of the node execution begins from. Defaults to the first declared node when left empty. | false |
 | maxTransitions | Max Transitions | INTEGER | The maximum number of node-to-node transitions allowed before the graph is halted, to guard against infinite loops. | false |
+| transitions | Transitions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(from), STRING\(to), STRING\(condition)&#125;] </details> | The edges between nodes. Conditional transitions are checked in declared order, then the unconditional one. | false |
 
 
 

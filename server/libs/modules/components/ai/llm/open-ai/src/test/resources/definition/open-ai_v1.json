@@ -301,6 +301,18 @@
         "value": "gpt-5.4-nano-2026-03-17"
       }, {
         "description": null,
+        "label": "gpt-5.6-luna",
+        "value": "gpt-5.6-luna"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-sol",
+        "value": "gpt-5.6-sol"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-terra",
+        "value": "gpt-5.6-terra"
+      }, {
+        "description": null,
         "label": "o1",
         "value": "o1"
       }, {
@@ -1555,6 +1567,18 @@
         "description": null,
         "label": "gpt-5.4-nano-2026-03-17",
         "value": "gpt-5.4-nano-2026-03-17"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-luna",
+        "value": "gpt-5.6-luna"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-sol",
+        "value": "gpt-5.6-sol"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-terra",
+        "value": "gpt-5.6-terra"
       }, {
         "description": null,
         "label": "o1",
@@ -3521,6 +3545,10 @@
         "value": "gpt-4o-transcribe-diarize"
       }, {
         "description": null,
+        "label": "gpt-transcribe",
+        "value": "gpt-transcribe"
+      }, {
+        "description": null,
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
@@ -4210,6 +4238,18 @@
         "value": "gpt-5.4-nano-2026-03-17"
       }, {
         "description": null,
+        "label": "gpt-5.6-luna",
+        "value": "gpt-5.6-luna"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-sol",
+        "value": "gpt-5.6-sol"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-terra",
+        "value": "gpt-5.6-terra"
+      }, {
+        "description": null,
         "label": "o1",
         "value": "o1"
       }, {
@@ -4509,6 +4549,64 @@
       "minLength": null,
       "name": "user",
       "options": [ ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model reason before responding.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Thinking",
+      "metadata": { },
+      "name": "thinking",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": "medium",
+      "description": "How much the model reasons before responding. Higher effort costs more tokens and takes longer.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Reasoning effort",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "reasoningEffort",
+      "options": [ {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
       "placeholder": null,

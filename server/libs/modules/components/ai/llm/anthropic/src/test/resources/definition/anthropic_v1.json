@@ -37,10 +37,6 @@
       "name": "model",
       "options": [ {
         "description": null,
-        "label": "claude-3-haiku-20240307",
-        "value": "claude-3-haiku-20240307"
-      }, {
-        "description": null,
         "label": "claude-fable-5",
         "value": "claude-fable-5"
       }, {
@@ -61,20 +57,12 @@
         "value": "claude-mythos-preview"
       }, {
         "description": null,
-        "label": "claude-opus-4-0",
-        "value": "claude-opus-4-0"
-      }, {
-        "description": null,
         "label": "claude-opus-4-1",
         "value": "claude-opus-4-1"
       }, {
         "description": null,
         "label": "claude-opus-4-1-20250805",
         "value": "claude-opus-4-1-20250805"
-      }, {
-        "description": null,
-        "label": "claude-opus-4-20250514",
-        "value": "claude-opus-4-20250514"
       }, {
         "description": null,
         "label": "claude-opus-4-5",
@@ -97,12 +85,8 @@
         "value": "claude-opus-4-8"
       }, {
         "description": null,
-        "label": "claude-sonnet-4-0",
-        "value": "claude-sonnet-4-0"
-      }, {
-        "description": null,
-        "label": "claude-sonnet-4-20250514",
-        "value": "claude-sonnet-4-20250514"
+        "label": "claude-opus-5",
+        "value": "claude-opus-5"
       }, {
         "description": null,
         "label": "claude-sonnet-4-5",
@@ -115,6 +99,10 @@
         "description": null,
         "label": "claude-sonnet-4-6",
         "value": "claude-sonnet-4-6"
+      }, {
+        "description": null,
+        "label": "claude-sonnet-5",
+        "value": "claude-sonnet-5"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
@@ -782,10 +770,6 @@
       "name": "model",
       "options": [ {
         "description": null,
-        "label": "claude-3-haiku-20240307",
-        "value": "claude-3-haiku-20240307"
-      }, {
-        "description": null,
         "label": "claude-fable-5",
         "value": "claude-fable-5"
       }, {
@@ -806,20 +790,12 @@
         "value": "claude-mythos-preview"
       }, {
         "description": null,
-        "label": "claude-opus-4-0",
-        "value": "claude-opus-4-0"
-      }, {
-        "description": null,
         "label": "claude-opus-4-1",
         "value": "claude-opus-4-1"
       }, {
         "description": null,
         "label": "claude-opus-4-1-20250805",
         "value": "claude-opus-4-1-20250805"
-      }, {
-        "description": null,
-        "label": "claude-opus-4-20250514",
-        "value": "claude-opus-4-20250514"
       }, {
         "description": null,
         "label": "claude-opus-4-5",
@@ -842,12 +818,8 @@
         "value": "claude-opus-4-8"
       }, {
         "description": null,
-        "label": "claude-sonnet-4-0",
-        "value": "claude-sonnet-4-0"
-      }, {
-        "description": null,
-        "label": "claude-sonnet-4-20250514",
-        "value": "claude-sonnet-4-20250514"
+        "label": "claude-opus-5",
+        "value": "claude-opus-5"
       }, {
         "description": null,
         "label": "claude-sonnet-4-5",
@@ -860,6 +832,10 @@
         "description": null,
         "label": "claude-sonnet-4-6",
         "value": "claude-sonnet-4-6"
+      }, {
+        "description": null,
+        "label": "claude-sonnet-5",
+        "value": "claude-sonnet-5"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
@@ -1514,10 +1490,6 @@
       "name": "model",
       "options": [ {
         "description": null,
-        "label": "claude-3-haiku-20240307",
-        "value": "claude-3-haiku-20240307"
-      }, {
-        "description": null,
         "label": "claude-fable-5",
         "value": "claude-fable-5"
       }, {
@@ -1538,20 +1510,12 @@
         "value": "claude-mythos-preview"
       }, {
         "description": null,
-        "label": "claude-opus-4-0",
-        "value": "claude-opus-4-0"
-      }, {
-        "description": null,
         "label": "claude-opus-4-1",
         "value": "claude-opus-4-1"
       }, {
         "description": null,
         "label": "claude-opus-4-1-20250805",
         "value": "claude-opus-4-1-20250805"
-      }, {
-        "description": null,
-        "label": "claude-opus-4-20250514",
-        "value": "claude-opus-4-20250514"
       }, {
         "description": null,
         "label": "claude-opus-4-5",
@@ -1574,12 +1538,8 @@
         "value": "claude-opus-4-8"
       }, {
         "description": null,
-        "label": "claude-sonnet-4-0",
-        "value": "claude-sonnet-4-0"
-      }, {
-        "description": null,
-        "label": "claude-sonnet-4-20250514",
-        "value": "claude-sonnet-4-20250514"
+        "label": "claude-opus-5",
+        "value": "claude-opus-5"
       }, {
         "description": null,
         "label": "claude-sonnet-4-5",
@@ -1592,6 +1552,10 @@
         "description": null,
         "label": "claude-sonnet-4-6",
         "value": "claude-sonnet-4-6"
+      }, {
+        "description": null,
+        "label": "claude-sonnet-5",
+        "value": "claude-sonnet-5"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
@@ -1724,6 +1688,88 @@
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model search the web itself, using the provider's own search tool.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Web Search",
+      "metadata": { },
+      "name": "webSearch",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model reason before responding.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Thinking",
+      "metadata": { },
+      "name": "thinking",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": "medium",
+      "description": "How much the model reasons before responding. Higher effort costs more tokens and takes longer.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": true,
+      "hidden": false,
+      "label": "Reasoning effort",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "reasoningEffort",
+      "options": [ {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": false,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
     "title": "Antropic Model",
     "type": {
