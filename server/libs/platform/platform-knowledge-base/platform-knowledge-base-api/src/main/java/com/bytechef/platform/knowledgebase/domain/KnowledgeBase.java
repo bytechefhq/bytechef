@@ -18,12 +18,14 @@ package com.bytechef.platform.knowledgebase.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.OwnerType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -49,6 +51,12 @@ public class KnowledgeBase {
 
     @Column
     private int environment;
+
+    @Column("owner_id")
+    private @Nullable Long ownerId;
+
+    @Column("owner_type")
+    private @Nullable Integer ownerType;
 
     private int maxChunkSize = 1024;
 
@@ -119,6 +127,22 @@ public class KnowledgeBase {
         if (environment != null) {
             this.environment = environment.ordinal();
         }
+    }
+
+    public @Nullable Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(@Nullable Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public @Nullable OwnerType getOwnerType() {
+        return ownerType == null ? null : OwnerType.values()[ownerType];
+    }
+
+    public void setOwnerType(@Nullable OwnerType ownerType) {
+        this.ownerType = ownerType == null ? null : ownerType.ordinal();
     }
 
     public int getMaxChunkSize() {
