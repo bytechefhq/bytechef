@@ -781,6 +781,16 @@ class WorkflowServiceIntTest {
 ### Component Testing
 - Component tests auto-generate JSON definition files in `src/test/resources/definition/`
 - Delete existing `.json` files AND `build/resources/test/definition/` before running tests to regenerate them (classpath serves from build output)
+- **Regenerating takes two runs, and the first one crashes.** `JsonFileAssert` writes the snapshot to
+  `src/test/resources/…` but reads it back off the classpath (`build/resources/test/…`). After deleting both,
+  run once — the file is written to `src` and the test then throws `NullPointerException: url` on the
+  still-missing classpath copy. Run again; `processTestResources` copies it across and it passes. That NPE is
+  the expected midpoint, not a bug to debug
+- **`anthropic`, `gemini` and `mistral` snapshots drift on their own.** Their model options are read off SDK
+  enums (`AnthropicApi.Model`, `GoogleGenAiChatModel.ChatModel`, `MistralAiApi.ChatModel`), so an SDK bump
+  stales them with no repo change. Treat the three as one class — regenerating only the one that failed leaves
+  the others to fail later looking unrelated. `mistral` also filters SDK-deprecated constants, so a bump can
+  silently remove a model from the picker
 - Test both actions and triggers
 - Verify connection configurations
 - Test error handling and edge cases
@@ -789,7 +799,7 @@ class WorkflowServiceIntTest {
 - Use `@ExtendWith(ObjectMapperSetupExtension.class)` for tests that use `JsonUtils`, `MapUtils`, or `ConvertUtils` — do NOT manually call `setObjectMapper()` in test configurations
 
 ### Task Dispatcher Definition Snapshot Tests
-- `DefinitionFactoryTest` classes use `JsonFileAssert` (snapshot pattern): if the JSON file is missing, it's auto-generated; if present, it's compared
+- `DefinitionFactoryTest` classes use `JsonFileAssert` (snapshot pattern): if the JSON file is present it's compared; if missing it's written to `src/test/resources/` and the run then fails on the missing classpath copy — see the two-run note under Component Testing
 - When task dispatcher definition models change (new fields), delete snapshot JSON files from BOTH `src/test/resources/definition/` and `build/resources/test/definition/`, then rerun tests
 
 ### EE Microservice Remote Client Pattern
