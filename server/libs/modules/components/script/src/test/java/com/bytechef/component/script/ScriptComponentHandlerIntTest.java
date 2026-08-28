@@ -31,6 +31,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -94,6 +95,7 @@ public class ScriptComponentHandlerIntTest {
     }
 
     @Test
+    @Timeout(120)
     public void testPerformPython() {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
