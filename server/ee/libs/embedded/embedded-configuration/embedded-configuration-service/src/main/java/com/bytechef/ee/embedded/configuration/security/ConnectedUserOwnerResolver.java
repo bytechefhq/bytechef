@@ -17,6 +17,7 @@ import com.bytechef.platform.owner.Owner;
 import com.bytechef.platform.owner.OwnerResolver;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.authentication.PrincipalEnvironment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +43,7 @@ public class ConnectedUserOwnerResolver implements OwnerResolver {
     private final ConnectedUserService connectedUserService;
     private final IntegrationInstanceService integrationInstanceService;
 
+    @SuppressFBWarnings("EI")
     public ConnectedUserOwnerResolver(
         ConnectedUserProjectService connectedUserProjectService, ConnectedUserService connectedUserService,
         IntegrationInstanceService integrationInstanceService) {
