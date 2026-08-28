@@ -54,7 +54,8 @@ public class EmbeddedDataTableGraphQlController {
         return dataTableInfos.stream()
             .map(
                 dataTableInfo -> new EmbeddedDataTable(
-                    dataTableInfo.id(), dataTableInfo.baseName(), dataTableInfo.description()))
+                    dataTableInfo.id(), dataTableInfo.baseName(), dataTableInfo.description(),
+                    dataTableInfo.ownerId()))
             .toList();
     }
 
@@ -68,6 +69,9 @@ public class EmbeddedDataTableGraphQlController {
     public record AssignDataTableOwnerInput(Long dataTableId, @Nullable Long ownerId) {
     }
 
-    public record EmbeddedDataTable(Long id, String baseName, String description) {
+    /**
+     * A null ownerId is the vendor's, which the visibility rule shares with every account.
+     */
+    public record EmbeddedDataTable(Long id, String baseName, String description, @Nullable Long ownerId) {
     }
 }

@@ -64,8 +64,8 @@ class CreateDataTableToolCallbackTest {
         WorkspaceDataTableFacade workspaceDataTableFacade = mock(WorkspaceDataTableFacade.class);
 
         when(workspaceDataTableFacade.listTables(1L, 0L)).thenReturn(List.of(
-            new DataTableInfo(41L, "other_table", "", List.of(), null),
-            new DataTableInfo(42L, "invoices", "", List.of(), null)));
+            new DataTableInfo(41L, "other_table", "", List.of(), null, null),
+            new DataTableInfo(42L, "invoices", "", List.of(), null, null)));
 
         CreateDataTableToolCallback callback = new CreateDataTableToolCallback(workspaceDataTableFacade);
 

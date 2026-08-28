@@ -17,4 +17,6 @@ type EmbeddedDataTable {
     id: ID!
     baseName: String!
     description: String
+    "Null means the vendor owns it and every account can see it."
+    ownerId: ID
 }

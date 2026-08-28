@@ -23,7 +23,13 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class IntegrationComponentDefinitionFilter implements ComponentDefinitionFilter {
 
-    private static final List<String> COMPONENT_NAMES = List.of("apiPlatform", "webhook");
+    /**
+     * Listing-only, and modified in place rather than joined by a second bean: {@code ComponentDefinitionServiceImpl}
+     * selects a filter with {@code findFirst()}, so an added bean for the same platform type is either ignored or wins
+     * by bean ordering.
+     */
+    private static final List<String> COMPONENT_NAMES = List.of(
+        "apiPlatform", "dataTable", "knowledgeBase", "webhook");
 
     @Override
     public boolean filter(ComponentDefinition componentDefinition) {

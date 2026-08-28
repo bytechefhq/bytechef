@@ -55,7 +55,8 @@ public class EmbeddedKnowledgeBaseGraphQlController {
         return knowledgeBases.stream()
             .map(
                 knowledgeBase -> new EmbeddedKnowledgeBase(
-                    knowledgeBase.getId(), knowledgeBase.getName(), knowledgeBase.getDescription()))
+                    knowledgeBase.getId(), knowledgeBase.getName(), knowledgeBase.getDescription(),
+                    knowledgeBase.getOwnerId()))
             .toList();
     }
 
@@ -69,6 +70,9 @@ public class EmbeddedKnowledgeBaseGraphQlController {
     public record AssignKnowledgeBaseOwnerInput(Long knowledgeBaseId, @Nullable Long ownerId) {
     }
 
-    public record EmbeddedKnowledgeBase(Long id, String name, String description) {
+    /**
+     * A null ownerId is the vendor's, which the visibility rule shares with every account.
+     */
+    public record EmbeddedKnowledgeBase(Long id, String name, String description, @Nullable Long ownerId) {
     }
 }

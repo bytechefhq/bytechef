@@ -20,13 +20,19 @@ import com.bytechef.platform.data.table.domain.ColumnSpec;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Metadata description of a dynamic data table and its columns.
+ *
+ * <p>
+ * {@code ownerId} is null for a vendor-owned table, which the visibility rule shares with every account. It is carried
+ * here rather than looked up separately because a console that can assign ownership but not display it is unusable.
  *
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record DataTableInfo(
-    Long id, String baseName, String description, List<ColumnSpec> columns, Instant lastModifiedDate) {
+    Long id, String baseName, String description, List<ColumnSpec> columns, Instant lastModifiedDate,
+    @Nullable Long ownerId) {
 }
