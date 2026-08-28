@@ -21,21 +21,20 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.DELETE;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Marko Kriskovic
@@ -46,7 +45,8 @@ public final class KnowledgeBaseDeleteAction {
     }
 
     public static ActionDefinition of(
-        org.springframework.ai.vectorstore.VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService) {
+        org.springframework.ai.vectorstore.VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         VectorStore kbVectorStore = createVectorStore(vectorStore);
 
@@ -57,41 +57,27 @@ public final class KnowledgeBaseDeleteAction {
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to delete documents from.")
-                    .options(getKnowledgeBaseOptions(knowledgeBaseService))
+                    .options(KnowledgeBaseOptionsUtils.knowledgeBaseActionOptions(
+                        knowledgeBaseService, ownerResolverProvider))
                     .required(true),
                 METADATA_FILTER_PROPERTY)
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
-                    inputParameters, kbVectorStore));
+                    inputParameters, kbVectorStore, knowledgeBaseService, ownerResolverProvider,
+                    (ActionContextAware) context));
     }
 
-    private static Object perform(Parameters inputParameters, VectorStore vectorStore) {
+    private static Object perform(
+        Parameters inputParameters, VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider, ActionContextAware actionContextAware) {
+
+        knowledgeBaseService.getKnowledgeBase(
+            inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID),
+            OwnerResolution.resolve(actionContextAware, ownerResolverProvider));
+
         vectorStore.delete(inputParameters, ParametersFactory.create(Map.of()), null);
 
         return null;
     }
 
-    private static ActionDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(
-        KnowledgeBaseService knowledgeBaseService) {
-
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
-
-            List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
-
-            for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                String knowledgeBaseName = knowledgeBase.getName();
-
-                String knowledgeBaseNameLowerCase = knowledgeBaseName.toLowerCase(Locale.ROOT);
-
-                if (searchText == null || knowledgeBaseNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
-                    Long knowledgeBaseId = knowledgeBase.getId();
-
-                    options.add(option(knowledgeBaseName, knowledgeBaseId.longValue()));
-                }
-            }
-
-            return options;
-        };
-    }
 }

@@ -42,14 +42,17 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.document.Document;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Marko Kriskovic
@@ -64,7 +67,8 @@ public class KnowledgeBaseUpdateTool {
         KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         VectorStore kbVectorStore = createVectorStore(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
@@ -84,7 +88,9 @@ public class KnowledgeBaseUpdateTool {
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to update documents in.")
-                    .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
+                    .options(
+                        KnowledgeBaseOptionsUtils.knowledgeBaseOptions(
+                            knowledgeBaseService, ownerResolverProvider))
                     .required(true),
                 integer(KNOWLEDGE_BASE_DOCUMENT_ID)
                     .label("Document")
@@ -123,6 +129,10 @@ public class KnowledgeBaseUpdateTool {
                     .required(true))
             .object(() -> (MultipleConnectionsToolFunction) (
                 inputParameters, connectionParameters, extensions, componentConnections, context) -> {
+
+                knowledgeBaseService.getKnowledgeBase(
+                    inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID),
+                    OwnerResolution.resolve(context, ownerResolverProvider));
 
                 String content = inputParameters.getRequiredString(CONTENT);
 

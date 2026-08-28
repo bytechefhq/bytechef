@@ -31,15 +31,18 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStoreWrapper;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +53,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Search action for querying the internal knowledge base vector store. Supports three search modes:
@@ -68,7 +72,8 @@ public final class KnowledgeBaseSearchAction {
 
     public static ActionDefinition of(
         VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
-        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
+        KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         return action(SEARCH)
             .title("Search Data")
@@ -79,7 +84,9 @@ public final class KnowledgeBaseSearchAction {
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to search.")
-                    .options(getKnowledgeBaseOptions(knowledgeBaseService))
+                    .options(
+                        KnowledgeBaseOptionsUtils.knowledgeBaseActionOptions(
+                            knowledgeBaseService, ownerResolverProvider))
                     .required(true),
                 string(QUERY)
                     .label("Query")
@@ -109,11 +116,19 @@ public final class KnowledgeBaseSearchAction {
             .output()
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
-                    inputParameters, vectorStore));
+                    inputParameters, vectorStore, knowledgeBaseService, ownerResolverProvider,
+                    (ActionContextAware) context));
     }
 
-    private static Object perform(Parameters inputParameters, VectorStore vectorStore) {
+    private static Object perform(
+        Parameters inputParameters, VectorStore vectorStore, KnowledgeBaseService knowledgeBaseService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider, ActionContextAware actionContextAware) {
+
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+
+        // Throws before the vector store is ever wrapped, so an id the caller does not own never reaches it.
+        knowledgeBaseService.getKnowledgeBase(
+            knowledgeBaseId, OwnerResolution.resolve(actionContextAware, ownerResolverProvider));
         String query = inputParameters.getString(QUERY);
         List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
         List<Map<String, Object>> metadataFilters = inputParameters.getList(METADATA_FILTER, new TypeReference<>() {});
@@ -220,30 +235,6 @@ public final class KnowledgeBaseSearchAction {
         }
 
         return result == null ? null : result.build();
-    }
-
-    private static ActionDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(
-        KnowledgeBaseService knowledgeBaseService) {
-
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
-
-            List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
-
-            for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                String knowledgeBaseName = knowledgeBase.getName();
-
-                String knowledgeBaseNameLowerCase = knowledgeBaseName.toLowerCase(Locale.ROOT);
-
-                if (searchText == null || knowledgeBaseNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
-                    Long knowledgeBaseIdValue = knowledgeBase.getId();
-
-                    options.add(option(knowledgeBaseName, knowledgeBaseIdValue.longValue()));
-                }
-            }
-
-            return options;
-        };
     }
 
     private static ActionDefinition.OptionsFunction<String> getTagOptions(

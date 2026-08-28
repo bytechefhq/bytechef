@@ -24,6 +24,8 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
@@ -31,9 +33,13 @@ import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFaca
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.owner.Owner;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Shared option builders used by Knowledge Base actions and cluster elements.
@@ -46,19 +52,22 @@ public final class KnowledgeBaseOptionsUtils {
     }
 
     public static ClusterElementDefinition.OptionsFunction<Long> knowledgeBaseOptions(
-        KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseService knowledgeBaseService, ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         return (
             inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
-            context) -> buildKnowledgeBaseOptions(searchText, knowledgeBaseService);
+            context) -> buildKnowledgeBaseOptions(
+                searchText, knowledgeBaseService, OwnerResolution.resolve(context, ownerResolverProvider));
     }
 
     public static ActionDefinition.OptionsFunction<Long> knowledgeBaseActionOptions(
-        KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseService knowledgeBaseService, ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         return (
             inputParameters, connectionParameters, dependencyPaths, searchText,
-            context) -> buildKnowledgeBaseOptions(searchText, knowledgeBaseService);
+            context) -> buildKnowledgeBaseOptions(
+                searchText, knowledgeBaseService,
+                OwnerResolution.resolve((ActionContextAware) context, ownerResolverProvider));
     }
 
     public static ClusterElementDefinition.OptionsFunction<String> tagOptions(
@@ -99,12 +108,16 @@ public final class KnowledgeBaseOptionsUtils {
             context) -> buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
     }
 
+    /**
+     * The one implementation. Two inline copies of this used to live in KnowledgeBaseDeleteAction and
+     * KnowledgeBaseLoadAction; gating three copies is how one gets missed.
+     */
     private static List<Option<Long>> buildKnowledgeBaseOptions(
-        String searchText, KnowledgeBaseService knowledgeBaseService) {
+        String searchText, KnowledgeBaseService knowledgeBaseService, Optional<Owner> owner) {
 
         List<Option<Long>> options = new ArrayList<>();
 
-        for (KnowledgeBase knowledgeBase : knowledgeBaseService.getKnowledgeBases()) {
+        for (KnowledgeBase knowledgeBase : knowledgeBaseService.getKnowledgeBases(owner)) {
             String name = knowledgeBase.getName();
 
             if (matchesSearchText(name, searchText)) {

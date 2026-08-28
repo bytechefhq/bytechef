@@ -31,7 +31,8 @@ class KnowledgeBaseComponentHandlerTest {
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
             "definition/knowledgeBase_v1.json",
-            new KnowledgeBaseComponentHandler(null, null, null, null, null, null, null, null, null).getDefinition());
+            new KnowledgeBaseComponentHandler(null, null, null, null, null, null, null, null, null, null)
+                .getDefinition());
     }
 
     /**
@@ -49,7 +50,7 @@ class KnowledgeBaseComponentHandlerTest {
     void testClusterElementTypeMapIterationOrderIsDeterministic() {
         ClusterRootComponentDefinition clusterRootComponentDefinition =
             (ClusterRootComponentDefinition) new KnowledgeBaseComponentHandler(
-                null, null, null, null, null, null, null, null, null).getDefinition();
+                null, null, null, null, null, null, null, null, null, null).getDefinition();
 
         assertThat(clusterRootComponentDefinition.getActionClusterElementTypes()
             .keySet())

@@ -22,15 +22,14 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -40,19 +39,20 @@ import com.bytechef.platform.component.definition.ai.vectorstore.DocumentEnriche
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentSplitterFunction;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-import java.util.ArrayList;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Load action for adding documents to a knowledge base using document readers and transformers.
@@ -74,7 +74,8 @@ public final class KnowledgeBaseLoadAction {
         ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseService knowledgeBaseService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         VectorStore kbVectorStore = createVectorStore(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
@@ -87,14 +88,22 @@ public final class KnowledgeBaseLoadAction {
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to load documents into.")
-                    .options(getKnowledgeBaseOptions(knowledgeBaseService))
+                    .options(
+                        KnowledgeBaseOptionsUtils.knowledgeBaseActionOptions(
+                            knowledgeBaseService, ownerResolverProvider))
                     .required(true),
                 ADDITIONAL_METADATA_PROPERTY)
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions,
-                context) -> perform(
+                context) -> {
+                knowledgeBaseService.getKnowledgeBase(
+                    inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID),
+                    OwnerResolution.resolve((ActionContextAware) context, ownerResolverProvider));
+
+                return perform(
                     inputParameters, componentConnections, extensions, context, kbVectorStore,
-                    clusterElementDefinitionService));
+                    clusterElementDefinitionService);
+            });
     }
 
     private static Object perform(
@@ -172,27 +181,4 @@ public final class KnowledgeBaseLoadAction {
             .toList();
     }
 
-    private static ActionDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(
-        KnowledgeBaseService knowledgeBaseService) {
-
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
-
-            List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
-
-            for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                String name = knowledgeBase.getName();
-
-                String lowerCase = name.toLowerCase();
-
-                if (searchText == null || lowerCase.contains(searchText.toLowerCase())) {
-                    Long knowledgeBaseId = knowledgeBase.getId();
-
-                    options.add(option(name, knowledgeBaseId.longValue()));
-                }
-            }
-
-            return options;
-        };
-    }
 }

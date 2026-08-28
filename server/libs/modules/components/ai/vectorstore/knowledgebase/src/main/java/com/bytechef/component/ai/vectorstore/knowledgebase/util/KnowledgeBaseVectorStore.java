@@ -48,6 +48,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Knowledge Base VectorStore cluster element for AI agent integration.
@@ -74,7 +76,8 @@ public final class KnowledgeBaseVectorStore {
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         VectorStore kbVectorStore = createVectorStore(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
@@ -88,7 +91,9 @@ public final class KnowledgeBaseVectorStore {
                 ComponentDsl.integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to retrieve documents from.")
-                    .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
+                    .options(
+                        KnowledgeBaseOptionsUtils.knowledgeBaseOptions(
+                            knowledgeBaseService, ownerResolverProvider))
                     .required(true),
                 array(TAG_NAMES)
                     .label("Tags")

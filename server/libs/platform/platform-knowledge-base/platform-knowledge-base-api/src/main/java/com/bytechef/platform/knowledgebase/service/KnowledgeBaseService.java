@@ -17,7 +17,9 @@
 package com.bytechef.platform.knowledgebase.service;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.owner.Owner;
 import java.util.List;
+import java.util.Optional;
 
 public interface KnowledgeBaseService {
 
@@ -46,11 +48,27 @@ public interface KnowledgeBaseService {
     KnowledgeBase getKnowledgeBase(Long id);
 
     /**
+     * Owner-aware form. An unowned knowledge base is readable by everyone, an empty owner reads everything, and an
+     * owned one is readable only by that owner. A refusal is reported exactly as a missing knowledge base, so ids
+     * cannot be probed for existence.
+     *
+     * @param id    the knowledge base id
+     * @param owner the caller's owner, or empty for an admin or automation caller
+     * @return the knowledge base
+     */
+    KnowledgeBase getKnowledgeBase(Long id, Optional<Owner> owner);
+
+    /**
      * Retrieves a list of all available knowledge bases.
      *
      * @return a list of {@code KnowledgeBase} objects representing the knowledge bases.
      */
     List<KnowledgeBase> getKnowledgeBases();
+
+    /**
+     * Owner-aware form of the unscoped listing. See {@link #getKnowledgeBase(Long, Optional)}.
+     */
+    List<KnowledgeBase> getKnowledgeBases(Optional<Owner> owner);
 
     /**
      * Retrieves a list of knowledge bases for the specified environment.
@@ -59,6 +77,11 @@ public interface KnowledgeBaseService {
      * @return a list of {@code KnowledgeBase} objects in the given environment
      */
     List<KnowledgeBase> getKnowledgeBases(int environment);
+
+    /**
+     * Owner-aware form. See {@link #getKnowledgeBase(Long, Optional)}.
+     */
+    List<KnowledgeBase> getKnowledgeBases(int environment, Optional<Owner> owner);
 
     /**
      * Updates an existing KnowledgeBase identified by the given ID with the provided new values.

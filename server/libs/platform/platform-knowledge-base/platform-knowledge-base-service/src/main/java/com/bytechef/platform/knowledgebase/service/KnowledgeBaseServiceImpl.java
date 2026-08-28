@@ -20,9 +20,11 @@ import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvent;
 import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditPublisher;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
+import com.bytechef.platform.owner.Owner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,8 +67,22 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     @Override
     @Transactional(readOnly = true)
     public KnowledgeBase getKnowledgeBase(Long id) {
-        return knowledgeBaseRepository.findById(id)
+        return getKnowledgeBase(id, Optional.empty());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public KnowledgeBase getKnowledgeBase(Long id, Optional<Owner> owner) {
+        KnowledgeBase knowledgeBase = knowledgeBaseRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("KnowledgeBase not found: " + id));
+
+        if (!isReadableBy(knowledgeBase, owner)) {
+            // Deliberately the same message: a caller must not be able to tell "someone else's" from "does not
+            // exist", or the id space becomes an enumeration oracle.
+            throw new RuntimeException("KnowledgeBase not found: " + id);
+        }
+
+        return knowledgeBase;
     }
 
     @Override
@@ -77,8 +93,43 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<KnowledgeBase> getKnowledgeBases(Optional<Owner> owner) {
+        return knowledgeBaseRepository.findAll()
+            .stream()
+            .filter(knowledgeBase -> isReadableBy(knowledgeBase, owner))
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<KnowledgeBase> getKnowledgeBases(int environment) {
         return knowledgeBaseRepository.findAllByEnvironment(environment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<KnowledgeBase> getKnowledgeBases(int environment, Optional<Owner> owner) {
+        return knowledgeBaseRepository.findAllByEnvironment(environment)
+            .stream()
+            .filter(knowledgeBase -> isReadableBy(knowledgeBase, owner))
+            .toList();
+    }
+
+    /**
+     * Three rules, matching the data table ones: an unowned knowledge base belongs to the vendor and is readable by
+     * everyone, an empty owner is an admin or automation caller and reads everything, and an owned one is readable only
+     * by that exact owner.
+     */
+    private static boolean isReadableBy(KnowledgeBase knowledgeBase, Optional<Owner> owner) {
+        Long ownerId = knowledgeBase.getOwnerId();
+
+        if (ownerId == null || owner.isEmpty()) {
+            return true;
+        }
+
+        Owner curOwner = owner.get();
+
+        return curOwner.id() == ownerId && curOwner.type() == knowledgeBase.getOwnerType();
     }
 
     @Override

@@ -53,11 +53,13 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -81,13 +83,14 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
         KnowledgeBaseSourceService knowledgeBaseSourceService,
-        @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
+        @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(
                 clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
                 knowledgeBaseDocumentService, knowledgeBaseDocumentTagService, knowledgeBaseFileStorage,
-                knowledgeBaseService, knowledgeBaseSourceService, vectorStore);
+                knowledgeBaseService, knowledgeBaseSourceService, vectorStore, ownerResolverProvider);
     }
 
     @Override
@@ -105,7 +108,8 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
             KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-            KnowledgeBaseSourceService knowledgeBaseSourceService, VectorStore vectorStore) {
+            KnowledgeBaseSourceService knowledgeBaseSourceService, VectorStore vectorStore,
+            ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
             super(
                 component(KNOWLEDGE_BASE)
@@ -116,25 +120,32 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                     .icon("path:assets/knowledge-base.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
-                        KnowledgeBaseDeleteAction.of(vectorStore, knowledgeBaseService),
+                        KnowledgeBaseDeleteAction.of(
+                            vectorStore, knowledgeBaseService, ownerResolverProvider),
                         KnowledgeBaseLoadAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
-                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService,
+                            ownerResolverProvider),
                         KnowledgeBaseSearchAction.of(
-                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService,
+                            ownerResolverProvider),
                         KnowledgeBaseUpdateAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade,
                             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
-                            knowledgeBaseService))
+                            knowledgeBaseService,
+                            ownerResolverProvider))
                     .clusterElements(
                         KnowledgeBaseSearchTool.of(
-                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService,
+                            ownerResolverProvider),
                         KnowledgeBaseUpdateTool.of(
                             vectorStore, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
-                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService,
+                            ownerResolverProvider),
                         KnowledgeBaseVectorStore.of(
                             vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService),
+                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService,
+                            ownerResolverProvider),
                         writeAsDocumentClusterElement(
                             knowledgeBaseSourceService, knowledgeBaseDocumentService)));
         }
