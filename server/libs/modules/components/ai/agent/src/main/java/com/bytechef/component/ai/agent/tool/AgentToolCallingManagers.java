@@ -24,6 +24,7 @@ import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.execution.ToolExecutionExceptionProcessor;
 import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -64,6 +65,13 @@ public final class AgentToolCallingManagers {
         this.observationRegistry = ObservationRegistry.NOOP;
     }
 
+    /**
+     * Load-bearing {@code @Autowired}, not decoration. Spring uses a sole constructor implicitly, but this class has
+     * two, so without the annotation it falls back to a no-arg constructor that does not exist and the whole context
+     * fails with "No default constructor found" -- a message that points at the constructor this class lacks rather
+     * than at the one too many it has.
+     */
+    @Autowired
     public AgentToolCallingManagers(
         ToolCallingManager defaultToolCallingManager, ObjectProvider<ToolCallbackResolver> toolCallbackResolverProvider,
         ObjectProvider<ToolExecutionExceptionProcessor> toolExecutionExceptionProcessorProvider,
