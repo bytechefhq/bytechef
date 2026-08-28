@@ -20,6 +20,8 @@ import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTabl
 import com.bytechef.automation.data.table.configuration.repository.WorkspaceDataTableRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,17 @@ public class WorkspaceDataTableServiceImpl implements WorkspaceDataTableService 
         if (existing == null) {
             workspaceDataTableRepository.save(new WorkspaceDataTable(dataTableId, workspaceId));
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchWorkspaceId(Long dataTableId) {
+        List<WorkspaceDataTable> workspaceDataTables = workspaceDataTableRepository.findByDataTableId(dataTableId);
+
+        return workspaceDataTables.stream()
+            .map(WorkspaceDataTable::getWorkspaceId)
+            .filter(Objects::nonNull)
+            .findFirst();
     }
 
     @Override

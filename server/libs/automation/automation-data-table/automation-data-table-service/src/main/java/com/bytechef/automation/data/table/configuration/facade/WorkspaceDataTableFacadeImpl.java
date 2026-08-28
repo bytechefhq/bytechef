@@ -33,6 +33,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -95,6 +96,13 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public void duplicateTable(long dataTableId, String newBaseName, long environmentId) {
         dataTableService.duplicateTable(dataTableService.getBaseNameById(dataTableId), newBaseName, environmentId);
+
+        Optional<Long> workspaceId = workspaceDataTableService.fetchWorkspaceId(dataTableId);
+
+        if (workspaceId.isPresent()) {
+            workspaceDataTableService.assignDataTableToWorkspace(
+                dataTableService.getIdByBaseName(newBaseName), workspaceId.get());
+        }
     }
 
     @Override
