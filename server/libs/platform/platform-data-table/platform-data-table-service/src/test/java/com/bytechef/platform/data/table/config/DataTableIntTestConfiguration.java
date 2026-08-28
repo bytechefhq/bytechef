@@ -16,24 +16,46 @@
 
 package com.bytechef.platform.data.table.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.data.table.configuration.audit.DataTableAuditPublisher;
+import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
 /**
- * Scans only the migration package. The services in sibling packages need collaborators this migration has nothing to
- * do with, and pulling them in would couple every future change there to this test's context.
- *
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = "com.bytechef.platform.data.table.configuration.migration")
+@ComponentScan(basePackages = "com.bytechef.platform.data.table")
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class DataTableIntTestConfiguration {
+
+    @Bean
+    DataTableAuditPublisher dataTableAuditPublisher() {
+        return mock(DataTableAuditPublisher.class);
+    }
+
+    /**
+     * Reached only by {@code DataTableTagServiceImpl}, which these tests do not exercise. Mocked rather than scanned so
+     * tagging does not drag its own schema and services into a data-table context.
+     */
+    @Bean
+    TagService tagService() {
+        return mock(TagService.class);
+    }
+
+    @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
+    public static class DataTableIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+    }
 }

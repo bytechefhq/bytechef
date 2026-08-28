@@ -31,12 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -102,6 +103,7 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
+    @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId) {
@@ -131,9 +133,7 @@ public class DataTableServiceImpl implements DataTableService {
             "CREATE INDEX " + escapeIdentifier("idx_" + physicalName + "_owner") + " ON " +
                 escapeIdentifier(physicalName) + " (\"owner_type\", \"owner_id\")");
 
-        long dataTableId = checkRegistry(
-            baseName,
-            new ExecutionException("Unable to find table " + baseName, DataTableErrorType.DATA_TABLE_NOT_CREATED));
+        long dataTableId = register(baseName, description);
 
         dataTableAuditPublisher.publish(
             DataTableAuditEvent.DATA_TABLE_CREATED, dataTableId, Map.of("name", baseName));
@@ -180,6 +180,7 @@ public class DataTableServiceImpl implements DataTableService {
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
+    @Transactional
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
         validateBaseName(fromBaseName);
@@ -198,9 +199,14 @@ public class DataTableServiceImpl implements DataTableService {
             .collect(Collectors.joining(", "));
 
         String createSql = "CREATE TABLE " + escapeIdentifier(toPhysicalName) +
-            " (\"id\" BIGSERIAL PRIMARY KEY" + (userColumnsSql.isEmpty() ? "" : ", " + userColumnsSql) + ")";
+            " (\"id\" BIGSERIAL PRIMARY KEY, \"owner_id\" BIGINT, \"owner_type\" INT" +
+            (userColumnsSql.isEmpty() ? "" : ", " + userColumnsSql) + ")";
 
         jdbcTemplate.execute(createSql);
+
+        jdbcTemplate.execute(
+            "CREATE INDEX " + escapeIdentifier("idx_" + toPhysicalName + "_owner") + " ON " +
+                escapeIdentifier(toPhysicalName) + " (\"owner_type\", \"owner_id\")");
 
         if (!columnSpecs.isEmpty()) {
             String columnList = columnSpecs.stream()
@@ -213,9 +219,9 @@ public class DataTableServiceImpl implements DataTableService {
             jdbcTemplate.execute(insertSql);
         }
 
-        checkRegistry(
-            toBaseName,
-            new ExecutionException("Unable to find table " + toBaseName, DataTableErrorType.DATA_TABLE_NOT_DUPLICATED));
+        register(toBaseName, dataTableRepository.findByName(fromBaseName)
+            .map(DataTable::getDescription)
+            .orElse(null));
     }
 
     @Override
@@ -378,17 +384,25 @@ public class DataTableServiceImpl implements DataTableService {
         return count > 0;
     }
 
-    private long checkRegistry(String baseName, ExecutionException executionException) {
+    /**
+     * Writes the {@code data_table} row that gives a physical table its id. Nothing else creates one, and everything
+     * keyed on a data table id -- tags, webhooks, the workspace relation, {@code listTables} -- needs it to exist.
+     *
+     * <p>
+     * Called after the DDL and inside the same transaction, so a failed CREATE leaves no registry row and a failed
+     * insert leaves no physical table.
+     */
+    private long register(String baseName, @Nullable String description) {
         Assert.hasText(baseName, "baseName required");
 
-        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(baseName);
+        DataTable dataTable = new DataTable();
 
-        if (dataTableOptional.isEmpty()) {
-            throw executionException;
-        }
+        dataTable.setName(baseName);
+        dataTable.setDescription(description);
 
-        return dataTableOptional.get()
-            .getId();
+        DataTable savedDataTable = dataTableRepository.save(dataTable);
+
+        return savedDataTable.getId();
     }
 
     private String escapeIdentifier(String identifier) {

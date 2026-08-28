@@ -18,6 +18,7 @@ package com.bytechef.platform.data.table.configuration.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,7 +35,6 @@ import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,8 +66,7 @@ class DataTableServiceTest {
 
     @Test
     void testCreateTableEmitsReservedOwnerColumns() {
-        when(dataTableRepository.findByName("conversations")).thenReturn(
-            Optional.of(new DataTable(1L, "conversations")));
+        when(dataTableRepository.save(any(DataTable.class))).thenReturn(new DataTable(1L, "conversations"));
 
         dataTableService.createTable(
             "conversations", null, List.of(new ColumnSpec("title", ColumnType.STRING)), 0);
