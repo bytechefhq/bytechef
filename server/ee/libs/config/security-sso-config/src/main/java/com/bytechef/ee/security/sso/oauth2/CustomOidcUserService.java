@@ -60,6 +60,10 @@ public class CustomOidcUserService extends OidcUserService {
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
 
+        if (oidcUser == null) {
+            throw new OAuth2AuthenticationException("No user returned by OIDC provider");
+        }
+
         String email = oidcUser.getEmail();
 
         if (email == null) {

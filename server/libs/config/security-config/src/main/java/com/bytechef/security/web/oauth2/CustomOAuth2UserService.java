@@ -80,6 +80,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             .getRegistrationId()
             .toUpperCase(Locale.ROOT);
 
+        if (oAuth2User == null) {
+            throw new OAuth2AuthenticationException("No user returned by OAuth2 provider " + registrationId);
+        }
+
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         String email = extractEmail(registrationId, attributes, userRequest);
