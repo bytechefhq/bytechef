@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @ConditionalOnCoordinator
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("EI")
 public class EmbeddedKnowledgeBaseGraphQlController {
 

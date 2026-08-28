@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework.security:spring-security-core")

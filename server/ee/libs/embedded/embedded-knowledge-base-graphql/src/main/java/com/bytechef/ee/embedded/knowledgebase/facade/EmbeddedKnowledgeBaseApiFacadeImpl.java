@@ -15,6 +15,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnEEVersion
+@ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 @SuppressFBWarnings("EI")
 public class EmbeddedKnowledgeBaseApiFacadeImpl implements EmbeddedKnowledgeBaseApiFacade {
 
