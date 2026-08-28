@@ -18,12 +18,15 @@ package com.bytechef.platform.data.table.execution.service;
 
 import com.bytechef.commons.util.BooleanUtils;
 import com.bytechef.commons.util.DateUtils;
+import com.bytechef.platform.constant.OwnerType;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.ReservedColumns;
+import com.bytechef.platform.data.table.domain.RowOwnerFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
+import com.bytechef.platform.owner.Owner;
 import de.siegmar.fastcsv.reader.CsvReader;
 import de.siegmar.fastcsv.reader.CsvRow;
 import de.siegmar.fastcsv.writer.CsvWriter;
@@ -42,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
@@ -85,15 +89,26 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public boolean deleteRow(String baseName, long id, long environmentId) {
+        return deleteRow(baseName, id, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public boolean deleteRow(String baseName, long id, long environmentId, RowOwnerFilter rowOwnerFilter) {
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
         checkHasId(physicalName);
 
-        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
+        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?" +
+            ownerPredicate(rowOwnerFilter);
 
-        int count = jdbcTemplate.update(sql, ps -> ps.setLong(1, id));
+        int count = jdbcTemplate.update(sql, ps -> {
+            ps.setLong(1, id);
+
+            setOwnerParam(ps, 2, rowOwnerFilter);
+        });
 
         if (count > 0) {
             Map<String, Object> payload = new HashMap<>();
@@ -120,6 +135,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow getRow(String baseName, long id, long environmentId) {
+        return getRow(baseName, id, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public DataTableRow getRow(String baseName, long id, long environmentId, RowOwnerFilter rowOwnerFilter) {
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -135,9 +156,14 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .map(this::escapeIdentifier)
             .collect(Collectors.joining(", ")));
 
-        String sql = "SELECT " + selectColumns + " FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
+        String sql = "SELECT " + selectColumns + " FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?" +
+            ownerPredicate(rowOwnerFilter);
 
-        List<DataTableRow> rows = jdbcTemplate.query(sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> {
+        List<DataTableRow> rows = jdbcTemplate.query(sql, ps -> {
+            ps.setLong(1, id);
+
+            setOwnerParam(ps, 2, rowOwnerFilter);
+        }, (resultSet, rowNum) -> {
             long rowId = resultSet.getLong("id");
             Map<String, Object> values = new HashMap<>();
 
@@ -153,6 +179,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     public String exportCsv(String baseName, long environmentId) {
+        return exportCsv(baseName, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    public String exportCsv(String baseName, long environmentId, RowOwnerFilter rowOwnerFilter) {
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -202,6 +233,11 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     public void importCsv(String baseName, String csv, long environmentId) {
+        importCsv(baseName, csv, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    public void importCsv(String baseName, String csv, long environmentId, RowOwnerFilter rowOwnerFilter) {
         dataTableStorageService.checkWithinLimit(
             csv == null ? 0 : csv.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
 
@@ -295,6 +331,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+        return insertRow(baseName, values, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public DataTableRow insertRow(
+        String baseName, Map<String, Object> values, long environmentId, RowOwnerFilter rowOwnerFilter) {
         dataTableStorageService.checkWithinLimit(0);
 
         validateBaseName(baseName);
@@ -318,11 +361,20 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 .orElse(columnName))
             .toList();
 
-        String columnsClause = insertableColumnNames.stream()
+        Optional<Owner> ownerOptional = rowOwnerFilter.owner();
+
+        List<String> insertColumnNames = new ArrayList<>(insertableColumnNames);
+
+        if (ownerOptional.isPresent()) {
+            insertColumnNames.add(ReservedColumns.OWNER_ID);
+            insertColumnNames.add(ReservedColumns.OWNER_TYPE);
+        }
+
+        String columnsClause = insertColumnNames.stream()
             .map(this::escapeIdentifier)
             .collect(Collectors.joining(", "));
-        String placeholders = insertableColumnNames.stream()
-            .map(k -> "?")
+        String placeholders = insertColumnNames.stream()
+            .map(columnName -> "?")
             .collect(Collectors.joining(", "));
 
         List<String> returningColumnNames = new ArrayList<>();
@@ -336,7 +388,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .map(this::escapeIdentifier)
             .collect(Collectors.joining(", "));
 
-        String valuesClause = insertableColumnNames.isEmpty()
+        String valuesClause = insertColumnNames.isEmpty()
             ? " DEFAULT VALUES" : (" (" + columnsClause + ") VALUES (" + placeholders + ")");
 
         String sql =
@@ -354,6 +406,16 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 Object coercedValue = coerceValue(columnType, rawValue);
 
                 setParam(ps, i++, columnType, coercedValue);
+            }
+
+            if (ownerOptional.isPresent()) {
+                Owner owner = ownerOptional.get();
+
+                ps.setLong(i++, owner.id());
+
+                OwnerType ownerType = owner.type();
+
+                ps.setInt(i, ownerType.ordinal());
             }
         }, resultSet -> {
             if (resultSet.next()) {
@@ -394,6 +456,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
+        return listRows(baseName, limit, offset, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter) {
         validateBaseName(baseName);
 
         String buildPhysicalName = buildPhysicalName(environmentId, baseName);
@@ -411,11 +480,13 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String sql =
             "SELECT " + selectColumns + " FROM " + escapeIdentifier(buildPhysicalName) +
-                " ORDER BY \"id\" LIMIT ? OFFSET ?";
+                " WHERE TRUE" + ownerPredicate(rowOwnerFilter) + " ORDER BY \"id\" LIMIT ? OFFSET ?";
 
         return jdbcTemplate.query(sql, ps -> {
-            ps.setInt(1, Math.max(0, limit));
-            ps.setInt(2, Math.max(0, offset));
+            int index = setOwnerParam(ps, 1, rowOwnerFilter);
+
+            ps.setInt(index++, Math.max(0, limit));
+            ps.setInt(index, Math.max(0, offset));
         }, (rs, rowNum) -> {
             long id = rs.getLong("id");
             Map<String, Object> values = new HashMap<>();
@@ -439,6 +510,14 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        return updateRow(baseName, id, values, environmentId, RowOwnerFilter.unrestricted());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, long environmentId,
+        RowOwnerFilter rowOwnerFilter) {
         dataTableStorageService.checkWithinLimit(0);
 
         validateBaseName(baseName);
@@ -491,8 +570,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .collect(Collectors.joining(", "));
 
         String sql =
-            "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause + " WHERE \"id\" = ? RETURNING " +
-                returningClause;
+            "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause + " WHERE \"id\" = ?" +
+                ownerPredicate(rowOwnerFilter) + " RETURNING " + returningClause;
 
         Map<String, ColumnType> columnTypeMap = columnTypeMap(physicalName);
 
@@ -510,7 +589,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 setParam(ps, i++, columnType, coercedValue);
             }
 
-            ps.setLong(i, id);
+            ps.setLong(i++, id);
+
+            setOwnerParam(ps, i, rowOwnerFilter);
         }, rs -> {
             if (rs.next()) {
                 long curId = rs.getLong("id");
@@ -546,6 +627,35 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         Assert.isTrue(!normalizedName.startsWith("dt_"), "baseName must not start with 'dt_'");
         Assert.isTrue(normalizedName.matches("[a-z_][a-z0-9_]*"), "Invalid base name: " + baseName);
+    }
+
+    /**
+     * Narrows a statement to rows the caller owns, plus the unowned rows the vendor shares with everyone. Empty when
+     * the caller is unrestricted. The owner id is always a bound parameter, never interpolated.
+     */
+    private String ownerPredicate(RowOwnerFilter rowOwnerFilter) {
+        if (rowOwnerFilter.isUnrestricted()) {
+            return "";
+        }
+
+        return " AND (" + escapeIdentifier(ReservedColumns.OWNER_ID) + " = ? OR " +
+            escapeIdentifier(ReservedColumns.OWNER_ID) + " IS NULL)";
+    }
+
+    private int setOwnerParam(PreparedStatement preparedStatement, int index, RowOwnerFilter rowOwnerFilter)
+        throws SQLException {
+
+        Optional<Owner> ownerOptional = rowOwnerFilter.owner();
+
+        if (ownerOptional.isEmpty()) {
+            return index;
+        }
+
+        Owner owner = ownerOptional.get();
+
+        preparedStatement.setLong(index, owner.id());
+
+        return index + 1;
     }
 
     private String buildPhysicalName(long environmentId, String baseName) {

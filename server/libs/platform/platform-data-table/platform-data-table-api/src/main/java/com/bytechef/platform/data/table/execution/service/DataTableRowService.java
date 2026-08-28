@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.data.table.execution.service;
 
+import com.bytechef.platform.data.table.domain.RowOwnerFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,11 @@ public interface DataTableRowService {
     boolean deleteRow(String baseName, long id, long environmentId);
 
     /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    boolean deleteRow(String baseName, long id, long environmentId, RowOwnerFilter rowOwnerFilter);
+
+    /**
      * Gets a single row by its id.
      *
      * @param baseName      the logical table base name
@@ -53,6 +59,11 @@ public interface DataTableRowService {
     DataTableRow getRow(String baseName, long id, long environmentId);
 
     /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    DataTableRow getRow(String baseName, long id, long environmentId, RowOwnerFilter rowOwnerFilter);
+
+    /**
      * Inserts a row with provided values. Returns the created row including generated id.
      *
      * @param baseName      the logical table base name
@@ -61,6 +72,12 @@ public interface DataTableRowService {
      * @return the created row with generated id
      */
     DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId);
+
+    /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    DataTableRow insertRow(
+        String baseName, Map<String, Object> values, long environmentId, RowOwnerFilter rowOwnerFilter);
 
     /**
      * Lists rows of a dynamic table with pagination.
@@ -74,6 +91,12 @@ public interface DataTableRowService {
     List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId);
 
     /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter);
+
+    /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
      * header with column names in their physical order.
      *
@@ -82,6 +105,11 @@ public interface DataTableRowService {
      * @return CSV text representation of all rows
      */
     String exportCsv(String baseName, long environmentId);
+
+    /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    String exportCsv(String baseName, long environmentId, RowOwnerFilter rowOwnerFilter);
 
     /**
      * Imports CSV text into the table. The CSV must contain a header row with column names matching existing columns
@@ -94,6 +122,11 @@ public interface DataTableRowService {
     void importCsv(String baseName, String csv, long environmentId);
 
     /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    void importCsv(String baseName, String csv, long environmentId, RowOwnerFilter rowOwnerFilter);
+
+    /**
      * Updates a row by its stable id. Returns the updated row.
      *
      * @param baseName      the logical table base name
@@ -103,4 +136,11 @@ public interface DataTableRowService {
      * @return the updated row
      */
     DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId);
+
+    /**
+     * Owner-scoped form. See {@link RowOwnerFilter}.
+     */
+    DataTableRow updateRow(
+        String baseName, long id, Map<String, Object> values, long environmentId,
+        RowOwnerFilter rowOwnerFilter);
 }
