@@ -23,7 +23,9 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookTyp
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.ReservedColumns;
+import com.bytechef.platform.data.table.domain.RowFilter;
 import com.bytechef.platform.data.table.domain.RowOwnerFilter;
+import com.bytechef.platform.data.table.domain.RowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import com.bytechef.platform.owner.Owner;
@@ -463,6 +465,24 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> listRows(
         String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter) {
+
+        return listRows(baseName, limit, offset, environmentId, rowOwnerFilter, List.of());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter,
+        List<RowFilter> rowFilters) {
+
+        return listRows(baseName, limit, offset, environmentId, rowOwnerFilter, rowFilters, List.of());
+    }
+
+    @Override
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    public List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter,
+        List<RowFilter> rowFilters, List<RowSort> rowSorts) {
         validateBaseName(baseName);
 
         String buildPhysicalName = buildPhysicalName(environmentId, baseName);
@@ -478,12 +498,21 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .map(this::escapeIdentifier)
             .collect(Collectors.joining(", ")));
 
+        Map<String, ColumnType> columnTypes = columnTypeMap(buildPhysicalName);
+
+        RowQuerySqlBuilder.Fragment fragment = RowQuerySqlBuilder.filters(rowFilters, columnTypes);
+
         String sql =
             "SELECT " + selectColumns + " FROM " + escapeIdentifier(buildPhysicalName) +
-                " WHERE TRUE" + ownerPredicate(rowOwnerFilter) + " ORDER BY \"id\" LIMIT ? OFFSET ?";
+                " WHERE TRUE" + ownerPredicate(rowOwnerFilter) + fragment.sql() +
+                RowQuerySqlBuilder.orderBy(rowSorts, columnTypes) + " LIMIT ? OFFSET ?";
 
         return jdbcTemplate.query(sql, ps -> {
             int index = setOwnerParam(ps, 1, rowOwnerFilter);
+
+            for (RowQuerySqlBuilder.Binding binding : fragment.bindings()) {
+                setParam(ps, index++, binding.type(), binding.value());
+            }
 
             ps.setInt(index++, Math.max(0, limit));
             ps.setInt(index, Math.max(0, offset));
@@ -676,7 +705,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
     }
 
-    private Object coerceValue(ColumnType type, Object rawValue) {
+    static Object coerceValue(ColumnType type, Object rawValue) {
         if (rawValue == null) {
             return null;
         }

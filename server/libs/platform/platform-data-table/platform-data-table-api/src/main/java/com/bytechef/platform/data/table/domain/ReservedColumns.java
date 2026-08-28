@@ -34,6 +34,7 @@ public final class ReservedColumns {
     public static final String OWNER_TYPE = "owner_type";
 
     private static final Set<String> ALL = Set.of(ID, OWNER_ID, OWNER_TYPE);
+    private static final Set<String> HIDDEN = Set.of(OWNER_ID, OWNER_TYPE);
 
     private ReservedColumns() {
     }
@@ -48,5 +49,18 @@ public final class ReservedColumns {
         }
 
         return ALL.contains(columnName.toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * The narrower predicate: a hidden column is one a caller may not even name. {@code id} is reserved but not hidden
+     * -- it is returned on every row and taken by {@code getRow}/{@code updateRow}/{@code deleteRow}, so a query may
+     * filter and sort on it. The owner columns are the platform's alone.
+     */
+    public static boolean isHidden(@Nullable String columnName) {
+        if (columnName == null) {
+            return false;
+        }
+
+        return HIDDEN.contains(columnName.toLowerCase(Locale.ROOT));
     }
 }

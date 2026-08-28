@@ -8,7 +8,9 @@
 package com.bytechef.ee.platform.data.table.remote.client.service;
 
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.data.table.domain.RowFilter;
 import com.bytechef.platform.data.table.domain.RowOwnerFilter;
+import com.bytechef.platform.data.table.domain.RowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.util.List;
@@ -61,6 +63,22 @@ public class RemoteDataTableRowServiceClient implements DataTableRowService {
     @Override
     public List<DataTableRow> listRows(
         String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter,
+        List<RowFilter> rowFilters) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter,
+        List<RowFilter> rowFilters, List<RowSort> rowSorts) {
 
         throw new UnsupportedOperationException();
     }

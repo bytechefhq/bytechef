@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.data.table.execution.service;
 
+import com.bytechef.platform.data.table.domain.RowFilter;
 import com.bytechef.platform.data.table.domain.RowOwnerFilter;
+import com.bytechef.platform.data.table.domain.RowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +97,22 @@ public interface DataTableRowService {
      */
     List<DataTableRow> listRows(
         String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter);
+
+    /**
+     * Owner-scoped and filtered form. Filters narrow within what {@code rowOwnerFilter} already allows; being
+     * conjunctions, they can never widen it. See {@link RowFilter}.
+     */
+    List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter,
+        List<RowFilter> rowFilters);
+
+    /**
+     * Owner-scoped, filtered and sorted form. Every ordering ends on the row id, so pagination stays stable even when
+     * the sort key has ties. See {@link RowSort}.
+     */
+    List<DataTableRow> listRows(
+        String baseName, int limit, int offset, long environmentId, RowOwnerFilter rowOwnerFilter,
+        List<RowFilter> rowFilters, List<RowSort> rowSorts);
 
     /**
      * Exports the entire table (excluding the primary key column 'id' in the header) as CSV text. The first row is a
