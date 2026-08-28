@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.TriggerDefinition.TriggerType.DY
 import com.bytechef.component.datatable.util.DataTableUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
@@ -85,10 +84,7 @@ public class DataTableRecordDeletedTrigger {
                     .label("Table")
                     .description("Select a Data Table.")
                     .required(true)
-                    .options(
-                        (OptionsFunction<String>) (
-                            inputParameters, connectionParameters, depends, searchText,
-                            context) -> DataTableUtils.getTableOptions(searchText, dataTableService)))
+                    .options(DataTableUtils.getTriggerTableOptions(dataTableService, ownerResolverProvider)))
             .output((inputParameters, connectionParameters, context) -> {
                 TriggerContextAware triggerContextAware = (TriggerContextAware) context;
 

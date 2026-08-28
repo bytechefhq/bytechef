@@ -18,7 +18,10 @@ package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.owner.Owner;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Unified service for managing dynamic data tables and querying their metadata.
@@ -118,6 +121,27 @@ public interface DataTableService {
      *         tables exist, an empty list is returned.
      */
     List<DataTableInfo> listTables(long environmentId);
+
+    /**
+     * Owner-aware form. An unowned table belongs to the vendor and is listed for everyone, an empty owner lists
+     * everything, and an owned one is listed only for that owner -- the same rule the rows follow, one level up.
+     *
+     * @param environmentId the environment ID
+     * @param owner         the caller's owner, or empty for an admin or automation caller
+     */
+    List<DataTableInfo> listTables(long environmentId, Optional<Owner> owner);
+
+    /**
+     * Assigns a data table to an account, or returns it to the vendor when {@code owner} is null.
+     *
+     * <p>
+     * Table-level only. Rows keep whatever owner they were written with -- reassigning a table does not rewrite its
+     * contents.
+     *
+     * @param dataTableId the data table id
+     * @param owner       the owning account, or null to make the table shared again
+     */
+    void assignOwner(long dataTableId, @Nullable Owner owner);
 
     /**
      * Removes a column from an existing dynamic data table in the specified environment.

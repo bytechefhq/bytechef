@@ -316,6 +316,34 @@ class ConnectedUserResourceMembershipResolverTest {
         assertThat(resolver.resolve(OWN_PROJECT_ID, "Project", "PROJECT_DELETE")).isEqualTo(Decision.DENIED);
     }
 
+    // -- Data tables and knowledge bases ------------------------------------------------------------------------
+
+    /**
+     * Pins a deliberate omission rather than an oversight.
+     *
+     * <p>
+     * {@code WorkspaceDataTableFacadeImpl} and {@code WorkspaceKnowledgeBaseFacadeImpl} both carry
+     * {@code hasPermission(#id, 'DataTable'|'KnowledgeBase', ...)}, so a connected user reaching them arrives here,
+     * falls to the {@code default} arm as {@code NOT_APPLICABLE}, and -- because this principal IS governed --
+     * {@code ResourceMembershipDecider} maps that to {@code DENY}.
+     *
+     * <p>
+     * That denial is correct. The per-account ownership design gives connected users data tables and knowledge bases at
+     * RUNTIME only, through the owner filter in the services; managing them is the vendor admin's job, through the
+     * embedded console. Adding cases here would be a GRANT with no surface asking for one.
+     *
+     * <p>
+     * If a connected-user-facing API is ever built, this test is the place that says what changing these two answers
+     * means.
+     */
+    @Test
+    void testResolveDeniesDataTableAndKnowledgeBaseForAConnectedUser() {
+        assertThat(resolver.resolve(1L, "DataTable", "DATA_TABLE_VIEW")).isEqualTo(Decision.NOT_APPLICABLE);
+        assertThat(resolver.resolve(1L, "DataTable", "DATA_TABLE_EDIT")).isEqualTo(Decision.NOT_APPLICABLE);
+        assertThat(resolver.resolve(1L, "KnowledgeBase", "KNOWLEDGE_BASE_VIEW")).isEqualTo(Decision.NOT_APPLICABLE);
+        assertThat(resolver.resolve(1L, "KnowledgeBase", "KNOWLEDGE_BASE_EDIT")).isEqualTo(Decision.NOT_APPLICABLE);
+    }
+
     // -- Project -----------------------------------------------------------------------------------------------
 
     @Test

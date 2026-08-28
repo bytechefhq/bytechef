@@ -79,7 +79,7 @@ public class DataTableDeleteRecordsAction {
                 string(TABLE)
                     .label("Table")
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, ownerResolverProvider)),
                 array(IDS)
                     .label("Record IDs")
                     .description("IDs of records to delete")

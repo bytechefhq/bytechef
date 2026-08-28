@@ -18,10 +18,12 @@ package com.bytechef.platform.knowledgebase.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.constant.OwnerType;
+import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditPublisher;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.platform.owner.Owner;
@@ -40,6 +42,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class KnowledgeBaseOwnershipTest {
 
     private static final Owner ACCOUNT_A = Owner.connectedUser(1L);
+
+    @Mock
+    private KnowledgeBaseAuditPublisher knowledgeBaseAuditPublisher;
 
     @Mock
     private KnowledgeBaseRepository knowledgeBaseRepository;
@@ -87,6 +92,37 @@ class KnowledgeBaseOwnershipTest {
         List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases(2, Optional.of(ACCOUNT_A));
 
         assertEquals(2, knowledgeBases.size());
+    }
+
+    @Test
+    void testAssigningAnOwnerStampsBothColumns() {
+        KnowledgeBase knowledgeBase = new KnowledgeBase();
+
+        when(knowledgeBaseRepository.findById(7L)).thenReturn(Optional.of(knowledgeBase));
+
+        knowledgeBaseService.assignOwner(7L, ACCOUNT_A);
+
+        assertEquals(1L, knowledgeBase.getOwnerId());
+        assertEquals(OwnerType.CONNECTED_USER, knowledgeBase.getOwnerType());
+    }
+
+    @Test
+    void testAssigningANullOwnerReturnsTheKnowledgeBaseToTheVendor() {
+        KnowledgeBase knowledgeBase = ownedBy(1L);
+
+        when(knowledgeBaseRepository.findById(7L)).thenReturn(Optional.of(knowledgeBase));
+
+        knowledgeBaseService.assignOwner(7L, null);
+
+        assertNull(knowledgeBase.getOwnerId());
+        assertNull(knowledgeBase.getOwnerType());
+    }
+
+    @Test
+    void testAssigningAnOwnerToAMissingKnowledgeBaseIsRejected() {
+        when(knowledgeBaseRepository.findById(7L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> knowledgeBaseService.assignOwner(7L, ACCOUNT_A));
     }
 
     private static KnowledgeBase ownedBy(long ownerId) {

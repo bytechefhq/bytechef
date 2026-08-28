@@ -77,7 +77,7 @@ public class DataTableGetRecordAction {
                 string(TABLE)
                     .label("Table")
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, ownerResolverProvider)),
                 integer(ID)
                     .label("Record ID")
                     .required(true))

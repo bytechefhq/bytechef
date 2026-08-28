@@ -88,7 +88,7 @@ public class DataTableRecordCreatedTrigger {
                     .label("Table")
                     .description("Select a Data Table.")
                     .required(true)
-                    .options(DataTableUtils.getTriggerTableOptions(dataTableService)))
+                    .options(DataTableUtils.getTriggerTableOptions(dataTableService, ownerResolverProvider)))
             .output(this::output)
             .webhookEnable(this::webhookEnable)
             .webhookDisable(this::webhookDisable)

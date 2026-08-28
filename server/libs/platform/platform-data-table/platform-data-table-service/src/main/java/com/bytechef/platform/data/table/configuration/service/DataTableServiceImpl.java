@@ -26,11 +26,13 @@ import com.bytechef.platform.data.table.configuration.repository.DataTableReposi
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.ReservedColumns;
+import com.bytechef.platform.owner.Owner;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -243,6 +245,19 @@ public class DataTableServiceImpl implements DataTableService {
 
     @Override
     public List<DataTableInfo> listTables(long environmentId) {
+        return listTables(environmentId, Optional.empty());
+    }
+
+    /**
+     * The same visibility rule the rows follow, one level up: an unowned table belongs to the vendor and is everyone's,
+     * and a caller with no owner is an admin or an automation caller and sees everything.
+     *
+     * <p>
+     * The filter runs on the registry row before the column lookup, so a table the caller cannot see costs no
+     * {@code information_schema} work.
+     */
+    @Override
+    public List<DataTableInfo> listTables(long environmentId, Optional<Owner> owner) {
         String prefix = "dt_" + environmentId + "_";
 
         String sqlTables = "SELECT table_name FROM information_schema.tables "
@@ -259,10 +274,6 @@ public class DataTableServiceImpl implements DataTableService {
             }
 
             String baseName = tableName.substring(prefix.length());
-            List<ColumnSpec> columnSpecs = listColumns(tableName)
-                .stream()
-                .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
-                .toList();
 
             DataTable dataTable = dataTableRepository.findByName(baseName)
                 .orElse(null);
@@ -273,6 +284,15 @@ public class DataTableServiceImpl implements DataTableService {
                 continue;
             }
 
+            if (!isReadableBy(dataTable, owner)) {
+                continue;
+            }
+
+            List<ColumnSpec> columnSpecs = listColumns(tableName)
+                .stream()
+                .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
+                .toList();
+
             dataTableInfos.add(
                 new DataTableInfo(
                     dataTable.getId(), baseName, dataTable.getDescription(), columnSpecs,
@@ -280,6 +300,39 @@ public class DataTableServiceImpl implements DataTableService {
         }
 
         return dataTableInfos;
+    }
+
+    @Override
+    @Transactional
+    public void assignOwner(long dataTableId, @Nullable Owner owner) {
+        DataTable dataTable = dataTableRepository.findById(dataTableId)
+            .orElseThrow(() -> new IllegalArgumentException("Data table not found: " + dataTableId));
+
+        dataTable.setOwnerId(owner == null ? null : owner.id());
+        dataTable.setOwnerType(owner == null ? null : owner.type());
+
+        dataTableRepository.save(dataTable);
+    }
+
+    /**
+     * Whether {@code owner} may see this table at all. Mirrors {@code KnowledgeBaseServiceImpl.isReadableBy}
+     * deliberately: two stores, one rule, and a caller must not be able to tell "somebody else's" from "does not
+     * exist".
+     *
+     * <p>
+     * An owner id with no type is treated as owned rather than unowned, so a half-written owner fails closed instead of
+     * quietly sharing the table with every account.
+     */
+    static boolean isReadableBy(DataTable dataTable, Optional<Owner> owner) {
+        Long ownerId = dataTable.getOwnerId();
+
+        if (ownerId == null || owner.isEmpty()) {
+            return true;
+        }
+
+        Owner currentOwner = owner.get();
+
+        return currentOwner.id() == ownerId && currentOwner.type() == dataTable.getOwnerType();
     }
 
     /**

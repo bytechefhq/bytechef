@@ -11,7 +11,10 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.owner.Owner;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -55,6 +58,16 @@ public class RemoteDataTableServiceClient implements DataTableService {
 
     @Override
     public List<DataTableInfo> listTables(long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableInfo> listTables(long environmentId, Optional<Owner> owner) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void assignOwner(long dataTableId, @Nullable Owner owner) {
         throw new UnsupportedOperationException();
     }
 

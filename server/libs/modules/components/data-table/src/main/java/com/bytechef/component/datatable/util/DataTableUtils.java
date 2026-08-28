@@ -35,6 +35,9 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.TriggerContextAware;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -43,6 +46,8 @@ import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.RowOwnerFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.owner.Owner;
+import com.bytechef.platform.owner.OwnerResolver;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,7 +55,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Utility to construct output schemas for Data Table actions using table metadata.
@@ -63,29 +70,43 @@ public final class DataTableUtils {
     }
 
     /**
-     * Returns an OptionsFunction for action table selection dropdowns.
+     * Returns an OptionsFunction for action table selection dropdowns, narrowed to the tables the calling owner may
+     * see. Without the owner the dropdown lists every table in the tenant, which is how a connected user learns the
+     * names of other accounts' tables.
      *
-     * @param dataTableService the data table service
+     * @param dataTableService      the data table service
+     * @param ownerResolverProvider resolves the owner this invocation acts for
      * @return an OptionsFunction that provides table options
      */
-    public static ActionDefinition.OptionsFunction<String> getActionTableOptions(DataTableService dataTableService) {
+    public static ActionDefinition.OptionsFunction<String> getActionTableOptions(
+        DataTableService dataTableService, ObjectProvider<OwnerResolver> ownerResolverProvider) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
-            searchText, dataTableService);
+            searchText, dataTableService,
+            OwnerResolution.resolve((ActionContextAware) context, ownerResolverProvider));
     }
 
     /**
-     * Returns an OptionsFunction for trigger table selection dropdowns.
+     * Trigger form of {@link #getActionTableOptions}. {@code TriggerContextAware} has its own {@code OwnerResolution}
+     * overload -- it carries no editor flag, so it reads the job principal when there is one and the security context
+     * otherwise.
      *
-     * @param dataTableService the data table service
+     * @param dataTableService      the data table service
+     * @param ownerResolverProvider resolves the owner this invocation acts for
      * @return an OptionsFunction that provides table options
      */
-    public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(DataTableService dataTableService) {
+    public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(
+        DataTableService dataTableService, ObjectProvider<OwnerResolver> ownerResolverProvider) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
-            searchText, dataTableService);
+            searchText, dataTableService,
+            OwnerResolution.resolve((TriggerContextAware) context, ownerResolverProvider));
     }
 
-    public static List<Option<String>> getTableOptions(String searchText, DataTableService dataTableService) {
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEVELOPMENT.ordinal());
+    public static List<Option<String>> getTableOptions(
+        String searchText, DataTableService dataTableService, Optional<Owner> owner) {
+
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEVELOPMENT.ordinal(), owner);
 
         return dataTableInfos.stream()
             .filter(

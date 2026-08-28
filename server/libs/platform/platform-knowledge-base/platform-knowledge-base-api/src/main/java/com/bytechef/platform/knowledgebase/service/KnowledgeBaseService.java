@@ -20,6 +20,7 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.owner.Owner;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 public interface KnowledgeBaseService {
 
@@ -82,6 +83,18 @@ public interface KnowledgeBaseService {
      * Owner-aware form. See {@link #getKnowledgeBase(Long, Optional)}.
      */
     List<KnowledgeBase> getKnowledgeBases(int environment, Optional<Owner> owner);
+
+    /**
+     * Assigns a knowledge base to an account, or returns it to the vendor when {@code owner} is null.
+     *
+     * <p>
+     * Documents inherit through {@code knowledge_base_id} and carry no owner of their own, so this one write moves the
+     * whole knowledge base.
+     *
+     * @param id    the knowledge base id
+     * @param owner the owning account, or null to make the knowledge base shared again
+     */
+    void assignOwner(long id, @Nullable Owner owner);
 
     /**
      * Updates an existing KnowledgeBase identified by the given ID with the provided new values.

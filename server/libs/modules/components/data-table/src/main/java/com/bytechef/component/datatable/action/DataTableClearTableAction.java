@@ -77,7 +77,7 @@ public class DataTableClearTableAction {
                 string(TABLE)
                     .label("Table")
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)))
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, ownerResolverProvider)))
             .output(
                 outputSchema(
                     object()

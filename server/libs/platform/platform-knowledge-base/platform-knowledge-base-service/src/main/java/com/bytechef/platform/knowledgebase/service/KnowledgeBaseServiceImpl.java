@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -147,5 +148,19 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
         knowledgeBaseAuditPublisher.publish(KnowledgeBaseAuditEvent.KB_UPDATED, id);
 
         return savedKnowledgeBase;
+    }
+
+    @Override
+    @Transactional
+    public void assignOwner(long id, @Nullable Owner owner) {
+        KnowledgeBase knowledgeBase = knowledgeBaseRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("KnowledgeBase not found: " + id));
+
+        knowledgeBase.setOwnerId(owner == null ? null : owner.id());
+        knowledgeBase.setOwnerType(owner == null ? null : owner.type());
+
+        knowledgeBaseRepository.save(knowledgeBase);
+
+        knowledgeBaseAuditPublisher.publish(KnowledgeBaseAuditEvent.KB_UPDATED, id);
     }
 }

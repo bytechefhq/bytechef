@@ -81,7 +81,7 @@ public class DataTableCreateRecordsAction {
                 string(TABLE)
                     .label("Table")
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, ownerResolverProvider)),
                 dynamicProperties(RECORDS)
                     .propertiesLookupDependsOn(TABLE)
                     .properties(DataTableUtils.createDynamicProperties(dataTableService, false))

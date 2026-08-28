@@ -94,7 +94,7 @@ public class DataTableFindRecordsAction {
                 string(TABLE)
                     .label("Table")
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, ownerResolverProvider)),
                 array(FILTERS)
                     .label("Filters")
                     .description(
