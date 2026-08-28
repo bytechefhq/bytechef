@@ -44,6 +44,7 @@
 **Runtime scoping (Task 4–5)**
 - Modify: `server/libs/modules/components/data-table/src/main/java/com/bytechef/component/datatable/util/DataTableUtils.java`
 - Modify: `server/libs/platform/platform-data-table/platform-data-table-api/.../domain/RowOwnerFilter.java`
+- Modify: `.../platform-data-table-api/.../execution/service/DataTableRowService.java` and its impl — the pool on all 14 methods
 
 **Knowledge base (Task 6)**
 - Create: `server/libs/platform/platform-knowledge-base/platform-knowledge-base-service/src/main/resources/config/liquibase/changelog/platform/knowledge_base/20260829000001_platform_knowledge_base_add_platform_type.xml`
@@ -412,11 +413,45 @@ In `DataTableServiceImpl.listTables`, take the prefix from the pool and filter t
 
 `RemoteDataTableServiceClient` implements `DataTableService`, so widening the interface obliges it. Replace the two `listTables` overrides and the `createTable`/`getIdByBaseName`/`duplicateTable` overrides with the new signatures, each still `throw new UnsupportedOperationException();`.
 
-- [ ] **Step 6: Run the test and confirm it passes**
+- [ ] **Step 6: Thread the pool through the ROW service too**
 
-Same command as Step 2. Expected: `Results: SUCCESS (3 tests, 3 successes)`.
+`DataTableRowServiceImpl` builds physical names as well — 8 call sites — and its interface has 14 public
+methods. Without the pool every row operation on an embedded table targets `dt_…`, so the embedded pool
+is not merely unfiltered but unusable. Same mechanical change as Step 4, same commit.
 
-- [ ] **Step 7: Commit**
+Every `DataTableRowService` method that names a table takes a `PlatformType` immediately after
+`environmentId`: `insertRow`, `updateRow`, `deleteRow`, `getRow`, the four `listRows` overloads,
+`importCsv`, and the count/aggregate forms. Extract `prefix(platformType, environmentId)` to a shared
+package-private utility rather than copying it into this class, so the two cannot drift.
+
+`RemoteDataTableRowServiceClient` implements the interface, so all 14 stubs take the new parameter and
+keep throwing `UnsupportedOperationException`.
+
+- [ ] **Step 7: Prove a row round-trips in the embedded pool**
+
+Add to `DataTablePoolIsolationIntTest`:
+
+```java
+    @Test
+    void testRowsGoIntoTheRightPhysicalTable() {
+        dataTableService.createTable(
+            "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID,
+            PlatformType.EMBEDDED);
+
+        dataTableRowService.insertRow(
+            "rows", Map.of("title", "x"), ENVIRONMENT_ID, PlatformType.EMBEDDED, RowOwnerFilter.unownedOnly());
+
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM edt_0_rows", Integer.class);
+
+        assertThat(count).as("the row must land in the embedded physical table, not dt_0_rows").isEqualTo(1);
+    }
+```
+
+- [ ] **Step 8: Run the test and confirm it passes**
+
+Same command as Step 2. Expected: `Results: SUCCESS (4 tests, 4 successes)`.
+
+- [ ] **Step 9: Commit**
 
 ```bash
 ./gradlew :server:libs:platform:platform-data-table:platform-data-table-service:spotlessApply
@@ -740,7 +775,33 @@ DOCKER_HOST=unix:///Volumes/Data/Users/ivicac2/.orbstack/run/docker.sock TESTCON
 
 Expected: compilation failure — `unownedOnly()` does not exist.
 
-- [ ] **Step 3: Add `unownedOnly` to `RowOwnerFilter`**
+- [ ] **Step 3: Pin the table-level rule, which is deliberately different**
+
+Ownership has two independent axes and they do not follow the same rule. Add to the same test class:
+
+```java
+    @Test
+    void testAVendorRunStillSeesATableAssignedToAnAccount() {
+        dataTableService.createTable(
+            "assigned", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID,
+            PlatformType.EMBEDDED);
+
+        long id = dataTableService.getIdByBaseName("assigned", PlatformType.EMBEDDED);
+
+        dataTableService.assignOwner(id, Owner.connectedUser(1055L));
+
+        // Table-level ownership is metadata the vendor manages and must be able to see; only the ROWS are the
+        // account's. Filtering both levels alike would make the console's assignment view unusable.
+        assertThat(dataTableService.listTables(ENVIRONMENT_ID, PlatformType.EMBEDDED, Optional.empty()))
+            .extracting(DataTableInfo::baseName)
+            .contains("assigned");
+    }
+```
+
+This must pass without changing `isReadableBy` — it pins existing behaviour so a later "make the two
+levels symmetric" tidy-up fails loudly instead of silently hiding assigned tables from the console.
+
+- [ ] **Step 4: Add `unownedOnly` to `RowOwnerFilter`**
 
 `from(Optional.empty())` stays `unrestricted()` — that is correct for the AUTOMATION pool, whose rows have no owners, and for Community Edition. The new factory expresses the narrower thing an embedded-pool read needs:
 
@@ -756,11 +817,86 @@ Expected: compilation failure — `unownedOnly()` does not exist.
 
 (Match the existing record/constructor shape; the third component is the "restrict to NULL owner" flag the SQL builder reads.)
 
-- [ ] **Step 4: Emit the predicate**
+- [ ] **Step 5: Make an unowned write into an EMBEDDED table deliberate**
+
+An unowned row is visible to every account, so it must never be produced by omission. `insertRow` stamps
+the owner columns only when `rowOwnerFilter.owner()` is present, which means an unresolved owner writes a
+row nobody can attribute and everybody can read — permanently, since nothing corrects it afterwards.
+
+The three filters now say three different things on a write, and `unownedOnly()` doubles as the explicit
+"this row is shared" marker, so no new type is needed:
+
+| filter | write to an EMBEDDED table |
+|---|---|
+| `from(owner)` with an owner | stamp that owner |
+| `unownedOnly()` | write a shared row — deliberate |
+| `unrestricted()` | **reject** |
+
+```java
+    private static void checkWritableOwner(PlatformType platformType, RowOwnerFilter rowOwnerFilter) {
+        if (platformType != PlatformType.EMBEDDED) {
+            return;
+        }
+
+        if (rowOwnerFilter.owner().isEmpty() && !rowOwnerFilter.unownedOnly()) {
+            throw new IllegalArgumentException(
+                "A write to an embedded data table must either carry an owner or declare the row shared; an "
+                    + "unowned row is visible to every account and must not be produced by omission");
+        }
+    }
+```
+
+Call it from `insertRow`, `updateRow` and `importCsv` — all three can create or relabel rows. AUTOMATION
+tables are untouched: no row there has an owner and none is expected to.
+
+- [ ] **Step 6: Test both directions of the write rule**
+
+```java
+    @Test
+    void testAnUnresolvedOwnerCannotWriteAnEmbeddedRow() {
+        dataTableService.createTable(
+            "guarded", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID,
+            PlatformType.EMBEDDED);
+
+        assertThatThrownBy(() -> dataTableRowService.insertRow(
+            "guarded", Map.of("title", "x"), ENVIRONMENT_ID, PlatformType.EMBEDDED,
+            RowOwnerFilter.unrestricted()))
+            .as("a row nobody can attribute and everybody can read must not be written by omission")
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testADeliberateSharedWriteIsAllowed() {
+        dataTableService.createTable(
+            "shareable", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID,
+            PlatformType.EMBEDDED);
+
+        DataTableRow row = dataTableRowService.insertRow(
+            "shareable", Map.of("title", "reference"), ENVIRONMENT_ID, PlatformType.EMBEDDED,
+            RowOwnerFilter.unownedOnly());
+
+        assertThat(row).isNotNull();
+    }
+
+    @Test
+    void testAnAutomationWriteIsUnaffected() {
+        dataTableService.createTable(
+            "plain", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID,
+            PlatformType.AUTOMATION);
+
+        DataTableRow row = dataTableRowService.insertRow(
+            "plain", Map.of("title", "x"), ENVIRONMENT_ID, PlatformType.AUTOMATION,
+            RowOwnerFilter.unrestricted());
+
+        assertThat(row).isNotNull();
+    }
+```
+
+- [ ] **Step 7: Emit the predicate**
 
 In the SQL builder that turns a `RowOwnerFilter` into a predicate, the unowned-only case emits `owner_id IS NULL`. The existing owner case already emits `(owner_id = ? OR owner_id IS NULL)`, so the new case is that expression minus its first disjunct.
 
-- [ ] **Step 5: Add the account parameter to the actions**
+- [ ] **Step 8: Add the account parameter to the actions**
 
 Data table actions gain an optional account property. **Honour it only when the run has no owner:**
 
@@ -778,7 +914,7 @@ Data table actions gain an optional account property. **Honour it only when the 
     }
 ```
 
-- [ ] **Step 6: Write the escalation test**
+- [ ] **Step 9: Write the escalation test**
 
 ```java
     @Test
@@ -791,11 +927,11 @@ Data table actions gain an optional account property. **Honour it only when the 
     }
 ```
 
-- [ ] **Step 7: Run both tests and confirm they pass**
+- [ ] **Step 10: Run every test in this task and confirm they pass**
 
 Expected: `Results: SUCCESS`.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 11: Commit**
 
 ```bash
 ./gradlew :server:libs:platform:platform-data-table:platform-data-table-service:spotlessApply :server:libs:modules:components:data-table:spotlessApply

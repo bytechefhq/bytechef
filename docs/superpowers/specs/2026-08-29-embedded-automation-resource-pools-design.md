@@ -77,6 +77,28 @@ Alice's run the vendor's `invoices` table and hide her own data.
 connected user through `connected_user_project` — so the owner is available at the same seam and needs no
 new machinery.
 
+### Two ownership axes
+
+Ownership exists at two independent levels and they do **not** follow the same rule. A table can be
+unowned while its rows are Alice's, and vice versa.
+
+| axis | who filters | rule for a vendor run naming no account |
+|---|---|---|
+| **table** — `data_table.owner_id` | `DataTableServiceImpl.isReadableBy` | **unfiltered**: every table in the pool, assigned or not |
+| **row** — `owner_id` on each `dt_*`/`edt_*` table | `RowOwnerFilter` | **unowned rows only** |
+
+The asymmetry is deliberate, not an oversight. The two levels answer different questions: a table
+assignment is metadata the vendor manages and must be able to see in order to manage, while row contents
+are the account's data. So a vendor run sees a table assigned to Alice and reads nothing inside it until
+it names her.
+
+Filtering both levels the same way was the alternative and is rejected because it makes the console's
+assignment view unusable — you would have to name an account before you could see what is assigned to
+them.
+
+An owned run is unaffected by this: table-level `isReadableBy` already hides another account's table from
+Alice, and the row filter already hides another account's rows.
+
 **Invariant: a run with an owner never sees the AUTOMATION pool. No exception, no flag.** A bridged
 workflow therefore cannot read even a harmless shared lookup table from the automation pool. Reference
 data that account workflows need belongs in the embedded pool as unowned rows, which every account
@@ -204,6 +226,15 @@ reaches a connected user's rows.
 **The account parameter is honoured only when the run has no owner. If the run already belongs to a
 connected user, the parameter is ignored — never obeyed.** Without that, Alice's own workflow names Bob
 and reads Bob's data. It is a one-line check and a privilege escalation if omitted.
+
+**An unowned write must be deliberate.** An unowned row is visible to every account, and `insertRow`
+stamps the owner columns only when the filter carries an owner — so an unresolved owner writes a row
+nobody can attribute and everybody can read, permanently, with nothing to correct it afterwards. Unowned
+rows do two jobs that are indistinguishable in the data: deliberate shared reference data, and the
+accident. They are separable only at the moment of writing, so that is where the rule goes: on a write to
+an EMBEDDED table, `unrestricted()` is rejected, an owner is stamped, and `unownedOnly()` doubles as the
+explicit "this row is shared" marker. `insertRow`, `updateRow` and `importCsv` all take it — each can
+create or relabel a row. AUTOMATION tables are untouched.
 
 This tightens behaviour that already shipped: today `RowOwnerFilter.from(empty)` is `unrestricted()`, so a
 vendor run reads every account's rows. Changing it is safe now only because every existing resource is
