@@ -165,6 +165,13 @@ query above its per-project groups.
 ### AI Hub agent tool architecture (EE)
 
 Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConfiguration`):
+**Tiers 1 and 2 are AI-Hub-only.** The Copilot panels and the management MCP surface register
+every tool DIRECTLY via `.toolCallbacks(...)` with no tool-search advisor in the chain —
+`PinnedToolSearchToolCallingAdvisor`, `AiHubGlobalToolCatalog`, `MultiSessionToolIndex` and the
+`searchTool` itself live solely under `server/ee/libs/ai/ai-hub/`. `IntelligentToolCatalog` is a
+shared registry of tool DEFINITIONS (all three surfaces partition it by name); only the hub puts a
+pgvector search index in front of it. So "pinned vs catalog-demoted" is a choice that exists only
+on the hub — everywhere else the tool is simply present and always callable.
 
 1. **Pinned static list** — everything added via `toolCallbacks.add(...)` on the agent bean.
    `PinnedToolSearchToolCallingAdvisor` keeps the ENTIRE static list callable in every model
@@ -206,7 +213,8 @@ rendered multiple-choice question to the user mid-delegation: it asks, stops, an
 re-delegates with the answer — see "Subagent conversation memory and interactive questions" for the
 seam and for what does NOT survive that round trip. Per that plan's own conclusion, do NOT create a
 specialist just to hide the number of CRUD tools in a domain — self-contained CRUD domains go flat
-(pinned or catalog-demoted per the schema-pressure guidance above) on whichever surface needs them.
+(on the hub, pinned or catalog-demoted per the schema-pressure guidance above; on Copilot and MCP,
+simply registered) on whichever surface needs them.
 Reserve a specialist for genuine multi-step reasoning over a domain (workflow editing, code
 generation, research) that a flat tool list cannot express. Adding a subagent means:
 enum entry in `AiHubAgentType` (auto-registered via `AiHubAgentTypeProvider`), a

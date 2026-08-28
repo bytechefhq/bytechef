@@ -548,7 +548,7 @@ These are the parts that apply outside their own area, so they stay here:
   `com.bytechef.task.dispatcher` and fail when a dispatcher or completion handler on the classpath is
   missing from either list.
 - **A specialist subagent is for multi-step reasoning over a domain**, not for hiding the number of
-  CRUD tools in one. Self-contained CRUD goes flat (pinned or catalog-demoted).
+  CRUD tools in one. Self-contained CRUD goes flat (on the AI Hub, pinned or catalog-demoted; on Copilot and MCP, just registered — tool search exists only on the hub).
 
 ## Access and Authentication
 
