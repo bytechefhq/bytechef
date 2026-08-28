@@ -738,6 +738,8 @@ include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-r
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-service")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql")
+include("server:ee:libs:embedded:embedded-data-table-graphql")
+include("server:ee:libs:embedded:embedded-knowledge-base-graphql")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest")
 include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service")

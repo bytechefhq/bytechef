@@ -1,0 +1,20 @@
+extend type Query {
+    "ownerId filters to what that connected user would see, which includes the vendor's shared knowledge bases."
+    embeddedKnowledgeBases(environmentId: ID!, ownerId: ID): [EmbeddedKnowledgeBase!]!
+}
+
+extend type Mutation {
+    assignEmbeddedKnowledgeBaseOwner(input: AssignKnowledgeBaseOwnerInput!): Boolean!
+}
+
+input AssignKnowledgeBaseOwnerInput {
+    knowledgeBaseId: ID!
+    "Omit to return the knowledge base to the vendor, making it shared with every account again."
+    ownerId: ID
+}
+
+type EmbeddedKnowledgeBase {
+    id: ID!
+    name: String!
+    description: String
+}

@@ -356,6 +356,8 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
+    implementation(project(":server:ee:libs:embedded:embedded-data-table-graphql"))
+    implementation(project(":server:ee:libs:embedded:embedded-knowledge-base-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-public-rest"))

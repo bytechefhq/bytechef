@@ -1,0 +1,20 @@
+extend type Query {
+    "ownerId filters to what that connected user would see, which includes the vendor's shared tables."
+    embeddedDataTables(environmentId: ID!, ownerId: ID): [EmbeddedDataTable!]!
+}
+
+extend type Mutation {
+    assignEmbeddedDataTableOwner(input: AssignDataTableOwnerInput!): Boolean!
+}
+
+input AssignDataTableOwnerInput {
+    dataTableId: ID!
+    "Omit to return the table to the vendor, making it shared with every account again."
+    ownerId: ID
+}
+
+type EmbeddedDataTable {
+    id: ID!
+    baseName: String!
+    description: String
+}
