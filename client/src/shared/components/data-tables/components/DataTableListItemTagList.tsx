@@ -1,5 +1,5 @@
-import useDataTableListItemTagList from '@/pages/automation/datatables/components/hooks/useDataTableListItemTagList';
 import TagList from '@/shared/components/TagList';
+import useDataTableListItemTagList from '@/shared/components/data-tables/components/hooks/useDataTableListItemTagList';
 import {Tag} from '@/shared/middleware/graphql';
 import {useMemo} from 'react';
 

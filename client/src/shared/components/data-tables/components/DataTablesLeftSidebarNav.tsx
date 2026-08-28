@@ -1,4 +1,4 @@
-import useDataTablesLeftSidebarNav from '@/pages/automation/datatables/components/hooks/useDataTablesLeftSidebarNav';
+import useDataTablesLeftSidebarNav from '@/shared/components/data-tables/components/hooks/useDataTablesLeftSidebarNav';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {TagIcon} from 'lucide-react';
 

@@ -1,8 +1,8 @@
 import DeleteDataTableAlertDialog from '@/pages/automation/datatable/components/DeleteDataTableAlertDialog';
-import DataTableListItem from '@/pages/automation/datatables/components/DataTableListItem';
-import DuplicateDataTableDialog from '@/pages/automation/datatables/components/DuplicateDataTableDialog';
-import RenameDataTableDialog from '@/pages/automation/datatables/components/RenameDataTableDialog';
-import useDataTableList from '@/pages/automation/datatables/components/hooks/useDataTableList';
+import DataTableListItem from '@/shared/components/data-tables/components/DataTableListItem';
+import DuplicateDataTableDialog from '@/shared/components/data-tables/components/DuplicateDataTableDialog';
+import RenameDataTableDialog from '@/shared/components/data-tables/components/RenameDataTableDialog';
+import useDataTableList from '@/shared/components/data-tables/components/hooks/useDataTableList';
 import {DataTable, DataTableTagsEntry, Tag} from '@/shared/middleware/graphql';
 
 interface DataTableListProps {

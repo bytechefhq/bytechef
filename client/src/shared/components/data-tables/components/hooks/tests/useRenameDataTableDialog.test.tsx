@@ -18,7 +18,7 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/pages/automation/datatables/stores/useRenameDataTableDialogStore', () => ({
+vi.mock('@/shared/components/data-tables/stores/useRenameDataTableDialogStore', () => ({
     useRenameDataTableDialogStore: vi.fn(() => {
         return {
             baseName: hoisted.storeState.baseName,

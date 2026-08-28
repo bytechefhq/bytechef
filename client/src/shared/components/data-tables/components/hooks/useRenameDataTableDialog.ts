@@ -1,4 +1,4 @@
-import {useRenameDataTableDialogStore} from '@/pages/automation/datatables/stores/useRenameDataTableDialogStore';
+import {useRenameDataTableDialogStore} from '@/shared/components/data-tables/stores/useRenameDataTableDialogStore';
 import {useRenameDataTableMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';

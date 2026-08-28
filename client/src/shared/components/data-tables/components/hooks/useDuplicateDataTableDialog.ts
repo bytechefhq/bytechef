@@ -1,4 +1,4 @@
-import {useDuplicateDataTableDialogStore} from '@/pages/automation/datatables/stores/useDuplicateDataTableDialogStore';
+import {useDuplicateDataTableDialogStore} from '@/shared/components/data-tables/stores/useDuplicateDataTableDialogStore';
 import {useDuplicateDataTableMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';

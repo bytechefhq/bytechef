@@ -9,7 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import useRenameDataTableDialog from '@/pages/automation/datatables/components/hooks/useRenameDataTableDialog';
+import useRenameDataTableDialog from '@/shared/components/data-tables/components/hooks/useRenameDataTableDialog';
 
 const RenameDataTableDialog = () => {
     const {canRename, handleOpenChange, handleRenameSubmit, handleRenameValueChange, open, renameValue} =

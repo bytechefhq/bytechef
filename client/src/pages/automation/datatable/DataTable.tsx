@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
-import CreateDataTableDialog from '@/pages/automation/datatables/components/CreateDataTableDialog';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import CreateDataTableDialog from '@/shared/components/data-tables/components/CreateDataTableDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';

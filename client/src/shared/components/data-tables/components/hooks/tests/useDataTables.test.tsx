@@ -1,3 +1,4 @@
+import * as graphql from '@/shared/middleware/graphql';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -53,6 +54,11 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
             error: null,
             isLoading: false,
         })),
+        useEmbeddedDataTablesQuery: vi.fn(() => ({
+            data: {embeddedDataTables: []},
+            error: null,
+            isLoading: false,
+        })),
     };
 });
 
@@ -64,19 +70,19 @@ describe('useDataTables', () => {
 
     describe('initial state', () => {
         it('returns tables from query', () => {
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.tables).toHaveLength(3);
         });
 
         it('returns isLoading as false', () => {
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.isLoading).toBe(false);
         });
 
         it('returns error as null', () => {
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.error).toBeNull();
         });
@@ -84,13 +90,13 @@ describe('useDataTables', () => {
 
     describe('without tag filter', () => {
         it('returns all tables as filteredTables', () => {
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.filteredTables).toHaveLength(3);
         });
 
         it('returns tagId as undefined', () => {
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.tagId).toBeUndefined();
         });
@@ -100,7 +106,7 @@ describe('useDataTables', () => {
         it('returns tagId from search params', () => {
             hoisted.mockSearchParams = new URLSearchParams('tagId=1');
 
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.tagId).toBe('1');
         });
@@ -108,10 +114,42 @@ describe('useDataTables', () => {
         it('filters tables by tag', () => {
             hoisted.mockSearchParams = new URLSearchParams('tagId=1');
 
-            const {result} = renderHook(() => useDataTables());
+            const {result} = renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.filteredTables).toHaveLength(1);
             expect(result.current.filteredTables[0].id).toBe('1');
+        });
+    });
+
+    describe('scope', () => {
+        it('reads the workspace query and leaves the embedded one disabled', () => {
+            renderHook(() => useDataTables({type: 'WORKSPACE', workspaceId: 1049}));
+
+            expect(graphql.useDataTablesQuery).toHaveBeenCalledWith(
+                expect.objectContaining({workspaceId: '1049'}),
+                expect.objectContaining({enabled: true})
+            );
+            expect(graphql.useEmbeddedDataTablesQuery).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({enabled: false})
+            );
+        });
+
+        it('reads the embedded query under an embedded scope', () => {
+            renderHook(() => useDataTables({ownerId: 42, type: 'EMBEDDED'}));
+
+            expect(graphql.useEmbeddedDataTablesQuery).toHaveBeenCalledWith(
+                expect.objectContaining({ownerId: '42'}),
+                expect.objectContaining({enabled: true})
+            );
+        });
+
+        // Tags are workspace-scoped. Handing a workspace's tags to the vendor console would be a cross-scope leak in
+        // the UI, so the embedded scope must yield none rather than whatever the tag query last cached.
+        it('returns no tags under an embedded scope', () => {
+            const {result} = renderHook(() => useDataTables({type: 'EMBEDDED'}));
+
+            expect(result.current.allTags).toEqual([]);
         });
     });
 });

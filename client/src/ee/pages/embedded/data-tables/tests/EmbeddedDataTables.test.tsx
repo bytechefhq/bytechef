@@ -2,9 +2,9 @@ import EmbeddedDataTables from '@/ee/pages/embedded/data-tables/EmbeddedDataTabl
 import {render, screen, waitFor} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-const {assignMutateMock, useEmbeddedDataTablesQueryMock} = vi.hoisted(() => ({
+const {assignMutateMock, useDataTablesMock} = vi.hoisted(() => ({
     assignMutateMock: vi.fn(),
-    useEmbeddedDataTablesQueryMock: vi.fn(),
+    useDataTablesMock: vi.fn(),
 }));
 
 // Partial, because EnvironmentSelect draws useEnvironmentsQuery from this same generated module. A full factory
@@ -12,7 +12,10 @@ const {assignMutateMock, useEmbeddedDataTablesQueryMock} = vi.hoisted(() => ({
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAssignEmbeddedDataTableOwnerMutation: () => ({mutate: assignMutateMock}),
-    useEmbeddedDataTablesQuery: useEmbeddedDataTablesQueryMock,
+}));
+
+vi.mock('@/shared/components/data-tables/components/hooks/useDataTables', () => ({
+    default: useDataTablesMock,
 }));
 
 vi.mock('@/ee/pages/embedded/shared/components/useEmbeddedConnectedUsers', () => ({
@@ -26,12 +29,14 @@ describe('EmbeddedDataTables', () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        useEmbeddedDataTablesQueryMock.mockReturnValue({
-            data: {
-                embeddedDataTables: [{baseName: 'conversations', description: 'Chat history', id: '7', ownerId: null}],
-            },
+        useDataTablesMock.mockReturnValue({
+            allTags: [],
             error: undefined,
+            filteredTables: [],
             isLoading: false,
+            tables: [{baseName: 'conversations', columns: [], description: 'Chat history', id: '7', ownerId: null}],
+            tagId: undefined,
+            tagsByTableData: [],
         });
     });
 
@@ -41,19 +46,23 @@ describe('EmbeddedDataTables', () => {
         expect(await screen.findByText('conversations')).toBeInTheDocument();
     });
 
-    it('asks for every owner until one is chosen', async () => {
+    it('asks the shared hook for an embedded scope with every owner until one is chosen', async () => {
         render(<EmbeddedDataTables />);
 
         await waitFor(() => {
-            expect(useEmbeddedDataTablesQueryMock).toHaveBeenCalledWith(expect.objectContaining({ownerId: undefined}));
+            expect(useDataTablesMock).toHaveBeenCalledWith({ownerId: undefined, type: 'EMBEDDED'});
         });
     });
 
     it('shows an empty state rather than a blank page when there are no tables', async () => {
-        useEmbeddedDataTablesQueryMock.mockReturnValue({
-            data: {embeddedDataTables: []},
+        useDataTablesMock.mockReturnValue({
+            allTags: [],
             error: undefined,
+            filteredTables: [],
             isLoading: false,
+            tables: [],
+            tagId: undefined,
+            tagsByTableData: [],
         });
 
         render(<EmbeddedDataTables />);

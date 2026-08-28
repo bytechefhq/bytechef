@@ -1,16 +1,17 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import CreateDataTableDialog from '@/pages/automation/datatables/components/CreateDataTableDialog';
-import DataTableList from '@/pages/automation/datatables/components/DataTableList';
-import DataTablesFilterTitle from '@/pages/automation/datatables/components/DataTablesFilterTitle';
-import DataTablesLeftSidebarNav from '@/pages/automation/datatables/components/DataTablesLeftSidebarNav';
-import useDataTables from '@/pages/automation/datatables/components/hooks/useDataTables';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import CreateDataTableDialog from '@/shared/components/data-tables/components/CreateDataTableDialog';
+import DataTableList from '@/shared/components/data-tables/components/DataTableList';
+import DataTablesFilterTitle from '@/shared/components/data-tables/components/DataTablesFilterTitle';
+import DataTablesLeftSidebarNav from '@/shared/components/data-tables/components/DataTablesLeftSidebarNav';
+import useDataTables from '@/shared/components/data-tables/components/hooks/useDataTables';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useDataTableStorageUsageQuery} from '@/shared/middleware/graphql';
@@ -19,7 +20,12 @@ import {Table2Icon} from 'lucide-react';
 import {useEffect} from 'react';
 
 const DataTables = () => {
-    const {allTags, error, filteredTables, isLoading, tables, tagId, tagsByTableData} = useDataTables();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {allTags, error, filteredTables, isLoading, tables, tagId, tagsByTableData} = useDataTables({
+        type: 'WORKSPACE',
+        workspaceId: currentWorkspaceId,
+    });
 
     const {data: storageUsageData} = useDataTableStorageUsageQuery();
 

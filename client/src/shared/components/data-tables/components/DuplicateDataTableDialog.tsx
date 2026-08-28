@@ -8,7 +8,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import useDuplicateDataTableDialog from '@/pages/automation/datatables/components/hooks/useDuplicateDataTableDialog';
+import useDuplicateDataTableDialog from '@/shared/components/data-tables/components/hooks/useDuplicateDataTableDialog';
 
 const DuplicateDataTableDialog = () => {
     const {

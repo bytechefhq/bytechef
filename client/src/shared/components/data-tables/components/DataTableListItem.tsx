@@ -1,7 +1,7 @@
-import DataTableListItemDropdownMenu from '@/pages/automation/datatables/components/DataTableListItemDropdownMenu';
-import DataTableListItemTagList from '@/pages/automation/datatables/components/DataTableListItemTagList';
-import DataTableListItemTooltip from '@/pages/automation/datatables/components/DataTableListItemTooltip';
-import useDataTableListItem from '@/pages/automation/datatables/components/hooks/useDataTableListItem';
+import DataTableListItemDropdownMenu from '@/shared/components/data-tables/components/DataTableListItemDropdownMenu';
+import DataTableListItemTagList from '@/shared/components/data-tables/components/DataTableListItemTagList';
+import DataTableListItemTooltip from '@/shared/components/data-tables/components/DataTableListItemTooltip';
+import useDataTableListItem from '@/shared/components/data-tables/components/hooks/useDataTableListItem';
 import {DataTable, Tag} from '@/shared/middleware/graphql';
 
 interface DataTableListItemProps {

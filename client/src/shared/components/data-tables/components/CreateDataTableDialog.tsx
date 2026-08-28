@@ -12,8 +12,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
-import useCreateDataTableDialog from '@/pages/automation/datatables/components/hooks/useCreateDataTableDialog';
 import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
+import useCreateDataTableDialog from '@/shared/components/data-tables/components/hooks/useCreateDataTableDialog';
 import {ColumnType} from '@/shared/middleware/graphql';
 import {Plus, Trash2} from 'lucide-react';
 import {ReactNode} from 'react';

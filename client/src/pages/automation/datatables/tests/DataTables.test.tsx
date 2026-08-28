@@ -18,11 +18,11 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('@/pages/automation/datatables/components/hooks/useDataTables', () => ({
+vi.mock('@/shared/components/data-tables/components/hooks/useDataTables', () => ({
     default: hoisted.mockUseDataTables,
 }));
 
-vi.mock('@/pages/automation/datatables/components/CreateDataTableDialog', () => ({
+vi.mock('@/shared/components/data-tables/components/CreateDataTableDialog', () => ({
     // Exposes claimsCreateIntent on the rendered node so a test can prove the list page actually opts this
     // instance into claiming the dataTable.create command intent, rather than merely asserting it renders.
     default: ({claimsCreateIntent}: {claimsCreateIntent?: boolean}) => (
@@ -32,7 +32,7 @@ vi.mock('@/pages/automation/datatables/components/CreateDataTableDialog', () => 
     ),
 }));
 
-vi.mock('@/pages/automation/datatables/components/DataTableList', () => ({
+vi.mock('@/shared/components/data-tables/components/DataTableList', () => ({
     default: ({dataTables}: {dataTables: Array<{id: string; baseName: string}>}) => (
         <div data-testid="data-table-list">
             {dataTables.map((table) => (
@@ -44,11 +44,11 @@ vi.mock('@/pages/automation/datatables/components/DataTableList', () => ({
     ),
 }));
 
-vi.mock('@/pages/automation/datatables/components/DataTablesFilterTitle', () => ({
+vi.mock('@/shared/components/data-tables/components/DataTablesFilterTitle', () => ({
     default: () => <div data-testid="filter-title">Filter Title</div>,
 }));
 
-vi.mock('@/pages/automation/datatables/components/DataTablesLeftSidebarNav', () => ({
+vi.mock('@/shared/components/data-tables/components/DataTablesLeftSidebarNav', () => ({
     default: () => <div data-testid="left-sidebar-nav">Sidebar Nav</div>,
 }));
 

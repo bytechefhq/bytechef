@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import useDataTablesFilterTitle from '@/pages/automation/datatables/components/hooks/useDataTablesFilterTitle';
+import useDataTablesFilterTitle from '@/shared/components/data-tables/components/hooks/useDataTablesFilterTitle';
 import {DataTableTagsEntry, Tag} from '@/shared/middleware/graphql';
 
 interface DataTablesFilterTitleProps {

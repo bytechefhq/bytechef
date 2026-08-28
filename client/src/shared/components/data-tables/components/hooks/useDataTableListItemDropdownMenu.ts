@@ -1,6 +1,6 @@
 import useDeleteDataTableAlertDialog from '@/pages/automation/datatable/hooks/useDeleteDataTableAlertDialog';
-import useDuplicateDataTableDialog from '@/pages/automation/datatables/components/hooks/useDuplicateDataTableDialog';
-import useRenameDataTableDialog from '@/pages/automation/datatables/components/hooks/useRenameDataTableDialog';
+import useDuplicateDataTableDialog from '@/shared/components/data-tables/components/hooks/useDuplicateDataTableDialog';
+import useRenameDataTableDialog from '@/shared/components/data-tables/components/hooks/useRenameDataTableDialog';
 import {useExportDataTableCsvQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {MouseEvent, useCallback} from 'react';

@@ -6,7 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import useDataTableListItemDropdownMenu from '@/pages/automation/datatables/components/hooks/useDataTableListItemDropdownMenu';
+import useDataTableListItemDropdownMenu from '@/shared/components/data-tables/components/hooks/useDataTableListItemDropdownMenu';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface DataTableListItemDropdownMenuProps {

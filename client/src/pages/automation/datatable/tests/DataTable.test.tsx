@@ -88,7 +88,7 @@ vi.mock('../components/DataTableLeftSidebar', () => ({
     default: () => <nav data-testid="data-table-left-sidebar">Sidebar</nav>,
 }));
 
-vi.mock('@/pages/automation/datatables/components/CreateDataTableDialog', () => ({
+vi.mock('@/shared/components/data-tables/components/CreateDataTableDialog', () => ({
     default: () => <div data-testid="create-data-table-dialog" />,
 }));
 
