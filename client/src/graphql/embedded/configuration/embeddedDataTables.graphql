@@ -1,0 +1,12 @@
+query EmbeddedDataTables($environmentId: ID!, $ownerId: ID) {
+    embeddedDataTables(environmentId: $environmentId, ownerId: $ownerId) {
+        id
+        baseName
+        description
+        ownerId
+    }
+}
+
+mutation AssignEmbeddedDataTableOwner($input: AssignDataTableOwnerInput!) {
+    assignEmbeddedDataTableOwner(input: $input)
+}

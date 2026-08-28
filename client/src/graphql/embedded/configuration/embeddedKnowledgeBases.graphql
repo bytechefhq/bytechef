@@ -1,0 +1,12 @@
+query EmbeddedKnowledgeBases($environmentId: ID!, $ownerId: ID) {
+    embeddedKnowledgeBases(environmentId: $environmentId, ownerId: $ownerId) {
+        id
+        name
+        description
+        ownerId
+    }
+}
+
+mutation AssignEmbeddedKnowledgeBaseOwner($input: AssignKnowledgeBaseOwnerInput!) {
+    assignEmbeddedKnowledgeBaseOwner(input: $input)
+}

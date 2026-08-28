@@ -110,6 +110,8 @@ const IdentityProvidersPage = lazy(
 );
 const AutomationWorkflows = lazy(() => import('@/ee/pages/embedded/automation-workflows/AutomationWorkflows'));
 const AutomationWorkflow = lazy(() => import('@/ee/pages/embedded/automation-workflow/AutomationWorkflow'));
+const EmbeddedDataTables = lazy(() => import('@/ee/pages/embedded/data-tables/EmbeddedDataTables'));
+const EmbeddedKnowledgeBases = lazy(() => import('@/ee/pages/embedded/knowledge-bases/EmbeddedKnowledgeBases'));
 const ConnectedUsers = lazy(() => import('@/ee/pages/embedded/connected-users/ConnectedUsers'));
 const CustomComponentDetail = lazy(
     () => import('@/ee/pages/settings/platform/custom-components/CustomComponentDetail')
@@ -1424,6 +1426,30 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'app-events',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <EmbeddedDataTables />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'data-tables',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper>
+                                                    <EmbeddedKnowledgeBases />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'knowledge-bases',
                                 },
                                 {
                                     element: (
