@@ -180,13 +180,21 @@ Pool visibility is derived from the owner, at the seam where `OwnerResolution` a
 everything, correct for Community Edition. Pool resolution cannot copy that, because failing open *is*
 cross-pool leakage. An unresolvable pool yields nothing.
 
-**The editor/options path is the least-settled part of this design and the plan must resolve it by
-reading code, not by assumption.** `ActionContextAware.getPlatformType()` is nullable and
-`ActionContextImpl.Data` calls `Objects.requireNonNull(type)` only on its non-editor branch — the
-existing code arranges never to need it in the editor, which is exactly where the table dropdown runs.
-`OwnerResolution`'s editor branch asks `resolveCurrentPrincipal()`, which answers who is logged in; for
-an admin editing both kinds of workflow that does not determine the pool. The pool must therefore be
-threaded into the options request the way the environment already is.
+**The editor/options path needed no new machinery — resolved while planning, 2026-08-29.**
+`DataTableUtils.getTableOptions` already receives `OwnerResolution.resolve(...)`, so the options path
+resolves the owner itself, including in the editor where it falls through to `resolveCurrentPrincipal()`.
+Because scoping keys on the owner rather than the platform type, the pool follows from a value already in
+hand and nothing has to be threaded into the request. The concern this replaces was real only for the
+earlier platform-type-keyed draft: `ActionContextAware.getPlatformType()` is nullable and
+`ActionContextImpl.Data` requires it only on its non-editor branch, so the editor genuinely cannot supply
+it.
+
+**A leak vector found in the same pass.** `DataTableUtils.getDataTableInfo(service, baseName,
+environmentId)` resolves a table **by name with no scoping at all**, and feeds `rowObjectSchema`,
+`createSampleOutput` and the column-properties function. It exposes column metadata rather than row data,
+but an account naming `invoices` would learn its structure, and after the split two same-named tables in
+different pools would resolve to whichever the scan reached first. It takes the owner and the pool like
+every other lookup.
 
 ### Naming the account
 
