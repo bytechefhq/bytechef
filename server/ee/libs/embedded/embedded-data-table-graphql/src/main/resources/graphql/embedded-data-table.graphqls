@@ -17,6 +17,14 @@ type EmbeddedDataTable {
     id: ID!
     baseName: String!
     description: String
+    columns: [EmbeddedDataTableColumn!]!
+    lastModifiedDate: Long
     "Null means the vendor owns it and every account can see it."
     ownerId: ID
+}
+
+type EmbeddedDataTableColumn {
+    id: ID!
+    name: String!
+    type: ColumnType!
 }

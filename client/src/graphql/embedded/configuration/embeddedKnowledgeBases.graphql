@@ -3,6 +3,8 @@ query EmbeddedKnowledgeBases($environmentId: ID!, $ownerId: ID) {
         id
         name
         description
+        createdDate
+        lastModifiedDate
         ownerId
     }
 }

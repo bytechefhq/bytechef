@@ -13,6 +13,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -56,6 +57,7 @@ public class EmbeddedKnowledgeBaseGraphQlController {
             .map(
                 knowledgeBase -> new EmbeddedKnowledgeBase(
                     knowledgeBase.getId(), knowledgeBase.getName(), knowledgeBase.getDescription(),
+                    toEpochMilli(knowledgeBase.getCreatedDate()), toEpochMilli(knowledgeBase.getLastModifiedDate()),
                     knowledgeBase.getOwnerId()))
             .toList();
     }
@@ -70,9 +72,15 @@ public class EmbeddedKnowledgeBaseGraphQlController {
     public record AssignKnowledgeBaseOwnerInput(Long knowledgeBaseId, @Nullable Long ownerId) {
     }
 
+    private static @Nullable Long toEpochMilli(@Nullable Instant instant) {
+        return instant == null ? null : instant.toEpochMilli();
+    }
+
     /**
-     * A null ownerId is the vendor's, which the visibility rule shares with every account.
+     * Deliberately the same shape as the automation {@code KnowledgeBase} minus its documents, plus the owner, so one
+     * set of client components can render both surfaces.
      */
-    public record EmbeddedKnowledgeBase(Long id, String name, String description, @Nullable Long ownerId) {
+    public record EmbeddedKnowledgeBase(Long id, String name, String description, @Nullable Long createdDate,
+        @Nullable Long lastModifiedDate, @Nullable Long ownerId) {
     }
 }

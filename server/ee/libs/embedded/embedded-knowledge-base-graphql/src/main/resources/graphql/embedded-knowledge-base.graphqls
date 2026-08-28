@@ -17,6 +17,8 @@ type EmbeddedKnowledgeBase {
     id: ID!
     name: String!
     description: String
+    createdDate: Long
+    lastModifiedDate: Long
     "Null means the vendor owns it and every account can see it."
     ownerId: ID
 }

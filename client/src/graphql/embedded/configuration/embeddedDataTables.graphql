@@ -3,6 +3,12 @@ query EmbeddedDataTables($environmentId: ID!, $ownerId: ID) {
         id
         baseName
         description
+        columns {
+            id
+            name
+            type
+        }
+        lastModifiedDate
         ownerId
     }
 }

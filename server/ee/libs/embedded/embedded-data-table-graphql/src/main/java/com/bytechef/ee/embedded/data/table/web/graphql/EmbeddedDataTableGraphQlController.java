@@ -8,11 +8,14 @@
 package com.bytechef.ee.embedded.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.embedded.data.table.facade.EmbeddedDataTableApiFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.domain.ColumnType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -53,9 +56,7 @@ public class EmbeddedDataTableGraphQlController {
 
         return dataTableInfos.stream()
             .map(
-                dataTableInfo -> new EmbeddedDataTable(
-                    dataTableInfo.id(), dataTableInfo.baseName(), dataTableInfo.description(),
-                    dataTableInfo.ownerId()))
+                EmbeddedDataTableGraphQlController::toEmbeddedDataTable)
             .toList();
     }
 
@@ -70,8 +71,31 @@ public class EmbeddedDataTableGraphQlController {
     }
 
     /**
+     * Deliberately the same shape as the automation {@code DataTable}, plus the owner, so one set of client components
+     * can render both surfaces. The column id is base64 for the same reason it is there.
+     */
+    private static EmbeddedDataTable toEmbeddedDataTable(DataTableInfo dataTableInfo) {
+        List<EmbeddedDataTableColumn> columns = dataTableInfo.columns()
+            .stream()
+            .map(
+                columnSpec -> new EmbeddedDataTableColumn(
+                    EncodingUtils.urlEncodeBase64ToString(columnSpec.name()), columnSpec.name(), columnSpec.type()))
+            .toList();
+
+        Instant lastModifiedDate = dataTableInfo.lastModifiedDate();
+
+        return new EmbeddedDataTable(
+            dataTableInfo.id(), dataTableInfo.baseName(), dataTableInfo.description(), columns,
+            lastModifiedDate == null ? null : lastModifiedDate.toEpochMilli(), dataTableInfo.ownerId());
+    }
+
+    /**
      * A null ownerId is the vendor's, which the visibility rule shares with every account.
      */
-    public record EmbeddedDataTable(Long id, String baseName, String description, @Nullable Long ownerId) {
+    public record EmbeddedDataTable(Long id, String baseName, String description, List<EmbeddedDataTableColumn> columns,
+        @Nullable Long lastModifiedDate, @Nullable Long ownerId) {
+    }
+
+    public record EmbeddedDataTableColumn(String id, String name, ColumnType type) {
     }
 }
