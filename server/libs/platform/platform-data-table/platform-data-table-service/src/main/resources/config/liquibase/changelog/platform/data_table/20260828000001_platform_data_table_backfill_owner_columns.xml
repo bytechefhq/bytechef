@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/platform/data_table/20260828000001_platform_data_table_backfill_owner_columns.xml">
+
+    <!--
+        The dt_* tables are created at runtime, so they cannot be named in a changeset. This backfills the owner
+        columns onto the ones that already exist; tables created from here on get the columns from createTable.
+    -->
+    <changeSet id="20260828000001-1" author="Ivica Cardic">
+        <customChange class="com.bytechef.platform.data.table.configuration.migration.DataTableOwnerColumnChange"/>
+    </changeSet>
+</databaseChangeLog>

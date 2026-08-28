@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,10 +37,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 class DataTableOwnerColumnMigratorIntTest {
 
     @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private DataTableOwnerColumnMigrator dataTableOwnerColumnMigrator;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @BeforeEach
+    void setUp() {
+        dataTableOwnerColumnMigrator = new DataTableOwnerColumnMigrator(jdbcTemplate);
+    }
 
     @Test
     void testMigrateAddsOwnerColumnsToPreexistingTable() {
@@ -68,6 +73,35 @@ class DataTableOwnerColumnMigratorIntTest {
         dataTableOwnerColumnMigrator.migrate();
 
         assertFalse(hasColumn("not_a_data_table", "owner_id"));
+    }
+
+    @Test
+    void testNamingTheSchemaExplicitlyMigratesThatSchema() {
+        jdbcTemplate.execute("CREATE TABLE \"dt_0_legacy_three\" (\"id\" BIGSERIAL PRIMARY KEY)");
+
+        String schema = jdbcTemplate.queryForObject("SELECT current_schema()", String.class);
+
+        assertTrue(dataTableOwnerColumnMigrator.migrate(schema) >= 1);
+        assertTrue(hasColumn("dt_0_legacy_three", "owner_id"));
+    }
+
+    @Test
+    void testAnEmptySchemaMigratesNothing() {
+        jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS \"other_schema\"");
+
+        assertEquals(0, dataTableOwnerColumnMigrator.migrate("other_schema"));
+    }
+
+    /**
+     * Proves the customChange is wired, not merely harmless: Liquibase records a changeset only once it has run it, so
+     * a mistyped class name or a missing interface method shows up here rather than as a silent no-op.
+     */
+    @Test
+    void testLiquibaseRanTheBackfillChangeset() {
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM databasechangelog WHERE id = ?", Integer.class, "20260828000001-1");
+
+        assertEquals(1, count);
     }
 
     private boolean hasColumn(String tableName, String columnName) {

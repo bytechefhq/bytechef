@@ -19,22 +19,25 @@ package com.bytechef.platform.data.table.configuration.migration;
 import com.bytechef.platform.data.table.domain.ReservedColumns;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Locale;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 /**
  * Adds the reserved owner columns to {@code dt_*} tables created before those columns existed. The table set is
- * discovered from {@code information_schema} rather than declared, which is why this is a Java migration and not a
- * Liquibase changeset.
+ * discovered from {@code information_schema} rather than declared, which is why this is Java rather than plain
+ * changeset XML -- {@link DataTableOwnerColumnChange} runs it as a Liquibase {@code customChange}, so it is still
+ * recorded in {@code databasechangelog} and still runs once per tenant schema.
  *
  * <p>
- * Idempotent, and scoped to the connection's current schema, so it migrates one tenant per call.
+ * Idempotent, and scoped to one schema per call. Deliberately not a Spring bean: Liquibase instantiates the change
+ * reflectively, long before an application context exists.
  *
  * @author Ivica Cardic
  */
-@Component
 public class DataTableOwnerColumnMigrator {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableOwnerColumnMigrator.class);
@@ -47,46 +50,88 @@ public class DataTableOwnerColumnMigrator {
     }
 
     /**
+     * Migrates the connection's current schema.
+     *
+     * @return the number of tables altered; 0 when every table already carries the columns
+     */
+    public int migrate() {
+        return migrate(null);
+    }
+
+    /**
+     * Migrates one named schema, or the connection's current schema when {@code schemaName} is null.
+     *
+     * <p>
+     * The schema is named rather than inherited because Liquibase's per-tenant run sets its own default schema without
+     * necessarily moving the JDBC connection's {@code search_path}. Trusting {@code current_schema()} there would
+     * quietly migrate the wrong schema and report success.
+     *
      * @return the number of tables altered; 0 when every table already carries the columns
      */
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
-    public int migrate() {
+    public int migrate(@Nullable String schemaName) {
+        String schema = resolveSchema(schemaName);
+
         List<String> tableNames = jdbcTemplate.queryForList(
             "SELECT table_name FROM information_schema.tables "
-                + "WHERE table_schema = current_schema() AND table_type = 'BASE TABLE' AND table_name LIKE 'dt\\_%'",
-            String.class);
+                + "WHERE table_schema = ? AND table_type = 'BASE TABLE' AND table_name LIKE 'dt\\_%'",
+            String.class, schema);
 
         int altered = 0;
 
         for (String tableName : tableNames) {
-            if (hasOwnerColumns(tableName)) {
+            if (hasOwnerColumns(schema, tableName)) {
                 continue;
             }
 
-            jdbcTemplate.execute(
-                "ALTER TABLE \"" + tableName + "\" ADD COLUMN IF NOT EXISTS \"" + ReservedColumns.OWNER_ID
-                    + "\" BIGINT, ADD COLUMN IF NOT EXISTS \"" + ReservedColumns.OWNER_TYPE + "\" INT");
+            String qualifiedName = quote(schema) + "." + quote(tableName);
 
             jdbcTemplate.execute(
-                "CREATE INDEX IF NOT EXISTS \"idx_" + tableName + "_owner\" ON \"" + tableName + "\" (\""
-                    + ReservedColumns.OWNER_TYPE + "\", \"" + ReservedColumns.OWNER_ID + "\")");
+                "ALTER TABLE " + qualifiedName + " ADD COLUMN IF NOT EXISTS " + quote(ReservedColumns.OWNER_ID)
+                    + " BIGINT, ADD COLUMN IF NOT EXISTS " + quote(ReservedColumns.OWNER_TYPE) + " INT");
+
+            jdbcTemplate.execute(
+                "CREATE INDEX IF NOT EXISTS " + quote("idx_" + tableName + "_owner") + " ON " + qualifiedName + " ("
+                    + quote(ReservedColumns.OWNER_TYPE) + ", " + quote(ReservedColumns.OWNER_ID) + ")");
 
             altered++;
         }
 
         if (altered > 0) {
-            log.info("Added owner columns to {} data tables", altered);
+            log.info("Added owner columns to {} data tables in schema {}", altered, schema);
         }
 
         return altered;
     }
 
-    private boolean hasOwnerColumns(String tableName) {
+    private boolean hasOwnerColumns(String schema, String tableName) {
         Integer count = jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM information_schema.columns "
-                + "WHERE table_schema = current_schema() AND table_name = ? AND column_name IN (?, ?)",
-            Integer.class, tableName, ReservedColumns.OWNER_ID, ReservedColumns.OWNER_TYPE);
+                + "WHERE table_schema = ? AND table_name = ? AND column_name IN (?, ?)",
+            Integer.class, schema, tableName, ReservedColumns.OWNER_ID, ReservedColumns.OWNER_TYPE);
 
         return count != null && count == 2;
+    }
+
+    private String resolveSchema(@Nullable String schemaName) {
+        if (schemaName != null && !schemaName.isBlank()) {
+            return schemaName;
+        }
+
+        return jdbcTemplate.queryForObject("SELECT current_schema()", String.class);
+    }
+
+    /**
+     * Schema and table names reach this from {@code information_schema} or from Liquibase and never from a user, but
+     * they are still held to the identifier pattern the rest of the data table code enforces.
+     */
+    private String quote(String identifier) {
+        Assert.hasText(identifier, "identifier must not be empty");
+
+        String normalizedName = identifier.toLowerCase(Locale.ROOT);
+
+        Assert.isTrue(normalizedName.matches("[a-z_][a-z0-9_]*"), "Invalid identifier: " + identifier);
+
+        return '"' + normalizedName + '"';
     }
 }
