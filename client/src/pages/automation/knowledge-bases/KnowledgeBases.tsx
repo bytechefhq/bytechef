@@ -2,17 +2,17 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
-import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
-import KnowledgeBasesFilterTitle from '@/pages/automation/knowledge-bases/components/KnowledgeBasesFilterTitle';
-import KnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/components/KnowledgeBasesLeftSidebarNav';
-import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
-import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import CreateKnowledgeBaseDialog from '@/shared/components/knowledge-bases/components/CreateKnowledgeBaseDialog';
+import KnowledgeBasesFilterTitle from '@/shared/components/knowledge-bases/components/KnowledgeBasesFilterTitle';
+import KnowledgeBasesLeftSidebarNav from '@/shared/components/knowledge-bases/components/KnowledgeBasesLeftSidebarNav';
+import useKnowledgeBases from '@/shared/components/knowledge-bases/components/hooks/useKnowledgeBases';
+import KnowledgeBaseList from '@/shared/components/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useKnowledgeBaseEmbeddingActiveQuery, useKnowledgeBaseStorageUsageQuery} from '@/shared/middleware/graphql';
@@ -27,7 +27,7 @@ const KnowledgeBases = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const {allTags, error, filteredKnowledgeBases, isLoading, knowledgeBases, tagId, tagsByKnowledgeBaseData} =
-        useKnowledgeBases();
+        useKnowledgeBases({type: 'WORKSPACE', workspaceId: Number(currentWorkspaceId)});
 
     const {data: embeddingActiveData} = useKnowledgeBaseEmbeddingActiveQuery({
         environment: currentEnvironmentId,

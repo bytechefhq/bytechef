@@ -1,4 +1,4 @@
-import useKnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBasesLeftSidebarNav';
+import useKnowledgeBasesLeftSidebarNav from '@/shared/components/knowledge-bases/components/hooks/useKnowledgeBasesLeftSidebarNav';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {TagIcon} from 'lucide-react';
 

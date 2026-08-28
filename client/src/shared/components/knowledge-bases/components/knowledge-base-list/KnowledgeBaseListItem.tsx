@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import EditKnowledgeBaseDialog from '@/pages/automation/knowledge-base/components/EditKnowledgeBaseDialog';
-import KnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemDeleteDialog';
-import KnowledgeBaseListItemTagList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemTagList';
-import useKnowledgeBaseListItem from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItem';
+import KnowledgeBaseListItemDeleteDialog from '@/shared/components/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemDeleteDialog';
+import KnowledgeBaseListItemTagList from '@/shared/components/knowledge-bases/components/knowledge-base-list/KnowledgeBaseListItemTagList';
+import useKnowledgeBaseListItem from '@/shared/components/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItem';
 import {KnowledgeBase, Tag} from '@/shared/middleware/graphql';
 import {DatabaseIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 

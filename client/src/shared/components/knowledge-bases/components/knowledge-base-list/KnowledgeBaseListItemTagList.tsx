@@ -1,5 +1,5 @@
-import useKnowledgeBaseListItemTagList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItemTagList';
 import TagList from '@/shared/components/TagList';
+import useKnowledgeBaseListItemTagList from '@/shared/components/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItemTagList';
 import {Tag} from '@/shared/middleware/graphql';
 
 interface KnowledgeBaseListItemTagListProps {

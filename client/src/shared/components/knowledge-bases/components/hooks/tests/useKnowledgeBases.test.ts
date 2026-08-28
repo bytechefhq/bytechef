@@ -1,3 +1,4 @@
+import * as graphql from '@/shared/middleware/graphql';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -47,6 +48,11 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useEmbeddedKnowledgeBasesQuery: vi.fn(() => ({
+        data: {embeddedKnowledgeBases: []},
+        error: null,
+        isLoading: false,
+    })),
     useKnowledgeBaseTagsByKnowledgeBaseQuery: vi.fn(() => ({
         data: hoisted.tagsByKnowledgeBaseData,
     })),
@@ -74,7 +80,7 @@ describe('useKnowledgeBases', () => {
 
     describe('knowledgeBases', () => {
         it('returns knowledge bases from query', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.knowledgeBases).toEqual([
                 {id: 'kb-1', name: 'KB 1'},
@@ -91,7 +97,7 @@ describe('useKnowledgeBases', () => {
                 ],
             };
 
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.knowledgeBases).toEqual([
                 {id: 'kb-1', name: 'KB 1'},
@@ -102,7 +108,7 @@ describe('useKnowledgeBases', () => {
 
     describe('filteredKnowledgeBases', () => {
         it('returns all knowledge bases when no tag filter', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.filteredKnowledgeBases).toEqual(result.current.knowledgeBases);
         });
@@ -110,7 +116,7 @@ describe('useKnowledgeBases', () => {
         it('filters by tag when tagId is set', () => {
             hoisted.searchParams = new Map<string, string | null>([['tagId', '1']]);
 
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.filteredKnowledgeBases).toEqual([{id: 'kb-1', name: 'KB 1'}]);
         });
@@ -118,7 +124,7 @@ describe('useKnowledgeBases', () => {
         it('returns empty array when no matches for tag filter', () => {
             hoisted.searchParams = new Map<string, string | null>([['tagId', '999']]);
 
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.filteredKnowledgeBases).toEqual([]);
         });
@@ -126,7 +132,7 @@ describe('useKnowledgeBases', () => {
 
     describe('allTags', () => {
         it('returns all tags from query', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.allTags).toEqual([
                 {id: '1', name: 'Tag 1'},
@@ -137,7 +143,7 @@ describe('useKnowledgeBases', () => {
         it('returns empty array when no tags', () => {
             hoisted.allTagsData = {knowledgeBaseTags: null as unknown as typeof hoisted.allTagsData.knowledgeBaseTags};
 
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.allTags).toEqual([]);
         });
@@ -145,7 +151,7 @@ describe('useKnowledgeBases', () => {
 
     describe('tagsByKnowledgeBaseData', () => {
         it('returns tags by knowledge base from query', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.tagsByKnowledgeBaseData).toEqual([
                 {knowledgeBaseId: 'kb-1', tags: [{id: '1', name: 'Tag 1'}]},
@@ -156,7 +162,7 @@ describe('useKnowledgeBases', () => {
 
     describe('tagId', () => {
         it('returns undefined when no tag filter', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.tagId).toBeUndefined();
         });
@@ -164,7 +170,7 @@ describe('useKnowledgeBases', () => {
         it('returns tagId from search params', () => {
             hoisted.searchParams = new Map<string, string | null>([['tagId', '1']]);
 
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.tagId).toBe('1');
         });
@@ -172,7 +178,7 @@ describe('useKnowledgeBases', () => {
 
     describe('isLoading', () => {
         it('returns loading state from query', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.isLoading).toBe(false);
         });
@@ -180,9 +186,28 @@ describe('useKnowledgeBases', () => {
 
     describe('error', () => {
         it('returns error from query', () => {
-            const {result} = renderHook(() => useKnowledgeBases());
+            const {result} = renderHook(() => useKnowledgeBases({type: 'WORKSPACE', workspaceId: 1049}));
 
             expect(result.current.error).toBeNull();
+        });
+    });
+
+    describe('scope', () => {
+        // Tags are workspace-scoped. A disabled TanStack query still serves what is cached under its key, so the
+        // embedded scope has to drop them on the read rather than relying on `enabled`.
+        it('returns no tags under an embedded scope', () => {
+            const {result} = renderHook(() => useKnowledgeBases({type: 'EMBEDDED'}));
+
+            expect(result.current.allTags).toEqual([]);
+        });
+
+        it('reads the embedded query under an embedded scope', () => {
+            renderHook(() => useKnowledgeBases({ownerId: 42, type: 'EMBEDDED'}));
+
+            expect(graphql.useEmbeddedKnowledgeBasesQuery).toHaveBeenCalledWith(
+                expect.objectContaining({ownerId: '42'}),
+                expect.objectContaining({enabled: true})
+            );
         });
     });
 });

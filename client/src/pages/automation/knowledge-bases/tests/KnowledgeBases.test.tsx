@@ -14,7 +14,7 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
-vi.mock('../components/hooks/useKnowledgeBases', () => ({
+vi.mock('@/shared/components/knowledge-bases/components/hooks/useKnowledgeBases', () => ({
     default: hoisted.mockUseKnowledgeBases,
 }));
 
@@ -82,21 +82,21 @@ vi.mock('@/components/Button/Button', () => ({
     ),
 }));
 
-vi.mock('../components/CreateKnowledgeBaseDialog', () => ({
+vi.mock('@/shared/components/knowledge-bases/components/CreateKnowledgeBaseDialog', () => ({
     default: ({trigger, workspaceId}: {trigger?: React.ReactNode; workspaceId: string}) => (
         <div data-testid={`create-dialog-${workspaceId}`}>{trigger}</div>
     ),
 }));
 
-vi.mock('../components/KnowledgeBasesFilterTitle', () => ({
+vi.mock('@/shared/components/knowledge-bases/components/KnowledgeBasesFilterTitle', () => ({
     default: () => <div data-testid="filter-title">Filter Title</div>,
 }));
 
-vi.mock('../components/KnowledgeBasesLeftSidebarNav', () => ({
+vi.mock('@/shared/components/knowledge-bases/components/KnowledgeBasesLeftSidebarNav', () => ({
     default: () => <nav data-testid="left-sidebar-nav">Sidebar</nav>,
 }));
 
-vi.mock('../components/knowledge-base-list/KnowledgeBaseList', () => ({
+vi.mock('@/shared/components/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList', () => ({
     default: ({
         knowledgeBases,
     }: {

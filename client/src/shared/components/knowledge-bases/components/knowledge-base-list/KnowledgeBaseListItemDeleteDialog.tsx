@@ -8,7 +8,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import useKnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItemDeleteDialog';
+import useKnowledgeBaseListItemDeleteDialog from '@/shared/components/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItemDeleteDialog';
 
 interface KnowledgeBaseListItemDeleteDialogProps {
     knowledgeBaseId: string;

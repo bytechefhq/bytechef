@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
-import useCreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/hooks/useCreateKnowledgeBaseDialog';
 import {useCommandIntent} from '@/shared/command-bar/useCommandIntent';
+import useCreateKnowledgeBaseDialog from '@/shared/components/knowledge-bases/components/hooks/useCreateKnowledgeBaseDialog';
 import {cn} from '@/shared/util/cn-utils';
 import {Loader2, X} from 'lucide-react';
 import {ReactNode} from 'react';

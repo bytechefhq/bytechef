@@ -1,4 +1,4 @@
-import useKnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseList';
+import useKnowledgeBaseList from '@/shared/components/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseList';
 import {KnowledgeBase, KnowledgeBaseTagsEntry, Tag} from '@/shared/middleware/graphql';
 
 import KnowledgeBaseListItem from './KnowledgeBaseListItem';

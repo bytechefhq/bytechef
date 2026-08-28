@@ -6,11 +6,11 @@ import KnowledgeBaseInfoCard from '@/pages/automation/knowledge-base/components/
 import KnowledgeBaseLeftSidebarNav from '@/pages/automation/knowledge-base/components/KnowledgeBaseLeftSidebarNav';
 import KnowledgeBaseTabs from '@/pages/automation/knowledge-base/components/KnowledgeBaseTabs';
 import useKnowledgeBase from '@/pages/automation/knowledge-base/hooks/useKnowledgeBase';
-import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import CreateKnowledgeBaseDialog from '@/shared/components/knowledge-bases/components/CreateKnowledgeBaseDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';

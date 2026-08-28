@@ -1,5 +1,5 @@
 import Badge from '@/components/Badge/Badge';
-import useKnowledgeBasesFilterTitle from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBasesFilterTitle';
+import useKnowledgeBasesFilterTitle from '@/shared/components/knowledge-bases/components/hooks/useKnowledgeBasesFilterTitle';
 import {KnowledgeBaseTagsEntry, Tag} from '@/shared/middleware/graphql';
 
 interface KnowledgeBasesFilterTitleProps {
