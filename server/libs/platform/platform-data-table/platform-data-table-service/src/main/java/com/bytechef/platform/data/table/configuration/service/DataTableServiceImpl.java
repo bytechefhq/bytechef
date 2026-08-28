@@ -25,6 +25,7 @@ import com.bytechef.platform.data.table.configuration.exception.DataTableErrorTy
 import com.bytechef.platform.data.table.configuration.repository.DataTableRepository;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.ReservedColumns;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,10 +110,10 @@ public class DataTableServiceImpl implements DataTableService {
 
         Assert.notEmpty(columnSpecs, "columns must not be empty");
 
-        boolean hasId = columnSpecs.stream()
-            .anyMatch(c -> "id".equalsIgnoreCase(c.name()));
+        boolean hasReservedColumn = columnSpecs.stream()
+            .anyMatch(columnSpec -> ReservedColumns.isReserved(columnSpec.name()));
 
-        Assert.isTrue(!hasId, "Column name 'id' is reserved for primary key");
+        Assert.isTrue(!hasReservedColumn, "Column names " + ReservedColumns.all() + " are reserved");
 
         String userColsSql = columnSpecs.stream()
             .map(columnSpec -> escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type()))
@@ -120,10 +121,15 @@ public class DataTableServiceImpl implements DataTableService {
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 
-        String sql = "CREATE TABLE " + escapeIdentifier(physicalName) + " (\"id\" BIGSERIAL PRIMARY KEY" +
+        String sql = "CREATE TABLE " + escapeIdentifier(physicalName) +
+            " (\"id\" BIGSERIAL PRIMARY KEY, \"owner_id\" BIGINT, \"owner_type\" INT" +
             (userColsSql.isEmpty() ? "" : ", " + userColsSql) + ")";
 
         jdbcTemplate.execute(sql);
+
+        jdbcTemplate.execute(
+            "CREATE INDEX " + escapeIdentifier("idx_" + physicalName + "_owner") + " ON " +
+                escapeIdentifier(physicalName) + " (\"owner_type\", \"owner_id\")");
 
         long dataTableId = checkRegistry(
             baseName,
@@ -184,7 +190,7 @@ public class DataTableServiceImpl implements DataTableService {
 
         List<ColumnSpec> columnSpecs = listColumns(fromPhysicalName)
             .stream()
-            .filter(columnSpec -> !"id".equalsIgnoreCase(columnSpec.name()))
+            .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
             .toList();
 
         String userColumnsSql = columnSpecs.stream()
@@ -249,7 +255,7 @@ public class DataTableServiceImpl implements DataTableService {
             String baseName = tableName.substring(prefix.length());
             List<ColumnSpec> columnSpecs = listColumns(tableName)
                 .stream()
-                .filter(columnSpec -> !"id".equalsIgnoreCase(columnSpec.name()))
+                .filter(columnSpec -> !ReservedColumns.isReserved(columnSpec.name()))
                 .toList();
 
             DataTable dataTable = dataTableRepository.findByName(baseName)
@@ -305,8 +311,8 @@ public class DataTableServiceImpl implements DataTableService {
         validateBaseName(baseName);
         Assert.hasText(fromColumnName, "fromColumnName must not be empty");
         Assert.hasText(toColumnName, "toColumnName must not be empty");
-        Assert.isTrue(!"id".equalsIgnoreCase(fromColumnName), "Column 'id' cannot be renamed");
-        Assert.isTrue(!"id".equalsIgnoreCase(toColumnName), "Cannot rename to reserved name 'id'");
+        Assert.isTrue(!ReservedColumns.isReserved(fromColumnName), "Reserved columns cannot be renamed");
+        Assert.isTrue(!ReservedColumns.isReserved(toColumnName), "Cannot rename to a reserved name");
 
         String physicalName = buildPhysicalName(environmentId, baseName);
 

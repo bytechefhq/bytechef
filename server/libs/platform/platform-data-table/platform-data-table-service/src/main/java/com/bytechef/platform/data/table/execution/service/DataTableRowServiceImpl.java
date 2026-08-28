@@ -21,6 +21,7 @@ import com.bytechef.commons.util.DateUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.ReservedColumns;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import de.siegmar.fastcsv.reader.CsvReader;
@@ -127,7 +128,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<String> columnNames = listColumns(physicalName).stream()
             .map(ColumnSpec::name)
-            .filter(name -> !"id".equalsIgnoreCase(name))
+            .filter(name -> !ReservedColumns.isReserved(name))
             .toList();
 
         String selectColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
@@ -161,7 +162,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         List<ColumnSpec> columnSpecs = listColumns(physicalName);
         List<String> columnNames = columnSpecs.stream()
             .map(ColumnSpec::name)
-            .filter(n -> !"id".equalsIgnoreCase(n))
+            .filter(columnName -> !ReservedColumns.isReserved(columnName))
             .toList();
 
         StringWriter stringWriter = new StringWriter();
@@ -239,7 +240,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                     mappedColumnNames = new ArrayList<>(headers.size());
 
                     for (String header : headers) {
-                        if (header.equalsIgnoreCase("id")) {
+                        if (ReservedColumns.isReserved(header)) {
                             mappedColumnNames.add(null);
 
                             continue;
@@ -310,7 +311,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .stream()
             .filter(columnName -> allColumnNames.stream()
                 .anyMatch(column -> column.equalsIgnoreCase(columnName)))
-            .filter(k -> !"id".equalsIgnoreCase(k))
+            .filter(columnName -> !ReservedColumns.isReserved(columnName))
             .map(columnName -> allColumnNames.stream()
                 .filter(c -> c.equalsIgnoreCase(columnName))
                 .findFirst()
@@ -328,7 +329,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         returningColumnNames.add("id");
         returningColumnNames.addAll(allColumnNames.stream()
-            .filter(columnName -> !"id".equalsIgnoreCase(columnName))
+            .filter(columnName -> !ReservedColumns.isReserved(columnName))
             .toList());
 
         String returningClause = returningColumnNames.stream()
@@ -360,7 +361,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 Map<String, Object> map = new HashMap<>();
 
                 for (String columnName : returningColumnNames) {
-                    if (!"id".equalsIgnoreCase(columnName)) {
+                    if (!ReservedColumns.isReserved(columnName)) {
                         map.put(columnName, resultSet.getObject(columnName));
                     }
                 }
@@ -401,7 +402,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         List<String> columnNames = listColumns(buildPhysicalName).stream()
             .map(ColumnSpec::name)
-            .filter(n -> !"id".equalsIgnoreCase(n))
+            .filter(columnName -> !ReservedColumns.isReserved(columnName))
             .toList();
 
         String selectColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
@@ -454,7 +455,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .stream()
             .filter(columnName -> allColumnNames.stream()
                 .anyMatch(column -> column.equalsIgnoreCase(columnName)))
-            .filter(k -> !"id".equalsIgnoreCase(k))
+            .filter(columnName -> !ReservedColumns.isReserved(columnName))
             .map(columnName -> allColumnNames.stream()
                 .filter(c -> c.equalsIgnoreCase(columnName))
                 .findFirst()
@@ -482,7 +483,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         returningColumnNames.add("id");
         returningColumnNames.addAll(allColumnNames.stream()
-            .filter(c -> !"id".equalsIgnoreCase(c))
+            .filter(columnName -> !ReservedColumns.isReserved(columnName))
             .toList());
 
         String returningClause = returningColumnNames.stream()
@@ -516,7 +517,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 Map<String, Object> map = new HashMap<>();
 
                 for (String columnName : returningColumnNames) {
-                    if (!"id".equalsIgnoreCase(columnName)) {
+                    if (!ReservedColumns.isReserved(columnName)) {
                         map.put(columnName, rs.getObject(columnName));
                     }
                 }
