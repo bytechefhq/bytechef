@@ -448,14 +448,18 @@ public class DataTableServiceImpl implements DataTableService {
     private long register(String baseName, @Nullable String description) {
         Assert.hasText(baseName, "baseName required");
 
-        DataTable dataTable = new DataTable();
+        return dataTableRepository.findByName(baseName)
+            .map(DataTable::getId)
+            .orElseGet(() -> {
+                DataTable dataTable = new DataTable();
 
-        dataTable.setName(baseName);
-        dataTable.setDescription(description);
+                dataTable.setName(baseName);
+                dataTable.setDescription(description);
 
-        DataTable savedDataTable = dataTableRepository.save(dataTable);
+                DataTable savedDataTable = dataTableRepository.save(dataTable);
 
-        return savedDataTable.getId();
+                return savedDataTable.getId();
+            });
     }
 
     private String escapeIdentifier(String identifier) {

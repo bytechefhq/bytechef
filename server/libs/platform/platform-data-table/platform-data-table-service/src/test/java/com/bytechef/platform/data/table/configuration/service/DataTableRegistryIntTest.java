@@ -42,6 +42,7 @@ import org.springframework.context.annotation.Import;
 class DataTableRegistryIntTest {
 
     private static final long ENVIRONMENT_ID = 0;
+    private static final long OTHER_ENVIRONMENT_ID = 1;
 
     @Autowired
     private DataTableService dataTableService;
@@ -62,6 +63,30 @@ class DataTableRegistryIntTest {
             dataTableInfos.stream()
                 .anyMatch(dataTableInfo -> "registered".equals(dataTableInfo.baseName())),
             "A created table must be visible to listTables, which skips unregistered physical tables");
+    }
+
+    /**
+     * The registry row is the LOGICAL table; each environment holds its own physical instance of it. dropTable already
+     * treats it that way -- it removes the row only once no physical table for the base name remains in any environment
+     * -- so creation has to reuse an existing row rather than insert a second one that uk_data_table_name forbids.
+     */
+    @Test
+    void testTheSameNameCanBeCreatedInASecondEnvironment() {
+        dataTableService.createTable(
+            "shared", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
+        dataTableService.createTable(
+            "shared", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), OTHER_ENVIRONMENT_ID);
+
+        assertTrue(
+            listedIn(ENVIRONMENT_ID, "shared"), "the table must remain visible in the environment it was created in");
+        assertTrue(listedIn(OTHER_ENVIRONMENT_ID, "shared"), "and be visible in the second environment");
+    }
+
+    private boolean listedIn(long environmentId, String baseName) {
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
+
+        return dataTableInfos.stream()
+            .anyMatch(dataTableInfo -> baseName.equals(dataTableInfo.baseName()));
     }
 
     @Test
