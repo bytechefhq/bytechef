@@ -70,6 +70,7 @@ public class ConnectionGraphQlController {
         return true;
     }
 
+    @SuppressFBWarnings("EI")
     public record UpdateConnectionCredentialsInput(long connectionId, Map<String, Object> parameters, int version) {
     }
 
