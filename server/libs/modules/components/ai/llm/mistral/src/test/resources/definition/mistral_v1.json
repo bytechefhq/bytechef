@@ -53,16 +53,12 @@
         "value": "ministral-8b-latest"
       }, {
         "description": null,
-        "label": "mistral-large-latest",
-        "value": "mistral-large-latest"
+        "label": "mistral-medium-3-5",
+        "value": "mistral-medium-3-5"
       }, {
         "description": null,
-        "label": "mistral-medium-latest",
-        "value": "mistral-medium-latest"
-      }, {
-        "description": null,
-        "label": "mistral-small-latest",
-        "value": "mistral-small-latest"
+        "label": "mistral-small-2603",
+        "value": "mistral-small-2603"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
@@ -2424,16 +2420,12 @@
         "value": "ministral-8b-latest"
       }, {
         "description": null,
-        "label": "mistral-large-latest",
-        "value": "mistral-large-latest"
+        "label": "mistral-medium-3-5",
+        "value": "mistral-medium-3-5"
       }, {
         "description": null,
-        "label": "mistral-medium-latest",
-        "value": "mistral-medium-latest"
-      }, {
-        "description": null,
-        "label": "mistral-small-latest",
-        "value": "mistral-small-latest"
+        "label": "mistral-small-2603",
+        "value": "mistral-small-2603"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": false,
