@@ -37,6 +37,8 @@ import com.bytechef.platform.component.definition.AbstractComponentDefinitionWra
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.owner.OwnerResolver;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,10 +53,10 @@ public class DataTableComponentHandler implements ComponentHandler {
 
     public DataTableComponentHandler(
         DataTableService dataTableService, DataTableRowService dataTableRowService,
-        DataTableWebhookService dataTableWebhookService) {
+        DataTableWebhookService dataTableWebhookService, ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
         this.componentDefinition = new DataTableComponentDefinitionImpl(
-            dataTableService, dataTableRowService, dataTableWebhookService);
+            dataTableService, dataTableRowService, dataTableWebhookService, ownerResolverProvider);
     }
 
     @Override
@@ -66,23 +68,31 @@ public class DataTableComponentHandler implements ComponentHandler {
 
         public DataTableComponentDefinitionImpl(
             DataTableService dataTableService, DataTableRowService dataTableRowService,
-            DataTableWebhookService dataTableWebhookService) {
+            DataTableWebhookService dataTableWebhookService,
+            ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
-            super(buildDefinition(dataTableService, dataTableRowService, dataTableWebhookService));
+            super(
+                buildDefinition(
+                    dataTableService, dataTableRowService, dataTableWebhookService, ownerResolverProvider));
         }
 
         private static ComponentDefinition buildDefinition(
             DataTableService dataTableService, DataTableRowService dataTableRowService,
-            DataTableWebhookService dataTableWebhookService) {
+            DataTableWebhookService dataTableWebhookService,
+            ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
             ActionDefinition createRecordsAction = DataTableCreateRecordsAction.of(
-                dataTableService, dataTableRowService);
+                dataTableService, dataTableRowService, ownerResolverProvider);
             ActionDefinition deleteRecordsAction = DataTableDeleteRecordsAction.of(
-                dataTableService, dataTableRowService);
-            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(dataTableService, dataTableRowService);
-            ActionDefinition getRecordAction = DataTableGetRecordAction.of(dataTableService, dataTableRowService);
-            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(dataTableService, dataTableRowService);
-            ActionDefinition clearTableAction = DataTableClearTableAction.of(dataTableService, dataTableRowService);
+                dataTableService, dataTableRowService, ownerResolverProvider);
+            ActionDefinition updateRecordAction = DataTableUpdateRecordAction.of(
+                dataTableService, dataTableRowService, ownerResolverProvider);
+            ActionDefinition getRecordAction = DataTableGetRecordAction.of(
+                dataTableService, dataTableRowService, ownerResolverProvider);
+            ActionDefinition findRecordsAction = DataTableFindRecordsAction.of(
+                dataTableService, dataTableRowService, ownerResolverProvider);
+            ActionDefinition clearTableAction = DataTableClearTableAction.of(
+                dataTableService, dataTableRowService, ownerResolverProvider);
 
             return component(DATA_TABLE)
                 .title("Data Table")
@@ -104,9 +114,15 @@ public class DataTableComponentHandler implements ComponentHandler {
                     tool(findRecordsAction),
                     tool(clearTableAction))
                 .triggers(
-                    DataTableRecordCreatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordUpdatedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService),
-                    DataTableRecordDeletedTrigger.of(dataTableRowService, dataTableService, dataTableWebhookService));
+                    DataTableRecordCreatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService,
+                        ownerResolverProvider),
+                    DataTableRecordUpdatedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService,
+                        ownerResolverProvider),
+                    DataTableRecordDeletedTrigger.of(
+                        dataTableRowService, dataTableService, dataTableWebhookService,
+                        ownerResolverProvider));
         }
     }
 }

@@ -40,6 +40,7 @@ import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.RowOwnerFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import java.time.LocalDate;
@@ -130,11 +131,13 @@ public final class DataTableUtils {
      * @return an OutputResponse with schema and optional sample data
      */
     public static OutputResponse createTriggerOutputResponse(
-        DataTableRowService dataTableRowService, DataTableService dataTableService, String baseName) {
+        DataTableRowService dataTableRowService, DataTableService dataTableService, String baseName,
+        RowOwnerFilter rowOwnerFilter) {
 
         BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        List<DataTableRow> rows = dataTableRowService.listRows(
+            baseName, 1, 0, DEVELOPMENT.ordinal(), rowOwnerFilter);
 
         if (rows.isEmpty()) {
             return OutputResponse.of(rowSchema);

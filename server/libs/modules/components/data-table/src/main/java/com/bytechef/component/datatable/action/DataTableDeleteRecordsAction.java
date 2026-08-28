@@ -30,14 +30,18 @@ import com.bytechef.component.datatable.util.DataTableUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.RowOwnerFilter;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.owner.OwnerResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Delete Record(s): Delete record(s) from a table
@@ -48,17 +52,23 @@ public class DataTableDeleteRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final ObjectProvider<OwnerResolver> ownerResolverProvider;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
-        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService, ownerResolverProvider).build();
     }
 
-    private DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableDeleteRecordsAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.ownerResolverProvider = ownerResolverProvider;
     }
 
     private ModifiableActionDefinition build() {
@@ -98,11 +108,14 @@ public class DataTableDeleteRecordsAction {
         Object[] ids = inputParameters.getRequiredArray(IDS);
         List<Long> deletedIds = new ArrayList<>();
 
+        RowOwnerFilter rowOwnerFilter = RowOwnerFilter.from(
+            OwnerResolution.resolve(actionContextAware, ownerResolverProvider));
+
         for (Object curId : ids) {
             long id = (curId instanceof Number number) ? number.longValue() : Long.parseLong(String.valueOf(curId));
 
             if (dataTableRowService.deleteRow(
-                baseName, id, Objects.requireNonNull(actionContextAware.getEnvironmentId()))) {
+                baseName, id, Objects.requireNonNull(actionContextAware.getEnvironmentId()), rowOwnerFilter)) {
 
                 deletedIds.add(id);
             }

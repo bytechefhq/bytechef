@@ -32,13 +32,17 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.owner.OwnerResolution;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.RowOwnerFilter;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.owner.OwnerResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * Find Records: Find records in a table with pagination
@@ -49,17 +53,23 @@ public class DataTableFindRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final ObjectProvider<OwnerResolver> ownerResolverProvider;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
 
-        return new DataTableFindRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableFindRecordsAction(dataTableService, dataTableRowService, ownerResolverProvider).build();
     }
 
-    private DataTableFindRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableFindRecordsAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        ObjectProvider<OwnerResolver> ownerResolverProvider) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.ownerResolverProvider = ownerResolverProvider;
     }
 
     private ModifiableActionDefinition build() {
@@ -87,11 +97,17 @@ public class DataTableFindRecordsAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
+        ActionContextAware actionContextAware = (ActionContextAware) actionContext;
+
         String baseName = inputParameters.getRequiredString(TABLE);
 
         var rowSchema = DataTableUtils.rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        RowOwnerFilter rowOwnerFilter = RowOwnerFilter.from(
+            OwnerResolution.resolve(actionContextAware, ownerResolverProvider));
+
+        List<DataTableRow> rows = dataTableRowService.listRows(
+            baseName, 1, 0, DEVELOPMENT.ordinal(), rowOwnerFilter);
 
         if (rows.isEmpty()) {
             return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema));
@@ -115,7 +131,10 @@ public class DataTableFindRecordsAction {
         int limit = inputParameters.getInteger(LIMIT, 100);
         int offset = inputParameters.getInteger(OFFSET, 0);
 
+        RowOwnerFilter rowOwnerFilter = RowOwnerFilter.from(
+            OwnerResolution.resolve(actionContextAware, ownerResolverProvider));
+
         return dataTableRowService.listRows(
-            baseName, limit, offset, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+            baseName, limit, offset, Objects.requireNonNull(actionContextAware.getEnvironmentId()), rowOwnerFilter);
     }
 }
