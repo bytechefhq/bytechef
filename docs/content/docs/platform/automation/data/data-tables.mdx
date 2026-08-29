@@ -74,10 +74,17 @@ Add the **Data Table** component to a workflow to read and write your tables as 
 |---|---|
 | **Create Records** | Insert one or more new rows |
 | **Get Record** | Fetch a single row by its `id` |
-| **Find Records** | Query and filter rows |
+| **Find Records** | List rows from a table, with **Limit** and **Offset** for paging |
 | **Update Record** | Update an existing row by its `id` |
 | **Delete Records** | Delete rows |
 | **Clear Table** | Remove every row from the table |
+
+Select the table on any action and its inputs adapt to that table's columns.
+
+> **Coming soon.** Filtering and sorting on **Find Records** - conditions such as
+> `status equals qualified` or `amount between 100 and 500`, plus an order-by - are on the upcoming
+> release track. In the latest released version **Find Records** returns rows in insertion order and
+> you narrow the result with **Limit** and **Offset**, or fetch a known row with **Get Record**.
 
 ### Triggers
 
@@ -123,11 +130,11 @@ right shape for some jobs and the wrong shape for others.
 
 | Use case | How to model it |
 |---|---|
-| **Lookup tables** - map a code to a label, an SKU to a price, a country to a region. | One row per mapping; look the row up with **Find Records**. |
+| **Lookup tables** - map a code to a label, an SKU to a price, a country to a region. | One row per mapping, looked up with **Find Records**. Needs the filtering above; until it ships, keep the mapping small enough to read in one page and match it in the workflow. |
 | **Configuration data** - regional overrides, per-tenant knobs. | One row per configuration key. |
 | **Feature flags** - turn workflow behavior on and off without republishing. | A Boolean column keyed by flag name. |
-| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. |
-| **Deduplication keys** - record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing. |
+| **Work queues** - items pending processing. | Insert on enqueue; **Find Records** then **Delete Records** on consume. Consuming a *filtered* slice of the queue needs the filtering above. |
+| **Deduplication keys** - record processed external IDs so redeliveries are ignored. | One row per external ID, checked before processing. Needs the filtering above - the check is a lookup by external ID, which the latest released version cannot express. |
 | **Reference data** - data too dynamic for static configuration. | One row per record, refreshed by a workflow when the upstream changes. |
 
 ### What a Data Table is not
