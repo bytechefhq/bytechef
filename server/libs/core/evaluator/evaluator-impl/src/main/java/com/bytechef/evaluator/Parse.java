@@ -47,6 +47,23 @@ class Parse implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        if (arguments.length == 0 || arguments.length > 2) {
+            throw new AccessException(
+                "%s expects one or two arguments but received %d".formatted(functionName(), arguments.length));
+        }
+
+        String format = null;
+
+        if (arguments.length == 2) {
+            if (!(arguments[1] instanceof String formatArgument)) {
+                throw new AccessException(
+                    "%s expects a string format but received %s: %s".formatted(
+                        functionName(), typeNameOf(arguments[1]), arguments[1]));
+            }
+
+            format = formatArgument;
+        }
+
         Object argument = TemporalValueUtils.normalize(arguments[0]);
 
         if (argument instanceof ZonedDateTime zonedDateTime) {
@@ -68,24 +85,24 @@ class Parse implements MethodExecutor {
         }
 
         try {
-            return new TypedValue(parseText(text, arguments));
+            return new TypedValue(parseText(text, format));
         } catch (DateTimeException | IllegalArgumentException exception) {
             throw new AccessException(
                 "%s cannot parse %s: %s".formatted(functionName(), text, exception.getMessage()), exception);
         }
     }
 
-    private Object parseText(String text, Object[] arguments) {
+    private Object parseText(String text, @Nullable String format) {
         if (type == Type.DATE) {
-            if (arguments.length == 2) {
-                return ZonedDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1]));
+            if (format != null) {
+                return ZonedDateTime.parse(text, DateTimeFormatter.ofPattern(format));
             }
 
             return LocalDate.parse(text);
         }
 
-        if (arguments.length == 2) {
-            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1]));
+        if (format != null) {
+            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern(format));
         }
 
         return LocalDateTime.parse(text);
