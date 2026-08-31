@@ -17,6 +17,7 @@
 package com.bytechef.commons.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("unchecked")
 public class ValueTagUtilsTest {
 
     @Test
@@ -175,5 +177,31 @@ public class ValueTagUtilsTest {
             "real", 5L);
 
         assertEquals(value, ValueTagUtils.untag(ValueTagUtils.tag(value)));
+    }
+
+    @Test
+    public void testUntagMapKeepsAnUnescapedLookalikeAsAMap() {
+        Map<String, Object> legacy = Map.of("@bytechefType", "LONG", "@bytechefValue", "5");
+
+        assertEquals(legacy, ValueTagUtils.untagMap(legacy));
+    }
+
+    @Test
+    public void testUntagMapUnwrapsAnEscapedMap() {
+        Map<String, Object> lookalike = Map.of("@bytechefType", "LONG", "@bytechefValue", "5");
+
+        Object tagged = ValueTagUtils.tag(lookalike);
+
+        assertInstanceOf(Map.class, tagged);
+        assertEquals(lookalike, ValueTagUtils.untagMap((Map<String, ?>) tagged));
+    }
+
+    @Test
+    public void testUntagMapStillReconstructsValuesInsideTheMap() {
+        Map<String, Object> tagged = Map.of(
+            "when", Map.of("@bytechefType", "ZONED_DATE_TIME", "@bytechefValue", "2026-08-26T00:00:00Z"));
+
+        assertEquals(
+            Map.of("when", java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z")), ValueTagUtils.untagMap(tagged));
     }
 }

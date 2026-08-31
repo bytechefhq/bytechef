@@ -74,7 +74,7 @@ public final class ValueTagUtils {
     public static @Nullable Object untag(@Nullable Object value) {
         return switch (value) {
             case null -> null;
-            case Map<?, ?> map -> untagMap(map);
+            case Map<?, ?> map -> untagScalarOrMap(map);
             case List<?> list -> {
                 List<@Nullable Object> untaggedList = new ArrayList<>(list.size());
 
@@ -86,6 +86,17 @@ public final class ValueTagUtils {
             }
             default -> value;
         };
+    }
+
+    /**
+     * Reads back a value that was stored as a map. Unlike {@link #untag(Object)} this never reconstructs the map itself
+     * into a scalar: what was written as a map is a map, so a top-level tag shape here can only be payload data, and
+     * reconstructing it would both lose that data and break the caller's return type.
+     */
+    public static Map<String, @Nullable Object> untagMap(Map<String, ?> value) {
+        Map<?, ?> escaped = escapedMap(value);
+
+        return untagEntries(escaped == null ? value : escaped);
     }
 
     private static @Nullable Object tagNormalized(@Nullable Object value) {
@@ -134,8 +145,10 @@ public final class ValueTagUtils {
         return tag;
     }
 
-    private static Object untagMap(Map<?, ?> map) {
-        if (isTagShaped(map) && MAP_TYPE.equals(map.get(TYPE_KEY)) && map.get(VALUE_KEY) instanceof Map<?, ?> escaped) {
+    private static Object untagScalarOrMap(Map<?, ?> map) {
+        Map<?, ?> escaped = escapedMap(map);
+
+        if (escaped != null) {
             return untagEntries(escaped);
         }
 
@@ -158,13 +171,21 @@ public final class ValueTagUtils {
         return untaggedMap;
     }
 
+    private static @Nullable Map<?, ?> escapedMap(Map<?, ?> map) {
+        if (isTagShaped(map) && MAP_TYPE.equals(map.get(TYPE_KEY)) && map.get(VALUE_KEY) instanceof Map<?, ?> escaped) {
+            return escaped;
+        }
+
+        return null;
+    }
+
     private static boolean isTagShaped(Map<?, ?> map) {
         return map.size() == 2 && map.containsKey(TYPE_KEY) && map.containsKey(VALUE_KEY);
     }
 
     /**
-     * Whether {@link #untagMap(Map)} would read this map back as something other than a plain map, which is exactly
-     * when a map carrying user data of the same shape has to be escaped on write.
+     * Whether {@link #untagScalarOrMap(Map)} would read this map back as something other than a plain map, which is
+     * exactly when a map carrying user data of the same shape has to be escaped on write.
      */
     private static boolean isReconstructable(Map<?, ?> map) {
         if (!isTagShaped(map) || !(map.get(TYPE_KEY) instanceof String type)) {
