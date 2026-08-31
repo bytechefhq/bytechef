@@ -5,6 +5,8 @@ export interface EnvironmentConfigI {
     description: string;
     icon: LucideIcon;
     label: string;
+    shortLabel: string;
+    sidebarTheme: 'development' | 'production' | 'staging';
     styleType: 'primary-outline' | 'secondary-outline' | 'warning-outline';
 }
 
@@ -13,18 +15,24 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         description: 'Features are unstable, experimental, and may change or break frequently.',
         icon: WrenchIcon,
         label: 'DEVELOPMENT',
+        shortLabel: 'DEV',
+        sidebarTheme: 'development',
         styleType: 'secondary-outline',
     },
     [PRODUCTION_ENVIRONMENT]: {
         description: 'Live environment used by real users. Optimized for performance with strict safeguards.',
         icon: BoxIcon,
         label: 'PRODUCTION',
+        shortLabel: 'PRD',
+        sidebarTheme: 'production',
         styleType: 'primary-outline',
     },
     [STAGING_ENVIRONMENT]: {
         description: 'Used for final testing, QA, and validation before release.',
         icon: FlaskConicalIcon,
         label: 'STAGING',
+        shortLabel: 'STG',
+        sidebarTheme: 'staging',
         styleType: 'warning-outline',
     },
 };
