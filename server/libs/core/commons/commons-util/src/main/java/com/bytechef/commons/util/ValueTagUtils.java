@@ -37,12 +37,19 @@ import org.jspecify.annotations.Nullable;
  * reconstructs. Temporal values are normalized via {@link TemporalValueUtils#normalize(Object)} before being tagged;
  * numeric values are tagged as-is.
  *
+ * <p>
+ * Payload data can itself be a map of exactly that shape -- an API response whose body happens to use those two field
+ * names. Such a map is escaped on write by wrapping it in a {@code MAP} tag, so {@link #untag(Object)} can tell an
+ * encoder-written tag from user data that merely looks like one and neither is mistaken for the other.
+ *
  * @author Ivica Cardic
  */
 public final class ValueTagUtils {
 
     private static final String TYPE_KEY = "@bytechefType";
     private static final String VALUE_KEY = "@bytechefValue";
+
+    private static final String MAP_TYPE = "MAP";
 
     private static final Map<String, Function<String, Object>> PARSERS = Map.ofEntries(
         Map.entry("ZONED_DATE_TIME", ZonedDateTime::parse),
@@ -103,7 +110,7 @@ public final class ValueTagUtils {
                     taggedMap.put(String.valueOf(entry.getKey()), tagNormalized(entry.getValue()));
                 }
 
-                yield taggedMap;
+                yield isReconstructable(taggedMap) ? tagOf(MAP_TYPE, taggedMap) : taggedMap;
             }
             case List<?> list -> {
                 List<@Nullable Object> taggedList = new ArrayList<>(list.size());
@@ -118,7 +125,7 @@ public final class ValueTagUtils {
         };
     }
 
-    private static Map<String, Object> tagOf(String type, String value) {
+    private static Map<String, Object> tagOf(String type, Object value) {
         Map<String, Object> tag = new LinkedHashMap<>();
 
         tag.put(TYPE_KEY, type);
@@ -128,12 +135,20 @@ public final class ValueTagUtils {
     }
 
     private static Object untagMap(Map<?, ?> map) {
+        if (isTagShaped(map) && MAP_TYPE.equals(map.get(TYPE_KEY)) && map.get(VALUE_KEY) instanceof Map<?, ?> escaped) {
+            return untagEntries(escaped);
+        }
+
         Object reconstructed = reconstruct(map);
 
         if (reconstructed != null) {
             return reconstructed;
         }
 
+        return untagEntries(map);
+    }
+
+    private static Map<String, @Nullable Object> untagEntries(Map<?, ?> map) {
         Map<String, @Nullable Object> untaggedMap = new LinkedHashMap<>();
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
@@ -143,8 +158,27 @@ public final class ValueTagUtils {
         return untaggedMap;
     }
 
+    private static boolean isTagShaped(Map<?, ?> map) {
+        return map.size() == 2 && map.containsKey(TYPE_KEY) && map.containsKey(VALUE_KEY);
+    }
+
+    /**
+     * Whether {@link #untagMap(Map)} would read this map back as something other than a plain map, which is exactly
+     * when a map carrying user data of the same shape has to be escaped on write.
+     */
+    private static boolean isReconstructable(Map<?, ?> map) {
+        if (!isTagShaped(map) || !(map.get(TYPE_KEY) instanceof String type)) {
+            return false;
+        }
+
+        Object value = map.get(VALUE_KEY);
+
+        return (PARSERS.containsKey(type) && value instanceof String) ||
+            (MAP_TYPE.equals(type) && value instanceof Map);
+    }
+
     private static @Nullable Object reconstruct(Map<?, ?> map) {
-        if (map.size() != 2 || !map.containsKey(TYPE_KEY) || !map.containsKey(VALUE_KEY)) {
+        if (!isTagShaped(map)) {
             return null;
         }
 

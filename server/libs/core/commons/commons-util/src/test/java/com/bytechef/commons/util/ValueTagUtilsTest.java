@@ -145,4 +145,35 @@ public class ValueTagUtilsTest {
     public void testUntagReturnsNullForNull() {
         assertNull(ValueTagUtils.untag(null));
     }
+
+    @Test
+    public void testTagEscapesAMapThatWouldBeReadBackAsATag() {
+        Map<String, Object> lookalike = Map.of("@bytechefType", "LONG", "@bytechefValue", "5");
+
+        assertEquals(lookalike, ValueTagUtils.untag(ValueTagUtils.tag(lookalike)));
+    }
+
+    @Test
+    public void testTagEscapesALookalikeMapNestedInsideAList() {
+        Object value = List.of(
+            Map.of("row", Map.of("@bytechefType", "ZONED_DATE_TIME", "@bytechefValue", "2026-08-26T00:00:00Z")));
+
+        assertEquals(value, ValueTagUtils.untag(ValueTagUtils.tag(value)));
+    }
+
+    @Test
+    public void testTagEscapesAMapShapedLikeTheEscapeItself() {
+        Map<String, Object> lookalike = Map.of("@bytechefType", "MAP", "@bytechefValue", Map.of("a", 1));
+
+        assertEquals(lookalike, ValueTagUtils.untag(ValueTagUtils.tag(lookalike)));
+    }
+
+    @Test
+    public void testTagKeepsARealTagAndALookalikeApartInTheSameMap() {
+        Map<String, Object> value = Map.of(
+            "lookalike", Map.of("@bytechefType", "LONG", "@bytechefValue", "5"),
+            "real", 5L);
+
+        assertEquals(value, ValueTagUtils.untag(ValueTagUtils.tag(value)));
+    }
 }
