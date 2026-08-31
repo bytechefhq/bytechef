@@ -79,4 +79,31 @@ public class TaskFileStorageTest {
             Map.of("result", ZonedDateTime.parse("2026-08-26T00:00:00Z")),
             taskFileStorage.readJobOutputs(fileEntry));
     }
+
+    @Test
+    public void testContextValueSurvivesAMapThatLooksLikeATag() {
+        Map<String, ?> context = Map.of("@bytechefType", "LONG", "@bytechefValue", "5");
+
+        FileEntry fileEntry = taskFileStorage.storeContextValue(1L, Context.Classname.JOB, context);
+
+        assertEquals(context, taskFileStorage.readContextValue(fileEntry));
+    }
+
+    @Test
+    public void testJobOutputsSurviveAMapThatLooksLikeATag() {
+        Map<String, ?> outputs = Map.of("@bytechefType", "LONG", "@bytechefValue", "5");
+
+        FileEntry fileEntry = taskFileStorage.storeJobOutputs(1L, outputs);
+
+        assertEquals(outputs, taskFileStorage.readJobOutputs(fileEntry));
+    }
+
+    @Test
+    public void testTaskExecutionOutputSurvivesAMapThatLooksLikeATag() {
+        Object output = List.of(Map.of("@bytechefType", "ZONED_DATE_TIME", "@bytechefValue", "2026-08-26T00:00:00Z"));
+
+        FileEntry fileEntry = taskFileStorage.storeTaskExecutionOutput(1L, 1L, output);
+
+        assertEquals(output, taskFileStorage.readTaskExecutionOutput(fileEntry));
+    }
 }
