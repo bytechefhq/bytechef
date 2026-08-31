@@ -49,7 +49,7 @@ public class BrowserUseCreateSessionAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSession")
         .title("Create Session")
-        .description("Create a session and/or dispatch a task.")
+        .description("Create a V3 session and/or dispatch a task.")
         .help("", "https://docs.bytechef.io/reference/components/browser-use_v1#create-session")
         .properties(
             string(TASK)

@@ -562,7 +562,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Create a session and/or dispatch a task.",
+    "description": "Create a V3 session and/or dispatch a task.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/browser-use_v1#create-session"
@@ -2809,7 +2809,7 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "defaultValue": null,
       "description": "ID returned by Create Run.",
       "displayCondition": null,
@@ -2823,7 +2823,10 @@
       "minLength": null,
       "name": "runId",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -2839,7 +2842,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Get session details.",
+    "description": "Get V3 session details.",
     "help": {
       "body": "",
       "learnMoreUrl": "https://docs.bytechef.io/reference/components/browser-use_v1#get-session"
@@ -4628,7 +4631,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "createSession",
-    "description": "Create a session and/or dispatch a task.",
+    "description": "Create a V3 session and/or dispatch a task.",
     "element": { },
     "help": null,
     "outputDefinition": {
@@ -6867,7 +6870,7 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "SELECT",
       "defaultValue": null,
       "description": "ID returned by Create Run.",
       "displayCondition": null,
@@ -6881,7 +6884,10 @@
       "minLength": null,
       "name": "runId",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
@@ -6899,7 +6905,7 @@
     "workflowNodeDescription": null
   }, {
     "name": "getSession",
-    "description": "Get session details.",
+    "description": "Get V3 session details.",
     "element": { },
     "help": null,
     "outputDefinition": {

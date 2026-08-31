@@ -37,7 +37,7 @@ public class BrowserUseGetSessionAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getSession")
         .title("Get Session")
-        .description("Get session details.")
+        .description("Get V3 session details.")
         .help("", "https://docs.bytechef.io/reference/components/browser-use_v1#get-session")
         .properties(
             string(SESSION_ID)
