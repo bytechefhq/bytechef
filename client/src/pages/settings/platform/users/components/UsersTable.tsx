@@ -3,6 +3,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/c
 import UsersTableSkeleton from '@/pages/settings/platform/users/components/UsersTableSkeleton';
 import useDeleteUserAlertDialog from '@/pages/settings/platform/users/components/hooks/useDeleteUserAlertDialog';
 import useEditUserDialog from '@/pages/settings/platform/users/components/hooks/useEditUserDialog';
+import useCeEdition from '@/shared/edition/useCeEdition';
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
 import useUsersTable from './hooks/useUsersTable';
@@ -15,6 +16,7 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
     const {error, isLoading, users} = useUsersTable({pageNumber});
     const {handleOpen: handleOpenDelete} = useDeleteUserAlertDialog();
     const {handleOpen: handleOpenEdit} = useEditUserDialog();
+    const ceEdition = useCeEdition();
 
     if (error) {
         return <div className="text-destructive">Error: {(error as Error).message}</div>;
@@ -64,12 +66,14 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
                                 </TableCell>
 
                                 <TableCell className="flex justify-end whitespace-nowrap">
-                                    <Button
-                                        icon={<EditIcon className="size-4" />}
-                                        onClick={() => handleOpenEdit(user?.login ?? '')}
-                                        size="icon"
-                                        variant="ghost"
-                                    />
+                                    {!ceEdition && (
+                                        <Button
+                                            icon={<EditIcon className="size-4" />}
+                                            onClick={() => handleOpenEdit(user?.login ?? '')}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    )}
 
                                     <Button
                                         icon={<Trash2Icon className="size-4 text-destructive" />}

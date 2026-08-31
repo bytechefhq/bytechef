@@ -1,4 +1,5 @@
 import {useEditUserDialogStore} from '@/pages/settings/platform/users/stores/useEditUserDialogStore';
+import useCeEdition from '@/shared/edition/useCeEdition';
 import {useAuthoritiesQuery, useUpdateUserMutation, useUsersQuery} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
@@ -19,8 +20,10 @@ interface UseEditUserDialogI {
 export default function useEditUserDialog(): UseEditUserDialogI {
     const {clearLoginToEdit, editRole, loginToEdit, setEditRole, setLoginToEdit} = useEditUserDialogStore();
 
+    const ceEdition = useCeEdition();
+
     const {data: usersData} = useUsersQuery({});
-    const {data: authoritiesData} = useAuthoritiesQuery({});
+    const {data: authoritiesData} = useAuthoritiesQuery({}, {enabled: !ceEdition});
 
     const queryClient = useQueryClient();
 

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.platform.user.web.graphql.config;
+package com.bytechef.platform.user.web.graphql.config;
 
-import com.bytechef.ee.platform.user.facade.AuthorityFacade;
-import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
+import com.bytechef.platform.user.facade.UserManagementFacade;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,7 +29,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AuthorityFacade.class, IdentityProviderFacade.class
+    UserManagementFacade.class
 })
 public @interface PlatformUserGraphQlConfigurationSharedMocks {
 }

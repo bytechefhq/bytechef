@@ -1,8 +1,8 @@
 import {useInviteUserDialogStore} from '@/pages/settings/platform/users/stores/useInviteUserDialogStore';
 import {isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
 import {AUTHORITIES} from '@/shared/constants';
+import useCeEdition from '@/shared/edition/useCeEdition';
 import {useAuthoritiesQuery, useInviteUserMutation} from '@/shared/middleware/graphql';
-import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 
@@ -36,9 +36,9 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         setOpen,
     } = useInviteUserDialogStore();
 
-    const application = useApplicationInfoStore((state) => state.application);
+    const ceEdition = useCeEdition();
 
-    const {data: authoritiesData} = useAuthoritiesQuery({});
+    const {data: authoritiesData} = useAuthoritiesQuery({}, {enabled: !ceEdition});
 
     const queryClient = useQueryClient();
 
@@ -50,7 +50,6 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
     });
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
-    const ceEdition = application?.edition === EditionType.CE;
     const roleSelectVisible = !ceEdition;
     const inviteDisabled = !inviteEmail || (roleSelectVisible && !inviteRole) || !isValidPassword(invitePassword);
 

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.platform.user.web.graphql;
+package com.bytechef.platform.user.web.graphql;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.platform.user.facade.UserManagementFacade;
-import com.bytechef.ee.platform.user.facade.UserManagementFacade.UserWithAuthorities;
-import com.bytechef.ee.platform.user.facade.UserManagementFacade.UsersWithAuthorities;
-import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlConfigurationSharedMocks;
-import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlTestConfiguration;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.facade.UserManagementFacade;
+import com.bytechef.platform.user.facade.UserManagementFacade.UserWithAuthorities;
+import com.bytechef.platform.user.facade.UserManagementFacade.UsersWithAuthorities;
+import com.bytechef.platform.user.web.graphql.config.PlatformUserGraphQlConfigurationSharedMocks;
+import com.bytechef.platform.user.web.graphql.config.PlatformUserGraphQlTestConfiguration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

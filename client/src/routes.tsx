@@ -217,11 +217,9 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <UsersPage />
-                        </LazyLoadWrapper>
-                    </EEVersion>
+                    <LazyLoadWrapper>
+                        <UsersPage />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'users',

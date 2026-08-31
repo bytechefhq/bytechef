@@ -209,6 +209,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-service"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-graphql"))
     implementation(project(":server:libs:platform:platform-user:platform-user-rest"))
     implementation(project(":server:libs:platform:platform-user:platform-user-service"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-impl"))
