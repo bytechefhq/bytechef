@@ -12,7 +12,7 @@ import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEd
 import AiSkillListItemTagList from '@/pages/automation/ai/skills/components/AiSkillListItemTagList';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
-import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
+import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon} from 'lucide-react';
 
 interface AiSkillListItemProps {
     deleteSkill: (id: string) => Promise<void>;
@@ -31,7 +31,6 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
         setShowEditDialog,
         showDeleteDialog,
         showEditDialog,
-        skillColor,
     } = useAiSkillListItem({deleteSkill, onDownload, onUpdate, skill});
 
     return (
@@ -40,23 +39,15 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                 className="mb-2 flex cursor-pointer items-center justify-between gap-6 rounded border border-border/50 px-2 py-3 hover:bg-destructive-foreground"
                 onClick={handleClick}
             >
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <div className={`flex size-8 items-center justify-center rounded ${skillColor}`}>
-                        <ZapIcon className="size-4 text-content-onsurface-primary" />
-                    </div>
+                <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold">{skill.name}</div>
 
-                    <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold">{skill.name}</div>
+                    {skill.description && (
+                        <div className="line-clamp-1 text-xs text-content-neutral-secondary">{skill.description}</div>
+                    )}
 
-                        {skill.description && (
-                            <div className="line-clamp-1 text-xs text-content-neutral-secondary">
-                                {skill.description}
-                            </div>
-                        )}
-
-                        <div className="mt-2 flex items-center" onClick={(event) => event.stopPropagation()}>
-                            <AiSkillListItemTagList skillId={skill.id} tags={skill.tags ?? []} />
-                        </div>
+                    <div className="mt-2 flex items-center" onClick={(event) => event.stopPropagation()}>
+                        <AiSkillListItemTagList skillId={skill.id} tags={skill.tags ?? []} />
                     </div>
                 </div>
 

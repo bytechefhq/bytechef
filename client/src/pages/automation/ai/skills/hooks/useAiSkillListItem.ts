@@ -1,6 +1,5 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
-import getSkillColor from '@/pages/automation/ai/skills/utils/getSkillColor';
 import {AiSkill} from '@/shared/middleware/graphql';
 import {useCallback, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -50,8 +49,6 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, s
         [onUpdate, skill.id]
     );
 
-    const skillColor = getSkillColor(skill.id);
-
     return {
         handleClick,
         handleDeleteClick,
@@ -61,6 +58,5 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, s
         setShowEditDialog,
         showDeleteDialog,
         showEditDialog,
-        skillColor,
     };
 }

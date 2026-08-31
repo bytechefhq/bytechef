@@ -20,7 +20,7 @@ import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCo
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import FilterBadges from '@/shared/components/filters/FilterBadges';
-import FilterMenu from '@/shared/components/filters/FilterMenu';
+import FilterMenu, {hasActiveFilters} from '@/shared/components/filters/FilterMenu';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -120,7 +120,20 @@ const AiSkills = () => {
 
     if (showToolbar) {
         toolbarRight = (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
+                {showSearchAndCreate && (
+                    <div className="relative">
+                        <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-neutral-tertiary" />
+
+                        <Input
+                            className="w-64 pl-9"
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                            placeholder="Search skills..."
+                            value={searchQuery}
+                        />
+                    </div>
+                )}
+
                 {showSearchAndCreate && tagFilterGroups.length > 0 && (
                     <FilterMenu groups={tagFilterGroups} title="Filter Skills" />
                 )}
@@ -243,22 +256,12 @@ const AiSkills = () => {
             leftSidebarOpen={false}
         >
             <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
-                {/* Search and the active-tag chips sit above the list; the facets themselves collapse into
-                    the header's filter menu, so the header stays the same width however many there are. */}
+                {/* Search and the facet menu live in the header; only the active-tag chips sit above the
+                    list, where they survive an empty result set — filtering down to nothing is exactly when
+                    the chip that emptied the page has to stay reachable. */}
 
-                {showToolbar && showSearchAndCreate && (
+                {showToolbar && showSearchAndCreate && hasActiveFilters(tagFilterGroups) && (
                     <div className="flex flex-wrap items-center gap-2 pt-4 pb-2">
-                        <div className="relative">
-                            <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-neutral-tertiary" />
-
-                            <Input
-                                className="w-64 pl-9"
-                                onChange={(event) => setSearchQuery(event.target.value)}
-                                placeholder="Search skills..."
-                                value={searchQuery}
-                            />
-                        </div>
-
                         <FilterBadges groups={tagFilterGroups} />
                     </div>
                 )}
