@@ -1,15 +1,12 @@
 ---
 title: Users
-description: Organization members and their roles; invite people, change a role, and remove access.
-comingSoon: true
+description: Organization members - invite people, remove access, and, in Enterprise Edition, assign roles.
 ---
 
-<EEBadge />
-
-Organization membership is managed from **Settings → Users**. From this page an administrator invites new people by email, assigns each one an organization role, changes a role later, and removes people who should no longer have access.
+Organization membership is managed from **Settings → Users**. From this page an administrator invites new people by email and removes people who should no longer have access. In Enterprise Edition the same page assigns each account an organization role and changes it later.
 
 <Callout title="Availability">
-    User management is an Enterprise Edition feature behind the `ff-3900` feature flag, and the route requires the `ADMIN` authority. The page is not available in Community Edition, and non-admins cannot open it.
+    The page is available in both editions and requires the `ADMIN` authority, so non-admins cannot open it. Listing, inviting and removing users work the same either way. **Roles are Enterprise Edition only**: Community Edition has a single level of access, so every account is an administrator and the role controls described below are not rendered there.
 </Callout>
 
 ---
@@ -24,9 +21,9 @@ The header reads **Users**, described as "Manage organization users: invite or d
 |---|---|
 | **Email** | The user's email address. |
 | **Name** | First and last name, when set. |
-| **Role** | The organization authority, shown verbatim - `ROLE_ADMIN` or `ROLE_USER`. |
+| **Role** | The organization authority, shown verbatim - `ROLE_ADMIN` or `ROLE_USER`. Every Community Edition account reads `ROLE_ADMIN`. |
 | **Status** | **Active** when the account is activated, **Pending** otherwise. |
-| *(actions)* | Per-row **edit** (pencil) and **delete** (trash) buttons. |
+| *(actions)* | Per-row **edit** (pencil) and **delete** (trash) buttons. The edit button is Enterprise Edition only - it exists to change a role, and Community Edition has none to change. |
 
 When there are more users than fit on one page, pagination controls appear in the footer. If no users match, the table shows **No users found.**
 
@@ -35,10 +32,10 @@ When there are more users than fit on one page, pagination controls appear in th
 1. Click **Invite User**. The dialog explains: "Enter the user email. A strong password is pre-generated according to the security rules. This password will be included in the invitation email."
 2. Enter the **Email** address.
 3. A **Password** is generated for you and shown read-only. **Regenerate** produces a different one. The rule beneath the field states it: "Password must be at least 8 characters and include at least 1 uppercase letter and 1 number."
-4. Choose a **Role**. The options come from the organization's configured authorities; the first one is preselected.
+4. Choose a **Role**. The options come from the organization's configured authorities; the first one is preselected. This step is Enterprise Edition only - Community Edition shows no **Role** field and invites every account as an administrator.
 5. Click **Invite**.
 
-The **Invite** button stays disabled until an email address and a role are set *and* the generated password satisfies the password rules. An invalid role is rejected before any account row is created, so a bad request cannot leave an orphaned user behind.
+The **Invite** button stays disabled until an email address is set *and* the generated password satisfies the password rules; in Enterprise Edition a role must be chosen too. An invalid role is rejected before any account row is created, so a bad request cannot leave an orphaned user behind.
 
 ![The Invite User dialog](users/invite-user.png)
 
@@ -52,6 +49,10 @@ An invited account occupies a seat against the deployment's member quota from th
 
 ## Change a user's role
 
+<Callout title="Enterprise Edition">
+    Community Edition does not render the **edit** action. It exists only to change a role, and every Community Edition account is already an administrator.
+</Callout>
+
 1. Click the **edit** (pencil) icon on the user's row to open the **Edit User** dialog, described as "Change the user role."
 2. The dialog shows the selected **User** (their email) and a **Role** dropdown set to their current role.
 3. Pick a new **Role** and click **Save**.
@@ -61,6 +62,20 @@ Only the organization role is editable here - email and name are not. Workspace 
 ## Remove a user
 
 Click the **delete** (trash) icon on the row and confirm. The confirmation warns that the action cannot be undone. Removing a user revokes their access to the organization.
+
+## What differs between editions
+
+Community Edition has one level of access. There is nothing to assign, so the controls that would assign it are absent rather than disabled:
+
+| | Community Edition | Enterprise Edition |
+|---|---|---|
+| List, invite, remove users | Yes | Yes |
+| **Role** field in the invite dialog | Not shown - invites as administrator | Choose from the configured authorities |
+| **Role** column in the table | Always `ROLE_ADMIN` | The account's authority |
+| **edit** action / **Edit User** dialog | Not shown | Change the role |
+| Workspace roles and permission scopes | Not available | See below |
+
+Everything below this point - the workspace role model, permission scopes, and per-workspace membership - is Enterprise Edition.
 
 ---
 
