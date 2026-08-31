@@ -103,6 +103,7 @@ import * as React from 'react';
 import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyMentionsInput from './PropertyMentionsInput';
+import {FORMULA_MODE_PLACEHOLDER} from './mentionsInputPlaceholder';
 
 const microtaskTick = async (times = 1) => {
     for (let index = 0; index < times; index++) {
@@ -575,6 +576,160 @@ describe('PropertyMentionsInputEditor', () => {
             await microtaskTick(2);
 
             expect(screen.getByRole('textbox', {name: 'FormulaEditor'}).textContent).toBe('3 + 4');
+        });
+
+        it('should render the editor content in a monospace font in formula mode', async () => {
+            renderEditor({isFormulaMode: true, value: '=1 + 2'});
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'Editor'})).toHaveClass('font-mono');
+        });
+
+        it('should not render the editor content in a monospace font outside formula mode', async () => {
+            renderEditor({isFormulaMode: false, value: 'plain'});
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'Editor'})).not.toHaveClass('font-mono');
+        });
+
+        // The editor is created once, so the monospace class only tracks the toggle if tiptap's
+        // useEditor effect reapplies editorProps.attributes through setOptions on rerender.
+        it('should apply the monospace font when formula mode is switched on', async () => {
+            const {rerender} = render(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        isFormulaMode={false}
+                        label="FormulaEditor"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="plain"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'FormulaEditor'})).not.toHaveClass('font-mono');
+
+            rerender(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        isFormulaMode={true}
+                        label="FormulaEditor"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        placeholder=""
+                        type="STRING"
+                        value="plain"
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'FormulaEditor'})).toHaveClass('font-mono');
+        });
+
+        // text-xs/5, not plain text-xs: the /5 keeps the text-sm leading so the field holds its
+        // height across the toggle and the smaller text stays vertically centred in the line box.
+        it('should shrink the editor content to text-xs at the text-sm leading in formula mode', async () => {
+            renderEditor({isFormulaMode: true, value: '=1 + 2'});
+
+            await microtaskTick(2);
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            expect(textbox).toHaveClass('text-xs/5');
+            expect(textbox).not.toHaveClass('text-sm');
+        });
+
+        it('should keep the editor content at text-sm outside formula mode', async () => {
+            renderEditor({isFormulaMode: false, value: 'plain'});
+
+            await microtaskTick(2);
+
+            expect(screen.getByRole('textbox', {name: 'Editor'})).toHaveClass('text-sm');
+        });
+
+        // Data pill chips set their own text-sm, so the editor's text-xs does not reach them. The
+        // modifier on the wrapper is what the stylesheet hangs the smaller chip size off.
+        it('should mark the editor wrapper so data pill chips can shrink with the text', async () => {
+            const {container} = renderEditor({isFormulaMode: true, value: '=1 + 2'});
+
+            await microtaskTick(2);
+
+            expect(container.querySelector('.property-mentions-editor--formula-mode')).toBeInTheDocument();
+        });
+
+        it('should not mark the editor wrapper outside formula mode', async () => {
+            const {container} = renderEditor({isFormulaMode: false, value: 'plain'});
+
+            await microtaskTick(2);
+
+            expect(container.querySelector('.property-mentions-editor--formula-mode')).not.toBeInTheDocument();
+        });
+
+        it('should show the expression sample placeholder in formula mode', async () => {
+            const {container} = renderEditor({isFormulaMode: true, value: ''});
+
+            await microtaskTick(2);
+
+            expect(container.querySelector('[data-placeholder]')).toHaveAttribute(
+                'data-placeholder',
+                FORMULA_MODE_PLACEHOLDER
+            );
+        });
+
+        // The placeholder is resolved per decoration rather than baked into the extensions memo, so
+        // toggling formula mode has to swap it without the editor being rebuilt.
+        it('should swap the placeholder when formula mode is switched on', async () => {
+            const {container, rerender} = render(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        isFormulaMode={false}
+                        label="FormulaEditor"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        type="STRING"
+                        value=""
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(container.querySelector('[data-placeholder]')).not.toHaveAttribute(
+                'data-placeholder',
+                FORMULA_MODE_PLACEHOLDER
+            );
+
+            rerender(
+                <WorkflowEditorProvider value={editorProviderValue}>
+                    <PropertyMentionsInput
+                        controlType="TEXT"
+                        isFormulaMode={true}
+                        label="FormulaEditor"
+                        leadingIcon="📄"
+                        path="parameters.field"
+                        type="STRING"
+                        value=""
+                    />
+                </WorkflowEditorProvider>
+            );
+
+            await microtaskTick(2);
+
+            expect(container.querySelector('[data-placeholder]')).toHaveAttribute(
+                'data-placeholder',
+                FORMULA_MODE_PLACEHOLDER
+            );
         });
     });
 
