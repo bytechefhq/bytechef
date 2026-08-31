@@ -65,6 +65,18 @@ class DataTableServiceTest {
     }
 
     @Test
+    void testDropTableShouldUseTheLowercasedNameForBothLayers() {
+        when(jdbcTemplate.queryForObject(
+            anyString(), eq(Integer.class), anyString()))
+                .thenReturn(0);
+
+        dataTableService.dropTable("MyTable", 1L);
+
+        verify(jdbcTemplate).execute(contains("dt_1_mytable"));
+        verify(dataTableRepository).deleteByName("mytable");
+    }
+
+    @Test
     void testDropTableShouldPreserveMetadataWhenPhysicalTablesExistInOtherEnvironments() {
         when(jdbcTemplate.queryForObject(
             anyString(), eq(Integer.class), anyString()))
