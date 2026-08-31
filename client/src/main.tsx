@@ -10,7 +10,6 @@ import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import {StrictMode} from 'react';
 import {RouterProvider} from 'react-router-dom';
 
@@ -84,8 +83,6 @@ async function renderApp() {
                                 <RouterProvider router={router} />
                             </TooltipProvider>
                         </ConditionalPostHogProvider>
-
-                        <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
                     </QueryClientProvider>
                 </ThemeProvider>
             </I18n>
