@@ -48,3 +48,12 @@
         }
     }
 }
+
+/*
+ * Set smaller font to datapill mentions in formula mode to match the font size of the formula input
+ */
+@layer components {
+    .property-mentions-editor--formula-mode .tiptap .property-mention-chip {
+        @apply text-xs/5!;
+    }
+}
