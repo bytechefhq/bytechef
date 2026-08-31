@@ -11,7 +11,7 @@ import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/Ai
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
-import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
+import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon} from 'lucide-react';
 
 interface AiSkillListItemProps {
     deleteSkill: (id: string) => Promise<void>;
@@ -30,7 +30,6 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
         setShowEditDialog,
         showDeleteDialog,
         showEditDialog,
-        skillColor,
     } = useAiSkillListItem({deleteSkill, onDownload, onUpdate, skill});
 
     return (
@@ -39,20 +38,12 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                 className="mb-2 flex cursor-pointer items-center justify-between gap-6 rounded border border-border/50 px-2 py-4 hover:bg-destructive-foreground"
                 onClick={handleClick}
             >
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <div className={`flex size-8 items-center justify-center rounded ${skillColor}`}>
-                        <ZapIcon className="size-4 text-white" />
-                    </div>
+                <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold">{skill.name}</div>
 
-                    <div className="min-w-0 flex-1">
-                        <div className="text-sm font-semibold">{skill.name}</div>
-
-                        {skill.description && (
-                            <div className="line-clamp-1 text-xs text-content-neutral-secondary">
-                                {skill.description}
-                            </div>
-                        )}
-                    </div>
+                    {skill.description && (
+                        <div className="line-clamp-1 text-xs text-content-neutral-secondary">{skill.description}</div>
+                    )}
                 </div>
 
                 <div className="flex shrink-0 items-center gap-4">
