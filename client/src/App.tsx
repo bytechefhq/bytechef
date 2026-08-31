@@ -115,8 +115,10 @@ function App() {
             return edition === EditionType.EE && ai.hub.enabled;
         }
 
-        // The Gateway pages exist only in EE with the gateway toggle on; Skills and
-        // Memories stay visible like the old "AI" item.
+        // The AI group's two entries are gated differently. Gateway exists only in EE with the gateway
+        // toggle on; Memories needs no gate at all, since platform-ai-auto-memory ships in CE,
+        // server-app included. Filtering runs before grouping, so in CE the group renders as Memories
+        // alone rather than disappearing.
         if (navItem.href === '/automation/ai/gateway') {
             return edition === EditionType.EE && ai.gateway.enabled;
         }

@@ -13,6 +13,7 @@ import {
     MessageSquareIcon,
     MessagesSquareIcon,
     NetworkIcon,
+    NotebookPenIcon,
     RouterIcon,
     ServerIcon,
     Settings2Icon,
@@ -78,7 +79,6 @@ export const automationNavigation: NavigationItemI[] = [
         icon: NetworkIcon,
         name: 'A2A Servers',
     },
-    {group: 'Deploy', href: '/automation/ai/gateway', icon: RouterIcon, name: 'AI Gateway'},
     {
         group: 'Monitor',
         href: '/automation/executions',
@@ -109,6 +109,8 @@ export const automationNavigation: NavigationItemI[] = [
         icon: FileTextIcon,
         name: 'Files',
     },
+    {group: 'AI', href: '/automation/ai/gateway', icon: RouterIcon, name: 'AI Gateway'},
+    {group: 'AI', href: '/automation/ai/memories', icon: NotebookPenIcon, name: 'Memories'},
 ];
 
 export const embeddedNavigation: NavigationItemI[] = [

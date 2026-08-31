@@ -1,6 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
@@ -151,7 +151,7 @@ describe('Memories page', () => {
         expect(screen.getByText(/the agent stores facts here/i)).toBeInTheDocument();
     });
 
-    it('lists memories in a table alongside the filter row', () => {
+    it('lists memories in a table and exposes the count in the header', () => {
         const memories = [
             makeMemory({id: 1, memoryType: 'USER', name: 'alice_profile', title: 'Alice profile'}),
             makeMemory({id: 2, memoryType: 'FEEDBACK', name: 'concise_replies', title: 'Concise replies'}),
@@ -164,9 +164,10 @@ describe('Memories page', () => {
         expect(screen.getByText('Alice profile')).toBeInTheDocument();
         expect(screen.getByText('alice_profile')).toBeInTheDocument();
         expect(screen.getByText('Concise replies')).toBeInTheDocument();
-        // The row count was dropped along with the sidebar, and the facets collapsed into one filter menu.
-        expect(screen.queryByText('2 memories')).toBeNull();
-        expect(screen.getByRole('button', {name: 'Filter Memories'})).toBeInTheDocument();
+        // Header was restyled: instead of "Memories (2)" as a single label, the page now shows the
+        // search box plus a muted count suffix ("2 memories"). Both halves of the assertion-pair pin
+        // the new shape so a regression to the old single-label format would fail loudly.
+        expect(screen.getByText('2 memories')).toBeInTheDocument();
         expect(screen.getByPlaceholderText('Search by title or description...')).toBeInTheDocument();
         expect(screen.getByText('USER')).toBeInTheDocument();
         expect(screen.getByText('FEEDBACK')).toBeInTheDocument();
@@ -292,25 +293,12 @@ describe('Memories page', () => {
         expect(screen.queryByRole('button', {name: /edit deployment memory/i})).toBeNull();
     });
 
-    // Both facets live behind one filter-menu button, so changing either one means opening it first. The
-    // menu closes on pick, hence the reopen per option. What is currently selected is read off the chips
-    // beside the search box, not off the trigger.
-    const openFilterMenu = async () => {
-        await userEvent.click(screen.getByRole('button', {name: /^Filter Memories/}));
-    };
-
-    const pickFilterOption = async (option: string) => {
-        await openFilterMenu();
-
-        await userEvent.click(await screen.findByRole('menuitem', {name: option}));
-    };
-
-    it('invokes the memories query with the memoryType picked in the Type filter', async () => {
+    it('invokes the memories query with the memoryType picked in the Type sidebar group', async () => {
         mockUseMemoriesQuery.mockReturnValue(makeQueryResult({data: []}));
 
         wrap(<Memories />);
 
-        await pickFilterOption('Feedback');
+        await userEvent.click(screen.getByRole('link', {name: 'Feedback'}));
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
@@ -319,12 +307,12 @@ describe('Memories page', () => {
         expect(lastCall?.[2]).toBe('FEEDBACK');
     });
 
-    it('omits the Owner filter and both principal arguments while no owner has been picked', () => {
+    it('omits the Owner group and both principal arguments while no owner has been picked', () => {
         mockUsePrincipalsQuery.mockReturnValue(makeQueryResult({data: []}));
 
         wrap(<Memories />);
 
-        expect(screen.queryByRole('button', {name: /^Owner:/})).toBeNull();
+        expect(screen.queryByText('Owner')).toBeNull();
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
@@ -334,7 +322,7 @@ describe('Memories page', () => {
         expect(lastCall?.[4]).toBeUndefined();
     });
 
-    it('renders the server-resolved owner labels verbatim in the Owner filter', async () => {
+    it('renders the server-resolved owner labels verbatim in an Owner group', () => {
         mockUsePrincipalsQuery.mockReturnValue(
             makeQueryResult({
                 data: [
@@ -350,13 +338,12 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await openFilterMenu();
-
-        expect(await screen.findByRole('menuitem', {name: 'My memories'})).toBeInTheDocument();
-        expect(screen.getByRole('menuitem', {name: 'Support triage deployment'})).toBeInTheDocument();
+        expect(screen.getByText('Owner')).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'My memories'})).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'Support triage deployment'})).toBeInTheDocument();
     });
 
-    it('opens on the All owner scope, which sends no principal', async () => {
+    it('opens on the All owner scope, which sends no principal', () => {
         mockUsePrincipalsQuery.mockReturnValue(
             makeQueryResult({
                 data: [
@@ -372,13 +359,14 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        // No chip and no "Clear all" means no facet is filtering — the chips are the only report of that,
-        // since the trigger collapses every facet into one button.
-        expect(screen.queryByRole('button', {name: 'Clear all'})).toBeNull();
-        expect(screen.getByRole('button', {name: 'Filter Memories'})).toBeInTheDocument();
+        // Both groups carry an All row, so scope the query to the Owner group — LeftSidebarNav labels it with
+        // its title.
+        const ownerGroup = within(screen.getByLabelText('Owner'));
 
         // Absent principal arguments are the server's All scope on this query — every owner the caller may
         // address — so the default view spans owners rather than showing only the caller's own memories.
+        expect(ownerGroup.getByRole('link', {name: 'All'})).toHaveAttribute('aria-current', 'page');
+        expect(ownerGroup.getByRole('link', {name: 'My memories'})).not.toHaveAttribute('aria-current');
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
@@ -395,12 +383,12 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await pickFilterOption('My memories');
-        await pickFilterOption('Feedback');
+        await userEvent.click(screen.getByRole('link', {name: 'My memories'}));
+        await userEvent.click(screen.getByRole('link', {name: 'Feedback'}));
 
         // Picking a type must not reset the owner scope: they are separate facets, and the query carries both.
-        expect(screen.getByText('Owner: My memories')).toBeInTheDocument();
-        expect(screen.getByText('Type: Feedback')).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: 'My memories'})).toHaveAttribute('aria-current', 'page');
+        expect(screen.getByRole('link', {name: 'Feedback'})).toHaveAttribute('aria-current', 'page');
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
@@ -425,7 +413,7 @@ describe('Memories page', () => {
 
         wrap(<Memories />);
 
-        await pickFilterOption('Support triage deployment');
+        await userEvent.click(screen.getByRole('link', {name: 'Support triage deployment'}));
 
         const lastCall = mockUseMemoriesQuery.mock.lastCall;
 
@@ -448,7 +436,7 @@ describe('Memories page', () => {
 
         const {rerender} = wrap(<Memories />);
 
-        await pickFilterOption('Support triage deployment');
+        await userEvent.click(screen.getByRole('link', {name: 'Support triage deployment'}));
 
         // Pin the pre-condition, or the assertion below would also hold if the click never registered.
         expect(mockUseMemoriesQuery.mock.lastCall?.[3]).toBe('PROJECT_DEPLOYMENT');

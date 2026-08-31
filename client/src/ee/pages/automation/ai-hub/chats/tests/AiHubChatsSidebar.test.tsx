@@ -306,7 +306,7 @@ describe('AiHubChatsSidebar "More" menu', () => {
 
         expect(await screen.findByRole('menuitem', {name: /memories/i})).toHaveAttribute(
             'href',
-            '/automation/settings/ai/memories'
+            '/automation/ai/memories'
         );
         expect(screen.getByRole('menuitem', {name: /connectors/i})).toHaveAttribute(
             'href',

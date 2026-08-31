@@ -697,7 +697,7 @@ const AiHubChatsSidebar = () => {
     // - Scheduled, Memories, Connectors, and Skills use exact prefix matches against their
     //   canonical routes.
     const isOnNewChat = pathname === '/automation/ai-hub';
-    const isOnMemories = pathname.startsWith('/automation/settings/ai/memories');
+    const isOnMemories = pathname.startsWith('/automation/ai/memories');
     const isOnConnectors = pathname.startsWith('/automation/settings/ai-hub/connectors');
     const isOnScheduled = pathname.startsWith('/automation/ai-hub/scheduled');
     const isOnSkills = pathname.startsWith('/automation/settings/ai/skills');
@@ -802,7 +802,7 @@ const AiHubChatsSidebar = () => {
                         </DropdownMenuItem>
 
                         <DropdownMenuItem asChild>
-                            <Link to="/automation/settings/ai/memories">
+                            <Link to="/automation/ai/memories">
                                 <NotebookIcon />
                                 Memories
                             </Link>

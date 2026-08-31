@@ -286,19 +286,8 @@ const currentWorkspaceSettingsRoutes = {
             ),
             path: 'ai/agents/:tab',
         },
-        // Workspace-scoped, unlike Skills: every ai_auto_memory row is keyed by
-        // (workspaceId, principalType, principalId, environment), so the page belongs to the workspace
-        // group rather than the organization one.
         {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <AiAutoMemoriesPage />
-                        </LazyLoadWrapper>
-                    </EEVersion>
-                </PrivateRoute>
-            ),
+            loader: async () => redirect('/automation/ai/memories'),
             path: 'ai/memories',
         },
     ],
@@ -329,10 +318,6 @@ const currentWorkspaceSettingsRoutes = {
         {
             href: 'ai/agents',
             title: 'AI Agents',
-        },
-        {
-            href: 'ai/memories',
-            title: 'AI Memories',
         },
     ],
 };
@@ -1186,7 +1171,13 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'ai-hub/scheduled',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/settings/ai/memories'),
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <LazyLoadWrapper hasLeftSidebar>
+                                                <AiAutoMemoriesPage />
+                                            </LazyLoadWrapper>
+                                        </PrivateRoute>
+                                    ),
                                     path: 'ai/memories',
                                 },
                                 {
