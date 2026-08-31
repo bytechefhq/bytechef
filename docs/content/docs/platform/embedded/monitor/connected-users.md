@@ -79,4 +79,4 @@ Each table row has an ellipsis (⋮) menu with the same three actions available 
 
 ### Environment Selection
 
-Connected users are scoped to the current environment. Use the environment selector in the left sidebar (next to the user menu) to switch between Development, Staging, and Production to see users in each environment.
+Connected users are scoped to the current environment. Use the environment selector in the left sidebar header, beside the ByteChef name, to switch between Development, Staging, and Production to see users in each environment.

@@ -24,8 +24,11 @@ record.
 
 ## Choosing an environment
 
-The selector sits in the page header wherever environment matters. Switching it changes what the page
-lists - it never migrates anything.
+The selector sits in the left sidebar header, beside the ByteChef name, and applies to the whole
+application rather than to one page. Switching it changes what the pages below it list - it never
+migrates anything. The sidebar takes on a colour for the selected environment, so the current one stays
+visible after you have looked away; collapse the sidebar and the selector shrinks to the environment's
+icon.
 
 | Environment | Intended for |
 |---|---|
@@ -39,7 +42,7 @@ Development is the default for a new session.
 
 ## What carries an environment
 
-Practically everything with an environment selector on its page:
+Practically everything you can create:
 
 - **Connections** - a connection belongs to one environment, so the Stripe connection you pick in
   Development is a different record, with different keys, from the one in Production.

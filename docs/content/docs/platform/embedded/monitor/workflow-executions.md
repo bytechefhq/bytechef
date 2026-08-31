@@ -69,4 +69,4 @@ In **Automations** mode, the execution detail sheet reuses the automation execut
 
 ### Environment Selection
 
-Executions are scoped to the current environment. Use the environment selector in the left sidebar (next to the user menu) to switch between Development, Staging, and Production.
+Executions are scoped to the current environment. Use the environment selector in the left sidebar header to switch between Development, Staging, and Production.
