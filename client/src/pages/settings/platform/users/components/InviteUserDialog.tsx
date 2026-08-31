@@ -27,6 +27,7 @@ const InviteUserDialog = () => {
         invitePassword,
         inviteRole,
         open,
+        roleSelectVisible,
     } = useInviteUserDialog();
 
     return (
@@ -73,23 +74,28 @@ const InviteUserDialog = () => {
                             </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Role</label>
+                        {roleSelectVisible && (
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">Role</label>
 
-                            <Select onValueChange={(value) => handleRoleChange(value)} value={inviteRole ?? undefined}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
+                                <Select
+                                    onValueChange={(value) => handleRoleChange(value)}
+                                    value={inviteRole ?? undefined}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select role" />
+                                    </SelectTrigger>
 
-                                <SelectContent>
-                                    {authorities.map((authority) => (
-                                        <SelectItem key={authority} value={authority}>
-                                            {authority}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                                    <SelectContent>
+                                        {authorities.map((authority) => (
+                                            <SelectItem key={authority} value={authority}>
+                                                {authority}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
                     </div>
 
                     <DialogFooter>

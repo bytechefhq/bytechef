@@ -5,6 +5,7 @@ import useInviteUserDialog from '../useInviteUserDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
+        application: {edition: 'EE'} as {edition: string} | null,
         inviteUserMutate: vi.fn(),
         storeState: {
             inviteEmail: '',
@@ -70,6 +71,12 @@ vi.mock('@/shared/middleware/graphql', () => ({
     })),
 }));
 
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    EditionType: {CE: 'CE', EE: 'EE'},
+    useApplicationInfoStore: (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({application: hoisted.application}),
+}));
+
 vi.mock('@tanstack/react-query', () => ({
     useQueryClient: vi.fn(() => ({
         invalidateQueries: vi.fn(),
@@ -83,6 +90,7 @@ describe('useInviteUserDialog', () => {
         hoisted.storeState.invitePassword = 'GeneratedPass1';
         hoisted.storeState.inviteRole = null;
         hoisted.storeState.open = false;
+        hoisted.application = {edition: 'EE'};
     });
 
     describe('initial state', () => {
@@ -181,6 +189,24 @@ describe('useInviteUserDialog', () => {
             });
         });
 
+        it('invites as admin with no selected role when edition is CE', () => {
+            hoisted.application = {edition: 'CE'};
+            hoisted.storeState.open = true;
+            hoisted.storeState.inviteEmail = 'newuser@test.com';
+            hoisted.storeState.inviteRole = null;
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            act(() => {
+                result.current.handleInvite();
+            });
+
+            expect(hoisted.inviteUserMutate).toHaveBeenCalledWith({
+                email: 'newuser@test.com',
+                password: 'GeneratedPass1',
+                role: 'ROLE_ADMIN',
+            });
+        });
+
         it('closes dialog after successful invite', () => {
             hoisted.storeState.open = true;
             hoisted.storeState.inviteEmail = 'newuser@test.com';
@@ -194,6 +220,48 @@ describe('useInviteUserDialog', () => {
             rerender();
 
             expect(result.current.open).toBe(false);
+        });
+    });
+
+    describe('edition', () => {
+        it('shows the role select when edition is EE', () => {
+            hoisted.application = {edition: 'EE'};
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            expect(result.current.roleSelectVisible).toBe(true);
+        });
+
+        it('hides the role select when edition is CE', () => {
+            hoisted.application = {edition: 'CE'};
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            expect(result.current.roleSelectVisible).toBe(false);
+        });
+
+        it('shows the role select while the application info is still loading', () => {
+            hoisted.application = null;
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            expect(result.current.roleSelectVisible).toBe(true);
+        });
+
+        it('does not require a role when edition is CE', () => {
+            hoisted.application = {edition: 'CE'};
+            hoisted.storeState.open = true;
+            hoisted.storeState.inviteEmail = 'newuser@test.com';
+            hoisted.storeState.inviteRole = null;
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            expect(result.current.inviteDisabled).toBe(false);
+        });
+
+        it('still requires a role when edition is EE', () => {
+            hoisted.application = {edition: 'EE'};
+            hoisted.storeState.inviteEmail = 'newuser@test.com';
+            hoisted.storeState.inviteRole = null;
+            const {result} = renderHook(() => useInviteUserDialog());
+
+            expect(result.current.inviteDisabled).toBe(true);
         });
     });
 });
