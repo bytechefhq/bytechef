@@ -1,7 +1,6 @@
 import PageLoader from '@/components/PageLoader';
 import AiProviderList from '@/ee/pages/settings/platform/ai-providers/components/AiProviderList';
 import {useGetAiProvidersQuery} from '@/ee/shared/queries/platform/aiProviders.queries';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -23,7 +22,6 @@ const AiProviders = () => {
                         centerTitle
                         description="Enable providers used by Universal AI Connectors"
                         position="main"
-                        right={<EnvironmentSelect />}
                         title="AI Providers"
                     />
                 }

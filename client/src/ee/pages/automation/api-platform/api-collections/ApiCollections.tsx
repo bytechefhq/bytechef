@@ -8,7 +8,6 @@ import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/api
 import {useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -77,14 +76,9 @@ const ApiCollections = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        apiCollections && apiCollections.length > 0 ? (
-                            <div className="flex items-center gap-4">
-                                <EnvironmentSelect />
-
-                                <ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />
-                            </div>
-                        ) : (
-                            <EnvironmentSelect />
+                        apiCollections &&
+                        apiCollections.length > 0 && (
+                            <ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />
                         )
                     }
                     title={

@@ -5,7 +5,6 @@ import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -125,25 +124,18 @@ const ProjectDeployments = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        projectDeployments && projectDeployments.length > 0 ? (
-                            <div className="flex items-center gap-4">
-                                <EnvironmentSelect />
-
-                                <ProjectDeploymentDialog
-                                    onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
-                                    projectDeployment={
-                                        {
-                                            environmentId: currentEnvironmentId,
-                                        } as ProjectDeployment
-                                    }
-                                    redirectOnSubmit={false}
-                                    triggerNode={<Button label="New Deployment" />}
-                                />
-                            </div>
-                        ) : (
-                            !(projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading) && (
-                                <EnvironmentSelect />
-                            )
+                        projectDeployments &&
+                        projectDeployments.length > 0 && (
+                            <ProjectDeploymentDialog
+                                onSuccess={(deploymentId) => setNewlyCreatedDeploymentId(deploymentId)}
+                                projectDeployment={
+                                    {
+                                        environmentId: currentEnvironmentId,
+                                    } as ProjectDeployment
+                                }
+                                redirectOnSubmit={false}
+                                triggerNode={<Button label="New Deployment" />}
+                            />
                         )
                     }
                     title={

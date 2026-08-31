@@ -10,8 +10,13 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
+    useSidebar,
 } from '@/components/ui/sidebar';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon} from 'lucide-react';
+import {useEffect} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 
 import {AppSidebarFooter} from './AppSidebarFooter';
@@ -29,18 +34,43 @@ interface AppSidebarProps {
 export function AppSidebar({navigation}: AppSidebarProps) {
     const {pathname} = useLocation();
 
+    const {isMobile, state} = useSidebar();
+
+    const currentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.currentEnvironmentId);
+
+    const collapsed = state === 'collapsed' && !isMobile;
+
     const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
-    return (
-        <Sidebar className="h-full bg-muted" collapsible="icon">
-            <SidebarHeader>
-                <Link className="flex items-center gap-2 py-1" to="/">
-                    <span className="flex size-10 shrink-0 items-center justify-center">
-                        <img alt="ByteChef" className="size-8 max-w-none shrink-0" src={reactLogo} />
-                    </span>
+    useEffect(() => {
+        const {documentElement} = document;
+        const sidebarTheme = ENVIRONMENT_CONFIGS[currentEnvironmentId]?.sidebarTheme;
 
-                    <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
-                </Link>
+        if (!sidebarTheme) {
+            documentElement.removeAttribute('data-environment');
+
+            return;
+        }
+
+        documentElement.setAttribute('data-environment', sidebarTheme);
+
+        return () => documentElement.removeAttribute('data-environment');
+    }, [currentEnvironmentId]);
+
+    return (
+        <Sidebar className="h-full" collapsible="icon">
+            <SidebarHeader>
+                <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-1">
+                    <Link className="flex items-center gap-2 py-1" to="/">
+                        <span className="flex size-10 shrink-0 items-center justify-center">
+                            <img alt="ByteChef" className="size-8 max-w-none shrink-0" src={reactLogo} />
+                        </span>
+
+                        <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
+                    </Link>
+
+                    <EnvironmentSelect variant={collapsed ? 'icon' : 'compact'} />
+                </div>
             </SidebarHeader>
 
             <SidebarContent>
