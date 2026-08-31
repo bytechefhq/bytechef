@@ -1,6 +1,8 @@
 import {useInviteUserDialogStore} from '@/pages/settings/platform/users/stores/useInviteUserDialogStore';
 import {isValidPassword} from '@/pages/settings/platform/users/util/password-utils';
+import {AUTHORITIES} from '@/shared/constants';
 import {useAuthoritiesQuery, useInviteUserMutation} from '@/shared/middleware/graphql';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 
@@ -18,6 +20,7 @@ interface UseInviteUserDialogI {
     invitePassword: string;
     inviteRole: string | null;
     open: boolean;
+    roleSelectVisible: boolean;
 }
 
 export default function useInviteUserDialog(): UseInviteUserDialogI {
@@ -33,6 +36,8 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         setOpen,
     } = useInviteUserDialogStore();
 
+    const application = useApplicationInfoStore((state) => state.application);
+
     const {data: authoritiesData} = useAuthoritiesQuery({});
 
     const queryClient = useQueryClient();
@@ -45,13 +50,15 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
     });
 
     const authorities = useMemo(() => authoritiesData?.authorities ?? [], [authoritiesData]);
-    const inviteDisabled = !inviteEmail || !inviteRole || !isValidPassword(invitePassword);
+    const ceEdition = application?.edition === EditionType.CE;
+    const roleSelectVisible = !ceEdition;
+    const inviteDisabled = !inviteEmail || (roleSelectVisible && !inviteRole) || !isValidPassword(invitePassword);
 
     useEffect(() => {
-        if (open && !inviteRole && authorities.length > 0) {
+        if (roleSelectVisible && open && !inviteRole && authorities.length > 0) {
             setInviteRole(authorities[0]);
         }
-    }, [open, inviteRole, authorities, setInviteRole]);
+    }, [roleSelectVisible, open, inviteRole, authorities, setInviteRole]);
 
     const handleClose = () => {
         reset();
@@ -80,11 +87,13 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
     };
 
     const handleInvite = () => {
-        if (inviteEmail && inviteRole) {
+        const role = ceEdition ? AUTHORITIES.ADMIN : inviteRole;
+
+        if (inviteEmail && role) {
             inviteUserMutation.mutate({
                 email: inviteEmail,
                 password: invitePassword,
-                role: inviteRole,
+                role,
             });
         }
     };
@@ -103,5 +112,6 @@ export default function useInviteUserDialog(): UseInviteUserDialogI {
         invitePassword,
         inviteRole,
         open,
+        roleSelectVisible,
     };
 }

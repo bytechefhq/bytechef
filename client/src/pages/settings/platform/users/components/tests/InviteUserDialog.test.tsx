@@ -31,6 +31,7 @@ const defaultMockReturn = {
     invitePassword: 'GeneratedPass1',
     inviteRole: 'ROLE_ADMIN',
     open: true,
+    roleSelectVisible: true,
 };
 
 beforeEach(() => {
@@ -154,6 +155,7 @@ describe('InviteUserDialog closed state', () => {
             invitePassword: 'GeneratedPass1',
             inviteRole: null,
             open: false,
+            roleSelectVisible: true,
         });
     });
 
@@ -179,6 +181,7 @@ describe('InviteUserDialog inviteDisabled state', () => {
             invitePassword: 'GeneratedPass1',
             inviteRole: 'ROLE_ADMIN',
             open: true,
+            roleSelectVisible: true,
         });
     });
 
@@ -188,5 +191,23 @@ describe('InviteUserDialog inviteDisabled state', () => {
         const inviteButton = screen.getByRole('button', {name: 'Invite'});
 
         expect(inviteButton).toBeDisabled();
+    });
+});
+
+describe('InviteUserDialog Community Edition', () => {
+    beforeEach(() => {
+        hoisted.mockUseInviteUserDialog.mockReturnValue({...defaultMockReturn, roleSelectVisible: false});
+    });
+
+    it('should not display Role label when the role select is hidden', () => {
+        renderInviteUserDialog();
+
+        expect(screen.queryByText('Role')).not.toBeInTheDocument();
+    });
+
+    it('should still display Email label when the role select is hidden', () => {
+        renderInviteUserDialog();
+
+        expect(screen.getByText('Email')).toBeInTheDocument();
     });
 });
