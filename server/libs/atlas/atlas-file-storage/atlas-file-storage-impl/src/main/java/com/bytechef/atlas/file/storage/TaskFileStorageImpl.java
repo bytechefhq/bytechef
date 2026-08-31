@@ -43,23 +43,21 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, ?> readContextValue(FileEntry fileEntry) {
         Map<String, ?> value = JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXT_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
 
-        return (Map<String, ?>) ValueTagUtils.untag(value);
+        return ValueTagUtils.untagMap(value);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, ?> readJobOutputs(FileEntry fileEntry) {
         Map<String, ?> value = JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOB_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
 
-        return (Map<String, ?>) ValueTagUtils.untag(value);
+        return ValueTagUtils.untagMap(value);
     }
 
     @Override
