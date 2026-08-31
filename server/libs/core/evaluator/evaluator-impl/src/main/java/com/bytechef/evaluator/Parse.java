@@ -17,11 +17,13 @@
 package com.bytechef.evaluator;
 
 import com.bytechef.commons.util.TemporalValueUtils;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.MethodExecutor;
@@ -60,33 +62,43 @@ class Parse implements MethodExecutor {
         }
 
         if (!(argument instanceof String text)) {
-            String receivedTypeName;
-            if (argument == null) {
-                receivedTypeName = "null";
-            } else {
-                Class<?> argumentClass = argument.getClass();
-
-                receivedTypeName = argumentClass.getName();
-            }
-
-            throw new IllegalArgumentException(
+            throw new AccessException(
                 "%s expects a string or a temporal value but received %s: %s".formatted(
-                    functionName(), receivedTypeName, argument));
+                    functionName(), typeNameOf(argument), argument));
         }
 
+        try {
+            return new TypedValue(parseText(text, arguments));
+        } catch (DateTimeException | IllegalArgumentException exception) {
+            throw new AccessException(
+                "%s cannot parse %s: %s".formatted(functionName(), text, exception.getMessage()), exception);
+        }
+    }
+
+    private Object parseText(String text, Object[] arguments) {
         if (type == Type.DATE) {
             if (arguments.length == 2) {
-                return new TypedValue(ZonedDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1])));
+                return ZonedDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1]));
             }
 
-            return new TypedValue(LocalDate.parse(text));
+            return LocalDate.parse(text);
         }
 
         if (arguments.length == 2) {
-            return new TypedValue(LocalDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1])));
+            return LocalDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1]));
         }
 
-        return new TypedValue(LocalDateTime.parse(text));
+        return LocalDateTime.parse(text);
+    }
+
+    private static String typeNameOf(@Nullable Object argument) {
+        if (argument == null) {
+            return "null";
+        }
+
+        Class<?> argumentClass = argument.getClass();
+
+        return argumentClass.getName();
     }
 
     private String functionName() {
