@@ -56,7 +56,7 @@ Use the left sidebar to filter the connection list:
 
 ### Environment Selection
 
-Connections are scoped to environments. Use the environment selector in the left sidebar (next to the user menu) to switch between Development, Staging, and Production. Each environment maintains its own set of connections, allowing you to use different credentials for testing and production.
+Connections are scoped to environments. Use the environment selector in the left sidebar header to switch between Development, Staging, and Production. Each environment maintains its own set of connections, allowing you to use different credentials for testing and production.
 
 ### Connection Status
 

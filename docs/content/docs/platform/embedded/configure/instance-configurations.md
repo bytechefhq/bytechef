@@ -73,4 +73,4 @@ Use the left sidebar to narrow the list:
 
 ### Environment Selection
 
-Configurations are scoped to environments. Use the environment selector in the left sidebar (next to the user menu) to switch between Development, Staging, and Production. Each environment maintains its own set of configurations independently.
+Configurations are scoped to environments. Use the environment selector in the left sidebar header to switch between Development, Staging, and Production. Each environment maintains its own set of configurations independently.
