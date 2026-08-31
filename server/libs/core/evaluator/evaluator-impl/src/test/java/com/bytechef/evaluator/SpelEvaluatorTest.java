@@ -847,4 +847,46 @@ public class SpelEvaluatorTest {
                     Map.of("value", "=parseDate(${a})"), Map.of("a", LocalDateTime.of(2026, 8, 26, 0, 0))),
                 "value"));
     }
+
+    @Test
+    public void testParseDateWithNoArgumentsReturnsOriginalValueInLenientMode() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDate()"), Collections.emptyMap(), true);
+
+        assertEquals("=parseDate()", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateTimeWithNoArgumentsReturnsOriginalValueInLenientMode() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDateTime()"), Collections.emptyMap(), true);
+
+        assertEquals("=parseDateTime()", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateWithNoArgumentsThrowsInStrictMode() {
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=parseDate()"), Collections.emptyMap()));
+
+        assertTrue(illegalArgumentException.getMessage()
+            .contains("parseDate"), illegalArgumentException.getMessage());
+    }
+
+    @Test
+    public void testParseDateWithTooManyArgumentsThrowsInStrictMode() {
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(
+                Map.of("value", "=parseDate('2026-08-26', 'yyyy-MM-dd', 'extra')"), Collections.emptyMap()));
+    }
+
+    @Test
+    public void testParseDateWithNonStringFormatReturnsOriginalValueInLenientMode() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDate('2026-08-26', 5)"), Collections.emptyMap(), true);
+
+        assertEquals("=parseDate('2026-08-26', 5)", MapUtils.get(map, "value"));
+    }
 }
