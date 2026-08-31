@@ -51,10 +51,12 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
     @Override
     public long addWebhook(String baseName, String url, DataTableWebhookType type, long environmentId) {
-        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(baseName);
+        String normalizedBaseName = DataTableServiceImpl.normalizeBaseName(baseName);
+
+        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(normalizedBaseName);
 
         DataTable table = dataTableOptional.orElseThrow(
-            () -> new IllegalArgumentException("Table not found: " + baseName));
+            () -> new IllegalArgumentException("Table not found: " + normalizedBaseName));
 
         DataTableWebhook dataTableWebhook = new DataTableWebhook();
 
@@ -70,7 +72,9 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
     @Override
     public List<Webhook> listWebhooks(String baseName, long environmentId) {
-        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(baseName);
+        String normalizedBaseName = DataTableServiceImpl.normalizeBaseName(baseName);
+
+        Optional<DataTable> dataTableOptional = dataTableRepository.findByName(normalizedBaseName);
 
         if (dataTableOptional.isEmpty()) {
             return List.of();

@@ -58,16 +58,17 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void addColumn(String baseName, ColumnSpec columnSpec, long environmentId) {
-        validateBaseName(baseName);
+        String normalizedBaseName = normalizeBaseName(baseName);
+
         Assert.notNull(columnSpec, "column must not be null");
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
 
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " ADD COLUMN " +
             escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type());
@@ -85,7 +86,7 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
@@ -93,7 +94,7 @@ public class DataTableServiceImpl implements DataTableService {
     public void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId) {
 
-        validateBaseName(baseName);
+        String normalizedBaseName = normalizeBaseName(baseName);
 
         Assert.notEmpty(columnSpecs, "columns must not be empty");
 
@@ -106,14 +107,14 @@ public class DataTableServiceImpl implements DataTableService {
             .map(columnSpec -> escapeIdentifier(columnSpec.name()) + " " + sqlType(columnSpec.type()))
             .collect(Collectors.joining(", "));
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
 
         String sql = "CREATE TABLE " + escapeIdentifier(physicalName) + " (\"id\" BIGSERIAL PRIMARY KEY" +
             (userColsSql.isEmpty() ? "" : ", " + userColsSql) + ")";
 
         jdbcTemplate.execute(sql);
 
-        checkRegistry(baseName, description);
+        checkRegistry(normalizedBaseName, description);
     }
 
     /**
@@ -121,22 +122,22 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void dropTable(String baseName, long environmentId) {
-        validateBaseName(baseName);
+        String normalizedBaseName = normalizeBaseName(baseName);
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
 
         String sql = "DROP TABLE IF EXISTS " + escapeIdentifier(physicalName);
 
         jdbcTemplate.execute(sql);
 
-        if (!hasPhysicalTablesForBaseName(baseName)) {
-            dataTableRepository.deleteByName(baseName);
+        if (!hasPhysicalTablesForBaseName(normalizedBaseName)) {
+            dataTableRepository.deleteByName(normalizedBaseName);
         }
     }
 
@@ -145,17 +146,17 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void duplicateTable(String fromBaseName, String toBaseName, long environmentId) {
-        validateBaseName(fromBaseName);
-        validateBaseName(toBaseName);
+        String normalizedFromBaseName = normalizeBaseName(fromBaseName);
+        String normalizedToBaseName = normalizeBaseName(toBaseName);
 
-        String fromPhysicalName = buildPhysicalName(environmentId, fromBaseName);
-        String toPhysicalName = buildPhysicalName(environmentId, toBaseName);
+        String fromPhysicalName = buildPhysicalName(environmentId, normalizedFromBaseName);
+        String toPhysicalName = buildPhysicalName(environmentId, normalizedToBaseName);
 
         List<ColumnSpec> columnSpecs = listColumns(fromPhysicalName)
             .stream()
@@ -182,11 +183,11 @@ public class DataTableServiceImpl implements DataTableService {
             jdbcTemplate.execute(insertSql);
         }
 
-        String description = dataTableRepository.findByName(fromBaseName)
+        String description = dataTableRepository.findByName(normalizedFromBaseName)
             .map(DataTable::getDescription)
             .orElse(null);
 
-        checkRegistry(toBaseName, description);
+        checkRegistry(normalizedToBaseName, description);
     }
 
     @Override
@@ -199,9 +200,11 @@ public class DataTableServiceImpl implements DataTableService {
 
     @Override
     public long getIdByBaseName(String baseName) {
-        DataTable dataTable = dataTableRepository.findByName(baseName)
+        String normalizedBaseName = normalizeBaseName(baseName);
+
+        DataTable dataTable = dataTableRepository.findByName(normalizedBaseName)
             .orElseThrow(() -> new ExecutionException(
-                "Unable to find table " + baseName, DataTableErrorType.DATA_TABLE_NOT_FOUND));
+                "Unable to find table " + normalizedBaseName, DataTableErrorType.DATA_TABLE_NOT_FOUND));
 
         return dataTable.getId();
     }
@@ -255,16 +258,17 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void removeColumn(String baseName, String columnName, long environmentId) {
-        validateBaseName(baseName);
+        String normalizedBaseName = normalizeBaseName(baseName);
+
         Assert.hasText(columnName, "columnName must not be empty");
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
 
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " DROP COLUMN " + escapeIdentifier(columnName);
 
@@ -276,19 +280,20 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId) {
-        validateBaseName(baseName);
+        String normalizedBaseName = normalizeBaseName(baseName);
+
         Assert.hasText(fromColumnName, "fromColumnName must not be empty");
         Assert.hasText(toColumnName, "toColumnName must not be empty");
         Assert.isTrue(!"id".equalsIgnoreCase(fromColumnName), "Column 'id' cannot be renamed");
         Assert.isTrue(!"id".equalsIgnoreCase(toColumnName), "Cannot rename to reserved name 'id'");
 
-        String physicalName = buildPhysicalName(environmentId, baseName);
+        String physicalName = buildPhysicalName(environmentId, normalizedBaseName);
 
         String sql = "ALTER TABLE " + escapeIdentifier(physicalName) + " RENAME COLUMN " +
             escapeIdentifier(fromColumnName) + " TO " + escapeIdentifier(toColumnName);
@@ -301,39 +306,37 @@ public class DataTableServiceImpl implements DataTableService {
      *
      * <p>
      * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
+     * through {@link #escapeIdentifier(String)} and {@link #normalizeBaseName(String)} which enforce a strict allowlist
      * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection.
      */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void renameTable(String fromBaseName, String toBaseName, long environmentId) {
-        validateBaseName(fromBaseName);
-        validateBaseName(toBaseName);
+        String normalizedFromBaseName = normalizeBaseName(fromBaseName);
+        String normalizedToBaseName = normalizeBaseName(toBaseName);
 
-        String fromPhysicalName = buildPhysicalName(environmentId, fromBaseName);
-        String toPhysicalName = buildPhysicalName(environmentId, toBaseName);
+        String fromPhysicalName = buildPhysicalName(environmentId, normalizedFromBaseName);
+        String toPhysicalName = buildPhysicalName(environmentId, normalizedToBaseName);
 
         String sql = "ALTER TABLE " + escapeIdentifier(fromPhysicalName) + " RENAME TO " +
             escapeIdentifier(toPhysicalName);
 
         jdbcTemplate.execute(sql);
 
-        DataTable dataTable = dataTableRepository.findByName(fromBaseName)
-            .orElseThrow(() -> new IllegalArgumentException("Data table '" + fromBaseName + "' not found"));
+        DataTable dataTable = dataTableRepository.findByName(normalizedFromBaseName)
+            .orElseThrow(
+                () -> new IllegalArgumentException("Data table '" + normalizedFromBaseName + "' not found"));
 
-        dataTable.setName(toBaseName);
+        dataTable.setName(normalizedToBaseName);
 
         dataTableRepository.save(dataTable);
     }
 
-    private String buildPhysicalName(long environmentId, String baseName) {
-        String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
-
+    private String buildPhysicalName(long environmentId, String normalizedBaseName) {
         return "dt_" + environmentId + "_" + normalizedBaseName;
     }
 
-    private boolean hasPhysicalTablesForBaseName(String baseName) {
-        String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
+    private boolean hasPhysicalTablesForBaseName(String normalizedBaseName) {
         String escapedBaseName = normalizedBaseName.replace("\\", "\\\\")
             .replace("%", "\\%")
             .replace("_", "\\_");
@@ -346,7 +349,7 @@ public class DataTableServiceImpl implements DataTableService {
 
         if (count == null) {
             throw new IllegalStateException(
-                "Unexpected null result from COUNT(*) query for base name: " + baseName);
+                "Unexpected null result from COUNT(*) query for base name: " + normalizedBaseName);
         }
 
         return count > 0;
@@ -429,12 +432,14 @@ public class DataTableServiceImpl implements DataTableService {
         };
     }
 
-    private void validateBaseName(String baseName) {
+    static String normalizeBaseName(String baseName) {
         Assert.hasText(baseName, "baseName must not be empty");
 
-        String normalized = baseName.toLowerCase(Locale.ROOT);
+        String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
 
-        Assert.isTrue(!normalized.startsWith("dt_"), "baseName must not start with 'dt_'");
-        Assert.isTrue(normalized.matches("[a-z_][a-z0-9_]*"), "Invalid base name: " + baseName);
+        Assert.isTrue(!normalizedBaseName.startsWith("dt_"), "baseName must not start with 'dt_'");
+        Assert.isTrue(normalizedBaseName.matches("[a-z_][a-z0-9_]*"), "Invalid base name: " + baseName);
+
+        return normalizedBaseName;
     }
 }
