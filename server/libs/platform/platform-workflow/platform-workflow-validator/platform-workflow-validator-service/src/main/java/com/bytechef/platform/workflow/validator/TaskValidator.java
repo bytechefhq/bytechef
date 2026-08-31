@@ -252,7 +252,7 @@ class TaskValidator {
         FieldValidator.validateOptionalStringField(taskJsonNode, "label", errors, warnings);
         FieldValidator.validateRequiredStringField(taskJsonNode, "name", errors);
         appendErrorTaskTypeField(taskJsonNode, errors);
-        appendErrorRequiredObjectField(taskJsonNode, errors);
+        appendErrorParametersField(taskJsonNode, errors);
     }
 
     /**
@@ -354,15 +354,11 @@ class TaskValidator {
         }
     }
 
-    private static void appendErrorRequiredObjectField(JsonNode jsonNode, StringBuilder errors) {
-        if (!jsonNode.has("parameters")) {
-            StringUtils.appendWithNewline("Missing required field: " + "parameters", errors);
-        } else {
-            JsonNode fieldJsonNode = jsonNode.get("parameters");
+    private static void appendErrorParametersField(JsonNode jsonNode, StringBuilder errors) {
+        JsonNode parametersJsonNode = jsonNode.get("parameters");
 
-            if (!fieldJsonNode.isObject()) {
-                StringUtils.appendWithNewline("Field '" + "parameters" + "' must be an object", errors);
-            }
+        if (parametersJsonNode != null && !parametersJsonNode.isObject()) {
+            StringUtils.appendWithNewline("Field 'parameters' must be an object", errors);
         }
     }
 
