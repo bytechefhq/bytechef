@@ -1,0 +1,36 @@
+---
+label: "If Task Date Time Condition Over Task Outputs"
+inputs:
+- name: "dbDate"
+  type: "string"
+  required: true
+- name: "restDate"
+  type: "string"
+  required: true
+tasks:
+- name: "dbDate"
+  type: "temporal/v1/set"
+  parameters:
+    value: "${dbDate}"
+- name: "restDate"
+  type: "var/v1/set"
+  parameters:
+    value: "${restDate}"
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    conditions:
+    - - type: "dateTime"
+        value1: "${dbDate}"
+        operation: "AFTER"
+        value2: "${restDate}"
+    caseTrue:
+    - name: "dateTimeResult"
+      type: "var/v1/set"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "dateTimeResult"
+      type: "var/v1/set"
+      parameters:
+        value: "false branch"
