@@ -8,7 +8,6 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -127,8 +126,6 @@ export const WorkflowExecutions = () => {
 
                                 <TooltipContent>Refresh</TooltipContent>
                             </Tooltip>
-
-                            <EnvironmentSelect />
                         </div>
                     }
                     title={

@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -42,17 +41,8 @@ const McpServers = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        validMcpServers.length > 0 ? (
-                            <div className="flex items-center gap-4">
-                                <EnvironmentSelect />
-
-                                <McpServerDialog
-                                    mcpServer={undefined}
-                                    triggerNode={<Button label="New MCP Server" />}
-                                />
-                            </div>
-                        ) : (
-                            !(mcpServersIsLoading || tagsIsLoading) && <EnvironmentSelect />
+                        validMcpServers.length > 0 && (
+                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
                         )
                     }
                     title={

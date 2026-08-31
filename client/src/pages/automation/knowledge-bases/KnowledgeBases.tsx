@@ -8,7 +8,6 @@ import KnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/com
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useKnowledgeBaseEmbeddingActiveQuery} from '@/shared/middleware/graphql';
@@ -36,17 +35,11 @@ const KnowledgeBases = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        knowledgeBases.length > 0 ? (
-                            <div className="flex items-center gap-4">
-                                <EnvironmentSelect />
-
-                                <CreateKnowledgeBaseDialog
-                                    trigger={<Button>New Knowledge Base</Button>}
-                                    workspaceId={currentWorkspaceId}
-                                />
-                            </div>
-                        ) : (
-                            !isLoading && <EnvironmentSelect />
+                        knowledgeBases.length > 0 && (
+                            <CreateKnowledgeBaseDialog
+                                trigger={<Button>New Knowledge Base</Button>}
+                                workspaceId={currentWorkspaceId}
+                            />
                         )
                     }
                     title={
