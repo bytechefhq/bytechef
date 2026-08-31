@@ -28,6 +28,7 @@ import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.config.SecurityConfiguration;
+import com.bytechef.tenant.service.TenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.Locale;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -100,6 +101,9 @@ class SingleTenantUserDetailsServiceIntTest {
 
     @MockitoBean
     private RememberMeServices rememberMeServices;
+
+    @MockitoBean
+    private TenantService tenantService;
 
     @Autowired
     private UserService userService;
