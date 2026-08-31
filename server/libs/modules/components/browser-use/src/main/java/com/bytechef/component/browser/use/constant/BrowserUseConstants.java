@@ -32,10 +32,13 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
  */
 public class BrowserUseConstants {
 
+    public static final String CURSOR = "cursor";
     public static final String ENABLE_SCHEDULED_TASKS = "enableScheduledTasks";
     public static final String FORMAT = "format";
     public static final String ID = "id";
+    public static final String TITLE = "title";
     public static final String KEEP_ALIVE = "keepAlive";
+    public static final String LIMIT = "limit";
     public static final String MODEL = "model";
     public static final String OUTPUT_SCHEMA = "outputSchema";
     public static final String PAGE = "page";
