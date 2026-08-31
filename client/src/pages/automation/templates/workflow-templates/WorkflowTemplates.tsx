@@ -21,7 +21,8 @@ const WorkflowTemplates = () => {
     });
 
     const filtered = !!category || !!query;
-    const hasTemplates = !!preBuiltWorkflowTemplates?.length;
+    const workflowTemplates = preBuiltWorkflowTemplates ?? [];
+    const hasTemplates = workflowTemplates.length > 0;
 
     return (
         <TemplatesLayoutContainer searchPlaceholder="Search workflows..." title="Explore Workflow Templates">
@@ -37,15 +38,17 @@ const WorkflowTemplates = () => {
 
             {!isLoading && hasTemplates && (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {preBuiltWorkflowTemplates!.map((template) => {
-                        const icons = template.components.map((component) => component!.icon);
+                    {workflowTemplates.map((template) => {
+                        const icons = template.components
+                            .map((component) => component.icon)
+                            .filter((icon): icon is string => icon != null);
 
                         return (
                             <TemplateCard
                                 authorName={template.authorName}
                                 categories={template.categories}
                                 description={template.workflow.description}
-                                icons={icons as string[]}
+                                icons={icons}
                                 key={template.id}
                                 templateId={template.id!}
                                 title={template.workflow.label}
