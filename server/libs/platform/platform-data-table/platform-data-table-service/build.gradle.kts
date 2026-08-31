@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
