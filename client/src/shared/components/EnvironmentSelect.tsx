@@ -7,7 +7,6 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ENVIRONMENT_CONFIGS, type EnvironmentConfigI} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -75,41 +74,33 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
 
     return (
         <DropdownMenu>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            aria-label={isIcon ? currentConfig.label : undefined}
-                            className={twMerge('h-auto gap-1 p-2', isCompact && 'px-1', isIcon && 'p-1')}
-                            variant="ghost"
-                        >
-                            {isIcon ? (
-                                <Badge
-                                    aria-label={currentConfig.label}
-                                    icon={<CurrentIcon className="size-3" />}
-                                    styleType={currentConfig.styleType}
-                                    weight="semibold"
-                                />
-                            ) : (
-                                <Badge
-                                    icon={<CurrentIcon className="size-3" />}
-                                    label={isCompact ? currentConfig.shortLabel : currentConfig.label}
-                                    styleType={currentConfig.styleType}
-                                    weight="semibold"
-                                />
-                            )}
+            <DropdownMenuTrigger asChild>
+                <Button
+                    aria-label={isIcon ? currentConfig.label : undefined}
+                    className={twMerge('h-auto gap-1 p-2', isCompact && 'px-1', isIcon && 'p-1')}
+                    variant="ghost"
+                >
+                    {isIcon ? (
+                        <Badge
+                            aria-label={currentConfig.label}
+                            icon={<CurrentIcon className="size-3" />}
+                            styleType={currentConfig.styleType}
+                            weight="semibold"
+                        />
+                    ) : (
+                        <Badge
+                            icon={<CurrentIcon className="size-3" />}
+                            label={isCompact ? currentConfig.shortLabel : currentConfig.label}
+                            styleType={currentConfig.styleType}
+                            weight="semibold"
+                        />
+                    )}
 
-                            {!isIcon && (
-                                <ChevronDownIcon
-                                    className={twMerge('size-4 text-muted-foreground', isCompact && 'size-3')}
-                                />
-                            )}
-                        </Button>
-                    </DropdownMenuTrigger>
-                </TooltipTrigger>
-
-                <TooltipContent>{currentConfig.description}</TooltipContent>
-            </Tooltip>
+                    {!isIcon && (
+                        <ChevronDownIcon className={twMerge('size-4 text-muted-foreground', isCompact && 'size-3')} />
+                    )}
+                </Button>
+            </DropdownMenuTrigger>
 
             <DropdownMenuContent align={isCompact || isIcon ? 'start' : 'end'} className="w-72">
                 <DropdownMenuRadioGroup

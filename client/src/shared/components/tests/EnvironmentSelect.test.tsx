@@ -1,4 +1,3 @@
-import {TooltipProvider} from '@/components/ui/tooltip';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {mockScrollIntoView, render, screen, userEvent} from '@/shared/util/test-utils';
 import {MemoryRouter} from 'react-router-dom';
@@ -41,9 +40,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
 const renderEnvironmentSelect = (variant?: 'compact' | 'default' | 'icon') =>
     render(
         <MemoryRouter>
-            <TooltipProvider>
-                <EnvironmentSelect variant={variant} />
-            </TooltipProvider>
+            <EnvironmentSelect variant={variant} />
         </MemoryRouter>
     );
 
