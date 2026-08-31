@@ -40,8 +40,10 @@ public interface Evaluator {
      *
      * @param map     The {@link java.util.Map} instance to evaluate
      * @param context The context to evaluate the task against
-     * @param lenient When {@code true} (editor preview), invalid formula expressions return the original value. When
-     *                {@code false} (workflow execution), invalid formula expressions throw an exception.
+     * @param lenient When {@code true} (editor preview), a formula expression that is invalid or fails to evaluate
+     *                returns the original value. When {@code false} (workflow execution), it throws an exception. Plain
+     *                {@code ${...}} accessors always return the original value when they cannot be resolved, in either
+     *                mode.
      * @return the evaluate {@link java.util.Map}.
      */
     default Map<String, @Nullable Object> evaluate(Map<String, ?> map, Map<String, ?> context, boolean lenient) {
