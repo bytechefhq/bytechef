@@ -19,6 +19,7 @@ package com.bytechef.platform.knowledgebase.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfigurationSharedMocks;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * Integration tests for {@link KnowledgeBaseService}.
@@ -150,6 +152,35 @@ class KnowledgeBaseServiceIntTest {
         assertThat(savedKnowledgeBase.getMaxChunkSize()).isEqualTo(2048);
         assertThat(savedKnowledgeBase.getMinChunkSizeChars()).isEqualTo(256);
         assertThat(savedKnowledgeBase.getOverlap()).isEqualTo(128);
+    }
+
+    @Test
+    void testCreateKnowledgeBaseWithSameNameInAnotherEnvironment() {
+        knowledgeBaseService.createKnowledgeBase(createKnowledgeBase("support-docs", Environment.DEVELOPMENT));
+
+        KnowledgeBase productionKnowledgeBase =
+            knowledgeBaseService.createKnowledgeBase(createKnowledgeBase("support-docs", Environment.PRODUCTION));
+
+        assertThat(productionKnowledgeBase.getId()).isNotNull();
+        assertThat(productionKnowledgeBase.getEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Test
+    void testCreateKnowledgeBaseWithDuplicateNameInSameEnvironment() {
+        knowledgeBaseService.createKnowledgeBase(createKnowledgeBase("support-docs", Environment.DEVELOPMENT));
+
+        KnowledgeBase duplicateKnowledgeBase = createKnowledgeBase("support-docs", Environment.DEVELOPMENT);
+
+        assertThatThrownBy(() -> knowledgeBaseService.createKnowledgeBase(duplicateKnowledgeBase))
+            .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    private KnowledgeBase createKnowledgeBase(String name, Environment environment) {
+        KnowledgeBase knowledgeBase = createKnowledgeBase(name);
+
+        knowledgeBase.setEnvironment(environment);
+
+        return knowledgeBase;
     }
 
     private KnowledgeBase createKnowledgeBase(String name) {

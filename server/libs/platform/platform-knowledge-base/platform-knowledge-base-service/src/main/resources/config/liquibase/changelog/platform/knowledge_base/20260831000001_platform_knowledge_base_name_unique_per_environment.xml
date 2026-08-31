@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/platform/knowledge_base/20260831000001_platform_knowledge_base_name_unique_per_environment.xml">
+
+    <changeSet id="20260831000001-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <uniqueConstraintExists tableName="knowledge_base" constraintName="uk_knowledge_base_name"/>
+        </preConditions>
+
+        <dropUniqueConstraint tableName="knowledge_base" constraintName="uk_knowledge_base_name"/>
+        <rollback/>
+    </changeSet>
+
+    <changeSet id="20260831000001-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <uniqueConstraintExists tableName="knowledge_base"
+                                        constraintName="uk_knowledge_base_name_environment"/>
+            </not>
+        </preConditions>
+
+        <addUniqueConstraint tableName="knowledge_base" columnNames="name, environment"
+                             constraintName="uk_knowledge_base_name_environment"/>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
