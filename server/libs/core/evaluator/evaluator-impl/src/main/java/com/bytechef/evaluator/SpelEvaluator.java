@@ -281,7 +281,7 @@ public class SpelEvaluator implements Evaluator {
                             return value;
                         }
 
-                        if (lenient) {
+                        if (lenient || !formulaExpression) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Unevaluatable expression: {}", value, spelEvaluationException);
                             }

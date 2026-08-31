@@ -21,6 +21,7 @@ package com.bytechef.evaluator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -776,5 +778,73 @@ public class SpelEvaluatorTest {
         assertThrowsExactly(
             IllegalArgumentException.class,
             () -> EVALUATOR.evaluate(Map.of("value", "=parseDate(${dbValue})"), context));
+    }
+
+    @Test
+    public void testAccessorEvaluationFailureReturnsOriginalExpression() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "${items[5]}"), Map.of("items", List.of(1, 2, 3)));
+
+        assertEquals("${items[5]}", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testFormulaEvaluationFailureStillThrowsForTheSameFailure() {
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=${items[5]} > 1"), Map.of("items", List.of(1, 2, 3))));
+    }
+
+    @Test
+    public void testParseDateRejectionReturnsOriginalValueInLenientMode() {
+        Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDate(${dbTime})"), context, true);
+
+        assertEquals("=parseDate(${dbTime})", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateUnparseableTextReturnsOriginalValueInLenientMode() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDate('not-a-date')"), Collections.emptyMap(), true);
+
+        assertEquals("=parseDate('not-a-date')", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateUnparseableTextThrowsInStrictMode() {
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=parseDate('not-a-date')"), Collections.emptyMap()));
+
+        assertTrue(illegalArgumentException.getMessage()
+            .contains("parseDate"), illegalArgumentException.getMessage());
+    }
+
+    @Test
+    public void testParseDateReturnTypeFollowsTheArgumentPrecision() {
+        assertInstanceOf(
+            LocalDate.class,
+            MapUtils.get(EVALUATOR.evaluate(Map.of("value", "=parseDate(${a})"), Map.of("a", "2026-08-26")), "value"));
+        assertInstanceOf(
+            LocalDate.class,
+            MapUtils.get(
+                EVALUATOR.evaluate(Map.of("value", "=parseDate(${a})"), Map.of("a", LocalDate.of(2026, 8, 26))),
+                "value"));
+        assertInstanceOf(
+            java.time.ZonedDateTime.class,
+            MapUtils.get(
+                EVALUATOR.evaluate(
+                    Map.of("value", "=parseDate(${a})"),
+                    Map.of("a", java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"))),
+                "value"));
+        assertInstanceOf(
+            java.time.ZonedDateTime.class,
+            MapUtils.get(
+                EVALUATOR.evaluate(
+                    Map.of("value", "=parseDate(${a})"), Map.of("a", LocalDateTime.of(2026, 8, 26, 0, 0))),
+                "value"));
     }
 }
