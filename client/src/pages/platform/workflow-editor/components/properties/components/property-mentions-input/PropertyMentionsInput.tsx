@@ -21,6 +21,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
+import ExpressionHelpNote from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/ExpressionHelpNote';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -287,6 +288,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     <div
                         className={twMerge(
                             'property-mentions-editor flex h-full min-h-9 w-full rounded-md bg-white',
+                            // Data pill chips size themselves, so the editor's own text-xs does not
+                            // reach them. The modifier lets the stylesheet bring them down to match.
+                            isFormulaMode && 'property-mentions-editor--formula-mode',
                             leadingIcon && 'border-0 pr-0.5 pl-10',
                             className
                         )}
@@ -325,6 +329,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                     </p>
                 )}
+
+                {isFormulaMode && expressionEnabled !== false && !isFromAi && <ExpressionHelpNote />}
             </fieldset>
         );
     }

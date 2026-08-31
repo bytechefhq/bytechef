@@ -222,7 +222,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     ...(expressionEnabled !== false ? {suggestion: getSuggestionOptions()} : {}),
                 }),
                 Placeholder.configure({
-                    placeholder: getMentionsInputPlaceholder({expressionEnabled, placeholder, toolProperty}),
+                    // Resolved per decoration rather than baked in, so toggling formula mode swaps the
+                    // hint. Recreating `extensions` instead would rebuild the editor and drop the
+                    // document, and this memo deliberately does not depend on isFormulaMode.
+                    placeholder: () =>
+                        getMentionsInputPlaceholder({
+                            expressionEnabled,
+                            formulaMode: isFormulaModeRef.current ?? false,
+                            placeholder,
+                            toolProperty,
+                        }),
                 }),
             ];
 
@@ -499,6 +508,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     class: twMerge(
                         'w-full max-w-full min-w-0 border-none text-sm wrap-break-word break-all whitespace-pre-wrap ring-0 outline-hidden',
                         controlType === 'RICH_TEXT' && 'prose prose-sm',
+                        isFormulaMode && 'font-mono text-xs/5',
                         className
                     ),
                     id: elementId ?? '',
