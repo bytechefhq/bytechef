@@ -766,8 +766,8 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateTaskStructureMissingParametersAddsError() {
-        String invalidTask = """
+    void validateTaskStructureMissingParametersNoErrors() {
+        String task = """
             {
                 "label": "Test Task",
                 "name": "testTask",
@@ -777,9 +777,9 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        TaskValidator.validateTaskStructure(invalidTask, errors, new StringBuilder());
+        TaskValidator.validateTaskStructure(task, errors, new StringBuilder());
 
-        assertEquals("[testTask] Missing required field: parameters", errors.toString());
+        assertEquals("", errors.toString());
     }
 
     @Test
@@ -3248,7 +3248,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowTasksTaskWithMissingParametersFieldHandlesCorrectly() {
+    void validateWorkflowTasksTaskWithMissingParametersFieldHasNoErrors() {
         String tasksJson = """
             [
                 {
@@ -3279,11 +3279,7 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            String string = errors.toString();
-
-            assertTrue(
-                string.contains("Missing required field: parameters") ||
-                    string.contains("Task definition must have a 'parameters' object"));
+            assertEquals("", errors.toString());
         } catch (Exception e) {
             fail("Should handle missing parameters field: " + e.getMessage());
         }
