@@ -2,13 +2,26 @@ import {SidebarProvider} from '@/components/ui/sidebar';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {FolderIcon, Layers3Icon, LayoutTemplateIcon, MessagesSquareIcon} from 'lucide-react';
 import {MemoryRouter} from 'react-router-dom';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AppSidebar} from './AppSidebar';
+
+const hoisted = vi.hoisted(() => ({currentEnvironmentId: 0}));
 
 // AppSidebarFooter pulls in stores/queries; stub it so this test stays focused on nav.
 vi.mock('./AppSidebarFooter', () => ({
     AppSidebarFooter: () => null,
+}));
+
+// The selector's own rendering is covered by EnvironmentSelect.test.tsx; here it only has to prove it is
+// mounted in the rail header, in the form that fits the rail's current width.
+vi.mock('@/shared/components/EnvironmentSelect', () => ({
+    default: ({variant}: {variant?: string}) => <div data-testid="environment-select">{variant}</div>,
+}));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: (selector: (state: Record<string, unknown>) => unknown) =>
+        selector({currentEnvironmentId: hoisted.currentEnvironmentId}),
 }));
 
 const navigation = [
@@ -36,6 +49,10 @@ const renderSidebar = (open = true) =>
     );
 
 describe('AppSidebar', () => {
+    beforeEach(() => {
+        hoisted.currentEnvironmentId = 0;
+    });
+
     it('renders a menu item for each navigation entry', () => {
         renderSidebar(true);
 
@@ -68,6 +85,53 @@ describe('AppSidebar', () => {
         renderSidebar(true);
 
         expect(screen.queryByText('Deployments')).not.toBeInTheDocument();
+    });
+
+    describe('environment', () => {
+        it('renders the compact selector beside the wordmark when the rail is expanded', () => {
+            renderSidebar(true);
+
+            expect(screen.getByTestId('environment-select')).toHaveTextContent('compact');
+        });
+
+        // Hiding it on the collapsed rail is what made it look missing; the icon-only form fits 56px, so the
+        // control survives a collapse instead of disappearing with the wordmark.
+        it('falls back to the icon-only selector on the collapsed rail rather than hiding it', () => {
+            renderSidebar(false);
+
+            expect(screen.getByTestId('environment-select')).toHaveTextContent('icon');
+        });
+
+        it('tints the document element with the selected environment', () => {
+            renderSidebar(true);
+
+            expect(document.documentElement).toHaveAttribute('data-environment', 'development');
+        });
+
+        it('retints when the selected environment changes', () => {
+            const {rerender} = renderSidebar(true);
+
+            hoisted.currentEnvironmentId = 2;
+
+            rerender(
+                <MemoryRouter initialEntries={['/automation/projects']}>
+                    <SidebarProvider defaultOpen>
+                        <AppSidebar navigation={navigation} />
+                    </SidebarProvider>
+                </MemoryRouter>
+            );
+
+            expect(document.documentElement).toHaveAttribute('data-environment', 'production');
+        });
+
+        // Routes that render no sidebar (sign-in, the public pages) must not inherit the last tint.
+        it('clears the tint when the sidebar unmounts', () => {
+            const {unmount} = renderSidebar(true);
+
+            unmount();
+
+            expect(document.documentElement).not.toHaveAttribute('data-environment');
+        });
     });
 
     describe('collapsed rail', () => {

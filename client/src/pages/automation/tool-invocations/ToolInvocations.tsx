@@ -8,7 +8,6 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ToolInvocationsTable from '@/pages/automation/tool-invocations/components/ToolInvocationsTable';
 import {useToolInvocations} from '@/pages/automation/tool-invocations/hooks/useToolInvocations';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ExecutionsTabs from '@/shared/components/ExecutionsTabs';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -88,8 +87,6 @@ export const ToolInvocations = ({basePath = '/automation/executions', mcpServerO
                     position="main"
                     right={
                         <div className="flex items-center gap-1">
-                            <EnvironmentSelect />
-
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button

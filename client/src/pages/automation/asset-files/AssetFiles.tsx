@@ -17,7 +17,6 @@ import AssetFileUploadZone from '@/pages/automation/asset-files/components/Asset
 import {useAssetFileUpload} from '@/pages/automation/asset-files/hooks/useAssetFileUpload';
 import {useAssetFilesStore} from '@/pages/automation/asset-files/stores/useAssetFilesStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -298,8 +297,6 @@ const AssetFiles = () => {
     // stays visible regardless so the user can still flip envs from an empty workspace.
     const toolbarRight = (
         <div className="flex items-center gap-1">
-            <EnvironmentSelect />
-
             <CopilotButton source={Source.ASSET_FILE} />
 
             {!showCenteredEmpty && (

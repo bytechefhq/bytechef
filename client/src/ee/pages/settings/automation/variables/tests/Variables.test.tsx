@@ -21,7 +21,6 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isLoading: false,
     })),
 }));
-vi.mock('@/shared/components/EnvironmentSelect', () => ({default: () => <div>env-select</div>}));
 vi.mock(import('@tanstack/react-query'), async (importOriginal) => ({
     ...(await importOriginal()),
     useQueryClient: vi.fn(() => ({invalidateQueries: vi.fn()}) as never),

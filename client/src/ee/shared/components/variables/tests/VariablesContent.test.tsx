@@ -6,8 +6,6 @@ import VariablesContent from '../VariablesContent';
 import {VariablesProvider} from '../providers/variablesProvider';
 import {useVariablesStore} from '../stores/useVariablesStore';
 
-vi.mock('@/shared/components/EnvironmentSelect', () => ({default: () => <div>env-select</div>}));
-
 const variables = [{environmentId: '0', id: '1', name: 'API_URL', value: 'https://api'}];
 
 beforeEach(() => {

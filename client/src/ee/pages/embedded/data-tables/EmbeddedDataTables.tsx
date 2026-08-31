@@ -3,7 +3,6 @@ import PageLoader from '@/components/PageLoader';
 import EmbeddedDataTableList from '@/ee/pages/embedded/data-tables/components/EmbeddedDataTableList';
 import OwnerSelect from '@/ee/pages/embedded/shared/components/OwnerSelect';
 import useEmbeddedConnectedUsers from '@/ee/pages/embedded/shared/components/useEmbeddedConnectedUsers';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import useDataTables from '@/shared/components/data-tables/components/hooks/useDataTables';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -51,8 +50,6 @@ const EmbeddedDataTables = () => {
                                     onChange={setOwnerId}
                                     ownerId={ownerId}
                                 />
-
-                                <EnvironmentSelect />
                             </div>
                         }
                         title="Data Tables"

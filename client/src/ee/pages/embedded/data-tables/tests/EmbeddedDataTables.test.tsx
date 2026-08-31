@@ -7,8 +7,8 @@ const {assignMutateMock, useDataTablesMock} = vi.hoisted(() => ({
     useDataTablesMock: vi.fn(),
 }));
 
-// Partial, because EnvironmentSelect draws useEnvironmentsQuery from this same generated module. A full factory
-// silently removes it and every test here fails inside a component it is not testing.
+// Partial: the generated module is one big barrel, so a full factory would silently drop every other hook
+// the page's children pull from it and fail inside components this test is not exercising.
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useAssignEmbeddedDataTableOwnerMutation: () => ({mutate: assignMutateMock}),

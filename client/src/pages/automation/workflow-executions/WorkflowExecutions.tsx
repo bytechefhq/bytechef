@@ -7,7 +7,6 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ExecutionsTabs from '@/shared/components/ExecutionsTabs';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
@@ -126,8 +125,6 @@ export const WorkflowExecutions = () => {
                     position="main"
                     right={
                         <div className="flex items-center gap-1">
-                            <EnvironmentSelect />
-
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button

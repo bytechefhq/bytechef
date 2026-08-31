@@ -5,7 +5,6 @@ import {Skeleton} from '@/components/ui/skeleton';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -151,8 +150,6 @@ const ProjectDeployments = () => {
                         ((projectDeployments && projectDeployments.length > 0) ||
                             !(projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading)) && (
                             <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
                                 <CopilotButton source={Source.PROJECT_DEPLOYMENT} />
 
                                 {projectDeployments && projectDeployments.length > 0 && (

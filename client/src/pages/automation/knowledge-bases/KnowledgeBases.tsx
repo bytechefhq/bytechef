@@ -3,7 +3,6 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
@@ -62,8 +61,6 @@ const KnowledgeBases = () => {
                     right={
                         (knowledgeBases.length > 0 || !isLoading) && (
                             <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
                                 <CopilotButton source={Source.KNOWLEDGE_BASE} />
 
                                 {knowledgeBases.length > 0 && (

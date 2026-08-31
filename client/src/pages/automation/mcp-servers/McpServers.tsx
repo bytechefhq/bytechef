@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -64,8 +63,6 @@ const McpServers = () => {
                     right={
                         (validMcpServers.length > 0 || !(mcpServersIsLoading || tagsIsLoading)) && (
                             <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
                                 <CopilotButton source={Source.MCP_SERVER} />
 
                                 {validMcpServers.length > 0 && (

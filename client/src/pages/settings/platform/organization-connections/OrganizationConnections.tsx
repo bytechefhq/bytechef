@@ -5,7 +5,6 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import OrganizationConnectionDeleteDialog from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionDeleteDialog';
 import OrganizationConnectionsTable from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionsTable';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -121,18 +120,12 @@ const OrganizationConnections = () => {
                     description="Manage organization-wide shared connections."
                     position="main"
                     right={
-                        connections.length > 0 ? (
-                            <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
-                                <Button
-                                    icon={<PlusIcon />}
-                                    label="New Connection"
-                                    onClick={() => setIsCreateDialogOpen(true)}
-                                />
-                            </div>
-                        ) : (
-                            <EnvironmentSelect />
+                        connections.length > 0 && (
+                            <Button
+                                icon={<PlusIcon />}
+                                label="New Connection"
+                                onClick={() => setIsCreateDialogOpen(true)}
+                            />
                         )
                     }
                     title="Organization Connections"

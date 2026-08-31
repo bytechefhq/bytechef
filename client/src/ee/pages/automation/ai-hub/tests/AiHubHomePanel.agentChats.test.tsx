@@ -45,7 +45,6 @@ vi.mock('@/ee/pages/automation/ai-hub/composer/AiHubChatComposer', () => ({
     default: ({modelPicker}: {modelPicker: React.ReactNode}) => <div>{modelPicker}</div>,
 }));
 vi.mock('@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips', () => ({default: () => null}));
-vi.mock('@/shared/components/EnvironmentSelect', () => ({default: () => null}));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>

@@ -6,7 +6,6 @@ import VariableDialog from '@/ee/shared/components/variables/components/Variable
 import VariableTable from '@/ee/shared/components/variables/components/VariableTable';
 import useVariables from '@/ee/shared/components/variables/hooks/useVariables';
 import {useVariablesStore} from '@/ee/shared/components/variables/stores/useVariablesStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {VariableIcon} from 'lucide-react';
@@ -37,15 +36,9 @@ const VariablesContent = ({description, title}: VariablesContentProps) => {
                         description={description}
                         position="main"
                         right={
-                            canManage && variables && variables.length > 0 ? (
-                                <div className="flex items-center gap-4">
-                                    <EnvironmentSelect />
-
-                                    <VariableDialog triggerNode={<Button>New Variable</Button>} />
-                                </div>
-                            ) : (
-                                <EnvironmentSelect />
-                            )
+                            canManage &&
+                            variables &&
+                            variables.length > 0 && <VariableDialog triggerNode={<Button>New Variable</Button>} />
                         }
                         title={title}
                     />

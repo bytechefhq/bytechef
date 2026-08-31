@@ -9,7 +9,6 @@ import ContextStoresFilterTitle from '@/pages/automation/context-store/component
 import ContextStoreList from '@/pages/automation/context-store/components/context-store-list/ContextStoreList';
 import useContextStoreSources from '@/pages/automation/context-store/components/hooks/useContextStoreSources';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -158,8 +157,6 @@ const ContextStores = () => {
                     right={
                         (contextStores.length > 0 || !isLoading) && (
                             <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
                                 <CopilotButton source={Source.CONTEXT_STORE} />
 
                                 {contextStores.length > 0 && isAdmin && (

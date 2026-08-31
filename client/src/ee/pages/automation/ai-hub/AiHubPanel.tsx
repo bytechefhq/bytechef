@@ -9,32 +9,22 @@ import {
     isWebhookBridgedChat,
 } from '@/ee/pages/automation/ai-hub/chats/api/chats.api';
 import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useChats';
-import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
 import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubThread from '@/ee/pages/automation/ai-hub/messages/AiHubThread';
 import useAiHubSettingsStore from '@/ee/pages/automation/ai-hub/stores/useAiHubSettingsStore';
-import {useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useAiHubTabsStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubTabsStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {PanelRightOpenIcon, WrenchIcon} from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const AiHubPanel = () => {
-    const {generateChatId, resetMessages} = useAiHubStore(
-        useShallow((state) => ({
-            generateChatId: state.generateChatId,
-            resetMessages: state.resetMessages,
-        }))
-    );
-
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentChatId = useAiHubChatsStore((state) => state.currentChatId);
@@ -101,8 +91,6 @@ const AiHubPanel = () => {
             "This chat is bound to an AI Agent. Messages are forwarded to the agent's workflow instead of the AI Hub's own LLM.";
     }
 
-    const navigate = useNavigate();
-
     // Same hook the card itself reads, so the column's inset and the card's presence can never disagree.
     // Both calls resolve against the same two react-query keys, so this one is a cache read.
     const {visible: artifactsCardVisible} = useAiHubArtifactsCard();
@@ -147,24 +135,6 @@ const AiHubPanel = () => {
                 </div>
 
                 <div className="flex items-center gap-1">
-                    {/*
-                     * EnvironmentSelect first so it reads as "set scope, then act on scope". Switching
-                     * environments invalidates the active chat (it's scoped to one env's tables),
-                     * so the onChange resets chat state + routes home rather than leaving the
-                     * user staring at a stale 404 panel.
-                     */}
-
-                    <EnvironmentSelect
-                        onChange={() => {
-                            aiHubChatsStore.getState().setCurrentChatId(undefined);
-
-                            resetMessages();
-                            generateChatId();
-
-                            navigate('/automation/ai-hub');
-                        }}
-                    />
-
                     {/*
                      * The Ask / Build mode control moved into the message composer as a single labeled
                      * switch (ModeSwitch in AiHubChatComposer) — one toggle near the send button replaces the

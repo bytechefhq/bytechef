@@ -14,6 +14,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {CheckIcon, ChevronDownIcon} from 'lucide-react';
 import {useMemo} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 interface EnvironmentOptionI {
@@ -23,9 +24,14 @@ interface EnvironmentOptionI {
 
 interface EnvironmentSelectPropsI {
     onChange?: (environmentId: number) => void;
+    /** `compact` shortens the label to fit the app sidebar header beside the wordmark; `icon` drops the label
+     * and chevron entirely for the 56px collapsed rail, leaving the environment's icon as the whole control.
+     * Both open the menu rightwards — an end-aligned menu would run off the left edge of the screen from
+     * inside the rail. */
+    variant?: 'compact' | 'default' | 'icon';
 }
 
-const EnvironmentSelect = ({onChange}: EnvironmentSelectPropsI = {}) => {
+const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPropsI = {}) => {
     const application = useApplicationInfoStore((state) => state.application);
 
     const {currentEnvironmentId, setCurrentEnvironmentId} = useEnvironmentStore(
@@ -68,21 +74,42 @@ const EnvironmentSelect = ({onChange}: EnvironmentSelectPropsI = {}) => {
     }
 
     const CurrentIcon = currentConfig.icon;
+    const isCompact = variant === 'compact';
+    const isIcon = variant === 'icon';
 
     return (
         <DropdownMenu>
             <Tooltip>
                 <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
-                        <Button className="h-auto gap-1 p-2" variant="ghost">
-                            <Badge
-                                icon={<CurrentIcon className="size-3" />}
-                                label={currentConfig.label}
-                                styleType={currentConfig.styleType}
-                                weight="semibold"
-                            />
+                        <Button
+                            className={twMerge('h-auto gap-1 p-2', isCompact && 'px-1', isIcon && 'p-1')}
+                            variant="ghost"
+                        >
+                            {isIcon ? (
+                                <Badge
+                                    aria-label={currentConfig.label}
+                                    icon={<CurrentIcon className="size-3" />}
+                                    styleType={currentConfig.styleType}
+                                    weight="semibold"
+                                />
+                            ) : (
+                                <Badge
+                                    icon={<CurrentIcon className="size-3" />}
+                                    label={isCompact ? currentConfig.shortLabel : currentConfig.label}
+                                    styleType={currentConfig.styleType}
+                                    weight="semibold"
+                                />
+                            )}
 
-                            <ChevronDownIcon className="size-4 text-muted-foreground" />
+                            {/* The chevron is the first thing to go when space runs out: the badge alone still
+                                reads as a control, and the rail has no room for both. */}
+
+                            {!isIcon && (
+                                <ChevronDownIcon
+                                    className={twMerge('size-4 text-muted-foreground', isCompact && 'size-3')}
+                                />
+                            )}
                         </Button>
                     </DropdownMenuTrigger>
                 </TooltipTrigger>
@@ -90,7 +117,7 @@ const EnvironmentSelect = ({onChange}: EnvironmentSelectPropsI = {}) => {
                 <TooltipContent>{currentConfig.description}</TooltipContent>
             </Tooltip>
 
-            <DropdownMenuContent align="end" className="w-72">
+            <DropdownMenuContent align={isCompact || isIcon ? 'start' : 'end'} className="w-72">
                 <DropdownMenuRadioGroup
                     onValueChange={(value) => {
                         const nextEnvironmentId = +value;

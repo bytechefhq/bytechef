@@ -1,12 +1,10 @@
 import Button from '@/components/Button/Button';
 import AiHubChatsSidebarToggle from '@/ee/pages/automation/ai-hub/AiHubChatsSidebarToggle';
-import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
 import AiHubChatComposer from '@/ee/pages/automation/ai-hub/composer/AiHubChatComposer';
 import useAiHubChatLaunchers from '@/ee/pages/automation/ai-hub/hooks/useAiHubChatLaunchers';
 import AiHubSuggestionChips from '@/ee/pages/automation/ai-hub/messages/AiHubSuggestionChips';
-import {aiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
@@ -67,17 +65,6 @@ const AiHubHomePanel = () => {
                 <div className="flex h-header-height items-center self-start">
                     <AiHubChatsSidebarToggle />
                 </div>
-
-                <EnvironmentSelect
-                    onChange={() => {
-                        aiHubChatsStore.getState().setCurrentChatId(undefined);
-
-                        aiHubStore.getState().resetMessages();
-                        aiHubStore.getState().generateChatId();
-
-                        navigate('/automation/ai-hub');
-                    }}
-                />
             </div>
 
             <div className="flex flex-1 items-center justify-center px-4">

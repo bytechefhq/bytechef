@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ChatsSidebar from '@/pages/automation/chats/components/ChatsSidebar';
 import {useChatsStore} from '@/pages/automation/chats/stores/useChatsStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {MessageSquareIcon, MessageSquareXIcon} from 'lucide-react';
@@ -32,8 +31,6 @@ const Chats = () => {
                     position="main"
                     right={
                         <div className="flex items-center gap-1">
-                            <EnvironmentSelect />
-
                             {workflowExecutionId && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>

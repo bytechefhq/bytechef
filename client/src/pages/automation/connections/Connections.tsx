@@ -3,7 +3,6 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -96,29 +95,24 @@ export const Connections = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        connections && connections.length > 0 && componentDefinitions ? (
-                            <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
-                                {/* This is the "Create connection" command's target. */}
-
-                                <ConnectionDialog
-                                    claimsCreateIntent={true}
-                                    componentDefinitions={componentDefinitions}
-                                    connection={
-                                        {
-                                            environmentId: currentEnvironmentId,
-                                        } as Connection
-                                    }
-                                    connectionTagsQueryKey={ConnectionKeys.connectionTags(currentWorkspaceId!)}
-                                    connectionsQueryKey={ConnectionKeys.connections}
-                                    triggerNode={<Button label="New Connection" />}
-                                    useCreateConnectionMutation={useCreateConnectionMutation}
-                                    useGetConnectionTagsQuery={() => connectionTagsQueryResult}
-                                />
-                            </div>
-                        ) : (
-                            !isAnyLoading && <EnvironmentSelect />
+                        connections &&
+                        connections.length > 0 &&
+                        componentDefinitions && (
+                            /* This is the "Create connection" command's target. */
+                            <ConnectionDialog
+                                claimsCreateIntent={true}
+                                componentDefinitions={componentDefinitions}
+                                connection={
+                                    {
+                                        environmentId: currentEnvironmentId,
+                                    } as Connection
+                                }
+                                connectionTagsQueryKey={ConnectionKeys.connectionTags(currentWorkspaceId!)}
+                                connectionsQueryKey={ConnectionKeys.connections}
+                                triggerNode={<Button label="New Connection" />}
+                                useCreateConnectionMutation={useCreateConnectionMutation}
+                                useGetConnectionTagsQuery={() => connectionTagsQueryResult}
+                            />
                         )
                     }
                     title={

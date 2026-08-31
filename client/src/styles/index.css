@@ -338,6 +338,53 @@
         --rdg-color-scheme: dark;
     }
 
+    /* Environment tinting for the app sidebar. `data-environment` is set on the <Sidebar> from the selected
+       environment, so the rail itself reads as a standing signal of which environment the whole app points at
+       — the compact selector in its header names it, the wash keeps it visible after you look away.
+       Only the sidebar's own tokens are redefined, so the tint is scoped to that subtree and never reaches
+       page content. Each wash borrows its hue from the matching badge (neutral / amber / brand blue) but at a
+       fraction of the saturation: nav labels and icons still have to be readable on top of it. */
+
+    [data-environment='development'] {
+        --sidebar: 220 14.3% 95.9%;
+        --sidebar-accent: 220 13% 91%;
+        --sidebar-border: 220 13% 89%;
+    }
+
+    [data-environment='staging'] {
+        --sidebar: 48 70% 95%;
+        --sidebar-accent: 48 75% 89%;
+        --sidebar-border: 48 60% 84%;
+    }
+
+    [data-environment='production'] {
+        --sidebar: 215 55% 95%;
+        --sidebar-accent: 215 60% 89%;
+        --sidebar-border: 215 50% 84%;
+    }
+
+    .dark [data-environment='development'],
+    .dark[data-environment='development'] {
+        --sidebar: 215 27.9% 16.9%;
+        --sidebar-accent: 215 27.9% 22%;
+        --sidebar-border: 215 27.9% 25%;
+    }
+
+    .dark [data-environment='staging'],
+    .dark[data-environment='staging'] {
+        --sidebar: 43 40% 15%;
+        --sidebar-accent: 43 40% 22%;
+        --sidebar-border: 43 35% 27%;
+    }
+
+    .dark [data-environment='production'],
+    .dark[data-environment='production'] {
+        --sidebar: 217 40% 16%;
+        --sidebar-accent: 217 42% 23%;
+        --sidebar-border: 217 38% 28%;
+    }
+
+
     * {
         @apply border-border;
     }

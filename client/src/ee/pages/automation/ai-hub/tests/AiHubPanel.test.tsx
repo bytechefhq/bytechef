@@ -33,13 +33,6 @@ afterEach(() => {
     aiHubChatsStore.getState().reset();
 });
 
-// EnvironmentSelect now lives in the panel header (next to Ask/Build) and pulls useEnvironmentsQuery via
-// react-query. Stubbing it here keeps the panel test focused on its own surface and avoids dragging a
-// QueryClientProvider into the wrapper for a control unrelated to the assertions below.
-vi.mock('@/shared/components/EnvironmentSelect', () => ({
-    default: () => <div data-testid="env-select" />,
-}));
-
 function buildChat(overrides: Partial<AiHubChatI> = {}): AiHubChatI {
     return {
         aiAgentId: null,

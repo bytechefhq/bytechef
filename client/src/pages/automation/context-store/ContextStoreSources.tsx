@@ -10,7 +10,6 @@ import ContextStoreSourceEnabledToggle from '@/pages/automation/context-store/co
 import ContextStoreSourceRowActionsMenu from '@/pages/automation/context-store/components/ContextStoreSourceRowActionsMenu';
 import useContextStoreSources from '@/pages/automation/context-store/components/hooks/useContextStoreSources';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import SyncSourceStatusBadge from '@/shared/components/SyncSourceStatusBadge';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
@@ -120,8 +119,6 @@ const ContextStoreSources = () => {
                     position="main"
                     right={
                         <div className="flex items-center gap-1">
-                            <EnvironmentSelect />
-
                             {copilotEnabled && (
                                 <Button
                                     aria-label="Ask Copilot"

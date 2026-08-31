@@ -96,10 +96,6 @@ vi.mock('@/components/Button/Button', () => ({
     ),
 }));
 
-vi.mock('@/shared/components/EnvironmentSelect', () => ({
-    default: () => <div data-testid="environment-select" />,
-}));
-
 vi.mock('../components/AddContextSourceDialog', () => ({
     default: ({trigger}: {trigger?: React.ReactNode}) => <div data-testid="add-source-dialog">{trigger}</div>,
 }));

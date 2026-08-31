@@ -3,7 +3,6 @@ import PageLoader from '@/components/PageLoader';
 import EmbeddedKnowledgeBaseList from '@/ee/pages/embedded/knowledge-bases/components/EmbeddedKnowledgeBaseList';
 import OwnerSelect from '@/ee/pages/embedded/shared/components/OwnerSelect';
 import useEmbeddedConnectedUsers from '@/ee/pages/embedded/shared/components/useEmbeddedConnectedUsers';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import useKnowledgeBases from '@/shared/components/knowledge-bases/components/hooks/useKnowledgeBases';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -51,8 +50,6 @@ const EmbeddedKnowledgeBases = () => {
                                     onChange={setOwnerId}
                                     ownerId={ownerId}
                                 />
-
-                                <EnvironmentSelect />
                             </div>
                         }
                         title="Knowledge Bases"

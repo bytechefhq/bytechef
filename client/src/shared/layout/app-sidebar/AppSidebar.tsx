@@ -13,8 +13,11 @@ import {
     SidebarRail,
     useSidebar,
 } from '@/components/ui/sidebar';
+import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon} from 'lucide-react';
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 
 import AppSidebarCollapsedGroup from './AppSidebarCollapsedGroup';
@@ -42,6 +45,8 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const [openGroupLabel, setOpenGroupLabel] = useState<string | null>(null);
 
     const {isMobile, state} = useSidebar();
+
+    const currentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.currentEnvironmentId);
 
     // The mobile sidebar renders as a full sheet, never as an icon rail, so it keeps the expanded nav.
     const collapsed = state === 'collapsed' && !isMobile;
@@ -79,16 +84,47 @@ export function AppSidebar({navigation}: AppSidebarProps) {
         return foldedSections;
     }, [navigation]);
 
-    return (
-        <Sidebar className="h-full bg-muted" collapsible="icon">
-            <SidebarHeader>
-                <Link className="flex items-center gap-2 py-1" to="/">
-                    <span className="flex size-10 shrink-0 items-center justify-center">
-                        <img alt="ByteChef" className="size-8 max-w-none shrink-0" src={reactLogo} />
-                    </span>
+    // The tint is written to the document element rather than to <Sidebar>: on mobile the primitive spreads
+    // its props onto a Radix Sheet root, which renders no DOM node, and the sheet is portaled out of the
+    // sidebar subtree anyway — an attribute on the rail would leave the mobile sidebar untinted. Only the
+    // --sidebar-* tokens are redefined, and nothing outside the sidebar reads them, so a document-level
+    // attribute is still scoped in effect. This mirrors how the dark theme is applied.
+    useEffect(() => {
+        const {documentElement} = document;
+        const sidebarTheme = ENVIRONMENT_CONFIGS[currentEnvironmentId]?.sidebarTheme;
 
-                    <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
-                </Link>
+        if (!sidebarTheme) {
+            documentElement.removeAttribute('data-environment');
+
+            return;
+        }
+
+        documentElement.setAttribute('data-environment', sidebarTheme);
+
+        return () => documentElement.removeAttribute('data-environment');
+    }, [currentEnvironmentId]);
+
+    return (
+        // bg-muted is gone: it painted the positioning wrapper, which the primitive's own bg-sidebar child
+        // covers entirely, so it was dead paint that would now contradict the environment tint.
+        <Sidebar className="h-full" collapsible="icon">
+            {/* Collapsed, the 56px rail cannot fit the logo and the selector side by side, so the header
+                stacks and the selector drops to its icon-only form. It is never hidden: the environment is
+                the scope every page below is read through, and a rail the user keeps collapsed would
+                otherwise have nowhere to show or change it. */}
+
+            <SidebarHeader>
+                <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-1">
+                    <Link className="flex items-center gap-2 py-1" to="/">
+                        <span className="flex size-10 shrink-0 items-center justify-center">
+                            <img alt="ByteChef" className="size-8 max-w-none shrink-0" src={reactLogo} />
+                        </span>
+
+                        <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
+                    </Link>
+
+                    <EnvironmentSelect variant={collapsed ? 'icon' : 'compact'} />
+                </div>
             </SidebarHeader>
 
             <SidebarContent>

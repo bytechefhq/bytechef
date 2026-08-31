@@ -8,7 +8,6 @@ import AgentsFilterTitle from '@/pages/automation/agents/components/AgentsFilter
 import useAgents from '@/pages/automation/agents/hooks/useAgents';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -140,8 +139,6 @@ const AgentDeployments = () => {
                     position="main"
                     right={
                         <div className="flex items-center gap-1">
-                            <EnvironmentSelect />
-
                             {copilotEnabled && (
                                 <Button
                                     aria-label="Ask Copilot"

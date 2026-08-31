@@ -2,7 +2,6 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
@@ -55,8 +54,6 @@ const DataTables = () => {
                     right={
                         (tables.length > 0 || !isLoading) && (
                             <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
                                 <CopilotButton source={Source.DATA_TABLE} />
 
                                 {tables.length > 0 && (

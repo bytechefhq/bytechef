@@ -10,6 +10,7 @@ import {useAiHubChatsQuery} from '@/ee/pages/automation/ai-hub/chats/hooks/useCh
 import useRecordReferencedArtifacts from '@/ee/pages/automation/ai-hub/chats/hooks/useRecordReferencedArtifacts';
 import {useSwitchChat} from '@/ee/pages/automation/ai-hub/chats/hooks/useSwitchChat';
 import {aiHubChatsStore, useAiHubChatsStore} from '@/ee/pages/automation/ai-hub/chats/stores/useAiHubChatsStore';
+import {useResetAiHubChatOnEnvironmentChange} from '@/ee/pages/automation/ai-hub/hooks/useResetAiHubChatOnEnvironmentChange';
 import {useResetAiHubStoresOnWorkspaceChange} from '@/ee/pages/automation/ai-hub/hooks/useResetAiHubStoresOnWorkspaceChange';
 import {AiHubRuntimeProvider} from '@/ee/pages/automation/ai-hub/runtime-providers/AiHubRuntimeProvider';
 import {MODE, useAiHubStore} from '@/ee/pages/automation/ai-hub/stores/useAiHubStore';
@@ -178,6 +179,8 @@ const AiHubContent = () => {
     // surface — children (HomePanel, Panel, ResourcePanel) used to register it independently, which fired
     // the reset multiple times on workspace change.
     useResetAiHubStoresOnWorkspaceChange();
+
+    useResetAiHubChatOnEnvironmentChange();
 
     // Records each open right-panel tab as a `ai_hub_chat_artifact` so it shows up in the sidebar
     // artifact list. Bridges the gap between the UI-only tab state and the persistent artifact log —

@@ -23,7 +23,6 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
-    AudioLinesIcon,
     BlendIcon,
     ChevronsUpDownIcon,
     DiamondIcon,
@@ -101,16 +100,6 @@ export function AppSidebarFooter() {
             navigate(
                 `/embedded${currentEnvironmentId === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`
             );
-        }
-    };
-
-    const handleEnvironmentValueChange = (value: string) => {
-        setCurrentEnvironmentId(+value);
-
-        if (currentType === PlatformType.AUTOMATION) {
-            navigate(`/automation${+value === DEVELOPMENT_ENVIRONMENT ? '/projects' : '/deployments'}`);
-        } else if (currentType === PlatformType.EMBEDDED) {
-            navigate(`/embedded${+value === DEVELOPMENT_ENVIRONMENT ? '/integrations' : '/configurations'}`);
         }
     };
 
@@ -256,35 +245,6 @@ export function AppSidebarFooter() {
                                     >
                                         <PlusIcon /> <span>New Workspace</span>
                                     </DropdownMenuItem>
-                                </DropdownMenuSubContent>
-                            </DropdownMenuPortal>
-                        </DropdownMenuSub>
-
-                        <DropdownMenuSeparator />
-                    </>
-                )}
-
-                {application?.edition === 'EE' && environmentsQuery?.environments && (
-                    <>
-                        <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                <AudioLinesIcon className="size-5" />
-
-                                {`Environment: ${environmentsQuery?.environments.find((w) => +w?.id! === currentEnvironmentId)?.name}`}
-                            </DropdownMenuSubTrigger>
-
-                            <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                    <DropdownMenuRadioGroup
-                                        onValueChange={handleEnvironmentValueChange}
-                                        value={currentEnvironmentId?.toString()}
-                                    >
-                                        {environmentsQuery?.environments.map((environment) => (
-                                            <DropdownMenuRadioItem key={environment?.id} value={environment?.id!}>
-                                                {environment?.name}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
                                 </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                         </DropdownMenuSub>

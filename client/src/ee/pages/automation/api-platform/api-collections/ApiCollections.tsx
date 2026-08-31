@@ -8,7 +8,6 @@ import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/api
 import {ApiCollectionKeys, useGetApiCollectionsQuery} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -97,8 +96,6 @@ const ApiCollections = () => {
                         ((apiCollections && apiCollections.length > 0) ||
                             !(apiCollectionsIsLoading || projectsIsLoading || tagsIsLoading)) && (
                             <div className="flex items-center gap-1">
-                                <EnvironmentSelect />
-
                                 <CopilotButton source={Source.API_COLLECTION} />
 
                                 {apiCollections && apiCollections.length > 0 && (
