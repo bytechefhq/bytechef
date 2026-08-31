@@ -67,6 +67,8 @@ const ProjectWorkflowList = ({
         onSuccess: (response) => {
             captureProjectWorkflowCreated();
 
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
             navigate(`/automation/projects/${project.id}/project-workflows/${response.projectWorkflowId}`);
         },
     });
