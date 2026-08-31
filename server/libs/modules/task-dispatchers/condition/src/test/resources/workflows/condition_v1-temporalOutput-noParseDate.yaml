@@ -1,0 +1,29 @@
+---
+label: "If Task Temporal Output Without parseDate"
+inputs:
+- name: "dbDate"
+  type: "string"
+  required: true
+- name: "restDate"
+  type: "string"
+  required: true
+tasks:
+- name: "dbDate"
+  type: "temporal/v1/set"
+  parameters:
+    value: "${dbDate}"
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    rawExpression: true
+    expression: "=${dbDate} > parseDate(${restDate}, \"yyyy-MM-dd'T'HH:mm:ssX\")"
+    caseTrue:
+    - name: "comparisonResult"
+      type: "var/v1/set"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "comparisonResult"
+      type: "var/v1/set"
+      parameters:
+        value: "false branch"

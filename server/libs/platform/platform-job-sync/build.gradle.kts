@@ -19,4 +19,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-worker"))
+
+    testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
+    testImplementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
+    testImplementation(project(":server:libs:test:test-support"))
 }

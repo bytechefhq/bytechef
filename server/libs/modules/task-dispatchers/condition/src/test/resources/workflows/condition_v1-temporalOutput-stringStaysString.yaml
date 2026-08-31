@@ -1,0 +1,27 @@
+---
+label: "If Task String Output Stays A String"
+inputs:
+- name: "restDate"
+  type: "string"
+  required: true
+tasks:
+- name: "restDate"
+  type: "var/v1/set"
+  parameters:
+    value: "${restDate}"
+- name: "condition_1"
+  type: "condition/v1"
+  parameters:
+    rawExpression: true
+    expression: "=parseDate(${restDate}, \"yyyy-MM-dd'T'HH:mm:ssX\") > parseDate('2026-08-24T22:00:00Z',\
+      \ \"yyyy-MM-dd'T'HH:mm:ssX\")"
+    caseTrue:
+    - name: "stringResult"
+      type: "var/v1/set"
+      parameters:
+        value: "true branch"
+    caseFalse:
+    - name: "stringResult"
+      type: "var/v1/set"
+      parameters:
+        value: "false branch"
