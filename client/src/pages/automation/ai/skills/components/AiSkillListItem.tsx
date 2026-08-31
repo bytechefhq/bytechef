@@ -42,7 +42,9 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                     <div className="text-sm font-semibold">{skill.name}</div>
 
                     {skill.description && (
-                        <div className="line-clamp-1 text-xs text-content-neutral-secondary">{skill.description}</div>
+                        <div className="mt-1 line-clamp-1 text-xs text-content-neutral-secondary">
+                            {skill.description}
+                        </div>
                     )}
                 </div>
 
