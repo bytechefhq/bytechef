@@ -1,6 +1,7 @@
 dependencies {
     api(project(":server:libs:core:evaluator:evaluator-api"))
 
+    implementation(project(":server:libs:core:commons:commons-util"))
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-expression")
