@@ -277,11 +277,21 @@ public class SpelEvaluator implements Evaluator {
                     try {
                         return expression.getValue(createEvaluationContext(context, formulaExpression));
                     } catch (SpelEvaluationException spelEvaluationException) {
-                        if (log.isTraceEnabled()) {
-                            log.debug(spelEvaluationException.getMessage());
+                        if (isUnresolvedReference(spelEvaluationException)) {
+                            return value;
                         }
 
-                        return value;
+                        if (lenient) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Unevaluatable expression: {}", value, spelEvaluationException);
+                            }
+
+                            return value;
+                        }
+
+                        throw new IllegalArgumentException(
+                            "Unevaluatable expression: " + value + " - " + spelEvaluationException.getMessage(),
+                            spelEvaluationException);
                     }
                 }
             }
@@ -324,6 +334,13 @@ public class SpelEvaluator implements Evaluator {
 
             return executor;
         };
+    }
+
+    private static boolean isUnresolvedReference(SpelEvaluationException spelEvaluationException) {
+        SpelMessage messageCode = spelEvaluationException.getMessageCode();
+
+        return messageCode == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE ||
+            messageCode == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE_ON_NULL;
     }
 
     private static boolean validateTextExpression(String expression) {

@@ -16,8 +16,10 @@
 
 package com.bytechef.evaluator;
 
+import com.bytechef.commons.util.TemporalValueUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import org.springframework.expression.AccessException;
@@ -43,20 +45,51 @@ class Parse implements MethodExecutor {
 
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
+        Object argument = TemporalValueUtils.normalize(arguments[0]);
+
+        if (argument instanceof ZonedDateTime zonedDateTime) {
+            return new TypedValue(type == Type.DATE ? zonedDateTime : zonedDateTime.toLocalDateTime());
+        }
+
+        if (argument instanceof LocalDateTime localDateTime) {
+            return new TypedValue(type == Type.DATE ? localDateTime.atZone(ZoneOffset.UTC) : localDateTime);
+        }
+
+        if (argument instanceof LocalDate localDate) {
+            return new TypedValue(type == Type.DATE ? localDate : localDate.atStartOfDay());
+        }
+
+        if (!(argument instanceof String text)) {
+            String receivedTypeName;
+            if (argument == null) {
+                receivedTypeName = "null";
+            } else {
+                Class<?> argumentClass = argument.getClass();
+
+                receivedTypeName = argumentClass.getName();
+            }
+
+            throw new IllegalArgumentException(
+                "%s expects a string or a temporal value but received %s: %s".formatted(
+                    functionName(), receivedTypeName, argument));
+        }
+
         if (type == Type.DATE) {
             if (arguments.length == 2) {
-                return new TypedValue(
-                    ZonedDateTime.parse((String) arguments[0], DateTimeFormatter.ofPattern((String) arguments[1])));
-            } else {
-                return new TypedValue(LocalDate.parse((String) arguments[0]));
+                return new TypedValue(ZonedDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1])));
             }
-        } else {
-            if (arguments.length == 2) {
-                return new TypedValue(
-                    LocalDateTime.parse((String) arguments[0], DateTimeFormatter.ofPattern((String) arguments[1])));
-            } else {
-                return new TypedValue(LocalDateTime.parse((String) arguments[0]));
-            }
+
+            return new TypedValue(LocalDate.parse(text));
         }
+
+        if (arguments.length == 2) {
+            return new TypedValue(LocalDateTime.parse(text, DateTimeFormatter.ofPattern((String) arguments[1])));
+        }
+
+        return new TypedValue(LocalDateTime.parse(text));
+    }
+
+    private String functionName() {
+        return type == Type.DATE ? "parseDate" : "parseDateTime";
     }
 }

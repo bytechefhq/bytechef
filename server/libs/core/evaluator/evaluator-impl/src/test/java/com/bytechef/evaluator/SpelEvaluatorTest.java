@@ -571,11 +571,10 @@ public class SpelEvaluatorTest {
     }
 
     @Test
-    void testBeanReferenceIsSilentlyRejectedAtRuntime() {
-        Map<String, Object> map = EVALUATOR.evaluate(
-            Map.of("value", "=@dangerousService"), Collections.emptyMap());
-
-        assertEquals("=@dangerousService", MapUtils.get(map, "value"));
+    void testBeanReferenceIsRejectedAtRuntime() {
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=@dangerousService"), Collections.emptyMap()));
     }
 
     @Test
@@ -690,5 +689,92 @@ public class SpelEvaluatorTest {
             IllegalArgumentException.class,
             () -> EVALUATOR.evaluate(Map.of("key", "${" + accessor + "}"), Collections.emptyMap()),
             accessor);
+    }
+
+    @Test
+    public void testEvaluationFailureThrowsInStrictMode() {
+        String formula = "=${startDate} > parseDate('2026-08-24T22:00:00Z', \"yyyy-MM-dd'T'HH:mm:ssX\")";
+
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", formula), Map.of("startDate", "2026-08-26T00:00:00.000Z")));
+
+        assertTrue(illegalArgumentException.getMessage()
+            .contains("Cannot compare instances of class java.lang.String and class java.time.ZonedDateTime"));
+        assertNotNull(illegalArgumentException.getCause());
+    }
+
+    @Test
+    public void testEvaluationFailureReturnsOriginalValueInLenientMode() {
+        String formula = "=${startDate} > parseDate('2026-08-24T22:00:00Z', \"yyyy-MM-dd'T'HH:mm:ssX\")";
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", formula), Map.of("startDate", "2026-08-26T00:00:00.000Z"), true);
+
+        assertEquals(formula, MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateAcceptsAnAlreadyTemporalArgument() {
+        Map<String, Object> context = Map.of("dbDate", java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"));
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDate(${dbDate}, \"yyyy-MM-dd'T'HH:mm:ss.SSSX\")"), context);
+
+        assertEquals(java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"), MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateStillAcceptsAString() {
+        Map<String, Object> context = Map.of("dbDate", "2026-08-26T00:00:00.000Z");
+
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=parseDate(${dbDate}, \"yyyy-MM-dd'T'HH:mm:ss.SSSX\")"), context);
+
+        assertEquals(java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"), MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateTimeAcceptsAnAlreadyTemporalArgument() {
+        Map<String, Object> context = Map.of("dbDate", java.time.ZonedDateTime.parse("2026-08-26T00:00:00Z"));
+
+        Map<String, Object> map = EVALUATOR.evaluate(Map.of("value", "=parseDateTime(${dbDate})"), context);
+
+        assertEquals(LocalDateTime.of(2026, 8, 26, 0, 0), MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testParseDateRejectsALocalTimeArgument() {
+        Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
+
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=parseDate(${dbTime})"), context));
+
+        assertTrue(illegalArgumentException.getMessage()
+            .contains("parseDate"));
+        assertTrue(illegalArgumentException.getMessage()
+            .contains("10:15:30"));
+    }
+
+    @Test
+    public void testParseDateTimeRejectsALocalTimeArgument() {
+        Map<String, Object> context = Map.of("dbTime", java.time.LocalTime.of(10, 15, 30));
+
+        IllegalArgumentException illegalArgumentException = assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=parseDateTime(${dbTime})"), context));
+
+        assertTrue(illegalArgumentException.getMessage()
+            .contains("parseDateTime"));
+    }
+
+    @Test
+    public void testParseDateRejectsANonTemporalNonStringArgument() {
+        Map<String, Object> context = Map.of("dbValue", 123);
+
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", "=parseDate(${dbValue})"), context));
     }
 }
