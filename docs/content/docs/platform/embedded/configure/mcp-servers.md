@@ -15,7 +15,7 @@ comingSoon: true
 | Component filtering | Filter MCP servers by the components they expose using the left sidebar. |
 | Integration filtering | Filter by the integrations associated with the server. |
 | Tag filtering | Organize and filter servers by assigned tags. |
-| Environment selector | Choose the environment (e.g., Development) in the header. |
+| Environment selector | Choose the environment (e.g., Development) in the left sidebar header. |
 | Enable/Disable toggle | Activate or deactivate an MCP server without removing it. |
 
 ### MCP Server Details
@@ -75,7 +75,7 @@ Use the left sidebar to filter the server list:
 
 ### Environment Selection
 
-Use the environment selector at the top of the page (or the global one in the left sidebar) to switch between environments. MCP server configurations are scoped per environment.
+Use the environment selector in the left sidebar header to switch between environments. MCP server configurations are scoped per environment.
 
 ---
 

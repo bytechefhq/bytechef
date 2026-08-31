@@ -9,7 +9,7 @@ description: Manage API Keys for your embedded integration.
 
 ## API Keys
 
-<!-- TODO screenshot: Embedded → Settings → API Keys - the keys table with the environment selector and the New API Key button -->
+<!-- TODO screenshot: Embedded → Settings → API Keys - the keys table and the New API Key button -->
 
 API Keys are bearer tokens for **server-to-server** calls from your backend to the embedded public API - for example listing a user's integrations, executing a component action, or reading their workflow executions.
 
