@@ -16,9 +16,12 @@
 
 package com.bytechef.component.browser.use.util;
 
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.CURSOR;
 import static com.bytechef.component.browser.use.constant.BrowserUseConstants.ID;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.LIMIT;
 import static com.bytechef.component.browser.use.constant.BrowserUseConstants.PAGE;
 import static com.bytechef.component.browser.use.constant.BrowserUseConstants.PAGE_SIZE;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.TITLE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,6 +55,8 @@ class BrowserUseUtilsTest {
 
     private final List<Option<String>> expectedOptions = List.of(
         option("s1", "s1"), option("s2", "s2"));
+    private final List<Option<String>> expectedRunOptions = List.of(
+        option("t1", "r1"), option("t2", "r2"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
@@ -66,7 +71,8 @@ class BrowserUseUtilsTest {
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("sessions", List.of(Map.of(ID, "s1"), Map.of(ID, "s2")), "total", 2));
+            .thenReturn(Map.of(
+                "sessions", List.of(Map.of(ID, "s1", TITLE, "s1"), Map.of(ID, "s2", TITLE, "s2")), "total", 2));
 
         List<Option<String>> result = BrowserUseUtils.getSessionIdOptions(
             null, null, null, null, mockedContext);
@@ -84,6 +90,42 @@ class BrowserUseUtilsTest {
 
         Object[] objects = {
             PAGE, 1, PAGE_SIZE, 20
+        };
+
+        assertEquals(1, objectsArgumentCaptorAllValues.size());
+        assertArrayEquals(objects, objectsArgumentCaptorAllValues.getFirst());
+    }
+
+    @Test
+    void testGetRunIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(
+                "runs", List.of(Map.of(ID, "r1", TITLE, "t1"), Map.of(ID, "r2", TITLE, "t2")), "hasMore", false));
+
+        List<Option<String>> result = BrowserUseUtils.getRunIdOptions(
+            null, null, null, null, mockedContext);
+
+        assertEquals(expectedRunOptions, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/v4/runs", stringArgumentCaptor.getValue());
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        Object[] objects = {
+            LIMIT, 50, CURSOR, null
         };
 
         assertEquals(1, objectsArgumentCaptorAllValues.size());

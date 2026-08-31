@@ -23,7 +23,9 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
+import com.bytechef.component.browser.use.util.BrowserUseUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
@@ -41,6 +43,7 @@ public class BrowserUseGetRunAction {
             string(RUN_ID)
                 .label("Run ID")
                 .description("ID returned by Create Run.")
+                .options((ActionDefinition.OptionsFunction<String>) BrowserUseUtils::getRunIdOptions)
                 .required(true))
         .output(outputSchema(RUN_RESPONSE_PROPERTY))
         .perform(BrowserUseGetRunAction::perform);

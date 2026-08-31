@@ -16,9 +16,12 @@
 
 package com.bytechef.component.browser.use.util;
 
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.CURSOR;
 import static com.bytechef.component.browser.use.constant.BrowserUseConstants.ID;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.LIMIT;
 import static com.bytechef.component.browser.use.constant.BrowserUseConstants.PAGE;
 import static com.bytechef.component.browser.use.constant.BrowserUseConstants.PAGE_SIZE;
+import static com.bytechef.component.browser.use.constant.BrowserUseConstants.TITLE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
@@ -71,8 +74,50 @@ public class BrowserUseUtils {
         for (Object session : sessions) {
             if (session instanceof Map<?, ?> map) {
                 String id = (String) map.get(ID);
+                String title = (String) map.get(TITLE);
 
-                options.add(option(id, id));
+                options.add(option(title, id));
+            }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getRunIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        int defaultLimit = 50;
+        String cursor = null;
+        boolean hasMore;
+
+        List<Object> runs = new ArrayList<>();
+        Map<String, Object> body;
+
+        do {
+            body = context.http(http -> http.get("/api/v4/runs"))
+                .queryParameters(LIMIT, defaultLimit, CURSOR, cursor)
+                .configuration(responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("runs") instanceof List<?> run) {
+                runs.addAll(run);
+            }
+
+            cursor = (String) body.get("nextCursor");
+            hasMore = Boolean.TRUE.equals(body.get("hasMore"));
+
+        } while (hasMore);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Object run : runs) {
+            if (run instanceof Map<?, ?> map) {
+                String id = (String) map.get(ID);
+                String title = (String) map.get(TITLE);
+
+                options.add(option(title, id));
             }
         }
 
