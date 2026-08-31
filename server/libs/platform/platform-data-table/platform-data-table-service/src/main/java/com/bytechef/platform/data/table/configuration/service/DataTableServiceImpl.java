@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -112,9 +113,7 @@ public class DataTableServiceImpl implements DataTableService {
 
         jdbcTemplate.execute(sql);
 
-        checkRegistry(
-            baseName,
-            new ExecutionException("Unable to find table " + baseName, DataTableErrorType.DATA_TABLE_NOT_CREATED));
+        checkRegistry(baseName, description);
     }
 
     /**
@@ -183,9 +182,11 @@ public class DataTableServiceImpl implements DataTableService {
             jdbcTemplate.execute(insertSql);
         }
 
-        checkRegistry(
-            toBaseName,
-            new ExecutionException("Unable to find table " + toBaseName, DataTableErrorType.DATA_TABLE_NOT_DUPLICATED));
+        String description = dataTableRepository.findByName(fromBaseName)
+            .map(DataTable::getDescription)
+            .orElse(null);
+
+        checkRegistry(toBaseName, description);
     }
 
     @Override
@@ -351,14 +352,21 @@ public class DataTableServiceImpl implements DataTableService {
         return count > 0;
     }
 
-    private void checkRegistry(String baseName, ExecutionException executionException) {
+    private void checkRegistry(String baseName, @Nullable String description) {
         Assert.hasText(baseName, "baseName required");
 
         Optional<DataTable> dataTableOptional = dataTableRepository.findByName(baseName);
 
-        if (dataTableOptional.isEmpty()) {
-            throw executionException;
+        if (dataTableOptional.isPresent()) {
+            return;
         }
+
+        DataTable dataTable = new DataTable();
+
+        dataTable.setName(baseName);
+        dataTable.setDescription(description);
+
+        dataTableRepository.save(dataTable);
     }
 
     private String escapeIdentifier(String identifier) {
