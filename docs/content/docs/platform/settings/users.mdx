@@ -75,11 +75,13 @@ Community Edition has one level of access. There is nothing to assign, so the co
 | **edit** action / **Edit User** dialog | Not shown | Change the role |
 | Workspace roles and permission scopes | Not available | See below |
 
-Everything below this point - the workspace role model, permission scopes, and per-workspace membership - is Enterprise Edition.
+The workspace role model below - roles, permission scopes and per-workspace membership - is Enterprise Edition throughout, and each section carries the badge.
 
 ---
 
 ## Roles and permissions
+
+<EEBadge />
 
 <Callout type="warn" title="Coming soon">
     Role-based access control is on the upcoming release track and is not yet available in the latest released version of ByteChef.
@@ -94,6 +96,8 @@ Permissions are scoped to **workspaces**. There are no per-project roles and no 
 
 ### The built-in workspace roles
 
+<EEBadge />
+
 | Role | Rank |
 |---|---|
 | **Admin** | Most privileged. |
@@ -103,6 +107,8 @@ Permissions are scoped to **workspaces**. There are no per-project roles and no 
 The roles are ranked rather than enumerated: a role is granted every permission scope whose declared minimum role it is at least as privileged as, so `VIEWER ⊆ EDITOR ⊆ ADMIN` holds by construction. Adding a scope means declaring its minimum role once, not editing three role definitions.
 
 ### Permission scopes
+
+<EEBadge />
 
 Scopes are contributed per module at startup rather than listed in a central enum. The built-in set and its minimum role:
 
@@ -130,6 +136,8 @@ Declaring the same scope name with two different minimum roles fails the applica
 
 ### Managing workspace membership
 
+<EEBadge />
+
 Workspace membership has two surfaces. The current workspace's members are managed on its own page, **Settings → Current Workspace → [Users](/platform/automation/settings/users)**. To reach *another* workspace's members without switching to it, use **Settings → [Workspaces](/platform/settings/workspaces)**: each workspace row's **⋮** menu has a **Members** entry that opens the **Workspace Members** dialog. The dialog lists members with **User**, **Role**, and **Added** columns. An admin changes a member's role inline through the **Role** dropdown, removes a member with the trash action, and adds one through the **Add user** row - search by email, pick a role, confirm. The role dropdown is derived from the server-side role enum, so a role added server-side appears without a client change.
 
 Only a workspace **Admin** sees the role dropdown, the remove action, and the add row; everyone else sees the membership list read-only. Removing a user at the workspace level revokes their access to every project in that workspace at once.
@@ -138,9 +146,13 @@ Only a workspace **Admin** sees the role dropdown, the remove action, and the ad
 
 ### Federated identity
 
+<EEBadge />
+
 If you federate authentication through an external identity provider, group claims can drive workspace roles automatically. See [Identity Providers](/platform/settings/identity-providers).
 
 ### What gets logged
+
+<EEBadge />
 
 Membership and role changes are recorded in the [audit log](/platform/settings/audit-events) as `WORKSPACE_USER_ADDED`, `WORKSPACE_USER_REMOVED`, and `WORKSPACE_USER_ROLE_UPDATED`; account lifecycle as `USER_CREATED`, `USER_ACTIVATED`, `USER_PASSWORD_CHANGED`, and `USER_DELETED`.
 
