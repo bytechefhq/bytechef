@@ -24,6 +24,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -185,6 +186,36 @@ public class ConditionTaskUtilsTest {
                 List.of(Map.of("type", "number", "value1", "5", "value2", "10", "operation", "LESS"))));
 
         assertTrue(ConditionTaskUtils.resolveCase(taskExecution));
+    }
+
+    @Test
+    public void testResolveCaseWithOffsetBearingDateTimeOperands() {
+        assertTrue(
+            resolveDateTimeCase("AFTER", "2026-08-26T00:00:00.000Z", "2026-08-24T22:00:00Z"));
+        assertFalse(
+            resolveDateTimeCase("AFTER", "2026-08-23T00:00:00.000Z", "2026-08-24T22:00:00Z"));
+    }
+
+    @Test
+    public void testResolveCaseWithAlreadyTemporalDateTimeOperands() {
+        assertTrue(
+            resolveDateTimeCase(
+                "AFTER", ZonedDateTime.parse("2026-08-26T00:00:00Z"), ZonedDateTime.parse("2026-08-24T22:00:00Z")));
+    }
+
+    @Test
+    public void testResolveCaseWithZoneLessDateTimeOperandsIsUnchanged() {
+        assertTrue(resolveDateTimeCase("AFTER", "2026-08-26T00:00:00", "2026-08-24T22:00:00"));
+        assertTrue(resolveDateTimeCase("BEFORE", "2026-08-24T22:00:00", "2026-08-26T00:00:00"));
+    }
+
+    private static boolean resolveDateTimeCase(String operation, Object value1, Object value2) {
+        return ConditionTaskUtils.resolveCase(
+            buildConditionsTask(
+                List.of(
+                    List.of(
+                        Map.of(
+                            "type", "dateTime", "operation", operation, "value1", value1, "value2", value2)))));
     }
 
     private static TaskExecution buildRawExpressionTask(String expression) {

@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.condition;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -26,13 +27,18 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
+import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestTemporalTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor.TaskDispatcherJobExecution;
 import com.bytechef.task.dispatcher.condition.completion.ConditionTaskCompletionHandler;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -157,6 +163,126 @@ public class ConditionTaskDispatcherIntTest {
         Assertions.assertEquals("true branch", testVarTaskHandler.get("equalsResult"));
     }
 
+    @Test
+    public void testDispatchRawExpressionDateComparison() {
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-rawExpression-dateComparison".getBytes(StandardCharsets.UTF_8)),
+            Map.of("restDate", "2026-08-24T22:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("comparisonResult"));
+
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-rawExpression-dateComparison".getBytes(StandardCharsets.UTF_8)),
+            Map.of("restDate", "2026-08-27T22:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("false branch", testVarTaskHandler.get("comparisonResult"));
+    }
+
+    @Test
+    public void testDispatchRawExpressionUncomparableOperandsFailsWithEvaluationError() {
+        ExecutionException executionException = Assertions.assertThrows(
+            ExecutionException.class,
+            () -> taskDispatcherJobTestExecutor.execute(
+                EncodingUtils.base64EncodeToString(
+                    "condition_v1-rawExpression-uncomparableOperands".getBytes(StandardCharsets.UTF_8)),
+                Map.of("restDate", "2026-08-24T22:00:00Z"),
+                this::getTaskCompletionHandlerFactories,
+                this::getTaskDispatcherResolverFactories,
+                this::getTaskHandlerMap));
+
+        Assertions.assertTrue(
+            executionException.getMessage()
+                .contains("Cannot compare instances of class java.lang.String and class java.time.ZonedDateTime"),
+            executionException.getMessage());
+    }
+
+    @Test
+    public void testDispatchTemporalOutputComparesWithoutParseDate() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-temporalOutput-noParseDate".getBytes(StandardCharsets.UTF_8)),
+            Map.of("dbDate", "2026-08-26T00:00:00Z", "restDate", "2026-08-24T22:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("comparisonResult"));
+
+        TaskExecution dbDateTaskExecution = jobExecution.taskExecutions()
+            .stream()
+            .filter(taskExecution -> "dbDate".equals(taskExecution.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertInstanceOf(
+            ZonedDateTime.class,
+            taskFileStorage.readTaskExecutionOutput(Objects.requireNonNull(dbDateTaskExecution.getOutput())));
+
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-temporalOutput-noParseDate".getBytes(StandardCharsets.UTF_8)),
+            Map.of("dbDate", "2026-08-23T00:00:00Z", "restDate", "2026-08-24T22:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("false branch", testVarTaskHandler.get("comparisonResult"));
+    }
+
+    @Test
+    public void testDispatchStringOutputStaysAString() {
+        TaskDispatcherJobExecution jobExecution = taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-temporalOutput-stringStaysString".getBytes(StandardCharsets.UTF_8)),
+            Map.of("restDate", "2026-08-26T00:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("stringResult"));
+
+        TaskExecution restDateTaskExecution = jobExecution.taskExecutions()
+            .stream()
+            .filter(taskExecution -> "restDate".equals(taskExecution.getName()))
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertInstanceOf(
+            String.class,
+            taskFileStorage.readTaskExecutionOutput(Objects.requireNonNull(restDateTaskExecution.getOutput())));
+    }
+
+    @Test
+    public void testDispatchDateTimeConditionOverTaskOutputs() {
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-dateTime-temporalOutput".getBytes(StandardCharsets.UTF_8)),
+            Map.of("dbDate", "2026-08-26T00:00:00Z", "restDate", "2026-08-24T22:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("true branch", testVarTaskHandler.get("dateTimeResult"));
+
+        taskDispatcherJobTestExecutor.execute(
+            EncodingUtils.base64EncodeToString(
+                "condition_v1-dateTime-temporalOutput".getBytes(StandardCharsets.UTF_8)),
+            Map.of("dbDate", "2026-08-23T00:00:00Z", "restDate", "2026-08-24T22:00:00Z"),
+            this::getTaskCompletionHandlerFactories,
+            this::getTaskDispatcherResolverFactories,
+            this::getTaskHandlerMap);
+
+        Assertions.assertEquals("false branch", testVarTaskHandler.get("dateTimeResult"));
+    }
+
     @SuppressWarnings("PMD")
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
         ContextService contextService, CounterService counterService, TaskExecutionService taskExecutionService) {
@@ -179,6 +305,6 @@ public class ConditionTaskDispatcherIntTest {
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {
-        return Map.of("var/v1/set", testVarTaskHandler);
+        return Map.of("var/v1/set", testVarTaskHandler, "temporal/v1/set", new TestTemporalTaskHandler());
     }
 }
