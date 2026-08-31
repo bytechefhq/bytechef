@@ -80,6 +80,21 @@ class DataTableServiceIntTest {
     }
 
     @Test
+    void testCreateTableRegistersAMixedCaseNameUnderItsLowercasedForm() {
+        dataTableService.createTable(
+            "Registered", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEV_ENVIRONMENT_ID);
+
+        assertTrue(
+            dataTableInfos.stream()
+                .anyMatch(dataTableInfo -> "registered".equals(dataTableInfo.baseName())),
+            "listTables derives the base name from the lowercased physical table, so the registry must agree");
+
+        assertEquals(dataTableService.getIdByBaseName("Registered"), dataTableService.getIdByBaseName("registered"));
+    }
+
+    @Test
     void testDuplicateTableRegistersTheCopy() {
         dataTableService.createTable(
             "original", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
