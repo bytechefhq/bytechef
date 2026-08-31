@@ -18,6 +18,7 @@ package com.bytechef.platform.file.storage;
 
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.ValueTagUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,16 +39,18 @@ public class TriggerFileStorageImpl implements TriggerFileStorage {
 
     @Override
     public Object readTriggerExecutionOutput(FileEntry fileEntry) {
-        return JsonUtils.read(
+        Object value = JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TRIGGER_EXECUTION_FILES_DIR, fileEntry)),
             Object.class);
+
+        return ValueTagUtils.untag(value);
     }
 
     @Override
     public FileEntry storeTriggerExecutionOutput(long triggerExecutionId, Object output) {
         return fileStorageService.storeFileContent(
             TRIGGER_EXECUTION_FILES_DIR, triggerExecutionId + ".json",
-            CompressionUtils.compress(JsonUtils.write(output)));
+            CompressionUtils.compress(JsonUtils.write(ValueTagUtils.tag(output))));
     }
 }
