@@ -1,5 +1,6 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {
     encodePath,
     safeResolvePath,
@@ -90,10 +91,12 @@ const buildMentionId = ({
     }
 
     if (value.includes('/')) {
-        value = value.replaceAll('/', '.').replaceAll('.[index]', '[0]');
+        value = value.replaceAll('/', '.');
     }
 
-    return transformPathForObjectAccess(value);
+    const resolvedReference = resolveArrayIndexTemplate(value);
+
+    return transformPathForObjectAccess(resolvedReference);
 };
 
 const canInsertDataPill = (mentionInput: Editor | null, currentNode?: NodeDataType): boolean => {
@@ -297,10 +300,11 @@ const DataPill = ({
                         let sampleValue;
 
                         if (typeof sampleOutput === 'object') {
-                            sampleValue = getNestedObject(
-                                sampleOutput,
-                                `${getSubPropertyPath(subProperty.name).replaceAll('/', '.')}`
-                            );
+                            const subPropertyPath = getSubPropertyPath(subProperty.name);
+
+                            const dottedSubPropertyPath = subPropertyPath.replaceAll('/', '.');
+
+                            sampleValue = getNestedObject(sampleOutput, dottedSubPropertyPath);
                         } else {
                             sampleValue = sampleOutput;
                         }
