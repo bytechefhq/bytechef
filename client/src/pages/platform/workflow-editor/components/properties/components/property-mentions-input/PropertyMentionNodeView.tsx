@@ -1,17 +1,23 @@
 import Button from '@/components/Button/Button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {setArrayIndex, splitByArrayIndex} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {
     buildValidDataPillReferenceSet,
     isDataPillReferenceValid,
 } from '@/pages/platform/workflow-editor/utils/dataPillReferenceValidation';
+import {
+    type SampleArrayI,
+    resolveDataPillSampleArray,
+} from '@/pages/platform/workflow-editor/utils/resolveDataPillSampleArray';
 import {buildUnavailableDataPillHoverTitle} from '@/pages/platform/workflow-editor/utils/unavailableDatapillHoverTitle';
 import {NodeViewWrapper} from '@tiptap/react';
 import {XIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
+import PropertyMentionArrayIndexPopover from './PropertyMentionArrayIndexPopover';
 import {getDataPillIconSource} from './getDataPillIconSource';
 import {
     PROPERTY_MENTION_CHIP_CLASS,
@@ -21,16 +27,22 @@ import {
 
 import type {NodeViewProps} from '@tiptap/react';
 
-function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: NodeViewProps) {
+interface ArrayIndexChangeProps {
+    arrayIndex: number;
+    occurrence: number;
+}
+
+function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node, updateAttributes}: NodeViewProps) {
     const {class: htmlAttributeClass, ...restHtmlAttributes} = HTMLAttributes as {
         class?: string;
         [key: string]: unknown;
     };
 
-    const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
+    const {componentDefinitions, dataPills, sampleOutputs, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             componentDefinitions: state.componentDefinitions,
             dataPills: state.dataPills,
+            sampleOutputs: state.sampleOutputs,
             taskDispatcherDefinitions: state.taskDispatcherDefinitions,
             workflow: state.workflow,
         }))
@@ -59,6 +71,45 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: Nod
         [componentDefinitions, node.attrs.id, node.attrs.label, taskDispatcherDefinitions, workflow]
     );
 
+    const dataPillLabelParts = useMemo(() => splitByArrayIndex(dataPillLabel), [dataPillLabel]);
+
+    const sampleArraysByOccurrence = useMemo(() => {
+        const sampleArrays = new Map<number, SampleArrayI>();
+
+        for (const dataPillLabelPart of dataPillLabelParts) {
+            if (dataPillLabelPart.type !== 'arrayIndex') {
+                continue;
+            }
+
+            const sampleArray = resolveDataPillSampleArray({
+                mentionId,
+                occurrence: dataPillLabelPart.occurrence,
+                sampleOutputs,
+            });
+
+            if (sampleArray) {
+                sampleArrays.set(dataPillLabelPart.occurrence, sampleArray);
+            }
+        }
+
+        return sampleArrays;
+    }, [dataPillLabelParts, mentionId, sampleOutputs]);
+
+    const isRenderedFromMentionId = node.attrs.label == null && mentionId != null;
+
+    const isArrayIndexEditable = editor.isEditable && isRenderedFromMentionId;
+
+    const handleArrayIndexChange = useCallback(
+        ({arrayIndex, occurrence}: ArrayIndexChangeProps) => {
+            if (mentionId == null) {
+                return;
+            }
+
+            updateAttributes({id: setArrayIndex({arrayIndex, occurrence, reference: mentionId})});
+        },
+        [mentionId, updateAttributes]
+    );
+
     const unavailableTooltipText = useMemo(() => {
         if (!isUnavailable || mentionId == null) {
             return undefined;
@@ -83,7 +134,23 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: Nod
         <span className={dataPillChipClassName}>
             <img alt="Dynamic Value Icon" className="absolute size-4" draggable={false} src={iconSource} />
 
-            <span className={twMerge(PROPERTY_MENTION_LABEL_CLASS, 'ml-5')}>{dataPillLabel}</span>
+            <span className={twMerge(PROPERTY_MENTION_LABEL_CLASS, 'ml-5')}>
+                {dataPillLabelParts.map((dataPillLabelPart, partIndex) =>
+                    dataPillLabelPart.type === 'literal' ? (
+                        <span key={partIndex}>{dataPillLabelPart.text}</span>
+                    ) : (
+                        <PropertyMentionArrayIndexPopover
+                            disabled={!isArrayIndexEditable}
+                            key={partIndex}
+                            onArrayIndexChange={(arrayIndex) =>
+                                handleArrayIndexChange({arrayIndex, occurrence: dataPillLabelPart.occurrence})
+                            }
+                            sampleArray={sampleArraysByOccurrence.get(dataPillLabelPart.occurrence)}
+                            value={dataPillLabelPart.arrayIndex}
+                        />
+                    )
+                )}
+            </span>
         </span>
     );
 
