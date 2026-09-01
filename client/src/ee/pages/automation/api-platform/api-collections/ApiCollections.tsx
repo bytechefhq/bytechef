@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
@@ -45,6 +46,8 @@ const ApiCollections = () => {
             }
           : {type: Type.Project};
 
+    const isFiltered = 'id' in filterData && filterData.id !== undefined;
+
     const {
         data: projects,
         error: projectsError,
@@ -82,7 +85,7 @@ const ApiCollections = () => {
                         )
                     }
                     title={
-                        apiCollections && apiCollections.length > 0 ? (
+                        (apiCollections && apiCollections.length > 0) || isFiltered ? (
                             <ApiCollectionsFilterTitle filterData={filterData} projects={projects} tags={tags} />
                         ) : (
                             ''
@@ -117,6 +120,8 @@ const ApiCollections = () => {
                             <ReadOnlyWorkflowSheet />
                         </WorkflowReadOnlyProvider>
                     </div>
+                ) : isFiltered ? (
+                    <EmptyFilterResult entityName="API collections" />
                 ) : (
                     <EmptyList
                         button={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}

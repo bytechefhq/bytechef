@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import Header from '@/shared/layout/Header';
@@ -78,6 +79,8 @@ const McpServers = () => {
             <PageLoader errors={[mcpServersError, tagsError]} loading={mcpServersIsLoading || tagsIsLoading}>
                 {filteredMcpServers.length > 0 ? (
                     <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
+                ) : validMcpServers.length > 0 ? (
+                    <EmptyFilterResult entityName="MCP servers" />
                 ) : (
                     <EmptyList
                         button={
