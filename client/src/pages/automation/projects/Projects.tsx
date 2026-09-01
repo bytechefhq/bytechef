@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {ButtonGroup} from '@/components/ui/button-group';
@@ -62,12 +63,18 @@ const Projects = () => {
         type: tagId ? Type.Tag : Type.Category,
     };
 
+    const isFiltered = filterData.id !== undefined;
+
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({
         actionDefinitions: true,
         triggerDefinitions: true,
     });
 
-    const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery(currentWorkspaceId!);
+    const {
+        data: categories,
+        error: categoriesError,
+        isLoading: categoriesIsLoading,
+    } = useGetProjectCategoriesQuery(currentWorkspaceId!);
 
     const {
         data: projectGitConfigurations,
@@ -165,6 +172,8 @@ const Projects = () => {
                         tags={tags}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
+                ) : isFiltered ? (
+                    <EmptyFilterResult entityName="projects" />
                 ) : (
                     <EmptyList
                         button={
