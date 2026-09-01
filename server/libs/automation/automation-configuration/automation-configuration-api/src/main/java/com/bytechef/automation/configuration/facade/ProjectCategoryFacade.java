@@ -24,5 +24,5 @@ import java.util.List;
  */
 public interface ProjectCategoryFacade {
 
-    List<Category> getProjectCategories();
+    List<Category> getProjectCategories(long workspaceId);
 }
