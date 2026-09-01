@@ -39,7 +39,7 @@ type VariantType =
     | 'ghost'
     | 'link';
 
-type TextSizeType = 'lg' | 'default' | 'sm' | 'xs' | 'xxs';
+type TextSizeType = 'lg' | 'default' | 'sm' | 'xs' | 'xxs' | 'inline';
 type IconSizeType = 'icon' | 'iconSm' | 'iconXs' | 'iconXxs';
 
 const textButtonSizes: Record<TextSizeType, string> = {
@@ -49,6 +49,8 @@ const textButtonSizes: Record<TextSizeType, string> = {
     sm: 'h-8 px-3 py-2 text-xs',
     xs: 'h-6 px-2 py-1 text-xs gap-1',
     xxs: 'h-5 px-1.5 py-0.5 text-xs gap-1 [&_svg]:size-3',
+    // eslint-disable-next-line sort-keys
+    inline: 'h-auto gap-0 px-0 py-0 align-baseline text-[length:inherit]',
 };
 
 const iconButtonSizes: Record<IconSizeType, string> = {
@@ -77,7 +79,9 @@ const variants: Record<VariantType, string> = {
     link: 'bg-transparent hover:bg-transparent active:bg-transparent text-content-neutral-primary hover:text-content-neutral-primary active:text-content-brand-primary hover:underline active:underline',
 };
 
-const basicStyles = 'shadow-none hover:shadow-none active:shadow-none [&_svg]:size-4';
+const basicStyles = 'shadow-none hover:shadow-none active:shadow-none';
+
+const DEFAULT_ICON_SIZE_CLASS = '[&_svg]:size-4';
 
 const ICON_SIZES: IconSizeType[] = ['icon', 'iconSm', 'iconXs', 'iconXxs'];
 
@@ -96,8 +100,20 @@ const Button = ({
     const content = isIconSize(size) ? null : (label ?? children);
     const sizeClass = isIconSize(size) ? iconButtonSizes[size] : textButtonSizes[size ?? 'default'];
 
+    const isInlineSize = size === 'inline';
+
+    const hasOwnIconSize = sizeClass.includes('[&_svg]:size-');
+
+    const iconSizeClass = hasOwnIconSize || isInlineSize ? '' : DEFAULT_ICON_SIZE_CLASS;
+
+    const shadcnSize = isInlineSize ? null : undefined;
+
     return (
-        <ShadcnButton className={twMerge(basicStyles, sizeClass, variants[variant], className)} {...props}>
+        <ShadcnButton
+            className={twMerge(basicStyles, iconSizeClass, sizeClass, variants[variant], className)}
+            size={shadcnSize}
+            {...props}
+        >
             {icon}
 
             {content}
