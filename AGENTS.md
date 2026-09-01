@@ -53,6 +53,97 @@ ByteChef is a workflow automation platform. The client is a React application bu
     -   In event handlers: `event` instead of `e`
     -   In error handlers: `error` instead of `err`
 
+### Self-Documenting Code
+
+-   **Comments are forbidden**, with one exception: a comment directly above a `useEffect` explaining its behaviour in human language. If a comment feels necessary anywhere else, the code is not clear enough - fix the code instead.
+-   **Ways to replace a comment**:
+    -   Rename the variable, parameter, or function so the name states what the comment said
+    -   Extract a named intermediate variable instead of explaining an expression
+    -   Extract a named function instead of labelling a block with a comment
+    -   Encode the constraint in the type (union, discriminated union, named interface) instead of describing it
+-   ❌ Bad:
+
+```typescript
+// index of the item inside the array
+const value = segments[occurrence];
+
+// server rejects a placeholder, so it must be a number
+return reference.replace(pattern, `[${arrayIndex}]`);
+```
+
+-   ✅ Good:
+
+```typescript
+const arrayIndexSegment = segments[occurrence];
+
+return replacePlaceholderWithConcreteArrayIndex(reference, arrayIndex);
+```
+
+-   Do not restate the code (`// increment counter`), do not leave commented-out code, and do not leave changelog or attribution notes in comments - git history covers those.
+
+### No Evaluations Inside Function Arguments
+
+-   **Never pass an evaluation as an argument.** Extract it into a descriptively named variable first, then pass the variable. The variable name states what the value is, which is what makes the call site readable without tracing the expression.
+-   This covers function calls, arithmetic, ternaries, template literals, comparisons, and object or array literals built inline - anything that is not already a plain identifier, a literal, or a simple property access.
+-   Extract into the smallest enclosing scope: inside a loop body when the value depends on the loop variable, otherwise above the call.
+-   ❌ Bad:
+
+```typescript
+validReferences.add(toArrayIndexTemplate(value));
+
+setTotal(items.filter((item) => item.active).length * unitPrice);
+
+navigate(`/projects/${project.id}/workflows/${workflow.id}`);
+```
+
+-   ✅ Good:
+
+```typescript
+const arrayIndexTemplate = toArrayIndexTemplate(value);
+
+validReferences.add(arrayIndexTemplate);
+
+const activeItemCount = items.filter((item) => item.active).length;
+
+const total = activeItemCount * unitPrice;
+
+setTotal(total);
+
+const workflowPath = `/projects/${project.id}/workflows/${workflow.id}`;
+
+navigate(workflowPath);
+```
+
+-   Exception: the callback passed to an array method or a hook (`map`, `filter`, `useCallback`, `useMemo`) is the argument itself, not an evaluation of one, so it stays inline.
+
+### Function Parameters
+
+-   **Three or more parameters must be passed as a single object**, never as a positional list. Object properties are named at every call site, cannot be transposed by accident, and can be reordered or extended without touching callers.
+-   The same applies to React components: a component taking three or more props destructures a single typed props object (this is already the standard React pattern).
+-   Two or fewer parameters may stay positional when their order is obvious from the function name.
+-   Prefer an object even for two parameters when both share a type and could be swapped without a type error (e.g. two `number` parameters).
+-   Name the parameter interface after the function with a `Props` suffix (e.g. `setArrayIndex` → `SetArrayIndexProps`).
+-   ❌ Bad:
+
+```typescript
+function setArrayIndex(reference: string, occurrence: number, arrayIndex: number): string {}
+
+setArrayIndex(mentionId, occurrence, arrayIndex);
+```
+
+-   ✅ Good:
+
+```typescript
+interface SetArrayIndexProps {
+    arrayIndex: number;
+    occurrence: number;
+}
+
+function setArrayIndex(reference: string, {arrayIndex, occurrence}: SetArrayIndexProps): string {}
+
+setArrayIndex(mentionId, {arrayIndex, occurrence});
+```
+
 ### TypeScript Conventions
 
 -   **Strict Mode**: Always enabled
@@ -549,8 +640,9 @@ import {twMerge} from 'tailwind-merge';
 11. ❌ Don't use abbreviations for variables/parameters: `e`, `err`, `res`, `req`, `val`, `idx` → Use full names: `event`, `error`, `response`, `request`, `value`, `index`
 12. ❌ Don't use single-letter parameters in methods: `(a, b)`, `(acc, item)` → Use descriptive names: `(firstNumber, secondNumber)`, `(accumulator, item)`
 13. ❌ Don't use em dashes (—) or en dashes (–) → Use regular hyphens (-) instead
-14. ❌ Don't add comments, only allowed comments are just above a `useEffect` explaining their behaviour in human language
-15. ❌ Don't put evaluations inside function arguments → always extract into a variable
+14. ❌ Don't add comments, only allowed comments are just above a `useEffect` explaining their behaviour in human language → make the code self-documenting through naming and extraction instead
+15. ❌ Don't put evaluations inside function arguments → always extract into a descriptively named variable first: `const arrayIndexTemplate = toArrayIndexTemplate(value); validReferences.add(arrayIndexTemplate);`
+16. ❌ Don't declare three or more positional parameters → Pass a single named object: `setArrayIndex(reference, {arrayIndex, occurrence})`
 
 ## Code Generation
 
