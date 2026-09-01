@@ -130,4 +130,20 @@ describe('AiProviderList', () => {
 
         expect(screen.queryByText('Embeddings')).not.toBeInTheDocument();
     });
+
+    it('keeps other providers collapsed when a provider switch is toggled', async () => {
+        renderWithProviders(<AiProviderList aiProviders={providers} environment={1} />);
+
+        fireEvent.click(screen.getByText('Open AI'));
+
+        expect(await screen.findByText('sk-openai')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Open AI'));
+
+        expect(screen.queryByText('sk-openai')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getAllByRole('switch')[1]);
+
+        expect(screen.queryByText('sk-openai')).not.toBeInTheDocument();
+    });
 });
