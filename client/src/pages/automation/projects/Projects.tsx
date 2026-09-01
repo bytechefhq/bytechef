@@ -67,7 +67,7 @@ const Projects = () => {
         triggerDefinitions: true,
     });
 
-    const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery();
+    const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery(currentWorkspaceId!);
 
     const {
         data: projectGitConfigurations,

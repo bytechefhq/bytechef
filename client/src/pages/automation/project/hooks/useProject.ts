@@ -108,7 +108,7 @@ export const useProject = () => {
         );
     };
 
-    const {data: categories} = useGetProjectCategoriesQuery();
+    const {data: categories} = useGetProjectCategoriesQuery(currentWorkspaceId!);
 
     const {data: tags} = useGetProjectTagsQuery();
 

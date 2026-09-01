@@ -60,7 +60,11 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
 
     const {control, getValues, handleSubmit, reset, setValue} = form;
 
-    const {data: categories, error: categoriesError, isLoading: categoriesLoading} = useGetProjectCategoriesQuery();
+    const {
+        data: categories,
+        error: categoriesError,
+        isLoading: categoriesLoading,
+    } = useGetProjectCategoriesQuery(currentWorkspaceId!);
 
     const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetProjectTagsQuery();
 
@@ -80,7 +84,7 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
         }
 
         queryClient.invalidateQueries({
-            queryKey: ProjectCategoryKeys.projectCategories,
+            queryKey: ProjectCategoryKeys.projectCategories(currentWorkspaceId!),
         });
         queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
         queryClient.invalidateQueries({
