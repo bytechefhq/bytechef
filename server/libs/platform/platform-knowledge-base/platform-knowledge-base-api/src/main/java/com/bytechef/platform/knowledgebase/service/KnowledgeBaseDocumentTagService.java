@@ -42,11 +42,13 @@ public interface KnowledgeBaseDocumentTagService {
     List<String> getTagNamesByKnowledgeBaseId(Long knowledgeBaseId);
 
     /**
-     * Retrieves a mapping from document ID to list of tag names assigned to that document.
+     * Retrieves a mapping from document ID to list of tag names assigned to that document, for the documents belonging
+     * to the given knowledge base.
      *
+     * @param knowledgeBaseId the unique identifier of the knowledge base
      * @return a map where keys are document IDs and values are lists of tag name strings
      */
-    Map<Long, List<String>> getTagNamesByKnowledgeBaseDocumentId();
+    Map<Long, List<String>> getTagNamesByKnowledgeBaseDocumentId(Long knowledgeBaseId);
 
     /**
      * Retrieves a mapping from document name to list of tag names assigned to that document.

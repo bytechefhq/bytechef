@@ -1,3 +1,7 @@
+import {
+    useKnowledgeBaseDocumentTagsByDocumentQuery,
+    useKnowledgeBaseDocumentTagsQuery,
+} from '@/shared/middleware/graphql';
 import {renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -35,7 +39,7 @@ describe('useKnowledgeBaseDocumentList', () => {
 
     describe('getTagsForDocument', () => {
         it('returns empty array when no tags for document', () => {
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             expect(result.current.getTagsForDocument('doc-1')).toEqual([]);
         });
@@ -50,7 +54,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 ],
             };
 
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             const tags = result.current.getTagsForDocument('doc-1');
 
@@ -69,7 +73,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 ],
             };
 
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             expect(result.current.getTagsForDocument('doc-2')).toEqual([]);
         });
@@ -81,7 +85,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 knowledgeBaseDocumentTags: ['Tag 1', 'Tag 2', 'Tag 3'],
             };
 
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             const remainingTags = result.current.getRemainingTagsForDocument('doc-1');
 
@@ -102,7 +106,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 ],
             };
 
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             const remainingTags = result.current.getRemainingTagsForDocument('doc-1');
 
@@ -126,7 +130,7 @@ describe('useKnowledgeBaseDocumentList', () => {
                 ],
             };
 
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             const remainingTags = result.current.getRemainingTagsForDocument('doc-1');
 
@@ -136,10 +140,21 @@ describe('useKnowledgeBaseDocumentList', () => {
 
     describe('return values', () => {
         it('returns all expected functions', () => {
-            const {result} = renderHook(() => useKnowledgeBaseDocumentList());
+            const {result} = renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-1'}));
 
             expect(typeof result.current.getTagsForDocument).toBe('function');
             expect(typeof result.current.getRemainingTagsForDocument).toBe('function');
+        });
+    });
+
+    describe('scoping', () => {
+        // Both queries were unscoped, so the tag suggestions offered on one knowledge base's documents were
+        // aggregated from every document in the instance.
+        it('asks both tag queries for the knowledge base being viewed', () => {
+            renderHook(() => useKnowledgeBaseDocumentList({knowledgeBaseId: 'kb-7'}));
+
+            expect(useKnowledgeBaseDocumentTagsQuery).toHaveBeenCalledWith({knowledgeBaseId: 'kb-7'});
+            expect(useKnowledgeBaseDocumentTagsByDocumentQuery).toHaveBeenCalledWith({knowledgeBaseId: 'kb-7'});
         });
     });
 });

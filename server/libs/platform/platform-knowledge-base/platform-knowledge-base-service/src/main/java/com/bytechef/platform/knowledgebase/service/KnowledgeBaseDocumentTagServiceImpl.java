@@ -75,15 +75,12 @@ public class KnowledgeBaseDocumentTagServiceImpl implements KnowledgeBaseDocumen
     }
 
     @Override
-    public Map<Long, List<String>> getTagNamesByKnowledgeBaseDocumentId() {
+    public Map<Long, List<String>> getTagNamesByKnowledgeBaseDocumentId(Long knowledgeBaseId) {
         Map<Long, List<String>> map = new HashMap<>();
 
-        List<KnowledgeBaseDocument> documents = new ArrayList<>();
+        for (KnowledgeBaseDocument document : knowledgeBaseDocumentRepository.findAllByKnowledgeBaseId(
+            knowledgeBaseId)) {
 
-        knowledgeBaseDocumentRepository.findAll()
-            .forEach(documents::add);
-
-        for (KnowledgeBaseDocument document : documents) {
             List<String> tagNames = document.getTagNames();
 
             map.put(document.getId(), tagNames == null ? List.of() : tagNames);

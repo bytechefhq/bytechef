@@ -11,7 +11,7 @@ interface KnowledgeBaseDocumentListProps {
 }
 
 const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDocumentListProps) => {
-    const {getRemainingTagsForDocument, getTagsForDocument} = useKnowledgeBaseDocumentList();
+    const {getRemainingTagsForDocument, getTagsForDocument} = useKnowledgeBaseDocumentList({knowledgeBaseId});
 
     const {
         handleClose: handleDeleteDialogClose,
