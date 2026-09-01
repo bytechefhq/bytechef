@@ -121,7 +121,7 @@ const ApiCollections = () => {
                         </WorkflowReadOnlyProvider>
                     </div>
                 ) : isFiltered ? (
-                    <EmptyFilterResult entityName="API collections" />
+                    <EmptyFilterResult entityName="API collections" entityTitle="API Collections" />
                 ) : (
                     <EmptyList
                         button={<ApiCollectionDialog triggerNode={<Button label="New API Collection" />} />}

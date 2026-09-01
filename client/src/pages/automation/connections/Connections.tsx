@@ -201,7 +201,7 @@ export const Connections = () => {
                         />
                     )
                 ) : hasActiveFilter ? (
-                    <EmptyFilterResult entityName="connections" />
+                    <EmptyFilterResult entityName="connections" entityTitle="Connections" />
                 ) : (
                     <EmptyList
                         button={

@@ -248,7 +248,7 @@ const ProjectDeployments = () => {
                         </WorkflowReadOnlyProvider>
                     </div>
                 ) : isFiltered ? (
-                    <EmptyFilterResult entityName="project deployments" />
+                    <EmptyFilterResult entityName="project deployments" entityTitle="Project Deployments" />
                 ) : (
                     <EmptyList
                         button={

@@ -101,9 +101,9 @@ afterEach(() => {
     queryClient.clear();
 });
 
-const renderProjects = () => {
+const renderProjects = (initialEntries: string[] = ['/']) => {
     render(
-        <MemoryRouter>
+        <MemoryRouter initialEntries={initialEntries}>
             <QueryClientProvider client={queryClient}>
                 <TooltipProvider>
                     <Projects />
@@ -170,5 +170,23 @@ describe('Projects Import Functionality', () => {
                 workspaceId: 1,
             });
         });
+    });
+});
+
+describe('Projects empty states', () => {
+    it('offers to create a project when the workspace has none', () => {
+        renderProjects();
+
+        expect(screen.getByText('No Projects')).toBeInTheDocument();
+        expect(screen.getByText('Get started by creating a new project.')).toBeInTheDocument();
+    });
+
+    // The filtered list and the unfiltered one were the same array, so a filter that matched nothing rendered
+    // the first-run state and told the reader the workspace was empty.
+    it('reports a filter miss rather than an empty workspace', () => {
+        renderProjects(['/?tagId=1']);
+
+        expect(screen.getByText('No Matching Projects')).toBeInTheDocument();
+        expect(screen.queryByText('Get started by creating a new project.')).not.toBeInTheDocument();
     });
 });

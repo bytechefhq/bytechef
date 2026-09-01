@@ -173,7 +173,7 @@ const Projects = () => {
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
                 ) : isFiltered ? (
-                    <EmptyFilterResult entityName="projects" />
+                    <EmptyFilterResult entityName="projects" entityTitle="Projects" />
                 ) : (
                     <EmptyList
                         button={
