@@ -139,7 +139,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
             queryClient.invalidateQueries({
-                queryKey: ProjectCategoryKeys.projectCategories,
+                queryKey: ProjectCategoryKeys.projectCategories(currentWorkspaceId!),
             });
             queryClient.invalidateQueries({
                 queryKey: ProjectTagKeys.projectTags,

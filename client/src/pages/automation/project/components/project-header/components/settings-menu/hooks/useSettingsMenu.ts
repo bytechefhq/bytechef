@@ -43,7 +43,7 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
 
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
             queryClient.invalidateQueries({
-                queryKey: ProjectCategoryKeys.projectCategories,
+                queryKey: ProjectCategoryKeys.projectCategories(project.workspaceId!),
             });
             queryClient.invalidateQueries({
                 queryKey: ProjectTagKeys.projectTags,
