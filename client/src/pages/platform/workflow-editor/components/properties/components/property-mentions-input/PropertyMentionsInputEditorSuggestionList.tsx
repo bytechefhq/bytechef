@@ -1,5 +1,6 @@
 import './PropertyMentionsInputEditorSuggestionList.css';
 
+import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {DataPillType} from '@/shared/types';
 import {SuggestionProps} from '@tiptap/suggestion';
 import {forwardRef} from 'react';
@@ -21,7 +22,9 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
         const item: DataPillType = items[index];
 
         if (item) {
-            command({id: item.value.replace('[index]', '[0]')});
+            const mentionId = resolveArrayIndexTemplate(item.value);
+
+            command({id: mentionId});
         }
     };
 
