@@ -158,10 +158,11 @@ export default function useWorkflowNodeDetailsPanel({
         }))
     );
 
-    const {nodes, setDataPills, workflow, workflowNodes} = useWorkflowDataStore(
+    const {nodes, setDataPills, setSampleOutputs, workflow, workflowNodes} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
             setDataPills: state.setDataPills,
+            setSampleOutputs: state.setSampleOutputs,
             workflow: state.workflow,
             workflowNodes: state.workflowNodes,
         }))
@@ -929,6 +930,26 @@ export default function useWorkflowNodeDetailsPanel({
         workflowNodeOutputs,
     ]);
 
+    const calculatedSampleOutputs = useMemo(() => {
+        if (!workflowNodeOutputs) {
+            return {};
+        }
+
+        const sampleOutputs: Record<string, unknown> = {};
+
+        for (const workflowNodeOutput of workflowNodeOutputs) {
+            const sampleOutput =
+                workflowNodeOutput.outputResponse?.sampleOutput ??
+                workflowNodeOutput.variableOutputResponse?.sampleOutput;
+
+            if (workflowNodeOutput.workflowNodeName && sampleOutput !== undefined) {
+                sampleOutputs[workflowNodeOutput.workflowNodeName] = sampleOutput;
+            }
+        }
+
+        return sampleOutputs;
+    }, [workflowNodeOutputs]);
+
     const handleOperationSelectChange = useCallback(
         async (newOperationName: string) => {
             if (currentOperationName === newOperationName) {
@@ -1173,6 +1194,11 @@ export default function useWorkflowNodeDetailsPanel({
             setDataPills(calculatedDataPills);
         }
     }, [calculatedDataPills, setDataPills]);
+
+    // Set sample outputs only when the calculated sample outputs change
+    useEffect(() => {
+        setSampleOutputs(calculatedSampleOutputs);
+    }, [calculatedSampleOutputs, setSampleOutputs]);
 
     // Tab switching logic
     useEffect(() => {

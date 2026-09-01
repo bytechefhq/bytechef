@@ -25,6 +25,9 @@ interface WorkflowDataStateI {
     dataPills: Array<DataPillType>;
     setDataPills: (dataPills: Array<DataPillType>) => void;
 
+    sampleOutputs: Record<string, unknown>;
+    setSampleOutputs: (sampleOutputs: Record<string, unknown>) => void;
+
     edges: Edge[];
     setEdges: (edges: Edge[]) => void;
     onEdgesChange: OnEdgesChange;
@@ -201,6 +204,9 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                 dataPills: [],
                 setDataPills: (dataPills) => set((state) => ({...state, dataPills})),
 
+                sampleOutputs: {},
+                setSampleOutputs: (sampleOutputs) => set((state) => ({...state, sampleOutputs})),
+
                 edges: createDefaultEdges(),
                 setEdges: (edges) => {
                     set({edges});
@@ -244,6 +250,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                     set(() => ({
                         workflowNodes: [],
                         dataPills: [],
+                        sampleOutputs: {},
                         edges: createDefaultEdges(),
                         isWorkflowLoaded: false,
                         nodes: createDefaultNodes(DEFAULT_CANVAS_WIDTH),
