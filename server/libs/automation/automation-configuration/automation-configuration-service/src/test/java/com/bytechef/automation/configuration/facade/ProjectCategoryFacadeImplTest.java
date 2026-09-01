@@ -54,15 +54,19 @@ class ProjectCategoryFacadeImplTest {
     }
 
     /**
-     * The assertion is on the ids handed to {@code CategoryService}: the facade previously read every project in the
-     * instance, so a workspace holding no projects still offered another workspace's categories.
+     * The facade previously read every project in the instance, so a workspace holding no projects still offered
+     * another workspace's categories. Both halves are asserted: that no category id is asked for, and that the
+     * caller is handed an empty list rather than whatever the unstubbed collaborator happened to return.
      */
     @Test
     void testGetProjectCategoriesOfAWorkspaceWithoutProjectsIsEmpty() {
         when(projectService.getWorkspaceProjectIds(OTHER_WORKSPACE_ID)).thenReturn(List.of());
         when(projectService.getProjects(List.of())).thenReturn(List.of());
+        when(categoryService.getCategories(List.of())).thenReturn(List.of());
 
-        facade().getProjectCategories(OTHER_WORKSPACE_ID);
+        List<Category> categories = facade().getProjectCategories(OTHER_WORKSPACE_ID);
+
+        assertThat(categories).isEmpty();
 
         verify(categoryService).getCategories(List.of());
     }
