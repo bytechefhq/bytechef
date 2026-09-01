@@ -3145,6 +3145,16 @@ export type QueryKnowledgeBaseDocumentStatusArgs = {
 };
 
 
+export type QueryKnowledgeBaseDocumentTagsArgs = {
+  knowledgeBaseId: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseDocumentTagsByDocumentArgs = {
+  knowledgeBaseId: Scalars['ID']['input'];
+};
+
+
 export type QueryKnowledgeBaseEmbeddingActiveArgs = {
   environment: Scalars['Int']['input'];
 };

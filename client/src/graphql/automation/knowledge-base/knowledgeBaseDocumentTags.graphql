@@ -1,3 +1,3 @@
-query knowledgeBaseDocumentTags {
-    knowledgeBaseDocumentTags
+query knowledgeBaseDocumentTags($knowledgeBaseId: ID!) {
+    knowledgeBaseDocumentTags(knowledgeBaseId: $knowledgeBaseId)
 }

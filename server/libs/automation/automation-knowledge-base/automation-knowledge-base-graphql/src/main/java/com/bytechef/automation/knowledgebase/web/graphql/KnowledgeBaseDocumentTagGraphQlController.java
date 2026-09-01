@@ -47,13 +47,13 @@ public class KnowledgeBaseDocumentTagGraphQlController {
     }
 
     @QueryMapping
-    public List<String> knowledgeBaseDocumentTags() {
-        return knowledgeBaseDocumentTagService.getAllTagNames();
+    public List<String> knowledgeBaseDocumentTags(@Argument Long knowledgeBaseId) {
+        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
     }
 
     @QueryMapping
-    public List<KnowledgeBaseDocumentTagsEntry> knowledgeBaseDocumentTagsByDocument() {
-        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseDocumentId()
+    public List<KnowledgeBaseDocumentTagsEntry> knowledgeBaseDocumentTagsByDocument(@Argument Long knowledgeBaseId) {
+        return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseDocumentId(knowledgeBaseId)
             .entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseDocumentTagsEntry(entry.getKey(), entry.getValue()))
