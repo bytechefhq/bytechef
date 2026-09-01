@@ -55,8 +55,8 @@ class ProjectCategoryFacadeImplTest {
 
     /**
      * The facade previously read every project in the instance, so a workspace holding no projects still offered
-     * another workspace's categories. Both halves are asserted: that no category id is asked for, and that the
-     * caller is handed an empty list rather than whatever the unstubbed collaborator happened to return.
+     * another workspace's categories. Both halves are asserted: that no category id is asked for, and that the caller
+     * is handed an empty list rather than whatever the unstubbed collaborator happened to return.
      */
     @Test
     void testGetProjectCategoriesOfAWorkspaceWithoutProjectsIsEmpty() {
