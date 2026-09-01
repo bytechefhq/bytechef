@@ -54,7 +54,8 @@ public class JsonFileWriteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
-        .description("Writes the data to a JSON file.")
+        .description(
+            "Writes workflow data to a JSON or JSONL file. Source Data is the object or array to serialize (typically a data pill), not a file path.")
         .properties(
             string(FILE_TYPE)
                 .label("File Type")
@@ -66,18 +67,20 @@ public class JsonFileWriteAction {
                 .required(true),
             string(TYPE)
                 .label("Type")
-                .description("The value type.")
+                .description("Whether Source Data is a JSON object or a JSON array.")
                 .options(
                     option("Object", ValueType.OBJECT.name()),
                     option("Array", ValueType.ARRAY.name())),
             object(SOURCE)
-                .label("Source")
-                .description("The object to write to the file.")
+                .label("Source Data")
+                .description(
+                    "The JSON object to write. Map this from a previous step with a data pill. This is the data itself, not a file path.")
                 .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             array(SOURCE)
-                .label("Source")
-                .description("The array to write to the file.")
+                .label("Source Data")
+                .description(
+                    "The JSON array (list of objects) to write. Map this from a previous step with a data pill. For JSON, the file contains one JSON array. For JSONL, each item is written as one JSON object per line.")
                 .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
                 .required(true),
             string(FILENAME)

@@ -67,16 +67,23 @@ The output for this action is dynamic and may vary depending on the input parame
 ### Write to File
 Name: write
 
-`Writes the data to a JSON file.`
+`Writes workflow data to a JSON or JSONL file. Source Data is the object or array to serialize (typically a data pill), not a file path.`
+
+`source` is the JSON to serialize into the file, not a file path and not source code. Map it from a previous step with a data pill.
+
+- Type **OBJECT**: writes one JSON object.
+- Type **ARRAY**: writes a JSON array of objects. For JSONL, each array item is written as one JSON object per line.
+
+The action returns a `FILE_ENTRY` for the created file.
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | fileType | File Type | STRING <details> <summary> Options </summary> <span>JSON</span>, <span>JSONL</span> </details> | The file type to choose. | true |
-| type | Type | STRING <details> <summary> Options </summary> <span>OBJECT</span>, <span>ARRAY</span> </details> | The value type. | false |
-| source | Source | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The object to write to the file. | true |
-| source | Source | ARRAY <details> <summary> Items </summary> [] </details> | The array to write to the file. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span>OBJECT</span>, <span>ARRAY</span> </details> | Whether Source Data is a JSON object or a JSON array. | false |
+| source | Source Data | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The JSON object to write. Map this from a previous step with a data pill. This is the data itself, not a file path. | true |
+| source | Source Data | ARRAY <details> <summary> Items </summary> [] </details> | The JSON array (list of objects) to write. Map this from a previous step with a data pill. For JSON, the file contains one JSON array. For JSONL, each item is written as one JSON object per line. | true |
 | filename | Filename | STRING | Filename to set for binary data. By default, "file.json" will be used. | true |
 
 #### Example JSON Structure
