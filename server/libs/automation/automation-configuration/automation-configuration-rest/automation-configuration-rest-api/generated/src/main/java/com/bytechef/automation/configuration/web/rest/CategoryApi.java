@@ -42,17 +42,18 @@ public interface CategoryApi {
         return Optional.empty();
     }
 
-    String PATH_GET_PROJECT_CATEGORIES = "/projects/categories";
+    String PATH_GET_PROJECT_CATEGORIES = "/workspaces/{id}/project-categories";
     /**
-     * GET /projects/categories : Get categories
-     * Get categories.
+     * GET /workspaces/{id}/project-categories : Get project categories
+     * Get project categories for a workspace.
      *
+     * @param id The id of a workspace. (required)
      * @return The list of categories. (status code 200)
      */
     @Operation(
         operationId = "getProjectCategories",
-        summary = "Get categories",
-        description = "Get categories.",
+        summary = "Get project categories",
+        description = "Get project categories for a workspace.",
         tags = { "category" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of categories.", content = {
@@ -66,7 +67,7 @@ public interface CategoryApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<CategoryModel>> getProjectCategories(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
