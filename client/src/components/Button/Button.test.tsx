@@ -52,6 +52,33 @@ describe('Button sizes', () => {
         expect(screen.getByText('Button')).toHaveClass('h-5 px-1.5 py-0.5 text-xs gap-1 [&_svg]:size-3');
     });
 
+    it('should render an inline size button with label if the size prop is set to inline', () => {
+        render(<Button label="Button" size="inline" />);
+
+        expect(screen.getByRole('button')).toHaveTextContent('Button');
+        expect(screen.getByText('Button')).toHaveClass('h-auto gap-0 px-0 py-0 align-baseline text-[length:inherit]');
+    });
+
+    it('should not force an icon size on an inline size button so the icon can size itself', () => {
+        render(<Button icon={<CircleIcon className="size-2.5" />} label="Button" size="inline" />);
+
+        expect(screen.getByRole('button')).not.toHaveClass('[&_svg]:size-4');
+    });
+
+    it('should not apply the shadcn size classes to an inline size button', () => {
+        render(<Button icon={<CircleIcon />} label="Button" size="inline" />);
+
+        expect(screen.getByRole('button')).not.toHaveClass('h-9');
+        expect(screen.getByRole('button')).not.toHaveClass('px-4');
+        expect(screen.getByRole('button')).not.toHaveClass('has-[>svg]:px-3');
+    });
+
+    it('should apply the default icon size to the other text sizes', () => {
+        render(<Button icon={<CircleIcon />} label="Button" size="default" />);
+
+        expect(screen.getByRole('button')).toHaveClass('[&_svg]:size-4');
+    });
+
     it('should render an icon size button with icon if the size prop is set to icon and icon prop is set', () => {
         const {container} = render(<Button icon={<CircleIcon />} size="icon" />);
 

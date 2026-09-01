@@ -1,5 +1,5 @@
 import {Decorator, Meta, StoryObj} from '@storybook/react-vite';
-import {CircleIcon, Download, PlusIcon, Save, SaveIcon, Settings, Trash2, XIcon} from 'lucide-react';
+import {ChevronDownIcon, CircleIcon, Download, PlusIcon, Save, SaveIcon, Settings, Trash2, XIcon} from 'lucide-react';
 
 import Button from './Button';
 
@@ -97,8 +97,8 @@ const meta = {
         size: {
             control: {type: 'select'},
             description:
-                'Size variant of the button - icon sizes are to be used along with the `icon` prop and **cannot** be used with label or custom content.',
-            options: ['lg', 'default', 'sm', 'xs', 'xxs', ...ICON_SIZES],
+                'Size variant of the button - icon sizes are to be used along with the `icon` prop and **cannot** be used with label or custom content. The `inline` size drops the fixed height, padding and font size so the button flows inside a line of text.',
+            options: ['lg', 'default', 'sm', 'xs', 'xxs', 'inline', ...ICON_SIZES],
             table: {
                 type: {summary: 'string'},
             },
@@ -181,6 +181,41 @@ export const TextButtonSizeVariants: Story = {
             <Button label="xs" size="xs" />
 
             <Button label="xxs" size="xxs" />
+        </div>
+    ),
+};
+
+export const InlineButtonSizeVariant: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'The inline size strips the fixed height, padding and font size so the button flows inside a line of text and inherits its font size. It also leaves the icon size to the icon itself, so pass a size class on the icon when the default is too large. Use it for interactive text inside a paragraph or an editor, not as a standalone control.',
+            },
+        },
+    },
+    render: () => (
+        <div className="max-w-md space-y-4 text-sm">
+            <p>
+                <span>Reading the item at position </span>
+
+                <Button
+                    className="rounded-sm bg-surface-brand-secondary px-1 font-medium text-content-brand-primary"
+                    size="inline"
+                    variant="ghost"
+                >
+                    <span className="font-mono tabular-nums">[2]</span>
+
+                    <ChevronDownIcon className="ml-0.5 size-2.5" />
+                </Button>
+
+                <span> of the array.</span>
+            </p>
+
+            <p className="text-base">
+                <span>The same button in larger text picks up the surrounding font size: </span>
+
+                <Button label="inline" size="inline" variant="link" />
+            </p>
         </div>
     ),
 };
