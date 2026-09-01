@@ -130,7 +130,13 @@ const ProjectDeploymentDialogBasicStep = ({
         setCurrentProjectVersion(undefined);
     };
 
-    const hasDeployments = (projectDeployments?.length ?? 0) > 0;
+    const deploymentCount = projectDeployments?.length ?? 0;
+    const hasDeployments = deploymentCount > 0;
+
+    const existingDeploymentsNote =
+        deploymentCount === 1
+            ? 'A deployment already exists for this project. This will start an additional deployment instance.'
+            : 'Deployments already exist for this project. This will start an additional deployment instance.';
 
     const newDeploymentForm = (
         <>
@@ -313,12 +319,8 @@ const ProjectDeploymentDialogBasicStep = ({
                 </TabsTrigger>
             </TabsList>
 
-            <TabsContent className="m-0 flex flex-col gap-4" value="new-deployment">
-                <Note
-                    className="mt-4"
-                    content="Deployments already exists. This will start an additional deployment instance."
-                    icon={<InfoIcon />}
-                />
+            <TabsContent className="m-0 flex flex-col gap-4 pt-4" value="new-deployment">
+                {hasDeployments && <Note content={existingDeploymentsNote} icon={<InfoIcon />} />}
 
                 {newDeploymentForm}
             </TabsContent>
