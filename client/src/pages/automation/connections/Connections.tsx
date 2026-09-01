@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import ConnectionsFilterTitle from '@/pages/automation/connections/components/ConnectionsFilterTitle';
@@ -112,7 +113,7 @@ export const Connections = () => {
                         )
                     }
                     title={
-                        connections && connections.length > 0 && componentDefinitions ? (
+                        ((connections && connections.length > 0) || hasActiveFilter) && componentDefinitions ? (
                             <ConnectionsFilterTitle
                                 componentDefinitions={componentDefinitions}
                                 filterData={filterData}
@@ -199,6 +200,8 @@ export const Connections = () => {
                             tags={tags}
                         />
                     )
+                ) : hasActiveFilter ? (
+                    <EmptyFilterResult entityName="connections" />
                 ) : (
                     <EmptyList
                         button={

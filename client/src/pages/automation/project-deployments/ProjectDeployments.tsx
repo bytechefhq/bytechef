@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Skeleton} from '@/components/ui/skeleton';
@@ -65,6 +66,8 @@ const ProjectDeployments = () => {
         id: projectId ? parseInt(projectId) : tagId ? parseInt(tagId) : undefined,
         type: tagId ? Type.Tag : Type.Project,
     };
+
+    const isFiltered = filterData.id !== undefined;
 
     const {
         data: projects,
@@ -139,7 +142,7 @@ const ProjectDeployments = () => {
                         )
                     }
                     title={
-                        projectDeployments && projectDeployments.length > 0 ? (
+                        (projectDeployments && projectDeployments.length > 0) || isFiltered ? (
                             <ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />
                         ) : (
                             ''
@@ -244,6 +247,8 @@ const ProjectDeployments = () => {
                             <ReadOnlyWorkflowSheet />
                         </WorkflowReadOnlyProvider>
                     </div>
+                ) : isFiltered ? (
+                    <EmptyFilterResult entityName="project deployments" />
                 ) : (
                     <EmptyList
                         button={
