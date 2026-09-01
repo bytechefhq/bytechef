@@ -12,7 +12,7 @@ it('names what was filtered rather than offering to create one', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
 });
 
-it('carries the caller\'s casing into the title and the message separately', () => {
+it("carries the caller's casing into the title and the message separately", () => {
     render(<EmptyFilterResult entityName="API collections" entityTitle="API Collections" />);
 
     expect(screen.getByText('No Matching API Collections')).toBeInTheDocument();
