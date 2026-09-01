@@ -44,9 +44,9 @@ public class CategoryApiController implements CategoryApi {
     }
 
     @Override
-    public ResponseEntity<List<CategoryModel>> getProjectCategories() {
+    public ResponseEntity<List<CategoryModel>> getProjectCategories(Long id) {
         return ResponseEntity.ok(
-            projectCategoryFacade.getProjectCategories()
+            projectCategoryFacade.getProjectCategories(id)
                 .stream()
                 .map(category -> conversionService.convert(category, CategoryModel.class))
                 .toList());

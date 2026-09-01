@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -94,12 +95,12 @@ public class CategoryApiControllerIntTest {
     @Test
     public void testGetProjectCategories() {
         try {
-            when(projectCategoryFacade.getProjectCategories())
+            when(projectCategoryFacade.getProjectCategories(anyLong()))
                 .thenReturn(List.of(new Category(1, "name")));
 
             this.webTestClient
                 .get()
-                .uri("/internal/projects/categories")
+                .uri("/internal/workspaces/1/project-categories")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()

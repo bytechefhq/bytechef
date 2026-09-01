@@ -24,6 +24,7 @@ import com.bytechef.platform.category.service.CategoryService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +46,9 @@ public class ProjectCategoryFacadeImpl implements ProjectCategoryFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Category> getProjectCategories() {
-        List<Project> projects = projectService.getProjects();
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
+    public List<Category> getProjectCategories(long workspaceId) {
+        List<Project> projects = projectService.getProjects(projectService.getWorkspaceProjectIds(workspaceId));
 
         return categoryService.getCategories(
             CollectionUtils.filter(CollectionUtils.map(projects, Project::getCategoryId), Objects::nonNull));

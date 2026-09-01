@@ -465,13 +465,21 @@ paths:
               schema:
                 type: integer
                 format: int64
-  /projects/categories:
+  /workspaces/{id}/project-categories:
     get:
-      description: "Get categories."
-      summary: "Get categories"
+      description: "Get project categories for a workspace."
+      summary: "Get project categories"
       tags:
       - "category"
       operationId: "getProjectCategories"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of categories."
