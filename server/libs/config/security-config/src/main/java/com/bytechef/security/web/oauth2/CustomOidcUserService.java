@@ -16,7 +16,6 @@
 
 package com.bytechef.security.web.oauth2;
 
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.domain.User;
@@ -38,8 +37,12 @@ import org.springframework.stereotype.Service;
 
 /**
  * Custom OIDC user service that integrates OIDC provider users (Okta, Azure AD, Google Workspace) with the internal
- * ByteChef user model. Extracts standardized OIDC claims (email, given_name, family_name, picture, sub) and
- * finds/creates the corresponding internal user.
+ * ByteChef user model. Extracts standardized OIDC claims (email, given_name, family_name, picture, sub) and resolves
+ * the corresponding internal user.
+ *
+ * <p>
+ * An {@code sso-} registration is provisioned as its {@code IdentityProvider} record says. Every other registration is
+ * plain social login, which signs an invited user in rather than provisioning a new one.
  *
  * @author Ivica Cardic
  */
@@ -85,22 +88,24 @@ public class CustomOidcUserService extends OidcUserService {
 
         String registrationId = clientRegistration.getRegistrationId();
 
-        String authProvider = registrationId.startsWith(SSO_PREFIX) ? "SSO" : registrationId.toUpperCase();
+        boolean ssoRegistration = registrationId.startsWith(SSO_PREFIX);
 
-        boolean autoProvision = true;
-        String defaultAuthority = AuthorityConstants.ADMIN;
+        String authProvider = ssoRegistration ? "SSO" : registrationId.toUpperCase();
 
-        if (registrationId.startsWith(SSO_PREFIX) && identityProviderService != null) {
+        User user;
+
+        if (ssoRegistration && identityProviderService != null) {
             long identityProviderId = Long.parseLong(registrationId.substring(SSO_PREFIX.length()));
 
             IdentityProvider identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
 
-            autoProvision = identityProvider.isAutoProvision();
-            defaultAuthority = identityProvider.getDefaultAuthority();
+            user = SocialUserResolver.resolveUser(
+                userService, email, firstName, lastName, imageUrl, authProvider, providerId,
+                identityProvider.isAutoProvision(), identityProvider.getDefaultAuthority());
+        } else {
+            user = SocialUserResolver.resolveInvitedUser(
+                userService, email, firstName, lastName, imageUrl, authProvider, providerId);
         }
-
-        User user = userService.findOrCreateSocialUser(
-            email, firstName, lastName, imageUrl, authProvider, providerId, autoProvision, defaultAuthority);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()
