@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -77,9 +78,15 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
             defaultAuthority = identityProvider.getDefaultAuthority();
         }
 
-        userService.findOrCreateSocialUser(
-            email, firstName, lastName, null, UserConstants.AUTH_PROVIDER_SAML, principal.getName(), autoProvision,
-            defaultAuthority);
+        try {
+            userService.findOrCreateSocialUser(
+                email, firstName, lastName, null, UserConstants.AUTH_PROVIDER_SAML, principal.getName(), autoProvision,
+                defaultAuthority);
+        } catch (IllegalStateException illegalStateException) {
+            rejectUnprovisionedLogin(request, response);
+
+            return;
+        }
 
         List<String> tenantIds = tenantService.getTenantIdsByUserEmail(email);
 
@@ -90,6 +97,22 @@ public class SsoSaml2AuthenticationSuccessHandler implements AuthenticationSucce
         rememberMeServices.loginSuccess(request, response, authentication);
 
         response.sendRedirect("/oauth2/redirect");
+    }
+
+    private void rejectUnprovisionedLogin(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+
+        rememberMeServices.loginFail(request, response);
+
+        SecurityContextHolder.clearContext();
+
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        response.sendRedirect("/login?error=saml");
     }
 
     private String extractEmail(Saml2AuthenticatedPrincipal principal) {
