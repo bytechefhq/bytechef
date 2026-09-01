@@ -20,7 +20,7 @@ const isConfigured = (aiProvider: AiProvider) => isOllamaProvider(aiProvider) ||
 
 const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; environment: number}) => {
     const [enabledItems, setEnabledItems] = useState<{[key: number]: boolean}>({});
-    const [openItem, setOpenItem] = useState<string>();
+    const [openItem, setOpenItem] = useState('');
     const [showForm, setShowForm] = useState<{[key: number]: boolean}>({});
 
     const queryClient = useQueryClient();
@@ -42,7 +42,7 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
             [aiProvider.id!]: value,
         }));
 
-        setOpenItem(undefined);
+        setOpenItem('');
 
         const configured = isConfigured(aiProvider);
 
