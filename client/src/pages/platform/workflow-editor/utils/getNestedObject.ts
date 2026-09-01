@@ -1,3 +1,5 @@
+const ARRAY_ACCESS_PATTERN = /^(.*?)\[(index|\d+)\]$/;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getNestedObject = (jsonObject: any, selector: string) => {
     const selectors = selector.split('.');
@@ -11,17 +13,17 @@ const getNestedObject = (jsonObject: any, selector: string) => {
             let finalKey: string | undefined = key;
             let index = -1;
 
-            if (finalKey === '[index]') {
-                index = 0;
+            const arrayAccessMatch = key.match(ARRAY_ACCESS_PATTERN);
 
-                finalKey = undefined;
-            } else if (finalKey.endsWith('[index]')) {
-                index = 0;
+            if (arrayAccessMatch) {
+                const [, propertyName, arrayIndex] = arrayAccessMatch;
 
-                finalKey = finalKey.substring(0, finalKey.length - '[index]'.length);
+                index = arrayIndex === 'index' ? 0 : Number(arrayIndex);
+
+                finalKey = propertyName || undefined;
             }
 
-            if (Array.isArray(object)) {
+            if (Array.isArray(object) && index === -1) {
                 index = 0;
             }
 
@@ -34,8 +36,7 @@ const getNestedObject = (jsonObject: any, selector: string) => {
             } else {
                 return finalKey ? object[finalKey] : undefined;
             }
-            /* eslint-disable @typescript-eslint/no-unused-vars */
-        } catch (error) {
+        } catch {
             return undefined;
         }
     }, jsonObject);

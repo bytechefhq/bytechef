@@ -19,11 +19,11 @@ describe('datapillReferenceValidation', () => {
             expect(set.has('gmail.subject')).toBe(true);
         });
 
-        it('adds [0] variant when value contains [index]', () => {
-            const set = buildValidDataPillReferenceSet([pill('airtable.rows[index].id')]);
+        it('adds the [index] template when a value carries a numeric index', () => {
+            const set = buildValidDataPillReferenceSet([pill('airtable.rows[0].id')]);
 
-            expect(set.has('airtable.rows[index].id')).toBe(true);
             expect(set.has('airtable.rows[0].id')).toBe(true);
+            expect(set.has('airtable.rows[index].id')).toBe(true);
         });
     });
 
@@ -54,16 +54,30 @@ describe('datapillReferenceValidation', () => {
             expect(isDataPillReferenceValid('accelo.field', set)).toBe(false);
         });
 
-        it('accepts [0] mention id when catalog uses [index]', () => {
+        it('accepts any numeric index when catalog uses [index]', () => {
             const set = buildValidDataPillReferenceSet([pill('airtable.rows[index].id')]);
 
             expect(isDataPillReferenceValid('airtable.rows[0].id', set)).toBe(true);
+            expect(isDataPillReferenceValid('airtable.rows[7].id', set)).toBe(true);
+            expect(isDataPillReferenceValid('airtable.rows[12].id', set)).toBe(true);
         });
 
-        it('accepts [index] mention id when catalog includes [0] variant in set', () => {
+        it('accepts [index] mention id when catalog uses [index]', () => {
             const set = buildValidDataPillReferenceSet([pill('airtable.rows[index].id')]);
 
             expect(isDataPillReferenceValid('airtable.rows[index].id', set)).toBe(true);
+        });
+
+        it('accepts every array index of a nested array reference', () => {
+            const set = buildValidDataPillReferenceSet([pill('airtable.rows[index].cells[index].value')]);
+
+            expect(isDataPillReferenceValid('airtable.rows[2].cells[9].value', set)).toBe(true);
+        });
+
+        it('still rejects a reference whose path is not in the catalog', () => {
+            const set = buildValidDataPillReferenceSet([pill('airtable.rows[index].id')]);
+
+            expect(isDataPillReferenceValid('airtable.rows[2].missing', set)).toBe(false);
         });
     });
 });
