@@ -5,14 +5,20 @@
 @config '../../tailwind.config.js';
 
 /* tw-animate-css defaults animation-fill-mode to `none`, which makes Radix-driven
-   exit animations (dialogs, sheets, dropdowns, popovers, etc.) snap back to their
-   resting state for a frame before unmount, causing a visible flicker on close.
-   Match v3 tailwindcss-animate's behavior by forcing `forwards`. */
+   exit animations (dialogs, sheets, dropdowns, popovers, accordions, etc.) snap back
+   to their resting state for a frame before unmount, causing a visible flicker on
+   close. Match v3 tailwindcss-animate's behavior by forcing `forwards`. */
 @theme {
     --animate-in: enter var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease)
         var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal)
         forwards;
     --animate-out: exit var(--tw-animation-duration, var(--tw-duration, 0.15s)) var(--tw-ease, ease)
+        var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal)
+        forwards;
+    --animate-accordion-down: accordion-down var(--tw-animation-duration, var(--tw-duration, 0.2s))
+        var(--tw-ease, ease-out) var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1)
+        var(--tw-animation-direction, normal) forwards;
+    --animate-accordion-up: accordion-up var(--tw-animation-duration, var(--tw-duration, 0.2s)) var(--tw-ease, ease-out)
         var(--tw-animation-delay, 0s) var(--tw-animation-iteration-count, 1) var(--tw-animation-direction, normal)
         forwards;
 }
