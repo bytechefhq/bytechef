@@ -3,13 +3,14 @@ import {FilterXIcon} from 'lucide-react';
 
 interface EmptyFilterResultProps {
     entityName: string;
+    entityTitle: string;
 }
 
-const EmptyFilterResult = ({entityName}: EmptyFilterResultProps) => (
+const EmptyFilterResult = ({entityName, entityTitle}: EmptyFilterResultProps) => (
     <EmptyList
         icon={<FilterXIcon className="size-24 text-stroke-neutral-tertiary" />}
-        message={`No ${entityName} match the current filter. Clear it to see the rest.`}
-        title="No matches"
+        message={`No ${entityName} match the current filter.`}
+        title={`No Matching ${entityTitle}`}
     />
 );
 

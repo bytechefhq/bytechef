@@ -80,7 +80,7 @@ const McpServers = () => {
                 {filteredMcpServers.length > 0 ? (
                     <McpServerList mcpServers={filteredMcpServers as McpServer[]} tags={tags} />
                 ) : validMcpServers.length > 0 ? (
-                    <EmptyFilterResult entityName="MCP servers" />
+                    <EmptyFilterResult entityName="MCP servers" entityTitle="MCP Servers" />
                 ) : (
                     <EmptyList
                         button={
