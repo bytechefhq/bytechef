@@ -16,7 +16,6 @@
 
 package com.bytechef.security.web.oauth2;
 
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -92,8 +91,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Email not available from OAuth2 provider " + registrationId);
         }
 
-        User user = userService.findOrCreateSocialUser(
-            email, firstName, lastName, imageUrl, registrationId, providerId, true, AuthorityConstants.ADMIN);
+        User user = SocialUserResolver.resolveInvitedUser(
+            userService, email, firstName, lastName, imageUrl, registrationId, providerId);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()
