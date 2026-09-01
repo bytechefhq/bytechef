@@ -1,49 +1,33 @@
 import {DataPillType} from '@/shared/types';
 
+import {toArrayIndexTemplate} from './dataPillArrayIndex';
+
 export function buildValidDataPillReferenceSet(dataPills: Array<DataPillType>): Set<string> {
-    const set = new Set<string>();
+    const validReferences = new Set<string>();
 
     for (const dataPill of dataPills) {
         const value = dataPill.value;
 
-        set.add(value);
+        validReferences.add(value);
 
-        if (value.includes('[index]')) {
-            set.add(value.replaceAll('[index]', '[0]'));
-        }
+        const arrayIndexTemplate = toArrayIndexTemplate(value);
 
-        if (value.includes('[0]')) {
-            set.add(value.replaceAll('[0]', '[index]'));
-        }
+        validReferences.add(arrayIndexTemplate);
     }
 
-    return set;
+    return validReferences;
 }
 
-export function isDataPillReferenceValid(reference: string | null | undefined, validSet: Set<string>): boolean {
-    if (!reference || validSet.size === 0) {
+export function isDataPillReferenceValid(reference: string | null | undefined, validReferences: Set<string>): boolean {
+    if (!reference || validReferences.size === 0) {
         return true;
     }
 
-    if (validSet.has(reference)) {
+    if (validReferences.has(reference)) {
         return true;
     }
 
-    if (reference.includes('[index]')) {
-        const withZero = reference.replaceAll('[index]', '[0]');
+    const arrayIndexTemplate = toArrayIndexTemplate(reference);
 
-        if (validSet.has(withZero)) {
-            return true;
-        }
-    }
-
-    if (reference.includes('[0]')) {
-        const withIndex = reference.replaceAll('[0]', '[index]');
-
-        if (validSet.has(withIndex)) {
-            return true;
-        }
-    }
-
-    return false;
+    return validReferences.has(arrayIndexTemplate);
 }
