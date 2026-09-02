@@ -160,6 +160,60 @@ public class PolyglotSandboxTest {
         });
     }
 
+    @Test
+    public void testStrictModeDeniesHostClassLookup() {
+        assertThatThrownBy(
+            () -> PolyglotSandbox.call(
+                ScriptSandboxMode.STRICT, "js", context -> context.eval("js", "Java.type('java.lang.System')")))
+                    .isInstanceOf(PolyglotException.class);
+    }
+
+    @Test
+    public void testTrustedModeAllowsHostClassLookup() {
+        Value value = PolyglotSandbox.call(
+            ScriptSandboxMode.TRUSTED, "js", null,
+            context -> context.eval("js", "Java.type('java.lang.System').getProperty('java.version')"));
+
+        assertThat(value.asString()).isNotBlank();
+    }
+
+    @Test
+    public void testLegacyCallDefaultsToStrictMode() {
+        assertThatThrownBy(
+            () -> PolyglotSandbox.call("js", context -> context.eval("js", "Java.type('java.lang.System')")))
+                .isInstanceOf(PolyglotException.class);
+    }
+
+    @Test
+    public void testTrustedModeTimeoutCancelsRunawayScript() {
+        assertThatThrownBy(
+            () -> PolyglotSandbox.call(
+                ScriptSandboxMode.TRUSTED, "js", Duration.ofSeconds(2),
+                context -> context.eval("js", "while (true) {}")))
+                    .isInstanceOf(PolyglotException.class)
+                    .matches(throwable -> ((PolyglotException) throwable).isCancelled(), "isCancelled");
+    }
+
+    @Test
+    public void testTrustedModeIgnoresResourceCeilings() {
+        PolyglotSandbox.setSettings(
+            new PolyglotSandboxSettings(
+                true, Duration.ofSeconds(1), PolyglotSandboxSettings.DEFAULT_MAX_HEAP_MEMORY,
+                PolyglotSandboxSettings.DEFAULT_MAX_CONCURRENT_EXECUTIONS));
+
+        String loopScript = "let total = 0; for (let i = 0; i < 20000000; i++) { total += i; } total";
+
+        assertThatThrownBy(
+            () -> PolyglotSandbox.call(ScriptSandboxMode.STRICT, "js", context -> context.eval("js", loopScript)))
+                .isInstanceOf(PolyglotException.class)
+                .hasMessageContaining("CPU time limit");
+
+        Value value = PolyglotSandbox.call(
+            ScriptSandboxMode.TRUSTED, "js", null, context -> context.eval("js", loopScript));
+
+        assertThat(value.asDouble()).isEqualTo(199999990000000.0);
+    }
+
     private static <V> V onVirtualThread(Supplier<V> supplier) {
         AtomicReference<V> resultReference = new AtomicReference<>();
         AtomicReference<Throwable> throwableReference = new AtomicReference<>();
