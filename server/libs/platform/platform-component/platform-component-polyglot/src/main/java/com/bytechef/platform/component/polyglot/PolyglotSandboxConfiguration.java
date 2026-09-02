@@ -16,25 +16,32 @@
 
 package com.bytechef.platform.component.polyglot;
 
+import com.bytechef.config.ApplicationProperties;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.unit.DataSize;
 
 /**
  * @author Ivica Cardic
  */
 @Configuration
-@EnableConfigurationProperties(PolyglotSandboxProperties.class)
 public class PolyglotSandboxConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(PolyglotSandboxConfiguration.class);
 
     private final PolyglotSandboxSettings polyglotSandboxSettings;
 
-    public PolyglotSandboxConfiguration(PolyglotSandboxProperties polyglotSandboxProperties) {
-        this.polyglotSandboxSettings = polyglotSandboxProperties.toPolyglotSandboxSettings();
+    public PolyglotSandboxConfiguration(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Script.Sandbox sandbox = applicationProperties.getScript()
+            .getSandbox();
+
+        DataSize maxHeapMemory = sandbox.getMaxHeapMemory();
+
+        this.polyglotSandboxSettings = new PolyglotSandboxSettings(
+            sandbox.isEnabled(), sandbox.getMaxCpuTime(), maxHeapMemory == null ? null : maxHeapMemory.toBytes(),
+            sandbox.getMaxConcurrentExecutions());
     }
 
     @PostConstruct
