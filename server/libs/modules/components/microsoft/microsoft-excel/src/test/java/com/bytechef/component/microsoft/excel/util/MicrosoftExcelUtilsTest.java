@@ -371,6 +371,47 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
+    void testGetUsedRangeValues(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        mockedParameters = MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(VALUES, List.of(List.of("A", "B"), List.of("C", "D"))));
+
+        List<List<Object>> result = MicrosoftExcelUtils.getUsedRangeValues(mockedParameters, mockedContext);
+
+        assertEquals(List.of(List.of("A", "B"), List.of("C", "D")), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/me/drive/items/1/workbook/worksheets/test/usedRange", stringArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetUsedRangeValuesWithEmptySheet(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
+
+        mockedParameters = MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("rowCount", 0));
+
+        List<List<Object>> result = MicrosoftExcelUtils.getUsedRangeValues(mockedParameters, mockedContext);
+
+        assertEquals(List.of(), result);
+    }
+
+    @Test
     void testGetMapOfValuesForRowWhereFirstRowIsHeader() {
         mockedParameters = MockParametersFactory.create(Map.of(IS_THE_FIRST_ROW_HEADER, true));
         List<Object> row = Arrays.asList("value1", "value2", "value3");
