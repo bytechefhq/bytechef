@@ -24,6 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
@@ -53,6 +60,11 @@ public final class PolyglotSandbox {
 
     private static final Object GUEST_EXECUTOR_LOCK = new Object();
 
+    private static final ScheduledExecutorService WATCHDOG_SCHEDULER = newWatchdogScheduler();
+
+    private static final ExecutorService WATCHDOG_CLOSE_EXECUTOR = Executors.newCachedThreadPool(
+        newDaemonThreadFactory("polyglot-sandbox-watchdog-close"));
+
     private static volatile PolyglotSandboxSettings settings = PolyglotSandboxSettings.defaults();
 
     @Nullable
@@ -78,27 +90,57 @@ public final class PolyglotSandbox {
     }
 
     public static <V> V call(String languageId, Function<Context, V> guestFunction) {
+        return call(ScriptSandboxMode.STRICT, languageId, guestFunction);
+    }
+
+    public static <V> V call(ScriptSandboxMode mode, String languageId, Function<Context, V> guestFunction) {
+        return call(mode, languageId, null, guestFunction);
+    }
+
+    public static <V> V call(
+        ScriptSandboxMode mode, String languageId, @Nullable Duration timeout, Function<Context, V> guestFunction) {
+
         PolyglotSandboxSettings currentSettings = settings;
 
-        if (requiresGuestThread(currentSettings, languageId)) {
+        if (requiresGuestThread(currentSettings, mode, languageId)) {
             PolyglotGuestExecutor polyglotGuestExecutor = getGuestExecutor(currentSettings);
 
-            return polyglotGuestExecutor.call(() -> callInline(currentSettings, guestFunction, languageId));
+            return polyglotGuestExecutor.call(
+                () -> callInline(currentSettings, mode, timeout, guestFunction, languageId));
         }
 
-        return callInline(currentSettings, guestFunction, languageId);
+        return callInline(currentSettings, mode, timeout, guestFunction, languageId);
     }
 
     private static <V> V callInline(
-        PolyglotSandboxSettings currentSettings, Function<Context, V> guestFunction, String... permittedLanguages) {
+        PolyglotSandboxSettings currentSettings, ScriptSandboxMode mode, @Nullable Duration timeout,
+        Function<Context, V> guestFunction, String... permittedLanguages) {
 
-        try (Context context = newContext(currentSettings, permittedLanguages)) {
-            return guestFunction.apply(context);
+        try (Context context = newContext(currentSettings, mode, permittedLanguages)) {
+            if (timeout == null) {
+                return guestFunction.apply(context);
+            }
+
+            ScheduledFuture<?> watchdogFuture = WATCHDOG_SCHEDULER.schedule(
+                () -> WATCHDOG_CLOSE_EXECUTOR.execute(() -> context.close(true)), timeout.toMillis(),
+                TimeUnit.MILLISECONDS);
+
+            try {
+                return guestFunction.apply(context);
+            } finally {
+                watchdogFuture.cancel(false);
+            }
         }
     }
 
-    private static Context newContext(PolyglotSandboxSettings currentSettings, String... permittedLanguages) {
-        boolean constrained = isConstrained(currentSettings, permittedLanguages);
+    private static Context newContext(
+        PolyglotSandboxSettings currentSettings, ScriptSandboxMode mode, String... permittedLanguages) {
+
+        if (mode == ScriptSandboxMode.TRUSTED) {
+            return newTrustedContext(permittedLanguages);
+        }
+
+        boolean constrained = isConstrained(currentSettings, mode, permittedLanguages);
 
         Context.Builder builder = Context.newBuilder(permittedLanguages)
             .engine(getEngine(constrained, permittedLanguages))
@@ -117,6 +159,13 @@ public final class PolyglotSandbox {
         }
 
         return builder.build();
+    }
+
+    private static Context newTrustedContext(String... permittedLanguages) {
+        return Context.newBuilder(permittedLanguages)
+            .engine(getEngine(false, permittedLanguages))
+            .allowAllAccess(true)
+            .build();
     }
 
     private static void applySandboxPolicy(Context.Builder builder, PolyglotSandboxSettings currentSettings) {
@@ -139,7 +188,7 @@ public final class PolyglotSandbox {
     }
 
     private static boolean requiresGuestThread(
-        PolyglotSandboxSettings currentSettings, String... permittedLanguages) {
+        PolyglotSandboxSettings currentSettings, ScriptSandboxMode mode, String... permittedLanguages) {
 
         Thread currentThread = Thread.currentThread();
 
@@ -147,7 +196,7 @@ public final class PolyglotSandbox {
             return false;
         }
 
-        return isConstrained(currentSettings, permittedLanguages) && isThreadMetered(currentSettings);
+        return isConstrained(currentSettings, mode, permittedLanguages) && isThreadMetered(currentSettings);
     }
 
     private static boolean isThreadMetered(PolyglotSandboxSettings currentSettings) {
@@ -174,7 +223,13 @@ public final class PolyglotSandbox {
         }
     }
 
-    private static boolean isConstrained(PolyglotSandboxSettings currentSettings, String... permittedLanguages) {
+    private static boolean isConstrained(
+        PolyglotSandboxSettings currentSettings, ScriptSandboxMode mode, String... permittedLanguages) {
+
+        if (mode == ScriptSandboxMode.TRUSTED) {
+            return false;
+        }
+
         if (!currentSettings.enabled() || permittedLanguages.length == 0) {
             return false;
         }
@@ -222,6 +277,25 @@ public final class PolyglotSandbox {
                 log.info("[guest] {}", line);
             }
         });
+    }
+
+    private static ScheduledThreadPoolExecutor newWatchdogScheduler() {
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(
+            1, newDaemonThreadFactory("polyglot-sandbox-watchdog"));
+
+        scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
+
+        return scheduledThreadPoolExecutor;
+    }
+
+    private static ThreadFactory newDaemonThreadFactory(String threadName) {
+        return runnable -> {
+            Thread thread = new Thread(runnable, threadName);
+
+            thread.setDaemon(true);
+
+            return thread;
+        };
     }
 
 }
