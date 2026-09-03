@@ -288,3 +288,21 @@ describe('WorkflowNode', () => {
         expect(screen.queryByText('FALSE')).not.toBeInTheDocument();
     });
 });
+
+describe('WorkflowNode reset position action', () => {
+    it('offers the reset position action on a box-mode cluster root that carries a saved position', () => {
+        renderNode(
+            {
+                clusterFrame: {contentOrigin: {x: 0, y: 0}, height: 300, width: 600},
+                clusterRoot: true,
+                componentName: 'aiAgent',
+                metadata: {ui: {nodePosition: {x: 10, y: 20}}},
+                name: 'aiAgent_1',
+                workflowNodeName: 'aiAgent_1',
+            } as unknown as NodeDataType,
+            'aiAgent_1'
+        );
+
+        expect(recordedContextMenuProps.value?.hasSavedPosition).toBe(true);
+    });
+});
