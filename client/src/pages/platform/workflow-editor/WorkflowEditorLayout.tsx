@@ -291,14 +291,15 @@ const WorkflowEditorLayout = ({
                 <Suspense fallback={null}>
                     <div
                         className={twMerge(
-                            'absolute inset-y-4 top-2 bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background',
+                            'absolute inset-y-4 top-2 bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-surface-main',
                             copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
                         )}
                     >
                         <AiAgentTestingPanel
-                            contentClassName="mx-4 mb-4 rounded-lg"
+                            contentClassName="rounded-none bg-transparent"
                             headerClassName="p-4"
                             onClose={handleClosePlayground}
+                            skipIntro
                         />
                     </div>
                 </Suspense>
