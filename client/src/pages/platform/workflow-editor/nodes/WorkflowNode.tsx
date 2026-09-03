@@ -458,7 +458,6 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             type="source"
                         />
                     )}
-
                 </>
             )}
 
@@ -554,7 +553,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const effectiveDirection: EffectiveDirectionType = isClusterCanvasNode ? 'TB' : layoutDirection;
     const parentClusterRootId = data.parentClusterRootId;
     const hasSavedClusterElementPosition = data.metadata?.ui?.nodePosition;
-    const hasSavedNodePosition = isRegularNode && !data.trigger && data.metadata?.ui?.nodePosition;
+    const hasSavedNodePosition =
+        (isRegularNode || !!data.clusterFrame) && !data.trigger && data.metadata?.ui?.nodePosition;
     const isTriggerDropzone = isRegularNode && !!data.trigger;
 
     const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
