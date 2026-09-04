@@ -40,7 +40,7 @@ public class LoggerDebugAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.debug(String.valueOf(text)));
+        context.log(log -> log.debug(text == null ? "" : String.valueOf(text)));
 
         return null;
     }
