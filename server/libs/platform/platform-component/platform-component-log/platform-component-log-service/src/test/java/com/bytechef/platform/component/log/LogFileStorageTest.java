@@ -203,6 +203,60 @@ class LogFileStorageTest {
         assertFalse(logFileStorage.logsExist(JOB_ID));
     }
 
+    @Test
+    void testAReadWaitsForThePendingWriteOfItsJob() {
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(false);
+        when(fileStorageService.getFileEntries(JOB_DIR + "/")).thenReturn(Set.of());
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(false);
+
+        logFileStorage.storeLogEntries(JOB_ID, 10L, List.of(logEntry(10L, "pending")));
+
+        logFileStorage.logsExist(JOB_ID);
+
+        verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("10.jsonl"), any(byte[].class), eq(false));
+    }
+
+    @Test
+    void testReadLogEntriesKeepsOnlyTheTaskExecutionsEntriesFromTheLegacyJobFile() {
+        FileEntry legacyFile = new FileEntry(LEGACY_FILENAME, "file://test/1.jsonl");
+        String legacyContent = jsonLine(logEntry(10L, "mine")) + jsonLine(logEntry(20L, "someone else's")) +
+            jsonLine(logEntry(10L, "mine too"));
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(false);
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(true);
+        when(fileStorageService.getFileEntry(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(legacyFile);
+        when(fileStorageService.readFileToBytes(LEGACY_DIR, legacyFile))
+            .thenReturn(legacyContent.getBytes(StandardCharsets.UTF_8));
+
+        List<LogEntry> logEntries = logFileStorage.readLogEntries(JOB_ID, 10L);
+
+        assertEquals(List.of("mine", "mine too"), messagesOf(logEntries));
+    }
+
+    @Test
+    void testLogsExistWhenOnlyTheLegacyJobFileIsPresent() {
+        when(fileStorageService.getFileEntries(JOB_DIR + "/")).thenReturn(Set.of());
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(true);
+
+        assertTrue(logFileStorage.logsExist(JOB_ID));
+    }
+
+    @Test
+    void testAnUnreadableLineIsSkippedWithoutHidingTheRest() {
+        FileEntry taskFile = new FileEntry("10.jsonl", "file://test/1/10.jsonl");
+        String content = jsonLine(logEntry(10L, "before")) + "{not json\n" + jsonLine(logEntry(10L, "after"));
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(true);
+        when(fileStorageService.getFileEntry(JOB_DIR, "10.jsonl")).thenReturn(taskFile);
+        when(fileStorageService.readFileToBytes(JOB_DIR, taskFile))
+            .thenReturn(content.getBytes(StandardCharsets.UTF_8));
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(false);
+
+        List<LogEntry> logEntries = logFileStorage.readLogEntries(JOB_ID, 10L);
+
+        assertEquals(List.of("before", "after"), messagesOf(logEntries));
+    }
+
     private static String jsonLine(LogEntry logEntry) {
         return JsonUtils.write(logEntry) + "\n";
     }

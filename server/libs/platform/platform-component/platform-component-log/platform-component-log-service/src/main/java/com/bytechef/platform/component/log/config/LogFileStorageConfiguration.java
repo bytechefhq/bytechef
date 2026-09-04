@@ -19,6 +19,9 @@ package com.bytechef.platform.component.log.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
+import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.platform.component.log.EditorLogFileStorage;
+import com.bytechef.platform.component.log.EditorLogFileStorageImpl;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
 import org.springframework.context.annotation.Bean;
@@ -31,12 +34,25 @@ import org.springframework.context.annotation.Configuration;
 class LogFileStorageConfiguration {
 
     @Bean
+    EditorLogFileStorage editorLogFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
+        return new EditorLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
+    }
+
+    @Bean
     LogFileStorage logFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
+        return new LogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
+    }
+
+    private static FileStorageService getFileStorageService(
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
         Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
-        return new LogFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
+        return fileStorageServiceRegistry.getFileStorageService(provider.name());
     }
 }

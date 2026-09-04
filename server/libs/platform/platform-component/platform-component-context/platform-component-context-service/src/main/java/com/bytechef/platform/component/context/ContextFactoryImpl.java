@@ -25,6 +25,7 @@ import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
+import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.constant.PlatformType;
@@ -47,7 +48,7 @@ public class ContextFactoryImpl implements ContextFactory {
     private final ApplicationContext applicationContext;
     private final CacheManager cacheManager;
     private final DataStorage dataStorage;
-    private final EditorLogFileStorageWriter editorLogFileStorageWriter;
+    private final EditorLogFileStorage editorLogFileStorage;
     private final EditorTempFileStorage editorTempFileStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final LogFileStorage logFileStorage;
@@ -58,7 +59,7 @@ public class ContextFactoryImpl implements ContextFactory {
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, ApplicationEventPublisher eventPublisher,
         FileStorageServiceRegistry fileStorageServiceRegistry, LogFileStorage logFileStorage,
         TempFileStorage tempFileStorage, Tracer tracer) {
 
@@ -71,7 +72,7 @@ public class ContextFactoryImpl implements ContextFactory {
                 .getProvider()
                 .name());
 
-        this.editorLogFileStorageWriter = new EditorLogFileStorageWriter(fileStorageService);
+        this.editorLogFileStorage = editorLogFileStorage;
         this.editorTempFileStorage = new EditorTempFileStorage(fileStorageService);
         this.eventPublisher = eventPublisher;
         this.logFileStorage = logFileStorage;
@@ -170,7 +171,7 @@ public class ContextFactoryImpl implements ContextFactory {
 
     private LogFileStorageWriter getLogFileStorageWriter(boolean editorEnvironment) {
         if (editorEnvironment) {
-            return editorLogFileStorageWriter;
+            return editorLogFileStorage;
         }
 
         return logFileStorage;
