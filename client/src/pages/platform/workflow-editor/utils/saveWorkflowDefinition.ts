@@ -20,6 +20,7 @@ interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
     nodeData?: NodeDataType;
     nodeIndex?: number;
+    onError?: () => void;
     onSuccess?: () => void;
     placeholderId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
@@ -32,6 +33,7 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
         decorative,
         nodeData,
         nodeIndex,
+        onError,
         onSuccess,
         placeholderId,
         taskDispatcherContext,
@@ -100,6 +102,7 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: [newTrigger]},
+            onError,
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();
@@ -284,6 +287,7 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
         newTask: existingWorkflowTask ? undefined : newTask,
+        onError,
         onSuccess,
         updateWorkflowMutation,
         workflow,
@@ -297,6 +301,7 @@ interface ExecuteWorkflowMutationProps {
         triggers?: Array<WorkflowTrigger>;
     };
     newTask?: WorkflowTask;
+    onError?: () => void;
     onSuccess?: () => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
@@ -306,6 +311,7 @@ interface ExecuteWorkflowMutationProps {
 function executeWorkflowMutation({
     definitionUpdate,
     newTask,
+    onError,
     onSuccess,
     updateWorkflowMutation,
     workflow,
@@ -365,6 +371,10 @@ function executeWorkflowMutation({
                 console.error('Failed to save workflow definition:', error);
 
                 setWorkflowWithoutHistory(previousWorkflow);
+
+                if (onError) {
+                    onError();
+                }
             },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
