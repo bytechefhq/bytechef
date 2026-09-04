@@ -49,8 +49,12 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
-    public void storeLogEntry(long jobId, long taskExecutionId, LogEntry logEntry) {
-        appendLogEntry(jobId, logEntry);
+    public void storeLogEntries(long jobId, long taskExecutionId, List<LogEntry> logEntries) {
+        if (logEntries.isEmpty()) {
+            return;
+        }
+
+        appendLogEntries(jobId, logEntries);
     }
 
     @Override
@@ -94,27 +98,35 @@ public class LogFileStorageImpl implements LogFileStorage {
         }
     }
 
-    private synchronized void appendLogEntry(long jobId, LogEntry logEntry) {
+    private synchronized void appendLogEntries(long jobId, List<LogEntry> logEntries) {
         try {
             String filename = jobId + ".jsonl";
-            byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
+            StringBuilder logLinesBuilder = new StringBuilder();
+
+            for (LogEntry logEntry : logEntries) {
+                logLinesBuilder.append(JsonUtils.write(logEntry))
+                    .append('\n');
+            }
+
+            byte[] logLinesBytes = logLinesBuilder.toString()
+                .getBytes(StandardCharsets.UTF_8);
 
             if (fileStorageService.fileExists(LOG_FILES_DIR, filename)) {
                 FileEntry fileEntry = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
 
                 byte[] existingContent = fileStorageService.readFileToBytes(LOG_FILES_DIR, fileEntry);
 
-                byte[] newContent = new byte[existingContent.length + logLineBytes.length];
+                byte[] newContent = new byte[existingContent.length + logLinesBytes.length];
 
                 System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
-                System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
+                System.arraycopy(logLinesBytes, 0, newContent, existingContent.length, logLinesBytes.length);
 
                 fileStorageService.storeFileContent(LOG_FILES_DIR, filename, newContent, false);
             } else {
-                fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLineBytes, false);
+                fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLinesBytes, false);
             }
         } catch (Exception exception) {
-            log.error("Failed to append log entry for job {}", jobId, exception);
+            log.error("Failed to append {} log entries for job {}", logEntries.size(), jobId, exception);
         }
     }
 
