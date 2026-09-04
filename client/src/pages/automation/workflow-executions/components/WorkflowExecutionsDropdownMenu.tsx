@@ -30,7 +30,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
         const id = execution.id;
 
         if (id != null) {
-            setWorkflowExecutionId(id);
+            setWorkflowExecutionId(id, execution.job ? 'JOB' : 'TRIGGER_EXECUTION');
             setWorkflowExecutionSheetOpen(true);
         }
     };

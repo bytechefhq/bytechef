@@ -23,7 +23,7 @@ interface WorkflowExecutionsTabsPanelProps {
     activeTab: TabValueType;
     dialogOpen: boolean;
     isEditorEnvironment?: boolean;
-    job: Job;
+    job?: Job;
     onEditSubflowClick?: (workflowUuid: string) => void;
     onSeeExecutionsClick?: (job: Job) => void;
     selectedItem: TriggerExecution | TaskExecution | undefined;
@@ -215,7 +215,7 @@ const WorkflowExecutionsTabsPanel = ({
                                         error={activeTab === 'error' ? selectedItem?.error : undefined}
                                         input={activeTab === 'input' ? selectedItem?.input : undefined}
                                         jobInputs={
-                                            activeTab === 'output' && isTriggerExecution ? job.inputs : undefined
+                                            activeTab === 'output' && isTriggerExecution ? job?.inputs : undefined
                                         }
                                         output={
                                             activeTab === 'output' && !isTriggerExecution
@@ -262,7 +262,7 @@ const WorkflowExecutionsTabsPanel = ({
                             </div>
                         ) : resolvedOutput !== undefined ? (
                             <WorkflowExecutionContent
-                                jobInputs={isTriggerExecution ? job.inputs : undefined}
+                                jobInputs={isTriggerExecution ? job?.inputs : undefined}
                                 output={isTriggerExecution ? undefined : resolvedOutput}
                                 workflowTriggerName={
                                     isTriggerExecution ? triggerExecution?.workflowTrigger?.name : undefined
@@ -280,10 +280,10 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsContent>
 
                     <TabsContent className="h-full p-3" value="logs">
-                        {job.id && (
+                        {(job?.id || triggerExecution?.id) && (
                             <WorkflowExecutionLogsContent
                                 isEditorEnvironment={isEditorEnvironment}
-                                jobId={job.id}
+                                jobId={job?.id}
                                 taskExecutionId={
                                     selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
                                 }

@@ -2,8 +2,11 @@ import Badge from '@/components/Badge/Badge';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
 import {
+    type EditorJobFileLogsQuery,
+    type JobFileLogsQuery,
     LogEntry,
     LogLevel,
+    type TriggerExecutionFileLogsQuery,
     useEditorJobFileLogsQuery,
     useJobFileLogsQuery,
     useTriggerExecutionFileLogsQuery,
@@ -14,10 +17,67 @@ import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
-    jobId: string;
+    jobId?: string;
     taskExecutionId?: string;
     triggerExecutionId?: string;
 }
+
+type LogsPageType = JobFileLogsQuery['jobFileLogs'];
+
+interface LogsQueryResultI<TData> {
+    data?: TData;
+    error: unknown;
+    isLoading: boolean;
+}
+
+interface SelectedLogsQueryI {
+    error: unknown;
+    isLoading: boolean;
+    logsData?: LogsPageType;
+}
+
+interface SelectLogsQueryProps {
+    editorQuery: LogsQueryResultI<EditorJobFileLogsQuery>;
+    isEditorEnvironment?: boolean;
+    isTriggerLogs: boolean;
+    productionQuery: LogsQueryResultI<JobFileLogsQuery>;
+    triggerQuery: LogsQueryResultI<TriggerExecutionFileLogsQuery>;
+}
+
+/**
+ * A row's logs come from exactly one of the three stores, so the active query decides the loading, error and content
+ * of the panel together. Reading them from separate conditionals would let the panel show one query's spinner beside
+ * another's entries.
+ */
+const selectLogsQuery = ({
+    editorQuery,
+    isEditorEnvironment,
+    isTriggerLogs,
+    productionQuery,
+    triggerQuery,
+}: SelectLogsQueryProps): SelectedLogsQueryI => {
+    if (isEditorEnvironment) {
+        return {
+            error: editorQuery.error,
+            isLoading: editorQuery.isLoading,
+            logsData: editorQuery.data?.editorJobFileLogs,
+        };
+    }
+
+    if (isTriggerLogs) {
+        return {
+            error: triggerQuery.error,
+            isLoading: triggerQuery.isLoading,
+            logsData: triggerQuery.data?.triggerExecutionFileLogs,
+        };
+    }
+
+    return {
+        error: productionQuery.error,
+        isLoading: productionQuery.isLoading,
+        logsData: productionQuery.data?.jobFileLogs,
+    };
+};
 
 const LOG_LEVEL_BADGE_CONFIG = {
     [LogLevel.Trace]: {
@@ -156,28 +216,21 @@ const WorkflowExecutionLogsContent = ({
     const [size] = useState(100);
 
     const isTriggerLogs = !isEditorEnvironment && !!triggerExecutionId;
+    const jobLogsFilter = taskExecutionId ? {taskExecutionId} : null;
 
-    const {
-        data: productionLogsData,
-        error: productionError,
-        isLoading: isProductionLoading,
-    } = useJobFileLogsQuery(
+    const productionQuery = useJobFileLogsQuery(
         {
-            filter: taskExecutionId ? {taskExecutionId} : null,
-            jobId,
+            filter: jobLogsFilter,
+            jobId: jobId || '',
             page,
             size,
         },
         {
-            enabled: !isEditorEnvironment && !isTriggerLogs,
+            enabled: !isEditorEnvironment && !isTriggerLogs && !!jobId,
         }
     );
 
-    const {
-        data: triggerLogsData,
-        error: triggerError,
-        isLoading: isTriggerLoading,
-    } = useTriggerExecutionFileLogsQuery(
+    const triggerQuery = useTriggerExecutionFileLogsQuery(
         {
             filter: null,
             page,
@@ -189,29 +242,25 @@ const WorkflowExecutionLogsContent = ({
         }
     );
 
-    const {
-        data: editorLogsData,
-        error: editorError,
-        isLoading: isEditorLoading,
-    } = useEditorJobFileLogsQuery(
+    const editorQuery = useEditorJobFileLogsQuery(
         {
-            filter: taskExecutionId ? {taskExecutionId} : null,
-            jobId,
+            filter: jobLogsFilter,
+            jobId: jobId || '',
             page,
             size,
         },
         {
-            enabled: isEditorEnvironment === true,
+            enabled: isEditorEnvironment === true && !!jobId,
         }
     );
 
-    const isLoading = isEditorEnvironment ? isEditorLoading : isTriggerLogs ? isTriggerLoading : isProductionLoading;
-    const error = isEditorEnvironment ? editorError : isTriggerLogs ? triggerError : productionError;
-    const logsData = isEditorEnvironment
-        ? editorLogsData?.editorJobFileLogs
-        : isTriggerLogs
-          ? triggerLogsData?.triggerExecutionFileLogs
-          : productionLogsData?.jobFileLogs;
+    const {error, isLoading, logsData} = selectLogsQuery({
+        editorQuery,
+        isEditorEnvironment,
+        isTriggerLogs,
+        productionQuery,
+        triggerQuery,
+    });
 
     const logs = useMemo(() => logsData?.content || [], [logsData]);
 

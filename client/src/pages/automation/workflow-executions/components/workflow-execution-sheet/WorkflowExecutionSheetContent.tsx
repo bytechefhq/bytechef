@@ -25,7 +25,7 @@ interface WorkflowExecutionSheetContentProps {
     handleSeeExecutions: (childJob: Job) => void;
     handleTaskClick: (taskExecution: TaskExecution | TriggerExecution) => void;
     isTriggerExecution: boolean;
-    job: Job;
+    job?: Job;
     jobFailedWithNoExecutions: boolean;
     jobFailureError: ExecutionError;
     rootJob?: Job;

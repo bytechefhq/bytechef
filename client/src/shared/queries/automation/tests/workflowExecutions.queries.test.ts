@@ -1,6 +1,28 @@
-import {describe, expect, it} from 'vitest';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {renderHook, waitFor} from '@testing-library/react';
+import {type ReactNode, createElement} from 'react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {WorkflowExecutionKeys} from '../workflowExecutions.queries';
+import {WorkflowExecutionKeys, useGetProjectWorkflowExecutionQuery} from '../workflowExecutions.queries';
+
+const {getTriggerExecutionWorkflowExecutionMock, getWorkflowExecutionMock} = vi.hoisted(() => ({
+    getTriggerExecutionWorkflowExecutionMock: vi.fn(),
+    getWorkflowExecutionMock: vi.fn(),
+}));
+
+vi.mock('@/shared/middleware/automation/workflow/execution', () => ({
+    WorkflowExecutionApi: class {
+        getTriggerExecutionWorkflowExecution = getTriggerExecutionWorkflowExecutionMock;
+        getWorkflowExecution = getWorkflowExecutionMock;
+    },
+}));
+
+const wrapper = ({children}: {children: ReactNode}) =>
+    createElement(
+        QueryClientProvider,
+        {client: new QueryClient({defaultOptions: {queries: {retry: false}}})},
+        children
+    );
 
 describe('workflowExecutions.queries', () => {
     describe('WorkflowExecutionKeys', () => {
@@ -25,6 +47,13 @@ describe('workflowExecutions.queries', () => {
             const result = WorkflowExecutionKeys.filteredWorkflowExecutions(request);
 
             expect(result).toEqual(['automation_workflowExecutions', request]);
+        });
+
+        it('keeps a trigger-only execution apart from the job with the same id', () => {
+            const triggerKey = WorkflowExecutionKeys.workflowExecution(123, 'TRIGGER_EXECUTION');
+
+            expect(triggerKey).toEqual(['automation_workflowExecutions', 'TRIGGER_EXECUTION', 123]);
+            expect(triggerKey).not.toEqual(WorkflowExecutionKeys.workflowExecution(123));
         });
 
         it('generates unique keys for different workflow execution ids', () => {
@@ -56,6 +85,36 @@ describe('workflowExecutions.queries', () => {
             const filteredKey = WorkflowExecutionKeys.filteredWorkflowExecutions({id: 1, pageNumber: 0});
 
             expect(filteredKey[0]).toBe(WorkflowExecutionKeys.workflowExecutions[0]);
+        });
+    });
+
+    describe('useGetProjectWorkflowExecutionQuery', () => {
+        beforeEach(() => {
+            getTriggerExecutionWorkflowExecutionMock.mockReset();
+            getWorkflowExecutionMock.mockReset();
+            getTriggerExecutionWorkflowExecutionMock.mockResolvedValue({id: 77});
+            getWorkflowExecutionMock.mockResolvedValue({id: 5});
+        });
+
+        it('asks the trigger execution endpoint for a trigger-only row', async () => {
+            const {result} = renderHook(
+                () => useGetProjectWorkflowExecutionQuery({id: 77}, true, undefined, 'TRIGGER_EXECUTION'),
+                {wrapper}
+            );
+
+            await waitFor(() => expect(result.current.data).toEqual({id: 77}));
+
+            expect(getTriggerExecutionWorkflowExecutionMock).toHaveBeenCalledWith({triggerExecutionId: 77});
+            expect(getWorkflowExecutionMock).not.toHaveBeenCalled();
+        });
+
+        it('asks the job endpoint for a job-backed row', async () => {
+            const {result} = renderHook(() => useGetProjectWorkflowExecutionQuery({id: 5}, true), {wrapper});
+
+            await waitFor(() => expect(result.current.data).toEqual({id: 5}));
+
+            expect(getWorkflowExecutionMock).toHaveBeenCalledWith({id: 5});
+            expect(getTriggerExecutionWorkflowExecutionMock).not.toHaveBeenCalled();
         });
     });
 });
