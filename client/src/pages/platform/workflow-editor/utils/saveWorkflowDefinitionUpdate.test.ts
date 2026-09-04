@@ -169,4 +169,36 @@ describe('saveWorkflowDefinitionUpdate', () => {
         expect(onError).toHaveBeenCalledOnce();
         expect(mockWorkflowState.setWorkflow).not.toHaveBeenCalled();
     });
+
+    it('saves nothing before the store holds a workflow', () => {
+        mockWorkflowState = makeWorkflowState({tasks: []});
+        mockWorkflowState.workflow = {...mockWorkflowState.workflow, id: ''};
+
+        const mutation = makeMutation();
+
+        saveWorkflowDefinitionUpdate({
+            updateDefinition: (definition) => definition,
+            updateWorkflowMutation: mutation,
+        });
+
+        expect(mutation.mutate).not.toHaveBeenCalled();
+    });
+
+    it('saves nothing when the stored definition is not valid JSON', () => {
+        mockWorkflowState = makeWorkflowState({tasks: []});
+        mockWorkflowState.workflow = {...mockWorkflowState.workflow, definition: '{not json'};
+
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const mutation = makeMutation();
+
+        saveWorkflowDefinitionUpdate({
+            updateDefinition: (definition) => definition,
+            updateWorkflowMutation: mutation,
+        });
+
+        expect(mutation.mutate).not.toHaveBeenCalled();
+        expect(isWorkflowMutating('workflow-1')).toBe(false);
+
+        consoleError.mockRestore();
+    });
 });

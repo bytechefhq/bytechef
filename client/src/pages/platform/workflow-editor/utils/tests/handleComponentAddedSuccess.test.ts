@@ -163,6 +163,17 @@ describe('openNodeDetailsPanelForNewNode', () => {
             expect(state.currentNode).toBeUndefined();
         });
 
+        it('does nothing for a node that never got a name', () => {
+            openNodeDetailsPanelForNewNode(makeNodeData());
+
+            handleComponentAddedError({nodeData: makeNodeData({name: undefined})});
+
+            const state = useWorkflowNodeDetailsPanelStore.getState();
+
+            expect(state.pendingSaveNodeNames.has('slack_1')).toBe(true);
+            expect(state.workflowNodeDetailsPanelOpen).toBe(true);
+        });
+
         it('leaves the panel alone when it shows a different node', () => {
             openNodeDetailsPanelForNewNode(makeNodeData({componentName: 'http', name: 'http_1'}));
             openNodeDetailsPanelForNewNode(makeNodeData());
