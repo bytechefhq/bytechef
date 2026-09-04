@@ -84,6 +84,7 @@ import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcher
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
 import isActionDefinitionFresh from './isActionDefinitionFresh';
+import {resolveDisplayConditionsQueryTarget} from './resolveDisplayConditionsQueryTarget';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 
@@ -358,17 +359,26 @@ export default function useWorkflowNodeDetailsPanel({
         !!currentNode && !!currentNode.taskDispatcher
     );
 
+    // The node details panel opens optimistically for a freshly added node, before the add-node save
+    // has reached the server. Until handleComponentAddedSuccess clears pendingSaveNodeName, every
+    // by-name request for that node 400s with "Workflow node with name: <name> does not exist".
+    const awaitingFirstSave = !!currentNodeName && currentNodeName === pendingSaveNodeName;
+
+    const displayConditionsQueryTarget = resolveDisplayConditionsQueryTarget({
+        activeTab,
+        currentClusterElementName,
+        currentNodeClusterElementType: currentNode?.clusterElementType,
+        currentNodeName,
+        pendingSaveNodeName,
+    });
+
     const displayConditionsQuery = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
             environmentId: currentEnvironmentId,
             id: workflow.id!,
             workflowNodeName: currentNodeName!,
         },
-        activeTab === 'properties' &&
-            !!currentNodeName &&
-            currentNodeName !== 'manual' &&
-            currentNodeName !== currentClusterElementName &&
-            !currentNode?.clusterElementType
+        displayConditionsQueryTarget === 'regular'
     );
 
     const clusterElementDisplayConditionsQuery = useGetClusterElementParameterDisplayConditionsQuery(
@@ -379,12 +389,7 @@ export default function useWorkflowNodeDetailsPanel({
             id: workflow.id!,
             workflowNodeName: rootClusterElementNodeData?.workflowNodeName as string,
         },
-        activeTab === 'properties' &&
-            !!currentNode &&
-            !!currentNodeName &&
-            currentNodeName !== 'manual' &&
-            currentNodeName === currentClusterElementName &&
-            !!currentNode.clusterElementType
+        !!currentNode && displayConditionsQueryTarget === 'cluster'
     );
 
     const {data: workflowNodeParameterDisplayConditions} = displayConditionsQuery;
@@ -1451,6 +1456,7 @@ export default function useWorkflowNodeDetailsPanel({
     return {
         activeDisplayConditionsQuery,
         activeTab,
+        awaitingFirstSave,
         currentActionDefinition,
         currentComponentDefinition,
         currentNode,
