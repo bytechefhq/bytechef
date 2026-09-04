@@ -44,6 +44,22 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     }
 }
 
+export function handleComponentAddedError({nodeData}: {nodeData: NodeDataType}): void {
+    const {currentNode, removePendingSaveNodeName, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore.getState();
+
+    if (!nodeData.name) {
+        return;
+    }
+
+    removePendingSaveNodeName(nodeData.name);
+
+    if (currentNode?.name === nodeData.name) {
+        setCurrentNode(undefined);
+        setWorkflowNodeDetailsPanelOpen(false);
+    }
+}
+
 export default function handleComponentAddedSuccess({
     nodeData,
     queryClient,
