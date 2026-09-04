@@ -1,7 +1,13 @@
 import Badge from '@/components/Badge/Badge';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
-import {LogEntry, LogLevel, useEditorJobFileLogsQuery, useJobFileLogsQuery} from '@/shared/middleware/graphql';
+import {
+    LogEntry,
+    LogLevel,
+    useEditorJobFileLogsQuery,
+    useJobFileLogsQuery,
+    useTriggerExecutionFileLogsQuery,
+} from '@/shared/middleware/graphql';
 import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -10,6 +16,7 @@ interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
     jobId: string;
     taskExecutionId?: string;
+    triggerExecutionId?: string;
 }
 
 const LOG_LEVEL_BADGE_CONFIG = {
@@ -143,9 +150,12 @@ const WorkflowExecutionLogsContent = ({
     isEditorEnvironment,
     jobId,
     taskExecutionId,
+    triggerExecutionId,
 }: WorkflowExecutionLogsContentProps) => {
     const [page] = useState(0);
     const [size] = useState(100);
+
+    const isTriggerLogs = !isEditorEnvironment && !!triggerExecutionId;
 
     const {
         data: productionLogsData,
@@ -159,7 +169,23 @@ const WorkflowExecutionLogsContent = ({
             size,
         },
         {
-            enabled: !isEditorEnvironment,
+            enabled: !isEditorEnvironment && !isTriggerLogs,
+        }
+    );
+
+    const {
+        data: triggerLogsData,
+        error: triggerError,
+        isLoading: isTriggerLoading,
+    } = useTriggerExecutionFileLogsQuery(
+        {
+            filter: null,
+            page,
+            size,
+            triggerExecutionId: triggerExecutionId || '',
+        },
+        {
+            enabled: isTriggerLogs,
         }
     );
 
@@ -179,9 +205,13 @@ const WorkflowExecutionLogsContent = ({
         }
     );
 
-    const isLoading = isEditorEnvironment ? isEditorLoading : isProductionLoading;
-    const error = isEditorEnvironment ? editorError : productionError;
-    const logsData = isEditorEnvironment ? editorLogsData?.editorJobFileLogs : productionLogsData?.jobFileLogs;
+    const isLoading = isEditorEnvironment ? isEditorLoading : isTriggerLogs ? isTriggerLoading : isProductionLoading;
+    const error = isEditorEnvironment ? editorError : isTriggerLogs ? triggerError : productionError;
+    const logsData = isEditorEnvironment
+        ? editorLogsData?.editorJobFileLogs
+        : isTriggerLogs
+          ? triggerLogsData?.triggerExecutionFileLogs
+          : productionLogsData?.jobFileLogs;
 
     const logs = useMemo(() => logsData?.content || [], [logsData]);
 
@@ -216,7 +246,7 @@ const WorkflowExecutionLogsContent = ({
                     <LogEntryRow
                         entry={logEntry}
                         key={`${logEntry.timestamp}-${index}`}
-                        showComponentName={!taskExecutionId}
+                        showComponentName={!taskExecutionId && !isTriggerLogs}
                     />
                 ))}
             </div>
