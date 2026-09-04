@@ -4,7 +4,10 @@ import {NodeDataType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {beforeEach, describe, expect, it} from 'vitest';
 
-import handleComponentAddedSuccess, {openNodeDetailsPanelForNewNode} from '../handleComponentAddedSuccess';
+import handleComponentAddedSuccess, {
+    handleComponentAddedError,
+    openNodeDetailsPanelForNewNode,
+} from '../handleComponentAddedSuccess';
 
 const makeNodeData = (overrides: Partial<NodeDataType> = {}): NodeDataType =>
     ({
@@ -145,6 +148,34 @@ describe('openNodeDetailsPanelForNewNode', () => {
         useWorkflowNodeDetailsPanelStore.getState().clearPendingSaveNodeNames();
 
         expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.size).toBe(0);
+    });
+
+    describe('handleComponentAddedError', () => {
+        it('releases the marker and closes the panel that was opened optimistically for the node', () => {
+            openNodeDetailsPanelForNewNode(makeNodeData());
+
+            handleComponentAddedError({nodeData: makeNodeData()});
+
+            const state = useWorkflowNodeDetailsPanelStore.getState();
+
+            expect(state.pendingSaveNodeNames.has('slack_1')).toBe(false);
+            expect(state.workflowNodeDetailsPanelOpen).toBe(false);
+            expect(state.currentNode).toBeUndefined();
+        });
+
+        it('leaves the panel alone when it shows a different node', () => {
+            openNodeDetailsPanelForNewNode(makeNodeData({componentName: 'http', name: 'http_1'}));
+            openNodeDetailsPanelForNewNode(makeNodeData());
+
+            handleComponentAddedError({nodeData: makeNodeData()});
+
+            const state = useWorkflowNodeDetailsPanelStore.getState();
+
+            expect(state.pendingSaveNodeNames.has('slack_1')).toBe(false);
+            expect(state.pendingSaveNodeNames.has('http_1')).toBe(true);
+            expect(state.workflowNodeDetailsPanelOpen).toBe(true);
+            expect(state.currentNode?.name).toBe('http_1');
+        });
     });
 
     it('should update panel when replacing a trigger while panel is open', () => {
