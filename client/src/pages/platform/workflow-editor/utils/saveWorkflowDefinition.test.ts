@@ -619,6 +619,29 @@ describe('saveWorkflowDefinition', () => {
             expect(rolledBackWorkflow.id).toBe('workflow-1');
         });
 
+        it('calls onError after rolling back so the caller can undo what it did optimistically', async () => {
+            mockWorkflowState = makeWorkflowState();
+            const mutation = makeMutation();
+            const onError = vi.fn();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                onError,
+                updateWorkflowMutation: mutation,
+            });
+
+            const callbacks = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][1];
+
+            callbacks.onError(new Error('version conflict'));
+
+            expect(onError).toHaveBeenCalledOnce();
+        });
+
         it('should update store with server response on mutation success', async () => {
             mockWorkflowState = makeWorkflowState();
             const mutation = makeMutation();
