@@ -38,7 +38,7 @@ import org.springframework.context.ApplicationContext;
 /**
  * @author Ivica Cardic
  */
-class ContextImplLogBufferTest {
+class ContextTest {
 
     private static final long JOB_ID = 42L;
     private static final long TASK_EXECUTION_ID = 4200L;
