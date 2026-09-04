@@ -5,6 +5,8 @@ import {TabValueType} from '@/shared/types';
 import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
 import {useEffect, useMemo, useRef, useState} from 'react';
 
+import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecutionSheetStore';
+
 const POLLING_INTERVAL_MS = 2000;
 
 const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolean) => {
@@ -15,9 +17,13 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     const jobIdRef = useRef<string | undefined>(undefined);
 
+    const workflowExecutionKind = useWorkflowExecutionSheetStore((state) => state.workflowExecutionKind);
+
     const {data: workflowExecution, isLoading: workflowExecutionLoading} = useGetProjectWorkflowExecutionQuery(
         {id: workflowExecutionId},
-        enabled
+        enabled,
+        undefined,
+        workflowExecutionKind
     );
 
     const isWorkflowRunning = useMemo(() => {
@@ -28,7 +34,12 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         return getWorkflowStatusType(workflowExecution.job, workflowExecution.triggerExecution) === 'running';
     }, [workflowExecution]);
 
-    useGetProjectWorkflowExecutionQuery({id: workflowExecutionId}, enabled && isWorkflowRunning, POLLING_INTERVAL_MS);
+    useGetProjectWorkflowExecutionQuery(
+        {id: workflowExecutionId},
+        enabled && isWorkflowRunning,
+        POLLING_INTERVAL_MS,
+        workflowExecutionKind
+    );
 
     const rootJob = workflowExecution?.job;
     const triggerExecution = workflowExecution?.triggerExecution;
@@ -89,6 +100,14 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     useEffect(() => {
         setSubflowStack([]);
     }, [workflowExecutionId]);
+
+    useEffect(() => {
+        if (!rootJob && triggerExecution && selectedItem?.id !== triggerExecution.id) {
+            setActiveTab(triggerExecution.error ? 'error' : 'input');
+
+            setSelectedItem(triggerExecution);
+        }
+    }, [rootJob, selectedItem?.id, triggerExecution]);
 
     useEffect(() => {
         if (!activeJob?.id || activeJob.id === jobIdRef.current) {

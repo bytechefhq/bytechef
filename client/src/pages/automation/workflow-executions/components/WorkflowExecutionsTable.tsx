@@ -25,12 +25,14 @@ interface ExecutionColumnI {
 
 const columns: ExecutionColumnI[] = [
     {
-        cell: (execution) => <WorkflowExecutionBadge status={execution.job?.status || ''} />,
+        cell: (execution) => (
+            <WorkflowExecutionBadge status={execution.job?.status || execution.triggerExecution?.status || ''} />
+        ),
         header: () => 'Status',
         id: 'status',
     },
     {
-        cell: (execution) => execution.job?.label,
+        cell: (execution) => execution.job?.label || execution.workflow?.label,
         header: (depth) => (depth > 0 ? 'Subflow' : 'Workflow'),
         id: 'workflow',
     },
@@ -58,8 +60,8 @@ const columns: ExecutionColumnI[] = [
     },
     {
         cell: (execution) => {
-            const startDate = execution.job?.startDate?.getTime();
-            const endDate = execution.job?.endDate?.getTime();
+            const startDate = (execution.job?.startDate || execution.triggerExecution?.startDate)?.getTime();
+            const endDate = (execution.job?.endDate || execution.triggerExecution?.endDate)?.getTime();
 
             if (startDate && endDate) {
                 return `${Math.round(endDate - startDate)}ms`;
@@ -68,9 +70,21 @@ const columns: ExecutionColumnI[] = [
         header: () => 'Duration',
         id: 'duration',
     },
-    {cell: (execution) => formatDateTime(execution.job?.startDate), header: () => 'Start date', id: 'startDate'},
     {
-        cell: (execution) => (execution.job?.endDate ? formatDateTime(execution.job?.endDate) : null),
+        cell: (execution) => {
+            const startDate = execution.job?.startDate || execution.triggerExecution?.startDate;
+
+            return startDate ? formatDateTime(startDate) : null;
+        },
+        header: () => 'Start date',
+        id: 'startDate',
+    },
+    {
+        cell: (execution) => {
+            const endDate = execution.job?.endDate || execution.triggerExecution?.endDate;
+
+            return endDate ? formatDateTime(endDate) : null;
+        },
         header: () => 'End date',
         id: 'endDate',
     },
@@ -123,10 +137,14 @@ const ExecutionRows = ({
 
             const nextSeenJobIds = jobId != null ? new Set(seenJobIds).add(jobId) : seenJobIds;
 
-            const childJobs = getSubflowChildJobs({job: execution.job, seenJobIds: nextSeenJobIds});
+            const childJobs = execution.job
+                ? getSubflowChildJobs({job: execution.job, seenJobIds: nextSeenJobIds})
+                : [];
 
             const expandable = depth < MAX_SUBFLOW_DEPTH && childJobs.length > 0;
             const expanded = jobId != null && expandedJobIds.has(jobId);
+
+            const rowKey = jobId ?? `trigger_${execution.triggerExecution?.id ?? index}`;
 
             const isDeepestExpandedSubflow =
                 expandable &&
@@ -134,7 +152,7 @@ const ExecutionRows = ({
                 !hasExpandedSubflow({childJobs, depth: depth + 1, expandedJobIds, seenJobIds: nextSeenJobIds});
 
             return (
-                <Fragment key={`${depth}_${jobId ?? index}`}>
+                <Fragment key={`${depth}_${rowKey}`}>
                     <TableRow
                         className={twMerge(
                             'cursor-pointer border-0 hover:bg-surface-brand-secondary',

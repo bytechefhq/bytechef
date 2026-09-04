@@ -19,7 +19,7 @@ export function getExecutionStatusIcon(status: ExecutionStatusType) {
     }
 }
 
-export function getWorkflowStatusType(job: Job, triggerExecution?: TriggerExecution): WorkflowStatusType {
+export function getWorkflowStatusType(job?: Job, triggerExecution?: TriggerExecution): WorkflowStatusType {
     const jobStatus = job?.status;
     const triggerStatus = triggerExecution?.status;
 

@@ -3,7 +3,7 @@ import {getWorkflowStatusType} from '@/shared/components/workflow-executions/uti
 import {Job, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {CheckIcon, LoaderCircleIcon} from 'lucide-react';
 
-const WorkflowExecutionsHeader = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
+const WorkflowExecutionsHeader = ({job, triggerExecution}: {job?: Job; triggerExecution?: TriggerExecution}) => {
     const startTime = job?.startDate?.getTime();
     const endTime = job?.endDate?.getTime();
 
