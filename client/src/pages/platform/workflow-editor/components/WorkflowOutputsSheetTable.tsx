@@ -18,7 +18,7 @@ import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import stringifyWorkflowDefinition from '../utils/stringifyWorkflowDefinition';
+import saveWorkflowDefinitionUpdate from '../utils/saveWorkflowDefinitionUpdate';
 import WorkflowOutputValue from './WorkflowOutputValue';
 
 const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
@@ -31,23 +31,17 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     const {updateWorkflowMutation} = useWorkflowEditor();
 
     function handleDelete(input: WorkflowInput) {
-        const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);
+        saveWorkflowDefinitionUpdate({
+            updateDefinition: (workflowDefinition: WorkflowDefinitionType) => {
+                const outputs = workflowDefinition.outputs ?? [];
 
-        const outputs: WorkflowInput[] = definitionObject.outputs ?? [];
+                if (!outputs.some((output) => output.name === input.name)) {
+                    return undefined;
+                }
 
-        const index = outputs.findIndex((curInput) => curInput.name === input.name);
-
-        outputs.splice(index, 1);
-
-        updateWorkflowMutation!.mutate({
-            id: workflow.id!,
-            workflow: {
-                definition: stringifyWorkflowDefinition({
-                    ...definitionObject,
-                    outputs,
-                }),
-                version: workflow.version,
+                return {...workflowDefinition, outputs: outputs.filter((output) => output.name !== input.name)};
             },
+            updateWorkflowMutation: updateWorkflowMutation!,
         });
 
         setShowDeleteDialog(false);

@@ -14,15 +14,15 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
-import {WorkflowDefinitionType} from '@/shared/types';
+import {Workflow} from '@/shared/middleware/platform/configuration';
+import {WorkflowDefinitionType, WorkflowOutputType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Editor} from '@tiptap/react';
 import {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
-import stringifyWorkflowDefinition from '../utils/stringifyWorkflowDefinition';
+import saveWorkflowDefinitionUpdate from '../utils/saveWorkflowDefinitionUpdate';
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -70,31 +70,23 @@ const WorkflowOutputsSheetDialog = ({
     }
 
     function saveWorkflowOutputs(output: z.infer<typeof formSchema>) {
-        const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
+        saveWorkflowDefinitionUpdate({
+            onSuccess: () => closeDialog(),
+            updateDefinition: (workflowDefinition: WorkflowDefinitionType) => {
+                const outputs = [...(workflowDefinition.outputs ?? [])];
 
-        let outputs: WorkflowInput[] = workflowDefinition.outputs ?? [];
+                const workflowOutput = output as unknown as WorkflowOutputType;
 
-        if (outputIndex === -1) {
-            outputs = [...(outputs || []), output];
-        } else {
-            outputs[outputIndex] = output;
-        }
+                if (outputIndex === -1) {
+                    outputs.push(workflowOutput);
+                } else {
+                    outputs[outputIndex] = workflowOutput;
+                }
 
-        updateWorkflowMutation!.mutate(
-            {
-                id: workflow.id!,
-                workflow: {
-                    definition: stringifyWorkflowDefinition({
-                        ...workflowDefinition,
-                        outputs,
-                    }),
-                    version: workflow.version,
-                },
+                return {...workflowDefinition, outputs};
             },
-            {
-                onSuccess: () => closeDialog(),
-            }
-        );
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
     }
 
     return (
