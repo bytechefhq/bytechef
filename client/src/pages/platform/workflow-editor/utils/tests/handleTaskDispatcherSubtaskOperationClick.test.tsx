@@ -63,7 +63,7 @@ describe('handleTaskDispatcherSubtaskOperationClick', () => {
         useWorkflowNodeDetailsPanelStore.setState({
             activeTab: 'description',
             currentNode: undefined,
-            pendingSaveNodeName: undefined,
+            pendingSaveNodeNames: new Set<string>(),
             workflowNodeDetailsPanelOpen: false,
         });
     });
@@ -87,5 +87,18 @@ describe('handleTaskDispatcherSubtaskOperationClick', () => {
         const {nodeData} = saveWorkflowDefinitionMock.mock.calls[0][0] as {nodeData: NodeDataType};
 
         expect(nodeData.clusterElements).toEqual({});
+    });
+
+    it('closes the optimistically opened panel when the add fails', () => {
+        callHandler(false);
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(true);
+
+        const {onError} = saveWorkflowDefinitionMock.mock.calls[0][0] as {onError: () => void};
+
+        onError();
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(false);
+        expect(useWorkflowNodeDetailsPanelStore.getState().currentNode).toBeUndefined();
     });
 });

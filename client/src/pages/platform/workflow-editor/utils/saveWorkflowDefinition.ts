@@ -14,12 +14,13 @@ import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
-import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
+import {drainPendingSaves, enqueuePendingSave, isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface SaveWorkflowDefinitionProps {
     decorative?: boolean;
     nodeData?: NodeDataType;
     nodeIndex?: number;
+    onError?: () => void;
     onSuccess?: () => void;
     placeholderId?: string;
     taskDispatcherContext?: TaskDispatcherContextType;
@@ -27,17 +28,34 @@ interface SaveWorkflowDefinitionProps {
     updatedWorkflowTasks?: Array<WorkflowTask>;
 }
 
-export default async function saveWorkflowDefinition({
-    decorative,
-    nodeData,
-    nodeIndex,
-    onSuccess,
-    placeholderId,
-    taskDispatcherContext,
-    updateWorkflowMutation,
-    updatedWorkflowTasks,
-}: SaveWorkflowDefinitionProps) {
+export default async function saveWorkflowDefinition(props: SaveWorkflowDefinitionProps) {
+    const {
+        decorative,
+        nodeData,
+        nodeIndex,
+        onError,
+        onSuccess,
+        placeholderId,
+        taskDispatcherContext,
+        updateWorkflowMutation,
+        updatedWorkflowTasks,
+    } = props;
+
     const {workflow} = useWorkflowDataStore.getState();
+
+    if (workflow.id && isWorkflowMutating(workflow.id)) {
+        if (updatedWorkflowTasks) {
+            console.warn('Dropped a workflow save with precomputed tasks while another save was in flight');
+
+            return;
+        }
+
+        enqueuePendingSave(workflow.id, () => {
+            saveWorkflowDefinition(props);
+        });
+
+        return;
+    }
 
     let workflowDefinition: WorkflowDefinitionType;
 
@@ -84,6 +102,7 @@ export default async function saveWorkflowDefinition({
 
         executeWorkflowMutation({
             definitionUpdate: {triggers: [newTrigger]},
+            onError,
             onSuccess: () => {
                 if (onSuccess) {
                     onSuccess();
@@ -268,6 +287,7 @@ export default async function saveWorkflowDefinition({
     executeWorkflowMutation({
         definitionUpdate: {tasks: updatedWorkflowDefinitionTasks},
         newTask: existingWorkflowTask ? undefined : newTask,
+        onError,
         onSuccess,
         updateWorkflowMutation,
         workflow,
@@ -281,6 +301,7 @@ interface ExecuteWorkflowMutationProps {
         triggers?: Array<WorkflowTrigger>;
     };
     newTask?: WorkflowTask;
+    onError?: () => void;
     onSuccess?: () => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow;
@@ -290,12 +311,15 @@ interface ExecuteWorkflowMutationProps {
 function executeWorkflowMutation({
     definitionUpdate,
     newTask,
+    onError,
     onSuccess,
     updateWorkflowMutation,
     workflow,
     workflowDefinition,
 }: ExecuteWorkflowMutationProps) {
     if (isWorkflowMutating(workflow.id!)) {
+        console.warn('Dropped a workflow save that raced another save for the guard');
+
         return;
     }
 
@@ -347,9 +371,15 @@ function executeWorkflowMutation({
                 console.error('Failed to save workflow definition:', error);
 
                 setWorkflowWithoutHistory(previousWorkflow);
+
+                if (onError) {
+                    onError();
+                }
             },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);
+
+                drainPendingSaves(workflow.id!);
             },
             onSuccess: (updatedWorkflow) => {
                 useWorkflowDataStore.getState().setWorkflow({

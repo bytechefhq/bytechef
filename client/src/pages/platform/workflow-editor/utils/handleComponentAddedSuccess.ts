@@ -21,16 +21,16 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     }
 
     const {
+        addPendingSaveNodeName,
         currentNode,
         setActiveTab,
         setCurrentNode,
-        setPendingSaveNodeName,
         setWorkflowNodeDetailsPanelOpen,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore.getState();
 
     if (nodeData.name) {
-        setPendingSaveNodeName(nodeData.name);
+        addPendingSaveNodeName(nodeData.name);
     }
 
     if (workflowNodeDetailsPanelOpen) {
@@ -44,6 +44,22 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     }
 }
 
+export function handleComponentAddedError({nodeData}: {nodeData: NodeDataType}): void {
+    const {currentNode, removePendingSaveNodeName, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore.getState();
+
+    if (!nodeData.name) {
+        return;
+    }
+
+    removePendingSaveNodeName(nodeData.name);
+
+    if (currentNode?.name === nodeData.name) {
+        setCurrentNode(undefined);
+        setWorkflowNodeDetailsPanelOpen(false);
+    }
+}
+
 export default function handleComponentAddedSuccess({
     nodeData,
     queryClient,
@@ -51,9 +67,7 @@ export default function handleComponentAddedSuccess({
 }: HandleComponentAddedSuccessProps) {
     invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient, workflow.id!);
 
-    const {pendingSaveNodeName, setPendingSaveNodeName} = useWorkflowNodeDetailsPanelStore.getState();
-
-    if (nodeData.name && pendingSaveNodeName === nodeData.name) {
-        setPendingSaveNodeName(undefined);
+    if (nodeData.name) {
+        useWorkflowNodeDetailsPanelStore.getState().removePendingSaveNodeName(nodeData.name);
     }
 }

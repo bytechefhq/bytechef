@@ -6,6 +6,7 @@ import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowData
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {
     consumePendingDefinition,
+    drainPendingSaves,
     isWorkflowMutating,
     setPendingDefinition,
     setWorkflowMutating,
@@ -345,6 +346,8 @@ function firePositionMutation({
                         version: currentWorkflow.version,
                         workflowId,
                     });
+                } else {
+                    drainPendingSaves(workflowId);
                 }
             },
             onSuccess: (updatedWorkflow) => {

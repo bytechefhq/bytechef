@@ -300,13 +300,12 @@ describe('saveWorkflowDefinition', () => {
     });
 
     describe('mutation guard', () => {
-        it('should not mutate when workflow is already mutating', async () => {
+        it('queues the save while another mutation is in flight and fires it from fresh state once released', async () => {
             mockWorkflowState = makeWorkflowState();
 
             const mutation = makeMutation();
 
-            // Pre-set mutation flag
-            const {setWorkflowMutating} = await import('./workflowMutationGuard');
+            const {drainPendingSaves, hasPendingSaves, setWorkflowMutating} = await import('./workflowMutationGuard');
 
             setWorkflowMutating('workflow-1', true);
 
@@ -321,6 +320,79 @@ describe('saveWorkflowDefinition', () => {
             });
 
             expect(mutation.mutate).not.toHaveBeenCalled();
+            expect(mockWorkflowState.setWorkflow).not.toHaveBeenCalled();
+            expect(hasPendingSaves('workflow-1')).toBe(true);
+
+            mockWorkflowState = makeWorkflowState([{name: 'email_1', type: 'email/v1/send'}]);
+
+            setWorkflowMutating('workflow-1', false);
+
+            drainPendingSaves('workflow-1');
+
+            expect(mutation.mutate).toHaveBeenCalledTimes(1);
+
+            const savedDefinition = JSON.parse(
+                (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0].workflow.definition
+            );
+
+            expect(savedDefinition.tasks.map((task: {name: string}) => task.name)).toEqual(['email_1', 'httpClient_1']);
+            expect(hasPendingSaves('workflow-1')).toBe(false);
+            expect(isWorkflowMutating('workflow-1')).toBe(true);
+        });
+
+        it('drains the next queued save when its own mutation settles', async () => {
+            mockWorkflowState = makeWorkflowState();
+
+            const mutation = makeMutation();
+
+            const {setWorkflowMutating} = await import('./workflowMutationGuard');
+
+            await saveWorkflowDefinition({
+                nodeData: {componentName: 'httpClient', name: 'httpClient_1', operationName: 'get', version: 1},
+                updateWorkflowMutation: mutation,
+            } as unknown as Parameters<typeof saveWorkflowDefinition>[0]);
+
+            expect(isWorkflowMutating('workflow-1')).toBe(true);
+
+            await saveWorkflowDefinition({
+                nodeData: {componentName: 'logger', name: 'logger_1', operationName: 'debug', version: 1},
+                updateWorkflowMutation: mutation,
+            } as unknown as Parameters<typeof saveWorkflowDefinition>[0]);
+
+            expect(mutation.mutate).toHaveBeenCalledTimes(1);
+
+            const firstCallbacks = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][1];
+
+            firstCallbacks.onSettled();
+
+            expect(mutation.mutate).toHaveBeenCalledTimes(2);
+
+            const secondDefinition = JSON.parse(
+                (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[1][0].workflow.definition
+            );
+
+            expect(secondDefinition.tasks.map((task: {name: string}) => task.name)).toContain('logger_1');
+            expect(isWorkflowMutating('workflow-1')).toBe(true);
+
+            setWorkflowMutating('workflow-1', false);
+        });
+
+        it('drops a precomputed-tasks save while another mutation is in flight instead of replaying stale tasks', async () => {
+            mockWorkflowState = makeWorkflowState();
+
+            const mutation = makeMutation();
+
+            const {hasPendingSaves, setWorkflowMutating} = await import('./workflowMutationGuard');
+
+            setWorkflowMutating('workflow-1', true);
+
+            await saveWorkflowDefinition({
+                updateWorkflowMutation: mutation,
+                updatedWorkflowTasks: [{name: 'stale_1', type: 'logger/v1/debug'}],
+            });
+
+            expect(mutation.mutate).not.toHaveBeenCalled();
+            expect(hasPendingSaves('workflow-1')).toBe(false);
         });
 
         it('should set and clear mutation flag around mutate', async () => {
@@ -545,6 +617,29 @@ describe('saveWorkflowDefinition', () => {
             // Rolled-back workflow should NOT contain the new task
             expect(rolledBackWorkflow.definition).not.toContain('httpClient_1');
             expect(rolledBackWorkflow.id).toBe('workflow-1');
+        });
+
+        it('calls onError after rolling back so the caller can undo what it did optimistically', async () => {
+            mockWorkflowState = makeWorkflowState();
+            const mutation = makeMutation();
+            const onError = vi.fn();
+
+            await saveWorkflowDefinition({
+                nodeData: {
+                    componentName: 'httpClient',
+                    name: 'httpClient_1',
+                    operationName: 'get',
+                    version: 1,
+                } as unknown as NodeDataType,
+                onError,
+                updateWorkflowMutation: mutation,
+            });
+
+            const callbacks = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][1];
+
+            callbacks.onError(new Error('version conflict'));
+
+            expect(onError).toHaveBeenCalledOnce();
         });
 
         it('should update store with server response on mutation success', async () => {
