@@ -11,12 +11,11 @@ import {
     useGetConnectionsQuery,
 } from '@/ee/shared/queries/embedded/connections.queries';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import ConnectionsLeftSidebarNav from '@/shared/components/connection/ConnectionsLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {Link2Icon, TagIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {Link2Icon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectionList from './components/connection-list/ConnectionList';
@@ -66,19 +65,9 @@ export const Connections = () => {
         hasActiveFilter
     );
 
-    const allComponentNames = useMemo(
-        () =>
-            Array.from(
-                new Set(
-                    (hasActiveFilter ? unfilteredConnections : connections)?.map(
-                        (connection) => connection.componentName
-                    )
-                )
-            ),
-        [connections, hasActiveFilter, unfilteredConnections]
-    );
-
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetConnectionTagsQuery();
+
+    const componentRowsAreLoading = componentsLoading || connectionsIsLoading || unfilteredConnectionsIsLoading;
 
     return (
         <LayoutContainer
@@ -115,65 +104,15 @@ export const Connections = () => {
                 )
             }
             leftSidebarBody={
-                <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: !filterData?.id && filterData.type === Type.Component,
-                                        name: 'All Components',
-                                    }}
-                                />
-
-                                {!componentsLoading &&
-                                    componentDefinitions
-                                        ?.filter((componentDefinition) =>
-                                            allComponentNames.includes(componentDefinition.name)
-                                        )
-                                        ?.map((item) => (
-                                            <LeftSidebarNavItem
-                                                item={{
-                                                    current:
-                                                        filterData?.id === item.name &&
-                                                        filterData.type === Type.Component,
-                                                    id: item.name!,
-                                                    name: item.title!,
-                                                }}
-                                                key={item.name}
-                                                toLink={`?componentName=${item.name}`}
-                                            />
-                                        ))}
-                            </>
-                        }
-                        title="Components"
-                    />
-
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {!tagsIsLoading &&
-                                    (!tags?.length ? (
-                                        <p className="px-3 text-xs">No tags.</p>
-                                    ) : (
-                                        tags?.map((item) => (
-                                            <LeftSidebarNavItem
-                                                icon={<TagIcon className="mr-1 size-4" />}
-                                                item={{
-                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
-                                                    id: item.id!,
-                                                    name: item.name,
-                                                }}
-                                                key={item.id}
-                                                toLink={`?tagId=${item.id}`}
-                                            />
-                                        ))
-                                    ))}
-                            </>
-                        }
-                        title="Tags"
-                    />
-                </>
+                <ConnectionsLeftSidebarNav
+                    componentDefinitions={componentDefinitions}
+                    connections={hasActiveFilter ? unfilteredConnections : connections}
+                    connectionsAreLoading={componentRowsAreLoading}
+                    currentComponentName={componentName ?? undefined}
+                    currentTagId={tagId ? parseInt(tagId) : undefined}
+                    tags={tags}
+                    tagsIsLoading={tagsIsLoading}
+                />
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
             leftSidebarWidth="64"

@@ -114,10 +114,11 @@ describe('DataTablesLeftSidebarNav', () => {
             });
         });
 
-        it('should not render anything while loading', () => {
-            const {container} = renderWithRouter();
+        it('should render placeholder rows instead of the tags while loading', () => {
+            renderWithRouter();
 
-            expect(container).toBeEmptyDOMElement();
+            expect(screen.getByTestId('left-sidebar-nav-skeleton')).toBeInTheDocument();
+            expect(screen.queryByText('Important')).not.toBeInTheDocument();
         });
     });
 });

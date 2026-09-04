@@ -15,14 +15,18 @@ type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowPro
 
 interface AutomationWorkflowProjectsFilterSidebarProps {
     categories: EmbeddedCategoryType[] | undefined;
+    categoriesIsLoading?: boolean;
     filterData: {id?: string; type: AutomationWorkflowProjectFilterType};
     tags: EmbeddedTagType[] | undefined;
+    tagsIsLoading?: boolean;
 }
 
 const AutomationWorkflowProjectsFilterSidebar = ({
     categories,
+    categoriesIsLoading = false,
     filterData,
     tags,
+    tagsIsLoading = false,
 }: AutomationWorkflowProjectsFilterSidebarProps) => {
     return (
         <>
@@ -53,6 +57,7 @@ const AutomationWorkflowProjectsFilterSidebar = ({
                             ))}
                     </>
                 }
+                loading={categoriesIsLoading}
                 title="Categories"
             />
 
@@ -81,6 +86,7 @@ const AutomationWorkflowProjectsFilterSidebar = ({
                     </>
                 }
                 className="mb-0"
+                loading={tagsIsLoading}
                 title="Tags"
             />
         </>

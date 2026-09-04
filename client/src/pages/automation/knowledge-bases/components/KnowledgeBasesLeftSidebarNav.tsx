@@ -29,6 +29,7 @@ const KnowledgeBasesLeftSidebarNav = () => {
                     </>
                 )
             }
+            loading={isLoading}
             title="Tags"
         />
     );

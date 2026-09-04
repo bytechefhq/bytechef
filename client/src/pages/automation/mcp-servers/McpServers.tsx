@@ -68,6 +68,7 @@ const McpServers = () => {
                     componentDefinitionsIsLoading={componentDefinitionsIsLoading}
                     filterData={filterData}
                     mcpProjectsIsLoading={mcpProjectsIsLoading}
+                    mcpServersIsLoading={mcpServersIsLoading}
                     tags={tags}
                     tagsIsLoading={tagsIsLoading}
                     uniqueProjects={uniqueProjects}

@@ -54,9 +54,9 @@ const AutomationWorkflows = () => {
         isLoading: projectsIsLoading,
     } = useAutomationWorkflowProjectsQuery();
 
-    const {data: categoriesData} = useAutomationWorkflowProjectCategoriesQuery();
+    const {data: categoriesData, isLoading: categoriesIsLoading} = useAutomationWorkflowProjectCategoriesQuery();
 
-    const {data: tagsData} = useAutomationWorkflowProjectTagsQuery();
+    const {data: tagsData, isLoading: tagsIsLoading} = useAutomationWorkflowProjectTagsQuery();
 
     const categories = categoriesData?.automationWorkflowProjectCategories;
     const tags = tagsData?.automationWorkflowProjectTags;
@@ -269,7 +269,13 @@ const AutomationWorkflows = () => {
                 ) : undefined
             }
             leftSidebarBody={
-                <AutomationWorkflowProjectsFilterSidebar categories={categories} filterData={filterData} tags={tags} />
+                <AutomationWorkflowProjectsFilterSidebar
+                    categories={categories}
+                    categoriesIsLoading={categoriesIsLoading}
+                    filterData={filterData}
+                    tags={tags}
+                    tagsIsLoading={tagsIsLoading}
+                />
             }
             leftSidebarHeader={<Header title="Automation Workflows" />}
             leftSidebarWidth="64"

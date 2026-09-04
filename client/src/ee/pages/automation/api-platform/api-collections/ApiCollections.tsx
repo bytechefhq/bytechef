@@ -98,7 +98,9 @@ const ApiCollections = () => {
                     environment={currentEnvironmentId}
                     filterData={filterData}
                     projects={projects}
+                    projectsIsLoading={projectsIsLoading}
                     tags={tags}
+                    tagsIsLoading={tagsIsLoading}
                 />
             }
             leftSidebarHeader={<Header title="API Collections" />}

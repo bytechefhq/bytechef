@@ -1,6 +1,6 @@
 import {Type} from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import {ProjectBasic} from '@/ee/shared/middleware/automation/api-platform';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
 import {Tag} from '@/shared/middleware/automation/configuration';
 import {TagIcon} from 'lucide-react';
 
@@ -8,61 +8,47 @@ interface ApiPlatformLeftSidebarNavProps {
     environment?: number;
     filterData?: {id?: number; type: Type};
     projects: ProjectBasic[] | undefined;
+    projectsIsLoading?: boolean;
     tags: Tag[] | undefined;
+    tagsIsLoading?: boolean;
 }
 
-const ApiPlatformLeftSidebarNav = ({environment, filterData, projects, tags}: ApiPlatformLeftSidebarNavProps) => {
+const ApiPlatformLeftSidebarNav = ({
+    environment,
+    filterData,
+    projects,
+    projectsIsLoading = false,
+    tags,
+    tagsIsLoading = false,
+}: ApiPlatformLeftSidebarNavProps) => {
     return (
         <>
-            <LeftSidebarNav
-                body={
-                    <>
-                        <LeftSidebarNavItem
-                            item={{
-                                current: !filterData?.id && filterData?.type === Type.Project,
-                                name: 'All Projects',
-                            }}
-                            toLink={`../api-collections?environment=${environment ?? ''}`}
-                        />
-
-                        {projects &&
-                            projects?.map((item) => (
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: filterData?.id === item.id && filterData?.type === Type.Project,
-                                        id: item.id,
-                                        name: item.name,
-                                    }}
-                                    key={item.name}
-                                    toLink={`../api-collections?projectId=${item.id}&environment=${environment ?? ''}`}
-                                />
-                            ))}
-                    </>
-                }
+            <LeftSidebarFilterNav
+                items={(projects ?? []).map((project) => ({
+                    current: filterData?.id === project.id && filterData?.type === Type.Project,
+                    id: project.id!,
+                    name: project.name,
+                    toLink: `../api-collections?projectId=${project.id}&environment=${environment ?? ''}`,
+                }))}
+                leadItem={{
+                    current: !filterData?.id && filterData?.type === Type.Project,
+                    name: 'All Projects',
+                    toLink: `../api-collections?environment=${environment ?? ''}`,
+                }}
+                loading={projectsIsLoading}
                 title="Projects"
             />
 
-            <LeftSidebarNav
-                body={
-                    <>
-                        {tags && !!tags.length ? (
-                            tags?.map((item) => (
-                                <LeftSidebarNavItem
-                                    icon={<TagIcon className="mr-1 size-4" />}
-                                    item={{
-                                        current: filterData?.id === item.id && filterData?.type === Type.Tag,
-                                        id: item.id!,
-                                        name: item.name,
-                                    }}
-                                    key={item.id}
-                                    toLink={`../api-collections?tagId=${item.id}&environment=${environment ?? ''}`}
-                                />
-                            ))
-                        ) : (
-                            <span className="px-3 text-xs">No defined tags.</span>
-                        )}
-                    </>
-                }
+            <LeftSidebarFilterNav
+                emptyMessage="No defined tags."
+                icon={<TagIcon className="mr-1 size-4" />}
+                items={(tags ?? []).map((tag) => ({
+                    current: filterData?.id === tag.id && filterData?.type === Type.Tag,
+                    id: tag.id!,
+                    name: tag.name,
+                    toLink: `../api-collections?tagId=${tag.id}&environment=${environment ?? ''}`,
+                }))}
+                loading={tagsIsLoading}
                 title="Tags"
             />
         </>
