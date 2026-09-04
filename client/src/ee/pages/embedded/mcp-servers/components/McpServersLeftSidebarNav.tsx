@@ -1,5 +1,5 @@
 import {Type} from '@/ee/pages/embedded/mcp-servers/McpServers';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
 import {
     PlatformType,
     useMcpIntegrationInstanceConfigurationsQuery,
@@ -8,15 +8,19 @@ import {
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {TagIcon} from 'lucide-react';
-import {useMemo} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 interface McpServersLeftSidebarNavProps {
     allComponentNames: string[];
+    mcpServersIsLoading?: boolean;
     validMcpServerIds: Set<string>;
 }
 
-const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpServersLeftSidebarNavProps) => {
+const McpServersLeftSidebarNav = ({
+    allComponentNames,
+    mcpServersIsLoading = false,
+    validMcpServerIds,
+}: McpServersLeftSidebarNavProps) => {
     const [searchParams] = useSearchParams();
 
     const componentName = searchParams.get('componentName');
@@ -57,91 +61,49 @@ const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpSer
         ).values()
     );
 
-    const filteredComponentDefinitions = useMemo(
-        () =>
-            componentDefinitions?.filter((componentDefinition) =>
-                allComponentNames.includes(componentDefinition.name)
-            ) ?? [],
-        [componentDefinitions, allComponentNames]
-    );
+    const componentItems = (componentDefinitions ?? [])
+        .filter((componentDefinition) => allComponentNames.includes(componentDefinition.name))
+        .map((componentDefinition: ComponentDefinitionBasic) => ({
+            current: filterData?.id === componentDefinition.name && filterData.type === Type.Component,
+            id: componentDefinition.name,
+            name: componentDefinition.title!,
+            toLink: `?componentName=${componentDefinition.name}`,
+        }));
 
     return (
         <>
-            <LeftSidebarNav
-                body={
-                    <>
-                        <LeftSidebarNavItem
-                            item={{
-                                current: !filterData?.id && filterData.type === Type.Component,
-                                name: 'All Components',
-                            }}
-                            toLink=""
-                        />
-
-                        {!componentDefinitionsIsLoading &&
-                            filteredComponentDefinitions.map((componentDefinition: ComponentDefinitionBasic) => (
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current:
-                                            filterData?.id === componentDefinition.name &&
-                                            filterData.type === Type.Component,
-                                        id: componentDefinition.name!,
-                                        name: componentDefinition.title!,
-                                    }}
-                                    key={componentDefinition.name}
-                                    toLink={`?componentName=${componentDefinition.name}`}
-                                />
-                            ))}
-                    </>
-                }
+            <LeftSidebarFilterNav
+                items={componentItems}
+                leadItem={{
+                    current: !filterData?.id && filterData.type === Type.Component,
+                    name: 'All Components',
+                }}
+                loading={componentDefinitionsIsLoading || mcpServersIsLoading}
                 title="Components"
             />
 
-            <LeftSidebarNav
-                body={
-                    <>
-                        {!mcpIntegrationInstanceConfigurationsIsLoading && uniqueIntegrations.length === 0 && (
-                            <span className="px-3 text-xs">No integrations.</span>
-                        )}
-
-                        {!mcpIntegrationInstanceConfigurationsIsLoading &&
-                            uniqueIntegrations.map((integration) => (
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current:
-                                            filterData?.id === integration.id && filterData.type === Type.Integration,
-                                        id: integration.id!,
-                                        name: integration.name,
-                                    }}
-                                    key={integration.id}
-                                    toLink={`?integrationId=${integration.id}`}
-                                />
-                            ))}
-                    </>
-                }
+            <LeftSidebarFilterNav
+                emptyMessage="No integrations."
+                items={uniqueIntegrations.map((integration) => ({
+                    current: filterData?.id === integration.id && filterData.type === Type.Integration,
+                    id: integration.id,
+                    name: integration.name,
+                    toLink: `?integrationId=${integration.id}`,
+                }))}
+                loading={mcpIntegrationInstanceConfigurationsIsLoading || mcpServersIsLoading}
                 title="Integrations"
             />
 
-            <LeftSidebarNav
-                body={
-                    <>
-                        {!tagsIsLoading && !tags?.length && <span className="px-3 text-xs">No defined tags.</span>}
-
-                        {!tagsIsLoading &&
-                            tags?.map((tag) => (
-                                <LeftSidebarNavItem
-                                    icon={<TagIcon className="mr-1 size-4" />}
-                                    item={{
-                                        current: filterData?.id === tag!.id && filterData.type === Type.Tag,
-                                        id: tag!.id,
-                                        name: tag!.name,
-                                    }}
-                                    key={tag!.id}
-                                    toLink={`?tagId=${tag!.id}`}
-                                />
-                            ))}
-                    </>
-                }
+            <LeftSidebarFilterNav
+                emptyMessage="No defined tags."
+                icon={<TagIcon className="mr-1 size-4" />}
+                items={(tags ?? []).map((tag) => ({
+                    current: filterData?.id === tag!.id && filterData.type === Type.Tag,
+                    id: tag!.id,
+                    name: tag!.name,
+                    toLink: `?tagId=${tag!.id}`,
+                }))}
+                loading={tagsIsLoading}
                 title="Tags"
             />
         </>
