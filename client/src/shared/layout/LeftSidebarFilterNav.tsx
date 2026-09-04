@@ -16,14 +16,25 @@ export interface LeftSidebarFilterNavLeadItemI {
 
 interface LeftSidebarFilterNavProps {
     className?: string;
+    /** Shown in place of the rows once the list has arrived and turned out to be empty. */
     emptyMessage?: string;
+    /** Rendered on every row, the way tag groups carry a tag icon. */
     icon?: ReactNode;
     items: LeftSidebarFilterNavItemI[];
+    /** The unfiltered entry a group opens with, such as "All Categories". */
     leadItem?: LeftSidebarFilterNavLeadItemI;
     loading?: boolean;
     title: string;
 }
 
+/**
+ * One filter group of a left sidebar: an optional unfiltered lead entry, a row per value, and an empty message
+ * when the list arrives empty. Every list page's rail is built from these, which is why the group owns the
+ * markup rather than each page repeating it.
+ *
+ * Callers decide what a row means — its label, its link and whether it is the current filter — and pass rows
+ * already in that shape.
+ */
 const LeftSidebarFilterNav = ({
     className,
     emptyMessage,

@@ -10,6 +10,7 @@ interface UnifiedApiLeftSidebarNavProps {
     currentUnifiedApiCategory?: string;
 }
 
+/** The fixed Unified API categories, shown beside the integration filters when the feature is on. */
 const UnifiedApiLeftSidebarNav = ({currentUnifiedApiCategory}: UnifiedApiLeftSidebarNavProps) => (
     <LeftSidebarFilterNav
         items={UNIFIED_API_CATEGORIES.map((category) => ({
