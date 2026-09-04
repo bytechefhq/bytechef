@@ -370,6 +370,11 @@ public interface Context {
                 return Objects.equals(contentType, other.contentType) && type == other.type;
             }
 
+            @Override
+            public String toString() {
+                return type + " (" + contentType + ")";
+            }
+
             private ResponseType(String contentType, Type type) {
                 this.contentType = contentType;
                 this.type = type;
