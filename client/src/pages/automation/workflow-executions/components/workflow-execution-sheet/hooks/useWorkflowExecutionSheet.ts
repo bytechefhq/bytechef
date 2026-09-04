@@ -10,11 +10,12 @@ import useWorkflowExecutionSheetStore from '../../../stores/useWorkflowExecution
 const useWorkflowExecutionSheet = () => {
     const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
 
-    const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionSheetOpen} =
+    const {setWorkflowExecutionSheetOpen, workflowExecutionId, workflowExecutionKind, workflowExecutionSheetOpen} =
         useWorkflowExecutionSheetStore(
             useShallow((state) => ({
                 setWorkflowExecutionSheetOpen: state.setWorkflowExecutionSheetOpen,
                 workflowExecutionId: state.workflowExecutionId,
+                workflowExecutionKind: state.workflowExecutionKind,
                 workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
             }))
         );
@@ -29,7 +30,9 @@ const useWorkflowExecutionSheet = () => {
         {
             id: workflowExecutionId,
         },
-        workflowExecutionSheetOpen
+        workflowExecutionSheetOpen,
+        undefined,
+        workflowExecutionKind
     );
 
     const handleCopilotClick = useCallback(() => {

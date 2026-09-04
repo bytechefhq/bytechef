@@ -16,7 +16,7 @@ export const useWorkflowExecutionsTable = () => {
 
     const handleRowClick = (execution: WorkflowExecution) => {
         if (execution.id != null) {
-            setWorkflowExecutionId(execution.id);
+            setWorkflowExecutionId(execution.id, execution.job ? 'JOB' : 'TRIGGER_EXECUTION');
 
             setWorkflowExecutionSheetOpen(true);
         }
