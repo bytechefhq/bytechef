@@ -37,6 +37,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -161,6 +163,33 @@ class LogFileStorageTest {
     }
 
     @Test
+    void testAwaitingATaskExecutionDoesNotWaitForItsSiblings() {
+        CountDownLatch siblingWriteLatch = new CountDownLatch(1);
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(false);
+        when(fileStorageService.fileExists(JOB_DIR, "20.jsonl")).thenAnswer(invocation -> {
+            assertTrue(siblingWriteLatch.await(5, TimeUnit.SECONDS));
+
+            return false;
+        });
+
+        logFileStorage.storeLogEntries(JOB_ID, 20L, List.of(logEntry(20L, "slow sibling")));
+        logFileStorage.storeLogEntries(JOB_ID, 10L, List.of(logEntry(10L, "mine")));
+
+        logFileStorage.awaitPendingWrites(JOB_ID, 10L);
+
+        verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("10.jsonl"), any(byte[].class), eq(false));
+        verify(fileStorageService, never()).storeFileContent(
+            eq(JOB_DIR), eq("20.jsonl"), any(byte[].class), eq(false));
+
+        siblingWriteLatch.countDown();
+
+        logFileStorage.awaitPendingWrites(JOB_ID);
+
+        verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("20.jsonl"), any(byte[].class), eq(false));
+    }
+
+    @Test
     void testReadLogEntriesReadsTheTaskExecutionFileDirectly() {
         FileEntry taskFile = new FileEntry("10.jsonl", "file://test/1/10.jsonl");
 
@@ -214,6 +243,25 @@ class LogFileStorageTest {
         logFileStorage.logsExist(JOB_ID);
 
         verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("10.jsonl"), any(byte[].class), eq(false));
+    }
+
+    @Test
+    void testAwaitPendingWritesReturnsOnceTheJobsWritesHaveLanded() {
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(false);
+
+        logFileStorage.storeLogEntries(JOB_ID, 10L, List.of(logEntry(10L, "must be durable")));
+
+        logFileStorage.awaitPendingWrites(JOB_ID);
+
+        verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("10.jsonl"), any(byte[].class), eq(false));
+    }
+
+    @Test
+    void testAwaitPendingWritesIsANoOpForAJobWithNothingQueued() {
+        logFileStorage.awaitPendingWrites(JOB_ID);
+
+        verify(fileStorageService, never()).storeFileContent(
+            anyString(), anyString(), any(byte[].class), eq(false));
     }
 
     @Test

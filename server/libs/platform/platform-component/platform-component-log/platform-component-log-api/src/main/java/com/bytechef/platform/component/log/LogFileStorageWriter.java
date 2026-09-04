@@ -49,6 +49,26 @@ public interface LogFileStorageWriter {
     void storeLogEntries(long jobId, long taskExecutionId, List<LogEntry> logEntries);
 
     /**
+     * Blocks until every entry stored for the job through this writer so far has reached storage. A writer that stores
+     * synchronously has nothing to wait for, hence the no-op default.
+     *
+     * @param jobId the job ID
+     */
+    default void awaitPendingWrites(long jobId) {
+    }
+
+    /**
+     * Blocks until every entry stored for the task execution through this writer so far has reached storage. A writer
+     * that does not track writes per task execution waits for the whole job.
+     *
+     * @param jobId           the job ID
+     * @param taskExecutionId the task execution ID
+     */
+    default void awaitPendingWrites(long jobId, long taskExecutionId) {
+        awaitPendingWrites(jobId);
+    }
+
+    /**
      * Deletes logs for a job (cleanup).
      *
      * @param jobId the job ID

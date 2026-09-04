@@ -26,9 +26,11 @@ package com.bytechef.platform.component.definition;
 public interface LogEntryBufferAware {
 
     /**
-     * Writes out every log entry buffered so far and stops buffering, so that entries logged afterwards are written as
-     * they arrive. Called once a task execution has finished with the context; entries logged later still reach
-     * storage, which matters for actions whose result is a stream consumed after the perform function returns.
+     * Writes out every log entry buffered so far, waits until the job's entries have reached storage, and stops
+     * buffering so that entries logged afterwards are written as they arrive. Called once a task execution has finished
+     * with the context, so a task that reports done has durable logs. Entries logged later still reach storage, which
+     * matters for actions whose result is a stream consumed after the perform function returns; those are not waited
+     * for.
      */
     void flushLogEntries();
 }

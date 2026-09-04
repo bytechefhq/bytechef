@@ -17,10 +17,11 @@
 package com.bytechef.platform.component.log;
 
 /**
- * Storage for the logs of workflow editor test runs. Same contract as {@link LogFileStorage}, kept as a distinct type
- * so the editor and production stores can be injected side by side.
+ * Storage for the logs of workflow editor test runs. Same contract as {@link LogFileStorage} but deliberately not a
+ * subtype of it: the editor and production stores are injected side by side, and a {@code LogFileStorage}-typed
+ * injection point must see exactly one candidate.
  *
  * @author Ivica Cardic
  */
-public interface EditorLogFileStorage extends LogFileStorage {
+public interface EditorLogFileStorage extends LogFileStorageReader, LogFileStorageWriter {
 }

@@ -32,6 +32,7 @@ import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -108,6 +109,11 @@ public class ComponentTestIntConfiguration {
     @Bean
     FileStorageServiceRegistry fileStorageServiceRegistry() {
         return new FileStorageServiceRegistry(List.of(new Base64FileStorageService()));
+    }
+
+    @Bean
+    EditorLogFileStorage editorLogFileStorage() {
+        return Mockito.mock(EditorLogFileStorage.class);
     }
 
     @Bean

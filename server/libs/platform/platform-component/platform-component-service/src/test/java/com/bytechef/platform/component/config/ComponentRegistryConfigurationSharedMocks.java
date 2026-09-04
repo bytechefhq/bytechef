@@ -18,6 +18,7 @@ package com.bytechef.platform.component.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -37,7 +38,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
     DataStorage.class, MessageBroker.class, OAuth2Service.class, TagService.class, WorkflowService.class,
-    ComponentConnectionFacade.class, LogFileStorage.class, WorkflowTestConfigurationService.class,
+    ComponentConnectionFacade.class, EditorLogFileStorage.class, LogFileStorage.class,
+    WorkflowTestConfigurationService.class,
 })
 public @interface ComponentRegistryConfigurationSharedMocks {
 }

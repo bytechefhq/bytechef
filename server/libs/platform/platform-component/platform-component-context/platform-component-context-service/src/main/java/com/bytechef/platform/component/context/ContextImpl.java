@@ -844,16 +844,16 @@ class ContextImpl implements Context, LogEntryBufferAware {
             synchronized (bufferedLogEntries) {
                 buffering = false;
 
-                if (bufferedLogEntries.isEmpty()) {
-                    return;
-                }
-
                 logEntriesToStore = List.copyOf(bufferedLogEntries);
 
                 bufferedLogEntries.clear();
             }
 
-            logFileStorageWriter.storeLogEntries(jobId, taskExecutionId, logEntriesToStore);
+            if (!logEntriesToStore.isEmpty()) {
+                logFileStorageWriter.storeLogEntries(jobId, taskExecutionId, logEntriesToStore);
+            }
+
+            logFileStorageWriter.awaitPendingWrites(jobId, taskExecutionId);
         }
 
         private void storeLogEntry(LogEntry.Level level, String message, @Nullable Exception exception) {
@@ -881,7 +881,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
                 if (buffering) {
                     bufferedLogEntries.add(logEntry);
 
-                    if (bufferedLogEntries.size() >= MAX_BUFFERED_LOG_ENTRIES) {
+                    if (bufferedLogEntries.size() >= MAX_BUFFERED_LOG_ENTRIES || level.isAtLeast(LogEntry.Level.WARN)) {
                         logEntriesToStore = List.copyOf(bufferedLogEntries);
 
                         bufferedLogEntries.clear();
