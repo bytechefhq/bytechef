@@ -52,6 +52,7 @@ import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionPar
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
+import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.Option;
@@ -255,18 +256,24 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         errorTypeField = "TRIGGER_TEST_FAILED")
     public TriggerOutput executeTrigger(
         @ComponentNameParam String componentName, int componentVersion, String triggerName,
-        @Nullable Long jobPrincipalId, @Nullable String workflowUuid,
+        @Nullable Long jobPrincipalId, @Nullable String workflowUuid, @Nullable Long triggerExecutionId,
         Map<String, ?> inputParameters, @Nullable Object triggerState, @Nullable WebhookRequest webhookRequest,
         @ConnectionParam @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
         PlatformType type, boolean editorEnvironment) {
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
-            environmentId, type, editorEnvironment);
+            environmentId, type, editorEnvironment, triggerExecutionId);
 
-        return doExecuteTrigger(
-            componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
-            componentConnection, triggerContext);
+        try {
+            return doExecuteTrigger(
+                componentName, componentVersion, triggerName, inputParameters, triggerState, webhookRequest,
+                componentConnection, triggerContext);
+        } finally {
+            if (triggerContext instanceof LogEntryBufferAware logEntryBufferAware) {
+                logEntryBufferAware.flushLogEntries();
+            }
+        }
     }
 
     @Override
