@@ -8,6 +8,7 @@ import {WorkflowTestApi, WorkflowTestExecution} from '@/shared/middleware/platfo
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {WorkflowDefinitionType} from '@/shared/types';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {MarkerSeverity} from 'monaco-editor';
 import {Ref, useCallback, useEffect, useState} from 'react';
@@ -16,6 +17,7 @@ import {useShallow} from 'zustand/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import saveWorkflowDefinitionUpdate from '../utils/saveWorkflowDefinitionUpdate';
 
 import type {editor} from 'monaco-editor';
 
@@ -171,29 +173,26 @@ const useWorkflowCodeEditorSheet = ({
 
     const handleSaveClick = (workflow: Workflow, definition: string) => {
         if (workflow && workflow.id) {
+            let editedWorkflowDefinition: WorkflowDefinitionType;
+
             try {
-                JSON.parse(definition);
-
-                updateWorkflowMutation!.mutate(
-                    {
-                        id: workflow.id,
-                        workflow: {
-                            definition,
-                            version: workflow.version,
-                        },
-                    },
-                    {
-                        onError: () => setDirty(true),
-                        onSuccess: () => {
-                            setDirty(false);
-
-                            invalidateWorkflowQueries();
-                        },
-                    }
-                );
+                editedWorkflowDefinition = JSON.parse(definition);
             } catch (error) {
                 console.error(`Invalid JSON: ${error}`);
+
+                return;
             }
+
+            saveWorkflowDefinitionUpdate({
+                onError: () => setDirty(true),
+                onSuccess: () => {
+                    setDirty(false);
+
+                    invalidateWorkflowQueries();
+                },
+                updateDefinition: () => editedWorkflowDefinition,
+                updateWorkflowMutation: updateWorkflowMutation!,
+            });
         }
     };
 
