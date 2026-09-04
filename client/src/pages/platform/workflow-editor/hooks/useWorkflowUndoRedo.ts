@@ -7,7 +7,7 @@ import useWorkflowDataStore, {
     useWorkflowTemporalStore,
 } from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import {isWorkflowMutating, setWorkflowMutating} from '../utils/workflowMutationGuard';
+import {drainPendingSaves, isWorkflowMutating, setWorkflowMutating} from '../utils/workflowMutationGuard';
 
 interface UseWorkflowUndoRedoReturnI {
     canRedo: boolean;
@@ -61,6 +61,8 @@ export default function useWorkflowUndoRedo(): UseWorkflowUndoRedoReturnI {
                     },
                     onSettled: () => {
                         setWorkflowMutating(workflowId, false);
+
+                        drainPendingSaves(workflowId);
                     },
                     onSuccess: (updatedWorkflow) => {
                         const currentWorkflow = useWorkflowDataStore.getState().workflow;
