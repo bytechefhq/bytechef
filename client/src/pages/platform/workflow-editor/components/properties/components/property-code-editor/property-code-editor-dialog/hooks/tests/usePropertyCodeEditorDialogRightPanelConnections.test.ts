@@ -240,6 +240,25 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
 
             expect(hoisted.mockMutate).not.toHaveBeenCalled();
         });
+
+        it('declines the save when the task is gone from the fresh definition', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, {
+                ...defaultProps,
+                workflow: {...defaultProps.workflow, definition: JSON.stringify({tasks: []})},
+            });
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'github',
+                    componentVersion: 2,
+                    name: 'github_connection',
+                });
+            });
+
+            expect(hoisted.mockMutate).not.toHaveBeenCalled();
+        });
     });
 
     describe('handleOnRemoveClick', () => {
@@ -368,6 +387,30 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
 
                 expect(definition.tasks[0].clusterElements.source.connections.s3_connection).toBeDefined();
             });
+        });
+
+        it('declines the save when the cluster element is gone from the fresh definition', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, {
+                ...clusterElementProps,
+                workflow: {
+                    ...clusterElementProps.workflow,
+                    definition: JSON.stringify({
+                        tasks: [{clusterElements: {}, name: 'dataStream_1', type: 'dataStream/v1/sync'}],
+                    }),
+                },
+            });
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'github',
+                    componentVersion: 2,
+                    name: 'github_connection',
+                });
+            });
+
+            expect(hoisted.mockMutate).not.toHaveBeenCalled();
         });
 
         describe('handleOnRemoveClick for cluster elements', () => {
@@ -727,6 +770,151 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
                 id: 'workflow-1',
                 version: 2,
             });
+        });
+    });
+
+    describe('tasks the change does not touch, and declines', () => {
+        const otherTask = {connections: {}, name: 'otherNode', type: 'logger/v1/debug'};
+
+        const plainProps = (tasks: Array<unknown>) => ({
+            componentConnections: [
+                {
+                    componentName: 'slack',
+                    componentVersion: 1,
+                    key: 'slack_1',
+                    required: true,
+                    workflowNodeName: 'testNode',
+                },
+            ],
+            workflow: {definition: JSON.stringify({tasks}), id: 'workflow-1', version: 1},
+            workflowNodeName: 'testNode',
+        });
+
+        const clusterProps = (clusterElements: Record<string, unknown>, extra: Array<unknown> = []) => ({
+            componentConnections: [
+                {
+                    componentName: 'amazonS3',
+                    componentVersion: 1,
+                    key: 's3_connection',
+                    required: true,
+                    workflowNodeName: 'source_1',
+                },
+            ],
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [...extra, {clusterElements, name: 'dataStream_1', type: 'dataStream/v1/sync'}],
+                }),
+                id: 'workflow-1',
+                version: 1,
+            },
+            workflowNodeName: 'source_1',
+        });
+
+        const source = {
+            connections: {s3_connection: {componentName: 'amazonS3', componentVersion: 1}},
+            name: 'source_1',
+            type: 'amazonS3/v1/amazonS3Read',
+        };
+
+        beforeEach(async () => {
+            hoisted.storeState.currentNode = {clusterElementType: undefined, name: 'testNode'};
+            hoisted.storeState.rootClusterElementNodeData = undefined;
+            vi.clearAllMocks();
+            vi.resetModules();
+        });
+
+        it('leaves the other tasks alone when adding a connection', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                plainProps([otherTask, {connections: {}, name: 'testNode', type: 'script/v1/run'}])
+            );
+
+            act(() => {
+                result.current.handleOnSubmit({componentName: 'github', componentVersion: 2, name: 'gh'});
+            });
+
+            const definition = JSON.parse(hoisted.mockMutate.mock.calls[0][0].workflow.definition);
+
+            expect(definition.tasks[0]).toEqual(otherTask);
+            expect(definition.tasks[1].connections.gh).toEqual({componentName: 'github', componentVersion: 2});
+        });
+
+        it('leaves the other tasks alone when removing a connection', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                plainProps([
+                    otherTask,
+                    {
+                        connections: {slack_1: {componentName: 'slack', componentVersion: 1}},
+                        name: 'testNode',
+                        type: 'script/v1/run',
+                    },
+                ])
+            );
+
+            act(() => {
+                result.current.handleOnRemoveClick('slack_1');
+            });
+
+            const definition = JSON.parse(hoisted.mockMutate.mock.calls[0][0].workflow.definition);
+
+            expect(definition.tasks[0]).toEqual(otherTask);
+            expect(definition.tasks[1].connections).toEqual({});
+        });
+
+        it('declines the removal when the task is gone from the fresh definition', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                plainProps([otherTask])
+            );
+
+            act(() => {
+                result.current.handleOnRemoveClick('slack_1');
+            });
+
+            expect(hoisted.mockMutate).not.toHaveBeenCalled();
+        });
+
+        it('leaves the other tasks alone when changing a cluster element connection', async () => {
+            hoisted.storeState.currentNode = {clusterElementType: 'source', name: 'source_1'};
+            hoisted.storeState.rootClusterElementNodeData = {workflowNodeName: 'dataStream_1'};
+
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                clusterProps({source}, [otherTask])
+            );
+
+            act(() => {
+                result.current.handleOnRemoveClick('s3_connection');
+            });
+
+            const definition = JSON.parse(hoisted.mockMutate.mock.calls[0][0].workflow.definition);
+
+            expect(definition.tasks[0]).toEqual(otherTask);
+            expect(definition.tasks[1].clusterElements.source.connections).toEqual({});
+        });
+
+        it('declines the cluster removal when the element is gone from the fresh definition', async () => {
+            hoisted.storeState.currentNode = {clusterElementType: 'source', name: 'source_1'};
+            hoisted.storeState.rootClusterElementNodeData = {workflowNodeName: 'dataStream_1'};
+
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, clusterProps({}));
+
+            act(() => {
+                result.current.handleOnRemoveClick('s3_connection');
+            });
+
+            expect(hoisted.mockMutate).not.toHaveBeenCalled();
         });
     });
 });
