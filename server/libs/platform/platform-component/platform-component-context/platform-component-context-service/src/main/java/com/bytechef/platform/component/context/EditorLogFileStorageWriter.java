@@ -23,6 +23,7 @@ import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,12 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
     }
 
     @Override
-    public void storeLogEntry(long jobId, long taskExecutionId, LogEntry logEntry) {
-        appendLogEntry(jobId, logEntry);
+    public void storeLogEntries(long jobId, long taskExecutionId, List<LogEntry> logEntries) {
+        if (logEntries.isEmpty()) {
+            return;
+        }
+
+        appendLogEntries(jobId, logEntries);
     }
 
     @Override
@@ -66,27 +71,35 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
         }
     }
 
-    private synchronized void appendLogEntry(long jobId, LogEntry logEntry) {
+    private synchronized void appendLogEntries(long jobId, List<LogEntry> logEntries) {
         try {
             String filename = jobId + ".jsonl";
-            byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
+            StringBuilder logLinesBuilder = new StringBuilder();
+
+            for (LogEntry logEntry : logEntries) {
+                logLinesBuilder.append(JsonUtils.write(logEntry))
+                    .append('\n');
+            }
+
+            byte[] logLinesBytes = logLinesBuilder.toString()
+                .getBytes(StandardCharsets.UTF_8);
 
             if (fileStorageService.fileExists(EDITOR_LOG_DIR, filename)) {
                 FileEntry existingFile = fileStorageService.getFileEntry(EDITOR_LOG_DIR, filename);
 
                 byte[] existingContent = fileStorageService.readFileToBytes(EDITOR_LOG_DIR, existingFile);
 
-                byte[] newContent = new byte[existingContent.length + logLineBytes.length];
+                byte[] newContent = new byte[existingContent.length + logLinesBytes.length];
 
                 System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
-                System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
+                System.arraycopy(logLinesBytes, 0, newContent, existingContent.length, logLinesBytes.length);
 
                 fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, newContent, false);
             } else {
-                fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, logLineBytes, false);
+                fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, logLinesBytes, false);
             }
         } catch (Exception exception) {
-            log.error("Failed to append log entry for job {}", jobId, exception);
+            log.error("Failed to append {} log entries for job {}", logEntries.size(), jobId, exception);
         }
     }
 }

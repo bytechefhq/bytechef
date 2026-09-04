@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.context;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +34,7 @@ import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -149,6 +152,38 @@ class EditorLogFileStorageWriterTest {
     }
 
     @Test
+    void testStoreLogEntriesWritesTheWholeBatchInOneRewrite() {
+        long jobId = 9L;
+        List<LogEntry> logEntries = List.of(
+            logEntry(900L, "first"), logEntry(900L, "second"), logEntry(900L, "third"));
+
+        when(fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(false);
+
+        editorLogFileStorageWriter.storeLogEntries(jobId, 900L, logEntries);
+
+        ArgumentCaptor<byte[]> contentArgumentCaptor = ArgumentCaptor.forClass(byte[].class);
+
+        verify(fileStorageService, times(1)).storeFileContent(
+            eq(EDITOR_LOG_DIR), eq(jobId + ".jsonl"), contentArgumentCaptor.capture(), eq(false));
+
+        String content = new String(contentArgumentCaptor.getValue(), StandardCharsets.UTF_8);
+
+        assertEquals(3, content.lines()
+            .count());
+        assertTrue(content.indexOf("first") < content.indexOf("second"));
+        assertTrue(content.indexOf("second") < content.indexOf("third"));
+    }
+
+    @Test
+    void testStoreLogEntriesSkipsAnEmptyBatch() {
+        editorLogFileStorageWriter.storeLogEntries(10L, 1000L, List.of());
+
+        verify(fileStorageService, never()).fileExists(anyString(), anyString());
+        verify(fileStorageService, never()).storeFileContent(
+            anyString(), anyString(), any(byte[].class), anyBoolean());
+    }
+
+    @Test
     void testDeleteLogEntries() {
         long jobId = 4L;
         FileEntry fileEntry = new FileEntry("4.jsonl", "file://test/4.jsonl");
@@ -198,5 +233,15 @@ class EditorLogFileStorageWriterTest {
         editorLogFileStorageWriter.deleteLogEntries(jobId);
 
         verify(fileStorageService).deleteFile(EDITOR_LOG_DIR, fileEntry);
+    }
+
+    private static LogEntry logEntry(long taskExecutionId, String message) {
+        return LogEntry.builder()
+            .timestamp(Instant.now())
+            .level(LogEntry.Level.INFO)
+            .componentName("test")
+            .taskExecutionId(taskExecutionId)
+            .message(message)
+            .build();
     }
 }
