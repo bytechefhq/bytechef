@@ -1,3 +1,4 @@
+import {clearAllWorkflowMutations} from '@/pages/platform/workflow-editor/utils/workflowMutationGuard';
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -13,6 +14,7 @@ const hoisted = vi.hoisted(() => {
             currentNode: {clusterElementType: undefined as string | undefined, name: 'testNode'},
             rootClusterElementNodeData: undefined as {workflowNodeName: string} | undefined,
             showConnectionNote: true,
+            workflow: undefined as {definition?: string; id?: string; version?: number} | undefined,
             workflowTestConfigurationConnections: [{connectionId: 1, workflowConnectionKey: 'slack_1'}],
         },
     };
@@ -42,11 +44,11 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => 
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => {
-    const workflowDataState = {setWorkflow: hoisted.mockSetWorkflow};
+    const getWorkflowDataState = () => ({setWorkflow: hoisted.mockSetWorkflow, workflow: hoisted.storeState.workflow});
 
-    const useWorkflowDataStore = (selector?: (state: unknown) => unknown) => selector?.(workflowDataState);
+    const useWorkflowDataStore = (selector?: (state: unknown) => unknown) => selector?.(getWorkflowDataState());
 
-    useWorkflowDataStore.getState = () => workflowDataState;
+    useWorkflowDataStore.getState = getWorkflowDataState;
 
     return {default: useWorkflowDataStore};
 });
@@ -80,6 +82,15 @@ vi.mock('@/shared/queries/platform/workflowTestConfigurations.queries', () => ({
     }),
 }));
 
+type ConnectionsHookType =
+    typeof import('../usePropertyCodeEditorDialogRightPanelConnections').usePropertyCodeEditorDialogRightPanelConnections;
+
+function renderConnectionsHook(hook: ConnectionsHookType, props: Parameters<ConnectionsHookType>[0]) {
+    hoisted.storeState.workflow = props.workflow;
+
+    return renderHook(() => hook(props));
+}
+
 describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
     const defaultProps = {
         componentConnections: [
@@ -101,6 +112,8 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
     };
 
     beforeEach(async () => {
+        hoisted.storeState.workflow = defaultProps.workflow;
+
         hoisted.storeState.showConnectionNote = true;
         hoisted.storeState.currentEnvironmentId = 1;
         hoisted.storeState.componentDefinitions = [{name: 'slack', title: 'Slack', version: 1}];
@@ -112,6 +125,8 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
     });
 
     afterEach(() => {
+        clearAllWorkflowMutations();
+
         vi.clearAllMocks();
     });
 
@@ -119,7 +134,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should return showConnectionNote from store', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             expect(result.current.showConnectionNote).toBe(true);
         });
@@ -127,7 +142,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should return componentDefinitions', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             expect(result.current.componentDefinitions).toEqual([{name: 'slack', title: 'Slack', version: 1}]);
         });
@@ -135,7 +150,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should return workflowTestConfigurationConnections', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             expect(result.current.workflowTestConfigurationConnections).toEqual([
                 {connectionId: 1, workflowConnectionKey: 'slack_1'},
@@ -145,7 +160,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should return showNewConnectionDialog as false initially', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             expect(result.current.showNewConnectionDialog).toBe(false);
         });
@@ -155,7 +170,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should call setShowConnectionNote with false', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleCloseConnectionNote();
@@ -169,7 +184,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should update showNewConnectionDialog state', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.setShowNewConnectionDialog(true);
@@ -183,7 +198,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should call updateWorkflowMutation.mutate with updated definition', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleOnSubmit({
@@ -210,12 +225,10 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should not call mutate when workflow definition is missing', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() =>
-                usePropertyCodeEditorDialogRightPanelConnections({
-                    ...defaultProps,
-                    workflow: {...defaultProps.workflow, definition: undefined},
-                })
-            );
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, {
+                ...defaultProps,
+                workflow: {...defaultProps.workflow, definition: undefined},
+            });
 
             act(() => {
                 result.current.handleOnSubmit({
@@ -233,7 +246,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should call updateWorkflowMutation.mutate with connection removed', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleOnRemoveClick('slack_1');
@@ -253,12 +266,10 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should not call mutate when workflow definition is missing', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() =>
-                usePropertyCodeEditorDialogRightPanelConnections({
-                    ...defaultProps,
-                    workflow: {...defaultProps.workflow, definition: undefined},
-                })
-            );
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, {
+                ...defaultProps,
+                workflow: {...defaultProps.workflow, definition: undefined},
+            });
 
             act(() => {
                 result.current.handleOnRemoveClick('slack_1');
@@ -312,8 +323,9 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             it('should add connection to cluster element', async () => {
                 const {usePropertyCodeEditorDialogRightPanelConnections} =
                     await import('../usePropertyCodeEditorDialogRightPanelConnections');
-                const {result} = renderHook(() =>
-                    usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps)
+                const {result} = renderConnectionsHook(
+                    usePropertyCodeEditorDialogRightPanelConnections,
+                    clusterElementProps
                 );
 
                 act(() => {
@@ -338,8 +350,9 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             it('should not overwrite existing cluster element connections', async () => {
                 const {usePropertyCodeEditorDialogRightPanelConnections} =
                     await import('../usePropertyCodeEditorDialogRightPanelConnections');
-                const {result} = renderHook(() =>
-                    usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps)
+                const {result} = renderConnectionsHook(
+                    usePropertyCodeEditorDialogRightPanelConnections,
+                    clusterElementProps
                 );
 
                 act(() => {
@@ -361,8 +374,9 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             it('should remove connection from cluster element', async () => {
                 const {usePropertyCodeEditorDialogRightPanelConnections} =
                     await import('../usePropertyCodeEditorDialogRightPanelConnections');
-                const {result} = renderHook(() =>
-                    usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps)
+                const {result} = renderConnectionsHook(
+                    usePropertyCodeEditorDialogRightPanelConnections,
+                    clusterElementProps
                 );
 
                 act(() => {
@@ -413,8 +427,9 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should add a connection to the matching tool cluster element', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() =>
-                usePropertyCodeEditorDialogRightPanelConnections(toolClusterElementProps)
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                toolClusterElementProps
             );
 
             act(() => {
@@ -439,8 +454,9 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should not modify other tools in the array when adding a connection', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() =>
-                usePropertyCodeEditorDialogRightPanelConnections(toolClusterElementProps)
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                toolClusterElementProps
             );
 
             act(() => {
@@ -485,7 +501,10 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
 
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(propsWithConnection));
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                propsWithConnection
+            );
 
             act(() => {
                 result.current.handleOnRemoveClick('slack_1');
@@ -504,7 +523,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should invalidate workflowNodeComponentConnections on submit success for regular nodes', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleOnSubmit({
@@ -556,7 +575,10 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
 
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps));
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                clusterElementProps
+            );
 
             act(() => {
                 result.current.handleOnSubmit({
@@ -580,7 +602,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should invalidate workflowNodeComponentConnections on remove success for regular nodes', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleOnRemoveClick('slack_1');
@@ -602,7 +624,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should sync the updated workflow into useWorkflowDataStore on submit success', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleOnSubmit({
@@ -629,7 +651,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         it('should sync the updated workflow into useWorkflowDataStore on remove success', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+            const {result} = renderConnectionsHook(usePropertyCodeEditorDialogRightPanelConnections, defaultProps);
 
             act(() => {
                 result.current.handleOnRemoveClick('slack_1');
@@ -680,7 +702,10 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
 
             const {usePropertyCodeEditorDialogRightPanelConnections} =
                 await import('../usePropertyCodeEditorDialogRightPanelConnections');
-            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps));
+            const {result} = renderConnectionsHook(
+                usePropertyCodeEditorDialogRightPanelConnections,
+                clusterElementProps
+            );
 
             act(() => {
                 result.current.handleOnSubmit({
