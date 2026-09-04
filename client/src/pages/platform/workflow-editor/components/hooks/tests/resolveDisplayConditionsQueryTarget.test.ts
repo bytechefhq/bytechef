@@ -6,10 +6,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: false,
                 currentClusterElementName: undefined,
                 currentNodeClusterElementType: undefined,
                 currentNodeName: 'logger_1',
-                pendingSaveNodeName: undefined,
             })
         ).toBe('regular');
     });
@@ -18,10 +18,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: false,
                 currentClusterElementName: 'openAi_1',
                 currentNodeClusterElementType: 'model',
                 currentNodeName: 'openAi_1',
-                pendingSaveNodeName: undefined,
             })
         ).toBe('cluster');
     });
@@ -30,10 +30,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'description',
+                awaitingFirstSave: false,
                 currentClusterElementName: undefined,
                 currentNodeClusterElementType: undefined,
                 currentNodeName: 'logger_1',
-                pendingSaveNodeName: undefined,
             })
         ).toBe('none');
     });
@@ -42,10 +42,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: false,
                 currentClusterElementName: undefined,
                 currentNodeClusterElementType: undefined,
                 currentNodeName: undefined,
-                pendingSaveNodeName: undefined,
             })
         ).toBe('none');
     });
@@ -54,10 +54,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: false,
                 currentClusterElementName: undefined,
                 currentNodeClusterElementType: undefined,
                 currentNodeName: 'manual',
-                pendingSaveNodeName: undefined,
             })
         ).toBe('none');
     });
@@ -69,10 +69,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: true,
                 currentClusterElementName: undefined,
                 currentNodeClusterElementType: undefined,
                 currentNodeName: 'logger_4',
-                pendingSaveNodeName: 'logger_4',
             })
         ).toBe('none');
     });
@@ -81,10 +81,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: true,
                 currentClusterElementName: 'openAi_1',
                 currentNodeClusterElementType: 'model',
                 currentNodeName: 'openAi_1',
-                pendingSaveNodeName: 'openAi_1',
             })
         ).toBe('none');
     });
@@ -93,10 +93,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: false,
                 currentClusterElementName: undefined,
                 currentNodeClusterElementType: undefined,
                 currentNodeName: 'logger_1',
-                pendingSaveNodeName: 'logger_4',
             })
         ).toBe('regular');
     });
@@ -105,10 +105,10 @@ describe('resolveDisplayConditionsQueryTarget', () => {
         expect(
             resolveDisplayConditionsQueryTarget({
                 activeTab: 'properties',
+                awaitingFirstSave: false,
                 currentClusterElementName: 'openAi_1',
                 currentNodeClusterElementType: undefined,
                 currentNodeName: 'openAi_1',
-                pendingSaveNodeName: undefined,
             })
         ).toBe('none');
     });
