@@ -63,7 +63,7 @@ describe('handleTaskDispatcherSubtaskOperationClick', () => {
         useWorkflowNodeDetailsPanelStore.setState({
             activeTab: 'description',
             currentNode: undefined,
-            pendingSaveNodeName: undefined,
+            pendingSaveNodeNames: new Set<string>(),
             workflowNodeDetailsPanelOpen: false,
         });
     });

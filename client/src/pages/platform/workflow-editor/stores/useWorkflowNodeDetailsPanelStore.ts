@@ -28,8 +28,9 @@ interface WorkflowNodeDetailsPanelStoreI {
     operationChangeInProgress: boolean;
     setOperationChangeInProgress: (operationChangeInProgress: boolean) => void;
 
-    pendingSaveNodeName: string | undefined;
-    setPendingSaveNodeName: (pendingSaveNodeName: string | undefined) => void;
+    pendingSaveNodeNames: ReadonlySet<string>;
+    addPendingSaveNodeName: (nodeName: string) => void;
+    removePendingSaveNodeName: (nodeName: string) => void;
 
     reset: () => void;
 
@@ -65,8 +66,21 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             setOperationChangeInProgress: (operationChangeInProgress) =>
                 set((state) => ({...state, operationChangeInProgress})),
 
-            pendingSaveNodeName: undefined,
-            setPendingSaveNodeName: (pendingSaveNodeName) => set((state) => ({...state, pendingSaveNodeName})),
+            pendingSaveNodeNames: new Set<string>(),
+            addPendingSaveNodeName: (nodeName) =>
+                set((state) => ({...state, pendingSaveNodeNames: new Set([...state.pendingSaveNodeNames, nodeName])})),
+            removePendingSaveNodeName: (nodeName) =>
+                set((state) => {
+                    if (!state.pendingSaveNodeNames.has(nodeName)) {
+                        return state;
+                    }
+
+                    const pendingSaveNodeNames = new Set(state.pendingSaveNodeNames);
+
+                    pendingSaveNodeNames.delete(nodeName);
+
+                    return {...state, pendingSaveNodeNames};
+                }),
 
             reset: () =>
                 set(() => ({
@@ -74,7 +88,6 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
                     currentNode: undefined,
                     focusedInput: null,
                     operationChangeInProgress: false,
-                    pendingSaveNodeName: undefined,
                     workflowNodeDetailsPanelOpen: false,
                 })),
 
