@@ -29,6 +29,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
@@ -43,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ import org.slf4j.helpers.MessageFormatter;
 /**
  * @author Ivica Cardic
  */
-class ContextImpl implements Context {
+class ContextImpl implements Context, LogEntryBufferAware {
 
     private final Converter converter;
     private final Encoder encoder;
@@ -67,7 +69,7 @@ class ContextImpl implements Context {
     private final File file;
     private final Http http;
     private final Json json;
-    private final Log log;
+    private final LogImpl log;
     private final MimeType mimeType;
     private final OutputSchema outputSchema;
     private final boolean editorEnvironment;
@@ -171,6 +173,11 @@ class ContextImpl implements Context {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void flushLogEntries() {
+        log.flushLogEntries();
     }
 
     @Override
@@ -660,6 +667,10 @@ class ContextImpl implements Context {
 
     private static class LogImpl implements Log {
 
+        private static final int MAX_BUFFERED_LOG_ENTRIES = 100;
+
+        private final List<LogEntry> bufferedLogEntries = new ArrayList<>();
+        private boolean buffering = true;
         private final String componentName;
         private final @Nullable String componentOperationName;
         private final @Nullable Long jobId;
@@ -823,6 +834,28 @@ class ContextImpl implements Context {
             return formattingTuple.getMessage();
         }
 
+        private void flushLogEntries() {
+            if (jobId == null || logFileStorageWriter == null) {
+                return;
+            }
+
+            List<LogEntry> logEntriesToStore;
+
+            synchronized (bufferedLogEntries) {
+                buffering = false;
+
+                if (bufferedLogEntries.isEmpty()) {
+                    return;
+                }
+
+                logEntriesToStore = List.copyOf(bufferedLogEntries);
+
+                bufferedLogEntries.clear();
+            }
+
+            logFileStorageWriter.storeLogEntries(jobId, taskExecutionId, logEntriesToStore);
+        }
+
         private void storeLogEntry(LogEntry.Level level, String message, @Nullable Exception exception) {
             if (jobId == null || logFileStorageWriter == null) {
                 return;
@@ -840,7 +873,27 @@ class ContextImpl implements Context {
                 builder.exception(exception);
             }
 
-            logFileStorageWriter.storeLogEntry(jobId, taskExecutionId, builder.build());
+            LogEntry logEntry = builder.build();
+
+            List<LogEntry> logEntriesToStore = null;
+
+            synchronized (bufferedLogEntries) {
+                if (buffering) {
+                    bufferedLogEntries.add(logEntry);
+
+                    if (bufferedLogEntries.size() >= MAX_BUFFERED_LOG_ENTRIES) {
+                        logEntriesToStore = List.copyOf(bufferedLogEntries);
+
+                        bufferedLogEntries.clear();
+                    }
+                } else {
+                    logEntriesToStore = List.of(logEntry);
+                }
+            }
+
+            if (logEntriesToStore != null) {
+                logFileStorageWriter.storeLogEntries(jobId, taskExecutionId, logEntriesToStore);
+            }
         }
     }
 
