@@ -31,6 +31,7 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
@@ -74,13 +75,18 @@ class ContextFactoryTest {
     }
 
     @Test
-    void testATriggerRunningForAnExecutionLogsToTheTriggerStoreUnderThatExecution() {
+    void testATriggerRunningForAnExecutionLogsToTheTriggerStoreUnderThatExecutionOnceFlushed() {
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             "webhook", 1, "newRequest", null, "workflow-uuid", null, null, PlatformType.AUTOMATION, false, 77L);
 
         triggerContext.log(log -> log.info("request received"));
 
+        verify(triggerLogFileStorage, never()).storeLogEntries(anyLong(), anyLong(), anyList());
+
+        ((LogEntryBufferAware) triggerContext).flushLogEntries();
+
         verify(triggerLogFileStorage).storeLogEntries(eq(77L), eq(77L), anyList());
+        verify(triggerLogFileStorage).awaitPendingWrites(77L, 77L);
         verify(logFileStorage, never()).storeLogEntries(anyLong(), anyLong(), anyList());
         verify(editorLogFileStorage, never()).storeLogEntries(anyLong(), anyLong(), anyList());
     }

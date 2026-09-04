@@ -48,7 +48,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         super(
             builder.componentName, builder.componentVersion, builder.triggerName, builder.componentConnection,
             builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
-            builder.tempFileStorage, builder.logFileStorageWriter, false,
+            builder.tempFileStorage, builder.logFileStorageWriter, true,
             builder.triggerExecutionId);
 
         this.data = new DataImpl(

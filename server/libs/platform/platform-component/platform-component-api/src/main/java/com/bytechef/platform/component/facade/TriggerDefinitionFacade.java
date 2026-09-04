@@ -74,8 +74,8 @@ public interface TriggerDefinitionFacade {
 
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
-        @Nullable String workflowUuid, Map<String, ?> inputParameters, Object triggerState,
-        WebhookRequest webhookRequest, @Nullable Long connectionId, @Nullable Long environmentId,
+        @Nullable String workflowUuid, @Nullable Long triggerExecutionId, Map<String, ?> inputParameters,
+        Object triggerState, WebhookRequest webhookRequest, @Nullable Long connectionId, @Nullable Long environmentId,
         @Nullable PlatformType type, boolean editorEnvironment);
 
     void executeWebhookDisable(
