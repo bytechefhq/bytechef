@@ -66,7 +66,7 @@ export interface WorkflowExecution {
      * @type {Job}
      * @memberof WorkflowExecution
      */
-    job: Job;
+    job?: Job;
     /**
      * 
      * @type {ProjectBasic}
@@ -98,7 +98,6 @@ export interface WorkflowExecution {
  */
 export function instanceOfWorkflowExecution(value: object): value is WorkflowExecution {
     if (!('id' in value) || value['id'] === undefined) return false;
-    if (!('job' in value) || value['job'] === undefined) return false;
     if (!('project' in value) || value['project'] === undefined) return false;
     if (!('projectDeployment' in value) || value['projectDeployment'] === undefined) return false;
     if (!('workflow' in value) || value['workflow'] === undefined) return false;
@@ -116,7 +115,7 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'id': json['id'],
-        'job': JobFromJSON(json['job']),
+        'job': json['job'] == null ? undefined : JobFromJSON(json['job']),
         'project': ProjectBasicFromJSON(json['project']),
         'projectDeployment': ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionFromJSON(json['triggerExecution']),
