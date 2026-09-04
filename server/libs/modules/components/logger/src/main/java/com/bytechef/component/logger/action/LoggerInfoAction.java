@@ -40,7 +40,7 @@ public class LoggerInfoAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(log -> log.info(String.valueOf(text)));
+        context.log(log -> log.info(text == null ? "" : String.valueOf(text)));
 
         return null;
     }
