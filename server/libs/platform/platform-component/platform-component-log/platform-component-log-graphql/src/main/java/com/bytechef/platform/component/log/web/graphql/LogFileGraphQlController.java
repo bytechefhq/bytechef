@@ -18,6 +18,7 @@ package com.bytechef.platform.component.log.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.component.log.LogFileStorage;
+import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -38,19 +39,53 @@ import org.springframework.stereotype.Controller;
 public class LogFileGraphQlController {
 
     private final LogFileStorage logFileStorage;
+    private final TriggerLogFileStorage triggerLogFileStorage;
 
     @SuppressFBWarnings("EI")
-    public LogFileGraphQlController(LogFileStorage logFileStorage) {
+    public LogFileGraphQlController(LogFileStorage logFileStorage, TriggerLogFileStorage triggerLogFileStorage) {
         this.logFileStorage = logFileStorage;
+        this.triggerLogFileStorage = triggerLogFileStorage;
     }
 
     @QueryMapping
     public LogPage jobFileLogs(
         @Argument long jobId, @Argument LogFilterInput filter, @Argument Integer page, @Argument Integer size) {
 
-        List<LogEntry> allEntries = logFileStorage.readLogEntriesByJobId(jobId);
+        return toLogPage(logFileStorage.readLogEntriesByJobId(jobId), filter, page, size);
+    }
 
-        List<LogEntry> filteredEntries = applyFilters(allEntries, filter);
+    @QueryMapping
+    public LogPage triggerExecutionFileLogs(
+        @Argument long triggerExecutionId, @Argument LogFilterInput filter, @Argument Integer page,
+        @Argument Integer size) {
+
+        return toLogPage(triggerLogFileStorage.readLogEntriesByJobId(triggerExecutionId), filter, page, size);
+    }
+
+    @QueryMapping
+    public boolean triggerExecutionFileLogsExist(@Argument long triggerExecutionId) {
+        return triggerLogFileStorage.logsExist(triggerExecutionId);
+    }
+
+    @QueryMapping
+    public List<LogEntry> taskExecutionFileLogs(@Argument long jobId, @Argument long taskExecutionId) {
+        return logFileStorage.readLogEntries(jobId, taskExecutionId);
+    }
+
+    @QueryMapping
+    public boolean jobFileLogsExist(@Argument long jobId) {
+        return logFileStorage.logsExist(jobId);
+    }
+
+    @MutationMapping
+    public boolean deleteJobFileLogs(@Argument long jobId) {
+        logFileStorage.deleteLogEntries(jobId);
+
+        return true;
+    }
+
+    private LogPage toLogPage(List<LogEntry> entries, LogFilterInput filter, Integer page, Integer size) {
+        List<LogEntry> filteredEntries = applyFilters(entries, filter);
 
         filteredEntries = filteredEntries.stream()
             .sorted(Comparator.comparing(LogEntry::timestamp))
@@ -70,23 +105,6 @@ public class LogFileGraphQlController {
         return new LogPage(
             pageContent, filteredEntries.size(), totalPages, pageNumber, pageSize, end < filteredEntries.size(),
             pageNumber > 0);
-    }
-
-    @QueryMapping
-    public List<LogEntry> taskExecutionFileLogs(@Argument long jobId, @Argument long taskExecutionId) {
-        return logFileStorage.readLogEntries(jobId, taskExecutionId);
-    }
-
-    @QueryMapping
-    public boolean jobFileLogsExist(@Argument long jobId) {
-        return logFileStorage.logsExist(jobId);
-    }
-
-    @MutationMapping
-    public boolean deleteJobFileLogs(@Argument long jobId) {
-        logFileStorage.deleteLogEntries(jobId);
-
-        return true;
     }
 
     private List<LogEntry> applyFilters(List<LogEntry> entries, LogFilterInput filter) {
