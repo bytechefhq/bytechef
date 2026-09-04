@@ -2,10 +2,10 @@ export type DisplayConditionsQueryTargetType = 'cluster' | 'none' | 'regular';
 
 interface ResolveDisplayConditionsQueryTargetProps {
     activeTab: string;
+    awaitingFirstSave: boolean;
     currentClusterElementName: string | undefined;
     currentNodeClusterElementType: string | undefined;
     currentNodeName: string | undefined;
-    pendingSaveNodeName: string | undefined;
 }
 
 /**
@@ -18,16 +18,16 @@ interface ResolveDisplayConditionsQueryTargetProps {
  */
 export function resolveDisplayConditionsQueryTarget({
     activeTab,
+    awaitingFirstSave,
     currentClusterElementName,
     currentNodeClusterElementType,
     currentNodeName,
-    pendingSaveNodeName,
 }: ResolveDisplayConditionsQueryTargetProps): DisplayConditionsQueryTargetType {
     if (activeTab !== 'properties' || !currentNodeName || currentNodeName === 'manual') {
         return 'none';
     }
 
-    if (currentNodeName === pendingSaveNodeName) {
+    if (awaitingFirstSave) {
         return 'none';
     }
 

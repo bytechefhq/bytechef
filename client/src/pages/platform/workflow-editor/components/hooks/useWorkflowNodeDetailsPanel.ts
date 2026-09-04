@@ -141,7 +141,7 @@ export default function useWorkflowNodeDetailsPanel({
         activeTab,
         currentNode,
         operationChangeInProgress,
-        pendingSaveNodeName,
+        pendingSaveNodeNames,
         setActiveTab,
         setCurrentNode,
         setOperationChangeInProgress,
@@ -151,7 +151,7 @@ export default function useWorkflowNodeDetailsPanel({
             activeTab: state.activeTab,
             currentNode: state.currentNode,
             operationChangeInProgress: state.operationChangeInProgress,
-            pendingSaveNodeName: state.pendingSaveNodeName,
+            pendingSaveNodeNames: state.pendingSaveNodeNames,
             setActiveTab: state.setActiveTab,
             setCurrentNode: state.setCurrentNode,
             setOperationChangeInProgress: state.setOperationChangeInProgress,
@@ -360,16 +360,14 @@ export default function useWorkflowNodeDetailsPanel({
     );
 
     // The node details panel opens optimistically for a freshly added node, before the add-node save
-    // has reached the server. Until handleComponentAddedSuccess clears pendingSaveNodeName, every
-    // by-name request for that node 400s with "Workflow node with name: <name> does not exist".
-    const awaitingFirstSave = !!currentNodeName && currentNodeName === pendingSaveNodeName;
+    const awaitingFirstSave = !!currentNodeName && pendingSaveNodeNames.has(currentNodeName);
 
     const displayConditionsQueryTarget = resolveDisplayConditionsQueryTarget({
         activeTab,
+        awaitingFirstSave,
         currentClusterElementName,
         currentNodeClusterElementType: currentNode?.clusterElementType,
         currentNodeName,
-        pendingSaveNodeName,
     });
 
     const displayConditionsQuery = useGetWorkflowNodeParameterDisplayConditionsQuery(
@@ -414,7 +412,7 @@ export default function useWorkflowNodeDetailsPanel({
                 !!currentNodeName &&
                 currentNodeName !== 'manual' &&
                 currentNodeName !== currentClusterElementName &&
-                currentNodeName !== pendingSaveNodeName &&
+                !awaitingFirstSave &&
                 !currentNode?.clusterElementType,
         }
     );
@@ -437,7 +435,7 @@ export default function useWorkflowNodeDetailsPanel({
                 !!currentNodeName &&
                 currentNodeName !== 'manual' &&
                 currentNodeName === currentClusterElementName &&
-                currentNodeName !== pendingSaveNodeName &&
+                !awaitingFirstSave &&
                 !!currentNode.clusterElementType,
         }
     );
@@ -1145,7 +1143,7 @@ export default function useWorkflowNodeDetailsPanel({
             currentNodeName,
             currentClusterElementName,
             currentNode?.clusterElementType,
-            pendingSaveNodeName
+            awaitingFirstSave
         );
 
         if (refetchTarget === 'cluster') {
@@ -1159,7 +1157,7 @@ export default function useWorkflowNodeDetailsPanel({
         currentNodeName,
         currentClusterElementName,
         currentNode?.clusterElementType,
-        pendingSaveNodeName,
+        awaitingFirstSave,
     ]);
 
     // Arm the errors loading cue when an operation switch starts.

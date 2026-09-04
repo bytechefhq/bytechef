@@ -10,13 +10,13 @@ export function resolveMissingRequiredPropertiesRefetch(
     currentNodeName: string | undefined,
     currentClusterElementName: string | undefined,
     currentNodeClusterElementType: string | undefined,
-    pendingSaveNodeName: string | undefined
+    awaitingFirstSave: boolean
 ): MissingRequiredPropertiesRefetchTargetType {
     if (!currentNodeName || currentNodeName === 'manual') {
         return 'none';
     }
 
-    if (currentNodeName === pendingSaveNodeName) {
+    if (awaitingFirstSave) {
         return 'none';
     }
 

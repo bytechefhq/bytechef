@@ -24,7 +24,7 @@ describe('openNodeDetailsPanelForNewNode', () => {
         useWorkflowNodeDetailsPanelStore.setState({
             activeTab: 'description',
             currentNode: undefined,
-            pendingSaveNodeName: undefined,
+            pendingSaveNodeNames: new Set<string>(),
             workflowNodeDetailsPanelOpen: false,
         });
     });
@@ -45,7 +45,28 @@ describe('openNodeDetailsPanelForNewNode', () => {
     it('should mark the new node as pending its first save so node-scoped queries wait for persistence', () => {
         openNodeDetailsPanelForNewNode(makeNodeData());
 
-        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeName).toBe('slack_1');
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.has('slack_1')).toBe(true);
+    });
+
+    it('keeps the first node pending when a second node is added before the first save lands', () => {
+        openNodeDetailsPanelForNewNode(makeNodeData({name: 'slack_1'}));
+        openNodeDetailsPanelForNewNode(makeNodeData({componentName: 'logger', name: 'logger_1'}));
+
+        const {pendingSaveNodeNames} = useWorkflowNodeDetailsPanelStore.getState();
+
+        expect(pendingSaveNodeNames.has('slack_1')).toBe(true);
+        expect(pendingSaveNodeNames.has('logger_1')).toBe(true);
+
+        handleComponentAddedSuccess({
+            nodeData: makeNodeData({componentName: 'logger', name: 'logger_1'}),
+            queryClient: new QueryClient(),
+            workflow: {id: 'workflow_1'} as Workflow,
+        });
+
+        const afterSecondSave = useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames;
+
+        expect(afterSecondSave.has('slack_1')).toBe(true);
+        expect(afterSecondSave.has('logger_1')).toBe(false);
     });
 
     it('should reset activeTab to description when opening the panel for a new node', () => {
@@ -86,7 +107,7 @@ describe('openNodeDetailsPanelForNewNode', () => {
     });
 
     it('should clear the pending-save marker when the added node is confirmed persisted', () => {
-        useWorkflowNodeDetailsPanelStore.setState({pendingSaveNodeName: 'slack_1'});
+        useWorkflowNodeDetailsPanelStore.setState({pendingSaveNodeNames: new Set(['slack_1'])});
 
         handleComponentAddedSuccess({
             nodeData: makeNodeData(),
@@ -94,11 +115,11 @@ describe('openNodeDetailsPanelForNewNode', () => {
             workflow: {id: 'workflow_1'} as Workflow,
         });
 
-        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeName).toBeUndefined();
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.has('slack_1')).toBe(false);
     });
 
     it('should not clear the pending-save marker of a different node still awaiting its save', () => {
-        useWorkflowNodeDetailsPanelStore.setState({pendingSaveNodeName: 'accelo_1'});
+        useWorkflowNodeDetailsPanelStore.setState({pendingSaveNodeNames: new Set(['accelo_1'])});
 
         handleComponentAddedSuccess({
             nodeData: makeNodeData({name: 'slack_1'}),
@@ -106,7 +127,15 @@ describe('openNodeDetailsPanelForNewNode', () => {
             workflow: {id: 'workflow_1'} as Workflow,
         });
 
-        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeName).toBe('accelo_1');
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.has('accelo_1')).toBe(true);
+    });
+
+    it('keeps the pending-save markers when the panel is reset, since they track saves rather than the panel', () => {
+        openNodeDetailsPanelForNewNode(makeNodeData());
+
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.has('slack_1')).toBe(true);
     });
 
     it('should update panel when replacing a trigger while panel is open', () => {
