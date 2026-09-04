@@ -51,4 +51,13 @@ public interface ContextFactory {
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
         @Nullable PlatformType type, boolean editorEnvironment);
+
+    /**
+     * Creates a trigger context for a trigger that is actually running for a persisted trigger execution. Log entries
+     * written through it are stored under that execution.
+     */
+    TriggerContext createTriggerContext(
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
+        @Nullable PlatformType type, boolean editorEnvironment, @Nullable Long triggerExecutionId);
 }

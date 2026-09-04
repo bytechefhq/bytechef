@@ -24,6 +24,8 @@ import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.EditorLogFileStorageImpl;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageImpl;
+import com.bytechef.platform.component.log.TriggerLogFileStorage;
+import com.bytechef.platform.component.log.TriggerLogFileStorageImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,6 +40,13 @@ class LogFileStorageConfiguration {
         ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
         return new EditorLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
+    }
+
+    @Bean
+    TriggerLogFileStorage triggerLogFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
+        return new TriggerLogFileStorageImpl(getFileStorageService(applicationProperties, fileStorageServiceRegistry));
     }
 
     @Bean

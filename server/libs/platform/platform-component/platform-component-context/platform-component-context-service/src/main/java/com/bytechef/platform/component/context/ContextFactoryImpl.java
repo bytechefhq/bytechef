@@ -28,6 +28,7 @@ import com.bytechef.platform.component.definition.datastream.ClusterElementResol
 import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
+import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -53,6 +54,7 @@ public class ContextFactoryImpl implements ContextFactory {
     private final ApplicationEventPublisher eventPublisher;
     private final LogFileStorage logFileStorage;
     private final TempFileStorage tempFileStorage;
+    private final TriggerLogFileStorage triggerLogFileStorage;
     private final String publicUrl;
     private final Tracer tracer;
 
@@ -61,7 +63,7 @@ public class ContextFactoryImpl implements ContextFactory {
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
         DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, ApplicationEventPublisher eventPublisher,
         FileStorageServiceRegistry fileStorageServiceRegistry, LogFileStorage logFileStorage,
-        TempFileStorage tempFileStorage, Tracer tracer) {
+        TempFileStorage tempFileStorage, Tracer tracer, TriggerLogFileStorage triggerLogFileStorage) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
@@ -78,6 +80,7 @@ public class ContextFactoryImpl implements ContextFactory {
         this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;
         this.tracer = tracer;
+        this.triggerLogFileStorage = triggerLogFileStorage;
         this.publicUrl = applicationProperties.getPublicUrl();
     }
 
@@ -144,6 +147,17 @@ public class ContextFactoryImpl implements ContextFactory {
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
         @Nullable PlatformType type, boolean editorEnvironment) {
 
+        return createTriggerContext(
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
+            environmentId, type, editorEnvironment, null);
+    }
+
+    @Override
+    public TriggerContext createTriggerContext(
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
+        @Nullable PlatformType type, boolean editorEnvironment, @Nullable Long triggerExecutionId) {
+
         return TriggerContextImpl
             .builder(
                 componentName, componentVersion, triggerName, editorEnvironment, cacheManager, dataStorage,
@@ -151,7 +165,8 @@ public class ContextFactoryImpl implements ContextFactory {
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobPrincipalId(jobPrincipalId)
-            .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
+            .logFileStorageWriter(triggerExecutionId == null ? null : triggerLogFileStorage)
+            .triggerExecutionId(triggerExecutionId)
             .type(type)
             .workflowUuid(workflowUuid)
             .build();

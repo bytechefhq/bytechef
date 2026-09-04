@@ -290,6 +290,26 @@ class LogFileStorageTest {
     }
 
     @Test
+    void testALineWrittenBeforeTriggerExecutionIdExistedStillParses() {
+        FileEntry taskFile = new FileEntry("10.jsonl", "file://test/1/10.jsonl");
+        String legacyLine =
+            "{\"timestamp\":\"2026-09-04T10:00:00Z\",\"level\":\"INFO\",\"componentName\":\"httpClient\","
+                + "\"componentOperationName\":\"get\",\"taskExecutionId\":10,\"message\":\"from before\"}\n";
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(true);
+        when(fileStorageService.getFileEntry(JOB_DIR, "10.jsonl")).thenReturn(taskFile);
+        when(fileStorageService.readFileToBytes(JOB_DIR, taskFile))
+            .thenReturn(legacyLine.getBytes(StandardCharsets.UTF_8));
+        when(fileStorageService.fileExists(LEGACY_DIR, LEGACY_FILENAME)).thenReturn(false);
+
+        List<LogEntry> logEntries = logFileStorage.readLogEntries(JOB_ID, 10L);
+
+        assertEquals(List.of("from before"), messagesOf(logEntries));
+        assertEquals(null, logEntries.get(0)
+            .triggerExecutionId());
+    }
+
+    @Test
     void testAnUnreadableLineIsSkippedWithoutHidingTheRest() {
         FileEntry taskFile = new FileEntry("10.jsonl", "file://test/1/10.jsonl");
         String content = jsonLine(logEntry(10L, "before")) + "{not json\n" + jsonLine(logEntry(10L, "after"));

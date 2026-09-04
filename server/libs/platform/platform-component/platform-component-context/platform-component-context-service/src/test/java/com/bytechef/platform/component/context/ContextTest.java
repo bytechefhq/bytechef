@@ -57,7 +57,7 @@ class ContextTest {
         context = new ContextImpl(
             "httpClient", 1, "get", null, JOB_ID, TASK_EXECUTION_ID, true,
             new HttpClientExecutor(mock(ApplicationContext.class), tempFileStorage), tempFileStorage,
-            logFileStorageWriter, true);
+            logFileStorageWriter, true, null);
     }
 
     @Test
@@ -170,7 +170,7 @@ class ContextTest {
         ContextImpl clusterElementContext = new ContextImpl(
             "openai", 1, "model", null, JOB_ID, TASK_EXECUTION_ID, true,
             new HttpClientExecutor(mock(ApplicationContext.class), tempFileStorage), tempFileStorage,
-            logFileStorageWriter, false);
+            logFileStorageWriter, false, null);
 
         clusterElementContext.log(log -> log.debug("prompt sent"));
         clusterElementContext.log(log -> log.debug("completion received"));
@@ -191,6 +191,33 @@ class ContextTest {
         clusterElementContext.flushLogEntries();
 
         verify(logFileStorageWriter, times(2)).storeLogEntries(eq(JOB_ID), eq(TASK_EXECUTION_ID), anyList());
+    }
+
+    @Test
+    void testATriggerContextStoresUnderItsTriggerExecutionInBothKeyPositions() {
+        TempFileStorage tempFileStorage = mock(TempFileStorage.class);
+
+        ContextImpl triggerContext = new ContextImpl(
+            "webhook", 1, "newRequest", null, null, 0, false,
+            new HttpClientExecutor(mock(ApplicationContext.class), tempFileStorage), tempFileStorage,
+            logFileStorageWriter, false, 77L);
+
+        triggerContext.log(log -> log.info("request received"));
+
+        ArgumentCaptor<List<LogEntry>> batchArgumentCaptor = batchCaptor();
+
+        verify(logFileStorageWriter).storeLogEntries(eq(77L), eq(77L), batchArgumentCaptor.capture());
+
+        LogEntry logEntry = batchArgumentCaptor.getValue()
+            .get(0);
+
+        assertEquals(Long.valueOf(77L), logEntry.triggerExecutionId());
+        assertEquals(77L, logEntry.taskExecutionId());
+        assertEquals("request received", logEntry.message());
+
+        triggerContext.flushLogEntries();
+
+        verify(logFileStorageWriter).awaitPendingWrites(77L, 77L);
     }
 
     @Test
