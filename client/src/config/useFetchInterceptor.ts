@@ -29,15 +29,13 @@ function isCsrfProtectedUrl(url: string): boolean {
     return url.includes('/graphql') || url.includes('/internal/');
 }
 
-/*
- * Some reads render their own error state inline and own the failure UX. The approval-form read,
- * for instance, shows a "Form no longer available" panel (see ApprovalForm.tsx) whenever its fetch
- * fails, and a workflow node's Test / Reset shows its failure in the Output tab (see
- * testOutputInlineErrors.ts), so a global error toast on top of them is redundant and confusing.
- * Suppress the toast for those endpoints.
- */
 function handlesErrorInline(url: string): boolean {
-    return url.includes('/approval-form/') || isInlineTestOutputUrl(url);
+    return (
+        url.includes('/approval-form/') ||
+        isInlineTestOutputUrl(url) ||
+        url.includes('/ai/chat/ai_hub/status') ||
+        /\/ai\/chat\/ai_hub\/[^/]+\/presence/.test(url)
+    );
 }
 
 const AUTHENTICATION_REQUIRED_ERROR_CODE = 'AUTHENTICATION_REQUIRED';

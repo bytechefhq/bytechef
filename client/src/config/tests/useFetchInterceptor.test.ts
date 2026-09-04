@@ -287,6 +287,42 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
+        it('skips toast for a failed AI Hub presence heartbeat', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Unknown thread', title: 'Not Found'},
+                status: 404,
+                url: 'http://localhost/api/platform/internal/ai/chat/ai_hub/thread-1/presence',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('skips toast for a failed AI Hub status poll', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Something went wrong', title: 'Error'},
+                status: 500,
+                url: 'http://localhost/api/platform/internal/ai/chat/ai_hub/status?threadIds=thread-1',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
         it('skips toast for AdminUserDTO with errorKey 100', async () => {
             renderHook(() => useFetchInterceptor());
 
