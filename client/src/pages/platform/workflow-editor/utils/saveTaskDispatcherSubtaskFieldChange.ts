@@ -8,6 +8,7 @@ import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
+import {enqueuePendingSave, isWorkflowMutating} from './workflowMutationGuard';
 
 type FieldUpdateType = {
     field: 'description' | 'label' | 'maxRetries' | 'operation';
@@ -22,18 +23,26 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
-export default function saveTaskDispatcherSubtaskFieldChange({
-    currentComponentDefinition,
-    currentNodeIndex,
-    currentOperationProperties,
-    fieldUpdate,
-    updateWorkflowMutation,
-}: SaveTaskDispatcherSubtaskFieldChangeProps): void {
+export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDispatcherSubtaskFieldChangeProps): void {
+    const {
+        currentComponentDefinition,
+        currentNodeIndex,
+        currentOperationProperties,
+        fieldUpdate,
+        updateWorkflowMutation,
+    } = props;
+
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!currentNode || !workflow.definition) {
+        return;
+    }
+
+    if (workflow.id && isWorkflowMutating(workflow.id)) {
+        enqueuePendingSave(workflow.id, () => saveTaskDispatcherSubtaskFieldChange(props));
+
         return;
     }
 
