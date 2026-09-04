@@ -1,5 +1,5 @@
-query jobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
-    jobFileLogs(jobId: $jobId, filter: $filter, page: $page, size: $size) {
+query triggerExecutionFileLogs($triggerExecutionId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
+    triggerExecutionFileLogs(triggerExecutionId: $triggerExecutionId, filter: $filter, page: $page, size: $size) {
         content {
             timestamp
             level
