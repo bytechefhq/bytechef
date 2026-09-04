@@ -143,6 +143,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowExecution"
+  /workflow-executions/trigger-executions/{triggerExecutionId}:
+    get:
+      description: "Get the execution view of a trigger execution that produced no job, such as a failed webhook or poll."
+      summary: "Get a trigger execution's workflow execution"
+      tags:
+      - "workflow-execution"
+      operationId: "getTriggerExecutionWorkflowExecution"
+      parameters:
+      - name: "triggerExecutionId"
+        description: "The id of a trigger execution."
+        in: "path"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "The execution object, without a job."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowExecution"
   /workflow-executions/{id}/task-executions/{taskExecutionId}:
     get:
       description: "Get a single task execution's input and output by id."
@@ -183,7 +205,6 @@ components:
         - "id"
         - "project"
         - "projectDeployment"
-        - "job"
         - "workflow"
       properties:
         id:
@@ -265,7 +286,6 @@ components:
         - "id"
         - "project"
         - "projectDeployment"
-        - "job"
         - "workflow"
       properties:
         id:
@@ -279,5 +299,7 @@ components:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectDeploymentBasic"
         job:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/JobBasic"
+        triggerExecution:
+          $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
         workflow:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowBasic"

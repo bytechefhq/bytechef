@@ -51,6 +51,7 @@ import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,8 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
-            jobService, mock(PrincipalJobService.class), mock(ProjectFacade.class),
+            mock(WorkflowExecutionRowService.class), jobService, mock(PrincipalJobService.class),
+            mock(ProjectFacade.class),
             mock(ProjectDeploymentService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));

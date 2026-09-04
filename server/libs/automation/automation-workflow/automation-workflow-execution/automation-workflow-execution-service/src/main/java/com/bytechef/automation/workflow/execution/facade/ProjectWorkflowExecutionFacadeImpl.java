@@ -48,26 +48,33 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.PrincipalJob;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.WorkflowExecutionRowDTO;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.execution.service.WorkflowExecutionRowService;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -87,6 +94,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     private final ContextService contextService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
+    private final WorkflowExecutionRowService workflowExecutionRowService;
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
@@ -103,7 +111,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     @SuppressFBWarnings("EI")
     public ProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
-        EnvironmentService environmentService, JobService jobService, PrincipalJobService principalJobService,
+        EnvironmentService environmentService, WorkflowExecutionRowService workflowExecutionRowService,
+        JobService jobService,
+        PrincipalJobService principalJobService,
         ProjectFacade projectFacade, ProjectDeploymentService projectDeploymentService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutionService taskExecutionService,
@@ -114,6 +124,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         this.contextService = contextService;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
+        this.workflowExecutionRowService = workflowExecutionRowService;
         this.jobService = jobService;
         this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
@@ -153,6 +164,22 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
                     .orElse(null),
                 job));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public WorkflowExecutionDTO getTriggerExecutionWorkflowExecution(long triggerExecutionId) {
+        TriggerExecution triggerExecution = triggerExecutionService.getTriggerExecution(triggerExecutionId);
+
+        WorkflowExecutionDTO workflowExecutionDTO = buildTriggerWorkflowExecutionDTOs(List.of(triggerExecution))
+            .get(triggerExecutionId);
+
+        if (workflowExecutionDTO == null) {
+            throw new NoSuchElementException(
+                "Trigger execution " + triggerExecutionId + " does not belong to a deployed workflow");
+        }
+
+        return workflowExecutionDTO;
     }
 
     @Override
@@ -225,11 +252,16 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             if (projectDeploymentIds.isEmpty()) {
                 workflowExecutionPage = Page.empty();
             } else {
-                Page<Long> jobIdsPage = principalJobService.getJobIds(
+                Page<WorkflowExecutionRowDTO> rowsPage = workflowExecutionRowService.getWorkflowExecutionRows(
                     jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, PlatformType.AUTOMATION, workflowIds,
-                    true, pageNumber);
+                    true, getFailedTriggerWorkflowExecutionIds(jobStatus, projectDeploymentIds, workflowIds),
+                    pageNumber);
 
-                List<Long> jobIds = jobIdsPage.getContent();
+                List<Long> jobIds = rowsPage.getContent()
+                    .stream()
+                    .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB)
+                    .map(WorkflowExecutionRowDTO::id)
+                    .toList();
 
                 List<Job> jobs = jobService.getJobs(jobIds);
 
@@ -286,12 +318,30 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     }
                 }
 
-                List<WorkflowExecutionDTO> workflowExecutionDTOs = buildWorkflowExecutionDTOs(
+                Map<Long, WorkflowExecutionDTO> jobWorkflowExecutionDTOMap = buildWorkflowExecutionDTOs(
                     jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, jobToPrincipalMap, deploymentMap,
-                    triggerExecutionByJobIdMap);
+                    triggerExecutionByJobIdMap)
+                        .stream()
+                        .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
+
+                Map<Long, WorkflowExecutionDTO> triggerWorkflowExecutionDTOMap = buildTriggerWorkflowExecutionDTOs(
+                    triggerExecutionService.getTriggerExecutions(
+                        rowsPage.getContent()
+                            .stream()
+                            .filter(row -> row.kind() == WorkflowExecutionRowDTO.Kind.TRIGGER_EXECUTION)
+                            .map(WorkflowExecutionRowDTO::id)
+                            .toList()));
+
+                List<WorkflowExecutionDTO> workflowExecutionDTOs = rowsPage.getContent()
+                    .stream()
+                    .map(row -> row.kind() == WorkflowExecutionRowDTO.Kind.JOB
+                        ? jobWorkflowExecutionDTOMap.get(row.id())
+                        : triggerWorkflowExecutionDTOMap.get(row.id()))
+                    .filter(Objects::nonNull)
+                    .toList();
 
                 workflowExecutionPage = new PageImpl<>(
-                    workflowExecutionDTOs, jobIdsPage.getPageable(), jobIdsPage.getTotalElements());
+                    workflowExecutionDTOs, rowsPage.getPageable(), rowsPage.getTotalElements());
             }
         }
 
@@ -368,6 +418,102 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return workflowExecutionDTOs;
     }
 
+    /**
+     * The encoded workflow execution ids under which a trigger of any workflow in scope, deployed by any deployment in
+     * scope, records its executions. Only the project version a deployment points at counts, and every id appears once,
+     * since the ids are bound one JDBC parameter each. Empty when the status filter rules failed triggers out, which
+     * keeps them off the page.
+     */
+    private List<String> getFailedTriggerWorkflowExecutionIds(
+        Status jobStatus, List<Long> projectDeploymentIds, List<String> workflowIds) {
+
+        if (jobStatus != null && jobStatus != Status.FAILED) {
+            return List.of();
+        }
+
+        Map<Long, ProjectDeployment> deploymentMap = projectDeploymentService.getProjectDeployments(
+            projectDeploymentIds)
+            .stream()
+            .collect(Collectors.toMap(deployment -> Validate.notNull(deployment.getId(), "id"), Function.identity()));
+
+        Map<String, Workflow> workflowMap = workflowService.getWorkflows(workflowIds)
+            .stream()
+            .collect(Collectors.toMap(Workflow::getId, Function.identity()));
+
+        Set<String> workflowExecutionIds = new LinkedHashSet<>();
+
+        for (ProjectWorkflow projectWorkflow : projectWorkflowService.getProjectWorkflows(
+            deploymentMap.values()
+                .stream()
+                .map(ProjectDeployment::getProjectId)
+                .distinct()
+                .toList())) {
+
+            Workflow workflow = workflowMap.get(projectWorkflow.getWorkflowId());
+
+            if (workflow == null) {
+                continue;
+            }
+
+            for (ProjectDeployment deployment : deploymentMap.values()) {
+                if (!Objects.equals(deployment.getProjectId(), projectWorkflow.getProjectId()) ||
+                    deployment.getProjectVersion() != projectWorkflow.getProjectVersion()) {
+
+                    continue;
+                }
+
+                for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
+                    workflowExecutionIds.add(
+                        WorkflowExecutionId.of(
+                            PlatformType.AUTOMATION, Validate.notNull(deployment.getId(), "id"),
+                            projectWorkflow.getUuidAsString(), workflowTrigger.getName())
+                            .toString());
+                }
+            }
+        }
+
+        return new ArrayList<>(workflowExecutionIds);
+    }
+
+    /**
+     * Execution rows for trigger executions that produced no job, keyed by trigger execution id. The deployment,
+     * project and workflow come from the trigger execution's workflow execution id.
+     */
+    private Map<Long, WorkflowExecutionDTO>
+        buildTriggerWorkflowExecutionDTOs(List<TriggerExecution> triggerExecutions) {
+        Map<Long, WorkflowExecutionDTO> workflowExecutionDTOMap = new HashMap<>();
+
+        for (TriggerExecution triggerExecution : triggerExecutions) {
+            WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
+
+            long projectDeploymentId = workflowExecutionId.getJobPrincipalId();
+
+            ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(projectDeploymentId);
+
+            Optional<String> workflowIdOptional = projectWorkflowService.fetchProjectWorkflowWorkflowId(
+                projectDeploymentId, workflowExecutionId.getWorkflowUuid());
+
+            if (workflowIdOptional.isEmpty()) {
+                if (log.isWarnEnabled()) {
+                    log.warn(
+                        "Skipping trigger execution id={}: workflow '{}' not found for deployment {}",
+                        triggerExecution.getId(), workflowExecutionId.getWorkflowUuid(), projectDeploymentId);
+                }
+
+                continue;
+            }
+
+            workflowExecutionDTOMap.put(
+                Validate.notNull(triggerExecution.getId(), "id"),
+                new WorkflowExecutionDTO(
+                    triggerExecution.getId(), projectService.getProject(projectDeployment.getProjectId()),
+                    projectDeployment, null, workflowService.getWorkflow(workflowIdOptional.get()),
+                    getTriggerExecutionDTO(projectDeploymentId, triggerExecution, null)));
+        }
+
+        return workflowExecutionDTOMap;
+    }
+
     private DefinitionResult getDefinition(String type, Map<String, DefinitionResult> definitionResultCache) {
         return definitionResultCache.computeIfAbsent(type, this::resolveDefinition);
     }
@@ -424,7 +570,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(
-        Number projectDeploymentId, TriggerExecution triggerExecution, Job job) {
+        Number projectDeploymentId, TriggerExecution triggerExecution, @Nullable Job job) {
 
         TriggerExecutionDTO triggerExecutionDTO = null;
 
@@ -435,15 +581,22 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
             Map<String, ?> workflowTriggerParameters = workflowTrigger.getParameters();
 
-            Map<String, Object> inputs = job.getInputs()
-                .entrySet()
-                .stream()
-                .filter(input -> !workflowTriggerParameters.containsKey(input.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Map<String, ?> input;
+
+            if (job == null) {
+                input = workflowTriggerParameters;
+            } else {
+                Map<String, Object> inputs = job.getInputs()
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> !workflowTriggerParameters.containsKey(entry.getKey()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                input = workflowTrigger.evaluateParameters(inputs, evaluator);
+            }
 
             triggerExecutionDTO = new TriggerExecutionDTO(
-                triggerExecution, definitionResult.title(), definitionResult.icon(),
-                workflowTrigger.evaluateParameters(inputs, evaluator),
+                triggerExecution, definitionResult.title(), definitionResult.icon(), input,
                 triggerExecution.getOutput() == null ? null
                     : triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
         }
