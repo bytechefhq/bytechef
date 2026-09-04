@@ -138,6 +138,15 @@ describe('openNodeDetailsPanelForNewNode', () => {
         expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.has('slack_1')).toBe(true);
     });
 
+    it('drops every marker when the editor asks for an explicit clear, e.g. on a workflow switch', () => {
+        openNodeDetailsPanelForNewNode(makeNodeData({name: 'slack_1'}));
+        openNodeDetailsPanelForNewNode(makeNodeData({componentName: 'logger', name: 'logger_1'}));
+
+        useWorkflowNodeDetailsPanelStore.getState().clearPendingSaveNodeNames();
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeNames.size).toBe(0);
+    });
+
     it('should update panel when replacing a trigger while panel is open', () => {
         const existingTrigger = makeNodeData({
             componentName: 'manual',

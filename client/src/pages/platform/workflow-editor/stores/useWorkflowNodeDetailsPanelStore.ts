@@ -30,6 +30,7 @@ interface WorkflowNodeDetailsPanelStoreI {
 
     pendingSaveNodeNames: ReadonlySet<string>;
     addPendingSaveNodeName: (nodeName: string) => void;
+    clearPendingSaveNodeNames: () => void;
     removePendingSaveNodeName: (nodeName: string) => void;
 
     reset: () => void;
@@ -69,6 +70,7 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             pendingSaveNodeNames: new Set<string>(),
             addPendingSaveNodeName: (nodeName) =>
                 set((state) => ({...state, pendingSaveNodeNames: new Set([...state.pendingSaveNodeNames, nodeName])})),
+            clearPendingSaveNodeNames: () => set((state) => ({...state, pendingSaveNodeNames: new Set<string>()})),
             removePendingSaveNodeName: (nodeName) =>
                 set((state) => {
                     if (!state.pendingSaveNodeNames.has(nodeName)) {
