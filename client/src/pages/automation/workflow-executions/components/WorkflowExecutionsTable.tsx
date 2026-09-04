@@ -178,10 +178,10 @@ const ExecutionRows = ({
 
                     {expandable && expanded && (
                         <TableRow className="border-0 even:bg-surface-neutral-primary">
-                            <TableCell className="p-0" colSpan={columns.length + 1}>
+                            <TableCell className="py-0 pr-0 pl-9" colSpan={columns.length + 1}>
                                 <Table
                                     className={twMerge(
-                                        'ml-9 border border-stroke-brand-secondary',
+                                        'border border-stroke-brand-secondary',
                                         depth > 0 && 'border-r-0 border-b-0'
                                     )}
                                 >
