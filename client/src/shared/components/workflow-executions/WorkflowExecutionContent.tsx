@@ -62,17 +62,21 @@ const WorkflowExecutionContent = ({
     }
 
     if (input !== undefined) {
+        if (!hasValue(input)) {
+            return (
+                <div className="flex items-center justify-center p-4">
+                    <span className="text-sm text-muted-foreground">No input data</span>
+                </div>
+            );
+        }
+
         return (
             <div className="space-y-2 rounded-md">
                 <div className="overflow-x-auto text-nowrap">
-                    {hasValue(input) ? (
-                        typeof input === 'object' ? (
-                            <JsonView src={input as object} />
-                        ) : (
-                            <span className="text-sm">{input}</span>
-                        )
+                    {typeof input === 'object' ? (
+                        <JsonView src={input as object} />
                     ) : (
-                        <span className="text-sm">No input data.</span>
+                        <span className="text-sm">{input}</span>
                     )}
                 </div>
             </div>
@@ -81,7 +85,11 @@ const WorkflowExecutionContent = ({
 
     if (output !== undefined || (jobInputs !== undefined && workflowTriggerName)) {
         if (!hasValue(filteredOutput)) {
-            return <span className="text-sm">No output data.</span>;
+            return (
+                <div className="flex items-center justify-center p-4">
+                    <span className="text-sm text-muted-foreground">No output data</span>
+                </div>
+            );
         }
 
         return (
