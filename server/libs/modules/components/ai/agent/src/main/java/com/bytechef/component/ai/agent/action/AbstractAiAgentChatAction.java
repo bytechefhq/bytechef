@@ -157,7 +157,7 @@ public abstract class AbstractAiAgentChatAction {
             .tools(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context)
+                    toolExecutionListener, toolSimulations, chatModel, context)
                         .toArray());
     }
 
@@ -479,7 +479,7 @@ public abstract class AbstractAiAgentChatAction {
 
     private List<ToolCallback> getToolCallbacks(
         List<ClusterElement> toolClusterElements, Map<String, ComponentConnection> connectionParameters,
-        boolean editorEnvironment, @Nullable ToolExecutionListener toolExecutionListener,
+        @Nullable ToolExecutionListener toolExecutionListener,
         @Nullable Map<String, Map<String, String>> toolSimulations, ChatModel chatModel, ActionContext context) {
 
         List<ToolCallback> toolCallbacks = new ArrayList<>();
@@ -520,13 +520,13 @@ public abstract class AbstractAiAgentChatAction {
                 }
             } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
                 toolCallbacks.add(
-                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, connectionParameters, editorEnvironment));
+                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, connectionParameters, context));
             } else {
                 ComponentConnection componentConnection = connectionParameters.get(
                     clusterElement.getWorkflowNodeName());
 
                 toolCallbacks.add(
-                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, editorEnvironment));
+                    aiAgentToolFacade.getFunctionToolCallback(clusterElement, componentConnection, context));
             }
         }
 
