@@ -16,9 +16,12 @@ export interface LeftSidebarFilterNavLeadItemI {
 
 interface LeftSidebarFilterNavProps {
     className?: string;
+    /** Shown in place of the rows once the list has arrived and turned out to be empty. */
     emptyMessage?: string;
+    /** Rendered on every row, the way tag groups carry a tag icon. */
     icon?: ReactNode;
     items: LeftSidebarFilterNavItemI[];
+    /** The unfiltered entry a group opens with, such as "All Categories". */
     leadItem?: LeftSidebarFilterNavLeadItemI;
     loading?: boolean;
     title: string;

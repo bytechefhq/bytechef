@@ -17,6 +17,7 @@ interface CategoryTagLeftSidebarNavProps {
     categoriesIsLoading?: boolean;
     currentCategoryId?: number;
     currentTagId?: number;
+    /** Groups appended after Tags, such as the embedded Unified API filters. */
     extraGroups?: ReactNode;
     otherFilterActive?: boolean;
     tags: CategoryTagLeftSidebarNavTagI[] | undefined;
