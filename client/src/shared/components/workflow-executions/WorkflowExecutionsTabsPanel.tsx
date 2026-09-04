@@ -287,6 +287,7 @@ const WorkflowExecutionsTabsPanel = ({
                                 taskExecutionId={
                                     selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
                                 }
+                                triggerExecutionId={isTriggerExecution ? triggerExecution?.id : undefined}
                             />
                         )}
                     </TabsContent>
