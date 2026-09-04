@@ -324,6 +324,8 @@ export default function handleDeleteTask({
         return;
     }
 
+    useWorkflowNodeDetailsPanelStore.getState().removePendingSaveNodeName(data.name);
+
     // Cancel any in-flight workflow query refetches from previous mutations
     // to prevent stale server data from overwriting the upcoming optimistic update.
     cancelWorkflowQueries();
