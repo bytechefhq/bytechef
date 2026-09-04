@@ -186,6 +186,8 @@ const WorkflowEditorLayout = ({
     useEffect(() => {
         return () => {
             clearAllWorkflowMutations();
+
+            useWorkflowNodeDetailsPanelStore.getState().clearPendingSaveNodeNames();
         };
     }, []);
 

@@ -298,6 +298,8 @@ export const useProject = () => {
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
 
+        useWorkflowNodeDetailsPanelStore.getState().clearPendingSaveNodeNames();
+
         const restorePanelParam = searchParams.get('restoreExecutionPanel');
         const fromSubflowParam = searchParams.get('fromSubflow');
 
