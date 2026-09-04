@@ -1255,7 +1255,7 @@ export type EditorJobFileLogsQueryVariables = Exact<{
 }>;
 
 
-export type EditorJobFileLogsQuery = { editorJobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
+export type EditorJobFileLogsQuery = { editorJobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
 
 export type EditorJobFileLogsExistQueryVariables = Exact<{
   jobId: string | number;
@@ -1270,7 +1270,7 @@ export type EditorTaskExecutionFileLogsQueryVariables = Exact<{
 }>;
 
 
-export type EditorTaskExecutionFileLogsQuery = { editorTaskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
+export type EditorTaskExecutionFileLogsQuery = { editorTaskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
 
 export type JobFileLogsQueryVariables = Exact<{
   jobId: string | number;
@@ -1280,7 +1280,7 @@ export type JobFileLogsQueryVariables = Exact<{
 }>;
 
 
-export type JobFileLogsQuery = { jobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
+export type JobFileLogsQuery = { jobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
 
 export type JobFileLogsExistQueryVariables = Exact<{
   jobId: string | number;
@@ -1295,7 +1295,24 @@ export type TaskExecutionFileLogsQueryVariables = Exact<{
 }>;
 
 
-export type TaskExecutionFileLogsQuery = { taskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
+export type TaskExecutionFileLogsQuery = { taskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
+
+export type TriggerExecutionFileLogsQueryVariables = Exact<{
+  triggerExecutionId: string | number;
+  filter?: Types.LogFilterInput | null | undefined;
+  page?: number | null | undefined;
+  size?: number | null | undefined;
+}>;
+
+
+export type TriggerExecutionFileLogsQuery = { triggerExecutionFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, triggerExecutionId: string | null, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
+
+export type TriggerExecutionFileLogsExistQueryVariables = Exact<{
+  triggerExecutionId: string | number;
+}>;
+
+
+export type TriggerExecutionFileLogsExistQuery = { triggerExecutionFileLogsExist: boolean };
 
 export type AdminApiKeysQueryVariables = Exact<{
   environmentId: string | number;
@@ -6337,6 +6354,7 @@ export const EditorJobFileLogsDocument = new TypedDocumentString(`
       componentName
       componentOperationName
       taskExecutionId
+      triggerExecutionId
       message
       exceptionType
       exceptionMessage
@@ -6398,6 +6416,7 @@ export const EditorTaskExecutionFileLogsDocument = new TypedDocumentString(`
     componentName
     componentOperationName
     taskExecutionId
+    triggerExecutionId
     message
     exceptionType
     exceptionMessage
@@ -6431,6 +6450,7 @@ export const JobFileLogsDocument = new TypedDocumentString(`
       componentName
       componentOperationName
       taskExecutionId
+      triggerExecutionId
       message
       exceptionType
       exceptionMessage
@@ -6492,6 +6512,7 @@ export const TaskExecutionFileLogsDocument = new TypedDocumentString(`
     componentName
     componentOperationName
     taskExecutionId
+    triggerExecutionId
     message
     exceptionType
     exceptionMessage
@@ -6512,6 +6533,74 @@ export const useTaskExecutionFileLogsQuery = <
       {
     queryKey: ['taskExecutionFileLogs', variables],
     queryFn: fetcher<TaskExecutionFileLogsQuery, TaskExecutionFileLogsQueryVariables>(TaskExecutionFileLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const TriggerExecutionFileLogsDocument = new TypedDocumentString(`
+    query triggerExecutionFileLogs($triggerExecutionId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) {
+  triggerExecutionFileLogs(
+    triggerExecutionId: $triggerExecutionId
+    filter: $filter
+    page: $page
+    size: $size
+  ) {
+    content {
+      timestamp
+      level
+      componentName
+      componentOperationName
+      taskExecutionId
+      triggerExecutionId
+      message
+      exceptionType
+      exceptionMessage
+      stackTrace
+    }
+    totalElements
+    totalPages
+    pageNumber
+    pageSize
+    hasNext
+    hasPrevious
+  }
+}
+    `);
+
+export const useTriggerExecutionFileLogsQuery = <
+      TData = TriggerExecutionFileLogsQuery,
+      TError = unknown
+    >(
+      variables: TriggerExecutionFileLogsQueryVariables,
+      options?: Omit<UseQueryOptions<TriggerExecutionFileLogsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TriggerExecutionFileLogsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TriggerExecutionFileLogsQuery, TError, TData>(
+      {
+    queryKey: ['triggerExecutionFileLogs', variables],
+    queryFn: fetcher<TriggerExecutionFileLogsQuery, TriggerExecutionFileLogsQueryVariables>(TriggerExecutionFileLogsDocument, variables),
+    ...options
+  }
+    )};
+
+export const TriggerExecutionFileLogsExistDocument = new TypedDocumentString(`
+    query triggerExecutionFileLogsExist($triggerExecutionId: ID!) {
+  triggerExecutionFileLogsExist(triggerExecutionId: $triggerExecutionId)
+}
+    `);
+
+export const useTriggerExecutionFileLogsExistQuery = <
+      TData = TriggerExecutionFileLogsExistQuery,
+      TError = unknown
+    >(
+      variables: TriggerExecutionFileLogsExistQueryVariables,
+      options?: Omit<UseQueryOptions<TriggerExecutionFileLogsExistQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<TriggerExecutionFileLogsExistQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<TriggerExecutionFileLogsExistQuery, TError, TData>(
+      {
+    queryKey: ['triggerExecutionFileLogsExist', variables],
+    queryFn: fetcher<TriggerExecutionFileLogsExistQuery, TriggerExecutionFileLogsExistQueryVariables>(TriggerExecutionFileLogsExistDocument, variables),
     ...options
   }
     )};
