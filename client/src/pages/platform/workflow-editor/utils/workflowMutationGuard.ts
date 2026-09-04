@@ -28,6 +28,8 @@ const mutatingWorkflows = new Set<string>();
  */
 const pendingDefinitions = new Map<string, string>();
 
+const pendingSaves = new Map<string, Array<() => void>>();
+
 export function isWorkflowMutating(workflowId?: string): boolean {
     if (!workflowId) {
         return mutatingWorkflows.size > 0;
@@ -60,6 +62,34 @@ export function consumePendingDefinition(workflowId: string): string | undefined
     return definition;
 }
 
+export function enqueuePendingSave(workflowId: string, save: () => void): void {
+    const saves = pendingSaves.get(workflowId) ?? [];
+
+    saves.push(save);
+
+    pendingSaves.set(workflowId, saves);
+}
+
+export function hasPendingSaves(workflowId: string): boolean {
+    return !!pendingSaves.get(workflowId)?.length;
+}
+
+export function drainPendingSaves(workflowId: string): void {
+    const saves = pendingSaves.get(workflowId);
+
+    if (!saves?.length) {
+        return;
+    }
+
+    pendingSaves.delete(workflowId);
+
+    for (const save of saves) {
+        save();
+    }
+}
+
+/**
+ */
 /**
  * Clears all mutation flags and pending definitions. Useful for cleanup
  * when a workflow editor unmounts to prevent stale flags from blocking
@@ -68,6 +98,7 @@ export function consumePendingDefinition(workflowId: string): string | undefined
 export function clearAllWorkflowMutations(): void {
     mutatingWorkflows.clear();
     pendingDefinitions.clear();
+    pendingSaves.clear();
 }
 
 interface DrainPendingMutationProps {
