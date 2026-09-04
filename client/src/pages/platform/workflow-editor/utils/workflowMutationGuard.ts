@@ -125,6 +125,8 @@ export function drainPendingDefinitionMutation({
     const pendingDefinition = consumePendingDefinition(workflowId);
 
     if (!pendingDefinition) {
+        drainPendingSaves(workflowId);
+
         return;
     }
 
