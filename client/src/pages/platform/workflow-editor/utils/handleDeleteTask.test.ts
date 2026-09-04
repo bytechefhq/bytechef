@@ -14,6 +14,7 @@ const mockSetWorkflow = vi.fn((newWorkflow) => {
     mockWorkflowState = newWorkflow;
 });
 const mockReset = vi.fn();
+const mockRemovePendingSaveNodeName = vi.fn();
 const mockSetWorkflowTestChatPanelOpen = vi.fn();
 
 vi.mock('../stores/useWorkflowDataStore', () => ({
@@ -29,6 +30,7 @@ vi.mock('../stores/useWorkflowDataStore', () => ({
 vi.mock('../stores/useWorkflowNodeDetailsPanelStore', () => ({
     default: {
         getState: () => ({
+            removePendingSaveNodeName: mockRemovePendingSaveNodeName,
             reset: mockReset,
             setWorkflowNodeDetailsPanelOpen: vi.fn(),
         }),
@@ -504,6 +506,24 @@ describe('handleDeleteTask', () => {
 
         expect(mockReset).toHaveBeenCalledOnce();
         expect(mockSetWorkflowTestChatPanelOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('releases the deleted node from the pending-first-save markers', () => {
+        const tasks = [makeTask('task_1')];
+        const workflow = makeWorkflow(tasks);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: undefined,
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mockRemovePendingSaveNodeName).toHaveBeenCalledWith('task_1');
     });
 
     it('should not close panel when deleting a different node', () => {
