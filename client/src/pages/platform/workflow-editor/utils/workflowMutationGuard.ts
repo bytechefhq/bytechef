@@ -89,8 +89,6 @@ export function drainPendingSaves(workflowId: string): void {
 }
 
 /**
- */
-/**
  * Clears all mutation flags and pending definitions. Useful for cleanup
  * when a workflow editor unmounts to prevent stale flags from blocking
  * future saves.

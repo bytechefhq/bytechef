@@ -359,7 +359,6 @@ export default function useWorkflowNodeDetailsPanel({
         !!currentNode && !!currentNode.taskDispatcher
     );
 
-    // The node details panel opens optimistically for a freshly added node, before the add-node save
     const awaitingFirstSave = !!currentNodeName && pendingSaveNodeNames.has(currentNodeName);
 
     const displayConditionsQueryTarget = resolveDisplayConditionsQueryTarget({
