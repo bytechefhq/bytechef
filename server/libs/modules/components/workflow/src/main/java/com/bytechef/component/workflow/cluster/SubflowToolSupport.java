@@ -21,7 +21,6 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
@@ -84,11 +83,8 @@ final class SubflowToolSupport {
         return actionContextAware;
     }
 
-    static Object suspendForSubflow(
-        ActionContextAware actionContextAware, Subflow subflow, Map<String, ?> inputs, boolean editorEnvironment) {
-
-        PendingSubflowRequest request = new PendingSubflowRequest(
-            subflow.workflowId(), subflow.inputsName(), inputs, editorEnvironment, PlatformType.AUTOMATION);
+    static Object suspendForSubflow(ActionContextAware actionContextAware, Subflow subflow, Map<String, ?> inputs) {
+        PendingSubflowRequest request = new PendingSubflowRequest(subflow.workflowId(), subflow.inputsName(), inputs);
 
         Map<String, Object> continueParameters = new HashMap<>();
 

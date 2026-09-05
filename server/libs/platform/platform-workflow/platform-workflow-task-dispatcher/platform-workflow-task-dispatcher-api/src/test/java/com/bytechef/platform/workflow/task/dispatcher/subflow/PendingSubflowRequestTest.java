@@ -16,46 +16,66 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.subflow;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.bytechef.platform.constant.PlatformType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class PendingSubflowRequestTest {
 
     @Test
-    void testJacksonRoundTrip() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
+    void testJsonRoundTrip() {
+        PendingSubflowRequest pendingSubflowRequest = new PendingSubflowRequest(
+            "wf-123", "newWorkflowCall", Map.of("amount", 42));
 
-        PendingSubflowRequest request = new PendingSubflowRequest(
-            "wf-123", "newWorkflowCall", Map.of("amount", 42), false, PlatformType.AUTOMATION);
+        PendingSubflowRequest roundTripped = JsonUtils.read(
+            JsonUtils.write(pendingSubflowRequest), PendingSubflowRequest.class);
 
-        String json = objectMapper.writeValueAsString(request);
-        PendingSubflowRequest result = objectMapper.readValue(json, PendingSubflowRequest.class);
-
-        assertEquals(request, result);
+        assertThat(roundTripped).isEqualTo(pendingSubflowRequest);
     }
 
     @Test
     void testConvertValueFromMap() {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         Map<String, Object> map = Map.of(
-            "workflowId", "wf-123", "inputsName", "newWorkflowCall", "inputs", Map.of("amount", 42),
-            "editorEnvironment", false, "platformType", "AUTOMATION");
+            "workflowId", "wf-123", "inputsName", "newWorkflowCall", "inputs", Map.of("amount", 42));
 
-        PendingSubflowRequest result = objectMapper.convertValue(map, PendingSubflowRequest.class);
+        PendingSubflowRequest pendingSubflowRequest = ConvertUtils.convertValue(map, PendingSubflowRequest.class);
 
-        assertEquals("wf-123", result.workflowId());
-        assertEquals("newWorkflowCall", result.inputsName());
-        assertEquals(PlatformType.AUTOMATION, result.platformType());
-        assertFalse(result.editorEnvironment());
-        assertEquals(Map.of("amount", 42), result.inputs());
+        assertThat(pendingSubflowRequest.workflowId()).isEqualTo("wf-123");
+        assertThat(pendingSubflowRequest.inputsName()).isEqualTo("newWorkflowCall");
+        assertThat(pendingSubflowRequest.inputs()).isEqualTo(Map.of("amount", 42));
+    }
+
+    @Test
+    void testRejectsBlankIdentifiers() {
+        assertThatThrownBy(() -> new PendingSubflowRequest(" ", "newWorkflowCall", Map.of()))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new PendingSubflowRequest("wf-123", "", Map.of()))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testCopiesInputsSoLaterChangesDoNotLeakIn() {
+        Map<String, Object> inputs = new HashMap<>();
+
+        inputs.put("amount", 42);
+
+        PendingSubflowRequest pendingSubflowRequest = new PendingSubflowRequest("wf-123", "newWorkflowCall", inputs);
+
+        inputs.put("amount", 43);
+
+        assertThat(pendingSubflowRequest.inputs()).isEqualTo(Map.of("amount", 42));
+        assertThatThrownBy(() -> ((Map<String, Object>) pendingSubflowRequest.inputs()).put("other", 1))
+            .isInstanceOf(UnsupportedOperationException.class);
     }
 }

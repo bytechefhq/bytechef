@@ -4,6 +4,9 @@ inputs:
 - name: "amount"
   type: "integer"
   required: false
+outputs:
+- name: "result"
+  value: "${result}"
 tasks:
 - name: "result"
   type: "var/v1/set"
