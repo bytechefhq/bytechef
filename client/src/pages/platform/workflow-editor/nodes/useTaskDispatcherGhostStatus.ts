@@ -1,4 +1,5 @@
-import useWorkflowEditorStore, {WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
+import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
+import {WorkflowTestNodeStateI} from '../stores/useWorkflowEditorStore';
 
 /**
  * Resolves the owning dispatcher's test-run status for a structural ghost node (top/bottom bar, loop left
@@ -7,7 +8,7 @@ import useWorkflowEditorStore, {WorkflowTestNodeStateI} from '../stores/useWorkf
 export default function useTaskDispatcherGhostStatus(data?: unknown): WorkflowTestNodeStateI['status'] | undefined {
     const taskDispatcherId = (data as {taskDispatcherId?: string} | undefined)?.taskDispatcherId;
 
-    return useWorkflowEditorStore((state) =>
-        taskDispatcherId ? state.workflowTestNodeStates[taskDispatcherId]?.status : undefined
-    );
+    const workflowTestNodeStates = useWorkflowTestNodeStates();
+
+    return taskDispatcherId ? workflowTestNodeStates[taskDispatcherId]?.status : undefined;
 }
