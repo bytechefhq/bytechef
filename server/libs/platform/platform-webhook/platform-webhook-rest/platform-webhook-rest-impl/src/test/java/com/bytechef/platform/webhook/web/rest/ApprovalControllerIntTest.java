@@ -21,18 +21,26 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -45,6 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * @author Ivica Cardic
  */
 @AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(ObjectMapperSetupExtension.class)
 @ContextConfiguration(classes = {
     ApprovalController.class, ApprovalControllerIntTest.ApprovalTokensConfiguration.class
 })
@@ -60,8 +69,16 @@ class ApprovalControllerIntTest {
     @MockitoBean
     private JobFacade jobFacade;
 
+    @MockitoBean
+    private JobService jobService;
+
     @Autowired
     private MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        stubJob(Map.of());
+    }
 
     @Test
     void testApproveResumesJobForSignedToken() throws Exception {
@@ -109,6 +126,51 @@ class ApprovalControllerIntTest {
             .andExpect(status().isBadRequest());
 
         verify(jobFacade, never()).resumeApproval(anyLong(), anyString(), anyBoolean());
+    }
+
+    @Test
+    void testApproveResumesSuspendedJobThroughItsSuspendedTaskExecution() throws Exception {
+        stubJob(Map.of(MetadataConstants.JOB_RESUME_ID, "resume-1", MetadataConstants.TASK_EXECUTION_RESUME_ID, 7L));
+
+        mockMvc
+            .perform(
+                post(
+                    "/approvals/{id}",
+                    approvalTokens.toSignedToken(
+                        ApprovalId.of(JOB_ID, true)
+                            .toString(),
+                        Duration.ofHours(1))))
+            .andExpect(status().isNoContent());
+
+        verify(jobFacade).resumeJob(JOB_ID, 7L, Map.of("approved", true));
+        verify(jobFacade, never()).resumeApproval(anyLong(), anyString(), anyBoolean());
+    }
+
+    @Test
+    void testApproveRejectionReachesSuspendedTaskAsApprovedFalse() throws Exception {
+        stubJob(Map.of(MetadataConstants.JOB_RESUME_ID, "resume-1", MetadataConstants.TASK_EXECUTION_RESUME_ID, 7L));
+
+        mockMvc
+            .perform(
+                post(
+                    "/approvals/{id}",
+                    approvalTokens.toSignedToken(
+                        ApprovalId.of(JOB_ID, false)
+                            .toString(),
+                        Duration.ofHours(1))))
+            .andExpect(status().isNoContent());
+
+        verify(jobFacade).resumeJob(JOB_ID, 7L, Map.of("approved", false));
+        verify(jobFacade, never()).resumeApproval(anyLong(), anyString(), anyBoolean());
+    }
+
+    private void stubJob(Map<String, ?> metadata) {
+        Job job = new Job();
+
+        job.setId(JOB_ID);
+        job.setMetadata(metadata);
+
+        when(jobService.getJob(JOB_ID)).thenReturn(job);
     }
 
     static class ApprovalTokensConfiguration {
