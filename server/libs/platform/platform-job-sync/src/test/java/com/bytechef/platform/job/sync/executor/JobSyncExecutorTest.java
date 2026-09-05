@@ -57,6 +57,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -228,6 +229,57 @@ class JobSyncExecutorTest {
 
     @Test
     @SuppressWarnings("PMD.UnusedLocalVariable")
+    void testWaitDoesNotReturnWhileTheJobIsStartedWithATerminatedLastTaskExecution() throws Exception {
+        long jobId = 505L;
+
+        Job startedJob = new Job();
+
+        startedJob.setId(jobId);
+        startedJob.setStatus(Job.Status.STARTED);
+
+        when(jobService.getJob(jobId)).thenReturn(startedJob);
+
+        TaskExecution completedTaskExecution = new TaskExecution();
+
+        completedTaskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.of(completedTaskExecution));
+
+        CountDownLatch awaitReturnedLatch = new CountDownLatch(1);
+
+        Thread thread = new Thread(() -> {
+            try {
+                TenantContext.runWithTenantId(TENANT, () -> jobSyncExecutor.awaitJob(jobId, false));
+            } finally {
+                awaitReturnedLatch.countDown();
+            }
+        });
+
+        thread.start();
+
+        waitForLatchRegistration(jobSyncExecutor, TENANT + "_" + jobId, Duration.ofMillis(250));
+
+        assertThat(awaitReturnedLatch.await(300, TimeUnit.MILLISECONDS)).isFalse();
+
+        Job stoppedJob = new Job();
+
+        stoppedJob.setId(jobId);
+        stoppedJob.setStatus(Job.Status.STOPPED);
+
+        when(jobService.getJob(jobId)).thenReturn(stoppedJob);
+
+        JobStatusApplicationEvent jobStatusApplicationEvent = new JobStatusApplicationEvent(
+            jobId, Job.Status.STOPPED);
+
+        jobStatusApplicationEvent.putMetadata(TenantConstants.CURRENT_TENANT_ID, TENANT);
+
+        memoryMessageBroker.send(TaskCoordinatorMessageRoute.APPLICATION_EVENTS, jobStatusApplicationEvent);
+
+        assertThat(awaitReturnedLatch.await(1, TimeUnit.SECONDS)).isTrue();
+    }
+
+    @Test
+    @SuppressWarnings("PMD.UnusedLocalVariable")
     void testTaskStartedListenerInvokedAndJobIdDerivedFromTaskExecutionId() throws Exception {
         long jobId = 404L;
         long taskExecutionId = 9001L;
@@ -294,7 +346,7 @@ class JobSyncExecutorTest {
         failedJob.setError(new ExecutionError("Invalid expression: function perform(input) {}", List.of()));
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
@@ -343,7 +395,7 @@ class JobSyncExecutorTest {
         failedJob.setStatus(Job.Status.FAILED);
 
         when(jobService.getJob(jobId)).thenReturn(failedJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
