@@ -100,7 +100,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
                     erroredTaskExecution.setError(
                         new ExecutionError(
-                            "Subflow job %d (workflow '%s') failed".formatted(job.getId(), job.getWorkflowId()),
+                            "Child job %d (workflow '%s') failed".formatted(job.getId(), job.getWorkflowId()),
                             List.of()));
 
                     eventPublisher.publishEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
