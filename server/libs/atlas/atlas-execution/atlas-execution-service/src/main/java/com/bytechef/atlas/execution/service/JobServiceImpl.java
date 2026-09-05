@@ -127,8 +127,10 @@ public class JobServiceImpl implements JobService {
     public Job resumeToStatusStarted(long id) {
         Job job = OptionalUtils.get(jobRepository.findById(id), String.format("Unknown job %s", id));
 
-        Assert.isTrue(job.getParentTaskExecutionId() == null, "Can't resume a subflow");
         Assert.isTrue(isRestartable(job), "can't resume job " + id + " as it is " + job.getStatus());
+        Assert.isTrue(
+            job.getParentTaskExecutionId() == null || job.getStatus() == Job.Status.STOPPED,
+            "Can't restart failed subflow job " + id);
 
         if (job.getStatus() == Job.Status.FAILED) {
             job.setStartDate(Instant.now());
