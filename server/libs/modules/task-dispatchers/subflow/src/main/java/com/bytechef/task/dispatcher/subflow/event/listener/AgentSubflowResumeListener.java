@@ -32,6 +32,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -98,9 +99,16 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
             ? buildCompletedResumeData(subflowJob)
             : buildFailedResumeData(subflowJob);
 
+        Map<String, Object> agentJobMetadata = new HashMap<>(agentJob.getMetadata());
+
+        agentJobMetadata.remove(SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID);
+
+        agentJob.setMetadata(agentJobMetadata);
+
+        jobService.update(agentJob);
+
         jobFacade.resumeJob(
-            agentJobId, MapUtils.getLong(agentJob.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID),
-            resumeData);
+            agentJobId, MapUtils.getLong(agentJobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID), resumeData);
 
         if (log.isDebugEnabled()) {
             log.debug("Resumed agent job {} after sub-workflow job {} {}", agentJobId, subflowJob.getId(), status);
