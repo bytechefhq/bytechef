@@ -1,0 +1,17 @@
+---
+label: "Fan out to two agents"
+tasks:
+- name: "fanOut"
+  type: "parallel/v1"
+  parameters:
+    tasks:
+    - name: "callAlpha"
+      type: "callAiAgent/v1"
+      parameters:
+        agentUuid: "alpha-agent"
+        message: "go"
+    - name: "callBeta"
+      type: "callAiAgent/v1"
+      parameters:
+        agentUuid: "beta-agent"
+        message: "go"
