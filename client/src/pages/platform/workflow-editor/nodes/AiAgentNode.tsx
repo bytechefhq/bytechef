@@ -11,7 +11,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
+import {CheckIcon, ChevronsUpDownIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
 import {ChangeEvent, FocusEvent, KeyboardEvent, memo, useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
@@ -19,8 +19,10 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import useClusterElementsViewMode from '../hooks/useClusterElementsViewMode';
 import useNodeClickHandler from '../hooks/useNodeClick';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -66,6 +68,12 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             }))
         );
 
+    const clusterElementsViewMode = useClusterElementsViewMode();
+    const collapsed = useClusterFrameCollapsedStore((state) =>
+        workflow.id ? state.collapsedByWorkflowId[workflow.id]?.[id] === true : false
+    );
+    const setClusterFrameCollapsed = useClusterFrameCollapsedStore((state) => state.setClusterFrameCollapsed);
+
     const queryClient = useQueryClient();
     const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
@@ -104,6 +112,14 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         },
         infoCardOpen
     );
+
+    const expandable = clusterElementsViewMode === 'box' && collapsed;
+
+    const handleExpand = useCallback(() => {
+        if (workflow.id) {
+            setClusterFrameCollapsed(workflow.id, id, false);
+        }
+    }, [id, setClusterFrameCollapsed, workflow.id]);
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
@@ -352,6 +368,23 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             onMouseDown={(event) => event.stopPropagation()}
                         >
                             {nodeMenuTrigger}
+                        </div>
+                    )}
+
+                    {expandable && (
+                        <div
+                            className={twMerge('nodrag absolute -left-8 z-10', suppressHover ? 'top-0' : 'top-8')}
+                            onMouseDown={(event) => event.stopPropagation()}
+                        >
+                            <Button
+                                aria-label="Expand cluster elements"
+                                className="size-6 rounded-md border border-stroke-neutral-tertiary bg-surface-neutral-primary p-1 shadow-sm [&_svg]:size-4"
+                                icon={<ChevronsUpDownIcon />}
+                                onClick={handleExpand}
+                                size="iconXs"
+                                title="Expand cluster elements"
+                                variant="ghost"
+                            />
                         </div>
                     )}
 
