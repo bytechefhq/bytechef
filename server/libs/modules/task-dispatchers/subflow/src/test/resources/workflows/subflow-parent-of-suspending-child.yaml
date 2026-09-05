@@ -1,0 +1,14 @@
+---
+label: "Parent of a suspending child"
+outputs:
+- name: "childResult"
+  value: "${callChild.result}"
+tasks:
+- name: "callChild"
+  type: "subflow/v1"
+  parameters:
+    workflowUuid: "suspending-child-uuid"
+- name: "afterChild"
+  type: "var/v1/set"
+  parameters:
+    value: "${callChild.result}"
