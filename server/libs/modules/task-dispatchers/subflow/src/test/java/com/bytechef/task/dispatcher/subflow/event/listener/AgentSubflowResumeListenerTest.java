@@ -17,6 +17,7 @@
 package com.bytechef.task.dispatcher.subflow.event.listener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -92,6 +93,47 @@ class AgentSubflowResumeListenerTest {
         listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.COMPLETED));
 
         verify(jobFacade).resumeJob(eq(agentJobId), anyLong(), any());
+    }
+
+    @Test
+    void testClearsLaunchedSubflowJobIdBeforeResuming() {
+        long subflowJobId = 200L;
+        long agentJobId = 100L;
+
+        Job subflowJob = new Job();
+
+        subflowJob.setId(subflowJobId);
+        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
+
+        Job agentJob = new Job();
+
+        agentJob.setId(agentJobId);
+        agentJob.setStatus(Job.Status.STOPPED);
+        agentJob.setMetadata(
+            Map.of(
+                MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L,
+                SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID, subflowJobId));
+
+        when(jobService.getJob(subflowJobId)).thenReturn(subflowJob);
+        when(jobService.getJob(agentJobId)).thenReturn(agentJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(subflowJobId)).thenReturn(Optional.empty());
+
+        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
+            jobFacade, jobService, taskExecutionService, taskFileStorage);
+
+        listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.COMPLETED));
+
+        ArgumentCaptor<Job> updatedJobCaptor = ArgumentCaptor.forClass(Job.class);
+
+        verify(jobService).update(updatedJobCaptor.capture());
+        verify(jobFacade).resumeJob(eq(agentJobId), eq(1L), any());
+
+        Job updatedAgentJob = updatedJobCaptor.getValue();
+
+        assertEquals(agentJobId, updatedAgentJob.getId());
+        assertFalse(
+            updatedAgentJob.getMetadata()
+                .containsKey(SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID));
     }
 
     @Test
