@@ -55,7 +55,7 @@ const iconButtonSizes: Record<IconSizeType, string> = {
 
 const variants: Record<VariantType, string> = {
     default:
-        'bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active text-content-onsurface-primary',
+        'bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-active text-content-onbrand',
     secondary:
         'bg-surface-neutral-secondary hover:bg-surface-neutral-secondary-hover active:bg-surface-brand-secondary text-content-neutral-primary active:text-content-brand-primary',
     // eslint-disable-next-line sort-keys
