@@ -40,7 +40,11 @@ export function buildGenericNodeData(
             string | undefined;
 
         if (taskDispatcherId) {
-            if (type === 'condition') {
+            if (type === 'callAiAgent') {
+                newNodeData.callAiAgentData = {
+                    callAiAgentId: taskDispatcherId,
+                };
+            } else if (type === 'condition') {
                 newNodeData.conditionData = {
                     conditionCase: taskDispatcherContext.conditionCase || CONDITION_CASE_TRUE,
                     conditionId: taskDispatcherId,
@@ -246,6 +250,27 @@ export const TASK_DISPATCHER_CONFIG = {
                 },
             };
         },
+    },
+    callAiAgent: {
+        buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>
+            buildGenericNodeData(baseNodeData, taskDispatcherContext, taskDispatcherId, 'callAiAgent'),
+
+        contextIdentifier: 'callAiAgentId',
+        dataKey: 'callAiAgentData',
+        extractContextFromPlaceholder: (placeholderId: string): TaskDispatcherContextType => {
+            const parts = placeholderId.split('-');
+            const index = parseInt(parts[parts.length - 1] || '-1');
+
+            return {index, taskDispatcherId: parts[0]};
+        },
+        getDispatcherId: (context: TaskDispatcherContextType) => context.callAiAgentId,
+        getInitialParameters: (properties: Array<PropertyAllType>) => ({
+            ...getParametersWithDefaultValues({properties}),
+        }),
+        getSubtasks: () => [],
+        getTask: getTaskDispatcherTask,
+        initializeParameters: () => ({}),
+        updateTaskParameters: ({task}: UpdateTaskParametersType): WorkflowTask => task,
     },
     condition: {
         buildNodeData: ({baseNodeData, taskDispatcherContext, taskDispatcherId}: BuildNodeDataType): NodeDataType =>

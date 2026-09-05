@@ -121,6 +121,10 @@ type SubflowDataType = {
     subflowId: string;
 };
 
+type CallAiAgentDataType = {
+    callAiAgentId: string;
+};
+
 type TerminateDataType = {
     terminateId: string;
 };
@@ -188,6 +192,7 @@ export type NodeDataType = {
     branchData?: BranchDataType;
     branchId?: string;
     branchIndex?: number;
+    callAiAgentData?: CallAiAgentDataType;
     caseKey?: string | number;
     clusterElements?: ClusterElementsType | Array<ClusterElementDefinitionBasic>;
     clusterElementName?: string;
@@ -384,6 +389,7 @@ export type UpdateWorkflowMutationType = UseMutationResult<Workflow, Error, Upda
 export type TaskDispatcherContextType = {
     branchIndex?: number;
     branchId?: string;
+    callAiAgentId?: string;
     caseKey?: string | number;
     conditionCase?: 'caseTrue' | 'caseFalse';
     conditionId?: string;
