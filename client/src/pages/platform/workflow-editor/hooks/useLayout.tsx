@@ -24,6 +24,7 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useClusterElementNodes from '../../cluster-element-editor/hooks/useClusterElementNodes';
+import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -221,12 +222,19 @@ export default function useLayout({
     const [layoutRetryNonce, setLayoutRetryNonce] = useState(0);
     const clusterElementsViewMode = useClusterElementsViewMode();
 
+    const workflowId = useWorkflowDataStore((state) => state.workflow.id);
+    const collapsedClusterRootIds = useClusterFrameCollapsedStore((state) =>
+        workflowId ? state.collapsedByWorkflowId[workflowId] : undefined
+    );
+
     const boxModeClusterRootIds = useMemo(
         () =>
             clusterElementsViewMode === 'box'
-                ? (tasks ?? []).filter((task) => task.clusterRoot).map((task) => task.name)
+                ? (tasks ?? [])
+                      .filter((task) => task.clusterRoot && !collapsedClusterRootIds?.[task.name])
+                      .map((task) => task.name)
                 : [],
-        [clusterElementsViewMode, tasks]
+        [clusterElementsViewMode, collapsedClusterRootIds, tasks]
     );
 
     const {definitionsReady, edgesByRootId, nodesByRootId} = useClusterElementNodes(boxModeClusterRootIds);

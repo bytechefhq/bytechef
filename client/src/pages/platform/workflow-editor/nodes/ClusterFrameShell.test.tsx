@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {useClusterElementsCanvasDialogStore} from '../components/stores/useClusterElementsCanvasDialogStore';
+import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import ClusterFrameShell from './ClusterFrameShell';
@@ -81,6 +82,7 @@ describe('ClusterFrameShell', () => {
             clusterFrameLockedByRootId: {},
             rootClusterElementNodeData: undefined,
         });
+        useClusterFrameCollapsedStore.setState({collapsedByWorkflowId: {}});
         useWorkflowDataStore.setState({workflow: {definition: undefined, id: 'workflow-1', nodeNames: [], version: 1}});
         useClusterElementsCanvasDialogStore.setState({
             showAiAgentEditor: false,
@@ -143,6 +145,7 @@ describe('ClusterFrameShell', () => {
 
         expect(screen.queryByRole('button', {name: 'Unlock node movement'})).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Reset layout'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Collapse cluster elements'})).not.toBeInTheDocument();
         expect(screen.getByText('AI Agent')).toBeInTheDocument();
     });
 
@@ -165,6 +168,22 @@ describe('ClusterFrameShell', () => {
         });
 
         expect(useWorkflowEditorStore.getState().clusterFrameLockedByRootId.aiAgent_1).toBe(true);
+    });
+
+    it('records this root as collapsed under the open workflow when the collapse control is used', () => {
+        render(
+            <ClusterFrameShell data={CLUSTER_ROOT_DATA} nodeId="aiAgent_1">
+                <div>root card</div>
+            </ClusterFrameShell>
+        );
+
+        act(() => {
+            screen.getByRole('button', {name: 'Collapse cluster elements'}).click();
+        });
+
+        expect(useClusterFrameCollapsedStore.getState().collapsedByWorkflowId).toEqual({
+            'workflow-1': {aiAgent_1: true},
+        });
     });
 
     it('clears every saved element position for this root when Reset layout is used', () => {
