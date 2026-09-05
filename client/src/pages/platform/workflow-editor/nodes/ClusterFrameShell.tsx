@@ -8,6 +8,7 @@ import {NodeDataType} from '@/shared/types';
 import {Handle, Position} from '@xyflow/react';
 import {
     BrushCleaningIcon,
+    ChevronsDownUpIcon,
     ExternalLinkIcon,
     FlaskConicalIcon,
     LockIcon,
@@ -22,6 +23,7 @@ import {twMerge} from 'tailwind-merge';
 
 import {useClusterElementsCanvasDialogStore} from '../components/stores/useClusterElementsCanvasDialogStore';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import useClusterFrameCollapsedStore from '../stores/useClusterFrameCollapsedStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -53,6 +55,8 @@ const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => 
     const setClusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.setClusterElementsCanvasOpen);
     const setRootClusterElementNodeData = useWorkflowEditorStore((state) => state.setRootClusterElementNodeData);
     const workflowDefinition = useWorkflowDataStore((state) => state.workflow.definition);
+    const workflowId = useWorkflowDataStore((state) => state.workflow.id);
+    const setClusterFrameCollapsed = useClusterFrameCollapsedStore((state) => state.setClusterFrameCollapsed);
     const setShowAiAgentEditor = useClusterElementsCanvasDialogStore((state) => state.setShowAiAgentEditor);
     const setShowDataStreamEditor = useClusterElementsCanvasDialogStore((state) => state.setShowDataStreamEditor);
     const setTestingPanelOpen = useClusterElementsCanvasDialogStore((state) => state.setTestingPanelOpen);
@@ -82,6 +86,12 @@ const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => 
     const handleToggleLock = useCallback(() => {
         setClusterFrameLocked(nodeId, !locked);
     }, [locked, nodeId, setClusterFrameLocked]);
+
+    const handleCollapse = useCallback(() => {
+        if (workflowId) {
+            setClusterFrameCollapsed(workflowId, nodeId, true);
+        }
+    }, [nodeId, setClusterFrameCollapsed, workflowId]);
 
     const handleResetLayout = useCallback(() => {
         if (!updateWorkflowMutation) {
@@ -298,6 +308,15 @@ const ClusterFrameShell = ({children, data, nodeId}: ClusterFrameShellProps) => 
                             type="button"
                         >
                             <BrushCleaningIcon className="size-3.5" />
+                        </button>
+
+                        <button
+                            aria-label="Collapse cluster elements"
+                            className={HEADER_BUTTON_CLASSNAME}
+                            onClick={handleCollapse}
+                            type="button"
+                        >
+                            <ChevronsDownUpIcon className="size-3.5" />
                         </button>
                     </div>
                 )}
