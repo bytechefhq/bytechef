@@ -1,0 +1,16 @@
+---
+label: "Agent whose tool calls two sub-workflows in sequence"
+outputs:
+- name: "firstToolResult"
+  value: "${firstCall}"
+- name: "secondToolResult"
+  value: "${secondCall}"
+tasks:
+- name: "firstCall"
+  type: "agentTool/v1"
+  parameters:
+    subflow: "agent-subflow-bridge-fast"
+- name: "secondCall"
+  type: "agentTool/v1"
+  parameters:
+    subflow: "agent-subflow-bridge-fast"

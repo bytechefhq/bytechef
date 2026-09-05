@@ -29,6 +29,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunc
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
@@ -65,7 +66,8 @@ public class WorkflowCallWorkflowTool {
     }
 
     public static ClusterElementDefinition<ToolFunction> of(
-        SubflowDataSource subflowDataSource, SubflowResolver subflowResolver) {
+        SubflowDataSource subflowDataSource, SubflowResolver subflowResolver,
+        SubflowSyncExecutor subflowSyncExecutor) {
 
         return ComponentDsl.<ToolFunction>clusterElement("callWorkflow")
             .title("Call Workflow")
@@ -81,12 +83,21 @@ public class WorkflowCallWorkflowTool {
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
                     .properties(getPropertiesFunction(subflowDataSource)))
-            .object(() -> getToolFunction(subflowResolver))
+            .object(() -> getToolFunction(subflowResolver, subflowSyncExecutor))
             .output(getOutputFunction(subflowDataSource));
     }
 
-    private static ToolFunction getToolFunction(SubflowResolver subflowResolver) {
+    private static ToolFunction getToolFunction(
+        SubflowResolver subflowResolver, SubflowSyncExecutor subflowSyncExecutor) {
+
         return (inputParameters, connectionParameters, context) -> {
+            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
+            Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
+
+            if (context.isEditorEnvironment()) {
+                return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, true);
+            }
+
             ActionContextAware actionContextAware;
 
             try {
@@ -95,15 +106,10 @@ public class WorkflowCallWorkflowTool {
                 return guardFailure.getMessage();
             }
 
-            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
-            Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
-
-            boolean editorEnvironment = context.isEditorEnvironment();
-
             Subflow subflow;
 
             try {
-                subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, editorEnvironment);
+                subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, false);
             } catch (RuntimeException exception) {
                 log.warn(
                     "Sub-workflow resolution failed for uuid={} (jobId={}): {}",
@@ -112,7 +118,7 @@ public class WorkflowCallWorkflowTool {
                 return ERROR_RESOLVE_FAILED_PREFIX + exception.getMessage();
             }
 
-            return SubflowToolSupport.suspendForSubflow(actionContextAware, subflow, inputs, editorEnvironment);
+            return SubflowToolSupport.suspendForSubflow(actionContextAware, subflow, inputs);
         };
     }
 

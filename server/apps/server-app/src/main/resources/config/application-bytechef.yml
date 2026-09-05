@@ -195,6 +195,10 @@ bytechef:
       # kept separate so a burst of scheduled runs cannot leave an interactive caller waiting for a permit.
       sync-concurrency-limit: 5
   workflow:
+    execution:
+      agent:
+        # Maximum nesting depth of sub-workflows called by AI agent tools default: 10
+        max-subflow-depth: 10
     output-storage:
       # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
       provider: jdbc

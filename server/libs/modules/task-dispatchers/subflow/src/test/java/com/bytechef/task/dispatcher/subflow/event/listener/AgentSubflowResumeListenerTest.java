@@ -16,13 +16,14 @@
 
 package com.bytechef.task.dispatcher.subflow.event.listener;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
@@ -37,14 +38,18 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * @author Ivica Cardic
@@ -52,7 +57,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith({
     MockitoExtension.class, ObjectMapperSetupExtension.class
 })
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AgentSubflowResumeListenerTest {
+
+    private static final long AGENT_JOB_ID = 100L;
+    private static final String AGENT_JOB_RESUME_ID = "agent-resume-id";
+    private static final long SUBFLOW_JOB_ID = 200L;
+    private static final long TASK_EXECUTION_RESUME_ID = 7L;
 
     @Mock
     private JobFacade jobFacade;
@@ -66,297 +77,204 @@ class AgentSubflowResumeListenerTest {
     @Mock
     private TaskFileStorage taskFileStorage;
 
-    @Test
-    void testResumesAgentWithSubflowOutputOnCompleted() {
-        long subflowJobId = 200L;
-        long agentJobId = 100L;
+    private AgentSubflowResumeListener agentSubflowResumeListener;
 
-        Job subflowJob = new Job();
-
-        subflowJob.setId(subflowJobId);
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
-
-        when(jobService.getJob(subflowJobId)).thenReturn(subflowJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(subflowJobId)).thenReturn(Optional.empty());
-
-        Job agentJob = new Job();
-
-        agentJob.setId(agentJobId);
-        agentJob.setStatus(Job.Status.STOPPED);
-        agentJob.setMetadata(Map.of(MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L));
-
-        when(jobService.getJob(agentJobId)).thenReturn(agentJob);
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
+    @BeforeEach
+    void beforeEach() {
+        agentSubflowResumeListener = new AgentSubflowResumeListener(
             jobFacade, jobService, taskExecutionService, taskFileStorage);
 
-        listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.COMPLETED));
-
-        verify(jobFacade).resumeJob(eq(agentJobId), anyLong(), any());
-    }
-
-    @Test
-    void testClearsLaunchedSubflowJobIdBeforeResuming() {
-        long subflowJobId = 200L;
-        long agentJobId = 100L;
-
-        Job subflowJob = new Job();
-
-        subflowJob.setId(subflowJobId);
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
-
         Job agentJob = new Job();
 
-        agentJob.setId(agentJobId);
+        agentJob.setId(AGENT_JOB_ID);
         agentJob.setStatus(Job.Status.STOPPED);
         agentJob.setMetadata(
             Map.of(
-                MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L,
-                SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID, subflowJobId));
+                MetadataConstants.JOB_RESUME_ID, AGENT_JOB_RESUME_ID, MetadataConstants.TASK_EXECUTION_RESUME_ID,
+                TASK_EXECUTION_RESUME_ID));
 
-        when(jobService.getJob(subflowJobId)).thenReturn(subflowJob);
-        when(jobService.getJob(agentJobId)).thenReturn(agentJob);
-        when(taskExecutionService.fetchLastJobTaskExecution(subflowJobId)).thenReturn(Optional.empty());
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.COMPLETED));
-
-        ArgumentCaptor<Job> updatedJobCaptor = ArgumentCaptor.forClass(Job.class);
-
-        verify(jobService).update(updatedJobCaptor.capture());
-        verify(jobFacade).resumeJob(eq(agentJobId), eq(1L), any());
-
-        Job updatedAgentJob = updatedJobCaptor.getValue();
-
-        assertEquals(agentJobId, updatedAgentJob.getId());
-        assertFalse(
-            updatedAgentJob.getMetadata()
-                .containsKey(SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID));
+        when(jobService.getJob(AGENT_JOB_ID)).thenReturn(agentJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(SUBFLOW_JOB_ID)).thenReturn(Optional.empty());
     }
 
     @Test
-    void testResumesAgentWithErrorOnFailed() {
-        Job subflowJob = new Job();
+    void testResumesAgentWithSubflowOutputOnCompleted() {
+        FileEntry outputs = new FileEntry("outputs.json", "base64:///outputs.json");
 
-        subflowJob.setId(200L);
-        subflowJob.setWorkflowId("wf-99");
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, 100L));
+        Job subflowJob = stubSubflowJob(Job.Status.COMPLETED);
 
-        when(jobService.getJob(200L)).thenReturn(subflowJob);
+        subflowJob.setOutputs(outputs);
 
-        Job agentJob = new Job();
+        doReturn(Map.of("answer", 42)).when(taskFileStorage)
+            .readJobOutputs(outputs);
 
-        agentJob.setId(100L);
-        agentJob.setStatus(Job.Status.STOPPED);
-        agentJob.setMetadata(Map.of(MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L));
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.COMPLETED));
 
-        when(jobService.getJob(100L)).thenReturn(agentJob);
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(200L, Job.Status.FAILED));
-
-        verify(jobFacade).resumeJob(eq(100L), anyLong(), org.mockito.ArgumentMatchers.argThat(
-            (Map<String, ?> data) -> data != null && data.containsKey("error")));
+        assertThat(captureResumeData()).containsEntry("status", "completed")
+            .containsEntry("result", Map.of("answer", 42));
     }
 
     @Test
-    void testIgnoresNonAgentSubflowJob() {
+    void testCompletedSubflowWithoutOutputsStillReportsCompletion() {
+        stubSubflowJob(Job.Status.COMPLETED);
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.COMPLETED));
+
+        assertThat(captureResumeData()).isEqualTo(Map.of("status", "completed"));
+    }
+
+    @Test
+    void testFailedSubflowReportsTheFailedTaskErrorMessage() {
+        stubSubflowJob(Job.Status.FAILED);
+
+        TaskExecution failedTaskExecution = TaskExecution.builder()
+            .build();
+
+        failedTaskExecution.setStatus(TaskExecution.Status.FAILED);
+        failedTaskExecution.setError(new ExecutionError("connection refused", List.of()));
+
+        when(taskExecutionService.getJobTaskExecutions(SUBFLOW_JOB_ID)).thenReturn(List.of(failedTaskExecution));
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.FAILED));
+
+        Map<String, Object> resumeData = captureResumeData();
+
+        assertThat(resumeData).containsEntry("status", "failed");
+        assertThat((String) resumeData.get("error")).contains("connection refused");
+    }
+
+    @Test
+    void testFailedSubflowWhoseTasksCannotBeReadFallsBackToTheJobError() {
+        Job subflowJob = stubSubflowJob(Job.Status.FAILED);
+
+        subflowJob.setError(new ExecutionError("job level failure", List.of()));
+
+        when(taskExecutionService.getJobTaskExecutions(SUBFLOW_JOB_ID))
+            .thenThrow(new IllegalStateException("database unavailable"));
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.FAILED));
+
+        Map<String, Object> resumeData = captureResumeData();
+
+        assertThat(resumeData).containsEntry("status", "failed");
+        assertThat((String) resumeData.get("error")).contains("job level failure");
+    }
+
+    @Test
+    void testFailedSubflowWithoutAnyErrorReportsAnUnknownError() {
+        stubSubflowJob(Job.Status.FAILED);
+
+        when(taskExecutionService.getJobTaskExecutions(SUBFLOW_JOB_ID)).thenReturn(List.of());
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.FAILED));
+
+        assertThat((String) captureResumeData().get("error")).contains("unknown error");
+    }
+
+    @Test
+    void testCompletedSubflowWithACallableResponseResumesAgentWithTheResponseOutput() {
+        FileEntry callableOutput = new FileEntry("response.json", "base64:///response.json");
+
+        stubSubflowJob(Job.Status.COMPLETED);
+
+        TaskExecution responseTaskExecution = TaskExecution.builder()
+            .metadata(Map.of(MetadataConstants.CALLABLE_RESPONSE, true))
+            .output(callableOutput)
+            .build();
+
+        when(taskExecutionService.fetchLastJobTaskExecution(SUBFLOW_JOB_ID))
+            .thenReturn(Optional.of(responseTaskExecution));
+        doReturn(Map.of("output", Map.of("reply", "hello"))).when(taskFileStorage)
+            .readTaskExecutionOutput(callableOutput);
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.COMPLETED));
+
+        assertThat(captureResumeData()).containsEntry("status", "completed")
+            .containsEntry("result", Map.of("reply", "hello"));
+    }
+
+    @Test
+    void testStoppedSubflowReleasesTheAgentWithAnError() {
+        stubSubflowJob(Job.Status.STOPPED);
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.STOPPED));
+
+        assertThat((String) captureResumeData().get("error")).contains("stopped");
+    }
+
+    @Test
+    void testSuspendedSubflowKeepsTheAgentWaiting() {
+        stubSubflowJob(Job.Status.STOPPED);
+
+        agentSubflowResumeListener.onApplicationEvent(JobStatusApplicationEvent.suspended(SUBFLOW_JOB_ID));
+
+        verifyNoInteractions(jobFacade);
+    }
+
+    @Test
+    void testJobWithoutAnAgentLinkIsIgnored() {
         Job job = new Job();
 
-        job.setId(200L);
-        job.setMetadata(Map.of());
+        job.setId(SUBFLOW_JOB_ID);
+        job.setStatus(Job.Status.COMPLETED);
+        job.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, AGENT_JOB_ID));
 
-        when(jobService.getJob(200L)).thenReturn(job);
+        when(jobService.getJob(SUBFLOW_JOB_ID)).thenReturn(job);
 
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(200L, Job.Status.COMPLETED));
-
-        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
-    }
-
-    @Test
-    void testNoOpWhenAgentNotStopped() {
-        Job subflowJob = new Job();
-
-        subflowJob.setId(200L);
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, 100L));
-
-        when(jobService.getJob(200L)).thenReturn(subflowJob);
-
-        Job agentJob = new Job();
-
-        agentJob.setId(100L);
-        agentJob.setStatus(Job.Status.STARTED);
-
-        when(jobService.getJob(100L)).thenReturn(agentJob);
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(200L, Job.Status.COMPLETED));
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.COMPLETED));
 
         verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
     }
 
     @Test
-    void testIgnoresNonTerminalStatus() {
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
+    void testUnreadableOutputsResumeTheAgentWithAnError() {
+        FileEntry outputs = new FileEntry("outputs.json", "base64:///outputs.json");
 
-        listener.onApplicationEvent(new JobStatusApplicationEvent(200L, Job.Status.STARTED));
+        Job subflowJob = stubSubflowJob(Job.Status.COMPLETED);
 
-        verify(jobService, never()).getJob(anyLong());
-        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), any());
+        subflowJob.setOutputs(outputs);
+
+        when(taskFileStorage.readJobOutputs(outputs)).thenThrow(new IllegalStateException("storage unavailable"));
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.COMPLETED));
+
+        Map<String, Object> resumeData = captureResumeData();
+
+        assertThat(resumeData).containsEntry("status", "failed");
+        assertThat((String) resumeData.get("error")).contains("storage unavailable");
     }
 
-    @Test
-    void testResumeUsesCallableResponseOutputWhenLastTaskHasIt() {
-        long subflowJobId = 200L;
-        long agentJobId = 100L;
-
+    private Job stubSubflowJob(Job.Status status) {
         Job subflowJob = new Job();
 
-        subflowJob.setId(subflowJobId);
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
+        subflowJob.setId(SUBFLOW_JOB_ID);
+        subflowJob.setStatus(status);
+        subflowJob.setWorkflowId("subflow-workflow");
+        subflowJob.setMetadata(
+            Map.of(
+                SubflowRequestConstants.AGENT_JOB_ID, AGENT_JOB_ID, SubflowRequestConstants.AGENT_JOB_RESUME_ID,
+                AGENT_JOB_RESUME_ID));
 
-        when(jobService.getJob(subflowJobId)).thenReturn(subflowJob);
+        when(jobService.getJob(SUBFLOW_JOB_ID)).thenReturn(subflowJob);
 
-        TaskExecution lastTaskExecution = new TaskExecution();
-        FileEntry callableResponseFileEntry = new FileEntry("callable.json", "/tmp/callable.json");
-
-        lastTaskExecution.setOutput(callableResponseFileEntry);
-        lastTaskExecution.putMetadata(MetadataConstants.CALLABLE_RESPONSE, true);
-
-        when(taskExecutionService.fetchLastJobTaskExecution(subflowJobId)).thenReturn(Optional.of(lastTaskExecution));
-
-        Map<String, Object> callableResponseMap = Map.of(
-            "output", Map.of("approved", true, "approver", "alice"));
-
-        when(taskFileStorage.readTaskExecutionOutput(callableResponseFileEntry)).thenReturn(callableResponseMap);
-
-        Job agentJob = new Job();
-
-        agentJob.setId(agentJobId);
-        agentJob.setStatus(Job.Status.STOPPED);
-        agentJob.setMetadata(Map.of(MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L));
-
-        when(jobService.getJob(agentJobId)).thenReturn(agentJob);
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.COMPLETED));
-
-        ArgumentCaptor<Map<String, ?>> resumeDataCaptor = ArgumentCaptor.captor();
-
-        verify(jobFacade).resumeJob(eq(agentJobId), anyLong(), resumeDataCaptor.capture());
-
-        Map<String, ?> resumeData = resumeDataCaptor.getValue();
-
-        assertEquals(true, resumeData.get("approved"));
-        assertEquals("alice", resumeData.get("approver"));
+        return subflowJob;
     }
 
-    @Test
-    void testResumeFallsBackToErrorWhenCallableResponseExtractionFails() {
-        long subflowJobId = 200L;
-        long agentJobId = 100L;
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> captureResumeData() {
+        ArgumentCaptor<Map<String, ?>> resumeDataCaptor = ArgumentCaptor.forClass(Map.class);
 
-        Job subflowJob = new Job();
+        verify(jobFacade).resumeJob(eq(AGENT_JOB_ID), eq(TASK_EXECUTION_RESUME_ID), resumeDataCaptor.capture());
 
-        subflowJob.setId(subflowJobId);
-        subflowJob.setWorkflowId("wf-99");
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
-
-        when(jobService.getJob(subflowJobId)).thenReturn(subflowJob);
-
-        TaskExecution lastTaskExecution = new TaskExecution();
-        FileEntry callableResponseFileEntry = new FileEntry("callable.json", "/tmp/callable.json");
-
-        lastTaskExecution.setOutput(callableResponseFileEntry);
-        lastTaskExecution.putMetadata(MetadataConstants.CALLABLE_RESPONSE, true);
-
-        when(taskExecutionService.fetchLastJobTaskExecution(subflowJobId)).thenReturn(Optional.of(lastTaskExecution));
-
-        when(taskFileStorage.readTaskExecutionOutput(callableResponseFileEntry))
-            .thenThrow(new IllegalStateException("storage IO failure"));
-
-        Job agentJob = new Job();
-
-        agentJob.setId(agentJobId);
-        agentJob.setStatus(Job.Status.STOPPED);
-        agentJob.setMetadata(Map.of(MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L));
-
-        when(jobService.getJob(agentJobId)).thenReturn(agentJob);
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.COMPLETED));
-
-        ArgumentCaptor<Map<String, ?>> resumeDataCaptor = ArgumentCaptor.captor();
-
-        verify(jobFacade).resumeJob(eq(agentJobId), anyLong(), resumeDataCaptor.capture());
-
-        Map<String, ?> resumeData = resumeDataCaptor.getValue();
-
-        assertEquals(
-            true, resumeData.containsKey("error"),
-            "On extraction failure the agent must be resumed with an error payload, not a silent fallback");
-
-        Object errorMessage = resumeData.get("error");
-
-        assertEquals(String.class, errorMessage.getClass());
-
-        String errorString = (String) errorMessage;
-
-        assertEquals(
-            true, errorString.contains("storage IO failure"),
-            "Expected the underlying extraction failure cause in the error payload, got: " + errorString);
-    }
-
-    @Test
-    void testFailedResumeIncludesExecutionErrorMessage() {
-        long subflowJobId = 200L;
-        long agentJobId = 100L;
-
-        Job subflowJob = new Job();
-
-        subflowJob.setId(subflowJobId);
-        subflowJob.setWorkflowId("wf-99");
-        subflowJob.setMetadata(Map.of(SubflowRequestConstants.AGENT_JOB_ID, agentJobId));
-        subflowJob.setError(new ExecutionError("approval task threw", List.of()));
-
-        when(jobService.getJob(subflowJobId)).thenReturn(subflowJob);
-
-        Job agentJob = new Job();
-
-        agentJob.setId(agentJobId);
-        agentJob.setStatus(Job.Status.STOPPED);
-        agentJob.setMetadata(Map.of(MetadataConstants.TASK_EXECUTION_RESUME_ID, 1L));
-
-        when(jobService.getJob(agentJobId)).thenReturn(agentJob);
-
-        AgentSubflowResumeListener listener = new AgentSubflowResumeListener(
-            jobFacade, jobService, taskExecutionService, taskFileStorage);
-
-        listener.onApplicationEvent(new JobStatusApplicationEvent(subflowJobId, Job.Status.FAILED));
-
-        ArgumentCaptor<Map<String, ?>> resumeDataCaptor = ArgumentCaptor.captor();
-
-        verify(jobFacade).resumeJob(eq(agentJobId), anyLong(), resumeDataCaptor.capture());
-
-        String errorString = (String) resumeDataCaptor.getValue()
-            .get("error");
-
-        assertEquals(
-            true, errorString.contains("approval task threw"),
-            "Expected the ExecutionError message in the failed-resume payload, got: " + errorString);
+        return new HashMap<>(resumeDataCaptor.getValue());
     }
 }

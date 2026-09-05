@@ -16,15 +16,21 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.subflow;
 
-import com.bytechef.platform.constant.PlatformType;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import org.apache.commons.lang3.Validate;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record PendingSubflowRequest(
-    String workflowId, String inputsName, Map<String, ?> inputs, boolean editorEnvironment,
-    PlatformType platformType) {
+public record PendingSubflowRequest(String workflowId, String inputsName, Map<String, ?> inputs) {
+
+    public PendingSubflowRequest {
+        Validate.notBlank(workflowId, "workflowId");
+        Validate.notBlank(inputsName, "inputsName");
+
+        inputs = Collections.unmodifiableMap(new HashMap<>(Objects.requireNonNull(inputs, "inputs")));
+    }
 }
