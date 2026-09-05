@@ -166,6 +166,7 @@ export const DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM = 0.9;
 
 export const TASK_DISPATCHER_NAMES = [
     'branch',
+    'callAiAgent',
     'condition',
     'each',
     'fork-join',
@@ -179,7 +180,7 @@ export const TASK_DISPATCHER_NAMES = [
     'terminate',
 ];
 
-export const CHILDLESS_TASK_DISPATCHER_NAMES = ['loopBreak', 'subflow', 'terminate'];
+export const CHILDLESS_TASK_DISPATCHER_NAMES = ['callAiAgent', 'loopBreak', 'subflow', 'terminate'];
 
 export const SORT_OPTIONS = [
     {
@@ -238,6 +239,7 @@ export const COMPONENT_CATEGORY_ICON: Record<string, ReactNode> = {
 
 export const TASK_DISPATCHER_DATA_KEY_MAP = {
     branch: 'branchData',
+    callAiAgent: 'callAiAgentData',
     condition: 'conditionData',
     each: 'eachData',
     'fork-join': 'forkJoinData',
