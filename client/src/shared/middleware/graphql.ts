@@ -1463,6 +1463,17 @@ export type ComponentDefinitionSearchQueryVariables = Exact<{
 
 export type ComponentDefinitionSearchQuery = { componentDefinitionSearch: Array<{ name: string, title: string | null, icon: string | null, description: string | null, version: number | null, actionsCount: number | null, triggersCount: number | null, clusterElementsCount: any, componentCategories: Array<{ name: string, label: string | null }> | null, actions: Array<{ name: string, title: string | null, description: string | null }> | null, triggers: Array<{ name: string, title: string | null, description: string | null }> | null, clusterElements: Array<{ type: { name: string | null, label: string | null } | null }> | null }> };
 
+export type ComponentPropertyDisplayConditionsQueryVariables = Exact<{
+  componentName: string;
+  componentVersion: number;
+  operationName: string;
+  operationType: Types.ComponentOperationType;
+  parameters?: any;
+}>;
+
+
+export type ComponentPropertyDisplayConditionsQuery = { componentPropertyDisplayConditions: any };
+
 export type CreateApiKeyMutationVariables = Exact<{
   name: string;
   environmentId: string | number;
@@ -7381,6 +7392,34 @@ export const useComponentDefinitionSearchQuery = <
       {
     queryKey: ['ComponentDefinitionSearch', variables],
     queryFn: fetcher<ComponentDefinitionSearchQuery, ComponentDefinitionSearchQueryVariables>(ComponentDefinitionSearchDocument, variables),
+    ...options
+  }
+    )};
+
+export const ComponentPropertyDisplayConditionsDocument = new TypedDocumentString(`
+    query componentPropertyDisplayConditions($componentName: String!, $componentVersion: Int!, $operationName: String!, $operationType: ComponentOperationType!, $parameters: Map) {
+  componentPropertyDisplayConditions(
+    componentName: $componentName
+    componentVersion: $componentVersion
+    operationName: $operationName
+    operationType: $operationType
+    parameters: $parameters
+  )
+}
+    `);
+
+export const useComponentPropertyDisplayConditionsQuery = <
+      TData = ComponentPropertyDisplayConditionsQuery,
+      TError = unknown
+    >(
+      variables: ComponentPropertyDisplayConditionsQueryVariables,
+      options?: Omit<UseQueryOptions<ComponentPropertyDisplayConditionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ComponentPropertyDisplayConditionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ComponentPropertyDisplayConditionsQuery, TError, TData>(
+      {
+    queryKey: ['componentPropertyDisplayConditions', variables],
+    queryFn: fetcher<ComponentPropertyDisplayConditionsQuery, ComponentPropertyDisplayConditionsQueryVariables>(ComponentPropertyDisplayConditionsDocument, variables),
     ...options
   }
     )};
