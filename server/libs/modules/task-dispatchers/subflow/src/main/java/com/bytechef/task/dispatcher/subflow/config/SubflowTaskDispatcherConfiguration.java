@@ -22,13 +22,16 @@ import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
+import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowLauncher;
 import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowResumeListener;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,14 +68,20 @@ public class SubflowTaskDispatcherConfiguration {
 
     @Configuration
     @ConditionalOnCoordinator
+    @ConditionalOnClass(name = "com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler")
     public static class AgentSubflowBridgeConfiguration {
 
         @Bean
         AgentSubflowLauncher agentSubflowLauncher(
-            ChildJobPrincipalFactory childJobPrincipalFactory, JobService jobService,
-            TaskExecutionService taskExecutionService) {
+            ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
+            JobFacade jobFacade, JobService jobService, TaskStateService taskStateService) {
 
-            return new AgentSubflowLauncher(childJobPrincipalFactory, jobService, taskExecutionService);
+            ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+            ApplicationProperties.Workflow.Execution execution = workflow.getExecution();
+            ApplicationProperties.Workflow.Execution.Agent agent = execution.getAgent();
+
+            return new AgentSubflowLauncher(
+                childJobPrincipalFactory, jobFacade, jobService, agent.getMaxSubflowDepth(), taskStateService);
         }
 
         @Bean
