@@ -1,6 +1,8 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
+import useJobExecutionOverlay from '@/pages/platform/workflow-editor/hooks/useJobExecutionOverlay';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
+import {WorkflowExecutionOverlayContext} from '@/pages/platform/workflow-editor/providers/workflowExecutionOverlayContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
@@ -12,7 +14,7 @@ import useWorkflowExecutionSheetWorkflowPanel from '../../hooks/useWorkflowExecu
 const WorkflowEditor = lazy(() => import('@/pages/platform/workflow-editor/components/WorkflowEditor'));
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
-    const {workflow} = workflowExecution;
+    const {job, workflow} = workflowExecution;
 
     const [ready, setReady] = useState(false);
 
@@ -26,6 +28,8 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
         taskDispatcherDefinitionsError,
         taskDispatcherDefinitionsLoading,
     } = useWorkflowLayout();
+
+    const workflowExecutionOverlay = useJobExecutionOverlay(job);
 
     const {data: workflowDetails, isLoading: isWorkflowDetailsLoading} = useGetWorkflowQuery(
         workflow!.id as string,
@@ -62,14 +66,16 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                                     </div>
                                 }
                             >
-                                <WorkflowEditor
-                                    componentDefinitions={componentDefinitions}
-                                    customCanvasWidth={canvasWidth}
-                                    fitViewOnLoad
-                                    readOnlyLayoutDirection="TB"
-                                    readOnlyWorkflow={workflowDetails}
-                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                />
+                                <WorkflowExecutionOverlayContext.Provider value={workflowExecutionOverlay}>
+                                    <WorkflowEditor
+                                        componentDefinitions={componentDefinitions}
+                                        customCanvasWidth={canvasWidth}
+                                        fitViewOnLoad
+                                        readOnlyLayoutDirection="TB"
+                                        readOnlyWorkflow={workflowDetails}
+                                        taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                    />
+                                </WorkflowExecutionOverlayContext.Provider>
                             </Suspense>
                         )}
                     </PageLoader>

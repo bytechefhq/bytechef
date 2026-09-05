@@ -1,8 +1,9 @@
 import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
 import {render} from '@testing-library/react';
 import {EdgeProps, Position, ReactFlowProvider} from '@xyflow/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import RoundedSmoothStepEdge from './RoundedSmoothStepEdge';
 
 const {directionStoreState} = vi.hoisted(() => ({
@@ -149,5 +150,43 @@ describe('RoundedSmoothStepEdge trigger fan-in', () => {
 
         expect(getPathPoints(innerEdgePath).some((point) => point.x === busX)).toBe(true);
         expect(getPathPoints(outerEdgePath).some((point) => point.x === busX)).toBe(true);
+    });
+});
+
+describe('RoundedSmoothStepEdge while the workflow is running', () => {
+    afterEach(() => {
+        useWorkflowEditorStore.setState({workflowIsRunning: false});
+    });
+
+    const renderEdgeClassName = () => {
+        const {container} = render(
+            <ReactFlowProvider>
+                <svg>
+                    <RoundedSmoothStepEdge
+                        id="parallel_1-parallel-top-ghost=>parallel_1-parallel-placeholder-0"
+                        source="parallel_1-parallel-top-ghost"
+                        sourcePosition={Position.Right}
+                        sourceX={300}
+                        sourceY={100}
+                        target="parallel_1-parallel-placeholder-0"
+                        targetPosition={Position.Top}
+                        targetX={600}
+                        targetY={300}
+                    />
+                </svg>
+            </ReactFlowProvider>
+        );
+
+        return container.querySelector('path')?.getAttribute('class') ?? '';
+    };
+
+    it('dashes like the lane edges it shares a path with, so the frame reads as running on both sides', () => {
+        useWorkflowEditorStore.setState({workflowIsRunning: true});
+
+        expect(renderEdgeClassName()).toMatch(/runningPath/);
+    });
+
+    it('draws a solid line when no run is in progress', () => {
+        expect(renderEdgeClassName()).not.toMatch(/runningPath/);
     });
 });

@@ -129,7 +129,7 @@ describe('resolveGhostBarSideStatuses', () => {
         expect(statuses).toEqual({leftStatus: 'COMPLETED', rightStatus: 'COMPLETED'});
     });
 
-    it('lets a failed case win over a completed one sharing the same handle', () => {
+    it('paints a half COMPLETED when the case under it failed, since the data reached it', () => {
         const sharedHandleEdges: Edge[] = [
             TOP_GHOST_EDGES[0],
             {
@@ -153,7 +153,7 @@ describe('resolveGhostBarSideStatuses', () => {
             }),
         });
 
-        expect(statuses.leftStatus).toBe('FAILED');
+        expect(statuses.leftStatus).toBe('COMPLETED');
     });
 
     it('ignores an edge that only shares the ghost id prefix with the bar handles', () => {
@@ -176,5 +176,52 @@ describe('resolveGhostBarSideStatuses', () => {
         });
 
         expect(statuses).toEqual({leftStatus: 'COMPLETED', rightStatus: 'COMPLETED'});
+    });
+
+    it('paints the completed half of a failed parallel join green and leaves the failed half neutral', () => {
+        const parallelBottomGhostId = 'parallel_1-parallel-bottom-ghost';
+
+        const parallelNodes: Node[] = [
+            {
+                data: {taskDispatcherId: 'parallel_1'},
+                id: parallelBottomGhostId,
+                position: {x: 0, y: 0},
+                type: 'taskDispatcherBottomGhostNode',
+            },
+            createTaskNode('anthropic_1'),
+            {data: {disabled: true, workflowNodeName: 'dataStorage_1'}, id: 'dataStorage_1', position: {x: 0, y: 0}},
+            createTaskNode('dataStorage_2'),
+        ];
+
+        const parallelEdges: Edge[] = [
+            {id: 'anthropic_1=>dataStorage_1', source: 'anthropic_1', target: 'dataStorage_1'},
+            {
+                id: `dataStorage_1=>${parallelBottomGhostId}`,
+                source: 'dataStorage_1',
+                target: parallelBottomGhostId,
+                targetHandle: `${parallelBottomGhostId}-left`,
+            },
+            {
+                id: `dataStorage_2=>${parallelBottomGhostId}`,
+                source: 'dataStorage_2',
+                target: parallelBottomGhostId,
+                targetHandle: `${parallelBottomGhostId}-right`,
+            },
+        ];
+
+        const statuses = resolveGhostBarSideStatuses({
+            edges: parallelEdges,
+            fallbackStatus: 'FAILED',
+            ghostNodeId: parallelBottomGhostId,
+            isBottomGhost: true,
+            nodes: parallelNodes,
+            workflowTestNodeStates: createNodeStates({
+                anthropic_1: 'FAILED',
+                dataStorage_2: 'COMPLETED',
+                parallel_1: 'FAILED',
+            }),
+        });
+
+        expect(statuses).toEqual({leftStatus: undefined, rightStatus: 'COMPLETED'});
     });
 });
