@@ -72,11 +72,13 @@ import {
     extractClusterElementComponentOperations,
 } from '../../../cluster-element-editor/utils/clusterElementsUtils';
 import useWorkflowIssues from '../../hooks/useWorkflowIssues';
+import useDataPillPanelStore from '../../stores/useDataPillPanelStore';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 import changeComponentVersion from '../../utils/changeComponentVersion';
 import findWorkflowIssueParameterPaths, {getParameterPathRoot} from '../../utils/findWorkflowIssueParameterPaths';
+import getDataPillPanelNodeOutputs from '../../utils/getDataPillPanelNodeOutputs';
 import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getNodeIssues from '../../utils/getNodeIssues';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
@@ -187,6 +189,8 @@ export default function useWorkflowNodeDetailsPanel({
             rootClusterElementNodeData: state.rootClusterElementNodeData,
         }))
     );
+
+    const setDataPillPanelHasContent = useDataPillPanelStore((state) => state.setDataPillPanelHasContent);
 
     const queryClient = useQueryClient();
 
@@ -1290,6 +1294,12 @@ export default function useWorkflowNodeDetailsPanel({
             setDataPills(calculatedDataPills);
         }
     }, [calculatedDataPills, setDataPills]);
+
+    useEffect(() => {
+        const hasNodeOutputs = getDataPillPanelNodeOutputs(workflowNodeOutputs ?? [], currentNode?.name).length > 0;
+
+        setDataPillPanelHasContent(hasNodeOutputs || !!workflow.inputs?.length);
+    }, [currentNode?.name, setDataPillPanelHasContent, workflow.inputs, workflowNodeOutputs]);
 
     // Set sample outputs only when the calculated sample outputs change
     useEffect(() => {

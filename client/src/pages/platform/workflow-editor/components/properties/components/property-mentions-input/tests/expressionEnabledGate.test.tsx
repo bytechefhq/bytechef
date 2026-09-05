@@ -33,7 +33,7 @@ const renderInput = (expressionEnabled?: boolean) =>
 
 describe('PropertyMentionsInput data pill panel gate', () => {
     beforeEach(() => {
-        useDataPillPanelStore.setState({dataPillPanelOpen: false});
+        useDataPillPanelStore.setState({dataPillPanelHasContent: true, dataPillPanelOpen: false});
         useWorkflowNodeDetailsPanelStore.setState({workflowNodeDetailsPanelOpen: true});
     });
 
