@@ -71,6 +71,54 @@ describe('ThemeProvider', () => {
         expect(document.documentElement.classList.contains('light')).toBe(true);
     });
 
+    it('neither reads nor writes storage when persistence is off', () => {
+        localStorage.setItem('bytechef.ui-theme', 'dark');
+
+        const ThemeConsumer = () => {
+            const {setTheme} = useTheme();
+
+            return <button onClick={() => setTheme('dark')} type="button" />;
+        };
+
+        const {getByRole} = render(
+            <ThemeProvider defaultTheme="light" persist={false}>
+                <ThemeConsumer />
+            </ThemeProvider>
+        );
+
+        expect(document.documentElement.classList.contains('light')).toBe(true);
+
+        act(() => getByRole('button').click());
+
+        expect(document.documentElement.classList.contains('dark')).toBe(true);
+
+        expect(localStorage.getItem('bytechef.ui-theme')).toBe('dark');
+
+        localStorage.setItem('bytechef.ui-theme', 'light');
+
+        act(() => getByRole('button').click());
+
+        expect(localStorage.getItem('bytechef.ui-theme')).toBe('light');
+    });
+
+    it('remembers the choice when persistence is on', () => {
+        const ThemeConsumer = () => {
+            const {setTheme} = useTheme();
+
+            return <button onClick={() => setTheme('dark')} type="button" />;
+        };
+
+        const {getByRole} = render(
+            <ThemeProvider defaultTheme="light">
+                <ThemeConsumer />
+            </ThemeProvider>
+        );
+
+        act(() => getByRole('button').click());
+
+        expect(localStorage.getItem('bytechef.ui-theme')).toBe('dark');
+    });
+
     it('throws when useTheme is called outside a ThemeProvider', () => {
         const ThemeConsumer = () => {
             useTheme();
