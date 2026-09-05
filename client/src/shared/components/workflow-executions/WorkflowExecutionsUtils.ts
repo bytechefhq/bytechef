@@ -51,7 +51,7 @@ export const getInitialSelectedItem = (
 };
 
 interface GetDisplayValueProps {
-    job: Job;
+    job?: Job;
     selectedItem: TaskExecution | TriggerExecution | undefined;
     tab: TabValueType;
     triggerExecution?: TriggerExecution;
@@ -70,7 +70,7 @@ export const getDisplayValue = ({job, selectedItem, tab, triggerExecution}: GetD
         return selectedItem.error;
     }
 
-    if (selectedItem.id === triggerExecution?.id && job.inputs && triggerExecution?.workflowTrigger?.name) {
+    if (selectedItem.id === triggerExecution?.id && job?.inputs && triggerExecution?.workflowTrigger?.name) {
         return getFilteredOutput(selectedItem.output, job.inputs, triggerExecution?.workflowTrigger?.name);
     }
 

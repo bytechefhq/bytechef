@@ -29,7 +29,8 @@ import org.jspecify.annotations.Nullable;
  */
 public record LogEntry(
     Instant timestamp, Level level, String componentName, @Nullable String componentOperationName, long taskExecutionId,
-    String message, @Nullable String exceptionType, @Nullable String exceptionMessage, @Nullable String stackTrace) {
+    @Nullable Long triggerExecutionId, String message, @Nullable String exceptionType,
+    @Nullable String exceptionMessage, @Nullable String stackTrace) {
 
     public enum Level {
         TRACE(0),
@@ -70,6 +71,7 @@ public record LogEntry(
         private String componentName;
         private String componentOperationName;
         private long taskExecutionId;
+        private @Nullable Long triggerExecutionId;
         private String message;
         private String exceptionType;
         private String exceptionMessage;
@@ -105,6 +107,12 @@ public record LogEntry(
             return this;
         }
 
+        public Builder triggerExecutionId(@Nullable Long triggerExecutionId) {
+            this.triggerExecutionId = triggerExecutionId;
+
+            return this;
+        }
+
         public Builder message(String message) {
             this.message = message;
 
@@ -125,7 +133,7 @@ public record LogEntry(
         public LogEntry build() {
             return new LogEntry(
                 timestamp, level, componentName, componentOperationName,
-                taskExecutionId, message, exceptionType, exceptionMessage, stackTrace);
+                taskExecutionId, triggerExecutionId, message, exceptionType, exceptionMessage, stackTrace);
         }
 
         @SuppressFBWarnings("INFORMATION_EXPOSURE_THROUGH_AN_ERROR_MESSAGE")

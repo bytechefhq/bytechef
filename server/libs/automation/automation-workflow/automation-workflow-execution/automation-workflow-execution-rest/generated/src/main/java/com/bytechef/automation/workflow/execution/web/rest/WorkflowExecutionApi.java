@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.769779+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-04T22:06:08.943670+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "workflow-execution", description = "The Automation Workflow Execution Internal API")
 public interface WorkflowExecutionApi {
@@ -44,6 +44,47 @@ public interface WorkflowExecutionApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_GET_TRIGGER_EXECUTION_WORKFLOW_EXECUTION = "/workflow-executions/trigger-executions/{triggerExecutionId}";
+    /**
+     * GET /workflow-executions/trigger-executions/{triggerExecutionId} : Get a trigger execution&#39;s workflow execution
+     * Get the execution view of a trigger execution that produced no job, such as a failed webhook or poll.
+     *
+     * @param triggerExecutionId The id of a trigger execution. (required)
+     * @return The execution object, without a job. (status code 200)
+     */
+    @Operation(
+        operationId = "getTriggerExecutionWorkflowExecution",
+        summary = "Get a trigger execution's workflow execution",
+        description = "Get the execution view of a trigger execution that produced no job, such as a failed webhook or poll.",
+        tags = { "workflow-execution" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The execution object, without a job.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowExecutionModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = WorkflowExecutionApi.PATH_GET_TRIGGER_EXECUTION_WORKFLOW_EXECUTION,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<WorkflowExecutionModel> getTriggerExecutionWorkflowExecution(
+        @Parameter(name = "triggerExecutionId", description = "The id of a trigger execution.", required = true, in = ParameterIn.PATH) @PathVariable("triggerExecutionId") Long triggerExecutionId
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"triggerExecution\" : { \"retryDelayFactor\" : 1, \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"batch\" : true, \"icon\" : \"icon\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 3, \"title\" : \"title\", \"type\" : \"type\", \"executionTime\" : 9, \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"input\" : { \"key\" : \"\" }, \"retryDelayMillis\" : 2, \"maxRetries\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"workflowTrigger\" : { \"metadata\" : { \"key\" : \"\" }, \"name\" : \"name\", \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"key\" : \"key\", \"required\" : true } ], \"timeout\" : \"timeout\" }, \"id\" : \"id\", \"retryAttempts\" : 6, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" }, \"workflow\" : { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"projectWorkflowId\" : 6, \"id\" : \"id\", \"label\" : \"label\", \"workflowUuid\" : \"workflowUuid\" }, \"project\" : { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"lastProjectVersion\" : 5, \"name\" : \"name\", \"description\" : \"description\", \"id\" : 4, \"uuid\" : \"uuid\", \"lastStatus\" : \"DRAFT\" }, \"id\" : 0, \"job\" : { \"outputs\" : { \"key\" : \"\" }, \"metadata\" : { \"key\" : \"\" }, \"taskExecutions\" : [ { \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"icon\" : \"icon\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"title\" : \"title\", \"type\" : \"type\", \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"retryDelayMillis\" : 7, \"children\" : [ null, null ], \"id\" : \"id\", \"retryAttempts\" : 3, \"retryDelayFactor\" : 2, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"workflowTask\" : { \"metadata\" : { \"key\" : \"\" }, \"pre\" : [ null, null ], \"clusterRoot\" : false, \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"timeout\" : \"timeout\", \"node\" : \"node\", \"maxRetries\" : 1, \"post\" : [ null, null ], \"clusterElements\" : { \"key\" : \"\" }, \"name\" : \"name\", \"finalize\" : [ null, null ], \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"key\" : \"key\", \"required\" : true } ] }, \"priority\" : 7, \"parentId\" : \"parentId\", \"iterations\" : [ [ null, null ], [ null, null ] ], \"executionTime\" : 5, \"input\" : { \"key\" : \"\" }, \"jobId\" : \"jobId\", \"maxRetries\" : 2, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"progress\" : 9, \"taskNumber\" : 4, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" }, { \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"icon\" : \"icon\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"title\" : \"title\", \"type\" : \"type\", \"output\" : \"{}\", \"retryDelay\" : \"retryDelay\", \"retryDelayMillis\" : 7, \"children\" : [ null, null ], \"id\" : \"id\", \"retryAttempts\" : 3, \"retryDelayFactor\" : 2, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"workflowTask\" : { \"metadata\" : { \"key\" : \"\" }, \"pre\" : [ null, null ], \"clusterRoot\" : false, \"description\" : \"description\", \"label\" : \"label\", \"type\" : \"type\", \"timeout\" : \"timeout\", \"node\" : \"node\", \"maxRetries\" : 1, \"post\" : [ null, null ], \"clusterElements\" : { \"key\" : \"\" }, \"name\" : \"name\", \"finalize\" : [ null, null ], \"parameters\" : { \"key\" : \"\" }, \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"key\" : \"key\", \"required\" : true }, { \"workflowNodeName\" : \"workflowNodeName\", \"componentName\" : \"componentName\", \"componentVersion\" : 1, \"key\" : \"key\", \"required\" : true } ] }, \"priority\" : 7, \"parentId\" : \"parentId\", \"iterations\" : [ [ null, null ], [ null, null ] ], \"executionTime\" : 5, \"input\" : { \"key\" : \"\" }, \"jobId\" : \"jobId\", \"maxRetries\" : 2, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"progress\" : 9, \"taskNumber\" : 4, \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"CREATED\" } ], \"endDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"currentTask\" : 6, \"label\" : \"label\", \"error\" : { \"stackTrace\" : [ \"stackTrace\", \"stackTrace\" ], \"message\" : \"message\" }, \"priority\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"parentTaskExecutionId\" : 1, \"webhooks\" : [ { \"type\" : \"type\", \"url\" : \"url\", \"retry\" : { \"maxAttempts\" : 7, \"multiplier\" : 1, \"initialInterval\" : 1, \"maxInterval\" : 6 } }, { \"type\" : \"type\", \"url\" : \"url\", \"retry\" : { \"maxAttempts\" : 7, \"multiplier\" : 1, \"initialInterval\" : 1, \"maxInterval\" : 6 } } ], \"id\" : \"id\", \"startDate\" : \"2000-01-23T04:56:07.000+00:00\", \"workflowId\" : \"workflowId\", \"status\" : \"CREATED\" }, \"projectDeployment\" : { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 9, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"id\" : 9, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"projectId\" : 6, \"enabled\" : true, \"projectVersion\" : 8 } }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_GET_WORKFLOW_EXECUTION = "/workflow-executions/{id}";
     /**

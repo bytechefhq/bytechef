@@ -1,16 +1,83 @@
 import Badge from '@/components/Badge/Badge';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import JsonView from '@/shared/components/JsonView';
-import {LogEntry, LogLevel, useEditorJobFileLogsQuery, useJobFileLogsQuery} from '@/shared/middleware/graphql';
+import {
+    type EditorJobFileLogsQuery,
+    type JobFileLogsQuery,
+    LogEntry,
+    LogLevel,
+    type TriggerExecutionFileLogsQuery,
+    useEditorJobFileLogsQuery,
+    useJobFileLogsQuery,
+    useTriggerExecutionFileLogsQuery,
+} from '@/shared/middleware/graphql';
 import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
-    jobId: string;
+    jobId?: string;
     taskExecutionId?: string;
+    triggerExecutionId?: string;
 }
+
+type LogsPageType = JobFileLogsQuery['jobFileLogs'];
+
+interface LogsQueryResultI<TData> {
+    data?: TData;
+    error: unknown;
+    isLoading: boolean;
+}
+
+interface SelectedLogsQueryI {
+    error: unknown;
+    isLoading: boolean;
+    logsData?: LogsPageType;
+}
+
+interface SelectLogsQueryProps {
+    editorQuery: LogsQueryResultI<EditorJobFileLogsQuery>;
+    isEditorEnvironment?: boolean;
+    isTriggerLogs: boolean;
+    productionQuery: LogsQueryResultI<JobFileLogsQuery>;
+    triggerQuery: LogsQueryResultI<TriggerExecutionFileLogsQuery>;
+}
+
+/**
+ * A row's logs come from exactly one of the three stores, so the active query decides the loading, error and content
+ * of the panel together. Reading them from separate conditionals would let the panel show one query's spinner beside
+ * another's entries.
+ */
+const selectLogsQuery = ({
+    editorQuery,
+    isEditorEnvironment,
+    isTriggerLogs,
+    productionQuery,
+    triggerQuery,
+}: SelectLogsQueryProps): SelectedLogsQueryI => {
+    if (isEditorEnvironment) {
+        return {
+            error: editorQuery.error,
+            isLoading: editorQuery.isLoading,
+            logsData: editorQuery.data?.editorJobFileLogs,
+        };
+    }
+
+    if (isTriggerLogs) {
+        return {
+            error: triggerQuery.error,
+            isLoading: triggerQuery.isLoading,
+            logsData: triggerQuery.data?.triggerExecutionFileLogs,
+        };
+    }
+
+    return {
+        error: productionQuery.error,
+        isLoading: productionQuery.isLoading,
+        logsData: productionQuery.data?.jobFileLogs,
+    };
+};
 
 const LOG_LEVEL_BADGE_CONFIG = {
     [LogLevel.Trace]: {
@@ -143,45 +210,57 @@ const WorkflowExecutionLogsContent = ({
     isEditorEnvironment,
     jobId,
     taskExecutionId,
+    triggerExecutionId,
 }: WorkflowExecutionLogsContentProps) => {
     const [page] = useState(0);
     const [size] = useState(100);
 
-    const {
-        data: productionLogsData,
-        error: productionError,
-        isLoading: isProductionLoading,
-    } = useJobFileLogsQuery(
+    const isTriggerLogs = !isEditorEnvironment && !!triggerExecutionId;
+    const jobLogsFilter = taskExecutionId ? {taskExecutionId} : null;
+
+    const productionQuery = useJobFileLogsQuery(
         {
-            filter: taskExecutionId ? {taskExecutionId} : null,
-            jobId,
+            filter: jobLogsFilter,
+            jobId: jobId || '',
             page,
             size,
         },
         {
-            enabled: !isEditorEnvironment,
+            enabled: !isEditorEnvironment && !isTriggerLogs && !!jobId,
         }
     );
 
-    const {
-        data: editorLogsData,
-        error: editorError,
-        isLoading: isEditorLoading,
-    } = useEditorJobFileLogsQuery(
+    const triggerQuery = useTriggerExecutionFileLogsQuery(
         {
-            filter: taskExecutionId ? {taskExecutionId} : null,
-            jobId,
+            filter: null,
+            page,
+            size,
+            triggerExecutionId: triggerExecutionId || '',
+        },
+        {
+            enabled: isTriggerLogs,
+        }
+    );
+
+    const editorQuery = useEditorJobFileLogsQuery(
+        {
+            filter: jobLogsFilter,
+            jobId: jobId || '',
             page,
             size,
         },
         {
-            enabled: isEditorEnvironment === true,
+            enabled: isEditorEnvironment === true && !!jobId,
         }
     );
 
-    const isLoading = isEditorEnvironment ? isEditorLoading : isProductionLoading;
-    const error = isEditorEnvironment ? editorError : productionError;
-    const logsData = isEditorEnvironment ? editorLogsData?.editorJobFileLogs : productionLogsData?.jobFileLogs;
+    const {error, isLoading, logsData} = selectLogsQuery({
+        editorQuery,
+        isEditorEnvironment,
+        isTriggerLogs,
+        productionQuery,
+        triggerQuery,
+    });
 
     const logs = useMemo(() => logsData?.content || [], [logsData]);
 
@@ -216,7 +295,7 @@ const WorkflowExecutionLogsContent = ({
                     <LogEntryRow
                         entry={logEntry}
                         key={`${logEntry.timestamp}-${index}`}
-                        showComponentName={!taskExecutionId}
+                        showComponentName={!taskExecutionId && !isTriggerLogs}
                     />
                 ))}
             </div>

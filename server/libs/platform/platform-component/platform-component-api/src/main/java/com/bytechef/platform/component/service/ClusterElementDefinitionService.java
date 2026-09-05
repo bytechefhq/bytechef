@@ -67,6 +67,20 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment);
 
     /**
+     * Executes a tool inside a parent action's task execution. The tool's context is derived from the parent via
+     * {@link ActionContextAware#toClusterElementContext} for every call, so the tool's log entries land under the
+     * parent task in the execution view and a token-refresh retry runs against the refreshed connection.
+     */
+    Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, ActionContextAware actionContext);
+
+    Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections,
+        ActionContextAware actionContext);
+
+    /**
      * Executes an approval-channel cluster element (e.g. sending the approval request over Gmail, Slack, ...) on behalf
      * of a running approval action.
      */

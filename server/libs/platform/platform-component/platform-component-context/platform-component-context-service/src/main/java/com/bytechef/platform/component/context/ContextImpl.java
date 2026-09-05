@@ -29,6 +29,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.log.LogFileStorageWriter;
@@ -43,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +61,7 @@ import org.slf4j.helpers.MessageFormatter;
 /**
  * @author Ivica Cardic
  */
-class ContextImpl implements Context {
+class ContextImpl implements Context, LogEntryBufferAware {
 
     private final Converter converter;
     private final Encoder encoder;
@@ -67,7 +69,7 @@ class ContextImpl implements Context {
     private final File file;
     private final Http http;
     private final Json json;
-    private final Log log;
+    private final LogImpl log;
     private final MimeType mimeType;
     private final OutputSchema outputSchema;
     private final boolean editorEnvironment;
@@ -81,7 +83,7 @@ class ContextImpl implements Context {
 
         this(
             componentName, componentVersion, componentOperationName, componentConnection, null, 0, editorEnvironment,
-            httpClientExecutor, tempFileStorage, null);
+            httpClientExecutor, tempFileStorage, null, false, null);
     }
 
     @SuppressFBWarnings("EI")
@@ -89,7 +91,8 @@ class ContextImpl implements Context {
         String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, @Nullable Long jobId, long taskExecutionId,
         boolean editorEnvironment, HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
-        @Nullable LogFileStorageWriter logFileStorageWriter) {
+        @Nullable LogFileStorageWriter logFileStorageWriter, boolean bufferLogEntries,
+        @Nullable Long triggerExecutionId) {
 
         this.converter = new ConverterImpl();
         this.editorEnvironment = editorEnvironment;
@@ -99,7 +102,9 @@ class ContextImpl implements Context {
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
         this.json = new JsonImpl();
-        this.log = new LogImpl(componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId);
+        this.log = new LogImpl(
+            componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId, bufferLogEntries,
+            triggerExecutionId);
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
@@ -171,6 +176,11 @@ class ContextImpl implements Context {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void flushLogEntries() {
+        log.flushLogEntries();
     }
 
     @Override
@@ -660,6 +670,10 @@ class ContextImpl implements Context {
 
     private static class LogImpl implements Log {
 
+        private static final int MAX_BUFFERED_LOG_ENTRIES = 100;
+
+        private final List<LogEntry> bufferedLogEntries = new ArrayList<>();
+        private boolean buffering;
         private final String componentName;
         private final @Nullable String componentOperationName;
         private final @Nullable Long jobId;
@@ -667,11 +681,14 @@ class ContextImpl implements Context {
         @SuppressWarnings("PMD.LogVariableNameWithPrivateStaticFinalModifiers")
         private final org.slf4j.Logger log;
         private final long taskExecutionId;
+        private final @Nullable Long triggerExecutionId;
 
         public LogImpl(
             String componentName, @Nullable String componentOperationName,
-            @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId) {
+            @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId,
+            boolean buffering, @Nullable Long triggerExecutionId) {
 
+            this.buffering = buffering;
             this.componentName = componentName;
             this.componentOperationName = componentOperationName;
             this.jobId = jobId;
@@ -680,6 +697,7 @@ class ContextImpl implements Context {
                 "com.bytechef.component." + componentName +
                     (componentOperationName == null ? "" : "." + componentOperationName));
             this.taskExecutionId = taskExecutionId;
+            this.triggerExecutionId = triggerExecutionId;
         }
 
         @Override
@@ -823,8 +841,42 @@ class ContextImpl implements Context {
             return formattingTuple.getMessage();
         }
 
+        private void flushLogEntries() {
+            if (logFileStorageWriter == null || !hasStorageKey()) {
+                return;
+            }
+
+            List<LogEntry> logEntriesToStore;
+
+            synchronized (bufferedLogEntries) {
+                buffering = false;
+
+                logEntriesToStore = List.copyOf(bufferedLogEntries);
+
+                bufferedLogEntries.clear();
+            }
+
+            if (!logEntriesToStore.isEmpty()) {
+                logFileStorageWriter.storeLogEntries(getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore);
+            }
+
+            logFileStorageWriter.awaitPendingWrites(getStorageJobId(), getStorageTaskExecutionId());
+        }
+
+        private boolean hasStorageKey() {
+            return jobId != null || triggerExecutionId != null;
+        }
+
+        private long getStorageJobId() {
+            return jobId != null ? jobId : Objects.requireNonNull(triggerExecutionId);
+        }
+
+        private long getStorageTaskExecutionId() {
+            return jobId != null ? taskExecutionId : Objects.requireNonNull(triggerExecutionId);
+        }
+
         private void storeLogEntry(LogEntry.Level level, String message, @Nullable Exception exception) {
-            if (jobId == null || logFileStorageWriter == null) {
+            if (logFileStorageWriter == null || !hasStorageKey()) {
                 return;
             }
 
@@ -833,14 +885,35 @@ class ContextImpl implements Context {
                 .level(level)
                 .componentName(componentName)
                 .componentOperationName(componentOperationName)
-                .taskExecutionId(taskExecutionId)
+                .taskExecutionId(getStorageTaskExecutionId())
+                .triggerExecutionId(triggerExecutionId)
                 .message(message);
 
             if (exception != null) {
                 builder.exception(exception);
             }
 
-            logFileStorageWriter.storeLogEntry(jobId, taskExecutionId, builder.build());
+            LogEntry logEntry = builder.build();
+
+            List<LogEntry> logEntriesToStore = null;
+
+            synchronized (bufferedLogEntries) {
+                if (buffering) {
+                    bufferedLogEntries.add(logEntry);
+
+                    if (bufferedLogEntries.size() >= MAX_BUFFERED_LOG_ENTRIES || level.isAtLeast(LogEntry.Level.WARN)) {
+                        logEntriesToStore = List.copyOf(bufferedLogEntries);
+
+                        bufferedLogEntries.clear();
+                    }
+                } else {
+                    logEntriesToStore = List.of(logEntry);
+                }
+            }
+
+            if (logEntriesToStore != null) {
+                logFileStorageWriter.storeLogEntries(getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore);
+            }
         }
     }
 

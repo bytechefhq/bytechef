@@ -50,7 +50,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
                     defaultSize={50}
                 >
-                    {job && (
+                    {(job || triggerExecution) && (
                         <WorkflowExecutionSheetContent
                             activeTab={activeTab}
                             deepestFailedExecution={deepestFailedExecution}

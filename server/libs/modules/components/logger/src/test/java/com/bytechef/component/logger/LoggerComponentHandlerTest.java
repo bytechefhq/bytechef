@@ -17,7 +17,6 @@
 package com.bytechef.component.logger;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,29 +27,5 @@ public class LoggerComponentHandlerTest {
     @Test
     public void testGetDefinition() {
         JsonFileAssert.assertEquals("definition/logger_v1.json", new LoggerComponentHandler().getDefinition());
-    }
-
-    @Disabled
-    @Test
-    public void testPerformDebug() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testPerformError() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testPerformInfo() {
-        // TODO
-    }
-
-    @Disabled
-    @Test
-    public void testPerformWarn() {
-        // TODO
     }
 }

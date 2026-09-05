@@ -5,6 +5,7 @@ query taskExecutionFileLogs($jobId: ID!, $taskExecutionId: ID!) {
         componentName
         componentOperationName
         taskExecutionId
+        triggerExecutionId
         message
         exceptionType
         exceptionMessage

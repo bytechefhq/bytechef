@@ -16,6 +16,15 @@
 
 package com.bytechef.platform.workflow.execution.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
+import com.bytechef.platform.workflow.execution.repository.TriggerExecutionRepository;
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -40,5 +49,22 @@ public class TriggerExecutionServiceTest {
     @Test
     public void testUpdate() {
         // TODO
+    }
+
+    @Test
+    public void testGetTriggerExecutionsLoadsByIdAndSkipsTheRepositoryForNoIds() {
+        TriggerExecutionRepository triggerExecutionRepository = mock(TriggerExecutionRepository.class);
+        TriggerExecutionService triggerExecutionService = new TriggerExecutionServiceImpl(triggerExecutionRepository);
+
+        TriggerExecution triggerExecution = TriggerExecution.builder()
+            .id(77L)
+            .build();
+
+        when(triggerExecutionRepository.findAllById(List.of(77L))).thenReturn(List.of(triggerExecution));
+
+        assertEquals(List.of(triggerExecution), triggerExecutionService.getTriggerExecutions(List.of(77L)));
+        assertEquals(List.of(), triggerExecutionService.getTriggerExecutions(List.of()));
+
+        verify(triggerExecutionRepository, never()).findAllById(List.of());
     }
 }

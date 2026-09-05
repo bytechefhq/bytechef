@@ -2,6 +2,8 @@ extend type Query {
     jobFileLogs(jobId: ID!, filter: LogFilterInput, page: Int, size: Int): LogPage!
     taskExecutionFileLogs(jobId: ID!, taskExecutionId: ID!): [LogEntry!]!
     jobFileLogsExist(jobId: ID!): Boolean!
+    triggerExecutionFileLogs(triggerExecutionId: ID!, filter: LogFilterInput, page: Int, size: Int): LogPage!
+    triggerExecutionFileLogsExist(triggerExecutionId: ID!): Boolean!
 }
 
 extend type Mutation {
@@ -22,6 +24,7 @@ type LogEntry {
     componentName: String!
     componentOperationName: String
     taskExecutionId: ID!
+    triggerExecutionId: ID
     message: String!
     exceptionType: String
     exceptionMessage: String

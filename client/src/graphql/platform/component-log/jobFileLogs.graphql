@@ -6,6 +6,7 @@ query jobFileLogs($jobId: ID!, $filter: LogFilterInput, $page: Int, $size: Int) 
             componentName
             componentOperationName
             taskExecutionId
+            triggerExecutionId
             message
             exceptionType
             exceptionMessage

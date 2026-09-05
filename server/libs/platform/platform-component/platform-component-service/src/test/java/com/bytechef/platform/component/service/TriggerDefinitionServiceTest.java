@@ -77,7 +77,7 @@ public class TriggerDefinitionServiceTest {
     void setUpMocks() {
         when(contextFactory.createTriggerContext(
             Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(),
-            Mockito.any(), Mockito.any(), Mockito.anyBoolean()))
+            Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(triggerContext);
     }
 
@@ -101,7 +101,7 @@ public class TriggerDefinitionServiceTest {
             componentDefinitionRegistry, contextFactory, eventPublisher);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null, null,
             PlatformType.AUTOMATION, false);
 
         assertNotNull(output, "TriggerOutput should not be null");
@@ -139,7 +139,7 @@ public class TriggerDefinitionServiceTest {
 
         ProviderException thrownException = assertThrows(ProviderException.class, () -> {
             triggerDefinitionService.executeTrigger(
-                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+                "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null, null,
                 PlatformType.AUTOMATION, false);
         });
 
@@ -196,7 +196,8 @@ public class TriggerDefinitionServiceTest {
 
         try {
             output = triggerDefinitionService.executeTrigger(
-                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), priorState, null, null, null,
+                "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), priorState, null, null,
+                null,
                 PlatformType.AUTOMATION, false);
         } finally {
             detachLogAppender(logAppender);
@@ -247,7 +248,8 @@ public class TriggerDefinitionServiceTest {
             componentDefinitionRegistry, contextFactory, eventPublisher);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), Map.of("cursor", "page-1"), null,
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), Map.of("cursor", "page-1"),
+            null,
             null, null, PlatformType.AUTOMATION, false);
 
         assertNotNull(output, "TriggerOutput should not be null");
@@ -286,7 +288,7 @@ public class TriggerDefinitionServiceTest {
             componentDefinitionRegistry, contextFactory, eventPublisher);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null, null,
             PlatformType.AUTOMATION, false);
 
         List<?> records = (List<?>) output.value();
@@ -337,7 +339,7 @@ public class TriggerDefinitionServiceTest {
             componentDefinitionRegistry, contextFactory, eventPublisher);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
-            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+            "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null, null,
             PlatformType.AUTOMATION, false);
 
         List<?> records = (List<?>) output.value();
@@ -375,7 +377,7 @@ public class TriggerDefinitionServiceTest {
 
         try {
             triggerDefinitionService.executeTrigger(
-                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+                "testComponent", 1, "testTrigger", null, null, null, Collections.emptyMap(), null, null, null, null,
                 PlatformType.AUTOMATION, false);
         } finally {
             detachLogAppender(logAppender);
@@ -420,5 +422,33 @@ public class TriggerDefinitionServiceTest {
         Logger logger = (Logger) LoggerFactory.getLogger(TriggerDefinitionServiceImpl.class);
 
         logger.detachAppender(logAppender);
+    }
+
+    @Test
+    public void testExecuteTriggerPassesTheTriggerExecutionIdToTheContextFactory() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+
+        PollFunction mockPollFunction =
+            (inputParameters, connectionParameters, closureParameters, context) -> new PollOutput(
+                List.of(), Map.of(), false);
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", null, null, 4200L, Collections.emptyMap(), null, null, null, null,
+            PlatformType.AUTOMATION, false);
+
+        Mockito.verify(contextFactory)
+            .createTriggerContext(
+                Mockito.eq("testComponent"), Mockito.eq(1), Mockito.eq("testTrigger"), Mockito.any(), Mockito.any(),
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(false), Mockito.eq(4200L));
     }
 }

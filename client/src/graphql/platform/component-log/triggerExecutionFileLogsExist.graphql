@@ -1,0 +1,3 @@
+query triggerExecutionFileLogsExist($triggerExecutionId: ID!) {
+    triggerExecutionFileLogsExist(triggerExecutionId: $triggerExecutionId)
+}

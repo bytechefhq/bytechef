@@ -48,7 +48,8 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         super(
             builder.componentName, builder.componentVersion, builder.triggerName, builder.componentConnection,
             builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
-            builder.tempFileStorage, builder.logFileStorageWriter);
+            builder.tempFileStorage, builder.logFileStorageWriter, true,
+            builder.triggerExecutionId);
 
         this.data = new DataImpl(
             builder.dataStorage, builder.componentName, builder.componentVersion, builder.triggerName,
@@ -86,6 +87,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private long taskExecutionId;
         private final TempFileStorage tempFileStorage;
+        private @Nullable Long triggerExecutionId;
         private final String triggerName;
         private @Nullable PlatformType type;
         private @Nullable String workflowUuid;
@@ -137,6 +139,12 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
 
         Builder taskExecutionId(long taskExecutionId) {
             this.taskExecutionId = taskExecutionId;
+
+            return this;
+        }
+
+        Builder triggerExecutionId(@Nullable Long triggerExecutionId) {
+            this.triggerExecutionId = triggerExecutionId;
 
             return this;
         }

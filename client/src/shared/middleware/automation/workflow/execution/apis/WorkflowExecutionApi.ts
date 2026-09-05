@@ -29,6 +29,10 @@ import {
     WorkflowExecutionToJSON,
 } from '../models/WorkflowExecution';
 
+export interface GetTriggerExecutionWorkflowExecutionRequest {
+    triggerExecutionId: number;
+}
+
 export interface GetWorkflowExecutionRequest {
     id: number;
 }
@@ -55,6 +59,53 @@ export interface GetWorkflowExecutionsPageRequest {
  * 
  */
 export class WorkflowExecutionApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for getTriggerExecutionWorkflowExecution without sending the request
+     */
+    async getTriggerExecutionWorkflowExecutionRequestOpts(requestParameters: GetTriggerExecutionWorkflowExecutionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['triggerExecutionId'] == null) {
+            throw new runtime.RequiredError(
+                'triggerExecutionId',
+                'Required parameter "triggerExecutionId" was null or undefined when calling getTriggerExecutionWorkflowExecution().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workflow-executions/trigger-executions/{triggerExecutionId}`;
+        urlPath = urlPath.replace('{triggerExecutionId}', encodeURIComponent(String(requestParameters['triggerExecutionId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get the execution view of a trigger execution that produced no job, such as a failed webhook or poll.
+     * Get a trigger execution\'s workflow execution
+     */
+    async getTriggerExecutionWorkflowExecutionRaw(requestParameters: GetTriggerExecutionWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowExecution>> {
+        const requestOptions = await this.getTriggerExecutionWorkflowExecutionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowExecutionFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the execution view of a trigger execution that produced no job, such as a failed webhook or poll.
+     * Get a trigger execution\'s workflow execution
+     */
+    async getTriggerExecutionWorkflowExecution(requestParameters: GetTriggerExecutionWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecution> {
+        const response = await this.getTriggerExecutionWorkflowExecutionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for getWorkflowExecution without sending the request

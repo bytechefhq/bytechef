@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.log;
 
 import com.bytechef.platform.component.log.domain.LogEntry;
+import java.util.List;
 
 /**
  * Interface for writing and managing storage of log entries associated with task executions. Provides methods to store
@@ -33,7 +34,39 @@ public interface LogFileStorageWriter {
      * @param taskExecutionId the task execution ID
      * @param logEntry        the log entry to store
      */
-    void storeLogEntry(long jobId, long taskExecutionId, LogEntry logEntry);
+    default void storeLogEntry(long jobId, long taskExecutionId, LogEntry logEntry) {
+        storeLogEntries(jobId, taskExecutionId, List.of(logEntry));
+    }
+
+    /**
+     * Stores a batch of log entries for a specific task execution in the order given. Appending a batch costs the same
+     * as appending a single entry, so callers that can accumulate entries should prefer this method.
+     *
+     * @param jobId           the job ID
+     * @param taskExecutionId the task execution ID
+     * @param logEntries      the log entries to store
+     */
+    void storeLogEntries(long jobId, long taskExecutionId, List<LogEntry> logEntries);
+
+    /**
+     * Blocks until every entry stored for the job through this writer so far has reached storage. A writer that stores
+     * synchronously has nothing to wait for, hence the no-op default.
+     *
+     * @param jobId the job ID
+     */
+    default void awaitPendingWrites(long jobId) {
+    }
+
+    /**
+     * Blocks until every entry stored for the task execution through this writer so far has reached storage. A writer
+     * that does not track writes per task execution waits for the whole job.
+     *
+     * @param jobId           the job ID
+     * @param taskExecutionId the task execution ID
+     */
+    default void awaitPendingWrites(long jobId, long taskExecutionId) {
+        awaitPendingWrites(jobId);
+    }
 
     /**
      * Deletes logs for a job (cleanup).

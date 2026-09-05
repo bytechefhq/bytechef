@@ -109,7 +109,7 @@ class ComponentToolsTest {
         assertEquals("result", result.name());
         verify(componentDefinitionService).getComponentDefinition(componentName, version);
         verify(triggerDefinitionFacade, never()).executeTrigger(
-            anyString(), anyInt(), anyString(), any(), any(), anyMap(), any(), any(), any(), any(), any(),
+            anyString(), anyInt(), anyString(), any(), any(), any(), anyMap(), any(), any(), any(), any(), any(),
             anyBoolean());
     }
 

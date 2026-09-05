@@ -1260,6 +1260,7 @@ export type LogEntry = {
   stackTrace?: Maybe<Scalars['String']['output']>;
   taskExecutionId: Scalars['ID']['output'];
   timestamp: Scalars['String']['output'];
+  triggerExecutionId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type LogFilterInput = {
@@ -2749,6 +2750,8 @@ export type Query = {
   toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
   triggerDefinition: TriggerDefinition;
   triggerDefinitions: Array<TriggerDefinition>;
+  triggerExecutionFileLogs: LogPage;
+  triggerExecutionFileLogsExist: Scalars['Boolean']['output'];
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
@@ -3346,6 +3349,19 @@ export type QueryTriggerDefinitionArgs = {
 export type QueryTriggerDefinitionsArgs = {
   componentName: Scalars['String']['input'];
   componentVersion: Scalars['Int']['input'];
+};
+
+
+export type QueryTriggerExecutionFileLogsArgs = {
+  filter?: InputMaybe<LogFilterInput>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  triggerExecutionId: Scalars['ID']['input'];
+};
+
+
+export type QueryTriggerExecutionFileLogsExistArgs = {
+  triggerExecutionId: Scalars['ID']['input'];
 };
 
 
