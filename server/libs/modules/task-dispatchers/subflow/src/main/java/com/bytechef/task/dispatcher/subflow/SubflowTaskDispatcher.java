@@ -28,19 +28,14 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
-import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -74,26 +69,9 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
         Subflow subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, editorEnvironment);
 
-        String workflowId = subflow.workflowId();
-
-        if (workflowId == null || workflowId.isEmpty()) {
-            throw new IllegalStateException(
-                "SubflowResolver returned an empty workflow ID for UUID '%s' (editorEnvironment=%s)".formatted(
-                    workflowUuid, editorEnvironment));
-        }
-
-        Map<String, ? extends Map<Object, ?>> inputs = Map.of(
-            subflow.inputsName(),
+        SubflowChildJobLauncher.launch(
+            childJobPrincipalFactory, job, taskExecution, subflow,
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
-
-        Map<String, Object> childMetadata = new HashMap<>(job.getMetadata());
-
-        SubflowRequestConstants.AGENT_LINK_KEYS.forEach(childMetadata::remove);
-
-        JobParametersDTO jobParametersDTO = new JobParametersDTO(
-            workflowId, taskExecution.getId(), inputs, null, null, List.of(), childMetadata);
-
-        childJobPrincipalFactory.createChildJob(Objects.requireNonNull(job.getId()), jobParametersDTO);
     }
 
     @Override
