@@ -546,6 +546,13 @@ export type ComponentDefinitionTuple = {
   value: Array<Maybe<ComponentDefinition>>;
 };
 
+/** Which kind of operation a component's properties belong to. */
+export enum ComponentOperationType {
+  Action = 'ACTION',
+  ClusterElement = 'CLUSTER_ELEMENT',
+  Trigger = 'TRIGGER'
+}
+
 export type ConnectedUser = {
   __typename?: 'ConnectedUser';
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -2663,6 +2670,12 @@ export type Query = {
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
+  /**
+   * Display conditions for an operation's properties evaluated against a standalone parameter map, for property
+   * forms that have no workflow — a tool config dialog, an MCP tool popover, a connection dialog. Returns the
+   * conditions that hold; a condition absent from the map is false.
+   */
+  componentPropertyDisplayConditions: Scalars['Map']['output'];
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
   connectedUserProjects: Array<ConnectedUserProject>;
@@ -2974,6 +2987,15 @@ export type QueryComponentDefinitionsArgs = {
   connectionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
   include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryComponentPropertyDisplayConditionsArgs = {
+  componentName: Scalars['String']['input'];
+  componentVersion: Scalars['Int']['input'];
+  operationName: Scalars['String']['input'];
+  operationType: ComponentOperationType;
+  parameters?: InputMaybe<Scalars['Map']['input']>;
 };
 
 
