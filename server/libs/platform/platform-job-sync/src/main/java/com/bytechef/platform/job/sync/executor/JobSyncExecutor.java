@@ -937,28 +937,6 @@ public class JobSyncExecutor {
         }
 
         try {
-            Optional<TaskExecution> lastTaskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
-
-            if (lastTaskExecutionOptional.isPresent()) {
-                TaskExecution taskExecution = lastTaskExecutionOptional.get();
-
-                TaskExecution.Status status = taskExecution.getStatus();
-
-                if (status.isTerminated()) {
-                    failJobOnHandlerFailure(jobId);
-
-                    jobCompletionLatches.remove(getKey(jobId));
-
-                    return;
-                }
-            }
-        } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
-            }
-        }
-
-        try {
             long timeoutMillis = getTimeoutMillis(timeout);
 
             if (jobFailures.getIfPresent(getKey(jobId)) == null) {
