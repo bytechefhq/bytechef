@@ -544,6 +544,59 @@ describe('useWorkflowTestStream', () => {
         expect(mockRemoveWorkflowTestNodeState).not.toHaveBeenCalled();
     });
 
+    it('should backfill task dispatchers nested in a loop iteration or a condition branch', () => {
+        mockWorkflowTestNodeStates = {condition_2: {status: 'COMPLETED'}, logger_1: {status: 'COMPLETED'}};
+
+        renderHook(() => useWorkflowTestStream({workflowId: 'workflow-123'}));
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        const eventHandlers = (useSSE as any).mock.calls[0][1].eventHandlers;
+
+        act(() => {
+            eventHandlers.result({
+                job: {
+                    id: '1',
+                    priority: 0,
+                    status: 'COMPLETED',
+                    taskExecutions: [
+                        {
+                            endDate: '2026-09-28T07:14:11.054Z',
+                            iterations: [
+                                [
+                                    {
+                                        children: [
+                                            {
+                                                endDate: '2026-09-28T07:14:11.001Z',
+                                                startDate: '2026-09-28T07:14:11.001Z',
+                                                status: 'COMPLETED',
+                                                workflowTask: {name: 'condition_2', type: 'condition/v1'},
+                                            },
+                                        ],
+                                        endDate: '2026-09-28T07:14:11.002Z',
+                                        startDate: '2026-09-28T07:14:11.001Z',
+                                        status: 'COMPLETED',
+                                        workflowTask: {name: 'condition_1', type: 'condition/v1'},
+                                    },
+                                ],
+                            ],
+                            startDate: '2026-09-28T07:14:11.000Z',
+                            status: 'COMPLETED',
+                            workflowTask: {name: 'loop_1', type: 'loop/v1'},
+                        },
+                    ],
+                },
+            });
+        });
+
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('loop_1', {durationMillis: 54, status: 'COMPLETED'});
+        expect(mockSetWorkflowTestNodeState).toHaveBeenCalledWith('condition_1', {
+            durationMillis: 1,
+            status: 'COMPLETED',
+        });
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('condition_2', expect.anything());
+        expect(mockSetWorkflowTestNodeState).not.toHaveBeenCalledWith('logger_1', expect.anything());
+    });
+
     it('should show a progress snapshot while the workflow is running', () => {
         mockWorkflowIsRunning = true;
 
