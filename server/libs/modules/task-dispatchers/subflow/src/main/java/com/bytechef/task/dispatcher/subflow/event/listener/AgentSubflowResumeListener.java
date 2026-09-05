@@ -32,7 +32,7 @@ import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(AgentSubflowResumeListener.class);
 
-    private final JobFacade jobFacade;
+    private final AgentJobResumer agentJobResumer;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
@@ -56,7 +56,7 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
         JobFacade jobFacade, JobService jobService, TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage) {
 
-        this.jobFacade = jobFacade;
+        this.agentJobResumer = new AgentJobResumer(jobFacade, jobService);
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
@@ -70,95 +70,88 @@ public class AgentSubflowResumeListener implements ApplicationEventListener {
 
         Job.Status status = jobStatusApplicationEvent.getStatus();
 
-        if (status != Job.Status.COMPLETED && status != Job.Status.FAILED) {
+        if (status != Job.Status.COMPLETED && status != Job.Status.FAILED && status != Job.Status.STOPPED) {
+            return;
+        }
+
+        if (status == Job.Status.STOPPED && jobStatusApplicationEvent.isSuspended()) {
             return;
         }
 
         Job subflowJob = jobService.getJob(jobStatusApplicationEvent.getJobId());
 
-        Object agentJobIdObject = subflowJob.getMetadata()
-            .get(SubflowRequestConstants.AGENT_JOB_ID);
+        Long agentJobId = MapUtils.getLong(subflowJob.getMetadata(), SubflowRequestConstants.AGENT_JOB_ID);
+        String agentJobResumeId = MapUtils.getString(
+            subflowJob.getMetadata(), SubflowRequestConstants.AGENT_JOB_RESUME_ID);
 
-        if (agentJobIdObject == null) {
+        if (agentJobId == null || agentJobResumeId == null) {
             return;
         }
 
-        long agentJobId = ((Number) agentJobIdObject).longValue();
+        Map<String, Object> resumeData = switch (status) {
+            case COMPLETED -> buildCompletedResumeData(subflowJob);
+            case FAILED -> AgentJobResumer.failed(
+                "Sub-workflow '%s' failed: %s".formatted(describeSubflow(subflowJob), getErrorMessage(subflowJob)));
+            default -> AgentJobResumer.failed(
+                "Sub-workflow '%s' was stopped before it finished".formatted(describeSubflow(subflowJob)));
+        };
 
-        Job agentJob = jobService.getJob(agentJobId);
-
-        if (agentJob.getStatus() != Job.Status.STOPPED) {
-            log.warn(
-                "Agent job {} is {} (expected STOPPED) when sub-workflow job {} terminated; skipping resume",
-                agentJobId, agentJob.getStatus(), subflowJob.getId());
-
-            return;
-        }
-
-        Map<String, ?> resumeData = status == Job.Status.COMPLETED
-            ? buildCompletedResumeData(subflowJob)
-            : buildFailedResumeData(subflowJob);
-
-        Map<String, Object> agentJobMetadata = new HashMap<>(agentJob.getMetadata());
-
-        agentJobMetadata.remove(SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID);
-
-        agentJob.setMetadata(agentJobMetadata);
-
-        jobService.update(agentJob);
-
-        jobFacade.resumeJob(
-            agentJobId, MapUtils.getLong(agentJobMetadata, MetadataConstants.TASK_EXECUTION_RESUME_ID), resumeData);
-
-        if (log.isDebugEnabled()) {
+        if (agentJobResumer.resume(agentJobId, agentJobResumeId, resumeData) && log.isDebugEnabled()) {
             log.debug("Resumed agent job {} after sub-workflow job {} {}", agentJobId, subflowJob.getId(), status);
         }
     }
 
-    private Map<String, ?> buildCompletedResumeData(Job subflowJob) {
-        Optional<Object> callableOutput;
-
+    private Map<String, Object> buildCompletedResumeData(Job subflowJob) {
         try {
-            callableOutput = getCallableResponseOutput(subflowJob);
+            Optional<Object> callableOutput = getCallableResponseOutput(subflowJob);
+
+            if (callableOutput.isPresent()) {
+                return AgentJobResumer.completed(callableOutput.get());
+            }
+
+            return AgentJobResumer.completed(
+                subflowJob.getOutputs() == null ? null : taskFileStorage.readJobOutputs(subflowJob.getOutputs()));
         } catch (RuntimeException exception) {
-            log.error(
-                "Failed to extract callable response output from sub-workflow job {} -- "
-                    + "agent will be resumed with an error payload to avoid silent data corruption",
-                subflowJob.getId(), exception);
+            log.error("Failed to read the outputs of sub-workflow job {}", subflowJob.getId(), exception);
 
-            return Map.of(
-                "error", "Sub-workflow '%s' completed but its result could not be read: %s"
-                    .formatted(describeSubflow(subflowJob), exception.getMessage()));
+            return AgentJobResumer.failed(
+                "Sub-workflow '%s' completed but its result could not be read: %s".formatted(
+                    describeSubflow(subflowJob), exception.getMessage()));
         }
-
-        Object output = callableOutput.orElseGet(() -> subflowJob.getOutputs() == null
-            ? Map.of()
-            : taskFileStorage.readJobOutputs(subflowJob.getOutputs()));
-
-        if (output == null) {
-            return Map.of();
-        }
-
-        if (output instanceof Map<?, ?> map) {
-            @SuppressWarnings("unchecked")
-            Map<String, ?> typed = (Map<String, ?>) map;
-
-            return typed;
-        }
-
-        return Map.of("result", output);
     }
 
-    private static Map<String, ?> buildFailedResumeData(Job subflowJob) {
-        ExecutionError error = subflowJob.getError();
-        String reason = error != null && error.getMessage() != null ? error.getMessage() : "unknown error";
+    private String getErrorMessage(Job subflowJob) {
+        List<TaskExecution> taskExecutions;
 
-        return Map.of(
-            "error", "Sub-workflow '%s' failed: %s".formatted(describeSubflow(subflowJob), reason));
+        try {
+            taskExecutions = taskExecutionService.getJobTaskExecutions(Objects.requireNonNull(subflowJob.getId()));
+        } catch (RuntimeException exception) {
+            log.error("Failed to read the task executions of sub-workflow job {}", subflowJob.getId(), exception);
+
+            taskExecutions = List.of();
+        }
+
+        for (int index = taskExecutions.size() - 1; index >= 0; index--) {
+            TaskExecution taskExecution = taskExecutions.get(index);
+
+            ExecutionError executionError = taskExecution.getError();
+
+            if (taskExecution.getStatus() == TaskExecution.Status.FAILED && executionError != null &&
+                executionError.getMessage() != null) {
+
+                return executionError.getMessage();
+            }
+        }
+
+        ExecutionError jobError = subflowJob.getError();
+
+        return jobError != null && jobError.getMessage() != null ? jobError.getMessage() : "unknown error";
     }
 
     private static String describeSubflow(Job subflowJob) {
-        return subflowJob.getWorkflowId() != null ? subflowJob.getWorkflowId() : "unknown";
+        String workflowId = subflowJob.getWorkflowId();
+
+        return workflowId == null ? "unknown" : workflowId;
     }
 
     private Optional<Object> getCallableResponseOutput(Job job) {

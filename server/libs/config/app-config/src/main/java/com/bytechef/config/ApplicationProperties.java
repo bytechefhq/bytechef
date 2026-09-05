@@ -4732,6 +4732,11 @@ public class ApplicationProperties {
     public static class Workflow {
 
         /**
+         * Workflow execution configuration
+         */
+        private Execution execution = new Execution();
+
+        /**
          * Output storage configuration for workflow results
          */
         private OutputStorage outputStorage = new OutputStorage();
@@ -4741,6 +4746,10 @@ public class ApplicationProperties {
          */
         private Repository repository = new Repository();
 
+        public Execution getExecution() {
+            return execution;
+        }
+
         public OutputStorage getOutputStorage() {
             return outputStorage;
         }
@@ -4749,12 +4758,54 @@ public class ApplicationProperties {
             return repository;
         }
 
+        public void setExecution(Execution execution) {
+            this.execution = execution;
+        }
+
         public void setOutputStorage(OutputStorage outputStorage) {
             this.outputStorage = outputStorage;
         }
 
         public void setRepository(Repository repository) {
             this.repository = repository;
+        }
+
+        /**
+         * Workflow execution configuration.
+         */
+        public static class Execution {
+
+            /**
+             * AI agent execution configuration
+             */
+            private Agent agent = new Agent();
+
+            public Agent getAgent() {
+                return agent;
+            }
+
+            public void setAgent(Agent agent) {
+                this.agent = agent;
+            }
+
+            /**
+             * AI agent execution configuration.
+             */
+            public static class Agent {
+
+                /**
+                 * Maximum nesting depth of sub-workflows called by AI agent tools
+                 */
+                private int maxSubflowDepth;
+
+                public int getMaxSubflowDepth() {
+                    return maxSubflowDepth;
+                }
+
+                public void setMaxSubflowDepth(int maxSubflowDepth) {
+                    this.maxSubflowDepth = maxSubflowDepth;
+                }
+            }
         }
 
         /**

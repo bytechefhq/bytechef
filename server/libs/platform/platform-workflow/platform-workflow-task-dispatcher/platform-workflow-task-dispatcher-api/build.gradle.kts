@@ -7,6 +7,5 @@ dependencies {
     implementation("org.springframework:spring-core")
     implementation(project(":server:libs:core:commons:commons-util"))
 
-    testImplementation("com.fasterxml.jackson.core:jackson-databind")
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(project(":server:libs:test:test-support"))
 }

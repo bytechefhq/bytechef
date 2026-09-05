@@ -8,5 +8,9 @@ bytechef:
   message-broker:
     provider: memory
   workflow:
+    execution:
+      agent:
+        # Maximum nesting depth of sub-workflows called by AI agent tools default: 10
+        max-subflow-depth: 10
     output-storage:
       provider: jdbc

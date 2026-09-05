@@ -1,0 +1,18 @@
+---
+label: "Sub-workflow that calls another sub-workflow through subflow/v1"
+inputs:
+- name: "amount"
+  type: "integer"
+  required: false
+outputs:
+- name: "result"
+  value: "${result}"
+tasks:
+- name: "callGrandchild"
+  type: "subflow/v1"
+  parameters:
+    workflowUuid: "agent-subflow-bridge-fast"
+- name: "result"
+  type: "var/v1/set"
+  parameters:
+    value: "nesting done"

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -34,6 +35,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.platform.ai.tool.ToolSuspension;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
@@ -148,6 +150,29 @@ class WorkflowCallWorkflowToolTest {
     }
 
     @Test
+    void testToolRunsTheSubflowSynchronouslyInTheEditor() throws Exception {
+        SubflowDataSource subflowDataSource = mock(SubflowDataSource.class);
+        SubflowResolver subflowResolver = mock(SubflowResolver.class);
+        SubflowSyncExecutor subflowSyncExecutor = mock(SubflowSyncExecutor.class);
+
+        when(subflowSyncExecutor.execute("uuid-1", "newWorkflowCall", Map.of("amount", 5), true))
+            .thenReturn(Map.of("total", 10));
+
+        ClusterElementContextAware context = mock(
+            ClusterElementContextAware.class,
+            withSettings().extraInterfaces(ClusterElementContext.class));
+
+        when(((ClusterElementContext) context).isEditorEnvironment()).thenReturn(true);
+
+        Object result = getToolFunction(subflowDataSource, subflowResolver, subflowSyncExecutor).apply(
+            MockParametersFactory.create(Map.of("workflowUuid", "uuid-1", "inputs", Map.of("amount", 5))),
+            MockParametersFactory.create(Map.of()), (ClusterElementContext) context);
+
+        assertEquals(Map.of("total", 10), result);
+        verify(context, never()).toActionContext(any(), anyInt(), any(), any());
+    }
+
+    @Test
     void testToolReturnsErrorWhenResolutionFails() throws Exception {
         SubflowDataSource subflowDataSource = mock(SubflowDataSource.class);
         SubflowResolver subflowResolver = mock(SubflowResolver.class);
@@ -187,8 +212,15 @@ class WorkflowCallWorkflowToolTest {
     private static ToolFunction getToolFunction(
         SubflowDataSource subflowDataSource, SubflowResolver subflowResolver) {
 
+        return getToolFunction(subflowDataSource, subflowResolver, mock(SubflowSyncExecutor.class));
+    }
+
+    private static ToolFunction getToolFunction(
+        SubflowDataSource subflowDataSource, SubflowResolver subflowResolver,
+        SubflowSyncExecutor subflowSyncExecutor) {
+
         ClusterElementDefinition<ToolFunction> definition = WorkflowCallWorkflowTool.of(
-            subflowDataSource, subflowResolver);
+            subflowDataSource, subflowResolver, subflowSyncExecutor);
 
         return definition.getElement();
     }

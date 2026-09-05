@@ -33,6 +33,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -86,6 +87,8 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 
         Map<String, Object> childMetadata = new HashMap<>(job.getMetadata());
+
+        SubflowRequestConstants.AGENT_LINK_KEYS.forEach(childMetadata::remove);
 
         JobParametersDTO jobParametersDTO = new JobParametersDTO(
             workflowId, taskExecution.getId(), inputs, null, null, List.of(), childMetadata);

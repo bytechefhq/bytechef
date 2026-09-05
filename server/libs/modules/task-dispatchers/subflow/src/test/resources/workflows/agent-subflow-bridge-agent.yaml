@@ -1,0 +1,14 @@
+---
+label: "Agent whose tool calls one sub-workflow"
+inputs:
+- name: "subflow"
+  type: "string"
+  required: true
+outputs:
+- name: "toolResult"
+  value: "${callTool}"
+tasks:
+- name: "callTool"
+  type: "agentTool/v1"
+  parameters:
+    subflow: "${subflow}"
