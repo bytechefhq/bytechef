@@ -262,6 +262,111 @@ class AgentSubflowBridgeIntTest {
             launchedJobParameters.get(), "A redelivered STOPPED event must not launch a second sub-workflow job");
     }
 
+    @Test
+    void testAgentCanBridgeTwoSequentialSubflowCalls() {
+        InMemoryTaskExecutionRepository taskExecutionRepository = new InMemoryTaskExecutionRepository();
+        JobService jobService = new JobServiceImpl(
+            new InMemoryJobRepository(taskExecutionRepository, new JsonMapper()));
+        TaskExecutionService taskExecutionService = new TaskExecutionServiceImpl(taskExecutionRepository);
+
+        long agentJobId = persistStoppedJob(jobService, "agent-job");
+
+        AtomicReference<JobParametersDTO> launchedJobParameters = new AtomicReference<>();
+
+        ChildJobPrincipalFactory childJobPrincipalFactory = new RecordingChildJobPrincipalFactory(
+            jobService, launchedJobParameters);
+
+        AgentSubflowLauncher launcher = new AgentSubflowLauncher(
+            childJobPrincipalFactory, jobService, taskExecutionService);
+        AgentSubflowResumeListener resumeListener = new AgentSubflowResumeListener(
+            new NoOpJobFacade(), jobService, taskExecutionService, taskFileStorage);
+
+        suspendAgentForSubflow(taskExecutionService, agentJobId, encodeWorkflowId(FAST_SUBFLOW), "first");
+
+        launcher.onApplicationEvent(new JobStatusApplicationEvent(agentJobId, Job.Status.STOPPED));
+
+        assertNotNull(launchedJobParameters.get(), "The first bridged call must launch");
+
+        long firstSubflowJobId = ((Number) jobService.getJob(agentJobId)
+            .getMetadata()
+            .get(SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID)).longValue();
+
+        Job firstSubflowJob = jobService.getJob(firstSubflowJobId);
+
+        firstSubflowJob.setStatus(Job.Status.COMPLETED);
+
+        jobService.update(firstSubflowJob);
+
+        resumeListener.onApplicationEvent(new JobStatusApplicationEvent(firstSubflowJobId, Job.Status.COMPLETED));
+
+        assertFalse(
+            jobService.getJob(agentJobId)
+                .getMetadata()
+                .containsKey(SubflowRequestConstants.LAUNCHED_SUBFLOW_JOB_ID),
+            "Resuming the agent must clear the launched-sub-workflow marker");
+
+        launchedJobParameters.set(null);
+
+        suspendAgentForSubflow(taskExecutionService, agentJobId, encodeWorkflowId(FAST_SUBFLOW), "second");
+
+        launcher.onApplicationEvent(new JobStatusApplicationEvent(agentJobId, Job.Status.STOPPED));
+
+        assertNotNull(launchedJobParameters.get(), "The second bridged call on the same agent job must launch");
+    }
+
+    private static void suspendAgentForSubflow(
+        TaskExecutionService taskExecutionService, long agentJobId, String subflowWorkflowId, String callName) {
+
+        PendingSubflowRequest request = new PendingSubflowRequest(
+            subflowWorkflowId, "newWorkflowCall", Map.of("call", callName), false, PlatformType.AUTOMATION);
+
+        TaskExecution agentTaskExecution = TaskExecution.builder()
+            .jobId(agentJobId)
+            .workflowTask(
+                new WorkflowTask(
+                    Map.of(WorkflowConstants.NAME, "callWorkflow_" + callName, WorkflowConstants.TYPE,
+                        "aiAgent/v1/chat")))
+            .build();
+
+        agentTaskExecution.putMetadata(
+            MetadataConstants.SUSPEND,
+            new Suspend(Map.of(SubflowRequestConstants.PENDING_SUBFLOW, request), null));
+
+        taskExecutionService.create(agentTaskExecution);
+    }
+
+    private static final class NoOpJobFacade implements JobFacade {
+
+        @Override
+        public long createJob(JobParametersDTO jobParametersDTO) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void deleteJob(long id) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        @Deprecated
+        public void resumeApproval(long jobId, String uuid, boolean approved) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void resumeJob(long id) {
+        }
+
+        @Override
+        public void resumeJob(long id, long taskExecutionId, Map<String, ?> data) {
+        }
+
+        @Override
+        public void stopJob(long id) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private static long persistStoppedJob(JobService jobService, String workflowId) {
         Job job = new Job();
 
