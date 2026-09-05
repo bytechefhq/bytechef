@@ -23,7 +23,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import ExpressionHelpNote from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/ExpressionHelpNote';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
-import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
+import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
@@ -120,13 +120,13 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             }))
         );
 
-        const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+        const openDataPillPanel = useOpenDataPillPanel();
 
         const onFocus = (editor: Editor) => {
             setFocusedInput(editor);
 
             if (workflowNodeDetailsPanelOpen && expressionEnabled !== false) {
-                setDataPillPanelOpen(true);
+                openDataPillPanel();
             }
         };
 

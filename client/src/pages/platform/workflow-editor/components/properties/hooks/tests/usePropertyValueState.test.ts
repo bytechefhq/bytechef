@@ -26,6 +26,7 @@ const hoisted = vi.hoisted(() => {
     };
 
     const dataStoreState = {
+        dataPills: [] as Array<{id: string; value: string}>,
         workflow: {
             definition: JSON.stringify({tasks: []}),
             id: 'workflow-1',
@@ -49,13 +50,22 @@ vi.mock('../../../../stores/useWorkflowNodeDetailsPanelStore', () => ({
 }));
 
 vi.mock('../../../../stores/useWorkflowDataStore', () => ({
-    default: (selector: (state: typeof hoisted.dataStoreState) => unknown) => selector(hoisted.dataStoreState),
+    default: Object.assign(
+        (selector: (state: typeof hoisted.dataStoreState) => unknown) => selector(hoisted.dataStoreState),
+        {getState: () => hoisted.dataStoreState}
+    ),
 }));
 
-vi.mock('../../../../stores/useDataPillPanelStore', () => ({
-    default: (selector: (state: {setDataPillPanelOpen: () => void}) => unknown) =>
-        selector({setDataPillPanelOpen: vi.fn()}),
-}));
+vi.mock('../../../../stores/useDataPillPanelStore', () => {
+    const dataPillPanelStoreState = {dataPillPanelHasContent: true, setDataPillPanelOpen: vi.fn()};
+
+    return {
+        default: Object.assign(
+            (selector: (state: typeof dataPillPanelStoreState) => unknown) => selector(dataPillPanelStoreState),
+            {getState: () => dataPillPanelStoreState}
+        ),
+    };
+});
 
 vi.mock('../../../../stores/useWorkflowEditorStore', () => ({
     default: (selector: (state: {rootClusterElementNodeData: undefined}) => unknown) =>

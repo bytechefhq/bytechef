@@ -5,6 +5,7 @@ import DataPillPanelBody, {
     OperationType,
 } from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import getDataPillPanelNodeOutputs from '@/pages/platform/workflow-editor/utils/getDataPillPanelNodeOutputs';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {InfoIcon, XIcon} from 'lucide-react';
@@ -43,20 +44,7 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
         }))
     );
 
-    const validWorkflowNodeOutputs = workflowNodeOutputs.filter((workflowNodeOutput) => {
-        const {actionDefinition, taskDispatcherDefinition, triggerDefinition, workflowNodeName} = workflowNodeOutput;
-
-        if (workflowNodeName === currentNode?.name) {
-            return false;
-        }
-
-        return (
-            actionDefinition?.outputDefined ||
-            triggerDefinition?.outputDefined ||
-            taskDispatcherDefinition?.outputDefined ||
-            taskDispatcherDefinition?.variablePropertiesDefined
-        );
-    });
+    const validWorkflowNodeOutputs = getDataPillPanelNodeOutputs(workflowNodeOutputs, currentNode?.name);
 
     const operations = validWorkflowNodeOutputs.map((workflowNodeOutput) => {
         const {actionDefinition, triggerDefinition} = workflowNodeOutput;
