@@ -9,6 +9,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import useCanvasDropzone from '../hooks/useCanvasDropzone';
+import useWorkflowIsRunning from '../hooks/useWorkflowIsRunning';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -24,7 +25,7 @@ import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
 import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './computeTriggerFanIn';
-import getExecutedEdgeStatus from './getExecutedEdgeStatus';
+import useExecutedEdgeStatus from './useExecutedEdgeStatus';
 
 export default function WorkflowEdge({
     data,
@@ -172,10 +173,8 @@ export default function WorkflowEdge({
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);
-    const workflowIsRunning = useWorkflowEditorStore((state) => state.workflowIsRunning);
-    const workflowTestNodeStates = useWorkflowEditorStore((state) => state.workflowTestNodeStates);
-
-    const executedEdgeStatus = getExecutedEdgeStatus(sourceNode, targetNode, workflowTestNodeStates);
+    const workflowIsRunning = useWorkflowIsRunning();
+    const executedEdgeStatus = useExecutedEdgeStatus(id);
 
     const edgeClusterElementType = (data as Record<string, unknown>)?.clusterElementType;
 

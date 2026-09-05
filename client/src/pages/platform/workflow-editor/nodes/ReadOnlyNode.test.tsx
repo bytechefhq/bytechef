@@ -3,6 +3,10 @@ import {render, screen} from '@testing-library/react';
 import {ReactFlowProvider} from '@xyflow/react';
 import {describe, expect, it, vi} from 'vitest';
 
+import {
+    WorkflowExecutionOverlayContext,
+    type WorkflowExecutionOverlayI,
+} from '../providers/workflowExecutionOverlayContext';
 import ReadOnlyNode from './ReadOnlyNode';
 
 // react-inlinesvg fetches the icon file, so stand in for it with the source it was handed.
@@ -40,6 +44,16 @@ function renderNode(data: NodeDataType) {
     return render(
         <ReactFlowProvider>
             <ReadOnlyNode data={data} />
+        </ReactFlowProvider>
+    );
+}
+
+function renderNodeWithExecution(data: NodeDataType, nodeStates: WorkflowExecutionOverlayI['nodeStates']) {
+    return render(
+        <ReactFlowProvider>
+            <WorkflowExecutionOverlayContext.Provider value={{isRunning: false, nodeStates, taskExecutions: []}}>
+                <ReadOnlyNode data={data} />
+            </WorkflowExecutionOverlayContext.Provider>
         </ReactFlowProvider>
     );
 }
@@ -141,5 +155,18 @@ describe('ReadOnlyNode', () => {
         renderNode({...BASE_DATA, isEffectivelyDisabled: true});
 
         expect(screen.queryByTitle('Disabled — skipped during execution')).not.toBeInTheDocument();
+    });
+
+    it('shows how the node ran in the overlaid execution', () => {
+        renderNodeWithExecution(BASE_DATA, {approval_1: {durationMillis: 1500, error: 'Timed out', status: 'FAILED'}});
+
+        expect(screen.getByTitle('Timed out')).toHaveClass('border-red-500');
+        expect(screen.getByText('1.5s')).toBeInTheDocument();
+    });
+
+    it('shows no execution status for a node that did not run', () => {
+        renderNodeWithExecution(BASE_DATA, {other_1: {durationMillis: 10, status: 'COMPLETED'}});
+
+        expect(screen.queryByText('10ms')).not.toBeInTheDocument();
     });
 });

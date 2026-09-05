@@ -1,5 +1,6 @@
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import buildNodeStatesFromTaskExecutions from '@/pages/platform/workflow-editor/utils/buildNodeStatesFromTaskExecutions';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {SSERequestType, useSSE} from '@/shared/hooks/useSSE';
 import {JobStatusEnum, WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
@@ -57,47 +58,30 @@ function clearProgressSnapshot() {
 }
 
 /**
- * Backfills node states from the final execution result. Task dispatcher executions (condition, loop, ...)
- * complete coordinator-side and never emit worker task lifecycle SSE events, so without this pass their nodes
- * would stay uncolored after a run even though they executed. Streamed states win — only missing (or
- * still-RUNNING) entries are filled in.
+ * Backfills node states from the final execution result. A task dispatcher (condition, loop, ...) whose body ran
+ * completes coordinator-side and never emits a task lifecycle SSE event, so without this pass its node -- and every
+ * edge touching it -- would stay uncolored after a run even though it executed. The whole execution tree is walked,
+ * not just the top level: a condition inside a loop iteration or another condition's branch is exactly such a
+ * dispatcher. Streamed states win — only missing (or still-RUNNING) entries are filled in.
  */
 function backfillNodeStatesFromResult(workflowTestExecution: WorkflowTestExecution) {
     const {setWorkflowTestNodeState, workflowTestNodeStates} = useWorkflowEditorStore.getState();
 
-    for (const taskExecution of workflowTestExecution.job?.taskExecutions ?? []) {
-        const name = taskExecution.workflowTask?.name;
+    const resultNodeStates = buildNodeStatesFromTaskExecutions(workflowTestExecution.job?.taskExecutions, false);
 
-        if (!name) {
-            continue;
-        }
-
+    for (const [name, nodeState] of Object.entries(resultNodeStates)) {
         const existingStatus = workflowTestNodeStates[name]?.status;
 
         if (existingStatus === 'COMPLETED' || existingStatus === 'FAILED') {
             continue;
         }
 
-        const status =
-            taskExecution.status === 'COMPLETED' ? 'COMPLETED' : taskExecution.status === 'FAILED' ? 'FAILED' : null;
-
-        if (status == null) {
-            continue;
-        }
-
-        setWorkflowTestNodeState(name, {
-            durationMillis: computeDurationMillis(
-                taskExecution.startDate?.toISOString(),
-                taskExecution.endDate?.toISOString()
-            ),
-            status,
-        });
+        setWorkflowTestNodeState(name, nodeState);
     }
 
-    // The result payload only carries top-level task executions, so a nested child (condition case, loop
-    // iteratee) whose task_completed SSE event was missed has no backfill source. A COMPLETED job proves
-    // every started task finished — sweep any node still marked RUNNING to COMPLETED so no spinner outlives
-    // the run.
+    // A nested child that neither streamed a task_completed event nor made it into the result tree has no
+    // backfill source. A COMPLETED job proves every started task finished — sweep any node still marked RUNNING
+    // to COMPLETED so no spinner outlives the run.
     const jobStatus = workflowTestExecution.job?.status;
 
     if (jobStatus === 'COMPLETED') {

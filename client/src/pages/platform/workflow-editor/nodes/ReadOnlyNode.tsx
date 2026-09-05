@@ -5,16 +5,23 @@ import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
 import {extractClusterElementIcons} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import useWorkflowTestNodeStates from '../hooks/useWorkflowTestNodeStates';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {mapHandlePosition} from '../utils/directionUtils';
+import getTestNodeStateBorderClassName from '../utils/getTestNodeStateBorderClassName';
 import {CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET, REGULAR_NODE_HANDLE_OFFSET} from '../utils/postDagreConstraints';
 import DisabledNodeBadge from './DisabledNodeBadge';
 import styles from './NodeTypes.module.css';
+import WorkflowTestNodeStatus from './WorkflowTestNodeStatus';
 
 const MAX_VISIBLE_CLUSTER_ELEMENT_ICONS = 5;
 
 const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
+
+    const workflowTestNodeStates = useWorkflowTestNodeStates();
+
+    const testNodeState = workflowTestNodeStates[data.workflowNodeName];
 
     const clusterElementIcons = useMemo(() => {
         if (!data.clusterElements || Array.isArray(data.clusterElements)) {
@@ -53,10 +60,13 @@ const ReadOnlyNode = ({data}: {data: NodeDataType}) => {
         >
             <div
                 className={twMerge(
-                    'flex items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow-sm',
-                    clusterElementIcons.length ? 'h-auto min-h-18 flex-col' : 'size-18'
+                    'relative flex items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary shadow-sm',
+                    clusterElementIcons.length ? 'h-auto min-h-18 flex-col' : 'size-18',
+                    getTestNodeStateBorderClassName(testNodeState)
                 )}
             >
+                {testNodeState && <WorkflowTestNodeStatus testNodeState={testNodeState} />}
+
                 <span className="self-center text-content-neutral-primary [&_svg]:size-9">{data.icon}</span>
 
                 {visibleClusterElementIcons.length > 0 && (
