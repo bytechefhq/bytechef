@@ -8,6 +8,11 @@ const currentDirectory = dirname(fileURLToPath(import.meta.url));
 const stylesheet = readFileSync(resolve(currentDirectory, '../index.css'), 'utf8');
 
 const THEME_EXEMPT_TOKENS = new Set([
+    '--hub-disable',
+    '--hub-disable-hover',
+    '--hub-enable',
+    '--hub-enable-hover',
+    '--hub-on-accent',
     '--radius',
     '--sidebar',
     '--sidebar-accent',

@@ -23,14 +23,53 @@
     @apply sm:text-sm;
 }
 
-.react-select__multi-value {
-    @apply rounded-md!;
-}
-
 .react-select__multi-value__remove {
     @apply rounded-r-md!;
 }
 
+.react-select__control {
+    @apply bg-surface-neutral-primary!;
+    @apply text-content-neutral-primary!;
+}
+
+.react-select__menu {
+    @apply border! border-stroke-neutral-secondary!;
+    @apply bg-surface-neutral-primary!;
+    @apply text-content-neutral-primary!;
+}
+
+.react-select__option {
+    @apply bg-transparent!;
+    @apply text-content-neutral-primary!;
+}
+
 .react-select__option--is-focused {
-    @apply dark:text-black;
+    @apply bg-surface-neutral-secondary!;
+}
+
+.react-select__option--is-selected {
+    @apply bg-surface-brand-primary!;
+    @apply text-content-onbrand!;
+}
+
+.react-select__single-value,
+.react-select__input-container {
+    @apply text-content-neutral-primary!;
+}
+
+.react-select__placeholder {
+    @apply text-content-neutral-tertiary!;
+}
+
+.react-select__multi-value {
+    @apply rounded-md!;
+    @apply bg-surface-neutral-secondary!;
+}
+
+.react-select__multi-value__label {
+    @apply text-content-neutral-primary!;
+}
+
+.react-select__indicator-separator {
+    @apply bg-stroke-neutral-secondary!;
 }

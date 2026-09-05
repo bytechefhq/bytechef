@@ -62,6 +62,7 @@ module.exports = {
                         'secondary-hover': 'hsl(var(--content-neutral-secondary-hover))',
                         tertiary: 'hsl(var(--content-neutral-tertiary))',
                     },
+                    onbrand: 'hsl(var(--content-onbrand))',
                     onsurface: {
                         primary: 'hsl(var(--content-onsurface-primary))',
                         secondary: 'hsl(var(--content-onsurface-secondary))',

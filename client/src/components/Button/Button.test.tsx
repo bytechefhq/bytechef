@@ -8,9 +8,7 @@ it('should render a default button with label if no styling props are set', () =
     render(<Button label="Button" />);
 
     expect(screen.getByRole('button')).toHaveTextContent('Button');
-    expect(screen.getByText('Button')).toHaveClass(
-        'h-9 px-4 py-2 bg-surface-brand-primary text-content-onsurface-primary'
-    );
+    expect(screen.getByText('Button')).toHaveClass('h-9 px-4 py-2 bg-surface-brand-primary text-content-onbrand');
     expect(screen.getByText('Button')).toHaveClass('hover:bg-surface-brand-primary-hover');
     expect(screen.getByText('Button')).toHaveClass('active:bg-surface-brand-primary-active');
 });
