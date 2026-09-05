@@ -1,0 +1,15 @@
+---
+label: "Fan out one agent node over a list of agents"
+tasks:
+- name: "mapFanOut"
+  type: "map/v1"
+  parameters:
+    items:
+    - "alpha-agent"
+    - "beta-agent"
+    iteratee:
+    - name: "callAgent"
+      type: "callAiAgent/v1"
+      parameters:
+        agentUuid: "${mapFanOut.item}"
+        message: "go"
