@@ -42,7 +42,7 @@ const ApiCollectionEndpointList = ({
                     <ul className="divide-y divide-stroke-neutral-primary">
                         {apiCollectionEndpoints?.map((apiCollectionEndpoint) => (
                             <li
-                                className="flex items-center justify-between rounded-md p-2 px-3 hover:bg-destructive-foreground"
+                                className="flex items-center justify-between rounded-md p-2 px-3 hover:bg-surface-neutral-primary-hover"
                                 key={apiCollectionEndpoint.id}
                             >
                                 {apiCollectionEndpoint &&
