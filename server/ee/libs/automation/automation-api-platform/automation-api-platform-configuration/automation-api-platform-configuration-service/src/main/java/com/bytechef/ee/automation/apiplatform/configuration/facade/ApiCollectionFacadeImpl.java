@@ -82,10 +82,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ApiCollectionFacadeImpl(
-        ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
-        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectDeploymentService projectDeploymentService,
+    public ApiCollectionFacadeImpl(ApiCollectionService apiCollectionService,
+        ApiCollectionEndpointService apiCollectionEndpointService, EnvironmentService environmentService,
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TagService tagService, WorkflowService workflowService) {
 
@@ -125,7 +124,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         apiCollection.setProjectDeploymentId(projectDeployment.getId());
 
-        return toApiCollectionDTO(apiCollectionService.create(apiCollection));
+        ApiCollection createdApiCollection = apiCollectionService.create(apiCollection);
+
+        return toApiCollectionDTO(createdApiCollection);
     }
 
     @Override
@@ -172,6 +173,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         apiCollectionService.delete(id);
         projectDeploymentFacade.deleteProjectDeployment(apiCollection.getProjectDeploymentId());
+
     }
 
     // Removing one endpoint changes the collection, so it takes the edit scope; deleteApiCollection removes every

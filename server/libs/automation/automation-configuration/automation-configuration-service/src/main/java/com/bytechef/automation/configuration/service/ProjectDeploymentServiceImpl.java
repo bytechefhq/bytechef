@@ -37,7 +37,8 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
     private final ProjectDeploymentRepository projectDeploymentRepository;
 
-    public ProjectDeploymentServiceImpl(ProjectDeploymentRepository projectDeploymentRepository) {
+    public ProjectDeploymentServiceImpl(
+        ProjectDeploymentRepository projectDeploymentRepository) {
 
         this.projectDeploymentRepository = projectDeploymentRepository;
     }
@@ -52,12 +53,15 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
         projectDeployment.setEnabled(false);
 
-        return projectDeploymentRepository.save(projectDeployment);
+        ProjectDeployment savedProjectDeployment = projectDeploymentRepository.save(projectDeployment);
+
+        return savedProjectDeployment;
     }
 
     @Override
     public void delete(long id) {
         projectDeploymentRepository.deleteById(id);
+
     }
 
     @Override
@@ -131,7 +135,9 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
         projectDeployment.setTagIds(tagIds);
 
-        return projectDeploymentRepository.save(projectDeployment);
+        ProjectDeployment savedProjectDeployment = projectDeploymentRepository.save(projectDeployment);
+
+        return savedProjectDeployment;
     }
 
     @Override
@@ -151,7 +157,9 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
         curProjectDeployment.setTagIds(projectDeployment.getTagIds());
         curProjectDeployment.setVersion(projectDeployment.getVersion());
 
-        return projectDeploymentRepository.save(curProjectDeployment);
+        ProjectDeployment savedProjectDeployment = projectDeploymentRepository.save(curProjectDeployment);
+
+        return savedProjectDeployment;
     }
 
     @Override
@@ -172,5 +180,6 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
         projectDeployment.setEnabled(enabled);
 
         projectDeploymentRepository.save(projectDeployment);
+
     }
 }

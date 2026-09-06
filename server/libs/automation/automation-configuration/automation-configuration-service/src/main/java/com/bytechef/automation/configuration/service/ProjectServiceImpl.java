@@ -47,7 +47,10 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
 
     @SuppressFBWarnings("EI")
-    public ProjectServiceImpl(ApplicationContext applicationContext, ProjectRepository projectRepository) {
+    public ProjectServiceImpl(
+        ApplicationContext applicationContext,
+        ProjectRepository projectRepository) {
+
         this.applicationContext = applicationContext;
         this.projectRepository = projectRepository;
     }
@@ -63,13 +66,16 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.isTrue(project.getId() == null, "'id' must be null");
         Assert.notNull(project.getName(), "'name' must not be null");
 
-        return projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
+
+        return savedProject;
     }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void delete(long id) {
         projectRepository.deleteById(id);
+
     }
 
     @Override
@@ -193,7 +199,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         project.setTagIds(tagIds);
 
-        return projectRepository.save(project);
+        Project savedProject = projectRepository.save(project);
+
+        return savedProject;
     }
 
     @Override
@@ -211,7 +219,9 @@ public class ProjectServiceImpl implements ProjectService {
         curProject.setTagIds(project.getTagIds());
         curProject.setVersion(project.getVersion());
 
-        return projectRepository.save(curProject);
+        Project savedProject = projectRepository.save(curProject);
+
+        return savedProject;
     }
 
     @Override

@@ -1,4 +1,6 @@
 dependencies {
+    implementation("io.micrometer:micrometer-core")
+    implementation("org.springframework.boot:spring-boot-actuator")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-actuator")

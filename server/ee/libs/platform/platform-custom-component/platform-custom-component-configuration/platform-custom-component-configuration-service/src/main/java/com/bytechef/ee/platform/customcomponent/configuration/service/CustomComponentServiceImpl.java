@@ -32,7 +32,9 @@ public class CustomComponentServiceImpl implements CustomComponentService {
 
     private final CustomComponentRepository customComponentRepository;
 
-    public CustomComponentServiceImpl(CustomComponentRepository customComponentRepository) {
+    public CustomComponentServiceImpl(
+        CustomComponentRepository customComponentRepository) {
+
         this.customComponentRepository = customComponentRepository;
     }
 
@@ -42,12 +44,15 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         Assert.isTrue(customComponent.getId() == null, "'id' must be null");
         Assert.notNull(customComponent.getName(), "'componentName' must not be null");
 
-        return customComponentRepository.save(customComponent);
+        CustomComponent savedCustomComponent = customComponentRepository.save(customComponent);
+
+        return savedCustomComponent;
     }
 
     @Override
     public void delete(long id) {
         customComponentRepository.deleteById(id);
+
     }
 
     @Override
@@ -58,6 +63,7 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         customComponent.setEnabled(enable);
 
         customComponentRepository.save(customComponent);
+
     }
 
     @Override
@@ -88,6 +94,8 @@ public class CustomComponentServiceImpl implements CustomComponentService {
         curCustomComponent.setIcon(customComponent.getIcon());
         curCustomComponent.setTitle(customComponent.getTitle());
 
-        return customComponentRepository.save(curCustomComponent);
+        CustomComponent savedCustomComponent = customComponentRepository.save(curCustomComponent);
+
+        return savedCustomComponent;
     }
 }

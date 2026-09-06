@@ -34,6 +34,7 @@ public class IntegrationServiceImpl implements IntegrationService {
     private final IntegrationRepository integrationRepository;
 
     public IntegrationServiceImpl(IntegrationRepository integrationRepository) {
+
         this.integrationRepository = integrationRepository;
     }
 
@@ -43,12 +44,15 @@ public class IntegrationServiceImpl implements IntegrationService {
         Assert.isTrue(integration.getId() == null, "'id' must be null");
         Assert.notNull(integration.getComponentName(), "'componentName' must not be null");
 
-        return integrationRepository.save(integration);
+        Integration savedIntegration = integrationRepository.save(integration);
+
+        return savedIntegration;
     }
 
     @Override
     public void delete(long id) {
         integrationRepository.deleteById(id);
+
     }
 
     @Override
@@ -138,6 +142,8 @@ public class IntegrationServiceImpl implements IntegrationService {
         curIntegration.setTagIds(integration.getTagIds());
         curIntegration.setVersion(integration.getVersion());
 
-        return integrationRepository.save(curIntegration);
+        Integration savedIntegration = integrationRepository.save(curIntegration);
+
+        return savedIntegration;
     }
 }

@@ -127,6 +127,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         if (projectDeploymentId != null) {
             projectDeploymentService.delete(projectDeploymentId);
         }
+
     }
 
     @Override

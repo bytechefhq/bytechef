@@ -36,14 +36,19 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
 
     private final ProjectWorkflowRepository projectWorkflowRepository;
 
-    public ProjectWorkflowServiceImpl(ProjectWorkflowRepository projectWorkflowRepository) {
+    public ProjectWorkflowServiceImpl(
+        ProjectWorkflowRepository projectWorkflowRepository) {
+
         this.projectWorkflowRepository = projectWorkflowRepository;
     }
 
     @Override
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId) {
-        return projectWorkflowRepository.save(new ProjectWorkflow(projectId, projectVersion, workflowId));
+        ProjectWorkflow savedProjectWorkflow = projectWorkflowRepository.save(
+            new ProjectWorkflow(projectId, projectVersion, workflowId));
+
+        return savedProjectWorkflow;
     }
 
     @Override
@@ -189,7 +194,12 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_DELETE')")
     public void delete(long projectId, int projectVersion, String workflowId) {
         projectWorkflowRepository.findByProjectIdAndProjectVersionAndWorkflowId(projectId, projectVersion, workflowId)
-            .ifPresent(projectWorkflow -> projectWorkflowRepository.deleteById(projectWorkflow.getId()));
+            .ifPresent(projectWorkflow -> {
+                long projectWorkflowId = projectWorkflow.getId();
+
+                projectWorkflowRepository.deleteById(projectWorkflowId);
+
+            });
     }
 
     @Override
@@ -219,7 +229,9 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         curProjectWorkflow.setWorkflowId(projectWorkflow.getWorkflowId());
         curProjectWorkflow.setUuid(projectWorkflow.getUuidAsString());
 
-        return projectWorkflowRepository.save(curProjectWorkflow);
+        ProjectWorkflow savedProjectWorkflow = projectWorkflowRepository.save(curProjectWorkflow);
+
+        return savedProjectWorkflow;
     }
 
     @Override

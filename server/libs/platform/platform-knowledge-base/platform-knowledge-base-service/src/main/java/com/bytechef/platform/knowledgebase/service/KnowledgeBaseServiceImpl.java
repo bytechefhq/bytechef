@@ -31,17 +31,21 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
     private final KnowledgeBaseRepository knowledgeBaseRepository;
 
     public KnowledgeBaseServiceImpl(KnowledgeBaseRepository knowledgeBaseRepository) {
+
         this.knowledgeBaseRepository = knowledgeBaseRepository;
     }
 
     @Override
     public KnowledgeBase createKnowledgeBase(KnowledgeBase knowledgeBase) {
-        return knowledgeBaseRepository.save(knowledgeBase);
+        KnowledgeBase savedKnowledgeBase = knowledgeBaseRepository.save(knowledgeBase);
+
+        return savedKnowledgeBase;
     }
 
     @Override
     public void deleteKnowledgeBase(Long id) {
         knowledgeBaseRepository.deleteById(id);
+
     }
 
     @Override
@@ -73,6 +77,8 @@ public class KnowledgeBaseServiceImpl implements KnowledgeBaseService {
         existingKnowledgeBase.setMinChunkSizeChars(knowledgeBase.getMinChunkSizeChars());
         existingKnowledgeBase.setOverlap(knowledgeBase.getOverlap());
 
-        return knowledgeBaseRepository.save(existingKnowledgeBase);
+        KnowledgeBase savedKnowledgeBase = knowledgeBaseRepository.save(existingKnowledgeBase);
+
+        return savedKnowledgeBase;
     }
 }

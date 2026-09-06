@@ -35,7 +35,9 @@ public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBase
 
     private final WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository;
 
-    public WorkspaceKnowledgeBaseServiceImpl(WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository) {
+    public WorkspaceKnowledgeBaseServiceImpl(
+        WorkspaceKnowledgeBaseRepository workspaceKnowledgeBaseRepository) {
+
         this.workspaceKnowledgeBaseRepository = workspaceKnowledgeBaseRepository;
     }
 
@@ -54,6 +56,7 @@ public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBase
             WorkspaceKnowledgeBase workspaceKnowledgeBase = new WorkspaceKnowledgeBase(knowledgeBaseId, workspaceId);
 
             workspaceKnowledgeBaseRepository.save(workspaceKnowledgeBase);
+
         }
     }
 
@@ -64,6 +67,7 @@ public class WorkspaceKnowledgeBaseServiceImpl implements WorkspaceKnowledgeBase
 
         if (!existingRelationships.isEmpty()) {
             workspaceKnowledgeBaseRepository.deleteAll(existingRelationships);
+
         }
     }
 }

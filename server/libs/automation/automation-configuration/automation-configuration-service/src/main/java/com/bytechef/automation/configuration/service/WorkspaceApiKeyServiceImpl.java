@@ -31,18 +31,23 @@ public class WorkspaceApiKeyServiceImpl implements WorkspaceApiKeyService {
 
     private final WorkspaceApiKeyRepository workspaceApiKeyRepository;
 
-    public WorkspaceApiKeyServiceImpl(WorkspaceApiKeyRepository workspaceApiKeyRepository) {
+    public WorkspaceApiKeyServiceImpl(
+        WorkspaceApiKeyRepository workspaceApiKeyRepository) {
+
         this.workspaceApiKeyRepository = workspaceApiKeyRepository;
     }
 
     @Override
     public WorkspaceApiKey create(long apiKeyId, long workspaceId) {
-        return workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
+        WorkspaceApiKey workspaceApiKey = workspaceApiKeyRepository.save(new WorkspaceApiKey(apiKeyId, workspaceId));
+
+        return workspaceApiKey;
     }
 
     @Override
     public void delete(long id) {
         workspaceApiKeyRepository.deleteById(id);
+
     }
 
     @Override
@@ -53,6 +58,11 @@ public class WorkspaceApiKeyServiceImpl implements WorkspaceApiKeyService {
     @Override
     public void deleteWorkspaceApiKey(long apiKeyId) {
         workspaceApiKeyRepository.findByApiKeyId(apiKeyId)
-            .ifPresent(workspaceApiKey -> workspaceApiKeyRepository.deleteById(workspaceApiKey.getId()));
+            .ifPresent(workspaceApiKey -> {
+                long workspaceApiKeyId = workspaceApiKey.getId();
+
+                workspaceApiKeyRepository.deleteById(workspaceApiKeyId);
+
+            });
     }
 }
