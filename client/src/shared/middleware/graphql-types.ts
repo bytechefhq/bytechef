@@ -102,6 +102,14 @@ export type AdminUserPage = {
   totalPages: Scalars['Int']['output'];
 };
 
+/** A workflow affected by connection reassignment. */
+export type AffectedWorkflow = {
+  __typename?: 'AffectedWorkflow';
+  connectionIds: Array<Scalars['ID']['output']>;
+  workflowId: Scalars['String']['output'];
+  workflowName: Scalars['String']['output'];
+};
+
 export type AiAgentEvalResult = {
   __typename?: 'AiAgentEvalResult';
   conclusion?: Maybe<AiAgentEvalResultConclusion>;
@@ -750,6 +758,28 @@ export type BuiltInRole = {
   scopes: Array<Scalars['String']['output']>;
 };
 
+export type BulkReassignFailure = {
+  __typename?: 'BulkReassignFailure';
+  connectionId: Scalars['ID']['output'];
+  /** Stable classifier the client can key on for localized rendering — either a ConnectionErrorType key or UNEXPECTED. */
+  errorCode: Scalars['String']['output'];
+  /** Human-readable fallback. Sanitized server-side so SQL/JDBC detail never reaches the admin UI. */
+  message: Scalars['String']['output'];
+};
+
+/** Outcome of a bulk connection reassignment / mark-pending operation. */
+export type BulkReassignResult = {
+  __typename?: 'BulkReassignResult';
+  failed: Scalars['Int']['output'];
+  failures: Array<BulkReassignFailure>;
+  /** Rows in a terminal state (e.g. REVOKED) that could not legally transition — counted separately from failed so a silent no-op does not look like an error. */
+  skipped: Scalars['Int']['output'];
+  /** Rows considered by the operation (pre-filter size of the candidate set). */
+  total: Scalars['Int']['output'];
+  /** Rows whose state was successfully advanced in this call. */
+  updated: Scalars['Int']['output'];
+};
+
 export type Category = {
   __typename?: 'Category';
   id?: Maybe<Scalars['ID']['output']>;
@@ -1007,6 +1037,16 @@ export type ConnectionDefinition = {
   version: Scalars['Int']['output'];
 };
 
+/** A connection that needs reassignment, with metadata about its usage. */
+export type ConnectionReassignmentItem = {
+  __typename?: 'ConnectionReassignmentItem';
+  connectionId: Scalars['ID']['output'];
+  connectionName: Scalars['String']['output'];
+  dependentWorkflowCount: Scalars['Int']['output'];
+  environmentId: Scalars['Int']['output'];
+  visibility: ResourceVisibility;
+};
+
 export type ConnectionSearchResult = SearchResult & {
   __typename?: 'ConnectionSearchResult';
   description?: Maybe<Scalars['String']['output']>;
@@ -1014,6 +1054,13 @@ export type ConnectionSearchResult = SearchResult & {
   name: Scalars['String']['output'];
   type: SearchAssetType;
 };
+
+/** Connection status indicating the lifecycle state of a connection. */
+export enum ConnectionStatus {
+  Active = 'ACTIVE',
+  PendingReassignment = 'PENDING_REASSIGNMENT',
+  Revoked = 'REVOKED'
+}
 
 export enum ControlType {
   ArrayBuilder = 'ARRAY_BUILDER',
@@ -1101,6 +1148,17 @@ export type CreateMcpProjectInput = {
   projectVersion: Scalars['Int']['input'];
   selectedWorkflowIds: Array<Scalars['String']['input']>;
   workflowConfigurations?: InputMaybe<Array<WorkflowConfigurationInput>>;
+};
+
+/** Input for creating a new organization connection. */
+export type CreateOrganizationConnectionInput = {
+  authorizationType?: InputMaybe<AuthorizationType>;
+  componentName: Scalars['String']['input'];
+  connectionVersion: Scalars['Int']['input'];
+  environmentId: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  parameters: Scalars['Map']['input'];
+  tags?: InputMaybe<Array<TagInput>>;
 };
 
 export type CreateWorkspaceMcpServerInput = {
@@ -2033,6 +2091,8 @@ export type Mutation = {
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   createMcpTool?: Maybe<McpTool>;
+  /** Create a new connection with ORGANIZATION visibility. (admin only, EE only) */
+  createOrganizationConnection: Scalars['ID']['output'];
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteA2aProject?: Maybe<Scalars['Boolean']['output']>;
@@ -2078,12 +2138,15 @@ export type Mutation = {
   deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
   deleteMcpTool?: Maybe<Scalars['Boolean']['output']>;
+  /** Delete an organization connection. Fails if the connection is not ORGANIZATION-scoped. (admin only, EE only) */
+  deleteOrganizationConnection: Scalars['Boolean']['output'];
   deleteRegisteredClient: Scalars['Boolean']['output'];
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   deleteWorkspaceApiKey: Scalars['Boolean']['output'];
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  /** Unlink a connection from all deployed workflows and test configurations, without deleting the connection itself. */
   disconnectConnection: Scalars['Boolean']['output'];
   dismissAutomationGettingStarted?: Maybe<Scalars['Boolean']['output']>;
   dismissEmbeddedGettingStarted?: Maybe<Scalars['Boolean']['output']>;
@@ -2103,6 +2166,8 @@ export type Mutation = {
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
   generateSpecification: GenerateSpecificationResponse;
+  /** Grant a named workspace member access to a connection its owner has withheld. Idempotent. (owner or admin, EE only) */
+  grantConnectionAccess: Scalars['Boolean']['output'];
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
@@ -2120,10 +2185,16 @@ export type Mutation = {
    * Requires the WORKSPACE_MEMBER_MANAGE scope in every environment of the workspace.
    */
   inviteWorkspaceUser: WorkspaceUser;
+  /** Mark all of a user's connections as pending reassignment. Returns per-row outcome so partial failures surface; a silent no-op batch does not look like an error. (admin only) */
+  markConnectionsPendingReassignment: BulkReassignResult;
   moveAutomationProjectConfigurationConnectedUsers: ConfigurationMoveResult;
   provisionConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
   provisionConnectedUserProjectWorkflows?: Maybe<Scalars['Boolean']['output']>;
   publishAutomationProject: Scalars['Boolean']['output'];
+  /** Reassign all of a user's unresolved connections to a new owner. (admin only) */
+  reassignAllConnections: Scalars['Boolean']['output'];
+  /** Reassign a single connection to a new owner. Resets status to ACTIVE if pending. (admin only) */
+  reassignConnection: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   /** Remove a user from the embedded members. */
   removeEmbeddedUser: Scalars['Boolean']['output'];
@@ -2147,11 +2218,15 @@ export type Mutation = {
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
   restoreAutomationProjectVersion: Scalars['Boolean']['output'];
+  /** Revoke a grant. Silent when no grant exists. (owner or admin, EE only) */
+  revokeConnectionAccess: Scalars['Boolean']['output'];
   revokeRegisteredClientGrant: Scalars['Boolean']['output'];
   revokeRegisteredClientGrants: Scalars['Boolean']['output'];
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
+  /** Set a connection's reach. PRIVATE withholds it from the workspace; WORKSPACE shares it. ORGANIZATION is set through createOrganizationConnection instead and is rejected here. Narrowing to PRIVATE fails while an active deployment uses the connection. (owner or admin, EE only) */
+  setConnectionVisibility: Scalars['Boolean']['output'];
   /** Give an embedded member a role in one environment. */
   setEmbeddedUserEnvironmentRole: EmbeddedUser;
   /**
@@ -2232,6 +2307,8 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
+  /** Update an organization connection's name and tags. (admin only, EE only) */
+  updateOrganizationConnection: Scalars['Boolean']['output'];
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
   updateWorkspaceMcpToolEnabled?: Maybe<McpTool>;
@@ -2479,6 +2556,11 @@ export type MutationCreateMcpToolArgs = {
 };
 
 
+export type MutationCreateOrganizationConnectionArgs = {
+  input: CreateOrganizationConnectionInput;
+};
+
+
 export type MutationCreateWorkspaceApiKeyArgs = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -2675,6 +2757,11 @@ export type MutationDeleteMcpToolArgs = {
 };
 
 
+export type MutationDeleteOrganizationConnectionArgs = {
+  connectionId: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteRegisteredClientArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2807,6 +2894,13 @@ export type MutationGenerateSpecificationArgs = {
 };
 
 
+export type MutationGrantConnectionAccessArgs = {
+  connectionId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationImportDataTableCsvArgs = {
   input: ImportCsvInput;
 };
@@ -2851,6 +2945,12 @@ export type MutationInviteWorkspaceUserArgs = {
 };
 
 
+export type MutationMarkConnectionsPendingReassignmentArgs = {
+  userLogin: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationMoveAutomationProjectConfigurationConnectedUsersArgs = {
   connectedUserIds: Array<Scalars['ID']['input']>;
   sourceId: Scalars['ID']['input'];
@@ -2874,6 +2974,20 @@ export type MutationProvisionConnectedUserProjectWorkflowsArgs = {
 export type MutationPublishAutomationProjectArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationReassignAllConnectionsArgs = {
+  newOwnerLogin: Scalars['String']['input'];
+  userLogin: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type MutationReassignConnectionArgs = {
+  connectionId: Scalars['ID']['input'];
+  newOwnerLogin: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -2928,6 +3042,13 @@ export type MutationRestoreAutomationProjectVersionArgs = {
 };
 
 
+export type MutationRevokeConnectionAccessArgs = {
+  connectionId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationRevokeRegisteredClientGrantArgs = {
   principalName: Scalars['String']['input'];
   registeredClientId: Scalars['ID']['input'];
@@ -2966,6 +3087,13 @@ export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
   workflowConnectionKey: Scalars['String']['input'];
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type MutationSetConnectionVisibilityArgs = {
+  connectionId: Scalars['ID']['input'];
+  visibility: ResourceVisibility;
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3335,6 +3463,14 @@ export type MutationUpdateMcpToolArgs = {
 };
 
 
+export type MutationUpdateOrganizationConnectionArgs = {
+  connectionId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  tagIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  version: Scalars['Int']['input'];
+};
+
+
 export type MutationUpdateUserArgs = {
   login: Scalars['String']['input'];
   role: Scalars['String']['input'];
@@ -3449,6 +3585,19 @@ export type Option = {
 export type OptionsDataSource = {
   __typename?: 'OptionsDataSource';
   optionsLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
+};
+
+/** An organization-scoped connection visible to all members across all workspaces. */
+export type OrganizationConnection = {
+  __typename?: 'OrganizationConnection';
+  componentName: Scalars['String']['output'];
+  createdBy?: Maybe<Scalars['String']['output']>;
+  createdDate?: Maybe<Scalars['String']['output']>;
+  environmentId: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  visibility: ResourceVisibility;
 };
 
 export type ParameterDefinitionInput = {
@@ -3717,6 +3866,8 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
+  /** Get workflows that would be affected by reassigning a user's connections. (admin only) */
+  affectedWorkflows: Array<AffectedWorkflow>;
   aiAgentEvalResult?: Maybe<AiAgentEvalResult>;
   aiAgentEvalResultTranscript?: Maybe<Scalars['String']['output']>;
   aiAgentEvalRun?: Maybe<AiAgentEvalRun>;
@@ -3814,6 +3965,8 @@ export type Query = {
   connectionComponentDefinition: ComponentDefinition;
   connectionDefinition: ConnectionDefinition;
   connectionDefinitions: Array<ConnectionDefinition>;
+  /** The users a private connection has been granted to. Owner or admin only — an ordinary viewer of a shared connection must not learn who else it was handed to. (EE only) */
+  connectionGrants: Array<Scalars['Long']['output']>;
   customComponent?: Maybe<CustomComponent>;
   customComponentDefinition?: Maybe<CustomComponentDefinition>;
   customComponents: Array<CustomComponent>;
@@ -3907,6 +4060,8 @@ export type Query = {
    */
   myWorkspaceScopes: Array<Scalars['String']['output']>;
   oauth2ConsentClient?: Maybe<OAuth2ConsentClient>;
+  /** Get all organization-level connections, optionally filtered by environment. (admin only, EE only) */
+  organizationConnections: Array<OrganizationConnection>;
   pendingApprovals?: Maybe<Array<Maybe<PendingApproval>>>;
   /**
    * Every permission scope the server recognises, grouped by the module that owns it, for composing a
@@ -3941,6 +4096,8 @@ export type Query = {
   triggerExecutionFileLogs: LogPage;
   triggerExecutionFileLogsExist: Scalars['Boolean']['output'];
   unifiedApiComponentDefinitions: Array<ComponentDefinition>;
+  /** Get all connections owned by a user within a workspace, with metadata about how many workflows depend on each. (admin only) */
+  unresolvedConnections: Array<ConnectionReassignmentItem>;
   user?: Maybe<AdminUser>;
   users?: Maybe<AdminUserPage>;
   validateWorkflow: WorkflowValidationResult;
@@ -4006,6 +4163,12 @@ export type QueryActionDefinitionsArgs = {
 
 export type QueryAdminApiKeysArgs = {
   environmentId: Scalars['ID']['input'];
+};
+
+
+export type QueryAffectedWorkflowsArgs = {
+  userLogin: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -4389,6 +4552,12 @@ export type QueryConnectionDefinitionsArgs = {
 };
 
 
+export type QueryConnectionGrantsArgs = {
+  connectionId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryCustomComponentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4712,6 +4881,11 @@ export type QueryOauth2ConsentClientArgs = {
 };
 
 
+export type QueryOrganizationConnectionsArgs = {
+  environmentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
 export type QueryPendingApprovalsArgs = {
   environmentId?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -4852,6 +5026,12 @@ export type QueryTriggerExecutionFileLogsExistArgs = {
 
 export type QueryUnifiedApiComponentDefinitionsArgs = {
   category: UnifiedApiCategory;
+};
+
+
+export type QueryUnresolvedConnectionsArgs = {
+  userLogin: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -5007,6 +5187,13 @@ export type RequestBodyDefinitionInput = {
   required?: InputMaybe<Scalars['Boolean']['input']>;
   schema: Scalars['String']['input'];
 };
+
+/** Visibility scope controlling which users can see and use a connection. */
+export enum ResourceVisibility {
+  Organization = 'ORGANIZATION',
+  Private = 'PRIVATE',
+  Workspace = 'WORKSPACE'
+}
 
 export type Resources = {
   __typename?: 'Resources';
