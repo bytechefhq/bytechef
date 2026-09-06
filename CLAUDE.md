@@ -146,7 +146,7 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - `runtime-job-app/` - Runtime job execution
 
 ### Available Components
-ByteChef includes 180+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
+ByteChef includes 250+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
 
 ## Development Patterns
 
