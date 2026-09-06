@@ -40,6 +40,7 @@ import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -170,14 +171,16 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
 
-        List<ComponentDefinition> components = getComponentDefinitions()
-            .stream()
-            .filter(componentDefinitionFilter::filter)
-            .filter(
-                filter(
-                    actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include))
-            .distinct()
-            .toList();
+        List<ComponentDefinition> components = filterLatestVersions(
+            getComponentDefinitions()
+                .stream()
+                .filter(componentDefinitionFilter::filter)
+                .filter(
+                    filter(
+                        actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions,
+                        include))
+                .distinct()
+                .toList());
 
         if (include != null && !include.isEmpty()) {
             components = new ArrayList<>(components);
@@ -197,13 +200,14 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + platformType));
 
-        return getComponentDefinitions()
-            .stream()
-            .filter(componentDefinitionFilter::filter)
-            .filter(componentDefinition -> hasMatchingComponent(componentDefinition, lowerCaseQuery) ||
-                hasMatchingAction(componentDefinition.getActions(), lowerCaseQuery) ||
-                hasMatchingTrigger(componentDefinition.getTriggers(), lowerCaseQuery))
-            .toList();
+        return filterLatestVersions(
+            getComponentDefinitions()
+                .stream()
+                .filter(componentDefinitionFilter::filter)
+                .filter(componentDefinition -> hasMatchingComponent(componentDefinition, lowerCaseQuery) ||
+                    hasMatchingAction(componentDefinition.getActions(), lowerCaseQuery) ||
+                    hasMatchingTrigger(componentDefinition.getTriggers(), lowerCaseQuery))
+                .toList());
     }
 
     @Override
@@ -211,6 +215,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         return componentDefinitionRegistry.getComponentDefinitions(name)
             .stream()
             .map(ComponentDefinition::new)
+            .sorted(Comparator.comparingInt(ComponentDefinition::getVersion))
             .toList();
     }
 
@@ -273,6 +278,24 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             return include == null && actionDefinitions == null && clusterElementDefinitions == null &&
                 connectionDefinitions == null && triggerDefinitions == null;
         };
+    }
+
+    private static List<ComponentDefinition> filterLatestVersions(List<ComponentDefinition> componentDefinitions) {
+        Map<String, ComponentDefinition> latestComponentDefinitionMap = new LinkedHashMap<>();
+
+        for (ComponentDefinition componentDefinition : componentDefinitions) {
+            latestComponentDefinitionMap.merge(
+                componentDefinition.getName(), componentDefinition,
+                (currentComponentDefinition, candidateComponentDefinition) -> {
+                    if (candidateComponentDefinition.getVersion() > currentComponentDefinition.getVersion()) {
+                        return candidateComponentDefinition;
+                    }
+
+                    return currentComponentDefinition;
+                });
+        }
+
+        return List.copyOf(latestComponentDefinitionMap.values());
     }
 
     private static boolean hasMatchingAction(List<ActionDefinition> actions, String lowerCaseQuery) {
