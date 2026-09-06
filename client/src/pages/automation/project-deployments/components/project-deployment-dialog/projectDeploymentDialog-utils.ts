@@ -328,7 +328,7 @@ export const splitSubflowDeploymentValues = (
     mergedConnections.forEach((mergedConnection, index) => {
         const connectionId = formConnections?.[index]?.connectionId;
 
-        if (connectionId == null) {
+        if (connectionId == null || Number.isNaN(connectionId)) {
             return;
         }
 
