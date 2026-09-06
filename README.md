@@ -105,27 +105,18 @@ docker run --name postgres -d -p 5432:5432 \
     postgres:15-alpine
 ```
 
-#### 3. Generate an Encryption Key
+#### 3. Start ByteChef Container
 
-ByteChef encrypts stored connection credentials with a single instance-wide key. Generate your own
-and keep it somewhere safe - if you lose it, every stored credential becomes undecryptable:
-
-```bash
-openssl rand -base64 16
-```
-
-#### 4. Start ByteChef Container
-
-Replace `<your-encryption-key>` with the value generated above:
+ByteChef generates the key that encrypts stored connection credentials on first start. Mounting
+`~/.bytechef` keeps that key on the host, so it survives recreating the container:
 
 ```bash
 docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
-    --env BYTECHEF_ENCRYPTION_PROVIDER=property \
-    --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=<your-encryption-key> \
     --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
+    -v ~/.bytechef:/root/.bytechef \
     --network bytechef_network \
     docker.bytechef.io/bytechef/bytechef:latest
 ```
