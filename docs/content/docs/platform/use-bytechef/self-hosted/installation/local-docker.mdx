@@ -31,10 +31,23 @@ workflows, connections, and execution history - lives there, so `docker compose 
 `-v`) deletes all of it. Plain `docker compose down` stops the containers and leaves the volume
 intact.
 
-The Compose file also sets a fixed encryption key (`BYTECHEF_ENCRYPTION_PROVIDER=property` with
-`BYTECHEF_ENCRYPTION_PROPERTY_KEY`) so stored OAuth connection credentials remain decryptable after
-you recreate the ByteChef container. Without a stable key, a fresh container cannot read connections
-already stored in PostgreSQL.
+ByteChef encrypts stored connection credentials with an instance-wide key. Under the default
+`filesystem` provider the key is generated on first start and written inside the container, which
+does not survive `docker rm` - so the Compose file keeps it in a second named volume, `storage_key`.
+Recreating the ByteChef container then leaves stored connections readable. `docker compose down -v`
+deletes this volume too, and a database restored without its key is a database of undecryptable
+credentials, so back the two up together.
+
+<Callout type="warn">
+If you created your instance before `storage_key` was added, its key still lives inside the old
+container and is lost the first time that container is recreated. Existing connections cannot be
+recovered without it - re-create them once after upgrading, then the key persists.
+</Callout>
+
+For anything beyond a local install - a multi-replica deployment, or any host where you want to hold
+the key yourself - set `BYTECHEF_ENCRYPTION_PROVIDER=property` with your own
+`BYTECHEF_ENCRYPTION_PROPERTY_KEY` from a secret manager instead. See
+[Configuration](/platform/use-bytechef/self-hosted/configuration#the-key).
 
 To point ByteChef at a PostgreSQL server you run yourself instead, override the datasource settings
 on the `bytechef` service:
@@ -80,7 +93,21 @@ docker run --name postgres -d -p 5432:5432 \
 </Step>
 <Step>
 
+**Generate an encryption key**
+
+There is no Compose file to persist the key for you here, so supply your own and store it somewhere
+safe - lose it and every stored credential becomes undecryptable:
+
+```bash
+openssl rand -base64 16
+```
+
+</Step>
+<Step>
+
 **Start the ByteChef container**
+
+Replace `<your-encryption-key>` with the value generated above:
 
 ```bash
 docker run --name bytechef -it -p 8080:8080 \
@@ -88,7 +115,7 @@ docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
     --env BYTECHEF_ENCRYPTION_PROVIDER=property \
-    --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=tTB1/UBIbYLuCXVi4PPfzA== \
+    --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=<your-encryption-key> \
     --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
     --network bytechef_network \
     docker.bytechef.io/bytechef/bytechef:latest
