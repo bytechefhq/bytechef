@@ -187,6 +187,50 @@ CRM · marketing · communication · e-commerce · cloud storage · databases ·
 
 ---
 
+## FAQ
+
+### How is this different from n8n, Zapier or Make?
+
+Those are automation tools where AI is a node you call and get an answer back. In ByteChef an agent is a step that owns a loop — it selects tools, executes them, observes the result and decides what to do next — and any workflow can be handed to an agent as a single tool. You get deterministic branching, retries and approvals in the same graph as the non-deterministic part, under one audit trail.
+
+### How is this different from LangChain, LangGraph or CrewAI?
+
+Those are libraries you build an application around: you own deployment, persistence, retries, credential storage and the UI. ByteChef is the running system — durable execution, a visual editor, managed connections, and 180+ connectors that are already agent tools. You can still drop into code where it earns its place; it just isn't the only way in.
+
+### Which LLM providers ship out of the box?
+
+Twelve direct providers — OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Gemini, Mistral, Groq, DeepSeek, Nvidia, Perplexity, Stability and Ollama — plus three aggregator components (OpenRouter, LiteLLM, NanoGPT) if you would rather route through a gateway.
+
+### How does an agent get its tools?
+
+Every connector is already a tool, and so is any workflow you point the agent at. To let the model supply a value at runtime, put the expression `=fromAi('order_id', 'STRING', {'description': 'The order to refund'})` in the field instead of a literal — that property then becomes part of the tool schema the model sees. It is the same properties panel you would otherwise type into; there is no separate tool definition to write.
+
+### What is available for memory and RAG?
+
+Eight chat-memory backends (built-in, JDBC, Redis, MongoDB, Cassandra, Neo4j, vector-store-backed, in-memory) and fourteen vector stores (pgvector, Pinecone, Qdrant, Weaviate, Milvus, Couchbase, MongoDB Atlas, Neo4j, Redis, Typesense, MariaDB, Oracle, S3, and the built-in knowledge base). Ingestion and chunking are native, and two RAG patterns ship as components: `rag-modular` and `rag-questionanswer`.
+
+### What guardrails are there?
+
+Twelve, attached to an agent the same way tools and memory are: PII, LLM-based PII, jailbreak, NSFW, topical alignment, keywords, secret keys, URLs, text sanitization, custom regex, custom rules, and a violation aggregator that decides what happens when several fire at once.
+
+### Does ByteChef work with MCP?
+
+In both directions. It consumes external MCP servers as a tool source, so remote MCP tools show up alongside connectors in an agent's tool list. It also exposes your own workflows as an MCP server over an API-key-authenticated endpoint, so Claude Desktop, Cursor or Windsurf can call them.
+
+### Do I need the Enterprise Edition?
+
+Only for the rows marked EE in the table above. Everything outside `/ee/` is Apache 2.0 — free to self-host and use commercially, including modified. Code under `/ee/` is covered by the ByteChef Enterprise License and is not; see [License](#license).
+
+### Where do I get help?
+
+- **Docs** — [docs.bytechef.io](https://docs.bytechef.io)
+- **Discord** — [discord.gg/VKvNxHjpYx](https://discord.gg/VKvNxHjpYx)
+- **Issues** — [GitHub Issues](https://github.com/bytechefhq/bytechef/issues), with templates for bugs, features and connector requests
+- **Roadmap** — [project board](https://github.com/orgs/bytechefhq/projects/3)
+- **Email** — [support@bytechef.io](mailto:support@bytechef.io)
+
+---
+
 ## Contributing
 
 If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started.
@@ -208,55 +252,3 @@ This project is licenced under **Apache 2.0** for the core (everything outside `
 ## Credits
 
 ByteChef started as a fork of [Piper](https://github.com/runabol/piper).
-
-## FAQ
-
-### What is ByteChef?
-
-ByteChef is an open-source platform that unifies AI agent orchestration and automation workflows. It provides a unified interface for integrating multiple AI services and automating complex business processes.
-
-### Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **AI Agent Orchestration** | Coordinate multiple AI agents for complex tasks |
-| **Workflow Automation** | Automate repetitive tasks with AI-powered decision making |
-| **Multi-Platform Integration** | Connect with popular AI services and platforms |
-| **Extensible Architecture** | Add custom tools and integrations easily |
-| **Low-Code Interface** | Build workflows visually without extensive coding |
-
-### How to get started?
-
-1. Check the [Installation Guide](#installation) in the README
-2. Follow the [Quick Start](#quick-start) instructions
-3. Explore the [Examples](#examples) section for common use cases
-4. Join the [Community](#community) for support and discussions
-
-### What integrations are available?
-
-ByteChef integrates with:
-- **AI Services** - OpenAI, Anthropic, AWS Bedrock, and more
-- **Data Sources** - PostgreSQL, MySQL, MongoDB, REST APIs
-- **Business Tools** - Slack, Email, CRM systems
-- **Cloud Platforms** - AWS, GCP, Azure
-
-### Is this project free and open source?
-
-Yes! ByteChef is licensed under an open-source license. You can use it freely for personal and commercial projects. Check the [License](#license) section for details.
-
-### How can I contribute?
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with clear commit messages
-4. Submit a pull request following the project's contribution guidelines
-
-### Where can I get help?
-
-- **Documentation** - Check the README and docs folder
-- **GitHub Issues** - Report bugs or request features
-- **Community Chat** - Join discussions with other users and developers
-
----
-
-**Made with ❤️ by the ByteChef community**
