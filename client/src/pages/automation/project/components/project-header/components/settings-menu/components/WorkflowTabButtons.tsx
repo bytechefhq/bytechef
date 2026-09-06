@@ -23,7 +23,6 @@ const WorkflowTabButtons = ({
 }) => {
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
 
-    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -50,15 +49,13 @@ const WorkflowTabButtons = ({
                 variant="ghost"
             />
 
-            {ff_1042 && (
-                <Button
-                    className="dropdown-menu-item"
-                    icon={<Share2Icon />}
-                    label="Share"
-                    onClick={onShareWorkflow}
-                    variant="ghost"
-                />
-            )}
+            <Button
+                className="dropdown-menu-item"
+                icon={<Share2Icon />}
+                label="Share"
+                onClick={onShareWorkflow}
+                variant="ghost"
+            />
 
             {ff_2939 && (
                 <Button

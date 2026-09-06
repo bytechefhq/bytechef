@@ -42,7 +42,6 @@ const ProjectTabButtons = ({
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
@@ -71,16 +70,14 @@ const ProjectTabButtons = ({
                 variant="ghost"
             />
 
-            {ff_1042 && (
-                <Button
-                    aria-label="Share ProjectButton"
-                    className="dropdown-menu-item"
-                    icon={<Share2Icon />}
-                    label="Share"
-                    onClick={onShareProject}
-                    variant="ghost"
-                />
-            )}
+            <Button
+                aria-label="Share ProjectButton"
+                className="dropdown-menu-item"
+                icon={<Share2Icon />}
+                label="Share"
+                onClick={onShareProject}
+                variant="ghost"
+            />
 
             {ff_2939 && (
                 <Button
