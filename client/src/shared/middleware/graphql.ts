@@ -2200,6 +2200,15 @@ export type RestoreAutomationProjectVersionMutationVariables = Exact<{
 
 export type RestoreAutomationProjectVersionMutation = { restoreAutomationProjectVersion: boolean };
 
+export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
+  userId: string | number;
+  environment: Types.EnvironmentEnum;
+  role: Types.WorkspaceRole;
+}>;
+
+
+export type SetEmbeddedUserEnvironmentRoleMutation = { setEmbeddedUserEnvironmentRole: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
+
 export type ToolEligibleAutomationProjectConfigurationWorkflowPropertiesQueryVariables = Exact<{
   automationProjectConfigurationId: string | number;
   workflowUuid: string;
@@ -2293,14 +2302,6 @@ export type ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery 
     | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, maxLength: number | null, minLength: number | null, placeholder: string | null, regex: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
-export type SetEmbeddedUserEnvironmentRoleMutationVariables = Exact<{
-  userId: string | number;
-  environment: Types.EnvironmentEnum;
-  role: Types.WorkspaceRole;
-}>;
-
-
-export type SetEmbeddedUserEnvironmentRoleMutation = { setEmbeddedUserEnvironmentRole: { id: string | null, userId: string, embeddedRole: Types.WorkspaceRole | null, customRoleId: string | null, environment: Types.EnvironmentEnum | null } };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
   integrationInstanceConfigurationId: string | number;
@@ -8199,22 +8200,6 @@ export const EmbeddedAiAutoMemoriesDocument = new TypedDocumentString(`
 }
     `);
 
-export const AddEmbeddedUserDocument = new TypedDocumentString(`
-    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
-  addEmbeddedUser(userId: $userId, role: $role) {
-    id
-    userId
-    embeddedRole
-    customRoleId
-    user {
-      email
-      firstName
-      lastName
-    }
-  }
-}
-    `);
-
 export const useEmbeddedAiAutoMemoriesQuery = <
       TData = EmbeddedAiAutoMemoriesQuery,
       TError = unknown
@@ -8280,6 +8265,22 @@ export const useUpdateEmbeddedAiAutoMemoryMutation = <
     ...options
   }
     )};
+
+export const AddEmbeddedUserDocument = new TypedDocumentString(`
+    mutation AddEmbeddedUser($userId: ID!, $role: WorkspaceRole!) {
+  addEmbeddedUser(userId: $userId, role: $role) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    user {
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `);
 
 export const useAddEmbeddedUserMutation = <
       TError = unknown,
@@ -11190,6 +11191,35 @@ export const useRestoreAutomationProjectVersionMutation = <
   }
     )};
 
+export const SetEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
+    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
+  setEmbeddedUserEnvironmentRole(
+    userId: $userId
+    environment: $environment
+    role: $role
+  ) {
+    id
+    userId
+    embeddedRole
+    customRoleId
+    environment
+  }
+}
+    `);
+
+export const useSetEmbeddedUserEnvironmentRoleMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>) => {
+    
+    return useMutation<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>(
+      {
+    mutationKey: ['SetEmbeddedUserEnvironmentRole'],
+    mutationFn: (variables?: SetEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<SetEmbeddedUserEnvironmentRoleMutation, SetEmbeddedUserEnvironmentRoleMutationVariables>(SetEmbeddedUserEnvironmentRoleDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocument = new TypedDocumentString(`
     query toolEligibleAutomationProjectConfigurationWorkflowProperties($automationProjectConfigurationId: ID!, $workflowUuid: String!) {
   toolEligibleAutomationProjectConfigurationWorkflowProperties(
@@ -11335,22 +11365,6 @@ export const ToolEligibleAutomationProjectConfigurationWorkflowPropertiesDocumen
         }
       }
     }
-  }
-}
-    `);
-
-export const SetEmbeddedUserEnvironmentRoleDocument = new TypedDocumentString(`
-    mutation SetEmbeddedUserEnvironmentRole($userId: ID!, $environment: EnvironmentEnum!, $role: WorkspaceRole!) {
-  setEmbeddedUserEnvironmentRole(
-    userId: $userId
-    environment: $environment
-    role: $role
-  ) {
-    id
-    userId
-    embeddedRole
-    customRoleId
-    environment
   }
 }
     `);
@@ -11532,19 +11546,6 @@ export const useToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQu
       {
     queryKey: ['toolEligibleIntegrationInstanceConfigurationWorkflowProperties', variables],
     queryFn: fetcher<ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQuery, ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables>(ToolEligibleIntegrationInstanceConfigurationWorkflowPropertiesDocument, variables),
-    ...options
-  }
-    )};
-
-export const useSetEmbeddedUserEnvironmentRoleMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>) => {
-    
-    return useMutation<SetEmbeddedUserEnvironmentRoleMutation, TError, SetEmbeddedUserEnvironmentRoleMutationVariables, TContext>(
-      {
-    mutationKey: ['SetEmbeddedUserEnvironmentRole'],
-    mutationFn: (variables?: SetEmbeddedUserEnvironmentRoleMutationVariables) => fetcher<SetEmbeddedUserEnvironmentRoleMutation, SetEmbeddedUserEnvironmentRoleMutationVariables>(SetEmbeddedUserEnvironmentRoleDocument, variables)(),
     ...options
   }
     )};
