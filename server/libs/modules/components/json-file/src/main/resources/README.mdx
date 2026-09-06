@@ -1,0 +1,8 @@
+## Write to File
+
+`source` is the JSON to serialize into the file, not a file path and not source code. Map it from a previous step with a data pill.
+
+- Type **OBJECT**: writes one JSON object.
+- Type **ARRAY**: writes a JSON array of objects. For JSONL, each array item is written as one JSON object per line.
+
+The action returns a `FILE_ENTRY` for the created file.
