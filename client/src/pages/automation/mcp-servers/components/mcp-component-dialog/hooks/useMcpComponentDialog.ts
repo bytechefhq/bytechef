@@ -49,6 +49,7 @@ const useMcpComponentDialog = ({mcpComponent, mcpServerId, onOpenChange, open}: 
         queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
         queryClient.invalidateQueries({queryKey: ['mcpComponents']});
         queryClient.invalidateQueries({queryKey: ['mcpServers']});
+        queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
     };
 
     const createMcpComponentWithToolsMutation = useCreateMcpComponentWithToolsMutation({
