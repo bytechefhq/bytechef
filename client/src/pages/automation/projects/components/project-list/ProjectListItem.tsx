@@ -111,7 +111,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     );
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
@@ -538,15 +537,13 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     </DropdownMenuItem>
                                 )}
 
-                                {ff_1042 && (
-                                    <DropdownMenuItem
-                                        aria-label="Share Project"
-                                        className="dropdown-menu-item"
-                                        onClick={() => setShowProjectShareDialog(true)}
-                                    >
-                                        <Share2Icon /> Share
-                                    </DropdownMenuItem>
-                                )}
+                                <DropdownMenuItem
+                                    aria-label="Share Project"
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowProjectShareDialog(true)}
+                                >
+                                    <Share2Icon /> Share
+                                </DropdownMenuItem>
 
                                 {ff_2939 && (
                                     <DropdownMenuItem

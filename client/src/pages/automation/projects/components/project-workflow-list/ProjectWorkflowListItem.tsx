@@ -75,7 +75,6 @@ const ProjectWorkflowListItem = ({
 
     const [searchParams] = useSearchParams();
 
-    const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
@@ -304,14 +303,12 @@ const ProjectWorkflowListItem = ({
                             </DropdownMenuItem>
                         )}
 
-                        {ff_1042 && (
-                            <DropdownMenuItem
-                                className="dropdown-menu-item"
-                                onClick={() => setShowWorkflowShareDialog(true)}
-                            >
-                                <Share2Icon /> Share
-                            </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem
+                            className="dropdown-menu-item"
+                            onClick={() => setShowWorkflowShareDialog(true)}
+                        >
+                            <Share2Icon /> Share
+                        </DropdownMenuItem>
 
                         {ff_2939 && (
                             <DropdownMenuItem
