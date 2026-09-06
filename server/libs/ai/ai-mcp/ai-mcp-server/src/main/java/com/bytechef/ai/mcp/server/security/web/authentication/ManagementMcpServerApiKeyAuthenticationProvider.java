@@ -62,7 +62,8 @@ public class ManagementMcpServerApiKeyAuthenticationProvider implements Authenti
         ManagementMcpServerApiKeyAuthenticationToken managementMcpServerApiKeyAuthenticationToken =
             (ManagementMcpServerApiKeyAuthenticationToken) authentication;
 
-        Property property = propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null);
+        Property property = propertyService.fetchProperty("mcp.server", Property.Scope.PLATFORM, null)
+            .orElseThrow(() -> new BadCredentialsException("MCP server secret key is not configured"));
 
         if (!Objects.equals(
             property.get("secretKey"), managementMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey())) {
