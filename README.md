@@ -130,7 +130,7 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 1. **New Project → New Workflow**,
 2. Add a trigger
 3. Add the **AI Agent** component
-4. Pick a **model**, attach **tools** from 180+ connectors, optionally add a **knowledge base** and **guardrails**
+4. Pick a **model**, attach **tools** from 250+ connectors, optionally add a **knowledge base** and **guardrails**
 5. Fill the necessary credentials
 6. Configure each component's parameters in the properties panel
 7. Test your workflow
@@ -142,7 +142,7 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 
 - **Visual editor** with JSON underneath, Git-friendly
 - **Flow controls** — `condition` · `branch` · `loop` · `each` · `map` · `parallel` · `fork-join` · `subflow` · `on-error` · `terminate` · `waitForApproval`
-- **Triggers** — static & dynamic webhooks · polling · app-event listeners · callable, plus schedule and form components
+- **Triggers** — static & dynamic webhooks · polling · hybrid · app-event listeners · callable, plus schedule and form components
 - **Polyglot code** — JavaScript · Python · Ruby on GraalVM
 - **Durable execution** on the Atlas runtime, Postgres-backed, queue-mode for horizontal scale (memory · Redis · RabbitMQ · Kafka · JMS · AMQP · SQS)
 - **Workflows-as-APIs** — workflows can be an authenticated HTTP endpoint
@@ -160,7 +160,7 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 
 ---
 
-## 180+ connectors
+## 250+ connectors
 
 CRM · marketing · communication · e-commerce · cloud storage · databases · AI/ML · helpdesk · finance. Every connector is **also an agent tool, also an MCP tool**. Browse the [full catalog](https://docs.bytechef.io/reference/components).
 
@@ -170,7 +170,7 @@ CRM · marketing · communication · e-commerce · cloud storage · databases ·
 
 | Capability                                                                | CE (Apache 2.0) | EE |
 |---------------------------------------------------------------------------| --- | --- |
-| Visual editor, AI agents, workflows, 180+ connectors                      | ✅ | ✅ |
+| Visual editor, AI agents, workflows, 250+ connectors                      | ✅ | ✅ |
 | Polyglot code (JS/Python/Ruby)                                            | ✅ | ✅ |
 | Knowledge bases, vector stores, guardrails, MCP server                    | ✅ | ✅ |
 | Agent skills, agent evaluations                                           | 🚧 in development | 🚧 in development |
@@ -191,11 +191,11 @@ CRM · marketing · communication · e-commerce · cloud storage · databases ·
 
 ### How is this different from n8n, Zapier or Make?
 
-Those are automation tools where AI is a node you call and get an answer back. In ByteChef an agent is a step that owns a loop — it selects tools, executes them, observes the result and decides what to do next — and any workflow can be handed to an agent as a single tool. You get deterministic branching, retries and approvals in the same graph as the non-deterministic part, under one audit trail.
+Those are automation tools where AI is a node you call and get an answer back. In ByteChef an agent is a step that owns a loop — it selects tools, executes them, observes the result and decides what to do next — and any workflow can be published as an MCP tool for agents to call. You get deterministic branching, retries and approvals in the same graph as the non-deterministic part, under one audit trail.
 
 ### How is this different from LangChain, LangGraph or CrewAI?
 
-Those are libraries you build an application around: you own deployment, persistence, retries, credential storage and the UI. ByteChef is the running system — durable execution, a visual editor, managed connections, and 180+ connectors that are already agent tools. You can still drop into code where it earns its place; it just isn't the only way in.
+Those are libraries you build an application around: you own deployment, persistence, retries, credential storage and the UI. ByteChef is the running system — durable execution, a visual editor, managed connections, and 250+ connectors that are already agent tools. You can still drop into code where it earns its place; it just isn't the only way in.
 
 ### Which LLM providers ship out of the box?
 
@@ -203,7 +203,7 @@ Twelve direct providers — OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Goo
 
 ### How does an agent get its tools?
 
-Every connector is already a tool, and so is any workflow you point the agent at. To let the model supply a value at runtime, put the expression `=fromAi('order_id', 'STRING', {'description': 'The order to refund'})` in the field instead of a literal — that property then becomes part of the tool schema the model sees. It is the same properties panel you would otherwise type into; there is no separate tool definition to write.
+Every connector is already a tool, and workflows you expose through the MCP server become tools too. To let the model supply a value at runtime, put the expression `=fromAi('order_id', 'STRING', {'description': 'The order to refund'})` in the field instead of a literal — that property then becomes part of the tool schema the model sees. It is the same properties panel you would otherwise type into; there is no separate tool definition to write.
 
 ### What is available for memory and RAG?
 
