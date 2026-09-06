@@ -94,10 +94,15 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
                 TenantContext.runWithTenantId(
                     authentication.getTenantId(),
                     () -> {
-                        Authentication authenticatedAuthentication = authenticationManager.authenticate(authentication);
+                        try {
+                            Authentication authenticatedAuthentication = authenticationManager.authenticate(
+                                authentication);
 
-                        successfulAuthentication(httpServletRequest, httpServletResponse, filterChain,
-                            authenticatedAuthentication);
+                            successfulAuthentication(
+                                httpServletRequest, httpServletResponse, filterChain, authenticatedAuthentication);
+                        } catch (AuthenticationException ex) {
+                            unsuccessfulAuthentication(httpServletRequest, httpServletResponse, ex);
+                        }
                     });
             }
         } catch (AuthenticationException ex) {
