@@ -130,7 +130,7 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 1. **New Project → New Workflow**,
 2. Add a trigger
 3. Add the **AI Agent** component
-4. Pick a **model**, attach **tools** from 200+ connectors, optionally add a **knowledge base** and **guardrails**
+4. Pick a **model**, attach **tools** from 180+ connectors, optionally add a **knowledge base** and **guardrails**
 5. Fill the necessary credentials
 6. Configure each component's parameters in the properties panel
 7. Test your workflow
@@ -141,9 +141,9 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 ## Workflow Automation
 
 - **Visual editor** with JSON underneath, Git-friendly
-- **Flow controls** — `condition` · `switch` · `loop` · `each` · `parallel` · `branch` · sub-workflows
-- **Triggers** — webhook · schedule · polling · app-event · manual · form
-- **Polyglot code** — Java · JavaScript · Python · Ruby on GraalVM
+- **Flow controls** — `condition` · `branch` · `loop` · `each` · `map` · `parallel` · `fork-join` · `subflow` · `on-error` · `terminate` · `waitForApproval`
+- **Triggers** — static & dynamic webhooks · polling · app-event listeners · callable, plus schedule and form components
+- **Polyglot code** — JavaScript · Python · Ruby on GraalVM
 - **Durable execution** on the Atlas runtime, Postgres-backed, queue-mode for horizontal scale (memory · Redis · RabbitMQ · Kafka · JMS · AMQP · SQS)
 - **Workflows-as-APIs** — workflows can be an authenticated HTTP endpoint
 - **Git-native** — push from the UI, environments backed by branches
@@ -170,8 +170,8 @@ CRM · marketing · communication · e-commerce · cloud storage · databases ·
 
 | Capability                                                                | CE (Apache 2.0) | EE |
 |---------------------------------------------------------------------------| --- | --- |
-| Visual editor, AI agents, workflows, 200+ connectors                      | ✅ | ✅ |
-| Polyglot code (Java/JS/Python/Ruby)                                       | ✅ | ✅ |
+| Visual editor, AI agents, workflows, 180+ connectors                      | ✅ | ✅ |
+| Polyglot code (JS/Python/Ruby)                                            | ✅ | ✅ |
 | Knowledge bases, vector stores, guardrails, MCP server                    | ✅ | ✅ |
 | Agent skills, agent evaluations                                           | 🚧 in development | 🚧 in development |
 | Self-host (Docker / Kubernetes / Helm)                                    | ✅ | ✅ |
