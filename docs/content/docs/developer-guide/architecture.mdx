@@ -43,7 +43,7 @@ flowchart TB
 
     BROKER(["Message broker - memory / Redis / RabbitMQ / Kafka / JMS / SQS"])
 
-    COMP["Component task handlers - 200+ components"]
+    COMP["Component task handlers - 250+ components"]
     SVC(("External services"))
 
     DB[("PostgreSQL")]
@@ -102,7 +102,7 @@ flowchart TB
     subgraph ENGINE["Engine + extensions"]
         ATLAS["atlas - workflow kernel"]
         TD["modules/task-dispatchers - control flow"]
-        COMPS["modules/components - 200+ integrations"]
+        COMPS["modules/components - 250+ integrations"]
     end
 
     subgraph CORE["core"]
@@ -128,7 +128,7 @@ flowchart TB
 |---|---|---|
 | Atlas engine | `server/libs/atlas/` | Generic workflow kernel: definitions, jobs, coordinator, worker, file storage |
 | Task dispatchers | `server/libs/modules/task-dispatchers/` | Control flow: `condition`, `loop`, `each`, `map`, `parallel`, `fork-join`, `branch`, `on-error`, `subflow`, `approval`, `suspend`, `terminate` |
-| Components | `server/libs/modules/components/` | The 200+ integrations built with the Component SDK |
+| Components | `server/libs/modules/components/` | The 250+ integrations built with the Component SDK |
 | Platform | `server/libs/platform/` | Everything that makes Atlas a product: component registry, connections, triggers, webhooks, scheduler, OAuth2, data storage |
 | Automation | `server/libs/automation/` | The workspace/project/deployment domain on top of the platform |
 | Embedded (EE) | `server/ee/libs/embedded/` | The embedded iPaaS domain (integrations, connected users) |
