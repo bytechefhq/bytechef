@@ -15,6 +15,8 @@ import {ComponentConnection, Workflow} from '../middleware/platform/configuratio
 import {useGetComponentDefinitionQuery} from '../queries/platform/componentDefinitions.queries';
 import EnvironmentBadge from './EnvironmentBadge';
 
+const NO_CONNECTION_VALUE = 'null';
+
 interface ConnectionRenderItemI {
     connection: ComponentConnection;
     groupedIndices?: number[];
@@ -42,7 +44,7 @@ interface ConnectionConfigurationListFormFieldProps {
     fieldNamePrefix: string;
     groupedIndices?: number[];
     index: number;
-    handleConnectionIdChange: (index: number, connectionId: number) => void;
+    handleConnectionIdChange: (index: number, connectionId: number | undefined) => void;
     handleConnectionDialogOpen?: (componentConnection: ComponentConnection) => void;
     workflowNodeLabel?: string;
 }
@@ -67,7 +69,7 @@ const ConnectionConfigurationListFormField = ({
 
     const handleConnectionValueChange = useCallback(
         (value: string) => {
-            const connectionId = Number(value);
+            const connectionId = value === NO_CONNECTION_VALUE ? undefined : Number(value);
 
             handleConnectionIdChange(index, connectionId);
 
@@ -175,7 +177,7 @@ const ConnectionConfigurationListFormField = ({
                         </FormControl>
 
                         <SelectContent>
-                            <SelectItem value="null">Select a connection...</SelectItem>
+                            <SelectItem value={NO_CONNECTION_VALUE}>Select a connection...</SelectItem>
 
                             {connectionList.map((connection) => (
                                 <SelectItem
@@ -254,7 +256,7 @@ interface SubflowConnectionGroupProps {
     control: Control<FieldValues>;
     fieldNamePrefix: string;
     getCurrentConnectionId?: (index: number) => number | undefined;
-    handleConnectionIdChange: (index: number, connectionId: number) => void;
+    handleConnectionIdChange: (index: number, connectionId: number | undefined) => void;
     handleConnectionDialogOpen?: (componentConnection: ComponentConnection) => void;
     node: SubflowTreeNodeI;
     subflowLabelMap?: Map<string, string>;
@@ -352,7 +354,7 @@ interface ConnectionConfigurationListProps {
     duplicateSubflowStubs?: SubflowDuplicateStubI[];
     fieldNamePrefix?: string;
     getCurrentConnectionId?: (index: number) => number | undefined;
-    handleConnectionIdChange: (index: number, connectionId: number) => void;
+    handleConnectionIdChange: (index: number, connectionId: number | undefined) => void;
     handleConnectionDialogOpen?: (componentConnection: ComponentConnection) => void;
     subflowLabelMap?: Map<string, string>;
     workflow: Workflow;
