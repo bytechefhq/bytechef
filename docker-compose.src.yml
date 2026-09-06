@@ -21,14 +21,16 @@ services:
       - BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef
       - BYTECHEF_DATASOURCE_USERNAME=postgres
       - BYTECHEF_DATASOURCE_PASSWORD=postgres
-      - BYTECHEF_ENCRYPTION_PROVIDER=property
-      - BYTECHEF_ENCRYPTION_PROPERTY_KEY=tTB1/UBIbYLuCXVi4PPfzA==
       - BYTECHEF_FEATURE_FLAGS
       - BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48keep1this1safe3ffb2
+    volumes:
+      - storage_key:/root/.bytechef
     ports:
       - "8080:8080"
 volumes:
   storage_db:
+    driver: "local"
+  storage_key:
     driver: "local"
   storage_cache:
     driver: "local"
