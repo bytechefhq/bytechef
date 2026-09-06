@@ -32,22 +32,24 @@ workflows, connections, and execution history - lives there, so `docker compose 
 intact.
 
 ByteChef encrypts stored connection credentials with an instance-wide key. Under the default
-`filesystem` provider the key is generated on first start and written inside the container, which
-does not survive `docker rm` - so the Compose file keeps it in a second named volume, `storage_key`.
-Recreating the ByteChef container then leaves stored connections readable. `docker compose down -v`
-deletes this volume too, and a database restored without its key is a database of undecryptable
-credentials, so back the two up together.
+`filesystem` provider that key is generated on first start and written to `~/.bytechef/key`, so the
+Compose file mounts your `~/.bytechef` directory into the container. Keeping the key on the host
+rather than inside the container has three consequences: it survives recreating the container,
+`docker compose down -v` does not touch it, and a server you run outside Docker uses the very same
+key - the same connections stay readable either way.
+
+Back the key up alongside the database. A database restored without its key is a database of
+undecryptable credentials.
 
 <Callout type="warn">
-If you created your instance before `storage_key` was added, its key still lives inside the old
-container and is lost the first time that container is recreated. Existing connections cannot be
-recovered without it - re-create them once after upgrading, then the key persists.
+An instance created before this mount existed kept its key inside the container, where it is lost
+the first time that container is recreated. Connections stored under it cannot be recovered -
+re-create them once, after which the key persists in `~/.bytechef`.
 </Callout>
 
-For anything beyond a local install - a multi-replica deployment, or any host where you want to hold
-the key yourself - set `BYTECHEF_ENCRYPTION_PROVIDER=property` with your own
-`BYTECHEF_ENCRYPTION_PROPERTY_KEY` from a secret manager instead. See
-[Configuration](/platform/use-bytechef/self-hosted/configuration#the-key).
+For a multi-replica deployment, or any host where you would rather hold the key in a secret manager,
+set `BYTECHEF_ENCRYPTION_PROVIDER=property` with your own `BYTECHEF_ENCRYPTION_PROPERTY_KEY`
+instead. See [Configuration](/platform/use-bytechef/self-hosted/configuration#the-key).
 
 To point ByteChef at a PostgreSQL server you run yourself instead, override the datasource settings
 on the `bytechef` service:
@@ -93,30 +95,18 @@ docker run --name postgres -d -p 5432:5432 \
 </Step>
 <Step>
 
-**Generate an encryption key**
-
-There is no Compose file to persist the key for you here, so supply your own and store it somewhere
-safe - lose it and every stored credential becomes undecryptable:
-
-```bash
-openssl rand -base64 16
-```
-
-</Step>
-<Step>
-
 **Start the ByteChef container**
 
-Replace `<your-encryption-key>` with the value generated above:
+Mount `~/.bytechef` so the generated encryption key stays on the host, exactly as the Compose file
+does:
 
 ```bash
 docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
-    --env BYTECHEF_ENCRYPTION_PROVIDER=property \
-    --env BYTECHEF_ENCRYPTION_PROPERTY_KEY=<your-encryption-key> \
     --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
+    -v ~/.bytechef:/root/.bytechef \
     --network bytechef_network \
     docker.bytechef.io/bytechef/bytechef:latest
 ```
