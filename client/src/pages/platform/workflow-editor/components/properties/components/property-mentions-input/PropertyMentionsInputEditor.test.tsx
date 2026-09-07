@@ -79,25 +79,12 @@ vi.mock('use-debounce', () => {
     return {useDebouncedCallback};
 });
 
-import {
-    type ConnectionI,
-    WorkflowEditorProvider,
-} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
+import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {
-    ComponentDefinitionBasic,
-    type DeleteClusterElementParameter200Response,
-    type DeleteClusterElementParameterOperationRequest,
-    type DeleteWorkflowNodeParameterRequest,
-    Tag,
-    type UpdateClusterElementParameterOperationRequest,
-    type UpdateWorkflowNodeParameterOperationRequest,
-} from '@/shared/middleware/platform/configuration';
-import {UpdateWorkflowMutationType} from '@/shared/types';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
-import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {waitFor} from '@testing-library/react';
 import * as React from 'react';
 import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -112,55 +99,9 @@ const microtaskTick = async (times = 1) => {
     }
 };
 
-const dummyMutation = {} as unknown as UseMutationResult<unknown, Error, unknown, unknown>;
-
-const editorProviderValue = {
-    ConnectionKeys: {
-        connection: () => [],
-        connectionTags: [],
-        connections: [],
-        filteredConnections: () => [],
-    },
-    cancelWorkflowQueries: () => {},
-    deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
-        DeleteClusterElementParameter200Response,
-        Error,
-        DeleteClusterElementParameterOperationRequest,
-        unknown
-    >,
-    deleteWorkflowNodeParameterMutation: dummyMutation as unknown as UseMutationResult<
-        DeleteClusterElementParameter200Response,
-        Error,
-        DeleteWorkflowNodeParameterRequest,
-        unknown
-    >,
-    invalidateWorkflowQueries: () => {},
-    updateClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
-        DeleteClusterElementParameter200Response,
-        Error,
-        UpdateClusterElementParameterOperationRequest,
-        unknown
-    >,
-    updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
-    updateWorkflowNodeParameterMutation: dummyMutation as unknown as UseMutationResult<
-        DeleteClusterElementParameter200Response,
-        Error,
-        UpdateWorkflowNodeParameterOperationRequest,
-        unknown
-    >,
-    useCreateConnectionMutation: () => ({}) as unknown as UseMutationResult<number, Error, ConnectionI, unknown>,
-    useGetComponentDefinitionsQuery: () => ({}) as UseQueryResult<Array<ComponentDefinitionBasic>, Error>,
-    useGetConnectionTagsQuery: () => ({}) as unknown as UseQueryResult<Tag[], Error>,
-    useGetConnectionsQuery: () => ({}) as unknown as UseQueryResult<ConnectionI[], Error>,
-    webhookTriggerTestApi: {
-        startWebhookTriggerTest: async () => ({}),
-        stopWebhookTriggerTest: async () => {},
-    },
-};
-
 const renderEditor = (props: Partial<React.ComponentProps<typeof PropertyMentionsInput>> = {}) =>
     render(
-        <WorkflowEditorProvider value={editorProviderValue}>
+        <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
             <PropertyMentionsInput
                 controlType="TEXT"
                 label="Editor"
@@ -233,7 +174,7 @@ describe('PropertyMentionsInputEditor', () => {
     describe('value sync effect', () => {
         it('should update editor content when value prop changes externally', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="SyncEditor"
@@ -251,7 +192,7 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'SyncEditor'}).textContent).toBe('initial');
 
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="SyncEditor"
@@ -271,7 +212,7 @@ describe('PropertyMentionsInputEditor', () => {
 
         it('should strip = prefix when value prop changes to an expression', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="ExprEditor"
@@ -289,7 +230,7 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'ExprEditor'}).textContent).toBe('plain');
 
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="ExprEditor"
@@ -311,7 +252,7 @@ describe('PropertyMentionsInputEditor', () => {
     describe('focus guard — prevents value overwrite during typing', () => {
         it('should not overwrite editor content with stale value prop while focused', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="FocusGuard"
@@ -342,7 +283,7 @@ describe('PropertyMentionsInputEditor', () => {
 
             // Simulate server response arriving with the old saved value
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="FocusGuard"
@@ -363,7 +304,7 @@ describe('PropertyMentionsInputEditor', () => {
 
         it('should sync value prop after editor loses focus', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="BlurSync"
@@ -395,7 +336,7 @@ describe('PropertyMentionsInputEditor', () => {
 
             // Now rerender with a new external value — should sync because editor is blurred
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="BlurSync"
@@ -415,7 +356,7 @@ describe('PropertyMentionsInputEditor', () => {
 
         it('should allow external sync when editor was never focused', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="NoFocus"
@@ -434,7 +375,7 @@ describe('PropertyMentionsInputEditor', () => {
 
             // Rerender with new value without ever focusing the editor
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         label="NoFocus"
@@ -540,7 +481,7 @@ describe('PropertyMentionsInputEditor', () => {
 
         it('should strip = from value when formula mode value changes externally', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         isFormulaMode={true}
@@ -559,7 +500,7 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'FormulaEditor'}).textContent).toBe('1 + 2');
 
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         isFormulaMode={true}
@@ -598,7 +539,7 @@ describe('PropertyMentionsInputEditor', () => {
         // useEditor effect reapplies editorProps.attributes through setOptions on rerender.
         it('should apply the monospace font when formula mode is switched on', async () => {
             const {rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         isFormulaMode={false}
@@ -617,7 +558,7 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'FormulaEditor'})).not.toHaveClass('font-mono');
 
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         isFormulaMode={true}
@@ -636,16 +577,16 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'FormulaEditor'})).toHaveClass('font-mono');
         });
 
-        // text-xs/5, not plain text-xs: the /5 keeps the text-sm leading so the field holds its
-        // height across the toggle and the smaller text stays vertically centred in the line box.
-        it('should shrink the editor content to text-xs at the text-sm leading in formula mode', async () => {
+        // 13px mono reads alongside the 14px sans of every other property value: 14px mono was too heavy,
+        // 12px too faint. The /5 pins the leading so the field holds its height across the toggle.
+        it('should set the editor content to 13px mono in formula mode', async () => {
             renderEditor({isFormulaMode: true, value: '=1 + 2'});
 
             await microtaskTick(2);
 
             const textbox = screen.getByRole('textbox', {name: 'Editor'});
 
-            expect(textbox).toHaveClass('text-xs/5');
+            expect(textbox).toHaveClass('text-[13px]/5');
             expect(textbox).not.toHaveClass('text-sm');
         });
 
@@ -657,8 +598,8 @@ describe('PropertyMentionsInputEditor', () => {
             expect(screen.getByRole('textbox', {name: 'Editor'})).toHaveClass('text-sm');
         });
 
-        // Data pill chips set their own text-sm, so the editor's text-xs does not reach them. The
-        // modifier on the wrapper is what the stylesheet hangs the smaller chip size off.
+        // Data pill chips size themselves, so the editor's own text size does not reach them. The
+        // modifier on the wrapper is what the stylesheet hangs the matching chip size off.
         it('should mark the editor wrapper so data pill chips can shrink with the text', async () => {
             const {container} = renderEditor({isFormulaMode: true, value: '=1 + 2'});
 
@@ -690,7 +631,7 @@ describe('PropertyMentionsInputEditor', () => {
         // toggling formula mode has to swap it without the editor being rebuilt.
         it('should swap the placeholder when formula mode is switched on', async () => {
             const {container, rerender} = render(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         isFormulaMode={false}
@@ -711,7 +652,7 @@ describe('PropertyMentionsInputEditor', () => {
             );
 
             rerender(
-                <WorkflowEditorProvider value={editorProviderValue}>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
                     <PropertyMentionsInput
                         controlType="TEXT"
                         isFormulaMode={true}

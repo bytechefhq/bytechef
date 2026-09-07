@@ -43,7 +43,7 @@ describe('useFormDisplayConditions', () => {
         );
 
         expect(hoisted.lastCall?.options.enabled).toBe(true);
-        expect(result.current).toEqual({"bodyContentType == 'JSON'": true});
+        expect(result.current.displayConditions).toEqual({"bodyContentType == 'JSON'": true});
     });
 
     // An empty map is a form whose defaults have not been applied yet, not a verdict that nothing holds. Querying
@@ -52,7 +52,7 @@ describe('useFormDisplayConditions', () => {
         const {result} = renderHook(() => useFormDisplayConditions({...properties, parameters: {}}));
 
         expect(hoisted.lastCall?.options.enabled).toBe(false);
-        expect(result.current).toBeUndefined();
+        expect(result.current.displayConditions).toBeUndefined();
     });
 
     it('stays unevaluated without a component version', () => {
@@ -65,7 +65,7 @@ describe('useFormDisplayConditions', () => {
         );
 
         expect(hoisted.lastCall?.options.enabled).toBe(false);
-        expect(result.current).toBeUndefined();
+        expect(result.current.displayConditions).toBeUndefined();
     });
 
     it('stays unevaluated when the caller disables it', () => {
@@ -92,5 +92,39 @@ describe('useFormDisplayConditions', () => {
         });
 
         expect(hoisted.lastCall?.variables.parameters).toEqual({bodyContentType: 'XML'});
+    });
+    // The query key carries the parameters, so every edit empties `data` until the next response lands. An
+    // undefined verdict means "unevaluated", which shows every conditional property, so dropping it mid-edit
+    // flashed the whole set of mutually exclusive properties on each keystroke.
+    it('keeps the last evaluated conditions while the next evaluation is in flight', () => {
+        const {rerender, result} = renderHook(
+            (parameters: Record<string, unknown>) => useFormDisplayConditions({...properties, parameters}),
+            {initialProps: {bodyContentType: 'JSON'} as Record<string, unknown>}
+        );
+
+        expect(result.current.displayConditions).toEqual({"bodyContentType == 'JSON'": true});
+
+        hoisted.result = undefined;
+
+        rerender({bodyContentType: 'XML'});
+
+        expect(result.current.displayConditions).toEqual({"bodyContentType == 'JSON'": true});
+        expect(result.current.isEvaluating).toBe(false);
+    });
+
+    it('reports it is evaluating until the first verdict arrives', () => {
+        hoisted.result = undefined;
+
+        const {result} = renderHook(() =>
+            useFormDisplayConditions({...properties, parameters: {bodyContentType: 'JSON'}})
+        );
+
+        expect(result.current.isEvaluating).toBe(true);
+    });
+
+    it('does not report it is evaluating when the query never runs', () => {
+        const {result} = renderHook(() => useFormDisplayConditions({...properties, parameters: {}}));
+
+        expect(result.current.isEvaluating).toBe(false);
     });
 });

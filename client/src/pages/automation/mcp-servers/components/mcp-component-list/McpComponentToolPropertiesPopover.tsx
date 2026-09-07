@@ -28,7 +28,12 @@ const McpComponentToolPropertiesPopover = ({
 
     const formValues = form.watch();
 
-    const formDisplayConditions = useMcpToolFormDisplayConditions(componentName, componentVersion, mcpTool, formValues);
+    const {displayConditions, isEvaluating} = useMcpToolFormDisplayConditions(
+        componentName,
+        componentVersion,
+        mcpTool,
+        formValues
+    );
 
     return (
         <PopoverContent
@@ -54,9 +59,9 @@ const McpComponentToolPropertiesPopover = ({
             </div>
 
             <Form {...form}>
-                <form className="flex min-h-0 flex-col" onSubmit={handleSubmit(handleFormSubmit)}>
+                <form className="flex min-h-0 flex-col" noValidate onSubmit={handleSubmit(handleFormSubmit)}>
                     <div className="min-h-0 flex-1 overflow-y-auto p-3">
-                        {isLoading ? (
+                        {isLoading || isEvaluating ? (
                             <p className="text-sm text-muted-foreground">Loading properties...</p>
                         ) : properties.length > 0 ? (
                             <fieldset className="space-y-4 border-0 p-0">
@@ -72,7 +77,7 @@ const McpComponentToolPropertiesPopover = ({
                                     <Properties
                                         control={control}
                                         controlPath=""
-                                        formDisplayConditions={formDisplayConditions}
+                                        formDisplayConditions={displayConditions}
                                         formState={formState}
                                         properties={properties}
                                         toolsMode

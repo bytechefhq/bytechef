@@ -19,21 +19,17 @@ export function getMentionsInputPlaceholder({
     placeholder,
     toolProperty,
 }: MentionsInputPlaceholderProps): string {
-    if (placeholder) {
-        return placeholder;
-    }
-
     if (expressionEnabled === false) {
-        return '';
+        return placeholder || '';
     }
 
     if (formulaMode) {
         return toolProperty ? TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER : FORMULA_MODE_PLACEHOLDER;
     }
 
-    if (toolProperty) {
-        return TOOL_PROPERTY_PLACEHOLDER;
+    if (placeholder) {
+        return placeholder;
     }
 
-    return DEFAULT_PLACEHOLDER;
+    return toolProperty ? TOOL_PROPERTY_PLACEHOLDER : DEFAULT_PLACEHOLDER;
 }

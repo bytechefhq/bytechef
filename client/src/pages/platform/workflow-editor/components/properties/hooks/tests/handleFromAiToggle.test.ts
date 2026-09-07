@@ -1,5 +1,7 @@
 import {describe, expect, it} from 'vitest';
 
+import {computeFromAiToggle} from '../fromAiToggle';
+
 /**
  * Tests for handleFromAiToggle and handleControlledModeSwitch fromAi cleanup.
  *
@@ -10,49 +12,14 @@ import {describe, expect, it} from 'vitest';
  * fromAi was active.
  *
  * The handlers must always:
- *   - update the form field value (empty when toggling off / leaving mode)
+ *   - update the form field value (keeps the expression when toggling off / empty when leaving mode)
  *   - call saveProperty so the backend strips the path from the fromAi array
  */
 
-interface FromAiToggleResultI {
-    fieldValue: string;
-    savePayload: {
-        fromAi: boolean;
-        includeInMetadata: boolean;
-        value: string;
-    } | null;
-}
-
 const FROM_AI_EXPRESSION = "=fromAi('fieldName')";
 
-const computeFromAiToggle = ({
-    custom = false,
-    fromAi,
-    fromAiExpression = FROM_AI_EXPRESSION,
-    hasPath = true,
-    hasWorkflowId = true,
-}: {
-    custom?: boolean;
-    fromAi: boolean;
-    fromAiExpression?: string;
-    hasPath?: boolean;
-    hasWorkflowId?: boolean;
-}): FromAiToggleResultI => {
-    const fieldValue = fromAi ? fromAiExpression : '';
-
-    if (!hasPath || !hasWorkflowId) {
-        return {fieldValue, savePayload: null};
-    }
-
-    return {
-        fieldValue,
-        savePayload: {
-            fromAi,
-            includeInMetadata: custom || fromAi,
-            value: fieldValue,
-        },
-    };
-};
+const toggle = (overrides: Partial<Parameters<typeof computeFromAiToggle>[0]> & {fromAi: boolean}) =>
+    computeFromAiToggle({fromAiExpression: FROM_AI_EXPRESSION, ...overrides});
 
 interface ModeSwitchResultI {
     savePayload: {
@@ -93,13 +60,13 @@ const computeControlledModeSwitch = ({
 describe('handleFromAiToggle', () => {
     describe('toggling ON', () => {
         it('sets field value to the fromAi expression', () => {
-            const result = computeFromAiToggle({fromAi: true});
+            const result = toggle({fromAi: true});
 
-            expect(result.fieldValue).toBe(FROM_AI_EXPRESSION);
+            expect(result.value).toBe(FROM_AI_EXPRESSION);
         });
 
         it('saves with fromAi true and forces includeInMetadata', () => {
-            const result = computeFromAiToggle({custom: false, fromAi: true});
+            const result = toggle({custom: false, fromAi: true});
 
             expect(result.savePayload).toEqual({
                 fromAi: true,
@@ -110,24 +77,24 @@ describe('handleFromAiToggle', () => {
     });
 
     describe('toggling OFF', () => {
-        it('clears the field value', () => {
-            const result = computeFromAiToggle({fromAi: false});
+        it('keeps the field value as the fromAi expression', () => {
+            const result = toggle({fromAi: false});
 
-            expect(result.fieldValue).toBe('');
+            expect(result.value).toBe(FROM_AI_EXPRESSION);
         });
 
         it('saves with fromAi false so the backend removes the entry', () => {
-            const result = computeFromAiToggle({custom: false, fromAi: false});
+            const result = toggle({custom: false, fromAi: false});
 
             expect(result.savePayload).toEqual({
                 fromAi: false,
                 includeInMetadata: false,
-                value: '',
+                value: FROM_AI_EXPRESSION,
             });
         });
 
         it('keeps includeInMetadata true when the property is custom', () => {
-            const result = computeFromAiToggle({custom: true, fromAi: false});
+            const result = toggle({custom: true, fromAi: false});
 
             expect(result.savePayload?.includeInMetadata).toBe(true);
         });
@@ -135,17 +102,17 @@ describe('handleFromAiToggle', () => {
 
     describe('guards', () => {
         it('does not save when path is missing', () => {
-            const result = computeFromAiToggle({fromAi: false, hasPath: false});
+            const result = toggle({fromAi: false, hasPath: false});
 
             expect(result.savePayload).toBeNull();
-            expect(result.fieldValue).toBe('');
+            expect(result.value).toBe(FROM_AI_EXPRESSION);
         });
 
         it('does not save when workflow id is missing', () => {
-            const result = computeFromAiToggle({fromAi: true, hasWorkflowId: false});
+            const result = toggle({fromAi: true, hasWorkflowId: false});
 
             expect(result.savePayload).toBeNull();
-            expect(result.fieldValue).toBe(FROM_AI_EXPRESSION);
+            expect(result.value).toBe(FROM_AI_EXPRESSION);
         });
     });
 });

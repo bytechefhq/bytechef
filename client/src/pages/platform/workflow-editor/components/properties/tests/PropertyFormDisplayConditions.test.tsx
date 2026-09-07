@@ -14,6 +14,7 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/hooks/usePropert
         controlType: property.controlType ?? 'TEXT',
         controlledDynamicMode: false,
         controlledDynamicOnChangeRef: {current: undefined},
+        controlledExpressionExitRef: {current: false},
         currentNode: undefined,
         displayCondition: property.displayCondition,
         editorRef: {current: null},

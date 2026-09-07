@@ -37,6 +37,7 @@ const McpIntegrationInstanceConfigurationWorkflowPropertiesPopover = ({
                 </div>
 
                 <Button
+                    aria-label="Close"
                     className="text-muted-foreground hover:text-foreground"
                     icon={<XIcon className="size-4" />}
                     onClick={onClose}
@@ -46,7 +47,7 @@ const McpIntegrationInstanceConfigurationWorkflowPropertiesPopover = ({
             </div>
 
             <Form {...form}>
-                <form className="flex min-h-0 flex-col" onSubmit={handleSubmit(handleFormSubmit)}>
+                <form className="flex min-h-0 flex-col" noValidate onSubmit={handleSubmit(handleFormSubmit)}>
                     <div className="min-h-0 flex-1 overflow-y-auto p-3">
                         {isLoading ? (
                             <p className="text-sm text-muted-foreground">Loading properties...</p>

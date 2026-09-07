@@ -50,10 +50,11 @@
 }
 
 /*
- * Set smaller font to datapill mentions in formula mode to match the font size of the formula input
+ * Size datapill mentions in formula mode to match the font size of the formula input, which chips do not
+ * inherit because they size themselves.
  */
 @layer components {
     .property-mentions-editor--formula-mode .tiptap .property-mention-chip {
-        @apply text-xs/5!;
+        @apply text-[13px]/5!;
     }
 }

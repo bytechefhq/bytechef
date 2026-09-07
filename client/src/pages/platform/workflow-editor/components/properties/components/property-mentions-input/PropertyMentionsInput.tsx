@@ -39,6 +39,7 @@ const PropertyMentionsInputEditorSheet = lazy(
 );
 
 interface PropertyMentionsInputProps {
+    autoFocus?: boolean;
     className?: string;
     controlType?: ControlType;
     defaultValue?: string;
@@ -69,6 +70,7 @@ interface PropertyMentionsInputProps {
 const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
     (
         {
+            autoFocus,
             className,
             controlType,
             defaultValue,
@@ -142,6 +144,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         const processedValue = newValue.trim().substring(1);
 
                         localEditorRef.current?.commands?.setContent(processedValue);
+                        localEditorRef.current?.commands?.focus('end');
+
+                        if (localEditorRef.current) {
+                            setFocusedInput(localEditorRef.current);
+                        }
 
                         return false;
                     }
@@ -149,7 +156,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 return true;
             },
-            [expressionEnabled, setIsFormulaMode]
+            [expressionEnabled, setFocusedInput, setIsFormulaMode]
         );
 
         const getPropertyMentionsInputEditorRef = useCallback(
@@ -296,7 +303,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         )}
                     >
                         <PropertyMentionsInputEditor
-                            className="px-2 py-[0.44rem]"
+                            autoFocus={autoFocus}
+                            className="px-2 py-2"
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
                             dataPills={dataPills}
