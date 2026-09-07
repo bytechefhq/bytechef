@@ -29,6 +29,8 @@ public class WorkflowValidatorErrorType extends AbstractErrorType {
 
     public static final WorkflowValidatorErrorType DUPLICATE_NODE_NAMES = new WorkflowValidatorErrorType(100);
 
+    public static final WorkflowValidatorErrorType INVALID_INPUT_NAME = new WorkflowValidatorErrorType(101);
+
     public WorkflowValidatorErrorType(int errorKey) {
         super(WorkflowValidatorFacade.class, errorKey);
     }

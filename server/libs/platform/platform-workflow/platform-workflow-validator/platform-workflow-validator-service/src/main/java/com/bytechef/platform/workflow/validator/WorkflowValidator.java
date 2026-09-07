@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 
@@ -39,6 +40,8 @@ public class WorkflowValidator {
 
     static final List<String> VALID_INPUT_TYPES = List.of(
         "boolean", "date", "date_time", "time", "integer", "number", "string");
+
+    private static final Pattern INPUT_NAME_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
 
     /**
      * Validates task parameters against a single PropertyInfo task definition.
@@ -534,6 +537,14 @@ public class WorkflowValidator {
         FieldValidator.validateRequiredStringField(inputJsonNode, "name", errors);
         FieldValidator.validateOptionalStringField(inputJsonNode, "label", errors, warnings);
 
+        if (!name.isEmpty() && !isValidInputName(name)) {
+            StringUtils.appendWithNewline(
+                prefix +
+                    "Field 'name' must start with a letter or underscore and contain only letters, digits and " +
+                    "underscores",
+                errors);
+        }
+
         if (!inputJsonNode.has("type")) {
             StringUtils.appendWithNewline(prefix + "Missing required field: type", errors);
         } else {
@@ -572,6 +583,49 @@ public class WorkflowValidator {
                     type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
             });
         }
+    }
+
+    public static List<String> getInvalidInputNames(String workflow) {
+        try {
+            return getInvalidInputNames(com.bytechef.commons.util.JsonUtils.readTree(workflow));
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    static List<String> getInvalidInputNames(JsonNode workflowJsonNode) {
+        List<String> invalidInputNames = new ArrayList<>();
+
+        JsonNode inputsJsonNode = workflowJsonNode.get("inputs");
+
+        if (inputsJsonNode == null || !inputsJsonNode.isArray()) {
+            return invalidInputNames;
+        }
+
+        for (JsonNode inputJsonNode : inputsJsonNode) {
+            if (!inputJsonNode.isObject() || !inputJsonNode.has("name")) {
+                continue;
+            }
+
+            JsonNode nameJsonNode = inputJsonNode.get("name");
+
+            if (!nameJsonNode.isString()) {
+                continue;
+            }
+
+            String name = nameJsonNode.asString();
+
+            if (!name.isBlank() && !isValidInputName(name)) {
+                invalidInputNames.add(name);
+            }
+        }
+
+        return invalidInputNames;
+    }
+
+    private static boolean isValidInputName(String name) {
+        return INPUT_NAME_PATTERN.matcher(name)
+            .matches();
     }
 
     public static List<String> getDuplicateNodeNames(String workflow) {

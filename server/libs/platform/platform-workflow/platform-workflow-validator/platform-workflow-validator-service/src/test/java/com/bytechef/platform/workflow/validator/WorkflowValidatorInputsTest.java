@@ -16,9 +16,14 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +52,7 @@ class WorkflowValidatorInputsTest {
                 "description": "Test workflow description",
                 "inputs": [
                     {
-                        "name": "any Name",
+                        "name": "anyName",
                         "label": "any Label",
                         "required": true,
                         "type": "string"
@@ -68,7 +73,7 @@ class WorkflowValidatorInputsTest {
                         "type": "component/v1/action1",
                         "parameters": {
                             "name": "${trigger_1.triggerResult}",
-                            "surname": "${any Name}"
+                            "surname": "${anyName}"
                         }
                     }
                 ]
@@ -531,7 +536,7 @@ class WorkflowValidatorInputsTest {
                 "description": "Test workflow description",
                 "inputs": [
                     {
-                        "name": "any Name",
+                        "name": "anyName",
                         "label": "any Label",
                         "type": "string"
                     }
@@ -550,7 +555,7 @@ class WorkflowValidatorInputsTest {
                         "name": "task_1",
                         "type": "component/v1/action1",
                         "parameters": {
-                            "surname": "${any Name.foo}"
+                            "surname": "${anyName.foo}"
                         }
                     }
                 ]
@@ -577,7 +582,7 @@ class WorkflowValidatorInputsTest {
 
         assertEquals("", errors.toString());
         assertEquals(
-            "[task_1] Property 'any Name.foo' might not exist in the output of 'string'", warnings.toString());
+            "[task_1] Property 'anyName.foo' might not exist in the output of 'string'", warnings.toString());
     }
 
     @Test
@@ -588,7 +593,7 @@ class WorkflowValidatorInputsTest {
                 "description": "",
                 "inputs": [
                     {
-                        "name": "any Name",
+                        "name": "anyName",
                         "label": "any Label",
                         "type": "boolean"
                     }
@@ -608,7 +613,7 @@ class WorkflowValidatorInputsTest {
                         "name": "var_1",
                         "parameters": {
                             "type": "STRING",
-                            "value": "${any Name}"
+                            "value": "${anyName}"
                         },
                         "type": "var/v1/set"
                     }
@@ -649,5 +654,102 @@ class WorkflowValidatorInputsTest {
         // entry in definition order (ARRAY). A boolean input bound into a STRING field is fine - it gets stringified.
         assertEquals("", errors.toString());
         assertEquals("", warnings.toString());
+    }
+
+    @Test
+    void validateWorkflowReportsInvalidInputNameAsError() {
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        WorkflowValidator.validateWorkflow(
+            inputNamesWorkflow("my input"), (taskType, kind) -> List.of(),
+            (taskType, kind, warningsBuilder) -> null, taskType -> null, new HashMap<>(), new HashMap<>(),
+            new HashMap<>(), errors, warnings);
+
+        assertEquals(
+            "[my input] Field 'name' must start with a letter or underscore and contain only letters, digits and " +
+                "underscores",
+            errors.toString()
+                .trim());
+    }
+
+    @Test
+    void getInvalidInputNamesReturnsNamesTheEvaluatorCannotResolve() {
+        assertEquals(
+            List.of("my input", "my-input", "1input", "my.input", "my@input"),
+            WorkflowValidator.getInvalidInputNames(
+                inputNamesWorkflow("my input", "my-input", "1input", "my.input", "my@input")));
+    }
+
+    @Test
+    void getInvalidInputNamesAcceptsLettersDigitsAndUnderscores() {
+        assertEquals(
+            List.of(),
+            WorkflowValidator.getInvalidInputNames(
+                inputNamesWorkflow("myInput", "my_input", "_leading", "input1", "INPUT_2")));
+    }
+
+    @Test
+    void getInvalidInputNamesReturnsEmptyListOnUnparseableWorkflow() {
+        assertEquals(List.of(), WorkflowValidator.getInvalidInputNames("not json"));
+    }
+
+    @Test
+    void validateInputNamesThrowsWithErrorKeyOnInvalidName() {
+        ConfigurationException exception = assertThrows(
+            ConfigurationException.class,
+            () -> inputNamesFacade().validateInputNames(inputNamesWorkflow("my input")));
+
+        assertEquals(WorkflowValidatorErrorType.INVALID_INPUT_NAME.getErrorKey(), exception.getErrorKey());
+
+        assertTrue(exception.getMessage()
+            .contains("my input"));
+    }
+
+    @Test
+    void validateInputNamesPassesWhenNamesAreValid() {
+        assertDoesNotThrow(() -> inputNamesFacade().validateInputNames(inputNamesWorkflow("my_input")));
+    }
+
+    private static WorkflowValidatorFacade inputNamesFacade() {
+        return new WorkflowValidatorFacade() {
+
+            @Override
+            public WorkflowValidationResult validateWorkflow(String workflow) {
+                return new WorkflowValidationResult(List.of(), List.of());
+            }
+
+            @Override
+            public WorkflowValidationResult validateWorkflowById(String workflowId) {
+                return new WorkflowValidationResult(List.of(), List.of());
+            }
+
+            @Override
+            public List<String> getDuplicateNodeNames(String workflow) {
+                return List.of();
+            }
+
+            @Override
+            public List<String> getInvalidInputNames(String workflow) {
+                return WorkflowValidator.getInvalidInputNames(workflow);
+            }
+        };
+    }
+
+    private static String inputNamesWorkflow(String... inputNames) {
+        StringBuilder inputs = new StringBuilder();
+
+        for (String inputName : inputNames) {
+            if (!inputs.isEmpty()) {
+                inputs.append(",");
+            }
+
+            inputs.append("{\"name\": \"")
+                .append(inputName)
+                .append("\", \"label\": \"L\", \"type\": \"string\"}");
+        }
+
+        return "{\"label\": \"L\", \"description\": \"D\", \"inputs\": [" + inputs +
+            "], \"triggers\": [], \"tasks\": []}";
     }
 }
