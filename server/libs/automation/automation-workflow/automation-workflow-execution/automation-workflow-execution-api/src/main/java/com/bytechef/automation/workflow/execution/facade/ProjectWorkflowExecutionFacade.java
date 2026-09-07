@@ -29,6 +29,12 @@ public interface ProjectWorkflowExecutionFacade {
 
     WorkflowExecutionDTO getWorkflowExecution(long id);
 
+    /**
+     * The execution view of a trigger execution that produced no job - a failed webhook or poll - with no job and the
+     * trigger execution filled in.
+     */
+    WorkflowExecutionDTO getTriggerExecutionWorkflowExecution(long triggerExecutionId);
+
     TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId);
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
