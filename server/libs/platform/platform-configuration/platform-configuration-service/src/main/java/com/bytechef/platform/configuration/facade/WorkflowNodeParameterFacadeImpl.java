@@ -202,6 +202,43 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @Override
+    public Map<String, Boolean> getDisplayConditions(
+        String componentName, int componentVersion, String operationName, OperationType operationType,
+        Map<String, ?> parameters) {
+
+        List<? extends BaseProperty> properties = switch (operationType) {
+            case ACTION -> {
+                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+                    componentName, componentVersion, operationName);
+
+                yield actionDefinition.getProperties();
+            }
+            case CLUSTER_ELEMENT -> {
+                ClusterElementDefinition clusterElementDefinition =
+                    clusterElementDefinitionService.getClusterElementDefinition(
+                        componentName, componentVersion, operationName);
+
+                yield clusterElementDefinition.getProperties();
+            }
+            case TRIGGER -> {
+                TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+                    componentName, componentVersion, operationName);
+
+                yield triggerDefinition.getProperties();
+            }
+        };
+
+        WorkflowNodeStructure.OperationType structureOperationType = switch (operationType) {
+            case ACTION -> WorkflowNodeStructure.OperationType.TASK;
+            case CLUSTER_ELEMENT -> WorkflowNodeStructure.OperationType.CLUSTER_ELEMENT;
+            case TRIGGER -> WorkflowNodeStructure.OperationType.TRIGGER;
+        };
+
+        return checkDisplayConditionsAndParameters(
+            "", structureOperationType, parameters, Map.of(), Map.of(), properties, false, Map.of());
+    }
+
+    @Override
     public DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, long environmentId) {

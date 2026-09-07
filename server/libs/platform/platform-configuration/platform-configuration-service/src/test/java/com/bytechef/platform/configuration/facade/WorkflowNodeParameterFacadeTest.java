@@ -1237,6 +1237,48 @@ public class WorkflowNodeParameterFacadeTest {
     }
 
     @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void testGetDisplayConditionsReturnsOnlyConditionsThatHold() {
+        List<StringProperty> properties = List.of(
+            mockRequiredStringProperty("bodyContentJson", "bodyContentType == 'JSON'"),
+            mockRequiredStringProperty("bodyContentXml", "bodyContentType == 'XML'"));
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn((List) properties);
+        when(actionDefinitionService.getActionDefinition("httpClient", 1, "post")).thenReturn(actionDefinition);
+
+        Map<String, Boolean> displayConditions = newFacadeWithSpelEvaluator().getDisplayConditions(
+            "httpClient", 1, "post", WorkflowNodeParameterFacade.OperationType.ACTION,
+            Map.of("bodyContentType", "JSON"));
+
+        assertTrue(displayConditions.get("bodyContentType == 'JSON'"));
+        assertFalse(displayConditions.containsKey("bodyContentType == 'XML'"));
+    }
+
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void testGetDisplayConditionsWithoutParametersEvaluatesNothing() {
+        List<StringProperty> properties = List.of(
+            mockRequiredStringProperty("bodyContentJson", "bodyContentType == 'JSON'"));
+
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        lenient().when(actionDefinition.getProperties())
+            .thenReturn((List) properties);
+        when(actionDefinitionService.getActionDefinition("httpClient", 1, "post")).thenReturn(actionDefinition);
+
+        Map<String, Boolean> displayConditions = newFacadeWithSpelEvaluator().getDisplayConditions(
+            "httpClient", 1, "post", WorkflowNodeParameterFacade.OperationType.ACTION, Map.of());
+
+        assertTrue(displayConditions.isEmpty());
+    }
+
+    @Test
     void testGetTaskWithForkJoinNestedLists() {
         // Given
         String workflowId = "workflow1";
@@ -1498,10 +1540,7 @@ public class WorkflowNodeParameterFacadeTest {
         "rawtypes", "unchecked"
     })
     void testGetWorkflowNodeMissingRequiredPropertiesExcludesHiddenProperties() {
-        WorkflowNodeParameterFacadeImpl facade = new WorkflowNodeParameterFacadeImpl(
-            actionDefinitionService, clusterElementDefinitionService, SpelEvaluator.create(),
-            taskDispatcherDefinitionService, triggerDefinitionService, workflowNodeOutputFacade,
-            workflowService, workflowTestConfigurationService);
+        WorkflowNodeParameterFacadeImpl facade = newFacadeWithSpelEvaluator();
         ArrayProperty messages = mock(ArrayProperty.class);
 
         lenient().when(messages.getName())
@@ -1584,7 +1623,15 @@ public class WorkflowNodeParameterFacadeTest {
             .thenReturn(true);
         lenient().when(property.getDisplayCondition())
             .thenReturn(displayCondition);
+
         return property;
+    }
+
+    private WorkflowNodeParameterFacadeImpl newFacadeWithSpelEvaluator() {
+        return new WorkflowNodeParameterFacadeImpl(
+            actionDefinitionService, clusterElementDefinitionService, SpelEvaluator.create(),
+            taskDispatcherDefinitionService, triggerDefinitionService, workflowNodeOutputFacade,
+            workflowService, workflowTestConfigurationService);
     }
 
     @SuppressWarnings({

@@ -18,6 +18,7 @@ package com.bytechef.platform.configuration.facade;
 
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.ParameterResultDTO;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,6 +32,19 @@ public interface WorkflowNodeParameterFacade {
 
     ParameterResultDTO deleteWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, long environmentId);
+
+    /**
+     * Evaluates an operation's display conditions against a standalone parameter map, with no workflow involved.
+     *
+     * @param parameters the form's current values, which is what the conditions are evaluated against
+     */
+    Map<String, Boolean> getDisplayConditions(
+        String componentName, int componentVersion, String operationName, OperationType operationType,
+        Map<String, ?> parameters);
+
+    enum OperationType {
+        ACTION, CLUSTER_ELEMENT, TRIGGER
+    }
 
     DisplayConditionResultDTO getClusterElementDisplayConditions(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
