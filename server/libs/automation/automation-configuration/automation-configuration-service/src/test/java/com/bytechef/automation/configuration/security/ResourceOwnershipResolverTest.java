@@ -64,14 +64,19 @@ class ResourceOwnershipResolverTest {
      * assertions below describe reality and fail on any <em>new</em> unresolved token. Every entry is a real defect
      * awaiting its own fix, not an exemption.
      *
+     * {@code Connection} and {@code McpServer} were both pinned here, each claimed by an environment resolver while no
+     * ownership resolver answered for it, until {@code ConnectionOwnershipResolver} and {@code McpServerOwnershipResolver}
+     * were added. Before that, the four connection sharing guards in {@code WorkspaceConnectionFacadeImpl} denied even
+     * the owner they name.
+     *
+     * <p>
      * Each entry records the grounds it is pinned on, and both directions of rot are checked, so the map cannot become
      * a permanent exemption: {@link #testEveryPinnedUnresolvedTokenIsStillUnresolved} fails once a resolver exists, and
      * {@link #testEveryPinnedUnresolvedTokenStillHasEveryGroundItIsPinnedOn} fails once any recorded ground no longer
      * holds. Naming the grounds rather than merely "something still references this" is what makes the second check
-     * bite: a token pinned on two independent grounds that loses one keeps the other, so a plain reference check would
-     * stay green while half the exemption's reason had evaporated — and the surviving half would silently re-admit
-     * whatever the lost half was guarding against. Either way the fix is the same one line — correct the grounds, or
-     * remove the entry.
+     * bite: delete a token's guards and it could still be claimed by an environment resolver, so a plain reference
+     * check would stay green while the guard-side exemption lived on to silently re-admit the next guard written for
+     * it. Either way the fix is the same one line — remove the entry.
      */
     private static final Map<String, Set<PinGrounds>> KNOWN_UNRESOLVED_TOKENS = Map.of();
 
@@ -304,9 +309,9 @@ class ResourceOwnershipResolverTest {
 
     /**
      * The other direction a pin rots in. {@link #testEveryPinnedUnresolvedTokenIsStillUnresolved} catches the entry
-     * whose resolver arrived; this one catches the entry whose recorded reason for existing went away. Without it, the
-     * four {@code 'Connection'} guards could be deleted outright and the guard-side exemption would live on, ready to
-     * silently re-admit the next guard someone writes for that token.
+     * whose resolver arrived; this one catches the entry whose recorded reason for existing went away. Without it, a
+     * pinned token's guards could be deleted outright and the guard-side exemption would live on, ready to silently
+     * re-admit the next guard someone writes for that token.
      */
     @Test
     void testEveryPinnedUnresolvedTokenStillHasEveryGroundItIsPinnedOn() {
