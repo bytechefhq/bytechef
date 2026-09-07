@@ -33,23 +33,26 @@ export const FormulaMode = Extension.create<FormulaModeOptionsI>({
         };
     },
     addKeyboardShortcuts() {
-        return {
-            Backspace: () => {
-                const hasNoContent = this.editor.state.doc.textContent.trim() === '';
-                const currentFormulaMode = this.options.getIsFormulaMode?.() ?? this.storage.isFormulaMode;
+        const exitWhenEmptied = () => {
+            const hasNoContent = this.editor.state.doc.textContent.trim() === '';
+            const currentFormulaMode = this.options.getIsFormulaMode?.() ?? this.storage.isFormulaMode;
 
-                if (hasNoContent && currentFormulaMode) {
-                    this.options.setIsFormulaMode(false);
+            if (hasNoContent && currentFormulaMode) {
+                this.options.setIsFormulaMode(false);
 
-                    this.storage.isFormulaMode = false;
+                this.storage.isFormulaMode = false;
 
-                    if (this.options.saveNullValue) {
-                        this.options.saveNullValue();
-                    }
+                if (this.options.saveNullValue) {
+                    this.options.saveNullValue();
                 }
+            }
 
-                return false;
-            },
+            return false;
+        };
+
+        return {
+            Backspace: exitWhenEmptied,
+            Delete: exitWhenEmptied,
         };
     },
     addOptions() {

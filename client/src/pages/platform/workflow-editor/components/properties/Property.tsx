@@ -86,6 +86,7 @@ const Property = ({
         controlledBlurError,
         controlledDynamicMode,
         controlledDynamicOnChangeRef,
+        controlledExpressionExitRef,
         controlledFromAi,
         currentNode,
         defaultValue,
@@ -167,6 +168,8 @@ const Property = ({
     const clusterElementContext = useClusterElementContext();
 
     const formDisplayConditions = useFormDisplayConditionsContext();
+
+    const requiredRule = required ? ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED : false;
 
     if (hidden && !control) {
         return <></>;
@@ -368,10 +371,7 @@ const Property = ({
                                             fieldOnChange(reconstructControlledExpressionValue(value))
                                         }
                                         path={calculatedPath}
-                                        placeholder={getMentionsInputPlaceholder({
-                                            expressionEnabled,
-                                            toolProperty: isToolsClusterElement,
-                                        })}
+                                        placeholder={placeholder}
                                         required={required}
                                         setIsFormulaMode={() => {}}
                                         showInputTypeSwitchButton
@@ -381,7 +381,7 @@ const Property = ({
                                     />
                                 );
                             }}
-                            rules={{required}}
+                            rules={{required: requiredRule}}
                         />
                     )}
 
@@ -481,10 +481,24 @@ const Property = ({
 
                                     const {onChange: fieldOnChange, ...fieldRest} = field;
 
+                                    let inputPlaceholder =
+                                        placeholder || `Type ${isNumericalInput ? 'a number' : 'something'}...`;
+
+                                    if (isNumericalInput && minValue && maxValue) {
+                                        inputPlaceholder = `From ${minValue} to ${maxValue}`;
+                                    } else if (showFromAi) {
+                                        inputPlaceholder = getMentionsInputPlaceholder({
+                                            expressionEnabled,
+                                            placeholder,
+                                            toolProperty: true,
+                                        });
+                                    }
+
                                     return (
                                         <>
                                             {showFromAi && (isExpressionMode || isFieldFromAi) ? (
                                                 <PropertyMentionsInput
+                                                    autoFocus={displayValue === '='}
                                                     controlType={controlType || 'TEXT'}
                                                     deletePropertyButton={deletePropertyButton}
                                                     description={description}
@@ -503,12 +517,15 @@ const Property = ({
                                                         fieldOnChange(reconstructControlledExpressionValue(value))
                                                     }
                                                     path={calculatedPath}
-                                                    placeholder={getMentionsInputPlaceholder({
-                                                        expressionEnabled,
-                                                        toolProperty: true,
-                                                    })}
+                                                    placeholder={placeholder}
                                                     required={required}
-                                                    setIsFormulaMode={() => {}}
+                                                    setIsFormulaMode={(formulaMode) => {
+                                                        if (!formulaMode) {
+                                                            controlledExpressionExitRef.current = true;
+
+                                                            fieldOnChange('');
+                                                        }
+                                                    }}
                                                     toolProperty
                                                     type={type}
                                                     value={displayValue}
@@ -516,6 +533,7 @@ const Property = ({
                                             ) : (
                                                 <PropertyInput
                                                     {...fieldRest}
+                                                    autoFocus={controlledExpressionExitRef.current}
                                                     deletePropertyButton={deletePropertyButton}
                                                     description={description}
                                                     disabled={isFieldFromAi}
@@ -574,12 +592,7 @@ const Property = ({
                                                             resolveExpressionValue(event.target.value, field.value)
                                                         );
                                                     }}
-                                                    placeholder={
-                                                        isNumericalInput && minValue && maxValue
-                                                            ? `From ${minValue} to ${maxValue}`
-                                                            : placeholder ||
-                                                              `Type ${isNumericalInput ? 'a number' : 'something'}...`
-                                                    }
+                                                    placeholder={inputPlaceholder}
                                                     required={required}
                                                     showInputTypeSwitchButton={showControlledSwitch}
                                                     title={type}
@@ -640,14 +653,17 @@ const Property = ({
                                 control={control}
                                 defaultValue={defaultValue}
                                 name={calculatedPath}
-                                render={({field: {name: fieldName, onBlur, onChange, value: fieldValue}}) => (
+                                render={({
+                                    field: {name: fieldName, onBlur, onChange, value: fieldValue},
+                                    fieldState,
+                                }) => (
                                     <PropertyComboBox
                                         arrayIndex={arrayIndex}
                                         defaultValue={defaultValue}
                                         deletePropertyButton={deletePropertyButton}
                                         description={description}
-                                        error={hasError}
-                                        errorMessage={errorMessage}
+                                        error={!!fieldState.error || hasError}
+                                        errorMessage={fieldState.error?.message || errorMessage}
                                         handleInputTypeSwitchButtonClick={() => {
                                             onChange('=');
                                             handleControlledModeSwitch(true);
@@ -678,7 +694,7 @@ const Property = ({
                                         workflowNodeName={currentNode?.name ?? ''}
                                     />
                                 )}
-                                rules={{required}}
+                                rules={{required: requiredRule}}
                             />
                         )}
 
@@ -715,7 +731,7 @@ const Property = ({
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                     />
                                 )}
-                                rules={{required}}
+                                rules={{required: requiredRule}}
                             />
                         )}
 
@@ -724,19 +740,19 @@ const Property = ({
                             control={control}
                             defaultValue={defaultValue}
                             name={calculatedPath}
-                            render={({field}) => (
+                            render={({field, fieldState}) => (
                                 <PropertyTextArea
                                     deletePropertyButton={deletePropertyButton}
                                     description={description}
-                                    error={hasError}
-                                    errorMessage={errorMessage}
+                                    error={!!fieldState.error || hasError}
+                                    errorMessage={fieldState.error?.message || errorMessage}
                                     label={label || name}
                                     leadingIcon={typeIcon}
                                     required={required}
                                     {...field}
                                 />
                             )}
-                            rules={{required}}
+                            rules={{required: requiredRule}}
                         />
                     )}
 
@@ -768,7 +784,7 @@ const Property = ({
                                     workflowId={workflow.id!}
                                 />
                             )}
-                            rules={{required}}
+                            rules={{required: requiredRule}}
                         />
                     )}
 

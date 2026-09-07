@@ -20,8 +20,16 @@ describe('getMentionsInputPlaceholder', () => {
         );
     });
 
-    it('prefers an explicit placeholder over the tool-property default', () => {
+    // The property's placeholder says what the value should look like, which neither generic hint can, so a
+    // tool property that defines one keeps it.
+    it('keeps a defined placeholder over the tool-property hint', () => {
         expect(getMentionsInputPlaceholder({expressionEnabled: true, placeholder: 'Custom', toolProperty: true})).toBe(
+            'Custom'
+        );
+    });
+
+    it('keeps a defined placeholder for a plain property', () => {
+        expect(getMentionsInputPlaceholder({expressionEnabled: true, placeholder: 'Custom', toolProperty: false})).toBe(
             'Custom'
         );
     });
@@ -50,7 +58,8 @@ describe('getMentionsInputPlaceholder', () => {
         expect(TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER.startsWith('=')).toBe(false);
     });
 
-    it('still prefers an explicit placeholder in formula mode', () => {
+    // Formula mode is the exception: the property's placeholder describes a value the field no longer holds.
+    it('keeps the formula-mode hint over a defined placeholder', () => {
         expect(
             getMentionsInputPlaceholder({
                 expressionEnabled: true,
@@ -58,6 +67,15 @@ describe('getMentionsInputPlaceholder', () => {
                 placeholder: 'Custom',
                 toolProperty: true,
             })
-        ).toBe('Custom');
+        ).toBe(TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER);
+
+        expect(
+            getMentionsInputPlaceholder({
+                expressionEnabled: true,
+                formulaMode: true,
+                placeholder: 'Custom',
+                toolProperty: false,
+            })
+        ).toBe(FORMULA_MODE_PLACEHOLDER);
     });
 });

@@ -47,6 +47,7 @@ import {
 import {useEvaluatorFunctionDefinitions} from './useEvaluatorFunctionDefinitions';
 
 interface PropertyMentionsInputEditorProps {
+    autoFocus?: boolean;
     className?: string;
     componentDefinitions: ComponentDefinitionBasic[];
     controlType?: string;
@@ -75,6 +76,7 @@ interface PropertyMentionsInputEditorProps {
 const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEditorProps>(
     (
         {
+            autoFocus,
             className,
             componentDefinitions,
             controlType,
@@ -112,10 +114,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
         const editorValueRef = useRef(editorValue);
         const isFocusedRef = useRef(false);
+        const autoFocusAppliedRef = useRef(false);
         const isFormulaModeRef = useRef(isFormulaMode);
+        const setIsFormulaModeRef = useRef(setIsFormulaMode);
+        const restoreFocusAfterExitRef = useRef(false);
 
         editorValueRef.current = editorValue;
         isFormulaModeRef.current = isFormulaMode;
+        setIsFormulaModeRef.current = setIsFormulaMode;
 
         const {currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
@@ -143,7 +149,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
                 FormulaMode.configure({
                     getIsFormulaMode: () => isFormulaModeRef.current ?? false,
-                    initialFormulaMode: isFormulaMode ?? false,
+                    initialFormulaMode: isFormulaModeRef.current ?? false,
                     saveNullValue: () => {
                         if (
                             !workflow.id ||
@@ -165,7 +171,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                             workflowId,
                         });
                     },
-                    setIsFormulaMode: setIsFormulaMode || (() => {}),
+                    setIsFormulaMode: (value: boolean) => {
+                        restoreFocusAfterExitRef.current = !value;
+
+                        setIsFormulaModeRef.current?.(value);
+                    },
                 }),
                 MentionStorage,
                 ...(expressionEnabled !== false ? [FunctionSuggestion, FunctionSignature] : []),
@@ -263,14 +273,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             return extensions;
-            // eslint-disable-next-line react-hooks/exhaustive-deps -- isFormulaMode intentionally omitted to avoid editor recreation on toggle
         }, [
             controlType,
             expressionEnabled,
             getComponentIcon,
             path,
             placeholder,
-            setIsFormulaMode,
             toolProperty,
             type,
             updateClusterElementParameterMutation,
@@ -508,7 +516,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     class: twMerge(
                         'w-full max-w-full min-w-0 border-none text-sm wrap-break-word break-all whitespace-pre-wrap ring-0 outline-hidden',
                         controlType === 'RICH_TEXT' && 'prose prose-sm',
-                        isFormulaMode && 'font-mono text-xs/5',
+                        isFormulaMode && 'font-mono text-[13px]/5',
                         className
                     ),
                     id: elementId ?? '',
@@ -572,6 +580,38 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         useEffect(() => {
             editorRef.current = editor;
         }, [editor]);
+
+        useEffect(() => {
+            if (!editor || !restoreFocusAfterExitRef.current) {
+                return;
+            }
+
+            restoreFocusAfterExitRef.current = false;
+
+            const timeoutId = setTimeout(() => {
+                editor.view.dom.focus({preventScroll: true});
+
+                editor.commands.focus('end');
+            }, 50);
+
+            return () => clearTimeout(timeoutId);
+        }, [editor, isFormulaMode]);
+
+        useEffect(() => {
+            if (!editor || !autoFocus || autoFocusAppliedRef.current) {
+                return;
+            }
+
+            autoFocusAppliedRef.current = true;
+
+            const timeoutId = setTimeout(() => {
+                editor.view.dom.focus({preventScroll: true});
+
+                editor.commands.focus('end');
+            }, 50);
+
+            return () => clearTimeout(timeoutId);
+        }, [autoFocus, editor]);
 
         useEffect(() => {
             if (!ref) {
@@ -671,7 +711,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         return (
             <>
                 {isFromAi ? (
-                    <div className="flex w-full items-center px-2 py-[0.44rem] text-sm font-medium text-muted-foreground italic">
+                    <div className="flex w-full items-center px-2 py-2 text-sm font-medium text-muted-foreground italic">
                         Automatically defined by the model
                     </div>
                 ) : (
