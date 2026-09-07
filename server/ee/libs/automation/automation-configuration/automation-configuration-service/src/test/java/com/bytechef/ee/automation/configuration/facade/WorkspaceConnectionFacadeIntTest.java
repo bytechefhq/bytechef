@@ -56,13 +56,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -165,9 +166,7 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-    })
+    @MethodSource("gatedMethods")
     void testGateAllowsTheConnectionOwner(String methodName) {
         authenticate(OWNER_LOGIN, AuthorityConstants.USER);
 
@@ -175,9 +174,7 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-    })
+    @MethodSource("gatedMethods")
     void testGateAllowsAWorkspaceAdminWhoIsNotTheOwner(String methodName) {
         authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
 
@@ -185,9 +182,7 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-    })
+    @MethodSource("gatedMethods")
     void testGateDeniesAnOrdinaryWorkspaceMember(String methodName) {
         authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
 
@@ -195,9 +190,7 @@ class WorkspaceConnectionFacadeIntTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-        "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-    })
+    @MethodSource("gatedMethods")
     void testGateAllowsATenantAdmin(String methodName) {
         authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
 
@@ -214,7 +207,7 @@ class WorkspaceConnectionFacadeIntTest {
             .toList();
 
         assertThat(annotatedMethods)
-            .as("a gate added to the facade must be added to the parameter lists above, or it goes unevaluated")
+            .as("a gate added to the facade must be added to GATED_METHODS, or it goes unevaluated")
             .containsExactlyInAnyOrder(GATED_METHODS);
     }
 
@@ -227,9 +220,7 @@ class WorkspaceConnectionFacadeIntTest {
     class WithoutOwnershipResolver {
 
         @ParameterizedTest
-        @ValueSource(strings = {
-            "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-        })
+        @MethodSource("com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacadeIntTest#gatedMethods")
         void testGateDeniesTheConnectionOwner(String methodName) {
             authenticate(OWNER_LOGIN, AuthorityConstants.USER);
 
@@ -237,9 +228,7 @@ class WorkspaceConnectionFacadeIntTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-            "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-        })
+        @MethodSource("com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacadeIntTest#gatedMethods")
         void testGateDeniesAWorkspaceAdmin(String methodName) {
             authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
 
@@ -247,14 +236,16 @@ class WorkspaceConnectionFacadeIntTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {
-            "setConnectionVisibility", "grantConnectionAccess", "revokeConnectionAccess", "getConnectionGrants"
-        })
+        @MethodSource("com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacadeIntTest#gatedMethods")
         void testGateAllowsATenantAdmin(String methodName) {
             authenticate(TENANT_ADMIN_LOGIN, AuthorityConstants.ADMIN);
 
             assertBodyReached(() -> invokeGatedMethod(methodName));
         }
+    }
+
+    private static Stream<String> gatedMethods() {
+        return Arrays.stream(GATED_METHODS);
     }
 
     private void invokeGatedMethod(String methodName) {
