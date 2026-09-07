@@ -206,10 +206,6 @@ public class MicrosoftExcelUtils {
         throw new IllegalStateException("Failed to get last used row");
     }
 
-    /**
-     * Fetches every row currently in the worksheet's used range in a single request. Used by the v2 New Row trigger to
-     * iterate rows with stable 1-based row indices.
-     */
     public static List<List<Object>> getUsedRangeValues(Parameters inputParameters, Context context) {
         Map<String, Object> body = context
             .http(http -> http.get("/me/drive/items/%s/workbook/worksheets/%s/usedRange"
@@ -235,11 +231,19 @@ public class MicrosoftExcelUtils {
     public static Map<String, Object> getMapOfValuesForRow(
         Parameters inputParameters, Context context, List<Object> row) {
 
+        List<Object> firstRow = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)
+            ? MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, 1)
+            : List.of();
+
+        return getMapOfValuesForRow(inputParameters, firstRow, row);
+    }
+
+    public static Map<String, Object> getMapOfValuesForRow(
+        Parameters inputParameters, List<Object> firstRow, List<Object> row) {
+
         Map<String, Object> valuesMap;
 
         if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
-            List<Object> firstRow = MicrosoftExcelRowUtils.getRowFromWorksheet(inputParameters, context, 1);
-
             valuesMap = IntStream.range(0, row.size())
                 .boxed()
                 .collect(

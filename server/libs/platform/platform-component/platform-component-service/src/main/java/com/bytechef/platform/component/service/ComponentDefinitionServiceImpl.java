@@ -40,6 +40,7 @@ import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -134,10 +135,11 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         List<ComponentDefinition> componentDefinitions = this.cachedComponentDefinitions;
 
         if (componentDefinitions == null) {
-            componentDefinitions = componentDefinitionRegistry.getStaticComponentDefinitions()
-                .stream()
-                .map(ComponentDefinition::new)
-                .toList();
+            componentDefinitions = filterLatestVersions(
+                componentDefinitionRegistry.getStaticComponentDefinitions()
+                    .stream()
+                    .map(ComponentDefinition::new)
+                    .toList());
 
             this.cachedComponentDefinitions = componentDefinitions;
         }
@@ -243,6 +245,18 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public boolean hasComponentDefinition(String name, @Nullable Integer version) {
         return componentDefinitionRegistry.hasComponentDefinition(name, version);
+    }
+
+    private static List<ComponentDefinition> filterLatestVersions(List<ComponentDefinition> componentDefinitions) {
+        Map<String, ComponentDefinition> latestComponentDefinitions = new LinkedHashMap<>();
+
+        for (ComponentDefinition componentDefinition : componentDefinitions) {
+            latestComponentDefinitions.merge(
+                componentDefinition.getName(), componentDefinition,
+                (first, second) -> first.getVersion() >= second.getVersion() ? first : second);
+        }
+
+        return List.copyOf(latestComponentDefinitions.values());
     }
 
     private static Predicate<ComponentDefinition> filter(

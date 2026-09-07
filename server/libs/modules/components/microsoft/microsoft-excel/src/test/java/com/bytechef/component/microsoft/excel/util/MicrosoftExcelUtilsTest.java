@@ -396,7 +396,7 @@ class MicrosoftExcelUtilsTest {
     }
 
     @Test
-    void testGetUsedRangeValuesWithEmptySheet(
+    void testGetUsedRangeValuesOnEmptyWorksheet(
         Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp) {
 
         mockedParameters = MockParametersFactory.create(Map.of(WORKBOOK_ID, 1, WORKSHEET_NAME, "test"));
@@ -404,11 +404,11 @@ class MicrosoftExcelUtilsTest {
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("rowCount", 0));
+            .thenReturn(Map.of("rowCount", 1, VALUES, List.of(List.of(""))));
 
         List<List<Object>> result = MicrosoftExcelUtils.getUsedRangeValues(mockedParameters, mockedContext);
 
-        assertEquals(List.of(), result);
+        assertEquals(List.of(List.of("")), result);
     }
 
     @Test

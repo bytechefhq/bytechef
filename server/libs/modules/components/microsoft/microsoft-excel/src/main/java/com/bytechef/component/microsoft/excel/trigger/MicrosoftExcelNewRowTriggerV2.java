@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.excel.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME;
@@ -28,26 +29,25 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.microsoft.excel.util.MicrosoftExcelRowDiffUtils;
 import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Anshul Goel
  */
 public class MicrosoftExcelNewRowTriggerV2 {
 
-    private static final String KNOWN_ROW_IDS = "knownRowIds";
+    private static final String KNOWN_ROW_HASHES = "knownRowHashes";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
         .description(
-            "Triggers when a new row is added. Tracks rows by 1-based worksheet row index so editing an existing row " +
-                "does not fire the trigger again.")
+            "Triggers when a new row is added. Rows are tracked by their content, so a row inserted in the " +
+                "middle of the worksheet is reported and editing an existing row does not fire the trigger.")
         .help("", "https://docs.bytechef.io/reference/components/microsoft-excel_v2#new-row")
         .type(TriggerType.POLLING)
         .properties(
@@ -76,28 +76,34 @@ public class MicrosoftExcelNewRowTriggerV2 {
 
         List<List<Object>> rows = MicrosoftExcelUtils.getUsedRangeValues(inputParameters, context);
 
-        Set<Integer> knownRowIds = new HashSet<>(
-            closureParameters.getList(KNOWN_ROW_IDS, Integer.class, List.of()));
+        boolean firstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
-        List<Integer> currentRowIds = new ArrayList<>();
-        List<Map<String, Object>> newRows = new ArrayList<>();
+        int firstDataRowIndex = firstRowHeader ? 1 : 0;
 
-        for (int i = 0; i < rows.size(); i++) {
-            List<Object> row = rows.get(i);
+        List<Object> headerRow = firstRowHeader && !rows.isEmpty() ? rows.getFirst() : List.of();
 
-            if (row.isEmpty()) {
+        List<List<Object>> dataRows = new ArrayList<>();
+        List<String> currentRowHashes = new ArrayList<>();
+
+        for (int index = firstDataRowIndex; index < rows.size(); index++) {
+            List<Object> row = rows.get(index);
+
+            if (MicrosoftExcelRowDiffUtils.isBlankRow(row)) {
                 continue;
             }
 
-            int rowId = i + 1;
-
-            currentRowIds.add(rowId);
-
-            if (!knownRowIds.contains(rowId)) {
-                newRows.add(MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, context, row));
-            }
+            dataRows.add(row);
+            currentRowHashes.add(MicrosoftExcelRowDiffUtils.getRowHash(row));
         }
 
-        return new PollOutput(newRows, Map.of(KNOWN_ROW_IDS, currentRowIds), false);
+        List<String> knownRowHashes = closureParameters.getList(KNOWN_ROW_HASHES, String.class, List.of());
+
+        List<Map<String, Object>> newRows = new ArrayList<>();
+
+        for (int index : MicrosoftExcelRowDiffUtils.getInsertedRowIndexes(knownRowHashes, currentRowHashes)) {
+            newRows.add(MicrosoftExcelUtils.getMapOfValuesForRow(inputParameters, headerRow, dataRows.get(index)));
+        }
+
+        return new PollOutput(newRows, Map.of(KNOWN_ROW_HASHES, currentRowHashes), false);
     }
 }
