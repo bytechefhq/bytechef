@@ -1,4 +1,12 @@
 extend type Query {
+    componentPropertyDisplayConditions(
+        componentName: String!
+        componentVersion: Int!
+        operationName: String!
+        operationType: ComponentOperationType!
+        parameters: Map
+    ): Map!
+
     clusterElementMissingRequiredProperties(
         workflowId: String!
         workflowNodeName: String!
@@ -10,4 +18,10 @@ extend type Query {
         workflowId: String!
         workflowNodeName: String!
     ): [String!]!
+}
+
+enum ComponentOperationType {
+    ACTION
+    CLUSTER_ELEMENT
+    TRIGGER
 }
