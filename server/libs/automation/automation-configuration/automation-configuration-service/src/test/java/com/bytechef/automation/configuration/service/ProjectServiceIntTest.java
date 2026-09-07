@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
@@ -231,6 +232,17 @@ public class ProjectServiceIntTest {
             .hasFieldOrPropertyWithValue("description", "description2")
             .hasFieldOrPropertyWithValue("name", "name2")
             .hasFieldOrPropertyWithValue("tagIds", List.of(tag.getId()));
+    }
+
+    @Test
+    public void testGetProjectsFilteredByStatusWithoutApiCollections() {
+        Project project = projectRepository.save(getProject());
+
+        List<Project> projects = projectService.getProjects(null, null, null, null, Status.DRAFT, null);
+
+        assertThat(projects)
+            .extracting(Project::getId)
+            .contains(project.getId());
     }
 
     private Project getProject() {
