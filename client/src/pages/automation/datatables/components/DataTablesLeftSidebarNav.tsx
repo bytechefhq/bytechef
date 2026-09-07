@@ -5,10 +5,6 @@ import {TagIcon} from 'lucide-react';
 const DataTablesLeftSidebarNav = () => {
     const {isLoading, tagId, tags} = useDataTablesLeftSidebarNav();
 
-    if (isLoading) {
-        return <></>;
-    }
-
     return (
         <LeftSidebarNav
             body={
@@ -31,6 +27,7 @@ const DataTablesLeftSidebarNav = () => {
                     )}
                 </>
             }
+            loading={isLoading}
             title="Tags"
         />
     );

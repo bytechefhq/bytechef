@@ -25,7 +25,7 @@ const DataTableLeftSidebar = ({currentId}: Props) => {
             </div>
 
             <div className="flex-1 overflow-y-auto">
-                <PageLoader errors={[error]} loading={isLoading}>
+                <PageLoader errors={[error]} loading={false}>
                     <LeftSidebarNav
                         body={
                             <>
@@ -54,6 +54,7 @@ const DataTableLeftSidebar = ({currentId}: Props) => {
                                 )}
                             </>
                         }
+                        loading={isLoading}
                     />
                 </PageLoader>
             </div>

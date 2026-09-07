@@ -13,6 +13,7 @@ import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/provide
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -138,61 +139,34 @@ const IntegrationInstanceConfigurations = () => {
             }
             leftSidebarBody={
                 <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: !filterData?.id && filterData.type === Type.Integration,
-                                        name: 'All Integrations',
-                                    }}
-                                />
-
-                                {componentDefinitions &&
-                                    integrations &&
-                                    integrations?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            item={{
-                                                current:
-                                                    filterData?.id === item.id && filterData.type === Type.Integration,
-                                                id: item.id,
-                                                name:
-                                                    componentDefinitions.find(
-                                                        (componentDefinition) =>
-                                                            componentDefinition.name === item.componentName!
-                                                    )?.title ?? '',
-                                            }}
-                                            key={item.id}
-                                            toLink={`?integrationId=${item.id}`}
-                                        />
-                                    ))}
-                            </>
-                        }
+                    <LeftSidebarFilterNav
+                        items={(componentDefinitions ? (integrations ?? []) : []).map((integration) => ({
+                            current: filterData?.id === integration.id && filterData.type === Type.Integration,
+                            id: integration.id!,
+                            name:
+                                componentDefinitions?.find(
+                                    (componentDefinition) => componentDefinition.name === integration.componentName!
+                                )?.title ?? '',
+                            toLink: `?integrationId=${integration.id}`,
+                        }))}
+                        leadItem={{
+                            current: !filterData?.id && filterData.type === Type.Integration,
+                            name: 'All Integrations',
+                        }}
+                        loading={componentDefinitionsLoading || integrationsLoading}
                         title="Integrations"
                     />
 
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {!tagsIsLoading &&
-                                    (tags && !!tags.length ? (
-                                        tags?.map((item) => (
-                                            <LeftSidebarNavItem
-                                                icon={<TagIcon className="mr-1 size-4" />}
-                                                item={{
-                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
-                                                    id: item.id!,
-                                                    name: item.name,
-                                                }}
-                                                key={item.id}
-                                                toLink={`?tagId=${item.id}`}
-                                            />
-                                        ))
-                                    ) : (
-                                        <span className="px-3 text-xs">No defined tags.</span>
-                                    ))}
-                            </>
-                        }
+                    <LeftSidebarFilterNav
+                        emptyMessage="No defined tags."
+                        icon={<TagIcon className="mr-1 size-4" />}
+                        items={(tags ?? []).map((tag) => ({
+                            current: filterData?.id === tag.id && filterData.type === Type.Tag,
+                            id: tag.id!,
+                            name: tag.name,
+                            toLink: `?tagId=${tag.id}`,
+                        }))}
+                        loading={tagsIsLoading}
                         title="Tags"
                     />
 

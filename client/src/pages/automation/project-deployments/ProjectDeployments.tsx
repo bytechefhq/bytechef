@@ -9,7 +9,7 @@ import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/provide
 import ReadOnlyWorkflowSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import LeftSidebarFilterNav from '@/shared/layout/LeftSidebarFilterNav';
 import {ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
@@ -152,56 +152,31 @@ const ProjectDeployments = () => {
             }
             leftSidebarBody={
                 <>
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                <LeftSidebarNavItem
-                                    item={{
-                                        current: !filterData?.id && filterData.type === Type.Project,
-                                        name: 'All Projects',
-                                    }}
-                                    toLink=""
-                                />
-
-                                {projects &&
-                                    projects?.map((item) => (
-                                        <LeftSidebarNavItem
-                                            item={{
-                                                current: filterData?.id === item.id && filterData.type === Type.Project,
-                                                id: item.id,
-                                                name: item.name,
-                                            }}
-                                            key={item.name}
-                                            toLink={`?projectId=${item.id}`}
-                                        />
-                                    ))}
-                            </>
-                        }
+                    <LeftSidebarFilterNav
+                        items={(projects ?? []).map((project) => ({
+                            current: filterData?.id === project.id && filterData.type === Type.Project,
+                            id: project.id!,
+                            name: project.name,
+                            toLink: `?projectId=${project.id}`,
+                        }))}
+                        leadItem={{
+                            current: !filterData?.id && filterData.type === Type.Project,
+                            name: 'All Projects',
+                        }}
+                        loading={projectsIsLoading}
                         title="Projects"
                     />
 
-                    <LeftSidebarNav
-                        body={
-                            <>
-                                {!tagsIsLoading &&
-                                    (tags && !!tags.length ? (
-                                        tags?.map((item) => (
-                                            <LeftSidebarNavItem
-                                                icon={<TagIcon className="mr-1 size-4" />}
-                                                item={{
-                                                    current: filterData?.id === item.id && filterData.type === Type.Tag,
-                                                    id: item.id!,
-                                                    name: item.name,
-                                                }}
-                                                key={item.id}
-                                                toLink={`?tagId=${item.id}`}
-                                            />
-                                        ))
-                                    ) : (
-                                        <span className="px-3 text-xs">No defined tags.</span>
-                                    ))}
-                            </>
-                        }
+                    <LeftSidebarFilterNav
+                        emptyMessage="No defined tags."
+                        icon={<TagIcon className="mr-1 size-4" />}
+                        items={(tags ?? []).map((tag) => ({
+                            current: filterData?.id === tag.id && filterData.type === Type.Tag,
+                            id: tag.id!,
+                            name: tag.name,
+                            toLink: `?tagId=${tag.id}`,
+                        }))}
+                        loading={tagsIsLoading}
                         title="Tags"
                     />
                 </>

@@ -20,14 +20,14 @@ const ApiClients = () => {
 
     const {data: apiKeys, error: apiKeysError, isLoading: apiKeysLoading} = useGetApiClientsQuery();
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({
+    const {data: projects, isLoading: projectsIsLoading} = useGetWorkspaceProjectsQuery({
         apiCollections: true,
         id: currentWorkspaceId!,
         includeAllFields: false,
         projectDeployments: true,
     });
 
-    const {data: tags} = useGetApiCollectionTagsQuery();
+    const {data: tags, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery();
 
     return (
         <PageLoader errors={[apiKeysError]} loading={apiKeysLoading}>
@@ -43,7 +43,14 @@ const ApiClients = () => {
                         title="API Clients"
                     />
                 }
-                leftSidebarBody={<ApiPlatformLeftSidebarNav projects={projects} tags={tags} />}
+                leftSidebarBody={
+                    <ApiPlatformLeftSidebarNav
+                        projects={projects}
+                        projectsIsLoading={projectsIsLoading}
+                        tags={tags}
+                        tagsIsLoading={tagsIsLoading}
+                    />
+                }
                 leftSidebarHeader={<Header title="API Collections" />}
                 leftSidebarWidth="64"
             >

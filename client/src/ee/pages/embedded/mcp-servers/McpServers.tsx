@@ -60,7 +60,11 @@ const McpServers = () => {
                 />
             }
             leftSidebarBody={
-                <McpServersLeftSidebarNav allComponentNames={allComponentNames} validMcpServerIds={validMcpServerIds} />
+                <McpServersLeftSidebarNav
+                    allComponentNames={allComponentNames}
+                    mcpServersIsLoading={mcpServersIsLoading}
+                    validMcpServerIds={validMcpServerIds}
+                />
             }
             leftSidebarHeader={<Header position="sidebar" title="MCP Servers" />}
             leftSidebarWidth="64"

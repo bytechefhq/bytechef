@@ -7,8 +7,8 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
-import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -154,7 +154,18 @@ const Projects = () => {
                     />
                 )
             }
-            leftSidebarBody={<ProjectsLeftSidebarNav categories={categories} filterData={filterData} tags={tags} />}
+            leftSidebarBody={
+                <CategoryTagLeftSidebarNav
+                    categories={categories}
+                    categoriesIsLoading={categoriesIsLoading}
+                    currentCategoryId={categoryId ? parseInt(categoryId) : undefined}
+                    currentTagId={tagId ? parseInt(tagId) : undefined}
+                    tags={tags}
+                    tagsClassName="mb-0"
+                    tagsEmptyMessage="No defined tags."
+                    tagsIsLoading={tagsIsLoading}
+                />
+            }
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}
             leftSidebarWidth="64"
         >
