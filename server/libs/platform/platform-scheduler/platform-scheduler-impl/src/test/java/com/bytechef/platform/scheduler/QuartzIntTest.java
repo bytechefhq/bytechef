@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.scheduler;
 
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.CONNECTION_ID;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzJdbcTestConfiguration;
@@ -175,8 +178,8 @@ public class QuartzIntTest {
         quartzTriggerScheduler.scheduleDynamicWebhookTriggerRefresh(
             webhookExpirationDate, componentName, componentVersion, workflowExecutionId, connectionId);
 
-        JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger");
-        TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger");
+        JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
+        TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
 
         // Then: Verify JobDataMap and trigger are loaded correctly
         // THIS WILL FAIL in Quartz 2.5.1 with PostgreSQL
@@ -190,7 +193,7 @@ public class QuartzIntTest {
         Assertions.assertEquals(workflowExecutionId.toString(),
             jobDataMap.getString("workflowExecutionId"), "WorkflowExecutionId should be in JobDataMap");
         Assertions.assertEquals(
-            connectionId, jobDataMap.getLong("connectionId"), "ConnectionId should be in JobDataMap");
+            connectionId, jobDataMap.get(CONNECTION_ID), "ConnectionId should be in JobDataMap");
 
         // Retrieve SimpleTrigger - THIS FAILS in Quartz 2.5.1
         Trigger retrievedTrigger = scheduler.getTrigger(triggerKey);

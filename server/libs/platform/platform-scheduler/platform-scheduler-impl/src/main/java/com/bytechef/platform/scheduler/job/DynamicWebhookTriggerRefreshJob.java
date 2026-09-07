@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.scheduler.job;
 
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.CONNECTION_ID;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
@@ -55,7 +58,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
 
         String workflowExecutionId = jobDataMap.getString("workflowExecutionId");
-        Long connectionId = jobDataMap.getLong("connectionID");
+        Long connectionId = (Long) jobDataMap.get(CONNECTION_ID);
 
         Instant webhookExpirationDate = refreshDynamicWebhookTrigger(
             WorkflowExecutionId.parse(workflowExecutionId), connectionId);
@@ -63,7 +66,7 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
         if (webhookExpirationDate != null) {
             Scheduler scheduler = context.getScheduler();
             try {
-                TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId, "DynamicWebhookTriggerRefresh");
+                TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId, DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
 
                 scheduler.rescheduleJob(
                     triggerKey,
