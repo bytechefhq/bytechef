@@ -36,6 +36,19 @@ describe('WorkflowExecutionContent', () => {
         expect(screen.queryByText('No output data')).not.toBeInTheDocument();
     });
 
+    it('wraps a long single-line string output instead of scrolling it sideways', () => {
+        const longHtml =
+            '<!DOCTYPE html> <html lang="hr"> <head> <meta name="viewport" content="width=device-width,height=device-height"> </head> </html>';
+
+        render(<WorkflowExecutionContent output={longHtml as unknown as object} />);
+
+        const rendered = screen.getByText(longHtml);
+
+        expect(rendered).toHaveClass('whitespace-pre-wrap');
+        expect(rendered).not.toHaveClass('text-nowrap');
+        expect(rendered.parentElement).not.toHaveClass('text-nowrap');
+    });
+
     it('shows the failure message of a failed trigger', () => {
         render(<WorkflowExecutionContent error={{message: 'Signature check failed', stackTrace: []}} />);
 

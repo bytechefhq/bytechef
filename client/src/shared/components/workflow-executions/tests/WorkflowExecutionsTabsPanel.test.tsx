@@ -75,6 +75,16 @@ describe('WorkflowExecutionsTabsPanel', () => {
         expect(screen.queryByTestId('logs-content')).not.toBeInTheDocument();
     });
 
+    it('widens the expanded output dialog past the default dialog width', () => {
+        renderPanel({activeTab: 'output', dialogOpen: true, job, selectedItem: taskExecution});
+
+        const dialog = screen.getByRole('dialog');
+
+        // The base DialogContent carries sm:max-w-lg, which wins over an unprefixed max-w at the sm
+        // breakpoint, so the wider width has to be applied on the sm variant too.
+        expect(dialog).toHaveClass('sm:max-w-workflow-execution-content-width');
+    });
+
     it('shows what the trigger handed the job on the output tab', () => {
         renderPanel({activeTab: 'output', job});
 
