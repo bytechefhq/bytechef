@@ -16,7 +16,7 @@ val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("l
 var profiles = ""
 
 if (project.hasProperty("prod")) {
-    profiles = "prod"
+    profiles = "prod,local"
 
     if (project.hasProperty("api-docs")) {
         profiles += ",api-docs"
@@ -38,7 +38,7 @@ if (project.hasProperty("prod")) {
         "developmentOnly"("org.springframework.boot:spring-boot-devtools:${libs.findVersion("spring-boot").get()}")
     }
 
-    profiles = "dev"
+    profiles = "dev,local"
 
     configure<org.springframework.boot.gradle.dsl.SpringBootExtension> {
         buildInfo {
