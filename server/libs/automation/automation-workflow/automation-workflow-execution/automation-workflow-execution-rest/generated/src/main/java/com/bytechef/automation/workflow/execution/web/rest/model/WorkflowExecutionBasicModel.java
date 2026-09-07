@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.769779+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-04T22:06:08.943670+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class WorkflowExecutionBasicModel {
 
   private Long id;
@@ -31,7 +31,9 @@ public class WorkflowExecutionBasicModel {
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job;
+  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job;
+
+  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
   private com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
 
@@ -42,11 +44,10 @@ public class WorkflowExecutionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowExecutionBasicModel(Long id, com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project, com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment, com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job, com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
+  public WorkflowExecutionBasicModel(Long id, com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project, com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment, com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.id = id;
     this.project = project;
     this.projectDeployment = projectDeployment;
-    this.job = job;
     this.workflow = workflow;
   }
 
@@ -113,7 +114,7 @@ public class WorkflowExecutionBasicModel {
     this.projectDeployment = projectDeployment;
   }
 
-  public WorkflowExecutionBasicModel job(com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job) {
+  public WorkflowExecutionBasicModel job(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job) {
     this.job = job;
     return this;
   }
@@ -122,16 +123,37 @@ public class WorkflowExecutionBasicModel {
    * Get job
    * @return job
    */
-  @NotNull @Valid 
-  @Schema(name = "job", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Valid 
+  @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
-  public com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel getJob() {
+  public @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel getJob() {
     return job;
   }
 
   @JsonProperty("job")
-  public void setJob(com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job) {
+  public void setJob(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job) {
     this.job = job;
+  }
+
+  public WorkflowExecutionBasicModel triggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
+    this.triggerExecution = triggerExecution;
+    return this;
+  }
+
+  /**
+   * Get triggerExecution
+   * @return triggerExecution
+   */
+  @Valid 
+  @Schema(name = "triggerExecution", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("triggerExecution")
+  public @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel getTriggerExecution() {
+    return triggerExecution;
+  }
+
+  @JsonProperty("triggerExecution")
+  public void setTriggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
+    this.triggerExecution = triggerExecution;
   }
 
   public WorkflowExecutionBasicModel workflow(com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
@@ -168,12 +190,13 @@ public class WorkflowExecutionBasicModel {
         Objects.equals(this.project, workflowExecutionBasic.project) &&
         Objects.equals(this.projectDeployment, workflowExecutionBasic.projectDeployment) &&
         Objects.equals(this.job, workflowExecutionBasic.job) &&
+        Objects.equals(this.triggerExecution, workflowExecutionBasic.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecutionBasic.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, project, projectDeployment, job, workflow);
+    return Objects.hash(id, project, projectDeployment, job, triggerExecution, workflow);
   }
 
   @Override
@@ -184,6 +207,7 @@ public class WorkflowExecutionBasicModel {
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
+    sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");
     return sb.toString();
