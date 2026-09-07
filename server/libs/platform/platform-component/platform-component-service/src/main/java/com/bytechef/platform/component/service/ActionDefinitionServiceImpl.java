@@ -53,6 +53,7 @@ import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionPar
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOptionsFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
@@ -251,51 +252,59 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         Optional<ResumePerformFunction> resumePerformOptional = actionDefinition.getResumePerform();
 
-        if (continueParameters == null || resumePerformOptional.isEmpty()) {
-            BasePerformFunction basePerformFunction = actionDefinition.getPerform()
-                .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
+        ActionContext actionContext = null;
 
-            Object result;
-            ActionContext actionContext;
+        try {
+            if (continueParameters == null || resumePerformOptional.isEmpty()) {
+                BasePerformFunction basePerformFunction = actionDefinition.getPerform()
+                    .orElseThrow(() -> new IllegalArgumentException("Perform function is not defined."));
 
-            if (basePerformFunction instanceof PerformFunction performFunction) {
+                Object result;
+
+                if (basePerformFunction instanceof PerformFunction performFunction) {
+                    ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
+
+                    actionContext = contextFactory.createActionContext(
+                        componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                        taskExecutionId, workflowId, firstComponentConnection, environmentId, type,
+                        editorEnvironment);
+
+                    result = executeSingleConnectionPerform(
+                        performFunction, inputParameters, firstComponentConnection, actionContext);
+                } else {
+                    actionContext = contextFactory.createActionContext(
+                        componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                        taskExecutionId, workflowId, null, environmentId, type, editorEnvironment);
+
+                    if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
+                        result = executeMultipleConnectionsPerform(
+                            performFunction, inputParameters, componentConnections, extensions, actionContext);
+                    } else if (basePerformFunction instanceof MultipleConnectionsStreamPerformFunction performFunction) {
+                        result = executeMultipleConnectionsStreamPerform(
+                            performFunction, inputParameters, componentConnections, extensions, actionContext);
+                    } else {
+                        result = executeMultipleConnectionsSseStreamResponsePerform(
+                            (MultipleConnectionsSseStreamResponsePerformFunction) basePerformFunction,
+                            inputParameters, componentConnections, extensions, actionContext);
+                    }
+                }
+
+                return checkSuspend(actionDefinition, actionContext, result);
+            } else {
                 ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
 
                 actionContext = contextFactory.createActionContext(
                     componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
                     taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
 
-                result = executeSingleConnectionPerform(
-                    performFunction, inputParameters, firstComponentConnection, actionContext);
-            } else {
-                actionContext = contextFactory.createActionContext(
-                    componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                    taskExecutionId, workflowId, null, environmentId, type, editorEnvironment);
-
-                if (basePerformFunction instanceof MultipleConnectionsPerformFunction performFunction) {
-                    result = executeMultipleConnectionsPerform(
-                        performFunction, inputParameters, componentConnections, extensions, actionContext);
-                } else if (basePerformFunction instanceof MultipleConnectionsStreamPerformFunction performFunction) {
-                    result = executeMultipleConnectionsStreamPerform(
-                        performFunction, inputParameters, componentConnections, extensions, actionContext);
-                } else {
-                    result = executeMultipleConnectionsSseStreamResponsePerform(
-                        (MultipleConnectionsSseStreamResponsePerformFunction) basePerformFunction, inputParameters,
-                        componentConnections, extensions, actionContext);
-                }
+                return executeResumePerform(
+                    actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters, resumeData,
+                    suspendExpiresAt, firstComponentConnection, actionContext);
             }
-
-            return checkSuspend(actionDefinition, actionContext, result);
-        } else {
-            ComponentConnection firstComponentConnection = getFirstComponentConnection(componentConnections);
-
-            ActionContext actionContext = contextFactory.createActionContext(
-                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
-                taskExecutionId, workflowId, firstComponentConnection, environmentId, type, editorEnvironment);
-
-            return executeResumePerform(
-                actionDefinition, resumePerformOptional.get(), inputParameters, continueParameters, resumeData,
-                suspendExpiresAt, firstComponentConnection, actionContext);
+        } finally {
+            if (actionContext instanceof LogEntryBufferAware logEntryBufferAware) {
+                logEntryBufferAware.flushLogEntries();
+            }
         }
     }
 
