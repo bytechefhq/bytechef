@@ -83,7 +83,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
 
         this(
             componentName, componentVersion, componentOperationName, componentConnection, null, 0, editorEnvironment,
-            httpClientExecutor, tempFileStorage, null, false);
+            httpClientExecutor, tempFileStorage, null, false, null);
     }
 
     @SuppressFBWarnings("EI")
@@ -91,7 +91,8 @@ class ContextImpl implements Context, LogEntryBufferAware {
         String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, @Nullable Long jobId, long taskExecutionId,
         boolean editorEnvironment, HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
-        @Nullable LogFileStorageWriter logFileStorageWriter, boolean bufferLogEntries) {
+        @Nullable LogFileStorageWriter logFileStorageWriter, boolean bufferLogEntries,
+        @Nullable Long triggerExecutionId) {
 
         this.converter = new ConverterImpl();
         this.editorEnvironment = editorEnvironment;
@@ -102,7 +103,8 @@ class ContextImpl implements Context, LogEntryBufferAware {
             componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.log = new LogImpl(
-            componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId, bufferLogEntries);
+            componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId, bufferLogEntries,
+            triggerExecutionId);
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
@@ -679,11 +681,12 @@ class ContextImpl implements Context, LogEntryBufferAware {
         @SuppressWarnings("PMD.LogVariableNameWithPrivateStaticFinalModifiers")
         private final org.slf4j.Logger log;
         private final long taskExecutionId;
+        private final @Nullable Long triggerExecutionId;
 
         public LogImpl(
             String componentName, @Nullable String componentOperationName,
             @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId,
-            boolean buffering) {
+            boolean buffering, @Nullable Long triggerExecutionId) {
 
             this.buffering = buffering;
             this.componentName = componentName;
@@ -694,6 +697,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
                 "com.bytechef.component." + componentName +
                     (componentOperationName == null ? "" : "." + componentOperationName));
             this.taskExecutionId = taskExecutionId;
+            this.triggerExecutionId = triggerExecutionId;
         }
 
         @Override
@@ -838,7 +842,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
         }
 
         private void flushLogEntries() {
-            if (jobId == null || logFileStorageWriter == null) {
+            if (logFileStorageWriter == null || !hasStorageKey()) {
                 return;
             }
 
@@ -853,14 +857,26 @@ class ContextImpl implements Context, LogEntryBufferAware {
             }
 
             if (!logEntriesToStore.isEmpty()) {
-                logFileStorageWriter.storeLogEntries(jobId, taskExecutionId, logEntriesToStore);
+                logFileStorageWriter.storeLogEntries(getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore);
             }
 
-            logFileStorageWriter.awaitPendingWrites(jobId, taskExecutionId);
+            logFileStorageWriter.awaitPendingWrites(getStorageJobId(), getStorageTaskExecutionId());
+        }
+
+        private boolean hasStorageKey() {
+            return jobId != null || triggerExecutionId != null;
+        }
+
+        private long getStorageJobId() {
+            return jobId != null ? jobId : Objects.requireNonNull(triggerExecutionId);
+        }
+
+        private long getStorageTaskExecutionId() {
+            return jobId != null ? taskExecutionId : Objects.requireNonNull(triggerExecutionId);
         }
 
         private void storeLogEntry(LogEntry.Level level, String message, @Nullable Exception exception) {
-            if (jobId == null || logFileStorageWriter == null) {
+            if (logFileStorageWriter == null || !hasStorageKey()) {
                 return;
             }
 
@@ -869,7 +885,8 @@ class ContextImpl implements Context, LogEntryBufferAware {
                 .level(level)
                 .componentName(componentName)
                 .componentOperationName(componentOperationName)
-                .taskExecutionId(taskExecutionId)
+                .taskExecutionId(getStorageTaskExecutionId())
+                .triggerExecutionId(triggerExecutionId)
                 .message(message);
 
             if (exception != null) {
@@ -895,7 +912,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
             }
 
             if (logEntriesToStore != null) {
-                logFileStorageWriter.storeLogEntries(jobId, taskExecutionId, logEntriesToStore);
+                logFileStorageWriter.storeLogEntries(getStorageJobId(), getStorageTaskExecutionId(), logEntriesToStore);
             }
         }
     }
