@@ -9,6 +9,26 @@ JAVA_SERVER_OPTS="-Dserver.tomcat.basedir=/opt/bytechef/server \
 
 SPRING_PROFILES="${SPRING_PROFILES_ACTIVE:-}"
 
+case "${BYTECHEF_DATABASE:-}" in
+  h2|H2)
+    case ",${SPRING_PROFILES}," in
+      *,h2,*)
+      ;;
+      *)
+        if [ -n "$SPRING_PROFILES" ]; then
+          SPRING_PROFILES="${SPRING_PROFILES},h2"
+        else
+          SPRING_PROFILES="prod,local,h2"
+        fi
+      ;;
+    esac
+
+    SPRING_PROFILES_ACTIVE="$SPRING_PROFILES"
+
+    export SPRING_PROFILES_ACTIVE
+  ;;
+esac
+
 case "$1" in
   liquibase)
     shift
