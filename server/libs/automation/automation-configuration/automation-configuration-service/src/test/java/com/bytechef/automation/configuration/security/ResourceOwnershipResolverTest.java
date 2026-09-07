@@ -64,6 +64,12 @@ class ResourceOwnershipResolverTest {
      * assertions below describe reality and fail on any <em>new</em> unresolved token. Every entry is a real defect
      * awaiting its own fix, not an exemption.
      *
+     * {@code Connection} and {@code McpServer} were both pinned here, each claimed by an environment resolver while no
+     * ownership resolver answered for it, until {@code ConnectionOwnershipResolver} and {@code McpServerOwnershipResolver}
+     * were added. Before that, the four connection sharing guards in {@code WorkspaceConnectionFacadeImpl} denied even
+     * the owner they name.
+     *
+     * <p>
      * Each entry records the grounds it is pinned on, and both directions of rot are checked, so the map cannot become
      * a permanent exemption: {@link #testEveryPinnedUnresolvedTokenIsStillUnresolved} fails once a resolver exists, and
      * {@link #testEveryPinnedUnresolvedTokenStillHasEveryGroundItIsPinnedOn} fails once any recorded ground no longer
@@ -336,9 +342,9 @@ class ResourceOwnershipResolverTest {
 
     /**
      * The other direction a pin rots in. {@link #testEveryPinnedUnresolvedTokenIsStillUnresolved} catches the entry
-     * whose resolver arrived; this one catches the entry whose recorded reason for existing went away. Without it, the
-     * four {@code 'Connection'} guards could be deleted outright and the guard-side exemption would live on, ready to
-     * silently re-admit the next guard someone writes for that token.
+     * whose resolver arrived; this one catches the entry whose recorded reason for existing went away. Without it, a
+     * pinned token's guards could be deleted outright and the guard-side exemption would live on, ready to silently
+     * re-admit the next guard someone writes for that token.
      */
     @Test
     void testEveryPinnedUnresolvedTokenStillHasEveryGroundItIsPinnedOn() {
