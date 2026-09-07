@@ -520,4 +520,70 @@ class AbstractToolFacadeTest {
     void testToSpelLiteralBooleanFalse() {
         assertEquals("false", AbstractToolFacade.toSpElLiteral(false));
     }
+
+    // The tool name and description are optional, so a tool configured with neither still has to reach the model
+    // under a callable name and with the description the tool itself carries.
+    @Test
+    void testGetToolNameFallsBackToComponentAndClusterElementName() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        assertEquals("HTTPCLIENT_POST", toolFacade.getToolName("httpClient", "post", Map.of()));
+    }
+
+    @Test
+    void testGetToolNameFallsBackWhenConfiguredNameIsBlank() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        assertEquals("HTTPCLIENT_POST", toolFacade.getToolName("httpClient", "post", Map.of("toolName", "   ")));
+    }
+
+    @Test
+    void testGetToolNamePrefersTheConfiguredName() {
+        AbstractToolFacade toolFacade = createToolFacade();
+
+        assertEquals(
+            "postThing", toolFacade.getToolName("httpClient", "post", Map.of("toolName", "postThing")));
+    }
+
+    @Test
+    void testGetToolDescriptionReturnsNullWhenUnconfigured() {
+        assertNull(AbstractToolFacade.getToolDescription(Map.of(), null));
+    }
+
+    @Test
+    void testGetToolDescriptionIgnoresABlankDescription() {
+        assertNull(AbstractToolFacade.getToolDescription(Map.of("toolDescription", "  "), null));
+    }
+
+    @Test
+    void testGetWorkflowToolNameFallsBackToTheWorkflowLabel() {
+        assertEquals("Send_Email", AbstractToolFacade.getWorkflowToolName(Map.of(), "Send Email"));
+    }
+
+    @Test
+    void testGetWorkflowToolNamePrefersTheConfiguredName() {
+        assertEquals(
+            "sendEmail", AbstractToolFacade.getWorkflowToolName(Map.of("toolName", "sendEmail"), "Send Email"));
+    }
+
+    @Test
+    void testGetWorkflowToolNameReturnsNullWithoutAConfiguredNameOrLabel() {
+        assertNull(AbstractToolFacade.getWorkflowToolName(Map.of(), null));
+    }
+
+    // Tool names reach the model as identifiers, so a label cannot be used verbatim.
+    @Test
+    void testToToolNameSanitizesALabel() {
+        assertEquals("Order_Sync_v2", AbstractToolFacade.toToolName("Order Sync (v2)"));
+    }
+
+    @Test
+    void testToToolNameKeepsAnAlreadyValidLabel() {
+        assertEquals("order-sync_2", AbstractToolFacade.toToolName("order-sync_2"));
+    }
+
+    @Test
+    void testToToolNameReturnsNullForALabelWithNothingUsable() {
+        assertNull(AbstractToolFacade.toToolName("()"));
+    }
 }
