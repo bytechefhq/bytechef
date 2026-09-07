@@ -384,8 +384,13 @@ polymorphic and has no foreign key.
 **Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
 it. Without that, a member holding `CONNECTION_EDIT` would pass the by-id check for a connection the
 list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
-`ResourceVisibilityProvider`; API keys and other user-owned resources keep it.
-`PermissionServiceVisibilityTest` is the regression guard.
+`ResourceVisibilityProvider`; a type with a `ResourceOwnershipResolver` but no visibility provider
+keeps it. API keys are **not** such a type — no main-source `ResourceOwnershipResolver` claims the
+`"ApiKey"` token, so that owner-isolation branch is never entered for them and nothing there isolates
+one user's keys from another's. Treat API keys as unprotected until someone decides whether they are
+user-owned or workspace-owned; the `API_KEY_*` entry in `PermissionScopeGateCoverageTest` records what
+was actually checked. `PermissionServiceVisibilityTest` is the regression guard for the visibility
+precondition.
 
 **GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
 - `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set
@@ -398,9 +403,6 @@ list correctly hides. In CE this replaces owner-isolation *only* for resource ty
   still fails at commit.
 - `connectionGrants(workspaceId, connectionId)` — owner-or-admin; a plain viewer must not learn who
   else a connection was handed to.
-
-**Audit**: `CONNECTION_VISIBILITY_CHANGED`, `CONNECTION_ACCESS_GRANTED`, `CONNECTION_ACCESS_REVOKED`.
-The first and last are `strictAudit` — both can remove access.
 
 **Metrics**: `bytechef_connection_create` (Counter), tagged
 `visibility=PRIVATE|WORKSPACE|ORGANIZATION`, wired via `ObjectProvider<MeterRegistry>` so lightweight
