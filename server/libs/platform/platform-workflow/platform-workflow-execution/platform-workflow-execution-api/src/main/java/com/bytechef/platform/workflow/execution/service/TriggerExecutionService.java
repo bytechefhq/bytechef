@@ -35,6 +35,8 @@ public interface TriggerExecutionService {
 
     List<TriggerExecution> getJobTriggerExecutions(List<Long> jobIds);
 
+    List<TriggerExecution> getTriggerExecutions(List<Long> ids);
+
     TriggerExecution getTriggerExecution(long id);
 
     TriggerExecution update(TriggerExecution triggerExecution);

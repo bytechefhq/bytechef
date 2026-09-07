@@ -64,6 +64,11 @@ public class RemoteTriggerExecutionServiceClient implements TriggerExecutionServ
     }
 
     @Override
+    public List<TriggerExecution> getTriggerExecutions(List<Long> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public TriggerExecution getTriggerExecution(long id) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
