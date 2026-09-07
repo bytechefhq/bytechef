@@ -57,6 +57,11 @@ class DataTableUtilsTest {
     }
 
     @Test
+    void testFlattenRowOfMissingRecordStaysNull() {
+        assertNull(DataTableUtils.flattenRow(null));
+    }
+
+    @Test
     void testFlattenRowsFlattensEveryRow() {
         List<Map<String, Object>> flattenedRows = DataTableUtils.flattenRows(
             List.of(new DataTableRow(1, Map.of("status", "BOT")), new DataTableRow(2, Map.of("status", "CLOSED"))));

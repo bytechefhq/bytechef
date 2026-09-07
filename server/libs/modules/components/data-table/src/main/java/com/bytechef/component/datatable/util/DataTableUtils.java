@@ -199,7 +199,12 @@ public final class DataTableUtils {
         return sampleOutput;
     }
 
-    public static Map<String, Object> flattenRow(DataTableRow dataTableRow) {
+    @Nullable
+    public static Map<String, Object> flattenRow(@Nullable DataTableRow dataTableRow) {
+        if (dataTableRow == null) {
+            return null;
+        }
+
         Map<String, Object> flattenedRow = new HashMap<>();
 
         flattenedRow.put("id", dataTableRow.id());
