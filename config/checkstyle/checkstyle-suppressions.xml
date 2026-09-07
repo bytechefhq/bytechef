@@ -34,4 +34,5 @@
 
     <!-- Central @ConfigurationProperties aggregator; its deliberate per-provider structure exceeds FileLength. -->
     <suppress files="ApplicationProperties\.java" checks="FileLength"/>
+    <suppress files="WorkflowNodeParameterFacadeTest\.java" checks="FileLength"/>
 </suppressions>
