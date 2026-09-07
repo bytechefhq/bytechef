@@ -531,15 +531,15 @@
         "value": "Africa/Bujumbura"
       }, {
         "description": null,
-        "label": "Africa/Cairo (GMT+03:00)",
+        "label": "Africa/Cairo (GMT+02:00)",
         "value": "Africa/Cairo"
       }, {
         "description": null,
-        "label": "Africa/Casablanca (GMT+01:00)",
+        "label": "Africa/Casablanca (GMT+00:00)",
         "value": "Africa/Casablanca"
       }, {
         "description": null,
-        "label": "Africa/Ceuta (GMT+02:00)",
+        "label": "Africa/Ceuta (GMT+01:00)",
         "value": "Africa/Ceuta"
       }, {
         "description": null,
@@ -563,7 +563,7 @@
         "value": "Africa/Douala"
       }, {
         "description": null,
-        "label": "Africa/El_Aaiun (GMT+01:00)",
+        "label": "Africa/El_Aaiun (GMT+00:00)",
         "value": "Africa/El_Aaiun"
       }, {
         "description": null,
@@ -691,15 +691,15 @@
         "value": "Africa/Tunis"
       }, {
         "description": null,
-        "label": "Africa/Windhoek (GMT+02:00)",
+        "label": "Africa/Windhoek (GMT+01:00)",
         "value": "Africa/Windhoek"
       }, {
         "description": null,
-        "label": "America/Adak (GMT-09:00)",
+        "label": "America/Adak (GMT-10:00)",
         "value": "America/Adak"
       }, {
         "description": null,
-        "label": "America/Anchorage (GMT-08:00)",
+        "label": "America/Anchorage (GMT-09:00)",
         "value": "America/Anchorage"
       }, {
         "description": null,
@@ -779,7 +779,7 @@
         "value": "America/Atikokan"
       }, {
         "description": null,
-        "label": "America/Atka (GMT-09:00)",
+        "label": "America/Atka (GMT-10:00)",
         "value": "America/Atka"
       }, {
         "description": null,
@@ -815,7 +815,7 @@
         "value": "America/Bogota"
       }, {
         "description": null,
-        "label": "America/Boise (GMT-06:00)",
+        "label": "America/Boise (GMT-07:00)",
         "value": "America/Boise"
       }, {
         "description": null,
@@ -823,7 +823,7 @@
         "value": "America/Buenos_Aires"
       }, {
         "description": null,
-        "label": "America/Cambridge_Bay (GMT-06:00)",
+        "label": "America/Cambridge_Bay (GMT-07:00)",
         "value": "America/Cambridge_Bay"
       }, {
         "description": null,
@@ -851,7 +851,7 @@
         "value": "America/Cayman"
       }, {
         "description": null,
-        "label": "America/Chicago (GMT-05:00)",
+        "label": "America/Chicago (GMT-06:00)",
         "value": "America/Chicago"
       }, {
         "description": null,
@@ -859,7 +859,7 @@
         "value": "America/Chihuahua"
       }, {
         "description": null,
-        "label": "America/Ciudad_Juarez (GMT-06:00)",
+        "label": "America/Ciudad_Juarez (GMT-07:00)",
         "value": "America/Ciudad_Juarez"
       }, {
         "description": null,
@@ -903,11 +903,11 @@
         "value": "America/Dawson_Creek"
       }, {
         "description": null,
-        "label": "America/Denver (GMT-06:00)",
+        "label": "America/Denver (GMT-07:00)",
         "value": "America/Denver"
       }, {
         "description": null,
-        "label": "America/Detroit (GMT-04:00)",
+        "label": "America/Detroit (GMT-05:00)",
         "value": "America/Detroit"
       }, {
         "description": null,
@@ -915,7 +915,7 @@
         "value": "America/Dominica"
       }, {
         "description": null,
-        "label": "America/Edmonton (GMT-06:00)",
+        "label": "America/Edmonton (GMT-07:00)",
         "value": "America/Edmonton"
       }, {
         "description": null,
@@ -927,7 +927,7 @@
         "value": "America/El_Salvador"
       }, {
         "description": null,
-        "label": "America/Ensenada (GMT-07:00)",
+        "label": "America/Ensenada (GMT-08:00)",
         "value": "America/Ensenada"
       }, {
         "description": null,
@@ -935,7 +935,7 @@
         "value": "America/Fort_Nelson"
       }, {
         "description": null,
-        "label": "America/Fort_Wayne (GMT-04:00)",
+        "label": "America/Fort_Wayne (GMT-05:00)",
         "value": "America/Fort_Wayne"
       }, {
         "description": null,
@@ -943,19 +943,19 @@
         "value": "America/Fortaleza"
       }, {
         "description": null,
-        "label": "America/Glace_Bay (GMT-03:00)",
+        "label": "America/Glace_Bay (GMT-04:00)",
         "value": "America/Glace_Bay"
       }, {
         "description": null,
-        "label": "America/Godthab (GMT-01:00)",
+        "label": "America/Godthab (GMT-02:00)",
         "value": "America/Godthab"
       }, {
         "description": null,
-        "label": "America/Goose_Bay (GMT-03:00)",
+        "label": "America/Goose_Bay (GMT-04:00)",
         "value": "America/Goose_Bay"
       }, {
         "description": null,
-        "label": "America/Grand_Turk (GMT-04:00)",
+        "label": "America/Grand_Turk (GMT-05:00)",
         "value": "America/Grand_Turk"
       }, {
         "description": null,
@@ -979,11 +979,11 @@
         "value": "America/Guyana"
       }, {
         "description": null,
-        "label": "America/Halifax (GMT-03:00)",
+        "label": "America/Halifax (GMT-04:00)",
         "value": "America/Halifax"
       }, {
         "description": null,
-        "label": "America/Havana (GMT-04:00)",
+        "label": "America/Havana (GMT-05:00)",
         "value": "America/Havana"
       }, {
         "description": null,
@@ -991,47 +991,47 @@
         "value": "America/Hermosillo"
       }, {
         "description": null,
-        "label": "America/Indiana/Indianapolis (GMT-04:00)",
+        "label": "America/Indiana/Indianapolis (GMT-05:00)",
         "value": "America/Indiana/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Indiana/Knox (GMT-05:00)",
+        "label": "America/Indiana/Knox (GMT-06:00)",
         "value": "America/Indiana/Knox"
       }, {
         "description": null,
-        "label": "America/Indiana/Marengo (GMT-04:00)",
+        "label": "America/Indiana/Marengo (GMT-05:00)",
         "value": "America/Indiana/Marengo"
       }, {
         "description": null,
-        "label": "America/Indiana/Petersburg (GMT-04:00)",
+        "label": "America/Indiana/Petersburg (GMT-05:00)",
         "value": "America/Indiana/Petersburg"
       }, {
         "description": null,
-        "label": "America/Indiana/Tell_City (GMT-05:00)",
+        "label": "America/Indiana/Tell_City (GMT-06:00)",
         "value": "America/Indiana/Tell_City"
       }, {
         "description": null,
-        "label": "America/Indiana/Vevay (GMT-04:00)",
+        "label": "America/Indiana/Vevay (GMT-05:00)",
         "value": "America/Indiana/Vevay"
       }, {
         "description": null,
-        "label": "America/Indiana/Vincennes (GMT-04:00)",
+        "label": "America/Indiana/Vincennes (GMT-05:00)",
         "value": "America/Indiana/Vincennes"
       }, {
         "description": null,
-        "label": "America/Indiana/Winamac (GMT-04:00)",
+        "label": "America/Indiana/Winamac (GMT-05:00)",
         "value": "America/Indiana/Winamac"
       }, {
         "description": null,
-        "label": "America/Indianapolis (GMT-04:00)",
+        "label": "America/Indianapolis (GMT-05:00)",
         "value": "America/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Inuvik (GMT-06:00)",
+        "label": "America/Inuvik (GMT-07:00)",
         "value": "America/Inuvik"
       }, {
         "description": null,
-        "label": "America/Iqaluit (GMT-04:00)",
+        "label": "America/Iqaluit (GMT-05:00)",
         "value": "America/Iqaluit"
       }, {
         "description": null,
@@ -1043,19 +1043,19 @@
         "value": "America/Jujuy"
       }, {
         "description": null,
-        "label": "America/Juneau (GMT-08:00)",
+        "label": "America/Juneau (GMT-09:00)",
         "value": "America/Juneau"
       }, {
         "description": null,
-        "label": "America/Kentucky/Louisville (GMT-04:00)",
+        "label": "America/Kentucky/Louisville (GMT-05:00)",
         "value": "America/Kentucky/Louisville"
       }, {
         "description": null,
-        "label": "America/Kentucky/Monticello (GMT-04:00)",
+        "label": "America/Kentucky/Monticello (GMT-05:00)",
         "value": "America/Kentucky/Monticello"
       }, {
         "description": null,
-        "label": "America/Knox_IN (GMT-05:00)",
+        "label": "America/Knox_IN (GMT-06:00)",
         "value": "America/Knox_IN"
       }, {
         "description": null,
@@ -1071,11 +1071,11 @@
         "value": "America/Lima"
       }, {
         "description": null,
-        "label": "America/Los_Angeles (GMT-07:00)",
+        "label": "America/Los_Angeles (GMT-08:00)",
         "value": "America/Los_Angeles"
       }, {
         "description": null,
-        "label": "America/Louisville (GMT-04:00)",
+        "label": "America/Louisville (GMT-05:00)",
         "value": "America/Louisville"
       }, {
         "description": null,
@@ -1103,7 +1103,7 @@
         "value": "America/Martinique"
       }, {
         "description": null,
-        "label": "America/Matamoros (GMT-05:00)",
+        "label": "America/Matamoros (GMT-06:00)",
         "value": "America/Matamoros"
       }, {
         "description": null,
@@ -1115,7 +1115,7 @@
         "value": "America/Mendoza"
       }, {
         "description": null,
-        "label": "America/Menominee (GMT-05:00)",
+        "label": "America/Menominee (GMT-06:00)",
         "value": "America/Menominee"
       }, {
         "description": null,
@@ -1123,7 +1123,7 @@
         "value": "America/Merida"
       }, {
         "description": null,
-        "label": "America/Metlakatla (GMT-08:00)",
+        "label": "America/Metlakatla (GMT-09:00)",
         "value": "America/Metlakatla"
       }, {
         "description": null,
@@ -1131,11 +1131,11 @@
         "value": "America/Mexico_City"
       }, {
         "description": null,
-        "label": "America/Miquelon (GMT-02:00)",
+        "label": "America/Miquelon (GMT-03:00)",
         "value": "America/Miquelon"
       }, {
         "description": null,
-        "label": "America/Moncton (GMT-03:00)",
+        "label": "America/Moncton (GMT-04:00)",
         "value": "America/Moncton"
       }, {
         "description": null,
@@ -1147,7 +1147,7 @@
         "value": "America/Montevideo"
       }, {
         "description": null,
-        "label": "America/Montreal (GMT-04:00)",
+        "label": "America/Montreal (GMT-05:00)",
         "value": "America/Montreal"
       }, {
         "description": null,
@@ -1155,19 +1155,19 @@
         "value": "America/Montserrat"
       }, {
         "description": null,
-        "label": "America/Nassau (GMT-04:00)",
+        "label": "America/Nassau (GMT-05:00)",
         "value": "America/Nassau"
       }, {
         "description": null,
-        "label": "America/New_York (GMT-04:00)",
+        "label": "America/New_York (GMT-05:00)",
         "value": "America/New_York"
       }, {
         "description": null,
-        "label": "America/Nipigon (GMT-04:00)",
+        "label": "America/Nipigon (GMT-05:00)",
         "value": "America/Nipigon"
       }, {
         "description": null,
-        "label": "America/Nome (GMT-08:00)",
+        "label": "America/Nome (GMT-09:00)",
         "value": "America/Nome"
       }, {
         "description": null,
@@ -1175,23 +1175,23 @@
         "value": "America/Noronha"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Beulah (GMT-05:00)",
+        "label": "America/North_Dakota/Beulah (GMT-06:00)",
         "value": "America/North_Dakota/Beulah"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Center (GMT-05:00)",
+        "label": "America/North_Dakota/Center (GMT-06:00)",
         "value": "America/North_Dakota/Center"
       }, {
         "description": null,
-        "label": "America/North_Dakota/New_Salem (GMT-05:00)",
+        "label": "America/North_Dakota/New_Salem (GMT-06:00)",
         "value": "America/North_Dakota/New_Salem"
       }, {
         "description": null,
-        "label": "America/Nuuk (GMT-01:00)",
+        "label": "America/Nuuk (GMT-02:00)",
         "value": "America/Nuuk"
       }, {
         "description": null,
-        "label": "America/Ojinaga (GMT-05:00)",
+        "label": "America/Ojinaga (GMT-06:00)",
         "value": "America/Ojinaga"
       }, {
         "description": null,
@@ -1199,7 +1199,7 @@
         "value": "America/Panama"
       }, {
         "description": null,
-        "label": "America/Pangnirtung (GMT-04:00)",
+        "label": "America/Pangnirtung (GMT-05:00)",
         "value": "America/Pangnirtung"
       }, {
         "description": null,
@@ -1211,7 +1211,7 @@
         "value": "America/Phoenix"
       }, {
         "description": null,
-        "label": "America/Port-au-Prince (GMT-04:00)",
+        "label": "America/Port-au-Prince (GMT-05:00)",
         "value": "America/Port-au-Prince"
       }, {
         "description": null,
@@ -1235,11 +1235,11 @@
         "value": "America/Punta_Arenas"
       }, {
         "description": null,
-        "label": "America/Rainy_River (GMT-05:00)",
+        "label": "America/Rainy_River (GMT-06:00)",
         "value": "America/Rainy_River"
       }, {
         "description": null,
-        "label": "America/Rankin_Inlet (GMT-05:00)",
+        "label": "America/Rankin_Inlet (GMT-06:00)",
         "value": "America/Rankin_Inlet"
       }, {
         "description": null,
@@ -1251,7 +1251,7 @@
         "value": "America/Regina"
       }, {
         "description": null,
-        "label": "America/Resolute (GMT-05:00)",
+        "label": "America/Resolute (GMT-06:00)",
         "value": "America/Resolute"
       }, {
         "description": null,
@@ -1263,7 +1263,7 @@
         "value": "America/Rosario"
       }, {
         "description": null,
-        "label": "America/Santa_Isabel (GMT-07:00)",
+        "label": "America/Santa_Isabel (GMT-08:00)",
         "value": "America/Santa_Isabel"
       }, {
         "description": null,
@@ -1283,15 +1283,15 @@
         "value": "America/Sao_Paulo"
       }, {
         "description": null,
-        "label": "America/Scoresbysund (GMT-01:00)",
+        "label": "America/Scoresbysund (GMT-02:00)",
         "value": "America/Scoresbysund"
       }, {
         "description": null,
-        "label": "America/Shiprock (GMT-06:00)",
+        "label": "America/Shiprock (GMT-07:00)",
         "value": "America/Shiprock"
       }, {
         "description": null,
-        "label": "America/Sitka (GMT-08:00)",
+        "label": "America/Sitka (GMT-09:00)",
         "value": "America/Sitka"
       }, {
         "description": null,
@@ -1299,7 +1299,7 @@
         "value": "America/St_Barthelemy"
       }, {
         "description": null,
-        "label": "America/St_Johns (GMT-02:30)",
+        "label": "America/St_Johns (GMT-03:30)",
         "value": "America/St_Johns"
       }, {
         "description": null,
@@ -1327,19 +1327,19 @@
         "value": "America/Tegucigalpa"
       }, {
         "description": null,
-        "label": "America/Thule (GMT-03:00)",
+        "label": "America/Thule (GMT-04:00)",
         "value": "America/Thule"
       }, {
         "description": null,
-        "label": "America/Thunder_Bay (GMT-04:00)",
+        "label": "America/Thunder_Bay (GMT-05:00)",
         "value": "America/Thunder_Bay"
       }, {
         "description": null,
-        "label": "America/Tijuana (GMT-07:00)",
+        "label": "America/Tijuana (GMT-08:00)",
         "value": "America/Tijuana"
       }, {
         "description": null,
-        "label": "America/Toronto (GMT-04:00)",
+        "label": "America/Toronto (GMT-05:00)",
         "value": "America/Toronto"
       }, {
         "description": null,
@@ -1347,7 +1347,7 @@
         "value": "America/Tortola"
       }, {
         "description": null,
-        "label": "America/Vancouver (GMT-07:00)",
+        "label": "America/Vancouver (GMT-08:00)",
         "value": "America/Vancouver"
       }, {
         "description": null,
@@ -1359,15 +1359,15 @@
         "value": "America/Whitehorse"
       }, {
         "description": null,
-        "label": "America/Winnipeg (GMT-05:00)",
+        "label": "America/Winnipeg (GMT-06:00)",
         "value": "America/Winnipeg"
       }, {
         "description": null,
-        "label": "America/Yakutat (GMT-08:00)",
+        "label": "America/Yakutat (GMT-09:00)",
         "value": "America/Yakutat"
       }, {
         "description": null,
-        "label": "America/Yellowknife (GMT-06:00)",
+        "label": "America/Yellowknife (GMT-07:00)",
         "value": "America/Yellowknife"
       }, {
         "description": null,
@@ -1411,7 +1411,7 @@
         "value": "Antarctica/Syowa"
       }, {
         "description": null,
-        "label": "Antarctica/Troll (GMT+02:00)",
+        "label": "Antarctica/Troll (GMT+00:00)",
         "value": "Antarctica/Troll"
       }, {
         "description": null,
@@ -1419,7 +1419,7 @@
         "value": "Antarctica/Vostok"
       }, {
         "description": null,
-        "label": "Arctic/Longyearbyen (GMT+02:00)",
+        "label": "Arctic/Longyearbyen (GMT+01:00)",
         "value": "Arctic/Longyearbyen"
       }, {
         "description": null,
@@ -1479,7 +1479,7 @@
         "value": "Asia/Barnaul"
       }, {
         "description": null,
-        "label": "Asia/Beirut (GMT+03:00)",
+        "label": "Asia/Beirut (GMT+02:00)",
         "value": "Asia/Beirut"
       }, {
         "description": null,
@@ -1539,11 +1539,11 @@
         "value": "Asia/Dushanbe"
       }, {
         "description": null,
-        "label": "Asia/Famagusta (GMT+03:00)",
+        "label": "Asia/Famagusta (GMT+02:00)",
         "value": "Asia/Famagusta"
       }, {
         "description": null,
-        "label": "Asia/Gaza (GMT+03:00)",
+        "label": "Asia/Gaza (GMT+02:00)",
         "value": "Asia/Gaza"
       }, {
         "description": null,
@@ -1551,7 +1551,7 @@
         "value": "Asia/Harbin"
       }, {
         "description": null,
-        "label": "Asia/Hebron (GMT+03:00)",
+        "label": "Asia/Hebron (GMT+02:00)",
         "value": "Asia/Hebron"
       }, {
         "description": null,
@@ -1583,7 +1583,7 @@
         "value": "Asia/Jayapura"
       }, {
         "description": null,
-        "label": "Asia/Jerusalem (GMT+03:00)",
+        "label": "Asia/Jerusalem (GMT+02:00)",
         "value": "Asia/Jerusalem"
       }, {
         "description": null,
@@ -1659,7 +1659,7 @@
         "value": "Asia/Muscat"
       }, {
         "description": null,
-        "label": "Asia/Nicosia (GMT+03:00)",
+        "label": "Asia/Nicosia (GMT+02:00)",
         "value": "Asia/Nicosia"
       }, {
         "description": null,
@@ -1755,7 +1755,7 @@
         "value": "Asia/Tehran"
       }, {
         "description": null,
-        "label": "Asia/Tel_Aviv (GMT+03:00)",
+        "label": "Asia/Tel_Aviv (GMT+02:00)",
         "value": "Asia/Tel_Aviv"
       }, {
         "description": null,
@@ -1819,15 +1819,15 @@
         "value": "Asia/Yerevan"
       }, {
         "description": null,
-        "label": "Atlantic/Azores (GMT+00:00)",
+        "label": "Atlantic/Azores (GMT-01:00)",
         "value": "Atlantic/Azores"
       }, {
         "description": null,
-        "label": "Atlantic/Bermuda (GMT-03:00)",
+        "label": "Atlantic/Bermuda (GMT-04:00)",
         "value": "Atlantic/Bermuda"
       }, {
         "description": null,
-        "label": "Atlantic/Canary (GMT+01:00)",
+        "label": "Atlantic/Canary (GMT+00:00)",
         "value": "Atlantic/Canary"
       }, {
         "description": null,
@@ -1835,19 +1835,19 @@
         "value": "Atlantic/Cape_Verde"
       }, {
         "description": null,
-        "label": "Atlantic/Faeroe (GMT+01:00)",
+        "label": "Atlantic/Faeroe (GMT+00:00)",
         "value": "Atlantic/Faeroe"
       }, {
         "description": null,
-        "label": "Atlantic/Faroe (GMT+01:00)",
+        "label": "Atlantic/Faroe (GMT+00:00)",
         "value": "Atlantic/Faroe"
       }, {
         "description": null,
-        "label": "Atlantic/Jan_Mayen (GMT+02:00)",
+        "label": "Atlantic/Jan_Mayen (GMT+01:00)",
         "value": "Atlantic/Jan_Mayen"
       }, {
         "description": null,
-        "label": "Atlantic/Madeira (GMT+01:00)",
+        "label": "Atlantic/Madeira (GMT+00:00)",
         "value": "Atlantic/Madeira"
       }, {
         "description": null,
@@ -1975,35 +1975,35 @@
         "value": "Brazil/West"
       }, {
         "description": null,
-        "label": "CET (GMT+02:00)",
+        "label": "CET (GMT+01:00)",
         "value": "CET"
       }, {
         "description": null,
-        "label": "CST6CDT (GMT-05:00)",
+        "label": "CST6CDT (GMT-06:00)",
         "value": "CST6CDT"
       }, {
         "description": null,
-        "label": "Canada/Atlantic (GMT-03:00)",
+        "label": "Canada/Atlantic (GMT-04:00)",
         "value": "Canada/Atlantic"
       }, {
         "description": null,
-        "label": "Canada/Central (GMT-05:00)",
+        "label": "Canada/Central (GMT-06:00)",
         "value": "Canada/Central"
       }, {
         "description": null,
-        "label": "Canada/Eastern (GMT-04:00)",
+        "label": "Canada/Eastern (GMT-05:00)",
         "value": "Canada/Eastern"
       }, {
         "description": null,
-        "label": "Canada/Mountain (GMT-06:00)",
+        "label": "Canada/Mountain (GMT-07:00)",
         "value": "Canada/Mountain"
       }, {
         "description": null,
-        "label": "Canada/Newfoundland (GMT-02:30)",
+        "label": "Canada/Newfoundland (GMT-03:30)",
         "value": "Canada/Newfoundland"
       }, {
         "description": null,
-        "label": "Canada/Pacific (GMT-07:00)",
+        "label": "Canada/Pacific (GMT-08:00)",
         "value": "Canada/Pacific"
       }, {
         "description": null,
@@ -2023,23 +2023,23 @@
         "value": "Chile/EasterIsland"
       }, {
         "description": null,
-        "label": "Cuba (GMT-04:00)",
+        "label": "Cuba (GMT-05:00)",
         "value": "Cuba"
       }, {
         "description": null,
-        "label": "EET (GMT+03:00)",
+        "label": "EET (GMT+02:00)",
         "value": "EET"
       }, {
         "description": null,
-        "label": "EST5EDT (GMT-04:00)",
+        "label": "EST5EDT (GMT-05:00)",
         "value": "EST5EDT"
       }, {
         "description": null,
-        "label": "Egypt (GMT+03:00)",
+        "label": "Egypt (GMT+02:00)",
         "value": "Egypt"
       }, {
         "description": null,
-        "label": "Eire (GMT+01:00)",
+        "label": "Eire (GMT+00:00)",
         "value": "Eire"
       }, {
         "description": null,
@@ -2183,11 +2183,11 @@
         "value": "Etc/Zulu"
       }, {
         "description": null,
-        "label": "Europe/Amsterdam (GMT+02:00)",
+        "label": "Europe/Amsterdam (GMT+01:00)",
         "value": "Europe/Amsterdam"
       }, {
         "description": null,
-        "label": "Europe/Andorra (GMT+02:00)",
+        "label": "Europe/Andorra (GMT+01:00)",
         "value": "Europe/Andorra"
       }, {
         "description": null,
@@ -2195,67 +2195,67 @@
         "value": "Europe/Astrakhan"
       }, {
         "description": null,
-        "label": "Europe/Athens (GMT+03:00)",
+        "label": "Europe/Athens (GMT+02:00)",
         "value": "Europe/Athens"
       }, {
         "description": null,
-        "label": "Europe/Belfast (GMT+01:00)",
+        "label": "Europe/Belfast (GMT+00:00)",
         "value": "Europe/Belfast"
       }, {
         "description": null,
-        "label": "Europe/Belgrade (GMT+02:00)",
+        "label": "Europe/Belgrade (GMT+01:00)",
         "value": "Europe/Belgrade"
       }, {
         "description": null,
-        "label": "Europe/Berlin (GMT+02:00)",
+        "label": "Europe/Berlin (GMT+01:00)",
         "value": "Europe/Berlin"
       }, {
         "description": null,
-        "label": "Europe/Bratislava (GMT+02:00)",
+        "label": "Europe/Bratislava (GMT+01:00)",
         "value": "Europe/Bratislava"
       }, {
         "description": null,
-        "label": "Europe/Brussels (GMT+02:00)",
+        "label": "Europe/Brussels (GMT+01:00)",
         "value": "Europe/Brussels"
       }, {
         "description": null,
-        "label": "Europe/Bucharest (GMT+03:00)",
+        "label": "Europe/Bucharest (GMT+02:00)",
         "value": "Europe/Bucharest"
       }, {
         "description": null,
-        "label": "Europe/Budapest (GMT+02:00)",
+        "label": "Europe/Budapest (GMT+01:00)",
         "value": "Europe/Budapest"
       }, {
         "description": null,
-        "label": "Europe/Busingen (GMT+02:00)",
+        "label": "Europe/Busingen (GMT+01:00)",
         "value": "Europe/Busingen"
       }, {
         "description": null,
-        "label": "Europe/Chisinau (GMT+03:00)",
+        "label": "Europe/Chisinau (GMT+02:00)",
         "value": "Europe/Chisinau"
       }, {
         "description": null,
-        "label": "Europe/Copenhagen (GMT+02:00)",
+        "label": "Europe/Copenhagen (GMT+01:00)",
         "value": "Europe/Copenhagen"
       }, {
         "description": null,
-        "label": "Europe/Dublin (GMT+01:00)",
+        "label": "Europe/Dublin (GMT+00:00)",
         "value": "Europe/Dublin"
       }, {
         "description": null,
-        "label": "Europe/Gibraltar (GMT+02:00)",
+        "label": "Europe/Gibraltar (GMT+01:00)",
         "value": "Europe/Gibraltar"
       }, {
         "description": null,
-        "label": "Europe/Guernsey (GMT+01:00)",
+        "label": "Europe/Guernsey (GMT+00:00)",
         "value": "Europe/Guernsey"
       }, {
         "description": null,
-        "label": "Europe/Helsinki (GMT+03:00)",
+        "label": "Europe/Helsinki (GMT+02:00)",
         "value": "Europe/Helsinki"
       }, {
         "description": null,
-        "label": "Europe/Isle_of_Man (GMT+01:00)",
+        "label": "Europe/Isle_of_Man (GMT+00:00)",
         "value": "Europe/Isle_of_Man"
       }, {
         "description": null,
@@ -2263,7 +2263,7 @@
         "value": "Europe/Istanbul"
       }, {
         "description": null,
-        "label": "Europe/Jersey (GMT+01:00)",
+        "label": "Europe/Jersey (GMT+00:00)",
         "value": "Europe/Jersey"
       }, {
         "description": null,
@@ -2271,7 +2271,7 @@
         "value": "Europe/Kaliningrad"
       }, {
         "description": null,
-        "label": "Europe/Kiev (GMT+03:00)",
+        "label": "Europe/Kiev (GMT+02:00)",
         "value": "Europe/Kiev"
       }, {
         "description": null,
@@ -2279,35 +2279,35 @@
         "value": "Europe/Kirov"
       }, {
         "description": null,
-        "label": "Europe/Kyiv (GMT+03:00)",
+        "label": "Europe/Kyiv (GMT+02:00)",
         "value": "Europe/Kyiv"
       }, {
         "description": null,
-        "label": "Europe/Lisbon (GMT+01:00)",
+        "label": "Europe/Lisbon (GMT+00:00)",
         "value": "Europe/Lisbon"
       }, {
         "description": null,
-        "label": "Europe/Ljubljana (GMT+02:00)",
+        "label": "Europe/Ljubljana (GMT+01:00)",
         "value": "Europe/Ljubljana"
       }, {
         "description": null,
-        "label": "Europe/London (GMT+01:00)",
+        "label": "Europe/London (GMT+00:00)",
         "value": "Europe/London"
       }, {
         "description": null,
-        "label": "Europe/Luxembourg (GMT+02:00)",
+        "label": "Europe/Luxembourg (GMT+01:00)",
         "value": "Europe/Luxembourg"
       }, {
         "description": null,
-        "label": "Europe/Madrid (GMT+02:00)",
+        "label": "Europe/Madrid (GMT+01:00)",
         "value": "Europe/Madrid"
       }, {
         "description": null,
-        "label": "Europe/Malta (GMT+02:00)",
+        "label": "Europe/Malta (GMT+01:00)",
         "value": "Europe/Malta"
       }, {
         "description": null,
-        "label": "Europe/Mariehamn (GMT+03:00)",
+        "label": "Europe/Mariehamn (GMT+02:00)",
         "value": "Europe/Mariehamn"
       }, {
         "description": null,
@@ -2315,7 +2315,7 @@
         "value": "Europe/Minsk"
       }, {
         "description": null,
-        "label": "Europe/Monaco (GMT+02:00)",
+        "label": "Europe/Monaco (GMT+01:00)",
         "value": "Europe/Monaco"
       }, {
         "description": null,
@@ -2323,31 +2323,31 @@
         "value": "Europe/Moscow"
       }, {
         "description": null,
-        "label": "Europe/Nicosia (GMT+03:00)",
+        "label": "Europe/Nicosia (GMT+02:00)",
         "value": "Europe/Nicosia"
       }, {
         "description": null,
-        "label": "Europe/Oslo (GMT+02:00)",
+        "label": "Europe/Oslo (GMT+01:00)",
         "value": "Europe/Oslo"
       }, {
         "description": null,
-        "label": "Europe/Paris (GMT+02:00)",
+        "label": "Europe/Paris (GMT+01:00)",
         "value": "Europe/Paris"
       }, {
         "description": null,
-        "label": "Europe/Podgorica (GMT+02:00)",
+        "label": "Europe/Podgorica (GMT+01:00)",
         "value": "Europe/Podgorica"
       }, {
         "description": null,
-        "label": "Europe/Prague (GMT+02:00)",
+        "label": "Europe/Prague (GMT+01:00)",
         "value": "Europe/Prague"
       }, {
         "description": null,
-        "label": "Europe/Riga (GMT+03:00)",
+        "label": "Europe/Riga (GMT+02:00)",
         "value": "Europe/Riga"
       }, {
         "description": null,
-        "label": "Europe/Rome (GMT+02:00)",
+        "label": "Europe/Rome (GMT+01:00)",
         "value": "Europe/Rome"
       }, {
         "description": null,
@@ -2355,11 +2355,11 @@
         "value": "Europe/Samara"
       }, {
         "description": null,
-        "label": "Europe/San_Marino (GMT+02:00)",
+        "label": "Europe/San_Marino (GMT+01:00)",
         "value": "Europe/San_Marino"
       }, {
         "description": null,
-        "label": "Europe/Sarajevo (GMT+02:00)",
+        "label": "Europe/Sarajevo (GMT+01:00)",
         "value": "Europe/Sarajevo"
       }, {
         "description": null,
@@ -2371,27 +2371,27 @@
         "value": "Europe/Simferopol"
       }, {
         "description": null,
-        "label": "Europe/Skopje (GMT+02:00)",
+        "label": "Europe/Skopje (GMT+01:00)",
         "value": "Europe/Skopje"
       }, {
         "description": null,
-        "label": "Europe/Sofia (GMT+03:00)",
+        "label": "Europe/Sofia (GMT+02:00)",
         "value": "Europe/Sofia"
       }, {
         "description": null,
-        "label": "Europe/Stockholm (GMT+02:00)",
+        "label": "Europe/Stockholm (GMT+01:00)",
         "value": "Europe/Stockholm"
       }, {
         "description": null,
-        "label": "Europe/Tallinn (GMT+03:00)",
+        "label": "Europe/Tallinn (GMT+02:00)",
         "value": "Europe/Tallinn"
       }, {
         "description": null,
-        "label": "Europe/Tirane (GMT+02:00)",
+        "label": "Europe/Tirane (GMT+01:00)",
         "value": "Europe/Tirane"
       }, {
         "description": null,
-        "label": "Europe/Tiraspol (GMT+03:00)",
+        "label": "Europe/Tiraspol (GMT+02:00)",
         "value": "Europe/Tiraspol"
       }, {
         "description": null,
@@ -2399,23 +2399,23 @@
         "value": "Europe/Ulyanovsk"
       }, {
         "description": null,
-        "label": "Europe/Uzhgorod (GMT+03:00)",
+        "label": "Europe/Uzhgorod (GMT+02:00)",
         "value": "Europe/Uzhgorod"
       }, {
         "description": null,
-        "label": "Europe/Vaduz (GMT+02:00)",
+        "label": "Europe/Vaduz (GMT+01:00)",
         "value": "Europe/Vaduz"
       }, {
         "description": null,
-        "label": "Europe/Vatican (GMT+02:00)",
+        "label": "Europe/Vatican (GMT+01:00)",
         "value": "Europe/Vatican"
       }, {
         "description": null,
-        "label": "Europe/Vienna (GMT+02:00)",
+        "label": "Europe/Vienna (GMT+01:00)",
         "value": "Europe/Vienna"
       }, {
         "description": null,
-        "label": "Europe/Vilnius (GMT+03:00)",
+        "label": "Europe/Vilnius (GMT+02:00)",
         "value": "Europe/Vilnius"
       }, {
         "description": null,
@@ -2423,27 +2423,27 @@
         "value": "Europe/Volgograd"
       }, {
         "description": null,
-        "label": "Europe/Warsaw (GMT+02:00)",
+        "label": "Europe/Warsaw (GMT+01:00)",
         "value": "Europe/Warsaw"
       }, {
         "description": null,
-        "label": "Europe/Zagreb (GMT+02:00)",
+        "label": "Europe/Zagreb (GMT+01:00)",
         "value": "Europe/Zagreb"
       }, {
         "description": null,
-        "label": "Europe/Zaporozhye (GMT+03:00)",
+        "label": "Europe/Zaporozhye (GMT+02:00)",
         "value": "Europe/Zaporozhye"
       }, {
         "description": null,
-        "label": "Europe/Zurich (GMT+02:00)",
+        "label": "Europe/Zurich (GMT+01:00)",
         "value": "Europe/Zurich"
       }, {
         "description": null,
-        "label": "GB (GMT+01:00)",
+        "label": "GB (GMT+00:00)",
         "value": "GB"
       }, {
         "description": null,
-        "label": "GB-Eire (GMT+01:00)",
+        "label": "GB-Eire (GMT+00:00)",
         "value": "GB-Eire"
       }, {
         "description": null,
@@ -2515,7 +2515,7 @@
         "value": "Iran"
       }, {
         "description": null,
-        "label": "Israel (GMT+03:00)",
+        "label": "Israel (GMT+02:00)",
         "value": "Israel"
       }, {
         "description": null,
@@ -2535,15 +2535,15 @@
         "value": "Libya"
       }, {
         "description": null,
-        "label": "MET (GMT+02:00)",
+        "label": "MET (GMT+01:00)",
         "value": "MET"
       }, {
         "description": null,
-        "label": "MST7MDT (GMT-06:00)",
+        "label": "MST7MDT (GMT-07:00)",
         "value": "MST7MDT"
       }, {
         "description": null,
-        "label": "Mexico/BajaNorte (GMT-07:00)",
+        "label": "Mexico/BajaNorte (GMT-08:00)",
         "value": "Mexico/BajaNorte"
       }, {
         "description": null,
@@ -2563,7 +2563,7 @@
         "value": "NZ-CHAT"
       }, {
         "description": null,
-        "label": "Navajo (GMT-06:00)",
+        "label": "Navajo (GMT-07:00)",
         "value": "Navajo"
       }, {
         "description": null,
@@ -2571,7 +2571,7 @@
         "value": "PRC"
       }, {
         "description": null,
-        "label": "PST8PDT (GMT-07:00)",
+        "label": "PST8PDT (GMT-08:00)",
         "value": "PST8PDT"
       }, {
         "description": null,
@@ -2751,11 +2751,11 @@
         "value": "Pacific/Yap"
       }, {
         "description": null,
-        "label": "Poland (GMT+02:00)",
+        "label": "Poland (GMT+01:00)",
         "value": "Poland"
       }, {
         "description": null,
-        "label": "Portugal (GMT+01:00)",
+        "label": "Portugal (GMT+00:00)",
         "value": "Portugal"
       }, {
         "description": null,
@@ -2771,7 +2771,7 @@
         "value": "SystemV/AST4"
       }, {
         "description": null,
-        "label": "SystemV/AST4ADT (GMT-03:00)",
+        "label": "SystemV/AST4ADT (GMT-04:00)",
         "value": "SystemV/AST4ADT"
       }, {
         "description": null,
@@ -2779,7 +2779,7 @@
         "value": "SystemV/CST6"
       }, {
         "description": null,
-        "label": "SystemV/CST6CDT (GMT-05:00)",
+        "label": "SystemV/CST6CDT (GMT-06:00)",
         "value": "SystemV/CST6CDT"
       }, {
         "description": null,
@@ -2787,7 +2787,7 @@
         "value": "SystemV/EST5"
       }, {
         "description": null,
-        "label": "SystemV/EST5EDT (GMT-04:00)",
+        "label": "SystemV/EST5EDT (GMT-05:00)",
         "value": "SystemV/EST5EDT"
       }, {
         "description": null,
@@ -2799,7 +2799,7 @@
         "value": "SystemV/MST7"
       }, {
         "description": null,
-        "label": "SystemV/MST7MDT (GMT-06:00)",
+        "label": "SystemV/MST7MDT (GMT-07:00)",
         "value": "SystemV/MST7MDT"
       }, {
         "description": null,
@@ -2807,7 +2807,7 @@
         "value": "SystemV/PST8"
       }, {
         "description": null,
-        "label": "SystemV/PST8PDT (GMT-07:00)",
+        "label": "SystemV/PST8PDT (GMT-08:00)",
         "value": "SystemV/PST8PDT"
       }, {
         "description": null,
@@ -2815,7 +2815,7 @@
         "value": "SystemV/YST9"
       }, {
         "description": null,
-        "label": "SystemV/YST9YDT (GMT-08:00)",
+        "label": "SystemV/YST9YDT (GMT-09:00)",
         "value": "SystemV/YST9YDT"
       }, {
         "description": null,
@@ -2827,11 +2827,11 @@
         "value": "UCT"
       }, {
         "description": null,
-        "label": "US/Alaska (GMT-08:00)",
+        "label": "US/Alaska (GMT-09:00)",
         "value": "US/Alaska"
       }, {
         "description": null,
-        "label": "US/Aleutian (GMT-09:00)",
+        "label": "US/Aleutian (GMT-10:00)",
         "value": "US/Aleutian"
       }, {
         "description": null,
@@ -2839,15 +2839,15 @@
         "value": "US/Arizona"
       }, {
         "description": null,
-        "label": "US/Central (GMT-05:00)",
+        "label": "US/Central (GMT-06:00)",
         "value": "US/Central"
       }, {
         "description": null,
-        "label": "US/East-Indiana (GMT-04:00)",
+        "label": "US/East-Indiana (GMT-05:00)",
         "value": "US/East-Indiana"
       }, {
         "description": null,
-        "label": "US/Eastern (GMT-04:00)",
+        "label": "US/Eastern (GMT-05:00)",
         "value": "US/Eastern"
       }, {
         "description": null,
@@ -2855,19 +2855,19 @@
         "value": "US/Hawaii"
       }, {
         "description": null,
-        "label": "US/Indiana-Starke (GMT-05:00)",
+        "label": "US/Indiana-Starke (GMT-06:00)",
         "value": "US/Indiana-Starke"
       }, {
         "description": null,
-        "label": "US/Michigan (GMT-04:00)",
+        "label": "US/Michigan (GMT-05:00)",
         "value": "US/Michigan"
       }, {
         "description": null,
-        "label": "US/Mountain (GMT-06:00)",
+        "label": "US/Mountain (GMT-07:00)",
         "value": "US/Mountain"
       }, {
         "description": null,
-        "label": "US/Pacific (GMT-07:00)",
+        "label": "US/Pacific (GMT-08:00)",
         "value": "US/Pacific"
       }, {
         "description": null,
@@ -2887,7 +2887,7 @@
         "value": "W-SU"
       }, {
         "description": null,
-        "label": "WET (GMT+01:00)",
+        "label": "WET (GMT+00:00)",
         "value": "WET"
       }, {
         "description": null,
@@ -3363,15 +3363,15 @@
         "value": "Africa/Bujumbura"
       }, {
         "description": null,
-        "label": "Africa/Cairo (GMT+03:00)",
+        "label": "Africa/Cairo (GMT+02:00)",
         "value": "Africa/Cairo"
       }, {
         "description": null,
-        "label": "Africa/Casablanca (GMT+01:00)",
+        "label": "Africa/Casablanca (GMT+00:00)",
         "value": "Africa/Casablanca"
       }, {
         "description": null,
-        "label": "Africa/Ceuta (GMT+02:00)",
+        "label": "Africa/Ceuta (GMT+01:00)",
         "value": "Africa/Ceuta"
       }, {
         "description": null,
@@ -3395,7 +3395,7 @@
         "value": "Africa/Douala"
       }, {
         "description": null,
-        "label": "Africa/El_Aaiun (GMT+01:00)",
+        "label": "Africa/El_Aaiun (GMT+00:00)",
         "value": "Africa/El_Aaiun"
       }, {
         "description": null,
@@ -3523,15 +3523,15 @@
         "value": "Africa/Tunis"
       }, {
         "description": null,
-        "label": "Africa/Windhoek (GMT+02:00)",
+        "label": "Africa/Windhoek (GMT+01:00)",
         "value": "Africa/Windhoek"
       }, {
         "description": null,
-        "label": "America/Adak (GMT-09:00)",
+        "label": "America/Adak (GMT-10:00)",
         "value": "America/Adak"
       }, {
         "description": null,
-        "label": "America/Anchorage (GMT-08:00)",
+        "label": "America/Anchorage (GMT-09:00)",
         "value": "America/Anchorage"
       }, {
         "description": null,
@@ -3611,7 +3611,7 @@
         "value": "America/Atikokan"
       }, {
         "description": null,
-        "label": "America/Atka (GMT-09:00)",
+        "label": "America/Atka (GMT-10:00)",
         "value": "America/Atka"
       }, {
         "description": null,
@@ -3647,7 +3647,7 @@
         "value": "America/Bogota"
       }, {
         "description": null,
-        "label": "America/Boise (GMT-06:00)",
+        "label": "America/Boise (GMT-07:00)",
         "value": "America/Boise"
       }, {
         "description": null,
@@ -3655,7 +3655,7 @@
         "value": "America/Buenos_Aires"
       }, {
         "description": null,
-        "label": "America/Cambridge_Bay (GMT-06:00)",
+        "label": "America/Cambridge_Bay (GMT-07:00)",
         "value": "America/Cambridge_Bay"
       }, {
         "description": null,
@@ -3683,7 +3683,7 @@
         "value": "America/Cayman"
       }, {
         "description": null,
-        "label": "America/Chicago (GMT-05:00)",
+        "label": "America/Chicago (GMT-06:00)",
         "value": "America/Chicago"
       }, {
         "description": null,
@@ -3691,7 +3691,7 @@
         "value": "America/Chihuahua"
       }, {
         "description": null,
-        "label": "America/Ciudad_Juarez (GMT-06:00)",
+        "label": "America/Ciudad_Juarez (GMT-07:00)",
         "value": "America/Ciudad_Juarez"
       }, {
         "description": null,
@@ -3735,11 +3735,11 @@
         "value": "America/Dawson_Creek"
       }, {
         "description": null,
-        "label": "America/Denver (GMT-06:00)",
+        "label": "America/Denver (GMT-07:00)",
         "value": "America/Denver"
       }, {
         "description": null,
-        "label": "America/Detroit (GMT-04:00)",
+        "label": "America/Detroit (GMT-05:00)",
         "value": "America/Detroit"
       }, {
         "description": null,
@@ -3747,7 +3747,7 @@
         "value": "America/Dominica"
       }, {
         "description": null,
-        "label": "America/Edmonton (GMT-06:00)",
+        "label": "America/Edmonton (GMT-07:00)",
         "value": "America/Edmonton"
       }, {
         "description": null,
@@ -3759,7 +3759,7 @@
         "value": "America/El_Salvador"
       }, {
         "description": null,
-        "label": "America/Ensenada (GMT-07:00)",
+        "label": "America/Ensenada (GMT-08:00)",
         "value": "America/Ensenada"
       }, {
         "description": null,
@@ -3767,7 +3767,7 @@
         "value": "America/Fort_Nelson"
       }, {
         "description": null,
-        "label": "America/Fort_Wayne (GMT-04:00)",
+        "label": "America/Fort_Wayne (GMT-05:00)",
         "value": "America/Fort_Wayne"
       }, {
         "description": null,
@@ -3775,19 +3775,19 @@
         "value": "America/Fortaleza"
       }, {
         "description": null,
-        "label": "America/Glace_Bay (GMT-03:00)",
+        "label": "America/Glace_Bay (GMT-04:00)",
         "value": "America/Glace_Bay"
       }, {
         "description": null,
-        "label": "America/Godthab (GMT-01:00)",
+        "label": "America/Godthab (GMT-02:00)",
         "value": "America/Godthab"
       }, {
         "description": null,
-        "label": "America/Goose_Bay (GMT-03:00)",
+        "label": "America/Goose_Bay (GMT-04:00)",
         "value": "America/Goose_Bay"
       }, {
         "description": null,
-        "label": "America/Grand_Turk (GMT-04:00)",
+        "label": "America/Grand_Turk (GMT-05:00)",
         "value": "America/Grand_Turk"
       }, {
         "description": null,
@@ -3811,11 +3811,11 @@
         "value": "America/Guyana"
       }, {
         "description": null,
-        "label": "America/Halifax (GMT-03:00)",
+        "label": "America/Halifax (GMT-04:00)",
         "value": "America/Halifax"
       }, {
         "description": null,
-        "label": "America/Havana (GMT-04:00)",
+        "label": "America/Havana (GMT-05:00)",
         "value": "America/Havana"
       }, {
         "description": null,
@@ -3823,47 +3823,47 @@
         "value": "America/Hermosillo"
       }, {
         "description": null,
-        "label": "America/Indiana/Indianapolis (GMT-04:00)",
+        "label": "America/Indiana/Indianapolis (GMT-05:00)",
         "value": "America/Indiana/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Indiana/Knox (GMT-05:00)",
+        "label": "America/Indiana/Knox (GMT-06:00)",
         "value": "America/Indiana/Knox"
       }, {
         "description": null,
-        "label": "America/Indiana/Marengo (GMT-04:00)",
+        "label": "America/Indiana/Marengo (GMT-05:00)",
         "value": "America/Indiana/Marengo"
       }, {
         "description": null,
-        "label": "America/Indiana/Petersburg (GMT-04:00)",
+        "label": "America/Indiana/Petersburg (GMT-05:00)",
         "value": "America/Indiana/Petersburg"
       }, {
         "description": null,
-        "label": "America/Indiana/Tell_City (GMT-05:00)",
+        "label": "America/Indiana/Tell_City (GMT-06:00)",
         "value": "America/Indiana/Tell_City"
       }, {
         "description": null,
-        "label": "America/Indiana/Vevay (GMT-04:00)",
+        "label": "America/Indiana/Vevay (GMT-05:00)",
         "value": "America/Indiana/Vevay"
       }, {
         "description": null,
-        "label": "America/Indiana/Vincennes (GMT-04:00)",
+        "label": "America/Indiana/Vincennes (GMT-05:00)",
         "value": "America/Indiana/Vincennes"
       }, {
         "description": null,
-        "label": "America/Indiana/Winamac (GMT-04:00)",
+        "label": "America/Indiana/Winamac (GMT-05:00)",
         "value": "America/Indiana/Winamac"
       }, {
         "description": null,
-        "label": "America/Indianapolis (GMT-04:00)",
+        "label": "America/Indianapolis (GMT-05:00)",
         "value": "America/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Inuvik (GMT-06:00)",
+        "label": "America/Inuvik (GMT-07:00)",
         "value": "America/Inuvik"
       }, {
         "description": null,
-        "label": "America/Iqaluit (GMT-04:00)",
+        "label": "America/Iqaluit (GMT-05:00)",
         "value": "America/Iqaluit"
       }, {
         "description": null,
@@ -3875,19 +3875,19 @@
         "value": "America/Jujuy"
       }, {
         "description": null,
-        "label": "America/Juneau (GMT-08:00)",
+        "label": "America/Juneau (GMT-09:00)",
         "value": "America/Juneau"
       }, {
         "description": null,
-        "label": "America/Kentucky/Louisville (GMT-04:00)",
+        "label": "America/Kentucky/Louisville (GMT-05:00)",
         "value": "America/Kentucky/Louisville"
       }, {
         "description": null,
-        "label": "America/Kentucky/Monticello (GMT-04:00)",
+        "label": "America/Kentucky/Monticello (GMT-05:00)",
         "value": "America/Kentucky/Monticello"
       }, {
         "description": null,
-        "label": "America/Knox_IN (GMT-05:00)",
+        "label": "America/Knox_IN (GMT-06:00)",
         "value": "America/Knox_IN"
       }, {
         "description": null,
@@ -3903,11 +3903,11 @@
         "value": "America/Lima"
       }, {
         "description": null,
-        "label": "America/Los_Angeles (GMT-07:00)",
+        "label": "America/Los_Angeles (GMT-08:00)",
         "value": "America/Los_Angeles"
       }, {
         "description": null,
-        "label": "America/Louisville (GMT-04:00)",
+        "label": "America/Louisville (GMT-05:00)",
         "value": "America/Louisville"
       }, {
         "description": null,
@@ -3935,7 +3935,7 @@
         "value": "America/Martinique"
       }, {
         "description": null,
-        "label": "America/Matamoros (GMT-05:00)",
+        "label": "America/Matamoros (GMT-06:00)",
         "value": "America/Matamoros"
       }, {
         "description": null,
@@ -3947,7 +3947,7 @@
         "value": "America/Mendoza"
       }, {
         "description": null,
-        "label": "America/Menominee (GMT-05:00)",
+        "label": "America/Menominee (GMT-06:00)",
         "value": "America/Menominee"
       }, {
         "description": null,
@@ -3955,7 +3955,7 @@
         "value": "America/Merida"
       }, {
         "description": null,
-        "label": "America/Metlakatla (GMT-08:00)",
+        "label": "America/Metlakatla (GMT-09:00)",
         "value": "America/Metlakatla"
       }, {
         "description": null,
@@ -3963,11 +3963,11 @@
         "value": "America/Mexico_City"
       }, {
         "description": null,
-        "label": "America/Miquelon (GMT-02:00)",
+        "label": "America/Miquelon (GMT-03:00)",
         "value": "America/Miquelon"
       }, {
         "description": null,
-        "label": "America/Moncton (GMT-03:00)",
+        "label": "America/Moncton (GMT-04:00)",
         "value": "America/Moncton"
       }, {
         "description": null,
@@ -3979,7 +3979,7 @@
         "value": "America/Montevideo"
       }, {
         "description": null,
-        "label": "America/Montreal (GMT-04:00)",
+        "label": "America/Montreal (GMT-05:00)",
         "value": "America/Montreal"
       }, {
         "description": null,
@@ -3987,19 +3987,19 @@
         "value": "America/Montserrat"
       }, {
         "description": null,
-        "label": "America/Nassau (GMT-04:00)",
+        "label": "America/Nassau (GMT-05:00)",
         "value": "America/Nassau"
       }, {
         "description": null,
-        "label": "America/New_York (GMT-04:00)",
+        "label": "America/New_York (GMT-05:00)",
         "value": "America/New_York"
       }, {
         "description": null,
-        "label": "America/Nipigon (GMT-04:00)",
+        "label": "America/Nipigon (GMT-05:00)",
         "value": "America/Nipigon"
       }, {
         "description": null,
-        "label": "America/Nome (GMT-08:00)",
+        "label": "America/Nome (GMT-09:00)",
         "value": "America/Nome"
       }, {
         "description": null,
@@ -4007,23 +4007,23 @@
         "value": "America/Noronha"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Beulah (GMT-05:00)",
+        "label": "America/North_Dakota/Beulah (GMT-06:00)",
         "value": "America/North_Dakota/Beulah"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Center (GMT-05:00)",
+        "label": "America/North_Dakota/Center (GMT-06:00)",
         "value": "America/North_Dakota/Center"
       }, {
         "description": null,
-        "label": "America/North_Dakota/New_Salem (GMT-05:00)",
+        "label": "America/North_Dakota/New_Salem (GMT-06:00)",
         "value": "America/North_Dakota/New_Salem"
       }, {
         "description": null,
-        "label": "America/Nuuk (GMT-01:00)",
+        "label": "America/Nuuk (GMT-02:00)",
         "value": "America/Nuuk"
       }, {
         "description": null,
-        "label": "America/Ojinaga (GMT-05:00)",
+        "label": "America/Ojinaga (GMT-06:00)",
         "value": "America/Ojinaga"
       }, {
         "description": null,
@@ -4031,7 +4031,7 @@
         "value": "America/Panama"
       }, {
         "description": null,
-        "label": "America/Pangnirtung (GMT-04:00)",
+        "label": "America/Pangnirtung (GMT-05:00)",
         "value": "America/Pangnirtung"
       }, {
         "description": null,
@@ -4043,7 +4043,7 @@
         "value": "America/Phoenix"
       }, {
         "description": null,
-        "label": "America/Port-au-Prince (GMT-04:00)",
+        "label": "America/Port-au-Prince (GMT-05:00)",
         "value": "America/Port-au-Prince"
       }, {
         "description": null,
@@ -4067,11 +4067,11 @@
         "value": "America/Punta_Arenas"
       }, {
         "description": null,
-        "label": "America/Rainy_River (GMT-05:00)",
+        "label": "America/Rainy_River (GMT-06:00)",
         "value": "America/Rainy_River"
       }, {
         "description": null,
-        "label": "America/Rankin_Inlet (GMT-05:00)",
+        "label": "America/Rankin_Inlet (GMT-06:00)",
         "value": "America/Rankin_Inlet"
       }, {
         "description": null,
@@ -4083,7 +4083,7 @@
         "value": "America/Regina"
       }, {
         "description": null,
-        "label": "America/Resolute (GMT-05:00)",
+        "label": "America/Resolute (GMT-06:00)",
         "value": "America/Resolute"
       }, {
         "description": null,
@@ -4095,7 +4095,7 @@
         "value": "America/Rosario"
       }, {
         "description": null,
-        "label": "America/Santa_Isabel (GMT-07:00)",
+        "label": "America/Santa_Isabel (GMT-08:00)",
         "value": "America/Santa_Isabel"
       }, {
         "description": null,
@@ -4115,15 +4115,15 @@
         "value": "America/Sao_Paulo"
       }, {
         "description": null,
-        "label": "America/Scoresbysund (GMT-01:00)",
+        "label": "America/Scoresbysund (GMT-02:00)",
         "value": "America/Scoresbysund"
       }, {
         "description": null,
-        "label": "America/Shiprock (GMT-06:00)",
+        "label": "America/Shiprock (GMT-07:00)",
         "value": "America/Shiprock"
       }, {
         "description": null,
-        "label": "America/Sitka (GMT-08:00)",
+        "label": "America/Sitka (GMT-09:00)",
         "value": "America/Sitka"
       }, {
         "description": null,
@@ -4131,7 +4131,7 @@
         "value": "America/St_Barthelemy"
       }, {
         "description": null,
-        "label": "America/St_Johns (GMT-02:30)",
+        "label": "America/St_Johns (GMT-03:30)",
         "value": "America/St_Johns"
       }, {
         "description": null,
@@ -4159,19 +4159,19 @@
         "value": "America/Tegucigalpa"
       }, {
         "description": null,
-        "label": "America/Thule (GMT-03:00)",
+        "label": "America/Thule (GMT-04:00)",
         "value": "America/Thule"
       }, {
         "description": null,
-        "label": "America/Thunder_Bay (GMT-04:00)",
+        "label": "America/Thunder_Bay (GMT-05:00)",
         "value": "America/Thunder_Bay"
       }, {
         "description": null,
-        "label": "America/Tijuana (GMT-07:00)",
+        "label": "America/Tijuana (GMT-08:00)",
         "value": "America/Tijuana"
       }, {
         "description": null,
-        "label": "America/Toronto (GMT-04:00)",
+        "label": "America/Toronto (GMT-05:00)",
         "value": "America/Toronto"
       }, {
         "description": null,
@@ -4179,7 +4179,7 @@
         "value": "America/Tortola"
       }, {
         "description": null,
-        "label": "America/Vancouver (GMT-07:00)",
+        "label": "America/Vancouver (GMT-08:00)",
         "value": "America/Vancouver"
       }, {
         "description": null,
@@ -4191,15 +4191,15 @@
         "value": "America/Whitehorse"
       }, {
         "description": null,
-        "label": "America/Winnipeg (GMT-05:00)",
+        "label": "America/Winnipeg (GMT-06:00)",
         "value": "America/Winnipeg"
       }, {
         "description": null,
-        "label": "America/Yakutat (GMT-08:00)",
+        "label": "America/Yakutat (GMT-09:00)",
         "value": "America/Yakutat"
       }, {
         "description": null,
-        "label": "America/Yellowknife (GMT-06:00)",
+        "label": "America/Yellowknife (GMT-07:00)",
         "value": "America/Yellowknife"
       }, {
         "description": null,
@@ -4243,7 +4243,7 @@
         "value": "Antarctica/Syowa"
       }, {
         "description": null,
-        "label": "Antarctica/Troll (GMT+02:00)",
+        "label": "Antarctica/Troll (GMT+00:00)",
         "value": "Antarctica/Troll"
       }, {
         "description": null,
@@ -4251,7 +4251,7 @@
         "value": "Antarctica/Vostok"
       }, {
         "description": null,
-        "label": "Arctic/Longyearbyen (GMT+02:00)",
+        "label": "Arctic/Longyearbyen (GMT+01:00)",
         "value": "Arctic/Longyearbyen"
       }, {
         "description": null,
@@ -4311,7 +4311,7 @@
         "value": "Asia/Barnaul"
       }, {
         "description": null,
-        "label": "Asia/Beirut (GMT+03:00)",
+        "label": "Asia/Beirut (GMT+02:00)",
         "value": "Asia/Beirut"
       }, {
         "description": null,
@@ -4371,11 +4371,11 @@
         "value": "Asia/Dushanbe"
       }, {
         "description": null,
-        "label": "Asia/Famagusta (GMT+03:00)",
+        "label": "Asia/Famagusta (GMT+02:00)",
         "value": "Asia/Famagusta"
       }, {
         "description": null,
-        "label": "Asia/Gaza (GMT+03:00)",
+        "label": "Asia/Gaza (GMT+02:00)",
         "value": "Asia/Gaza"
       }, {
         "description": null,
@@ -4383,7 +4383,7 @@
         "value": "Asia/Harbin"
       }, {
         "description": null,
-        "label": "Asia/Hebron (GMT+03:00)",
+        "label": "Asia/Hebron (GMT+02:00)",
         "value": "Asia/Hebron"
       }, {
         "description": null,
@@ -4415,7 +4415,7 @@
         "value": "Asia/Jayapura"
       }, {
         "description": null,
-        "label": "Asia/Jerusalem (GMT+03:00)",
+        "label": "Asia/Jerusalem (GMT+02:00)",
         "value": "Asia/Jerusalem"
       }, {
         "description": null,
@@ -4491,7 +4491,7 @@
         "value": "Asia/Muscat"
       }, {
         "description": null,
-        "label": "Asia/Nicosia (GMT+03:00)",
+        "label": "Asia/Nicosia (GMT+02:00)",
         "value": "Asia/Nicosia"
       }, {
         "description": null,
@@ -4587,7 +4587,7 @@
         "value": "Asia/Tehran"
       }, {
         "description": null,
-        "label": "Asia/Tel_Aviv (GMT+03:00)",
+        "label": "Asia/Tel_Aviv (GMT+02:00)",
         "value": "Asia/Tel_Aviv"
       }, {
         "description": null,
@@ -4651,15 +4651,15 @@
         "value": "Asia/Yerevan"
       }, {
         "description": null,
-        "label": "Atlantic/Azores (GMT+00:00)",
+        "label": "Atlantic/Azores (GMT-01:00)",
         "value": "Atlantic/Azores"
       }, {
         "description": null,
-        "label": "Atlantic/Bermuda (GMT-03:00)",
+        "label": "Atlantic/Bermuda (GMT-04:00)",
         "value": "Atlantic/Bermuda"
       }, {
         "description": null,
-        "label": "Atlantic/Canary (GMT+01:00)",
+        "label": "Atlantic/Canary (GMT+00:00)",
         "value": "Atlantic/Canary"
       }, {
         "description": null,
@@ -4667,19 +4667,19 @@
         "value": "Atlantic/Cape_Verde"
       }, {
         "description": null,
-        "label": "Atlantic/Faeroe (GMT+01:00)",
+        "label": "Atlantic/Faeroe (GMT+00:00)",
         "value": "Atlantic/Faeroe"
       }, {
         "description": null,
-        "label": "Atlantic/Faroe (GMT+01:00)",
+        "label": "Atlantic/Faroe (GMT+00:00)",
         "value": "Atlantic/Faroe"
       }, {
         "description": null,
-        "label": "Atlantic/Jan_Mayen (GMT+02:00)",
+        "label": "Atlantic/Jan_Mayen (GMT+01:00)",
         "value": "Atlantic/Jan_Mayen"
       }, {
         "description": null,
-        "label": "Atlantic/Madeira (GMT+01:00)",
+        "label": "Atlantic/Madeira (GMT+00:00)",
         "value": "Atlantic/Madeira"
       }, {
         "description": null,
@@ -4807,35 +4807,35 @@
         "value": "Brazil/West"
       }, {
         "description": null,
-        "label": "CET (GMT+02:00)",
+        "label": "CET (GMT+01:00)",
         "value": "CET"
       }, {
         "description": null,
-        "label": "CST6CDT (GMT-05:00)",
+        "label": "CST6CDT (GMT-06:00)",
         "value": "CST6CDT"
       }, {
         "description": null,
-        "label": "Canada/Atlantic (GMT-03:00)",
+        "label": "Canada/Atlantic (GMT-04:00)",
         "value": "Canada/Atlantic"
       }, {
         "description": null,
-        "label": "Canada/Central (GMT-05:00)",
+        "label": "Canada/Central (GMT-06:00)",
         "value": "Canada/Central"
       }, {
         "description": null,
-        "label": "Canada/Eastern (GMT-04:00)",
+        "label": "Canada/Eastern (GMT-05:00)",
         "value": "Canada/Eastern"
       }, {
         "description": null,
-        "label": "Canada/Mountain (GMT-06:00)",
+        "label": "Canada/Mountain (GMT-07:00)",
         "value": "Canada/Mountain"
       }, {
         "description": null,
-        "label": "Canada/Newfoundland (GMT-02:30)",
+        "label": "Canada/Newfoundland (GMT-03:30)",
         "value": "Canada/Newfoundland"
       }, {
         "description": null,
-        "label": "Canada/Pacific (GMT-07:00)",
+        "label": "Canada/Pacific (GMT-08:00)",
         "value": "Canada/Pacific"
       }, {
         "description": null,
@@ -4855,23 +4855,23 @@
         "value": "Chile/EasterIsland"
       }, {
         "description": null,
-        "label": "Cuba (GMT-04:00)",
+        "label": "Cuba (GMT-05:00)",
         "value": "Cuba"
       }, {
         "description": null,
-        "label": "EET (GMT+03:00)",
+        "label": "EET (GMT+02:00)",
         "value": "EET"
       }, {
         "description": null,
-        "label": "EST5EDT (GMT-04:00)",
+        "label": "EST5EDT (GMT-05:00)",
         "value": "EST5EDT"
       }, {
         "description": null,
-        "label": "Egypt (GMT+03:00)",
+        "label": "Egypt (GMT+02:00)",
         "value": "Egypt"
       }, {
         "description": null,
-        "label": "Eire (GMT+01:00)",
+        "label": "Eire (GMT+00:00)",
         "value": "Eire"
       }, {
         "description": null,
@@ -5015,11 +5015,11 @@
         "value": "Etc/Zulu"
       }, {
         "description": null,
-        "label": "Europe/Amsterdam (GMT+02:00)",
+        "label": "Europe/Amsterdam (GMT+01:00)",
         "value": "Europe/Amsterdam"
       }, {
         "description": null,
-        "label": "Europe/Andorra (GMT+02:00)",
+        "label": "Europe/Andorra (GMT+01:00)",
         "value": "Europe/Andorra"
       }, {
         "description": null,
@@ -5027,67 +5027,67 @@
         "value": "Europe/Astrakhan"
       }, {
         "description": null,
-        "label": "Europe/Athens (GMT+03:00)",
+        "label": "Europe/Athens (GMT+02:00)",
         "value": "Europe/Athens"
       }, {
         "description": null,
-        "label": "Europe/Belfast (GMT+01:00)",
+        "label": "Europe/Belfast (GMT+00:00)",
         "value": "Europe/Belfast"
       }, {
         "description": null,
-        "label": "Europe/Belgrade (GMT+02:00)",
+        "label": "Europe/Belgrade (GMT+01:00)",
         "value": "Europe/Belgrade"
       }, {
         "description": null,
-        "label": "Europe/Berlin (GMT+02:00)",
+        "label": "Europe/Berlin (GMT+01:00)",
         "value": "Europe/Berlin"
       }, {
         "description": null,
-        "label": "Europe/Bratislava (GMT+02:00)",
+        "label": "Europe/Bratislava (GMT+01:00)",
         "value": "Europe/Bratislava"
       }, {
         "description": null,
-        "label": "Europe/Brussels (GMT+02:00)",
+        "label": "Europe/Brussels (GMT+01:00)",
         "value": "Europe/Brussels"
       }, {
         "description": null,
-        "label": "Europe/Bucharest (GMT+03:00)",
+        "label": "Europe/Bucharest (GMT+02:00)",
         "value": "Europe/Bucharest"
       }, {
         "description": null,
-        "label": "Europe/Budapest (GMT+02:00)",
+        "label": "Europe/Budapest (GMT+01:00)",
         "value": "Europe/Budapest"
       }, {
         "description": null,
-        "label": "Europe/Busingen (GMT+02:00)",
+        "label": "Europe/Busingen (GMT+01:00)",
         "value": "Europe/Busingen"
       }, {
         "description": null,
-        "label": "Europe/Chisinau (GMT+03:00)",
+        "label": "Europe/Chisinau (GMT+02:00)",
         "value": "Europe/Chisinau"
       }, {
         "description": null,
-        "label": "Europe/Copenhagen (GMT+02:00)",
+        "label": "Europe/Copenhagen (GMT+01:00)",
         "value": "Europe/Copenhagen"
       }, {
         "description": null,
-        "label": "Europe/Dublin (GMT+01:00)",
+        "label": "Europe/Dublin (GMT+00:00)",
         "value": "Europe/Dublin"
       }, {
         "description": null,
-        "label": "Europe/Gibraltar (GMT+02:00)",
+        "label": "Europe/Gibraltar (GMT+01:00)",
         "value": "Europe/Gibraltar"
       }, {
         "description": null,
-        "label": "Europe/Guernsey (GMT+01:00)",
+        "label": "Europe/Guernsey (GMT+00:00)",
         "value": "Europe/Guernsey"
       }, {
         "description": null,
-        "label": "Europe/Helsinki (GMT+03:00)",
+        "label": "Europe/Helsinki (GMT+02:00)",
         "value": "Europe/Helsinki"
       }, {
         "description": null,
-        "label": "Europe/Isle_of_Man (GMT+01:00)",
+        "label": "Europe/Isle_of_Man (GMT+00:00)",
         "value": "Europe/Isle_of_Man"
       }, {
         "description": null,
@@ -5095,7 +5095,7 @@
         "value": "Europe/Istanbul"
       }, {
         "description": null,
-        "label": "Europe/Jersey (GMT+01:00)",
+        "label": "Europe/Jersey (GMT+00:00)",
         "value": "Europe/Jersey"
       }, {
         "description": null,
@@ -5103,7 +5103,7 @@
         "value": "Europe/Kaliningrad"
       }, {
         "description": null,
-        "label": "Europe/Kiev (GMT+03:00)",
+        "label": "Europe/Kiev (GMT+02:00)",
         "value": "Europe/Kiev"
       }, {
         "description": null,
@@ -5111,35 +5111,35 @@
         "value": "Europe/Kirov"
       }, {
         "description": null,
-        "label": "Europe/Kyiv (GMT+03:00)",
+        "label": "Europe/Kyiv (GMT+02:00)",
         "value": "Europe/Kyiv"
       }, {
         "description": null,
-        "label": "Europe/Lisbon (GMT+01:00)",
+        "label": "Europe/Lisbon (GMT+00:00)",
         "value": "Europe/Lisbon"
       }, {
         "description": null,
-        "label": "Europe/Ljubljana (GMT+02:00)",
+        "label": "Europe/Ljubljana (GMT+01:00)",
         "value": "Europe/Ljubljana"
       }, {
         "description": null,
-        "label": "Europe/London (GMT+01:00)",
+        "label": "Europe/London (GMT+00:00)",
         "value": "Europe/London"
       }, {
         "description": null,
-        "label": "Europe/Luxembourg (GMT+02:00)",
+        "label": "Europe/Luxembourg (GMT+01:00)",
         "value": "Europe/Luxembourg"
       }, {
         "description": null,
-        "label": "Europe/Madrid (GMT+02:00)",
+        "label": "Europe/Madrid (GMT+01:00)",
         "value": "Europe/Madrid"
       }, {
         "description": null,
-        "label": "Europe/Malta (GMT+02:00)",
+        "label": "Europe/Malta (GMT+01:00)",
         "value": "Europe/Malta"
       }, {
         "description": null,
-        "label": "Europe/Mariehamn (GMT+03:00)",
+        "label": "Europe/Mariehamn (GMT+02:00)",
         "value": "Europe/Mariehamn"
       }, {
         "description": null,
@@ -5147,7 +5147,7 @@
         "value": "Europe/Minsk"
       }, {
         "description": null,
-        "label": "Europe/Monaco (GMT+02:00)",
+        "label": "Europe/Monaco (GMT+01:00)",
         "value": "Europe/Monaco"
       }, {
         "description": null,
@@ -5155,31 +5155,31 @@
         "value": "Europe/Moscow"
       }, {
         "description": null,
-        "label": "Europe/Nicosia (GMT+03:00)",
+        "label": "Europe/Nicosia (GMT+02:00)",
         "value": "Europe/Nicosia"
       }, {
         "description": null,
-        "label": "Europe/Oslo (GMT+02:00)",
+        "label": "Europe/Oslo (GMT+01:00)",
         "value": "Europe/Oslo"
       }, {
         "description": null,
-        "label": "Europe/Paris (GMT+02:00)",
+        "label": "Europe/Paris (GMT+01:00)",
         "value": "Europe/Paris"
       }, {
         "description": null,
-        "label": "Europe/Podgorica (GMT+02:00)",
+        "label": "Europe/Podgorica (GMT+01:00)",
         "value": "Europe/Podgorica"
       }, {
         "description": null,
-        "label": "Europe/Prague (GMT+02:00)",
+        "label": "Europe/Prague (GMT+01:00)",
         "value": "Europe/Prague"
       }, {
         "description": null,
-        "label": "Europe/Riga (GMT+03:00)",
+        "label": "Europe/Riga (GMT+02:00)",
         "value": "Europe/Riga"
       }, {
         "description": null,
-        "label": "Europe/Rome (GMT+02:00)",
+        "label": "Europe/Rome (GMT+01:00)",
         "value": "Europe/Rome"
       }, {
         "description": null,
@@ -5187,11 +5187,11 @@
         "value": "Europe/Samara"
       }, {
         "description": null,
-        "label": "Europe/San_Marino (GMT+02:00)",
+        "label": "Europe/San_Marino (GMT+01:00)",
         "value": "Europe/San_Marino"
       }, {
         "description": null,
-        "label": "Europe/Sarajevo (GMT+02:00)",
+        "label": "Europe/Sarajevo (GMT+01:00)",
         "value": "Europe/Sarajevo"
       }, {
         "description": null,
@@ -5203,27 +5203,27 @@
         "value": "Europe/Simferopol"
       }, {
         "description": null,
-        "label": "Europe/Skopje (GMT+02:00)",
+        "label": "Europe/Skopje (GMT+01:00)",
         "value": "Europe/Skopje"
       }, {
         "description": null,
-        "label": "Europe/Sofia (GMT+03:00)",
+        "label": "Europe/Sofia (GMT+02:00)",
         "value": "Europe/Sofia"
       }, {
         "description": null,
-        "label": "Europe/Stockholm (GMT+02:00)",
+        "label": "Europe/Stockholm (GMT+01:00)",
         "value": "Europe/Stockholm"
       }, {
         "description": null,
-        "label": "Europe/Tallinn (GMT+03:00)",
+        "label": "Europe/Tallinn (GMT+02:00)",
         "value": "Europe/Tallinn"
       }, {
         "description": null,
-        "label": "Europe/Tirane (GMT+02:00)",
+        "label": "Europe/Tirane (GMT+01:00)",
         "value": "Europe/Tirane"
       }, {
         "description": null,
-        "label": "Europe/Tiraspol (GMT+03:00)",
+        "label": "Europe/Tiraspol (GMT+02:00)",
         "value": "Europe/Tiraspol"
       }, {
         "description": null,
@@ -5231,23 +5231,23 @@
         "value": "Europe/Ulyanovsk"
       }, {
         "description": null,
-        "label": "Europe/Uzhgorod (GMT+03:00)",
+        "label": "Europe/Uzhgorod (GMT+02:00)",
         "value": "Europe/Uzhgorod"
       }, {
         "description": null,
-        "label": "Europe/Vaduz (GMT+02:00)",
+        "label": "Europe/Vaduz (GMT+01:00)",
         "value": "Europe/Vaduz"
       }, {
         "description": null,
-        "label": "Europe/Vatican (GMT+02:00)",
+        "label": "Europe/Vatican (GMT+01:00)",
         "value": "Europe/Vatican"
       }, {
         "description": null,
-        "label": "Europe/Vienna (GMT+02:00)",
+        "label": "Europe/Vienna (GMT+01:00)",
         "value": "Europe/Vienna"
       }, {
         "description": null,
-        "label": "Europe/Vilnius (GMT+03:00)",
+        "label": "Europe/Vilnius (GMT+02:00)",
         "value": "Europe/Vilnius"
       }, {
         "description": null,
@@ -5255,27 +5255,27 @@
         "value": "Europe/Volgograd"
       }, {
         "description": null,
-        "label": "Europe/Warsaw (GMT+02:00)",
+        "label": "Europe/Warsaw (GMT+01:00)",
         "value": "Europe/Warsaw"
       }, {
         "description": null,
-        "label": "Europe/Zagreb (GMT+02:00)",
+        "label": "Europe/Zagreb (GMT+01:00)",
         "value": "Europe/Zagreb"
       }, {
         "description": null,
-        "label": "Europe/Zaporozhye (GMT+03:00)",
+        "label": "Europe/Zaporozhye (GMT+02:00)",
         "value": "Europe/Zaporozhye"
       }, {
         "description": null,
-        "label": "Europe/Zurich (GMT+02:00)",
+        "label": "Europe/Zurich (GMT+01:00)",
         "value": "Europe/Zurich"
       }, {
         "description": null,
-        "label": "GB (GMT+01:00)",
+        "label": "GB (GMT+00:00)",
         "value": "GB"
       }, {
         "description": null,
-        "label": "GB-Eire (GMT+01:00)",
+        "label": "GB-Eire (GMT+00:00)",
         "value": "GB-Eire"
       }, {
         "description": null,
@@ -5347,7 +5347,7 @@
         "value": "Iran"
       }, {
         "description": null,
-        "label": "Israel (GMT+03:00)",
+        "label": "Israel (GMT+02:00)",
         "value": "Israel"
       }, {
         "description": null,
@@ -5367,15 +5367,15 @@
         "value": "Libya"
       }, {
         "description": null,
-        "label": "MET (GMT+02:00)",
+        "label": "MET (GMT+01:00)",
         "value": "MET"
       }, {
         "description": null,
-        "label": "MST7MDT (GMT-06:00)",
+        "label": "MST7MDT (GMT-07:00)",
         "value": "MST7MDT"
       }, {
         "description": null,
-        "label": "Mexico/BajaNorte (GMT-07:00)",
+        "label": "Mexico/BajaNorte (GMT-08:00)",
         "value": "Mexico/BajaNorte"
       }, {
         "description": null,
@@ -5395,7 +5395,7 @@
         "value": "NZ-CHAT"
       }, {
         "description": null,
-        "label": "Navajo (GMT-06:00)",
+        "label": "Navajo (GMT-07:00)",
         "value": "Navajo"
       }, {
         "description": null,
@@ -5403,7 +5403,7 @@
         "value": "PRC"
       }, {
         "description": null,
-        "label": "PST8PDT (GMT-07:00)",
+        "label": "PST8PDT (GMT-08:00)",
         "value": "PST8PDT"
       }, {
         "description": null,
@@ -5583,11 +5583,11 @@
         "value": "Pacific/Yap"
       }, {
         "description": null,
-        "label": "Poland (GMT+02:00)",
+        "label": "Poland (GMT+01:00)",
         "value": "Poland"
       }, {
         "description": null,
-        "label": "Portugal (GMT+01:00)",
+        "label": "Portugal (GMT+00:00)",
         "value": "Portugal"
       }, {
         "description": null,
@@ -5603,7 +5603,7 @@
         "value": "SystemV/AST4"
       }, {
         "description": null,
-        "label": "SystemV/AST4ADT (GMT-03:00)",
+        "label": "SystemV/AST4ADT (GMT-04:00)",
         "value": "SystemV/AST4ADT"
       }, {
         "description": null,
@@ -5611,7 +5611,7 @@
         "value": "SystemV/CST6"
       }, {
         "description": null,
-        "label": "SystemV/CST6CDT (GMT-05:00)",
+        "label": "SystemV/CST6CDT (GMT-06:00)",
         "value": "SystemV/CST6CDT"
       }, {
         "description": null,
@@ -5619,7 +5619,7 @@
         "value": "SystemV/EST5"
       }, {
         "description": null,
-        "label": "SystemV/EST5EDT (GMT-04:00)",
+        "label": "SystemV/EST5EDT (GMT-05:00)",
         "value": "SystemV/EST5EDT"
       }, {
         "description": null,
@@ -5631,7 +5631,7 @@
         "value": "SystemV/MST7"
       }, {
         "description": null,
-        "label": "SystemV/MST7MDT (GMT-06:00)",
+        "label": "SystemV/MST7MDT (GMT-07:00)",
         "value": "SystemV/MST7MDT"
       }, {
         "description": null,
@@ -5639,7 +5639,7 @@
         "value": "SystemV/PST8"
       }, {
         "description": null,
-        "label": "SystemV/PST8PDT (GMT-07:00)",
+        "label": "SystemV/PST8PDT (GMT-08:00)",
         "value": "SystemV/PST8PDT"
       }, {
         "description": null,
@@ -5647,7 +5647,7 @@
         "value": "SystemV/YST9"
       }, {
         "description": null,
-        "label": "SystemV/YST9YDT (GMT-08:00)",
+        "label": "SystemV/YST9YDT (GMT-09:00)",
         "value": "SystemV/YST9YDT"
       }, {
         "description": null,
@@ -5659,11 +5659,11 @@
         "value": "UCT"
       }, {
         "description": null,
-        "label": "US/Alaska (GMT-08:00)",
+        "label": "US/Alaska (GMT-09:00)",
         "value": "US/Alaska"
       }, {
         "description": null,
-        "label": "US/Aleutian (GMT-09:00)",
+        "label": "US/Aleutian (GMT-10:00)",
         "value": "US/Aleutian"
       }, {
         "description": null,
@@ -5671,15 +5671,15 @@
         "value": "US/Arizona"
       }, {
         "description": null,
-        "label": "US/Central (GMT-05:00)",
+        "label": "US/Central (GMT-06:00)",
         "value": "US/Central"
       }, {
         "description": null,
-        "label": "US/East-Indiana (GMT-04:00)",
+        "label": "US/East-Indiana (GMT-05:00)",
         "value": "US/East-Indiana"
       }, {
         "description": null,
-        "label": "US/Eastern (GMT-04:00)",
+        "label": "US/Eastern (GMT-05:00)",
         "value": "US/Eastern"
       }, {
         "description": null,
@@ -5687,19 +5687,19 @@
         "value": "US/Hawaii"
       }, {
         "description": null,
-        "label": "US/Indiana-Starke (GMT-05:00)",
+        "label": "US/Indiana-Starke (GMT-06:00)",
         "value": "US/Indiana-Starke"
       }, {
         "description": null,
-        "label": "US/Michigan (GMT-04:00)",
+        "label": "US/Michigan (GMT-05:00)",
         "value": "US/Michigan"
       }, {
         "description": null,
-        "label": "US/Mountain (GMT-06:00)",
+        "label": "US/Mountain (GMT-07:00)",
         "value": "US/Mountain"
       }, {
         "description": null,
-        "label": "US/Pacific (GMT-07:00)",
+        "label": "US/Pacific (GMT-08:00)",
         "value": "US/Pacific"
       }, {
         "description": null,
@@ -5719,7 +5719,7 @@
         "value": "W-SU"
       }, {
         "description": null,
-        "label": "WET (GMT+01:00)",
+        "label": "WET (GMT+00:00)",
         "value": "WET"
       }, {
         "description": null,
@@ -6167,15 +6167,15 @@
         "value": "Africa/Bujumbura"
       }, {
         "description": null,
-        "label": "Africa/Cairo (GMT+03:00)",
+        "label": "Africa/Cairo (GMT+02:00)",
         "value": "Africa/Cairo"
       }, {
         "description": null,
-        "label": "Africa/Casablanca (GMT+01:00)",
+        "label": "Africa/Casablanca (GMT+00:00)",
         "value": "Africa/Casablanca"
       }, {
         "description": null,
-        "label": "Africa/Ceuta (GMT+02:00)",
+        "label": "Africa/Ceuta (GMT+01:00)",
         "value": "Africa/Ceuta"
       }, {
         "description": null,
@@ -6199,7 +6199,7 @@
         "value": "Africa/Douala"
       }, {
         "description": null,
-        "label": "Africa/El_Aaiun (GMT+01:00)",
+        "label": "Africa/El_Aaiun (GMT+00:00)",
         "value": "Africa/El_Aaiun"
       }, {
         "description": null,
@@ -6327,15 +6327,15 @@
         "value": "Africa/Tunis"
       }, {
         "description": null,
-        "label": "Africa/Windhoek (GMT+02:00)",
+        "label": "Africa/Windhoek (GMT+01:00)",
         "value": "Africa/Windhoek"
       }, {
         "description": null,
-        "label": "America/Adak (GMT-09:00)",
+        "label": "America/Adak (GMT-10:00)",
         "value": "America/Adak"
       }, {
         "description": null,
-        "label": "America/Anchorage (GMT-08:00)",
+        "label": "America/Anchorage (GMT-09:00)",
         "value": "America/Anchorage"
       }, {
         "description": null,
@@ -6415,7 +6415,7 @@
         "value": "America/Atikokan"
       }, {
         "description": null,
-        "label": "America/Atka (GMT-09:00)",
+        "label": "America/Atka (GMT-10:00)",
         "value": "America/Atka"
       }, {
         "description": null,
@@ -6451,7 +6451,7 @@
         "value": "America/Bogota"
       }, {
         "description": null,
-        "label": "America/Boise (GMT-06:00)",
+        "label": "America/Boise (GMT-07:00)",
         "value": "America/Boise"
       }, {
         "description": null,
@@ -6459,7 +6459,7 @@
         "value": "America/Buenos_Aires"
       }, {
         "description": null,
-        "label": "America/Cambridge_Bay (GMT-06:00)",
+        "label": "America/Cambridge_Bay (GMT-07:00)",
         "value": "America/Cambridge_Bay"
       }, {
         "description": null,
@@ -6487,7 +6487,7 @@
         "value": "America/Cayman"
       }, {
         "description": null,
-        "label": "America/Chicago (GMT-05:00)",
+        "label": "America/Chicago (GMT-06:00)",
         "value": "America/Chicago"
       }, {
         "description": null,
@@ -6495,7 +6495,7 @@
         "value": "America/Chihuahua"
       }, {
         "description": null,
-        "label": "America/Ciudad_Juarez (GMT-06:00)",
+        "label": "America/Ciudad_Juarez (GMT-07:00)",
         "value": "America/Ciudad_Juarez"
       }, {
         "description": null,
@@ -6539,11 +6539,11 @@
         "value": "America/Dawson_Creek"
       }, {
         "description": null,
-        "label": "America/Denver (GMT-06:00)",
+        "label": "America/Denver (GMT-07:00)",
         "value": "America/Denver"
       }, {
         "description": null,
-        "label": "America/Detroit (GMT-04:00)",
+        "label": "America/Detroit (GMT-05:00)",
         "value": "America/Detroit"
       }, {
         "description": null,
@@ -6551,7 +6551,7 @@
         "value": "America/Dominica"
       }, {
         "description": null,
-        "label": "America/Edmonton (GMT-06:00)",
+        "label": "America/Edmonton (GMT-07:00)",
         "value": "America/Edmonton"
       }, {
         "description": null,
@@ -6563,7 +6563,7 @@
         "value": "America/El_Salvador"
       }, {
         "description": null,
-        "label": "America/Ensenada (GMT-07:00)",
+        "label": "America/Ensenada (GMT-08:00)",
         "value": "America/Ensenada"
       }, {
         "description": null,
@@ -6571,7 +6571,7 @@
         "value": "America/Fort_Nelson"
       }, {
         "description": null,
-        "label": "America/Fort_Wayne (GMT-04:00)",
+        "label": "America/Fort_Wayne (GMT-05:00)",
         "value": "America/Fort_Wayne"
       }, {
         "description": null,
@@ -6579,19 +6579,19 @@
         "value": "America/Fortaleza"
       }, {
         "description": null,
-        "label": "America/Glace_Bay (GMT-03:00)",
+        "label": "America/Glace_Bay (GMT-04:00)",
         "value": "America/Glace_Bay"
       }, {
         "description": null,
-        "label": "America/Godthab (GMT-01:00)",
+        "label": "America/Godthab (GMT-02:00)",
         "value": "America/Godthab"
       }, {
         "description": null,
-        "label": "America/Goose_Bay (GMT-03:00)",
+        "label": "America/Goose_Bay (GMT-04:00)",
         "value": "America/Goose_Bay"
       }, {
         "description": null,
-        "label": "America/Grand_Turk (GMT-04:00)",
+        "label": "America/Grand_Turk (GMT-05:00)",
         "value": "America/Grand_Turk"
       }, {
         "description": null,
@@ -6615,11 +6615,11 @@
         "value": "America/Guyana"
       }, {
         "description": null,
-        "label": "America/Halifax (GMT-03:00)",
+        "label": "America/Halifax (GMT-04:00)",
         "value": "America/Halifax"
       }, {
         "description": null,
-        "label": "America/Havana (GMT-04:00)",
+        "label": "America/Havana (GMT-05:00)",
         "value": "America/Havana"
       }, {
         "description": null,
@@ -6627,47 +6627,47 @@
         "value": "America/Hermosillo"
       }, {
         "description": null,
-        "label": "America/Indiana/Indianapolis (GMT-04:00)",
+        "label": "America/Indiana/Indianapolis (GMT-05:00)",
         "value": "America/Indiana/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Indiana/Knox (GMT-05:00)",
+        "label": "America/Indiana/Knox (GMT-06:00)",
         "value": "America/Indiana/Knox"
       }, {
         "description": null,
-        "label": "America/Indiana/Marengo (GMT-04:00)",
+        "label": "America/Indiana/Marengo (GMT-05:00)",
         "value": "America/Indiana/Marengo"
       }, {
         "description": null,
-        "label": "America/Indiana/Petersburg (GMT-04:00)",
+        "label": "America/Indiana/Petersburg (GMT-05:00)",
         "value": "America/Indiana/Petersburg"
       }, {
         "description": null,
-        "label": "America/Indiana/Tell_City (GMT-05:00)",
+        "label": "America/Indiana/Tell_City (GMT-06:00)",
         "value": "America/Indiana/Tell_City"
       }, {
         "description": null,
-        "label": "America/Indiana/Vevay (GMT-04:00)",
+        "label": "America/Indiana/Vevay (GMT-05:00)",
         "value": "America/Indiana/Vevay"
       }, {
         "description": null,
-        "label": "America/Indiana/Vincennes (GMT-04:00)",
+        "label": "America/Indiana/Vincennes (GMT-05:00)",
         "value": "America/Indiana/Vincennes"
       }, {
         "description": null,
-        "label": "America/Indiana/Winamac (GMT-04:00)",
+        "label": "America/Indiana/Winamac (GMT-05:00)",
         "value": "America/Indiana/Winamac"
       }, {
         "description": null,
-        "label": "America/Indianapolis (GMT-04:00)",
+        "label": "America/Indianapolis (GMT-05:00)",
         "value": "America/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Inuvik (GMT-06:00)",
+        "label": "America/Inuvik (GMT-07:00)",
         "value": "America/Inuvik"
       }, {
         "description": null,
-        "label": "America/Iqaluit (GMT-04:00)",
+        "label": "America/Iqaluit (GMT-05:00)",
         "value": "America/Iqaluit"
       }, {
         "description": null,
@@ -6679,19 +6679,19 @@
         "value": "America/Jujuy"
       }, {
         "description": null,
-        "label": "America/Juneau (GMT-08:00)",
+        "label": "America/Juneau (GMT-09:00)",
         "value": "America/Juneau"
       }, {
         "description": null,
-        "label": "America/Kentucky/Louisville (GMT-04:00)",
+        "label": "America/Kentucky/Louisville (GMT-05:00)",
         "value": "America/Kentucky/Louisville"
       }, {
         "description": null,
-        "label": "America/Kentucky/Monticello (GMT-04:00)",
+        "label": "America/Kentucky/Monticello (GMT-05:00)",
         "value": "America/Kentucky/Monticello"
       }, {
         "description": null,
-        "label": "America/Knox_IN (GMT-05:00)",
+        "label": "America/Knox_IN (GMT-06:00)",
         "value": "America/Knox_IN"
       }, {
         "description": null,
@@ -6707,11 +6707,11 @@
         "value": "America/Lima"
       }, {
         "description": null,
-        "label": "America/Los_Angeles (GMT-07:00)",
+        "label": "America/Los_Angeles (GMT-08:00)",
         "value": "America/Los_Angeles"
       }, {
         "description": null,
-        "label": "America/Louisville (GMT-04:00)",
+        "label": "America/Louisville (GMT-05:00)",
         "value": "America/Louisville"
       }, {
         "description": null,
@@ -6739,7 +6739,7 @@
         "value": "America/Martinique"
       }, {
         "description": null,
-        "label": "America/Matamoros (GMT-05:00)",
+        "label": "America/Matamoros (GMT-06:00)",
         "value": "America/Matamoros"
       }, {
         "description": null,
@@ -6751,7 +6751,7 @@
         "value": "America/Mendoza"
       }, {
         "description": null,
-        "label": "America/Menominee (GMT-05:00)",
+        "label": "America/Menominee (GMT-06:00)",
         "value": "America/Menominee"
       }, {
         "description": null,
@@ -6759,7 +6759,7 @@
         "value": "America/Merida"
       }, {
         "description": null,
-        "label": "America/Metlakatla (GMT-08:00)",
+        "label": "America/Metlakatla (GMT-09:00)",
         "value": "America/Metlakatla"
       }, {
         "description": null,
@@ -6767,11 +6767,11 @@
         "value": "America/Mexico_City"
       }, {
         "description": null,
-        "label": "America/Miquelon (GMT-02:00)",
+        "label": "America/Miquelon (GMT-03:00)",
         "value": "America/Miquelon"
       }, {
         "description": null,
-        "label": "America/Moncton (GMT-03:00)",
+        "label": "America/Moncton (GMT-04:00)",
         "value": "America/Moncton"
       }, {
         "description": null,
@@ -6783,7 +6783,7 @@
         "value": "America/Montevideo"
       }, {
         "description": null,
-        "label": "America/Montreal (GMT-04:00)",
+        "label": "America/Montreal (GMT-05:00)",
         "value": "America/Montreal"
       }, {
         "description": null,
@@ -6791,19 +6791,19 @@
         "value": "America/Montserrat"
       }, {
         "description": null,
-        "label": "America/Nassau (GMT-04:00)",
+        "label": "America/Nassau (GMT-05:00)",
         "value": "America/Nassau"
       }, {
         "description": null,
-        "label": "America/New_York (GMT-04:00)",
+        "label": "America/New_York (GMT-05:00)",
         "value": "America/New_York"
       }, {
         "description": null,
-        "label": "America/Nipigon (GMT-04:00)",
+        "label": "America/Nipigon (GMT-05:00)",
         "value": "America/Nipigon"
       }, {
         "description": null,
-        "label": "America/Nome (GMT-08:00)",
+        "label": "America/Nome (GMT-09:00)",
         "value": "America/Nome"
       }, {
         "description": null,
@@ -6811,23 +6811,23 @@
         "value": "America/Noronha"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Beulah (GMT-05:00)",
+        "label": "America/North_Dakota/Beulah (GMT-06:00)",
         "value": "America/North_Dakota/Beulah"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Center (GMT-05:00)",
+        "label": "America/North_Dakota/Center (GMT-06:00)",
         "value": "America/North_Dakota/Center"
       }, {
         "description": null,
-        "label": "America/North_Dakota/New_Salem (GMT-05:00)",
+        "label": "America/North_Dakota/New_Salem (GMT-06:00)",
         "value": "America/North_Dakota/New_Salem"
       }, {
         "description": null,
-        "label": "America/Nuuk (GMT-01:00)",
+        "label": "America/Nuuk (GMT-02:00)",
         "value": "America/Nuuk"
       }, {
         "description": null,
-        "label": "America/Ojinaga (GMT-05:00)",
+        "label": "America/Ojinaga (GMT-06:00)",
         "value": "America/Ojinaga"
       }, {
         "description": null,
@@ -6835,7 +6835,7 @@
         "value": "America/Panama"
       }, {
         "description": null,
-        "label": "America/Pangnirtung (GMT-04:00)",
+        "label": "America/Pangnirtung (GMT-05:00)",
         "value": "America/Pangnirtung"
       }, {
         "description": null,
@@ -6847,7 +6847,7 @@
         "value": "America/Phoenix"
       }, {
         "description": null,
-        "label": "America/Port-au-Prince (GMT-04:00)",
+        "label": "America/Port-au-Prince (GMT-05:00)",
         "value": "America/Port-au-Prince"
       }, {
         "description": null,
@@ -6871,11 +6871,11 @@
         "value": "America/Punta_Arenas"
       }, {
         "description": null,
-        "label": "America/Rainy_River (GMT-05:00)",
+        "label": "America/Rainy_River (GMT-06:00)",
         "value": "America/Rainy_River"
       }, {
         "description": null,
-        "label": "America/Rankin_Inlet (GMT-05:00)",
+        "label": "America/Rankin_Inlet (GMT-06:00)",
         "value": "America/Rankin_Inlet"
       }, {
         "description": null,
@@ -6887,7 +6887,7 @@
         "value": "America/Regina"
       }, {
         "description": null,
-        "label": "America/Resolute (GMT-05:00)",
+        "label": "America/Resolute (GMT-06:00)",
         "value": "America/Resolute"
       }, {
         "description": null,
@@ -6899,7 +6899,7 @@
         "value": "America/Rosario"
       }, {
         "description": null,
-        "label": "America/Santa_Isabel (GMT-07:00)",
+        "label": "America/Santa_Isabel (GMT-08:00)",
         "value": "America/Santa_Isabel"
       }, {
         "description": null,
@@ -6919,15 +6919,15 @@
         "value": "America/Sao_Paulo"
       }, {
         "description": null,
-        "label": "America/Scoresbysund (GMT-01:00)",
+        "label": "America/Scoresbysund (GMT-02:00)",
         "value": "America/Scoresbysund"
       }, {
         "description": null,
-        "label": "America/Shiprock (GMT-06:00)",
+        "label": "America/Shiprock (GMT-07:00)",
         "value": "America/Shiprock"
       }, {
         "description": null,
-        "label": "America/Sitka (GMT-08:00)",
+        "label": "America/Sitka (GMT-09:00)",
         "value": "America/Sitka"
       }, {
         "description": null,
@@ -6935,7 +6935,7 @@
         "value": "America/St_Barthelemy"
       }, {
         "description": null,
-        "label": "America/St_Johns (GMT-02:30)",
+        "label": "America/St_Johns (GMT-03:30)",
         "value": "America/St_Johns"
       }, {
         "description": null,
@@ -6963,19 +6963,19 @@
         "value": "America/Tegucigalpa"
       }, {
         "description": null,
-        "label": "America/Thule (GMT-03:00)",
+        "label": "America/Thule (GMT-04:00)",
         "value": "America/Thule"
       }, {
         "description": null,
-        "label": "America/Thunder_Bay (GMT-04:00)",
+        "label": "America/Thunder_Bay (GMT-05:00)",
         "value": "America/Thunder_Bay"
       }, {
         "description": null,
-        "label": "America/Tijuana (GMT-07:00)",
+        "label": "America/Tijuana (GMT-08:00)",
         "value": "America/Tijuana"
       }, {
         "description": null,
-        "label": "America/Toronto (GMT-04:00)",
+        "label": "America/Toronto (GMT-05:00)",
         "value": "America/Toronto"
       }, {
         "description": null,
@@ -6983,7 +6983,7 @@
         "value": "America/Tortola"
       }, {
         "description": null,
-        "label": "America/Vancouver (GMT-07:00)",
+        "label": "America/Vancouver (GMT-08:00)",
         "value": "America/Vancouver"
       }, {
         "description": null,
@@ -6995,15 +6995,15 @@
         "value": "America/Whitehorse"
       }, {
         "description": null,
-        "label": "America/Winnipeg (GMT-05:00)",
+        "label": "America/Winnipeg (GMT-06:00)",
         "value": "America/Winnipeg"
       }, {
         "description": null,
-        "label": "America/Yakutat (GMT-08:00)",
+        "label": "America/Yakutat (GMT-09:00)",
         "value": "America/Yakutat"
       }, {
         "description": null,
-        "label": "America/Yellowknife (GMT-06:00)",
+        "label": "America/Yellowknife (GMT-07:00)",
         "value": "America/Yellowknife"
       }, {
         "description": null,
@@ -7047,7 +7047,7 @@
         "value": "Antarctica/Syowa"
       }, {
         "description": null,
-        "label": "Antarctica/Troll (GMT+02:00)",
+        "label": "Antarctica/Troll (GMT+00:00)",
         "value": "Antarctica/Troll"
       }, {
         "description": null,
@@ -7055,7 +7055,7 @@
         "value": "Antarctica/Vostok"
       }, {
         "description": null,
-        "label": "Arctic/Longyearbyen (GMT+02:00)",
+        "label": "Arctic/Longyearbyen (GMT+01:00)",
         "value": "Arctic/Longyearbyen"
       }, {
         "description": null,
@@ -7115,7 +7115,7 @@
         "value": "Asia/Barnaul"
       }, {
         "description": null,
-        "label": "Asia/Beirut (GMT+03:00)",
+        "label": "Asia/Beirut (GMT+02:00)",
         "value": "Asia/Beirut"
       }, {
         "description": null,
@@ -7175,11 +7175,11 @@
         "value": "Asia/Dushanbe"
       }, {
         "description": null,
-        "label": "Asia/Famagusta (GMT+03:00)",
+        "label": "Asia/Famagusta (GMT+02:00)",
         "value": "Asia/Famagusta"
       }, {
         "description": null,
-        "label": "Asia/Gaza (GMT+03:00)",
+        "label": "Asia/Gaza (GMT+02:00)",
         "value": "Asia/Gaza"
       }, {
         "description": null,
@@ -7187,7 +7187,7 @@
         "value": "Asia/Harbin"
       }, {
         "description": null,
-        "label": "Asia/Hebron (GMT+03:00)",
+        "label": "Asia/Hebron (GMT+02:00)",
         "value": "Asia/Hebron"
       }, {
         "description": null,
@@ -7219,7 +7219,7 @@
         "value": "Asia/Jayapura"
       }, {
         "description": null,
-        "label": "Asia/Jerusalem (GMT+03:00)",
+        "label": "Asia/Jerusalem (GMT+02:00)",
         "value": "Asia/Jerusalem"
       }, {
         "description": null,
@@ -7295,7 +7295,7 @@
         "value": "Asia/Muscat"
       }, {
         "description": null,
-        "label": "Asia/Nicosia (GMT+03:00)",
+        "label": "Asia/Nicosia (GMT+02:00)",
         "value": "Asia/Nicosia"
       }, {
         "description": null,
@@ -7391,7 +7391,7 @@
         "value": "Asia/Tehran"
       }, {
         "description": null,
-        "label": "Asia/Tel_Aviv (GMT+03:00)",
+        "label": "Asia/Tel_Aviv (GMT+02:00)",
         "value": "Asia/Tel_Aviv"
       }, {
         "description": null,
@@ -7455,15 +7455,15 @@
         "value": "Asia/Yerevan"
       }, {
         "description": null,
-        "label": "Atlantic/Azores (GMT+00:00)",
+        "label": "Atlantic/Azores (GMT-01:00)",
         "value": "Atlantic/Azores"
       }, {
         "description": null,
-        "label": "Atlantic/Bermuda (GMT-03:00)",
+        "label": "Atlantic/Bermuda (GMT-04:00)",
         "value": "Atlantic/Bermuda"
       }, {
         "description": null,
-        "label": "Atlantic/Canary (GMT+01:00)",
+        "label": "Atlantic/Canary (GMT+00:00)",
         "value": "Atlantic/Canary"
       }, {
         "description": null,
@@ -7471,19 +7471,19 @@
         "value": "Atlantic/Cape_Verde"
       }, {
         "description": null,
-        "label": "Atlantic/Faeroe (GMT+01:00)",
+        "label": "Atlantic/Faeroe (GMT+00:00)",
         "value": "Atlantic/Faeroe"
       }, {
         "description": null,
-        "label": "Atlantic/Faroe (GMT+01:00)",
+        "label": "Atlantic/Faroe (GMT+00:00)",
         "value": "Atlantic/Faroe"
       }, {
         "description": null,
-        "label": "Atlantic/Jan_Mayen (GMT+02:00)",
+        "label": "Atlantic/Jan_Mayen (GMT+01:00)",
         "value": "Atlantic/Jan_Mayen"
       }, {
         "description": null,
-        "label": "Atlantic/Madeira (GMT+01:00)",
+        "label": "Atlantic/Madeira (GMT+00:00)",
         "value": "Atlantic/Madeira"
       }, {
         "description": null,
@@ -7611,35 +7611,35 @@
         "value": "Brazil/West"
       }, {
         "description": null,
-        "label": "CET (GMT+02:00)",
+        "label": "CET (GMT+01:00)",
         "value": "CET"
       }, {
         "description": null,
-        "label": "CST6CDT (GMT-05:00)",
+        "label": "CST6CDT (GMT-06:00)",
         "value": "CST6CDT"
       }, {
         "description": null,
-        "label": "Canada/Atlantic (GMT-03:00)",
+        "label": "Canada/Atlantic (GMT-04:00)",
         "value": "Canada/Atlantic"
       }, {
         "description": null,
-        "label": "Canada/Central (GMT-05:00)",
+        "label": "Canada/Central (GMT-06:00)",
         "value": "Canada/Central"
       }, {
         "description": null,
-        "label": "Canada/Eastern (GMT-04:00)",
+        "label": "Canada/Eastern (GMT-05:00)",
         "value": "Canada/Eastern"
       }, {
         "description": null,
-        "label": "Canada/Mountain (GMT-06:00)",
+        "label": "Canada/Mountain (GMT-07:00)",
         "value": "Canada/Mountain"
       }, {
         "description": null,
-        "label": "Canada/Newfoundland (GMT-02:30)",
+        "label": "Canada/Newfoundland (GMT-03:30)",
         "value": "Canada/Newfoundland"
       }, {
         "description": null,
-        "label": "Canada/Pacific (GMT-07:00)",
+        "label": "Canada/Pacific (GMT-08:00)",
         "value": "Canada/Pacific"
       }, {
         "description": null,
@@ -7659,23 +7659,23 @@
         "value": "Chile/EasterIsland"
       }, {
         "description": null,
-        "label": "Cuba (GMT-04:00)",
+        "label": "Cuba (GMT-05:00)",
         "value": "Cuba"
       }, {
         "description": null,
-        "label": "EET (GMT+03:00)",
+        "label": "EET (GMT+02:00)",
         "value": "EET"
       }, {
         "description": null,
-        "label": "EST5EDT (GMT-04:00)",
+        "label": "EST5EDT (GMT-05:00)",
         "value": "EST5EDT"
       }, {
         "description": null,
-        "label": "Egypt (GMT+03:00)",
+        "label": "Egypt (GMT+02:00)",
         "value": "Egypt"
       }, {
         "description": null,
-        "label": "Eire (GMT+01:00)",
+        "label": "Eire (GMT+00:00)",
         "value": "Eire"
       }, {
         "description": null,
@@ -7819,11 +7819,11 @@
         "value": "Etc/Zulu"
       }, {
         "description": null,
-        "label": "Europe/Amsterdam (GMT+02:00)",
+        "label": "Europe/Amsterdam (GMT+01:00)",
         "value": "Europe/Amsterdam"
       }, {
         "description": null,
-        "label": "Europe/Andorra (GMT+02:00)",
+        "label": "Europe/Andorra (GMT+01:00)",
         "value": "Europe/Andorra"
       }, {
         "description": null,
@@ -7831,67 +7831,67 @@
         "value": "Europe/Astrakhan"
       }, {
         "description": null,
-        "label": "Europe/Athens (GMT+03:00)",
+        "label": "Europe/Athens (GMT+02:00)",
         "value": "Europe/Athens"
       }, {
         "description": null,
-        "label": "Europe/Belfast (GMT+01:00)",
+        "label": "Europe/Belfast (GMT+00:00)",
         "value": "Europe/Belfast"
       }, {
         "description": null,
-        "label": "Europe/Belgrade (GMT+02:00)",
+        "label": "Europe/Belgrade (GMT+01:00)",
         "value": "Europe/Belgrade"
       }, {
         "description": null,
-        "label": "Europe/Berlin (GMT+02:00)",
+        "label": "Europe/Berlin (GMT+01:00)",
         "value": "Europe/Berlin"
       }, {
         "description": null,
-        "label": "Europe/Bratislava (GMT+02:00)",
+        "label": "Europe/Bratislava (GMT+01:00)",
         "value": "Europe/Bratislava"
       }, {
         "description": null,
-        "label": "Europe/Brussels (GMT+02:00)",
+        "label": "Europe/Brussels (GMT+01:00)",
         "value": "Europe/Brussels"
       }, {
         "description": null,
-        "label": "Europe/Bucharest (GMT+03:00)",
+        "label": "Europe/Bucharest (GMT+02:00)",
         "value": "Europe/Bucharest"
       }, {
         "description": null,
-        "label": "Europe/Budapest (GMT+02:00)",
+        "label": "Europe/Budapest (GMT+01:00)",
         "value": "Europe/Budapest"
       }, {
         "description": null,
-        "label": "Europe/Busingen (GMT+02:00)",
+        "label": "Europe/Busingen (GMT+01:00)",
         "value": "Europe/Busingen"
       }, {
         "description": null,
-        "label": "Europe/Chisinau (GMT+03:00)",
+        "label": "Europe/Chisinau (GMT+02:00)",
         "value": "Europe/Chisinau"
       }, {
         "description": null,
-        "label": "Europe/Copenhagen (GMT+02:00)",
+        "label": "Europe/Copenhagen (GMT+01:00)",
         "value": "Europe/Copenhagen"
       }, {
         "description": null,
-        "label": "Europe/Dublin (GMT+01:00)",
+        "label": "Europe/Dublin (GMT+00:00)",
         "value": "Europe/Dublin"
       }, {
         "description": null,
-        "label": "Europe/Gibraltar (GMT+02:00)",
+        "label": "Europe/Gibraltar (GMT+01:00)",
         "value": "Europe/Gibraltar"
       }, {
         "description": null,
-        "label": "Europe/Guernsey (GMT+01:00)",
+        "label": "Europe/Guernsey (GMT+00:00)",
         "value": "Europe/Guernsey"
       }, {
         "description": null,
-        "label": "Europe/Helsinki (GMT+03:00)",
+        "label": "Europe/Helsinki (GMT+02:00)",
         "value": "Europe/Helsinki"
       }, {
         "description": null,
-        "label": "Europe/Isle_of_Man (GMT+01:00)",
+        "label": "Europe/Isle_of_Man (GMT+00:00)",
         "value": "Europe/Isle_of_Man"
       }, {
         "description": null,
@@ -7899,7 +7899,7 @@
         "value": "Europe/Istanbul"
       }, {
         "description": null,
-        "label": "Europe/Jersey (GMT+01:00)",
+        "label": "Europe/Jersey (GMT+00:00)",
         "value": "Europe/Jersey"
       }, {
         "description": null,
@@ -7907,7 +7907,7 @@
         "value": "Europe/Kaliningrad"
       }, {
         "description": null,
-        "label": "Europe/Kiev (GMT+03:00)",
+        "label": "Europe/Kiev (GMT+02:00)",
         "value": "Europe/Kiev"
       }, {
         "description": null,
@@ -7915,35 +7915,35 @@
         "value": "Europe/Kirov"
       }, {
         "description": null,
-        "label": "Europe/Kyiv (GMT+03:00)",
+        "label": "Europe/Kyiv (GMT+02:00)",
         "value": "Europe/Kyiv"
       }, {
         "description": null,
-        "label": "Europe/Lisbon (GMT+01:00)",
+        "label": "Europe/Lisbon (GMT+00:00)",
         "value": "Europe/Lisbon"
       }, {
         "description": null,
-        "label": "Europe/Ljubljana (GMT+02:00)",
+        "label": "Europe/Ljubljana (GMT+01:00)",
         "value": "Europe/Ljubljana"
       }, {
         "description": null,
-        "label": "Europe/London (GMT+01:00)",
+        "label": "Europe/London (GMT+00:00)",
         "value": "Europe/London"
       }, {
         "description": null,
-        "label": "Europe/Luxembourg (GMT+02:00)",
+        "label": "Europe/Luxembourg (GMT+01:00)",
         "value": "Europe/Luxembourg"
       }, {
         "description": null,
-        "label": "Europe/Madrid (GMT+02:00)",
+        "label": "Europe/Madrid (GMT+01:00)",
         "value": "Europe/Madrid"
       }, {
         "description": null,
-        "label": "Europe/Malta (GMT+02:00)",
+        "label": "Europe/Malta (GMT+01:00)",
         "value": "Europe/Malta"
       }, {
         "description": null,
-        "label": "Europe/Mariehamn (GMT+03:00)",
+        "label": "Europe/Mariehamn (GMT+02:00)",
         "value": "Europe/Mariehamn"
       }, {
         "description": null,
@@ -7951,7 +7951,7 @@
         "value": "Europe/Minsk"
       }, {
         "description": null,
-        "label": "Europe/Monaco (GMT+02:00)",
+        "label": "Europe/Monaco (GMT+01:00)",
         "value": "Europe/Monaco"
       }, {
         "description": null,
@@ -7959,31 +7959,31 @@
         "value": "Europe/Moscow"
       }, {
         "description": null,
-        "label": "Europe/Nicosia (GMT+03:00)",
+        "label": "Europe/Nicosia (GMT+02:00)",
         "value": "Europe/Nicosia"
       }, {
         "description": null,
-        "label": "Europe/Oslo (GMT+02:00)",
+        "label": "Europe/Oslo (GMT+01:00)",
         "value": "Europe/Oslo"
       }, {
         "description": null,
-        "label": "Europe/Paris (GMT+02:00)",
+        "label": "Europe/Paris (GMT+01:00)",
         "value": "Europe/Paris"
       }, {
         "description": null,
-        "label": "Europe/Podgorica (GMT+02:00)",
+        "label": "Europe/Podgorica (GMT+01:00)",
         "value": "Europe/Podgorica"
       }, {
         "description": null,
-        "label": "Europe/Prague (GMT+02:00)",
+        "label": "Europe/Prague (GMT+01:00)",
         "value": "Europe/Prague"
       }, {
         "description": null,
-        "label": "Europe/Riga (GMT+03:00)",
+        "label": "Europe/Riga (GMT+02:00)",
         "value": "Europe/Riga"
       }, {
         "description": null,
-        "label": "Europe/Rome (GMT+02:00)",
+        "label": "Europe/Rome (GMT+01:00)",
         "value": "Europe/Rome"
       }, {
         "description": null,
@@ -7991,11 +7991,11 @@
         "value": "Europe/Samara"
       }, {
         "description": null,
-        "label": "Europe/San_Marino (GMT+02:00)",
+        "label": "Europe/San_Marino (GMT+01:00)",
         "value": "Europe/San_Marino"
       }, {
         "description": null,
-        "label": "Europe/Sarajevo (GMT+02:00)",
+        "label": "Europe/Sarajevo (GMT+01:00)",
         "value": "Europe/Sarajevo"
       }, {
         "description": null,
@@ -8007,27 +8007,27 @@
         "value": "Europe/Simferopol"
       }, {
         "description": null,
-        "label": "Europe/Skopje (GMT+02:00)",
+        "label": "Europe/Skopje (GMT+01:00)",
         "value": "Europe/Skopje"
       }, {
         "description": null,
-        "label": "Europe/Sofia (GMT+03:00)",
+        "label": "Europe/Sofia (GMT+02:00)",
         "value": "Europe/Sofia"
       }, {
         "description": null,
-        "label": "Europe/Stockholm (GMT+02:00)",
+        "label": "Europe/Stockholm (GMT+01:00)",
         "value": "Europe/Stockholm"
       }, {
         "description": null,
-        "label": "Europe/Tallinn (GMT+03:00)",
+        "label": "Europe/Tallinn (GMT+02:00)",
         "value": "Europe/Tallinn"
       }, {
         "description": null,
-        "label": "Europe/Tirane (GMT+02:00)",
+        "label": "Europe/Tirane (GMT+01:00)",
         "value": "Europe/Tirane"
       }, {
         "description": null,
-        "label": "Europe/Tiraspol (GMT+03:00)",
+        "label": "Europe/Tiraspol (GMT+02:00)",
         "value": "Europe/Tiraspol"
       }, {
         "description": null,
@@ -8035,23 +8035,23 @@
         "value": "Europe/Ulyanovsk"
       }, {
         "description": null,
-        "label": "Europe/Uzhgorod (GMT+03:00)",
+        "label": "Europe/Uzhgorod (GMT+02:00)",
         "value": "Europe/Uzhgorod"
       }, {
         "description": null,
-        "label": "Europe/Vaduz (GMT+02:00)",
+        "label": "Europe/Vaduz (GMT+01:00)",
         "value": "Europe/Vaduz"
       }, {
         "description": null,
-        "label": "Europe/Vatican (GMT+02:00)",
+        "label": "Europe/Vatican (GMT+01:00)",
         "value": "Europe/Vatican"
       }, {
         "description": null,
-        "label": "Europe/Vienna (GMT+02:00)",
+        "label": "Europe/Vienna (GMT+01:00)",
         "value": "Europe/Vienna"
       }, {
         "description": null,
-        "label": "Europe/Vilnius (GMT+03:00)",
+        "label": "Europe/Vilnius (GMT+02:00)",
         "value": "Europe/Vilnius"
       }, {
         "description": null,
@@ -8059,27 +8059,27 @@
         "value": "Europe/Volgograd"
       }, {
         "description": null,
-        "label": "Europe/Warsaw (GMT+02:00)",
+        "label": "Europe/Warsaw (GMT+01:00)",
         "value": "Europe/Warsaw"
       }, {
         "description": null,
-        "label": "Europe/Zagreb (GMT+02:00)",
+        "label": "Europe/Zagreb (GMT+01:00)",
         "value": "Europe/Zagreb"
       }, {
         "description": null,
-        "label": "Europe/Zaporozhye (GMT+03:00)",
+        "label": "Europe/Zaporozhye (GMT+02:00)",
         "value": "Europe/Zaporozhye"
       }, {
         "description": null,
-        "label": "Europe/Zurich (GMT+02:00)",
+        "label": "Europe/Zurich (GMT+01:00)",
         "value": "Europe/Zurich"
       }, {
         "description": null,
-        "label": "GB (GMT+01:00)",
+        "label": "GB (GMT+00:00)",
         "value": "GB"
       }, {
         "description": null,
-        "label": "GB-Eire (GMT+01:00)",
+        "label": "GB-Eire (GMT+00:00)",
         "value": "GB-Eire"
       }, {
         "description": null,
@@ -8151,7 +8151,7 @@
         "value": "Iran"
       }, {
         "description": null,
-        "label": "Israel (GMT+03:00)",
+        "label": "Israel (GMT+02:00)",
         "value": "Israel"
       }, {
         "description": null,
@@ -8171,15 +8171,15 @@
         "value": "Libya"
       }, {
         "description": null,
-        "label": "MET (GMT+02:00)",
+        "label": "MET (GMT+01:00)",
         "value": "MET"
       }, {
         "description": null,
-        "label": "MST7MDT (GMT-06:00)",
+        "label": "MST7MDT (GMT-07:00)",
         "value": "MST7MDT"
       }, {
         "description": null,
-        "label": "Mexico/BajaNorte (GMT-07:00)",
+        "label": "Mexico/BajaNorte (GMT-08:00)",
         "value": "Mexico/BajaNorte"
       }, {
         "description": null,
@@ -8199,7 +8199,7 @@
         "value": "NZ-CHAT"
       }, {
         "description": null,
-        "label": "Navajo (GMT-06:00)",
+        "label": "Navajo (GMT-07:00)",
         "value": "Navajo"
       }, {
         "description": null,
@@ -8207,7 +8207,7 @@
         "value": "PRC"
       }, {
         "description": null,
-        "label": "PST8PDT (GMT-07:00)",
+        "label": "PST8PDT (GMT-08:00)",
         "value": "PST8PDT"
       }, {
         "description": null,
@@ -8387,11 +8387,11 @@
         "value": "Pacific/Yap"
       }, {
         "description": null,
-        "label": "Poland (GMT+02:00)",
+        "label": "Poland (GMT+01:00)",
         "value": "Poland"
       }, {
         "description": null,
-        "label": "Portugal (GMT+01:00)",
+        "label": "Portugal (GMT+00:00)",
         "value": "Portugal"
       }, {
         "description": null,
@@ -8407,7 +8407,7 @@
         "value": "SystemV/AST4"
       }, {
         "description": null,
-        "label": "SystemV/AST4ADT (GMT-03:00)",
+        "label": "SystemV/AST4ADT (GMT-04:00)",
         "value": "SystemV/AST4ADT"
       }, {
         "description": null,
@@ -8415,7 +8415,7 @@
         "value": "SystemV/CST6"
       }, {
         "description": null,
-        "label": "SystemV/CST6CDT (GMT-05:00)",
+        "label": "SystemV/CST6CDT (GMT-06:00)",
         "value": "SystemV/CST6CDT"
       }, {
         "description": null,
@@ -8423,7 +8423,7 @@
         "value": "SystemV/EST5"
       }, {
         "description": null,
-        "label": "SystemV/EST5EDT (GMT-04:00)",
+        "label": "SystemV/EST5EDT (GMT-05:00)",
         "value": "SystemV/EST5EDT"
       }, {
         "description": null,
@@ -8435,7 +8435,7 @@
         "value": "SystemV/MST7"
       }, {
         "description": null,
-        "label": "SystemV/MST7MDT (GMT-06:00)",
+        "label": "SystemV/MST7MDT (GMT-07:00)",
         "value": "SystemV/MST7MDT"
       }, {
         "description": null,
@@ -8443,7 +8443,7 @@
         "value": "SystemV/PST8"
       }, {
         "description": null,
-        "label": "SystemV/PST8PDT (GMT-07:00)",
+        "label": "SystemV/PST8PDT (GMT-08:00)",
         "value": "SystemV/PST8PDT"
       }, {
         "description": null,
@@ -8451,7 +8451,7 @@
         "value": "SystemV/YST9"
       }, {
         "description": null,
-        "label": "SystemV/YST9YDT (GMT-08:00)",
+        "label": "SystemV/YST9YDT (GMT-09:00)",
         "value": "SystemV/YST9YDT"
       }, {
         "description": null,
@@ -8463,11 +8463,11 @@
         "value": "UCT"
       }, {
         "description": null,
-        "label": "US/Alaska (GMT-08:00)",
+        "label": "US/Alaska (GMT-09:00)",
         "value": "US/Alaska"
       }, {
         "description": null,
-        "label": "US/Aleutian (GMT-09:00)",
+        "label": "US/Aleutian (GMT-10:00)",
         "value": "US/Aleutian"
       }, {
         "description": null,
@@ -8475,15 +8475,15 @@
         "value": "US/Arizona"
       }, {
         "description": null,
-        "label": "US/Central (GMT-05:00)",
+        "label": "US/Central (GMT-06:00)",
         "value": "US/Central"
       }, {
         "description": null,
-        "label": "US/East-Indiana (GMT-04:00)",
+        "label": "US/East-Indiana (GMT-05:00)",
         "value": "US/East-Indiana"
       }, {
         "description": null,
-        "label": "US/Eastern (GMT-04:00)",
+        "label": "US/Eastern (GMT-05:00)",
         "value": "US/Eastern"
       }, {
         "description": null,
@@ -8491,19 +8491,19 @@
         "value": "US/Hawaii"
       }, {
         "description": null,
-        "label": "US/Indiana-Starke (GMT-05:00)",
+        "label": "US/Indiana-Starke (GMT-06:00)",
         "value": "US/Indiana-Starke"
       }, {
         "description": null,
-        "label": "US/Michigan (GMT-04:00)",
+        "label": "US/Michigan (GMT-05:00)",
         "value": "US/Michigan"
       }, {
         "description": null,
-        "label": "US/Mountain (GMT-06:00)",
+        "label": "US/Mountain (GMT-07:00)",
         "value": "US/Mountain"
       }, {
         "description": null,
-        "label": "US/Pacific (GMT-07:00)",
+        "label": "US/Pacific (GMT-08:00)",
         "value": "US/Pacific"
       }, {
         "description": null,
@@ -8523,7 +8523,7 @@
         "value": "W-SU"
       }, {
         "description": null,
-        "label": "WET (GMT+01:00)",
+        "label": "WET (GMT+00:00)",
         "value": "WET"
       }, {
         "description": null,
@@ -8930,15 +8930,15 @@
         "value": "Africa/Bujumbura"
       }, {
         "description": null,
-        "label": "Africa/Cairo (GMT+03:00)",
+        "label": "Africa/Cairo (GMT+02:00)",
         "value": "Africa/Cairo"
       }, {
         "description": null,
-        "label": "Africa/Casablanca (GMT+01:00)",
+        "label": "Africa/Casablanca (GMT+00:00)",
         "value": "Africa/Casablanca"
       }, {
         "description": null,
-        "label": "Africa/Ceuta (GMT+02:00)",
+        "label": "Africa/Ceuta (GMT+01:00)",
         "value": "Africa/Ceuta"
       }, {
         "description": null,
@@ -8962,7 +8962,7 @@
         "value": "Africa/Douala"
       }, {
         "description": null,
-        "label": "Africa/El_Aaiun (GMT+01:00)",
+        "label": "Africa/El_Aaiun (GMT+00:00)",
         "value": "Africa/El_Aaiun"
       }, {
         "description": null,
@@ -9090,15 +9090,15 @@
         "value": "Africa/Tunis"
       }, {
         "description": null,
-        "label": "Africa/Windhoek (GMT+02:00)",
+        "label": "Africa/Windhoek (GMT+01:00)",
         "value": "Africa/Windhoek"
       }, {
         "description": null,
-        "label": "America/Adak (GMT-09:00)",
+        "label": "America/Adak (GMT-10:00)",
         "value": "America/Adak"
       }, {
         "description": null,
-        "label": "America/Anchorage (GMT-08:00)",
+        "label": "America/Anchorage (GMT-09:00)",
         "value": "America/Anchorage"
       }, {
         "description": null,
@@ -9178,7 +9178,7 @@
         "value": "America/Atikokan"
       }, {
         "description": null,
-        "label": "America/Atka (GMT-09:00)",
+        "label": "America/Atka (GMT-10:00)",
         "value": "America/Atka"
       }, {
         "description": null,
@@ -9214,7 +9214,7 @@
         "value": "America/Bogota"
       }, {
         "description": null,
-        "label": "America/Boise (GMT-06:00)",
+        "label": "America/Boise (GMT-07:00)",
         "value": "America/Boise"
       }, {
         "description": null,
@@ -9222,7 +9222,7 @@
         "value": "America/Buenos_Aires"
       }, {
         "description": null,
-        "label": "America/Cambridge_Bay (GMT-06:00)",
+        "label": "America/Cambridge_Bay (GMT-07:00)",
         "value": "America/Cambridge_Bay"
       }, {
         "description": null,
@@ -9250,7 +9250,7 @@
         "value": "America/Cayman"
       }, {
         "description": null,
-        "label": "America/Chicago (GMT-05:00)",
+        "label": "America/Chicago (GMT-06:00)",
         "value": "America/Chicago"
       }, {
         "description": null,
@@ -9258,7 +9258,7 @@
         "value": "America/Chihuahua"
       }, {
         "description": null,
-        "label": "America/Ciudad_Juarez (GMT-06:00)",
+        "label": "America/Ciudad_Juarez (GMT-07:00)",
         "value": "America/Ciudad_Juarez"
       }, {
         "description": null,
@@ -9302,11 +9302,11 @@
         "value": "America/Dawson_Creek"
       }, {
         "description": null,
-        "label": "America/Denver (GMT-06:00)",
+        "label": "America/Denver (GMT-07:00)",
         "value": "America/Denver"
       }, {
         "description": null,
-        "label": "America/Detroit (GMT-04:00)",
+        "label": "America/Detroit (GMT-05:00)",
         "value": "America/Detroit"
       }, {
         "description": null,
@@ -9314,7 +9314,7 @@
         "value": "America/Dominica"
       }, {
         "description": null,
-        "label": "America/Edmonton (GMT-06:00)",
+        "label": "America/Edmonton (GMT-07:00)",
         "value": "America/Edmonton"
       }, {
         "description": null,
@@ -9326,7 +9326,7 @@
         "value": "America/El_Salvador"
       }, {
         "description": null,
-        "label": "America/Ensenada (GMT-07:00)",
+        "label": "America/Ensenada (GMT-08:00)",
         "value": "America/Ensenada"
       }, {
         "description": null,
@@ -9334,7 +9334,7 @@
         "value": "America/Fort_Nelson"
       }, {
         "description": null,
-        "label": "America/Fort_Wayne (GMT-04:00)",
+        "label": "America/Fort_Wayne (GMT-05:00)",
         "value": "America/Fort_Wayne"
       }, {
         "description": null,
@@ -9342,19 +9342,19 @@
         "value": "America/Fortaleza"
       }, {
         "description": null,
-        "label": "America/Glace_Bay (GMT-03:00)",
+        "label": "America/Glace_Bay (GMT-04:00)",
         "value": "America/Glace_Bay"
       }, {
         "description": null,
-        "label": "America/Godthab (GMT-01:00)",
+        "label": "America/Godthab (GMT-02:00)",
         "value": "America/Godthab"
       }, {
         "description": null,
-        "label": "America/Goose_Bay (GMT-03:00)",
+        "label": "America/Goose_Bay (GMT-04:00)",
         "value": "America/Goose_Bay"
       }, {
         "description": null,
-        "label": "America/Grand_Turk (GMT-04:00)",
+        "label": "America/Grand_Turk (GMT-05:00)",
         "value": "America/Grand_Turk"
       }, {
         "description": null,
@@ -9378,11 +9378,11 @@
         "value": "America/Guyana"
       }, {
         "description": null,
-        "label": "America/Halifax (GMT-03:00)",
+        "label": "America/Halifax (GMT-04:00)",
         "value": "America/Halifax"
       }, {
         "description": null,
-        "label": "America/Havana (GMT-04:00)",
+        "label": "America/Havana (GMT-05:00)",
         "value": "America/Havana"
       }, {
         "description": null,
@@ -9390,47 +9390,47 @@
         "value": "America/Hermosillo"
       }, {
         "description": null,
-        "label": "America/Indiana/Indianapolis (GMT-04:00)",
+        "label": "America/Indiana/Indianapolis (GMT-05:00)",
         "value": "America/Indiana/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Indiana/Knox (GMT-05:00)",
+        "label": "America/Indiana/Knox (GMT-06:00)",
         "value": "America/Indiana/Knox"
       }, {
         "description": null,
-        "label": "America/Indiana/Marengo (GMT-04:00)",
+        "label": "America/Indiana/Marengo (GMT-05:00)",
         "value": "America/Indiana/Marengo"
       }, {
         "description": null,
-        "label": "America/Indiana/Petersburg (GMT-04:00)",
+        "label": "America/Indiana/Petersburg (GMT-05:00)",
         "value": "America/Indiana/Petersburg"
       }, {
         "description": null,
-        "label": "America/Indiana/Tell_City (GMT-05:00)",
+        "label": "America/Indiana/Tell_City (GMT-06:00)",
         "value": "America/Indiana/Tell_City"
       }, {
         "description": null,
-        "label": "America/Indiana/Vevay (GMT-04:00)",
+        "label": "America/Indiana/Vevay (GMT-05:00)",
         "value": "America/Indiana/Vevay"
       }, {
         "description": null,
-        "label": "America/Indiana/Vincennes (GMT-04:00)",
+        "label": "America/Indiana/Vincennes (GMT-05:00)",
         "value": "America/Indiana/Vincennes"
       }, {
         "description": null,
-        "label": "America/Indiana/Winamac (GMT-04:00)",
+        "label": "America/Indiana/Winamac (GMT-05:00)",
         "value": "America/Indiana/Winamac"
       }, {
         "description": null,
-        "label": "America/Indianapolis (GMT-04:00)",
+        "label": "America/Indianapolis (GMT-05:00)",
         "value": "America/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Inuvik (GMT-06:00)",
+        "label": "America/Inuvik (GMT-07:00)",
         "value": "America/Inuvik"
       }, {
         "description": null,
-        "label": "America/Iqaluit (GMT-04:00)",
+        "label": "America/Iqaluit (GMT-05:00)",
         "value": "America/Iqaluit"
       }, {
         "description": null,
@@ -9442,19 +9442,19 @@
         "value": "America/Jujuy"
       }, {
         "description": null,
-        "label": "America/Juneau (GMT-08:00)",
+        "label": "America/Juneau (GMT-09:00)",
         "value": "America/Juneau"
       }, {
         "description": null,
-        "label": "America/Kentucky/Louisville (GMT-04:00)",
+        "label": "America/Kentucky/Louisville (GMT-05:00)",
         "value": "America/Kentucky/Louisville"
       }, {
         "description": null,
-        "label": "America/Kentucky/Monticello (GMT-04:00)",
+        "label": "America/Kentucky/Monticello (GMT-05:00)",
         "value": "America/Kentucky/Monticello"
       }, {
         "description": null,
-        "label": "America/Knox_IN (GMT-05:00)",
+        "label": "America/Knox_IN (GMT-06:00)",
         "value": "America/Knox_IN"
       }, {
         "description": null,
@@ -9470,11 +9470,11 @@
         "value": "America/Lima"
       }, {
         "description": null,
-        "label": "America/Los_Angeles (GMT-07:00)",
+        "label": "America/Los_Angeles (GMT-08:00)",
         "value": "America/Los_Angeles"
       }, {
         "description": null,
-        "label": "America/Louisville (GMT-04:00)",
+        "label": "America/Louisville (GMT-05:00)",
         "value": "America/Louisville"
       }, {
         "description": null,
@@ -9502,7 +9502,7 @@
         "value": "America/Martinique"
       }, {
         "description": null,
-        "label": "America/Matamoros (GMT-05:00)",
+        "label": "America/Matamoros (GMT-06:00)",
         "value": "America/Matamoros"
       }, {
         "description": null,
@@ -9514,7 +9514,7 @@
         "value": "America/Mendoza"
       }, {
         "description": null,
-        "label": "America/Menominee (GMT-05:00)",
+        "label": "America/Menominee (GMT-06:00)",
         "value": "America/Menominee"
       }, {
         "description": null,
@@ -9522,7 +9522,7 @@
         "value": "America/Merida"
       }, {
         "description": null,
-        "label": "America/Metlakatla (GMT-08:00)",
+        "label": "America/Metlakatla (GMT-09:00)",
         "value": "America/Metlakatla"
       }, {
         "description": null,
@@ -9530,11 +9530,11 @@
         "value": "America/Mexico_City"
       }, {
         "description": null,
-        "label": "America/Miquelon (GMT-02:00)",
+        "label": "America/Miquelon (GMT-03:00)",
         "value": "America/Miquelon"
       }, {
         "description": null,
-        "label": "America/Moncton (GMT-03:00)",
+        "label": "America/Moncton (GMT-04:00)",
         "value": "America/Moncton"
       }, {
         "description": null,
@@ -9546,7 +9546,7 @@
         "value": "America/Montevideo"
       }, {
         "description": null,
-        "label": "America/Montreal (GMT-04:00)",
+        "label": "America/Montreal (GMT-05:00)",
         "value": "America/Montreal"
       }, {
         "description": null,
@@ -9554,19 +9554,19 @@
         "value": "America/Montserrat"
       }, {
         "description": null,
-        "label": "America/Nassau (GMT-04:00)",
+        "label": "America/Nassau (GMT-05:00)",
         "value": "America/Nassau"
       }, {
         "description": null,
-        "label": "America/New_York (GMT-04:00)",
+        "label": "America/New_York (GMT-05:00)",
         "value": "America/New_York"
       }, {
         "description": null,
-        "label": "America/Nipigon (GMT-04:00)",
+        "label": "America/Nipigon (GMT-05:00)",
         "value": "America/Nipigon"
       }, {
         "description": null,
-        "label": "America/Nome (GMT-08:00)",
+        "label": "America/Nome (GMT-09:00)",
         "value": "America/Nome"
       }, {
         "description": null,
@@ -9574,23 +9574,23 @@
         "value": "America/Noronha"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Beulah (GMT-05:00)",
+        "label": "America/North_Dakota/Beulah (GMT-06:00)",
         "value": "America/North_Dakota/Beulah"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Center (GMT-05:00)",
+        "label": "America/North_Dakota/Center (GMT-06:00)",
         "value": "America/North_Dakota/Center"
       }, {
         "description": null,
-        "label": "America/North_Dakota/New_Salem (GMT-05:00)",
+        "label": "America/North_Dakota/New_Salem (GMT-06:00)",
         "value": "America/North_Dakota/New_Salem"
       }, {
         "description": null,
-        "label": "America/Nuuk (GMT-01:00)",
+        "label": "America/Nuuk (GMT-02:00)",
         "value": "America/Nuuk"
       }, {
         "description": null,
-        "label": "America/Ojinaga (GMT-05:00)",
+        "label": "America/Ojinaga (GMT-06:00)",
         "value": "America/Ojinaga"
       }, {
         "description": null,
@@ -9598,7 +9598,7 @@
         "value": "America/Panama"
       }, {
         "description": null,
-        "label": "America/Pangnirtung (GMT-04:00)",
+        "label": "America/Pangnirtung (GMT-05:00)",
         "value": "America/Pangnirtung"
       }, {
         "description": null,
@@ -9610,7 +9610,7 @@
         "value": "America/Phoenix"
       }, {
         "description": null,
-        "label": "America/Port-au-Prince (GMT-04:00)",
+        "label": "America/Port-au-Prince (GMT-05:00)",
         "value": "America/Port-au-Prince"
       }, {
         "description": null,
@@ -9634,11 +9634,11 @@
         "value": "America/Punta_Arenas"
       }, {
         "description": null,
-        "label": "America/Rainy_River (GMT-05:00)",
+        "label": "America/Rainy_River (GMT-06:00)",
         "value": "America/Rainy_River"
       }, {
         "description": null,
-        "label": "America/Rankin_Inlet (GMT-05:00)",
+        "label": "America/Rankin_Inlet (GMT-06:00)",
         "value": "America/Rankin_Inlet"
       }, {
         "description": null,
@@ -9650,7 +9650,7 @@
         "value": "America/Regina"
       }, {
         "description": null,
-        "label": "America/Resolute (GMT-05:00)",
+        "label": "America/Resolute (GMT-06:00)",
         "value": "America/Resolute"
       }, {
         "description": null,
@@ -9662,7 +9662,7 @@
         "value": "America/Rosario"
       }, {
         "description": null,
-        "label": "America/Santa_Isabel (GMT-07:00)",
+        "label": "America/Santa_Isabel (GMT-08:00)",
         "value": "America/Santa_Isabel"
       }, {
         "description": null,
@@ -9682,15 +9682,15 @@
         "value": "America/Sao_Paulo"
       }, {
         "description": null,
-        "label": "America/Scoresbysund (GMT-01:00)",
+        "label": "America/Scoresbysund (GMT-02:00)",
         "value": "America/Scoresbysund"
       }, {
         "description": null,
-        "label": "America/Shiprock (GMT-06:00)",
+        "label": "America/Shiprock (GMT-07:00)",
         "value": "America/Shiprock"
       }, {
         "description": null,
-        "label": "America/Sitka (GMT-08:00)",
+        "label": "America/Sitka (GMT-09:00)",
         "value": "America/Sitka"
       }, {
         "description": null,
@@ -9698,7 +9698,7 @@
         "value": "America/St_Barthelemy"
       }, {
         "description": null,
-        "label": "America/St_Johns (GMT-02:30)",
+        "label": "America/St_Johns (GMT-03:30)",
         "value": "America/St_Johns"
       }, {
         "description": null,
@@ -9726,19 +9726,19 @@
         "value": "America/Tegucigalpa"
       }, {
         "description": null,
-        "label": "America/Thule (GMT-03:00)",
+        "label": "America/Thule (GMT-04:00)",
         "value": "America/Thule"
       }, {
         "description": null,
-        "label": "America/Thunder_Bay (GMT-04:00)",
+        "label": "America/Thunder_Bay (GMT-05:00)",
         "value": "America/Thunder_Bay"
       }, {
         "description": null,
-        "label": "America/Tijuana (GMT-07:00)",
+        "label": "America/Tijuana (GMT-08:00)",
         "value": "America/Tijuana"
       }, {
         "description": null,
-        "label": "America/Toronto (GMT-04:00)",
+        "label": "America/Toronto (GMT-05:00)",
         "value": "America/Toronto"
       }, {
         "description": null,
@@ -9746,7 +9746,7 @@
         "value": "America/Tortola"
       }, {
         "description": null,
-        "label": "America/Vancouver (GMT-07:00)",
+        "label": "America/Vancouver (GMT-08:00)",
         "value": "America/Vancouver"
       }, {
         "description": null,
@@ -9758,15 +9758,15 @@
         "value": "America/Whitehorse"
       }, {
         "description": null,
-        "label": "America/Winnipeg (GMT-05:00)",
+        "label": "America/Winnipeg (GMT-06:00)",
         "value": "America/Winnipeg"
       }, {
         "description": null,
-        "label": "America/Yakutat (GMT-08:00)",
+        "label": "America/Yakutat (GMT-09:00)",
         "value": "America/Yakutat"
       }, {
         "description": null,
-        "label": "America/Yellowknife (GMT-06:00)",
+        "label": "America/Yellowknife (GMT-07:00)",
         "value": "America/Yellowknife"
       }, {
         "description": null,
@@ -9810,7 +9810,7 @@
         "value": "Antarctica/Syowa"
       }, {
         "description": null,
-        "label": "Antarctica/Troll (GMT+02:00)",
+        "label": "Antarctica/Troll (GMT+00:00)",
         "value": "Antarctica/Troll"
       }, {
         "description": null,
@@ -9818,7 +9818,7 @@
         "value": "Antarctica/Vostok"
       }, {
         "description": null,
-        "label": "Arctic/Longyearbyen (GMT+02:00)",
+        "label": "Arctic/Longyearbyen (GMT+01:00)",
         "value": "Arctic/Longyearbyen"
       }, {
         "description": null,
@@ -9878,7 +9878,7 @@
         "value": "Asia/Barnaul"
       }, {
         "description": null,
-        "label": "Asia/Beirut (GMT+03:00)",
+        "label": "Asia/Beirut (GMT+02:00)",
         "value": "Asia/Beirut"
       }, {
         "description": null,
@@ -9938,11 +9938,11 @@
         "value": "Asia/Dushanbe"
       }, {
         "description": null,
-        "label": "Asia/Famagusta (GMT+03:00)",
+        "label": "Asia/Famagusta (GMT+02:00)",
         "value": "Asia/Famagusta"
       }, {
         "description": null,
-        "label": "Asia/Gaza (GMT+03:00)",
+        "label": "Asia/Gaza (GMT+02:00)",
         "value": "Asia/Gaza"
       }, {
         "description": null,
@@ -9950,7 +9950,7 @@
         "value": "Asia/Harbin"
       }, {
         "description": null,
-        "label": "Asia/Hebron (GMT+03:00)",
+        "label": "Asia/Hebron (GMT+02:00)",
         "value": "Asia/Hebron"
       }, {
         "description": null,
@@ -9982,7 +9982,7 @@
         "value": "Asia/Jayapura"
       }, {
         "description": null,
-        "label": "Asia/Jerusalem (GMT+03:00)",
+        "label": "Asia/Jerusalem (GMT+02:00)",
         "value": "Asia/Jerusalem"
       }, {
         "description": null,
@@ -10058,7 +10058,7 @@
         "value": "Asia/Muscat"
       }, {
         "description": null,
-        "label": "Asia/Nicosia (GMT+03:00)",
+        "label": "Asia/Nicosia (GMT+02:00)",
         "value": "Asia/Nicosia"
       }, {
         "description": null,
@@ -10154,7 +10154,7 @@
         "value": "Asia/Tehran"
       }, {
         "description": null,
-        "label": "Asia/Tel_Aviv (GMT+03:00)",
+        "label": "Asia/Tel_Aviv (GMT+02:00)",
         "value": "Asia/Tel_Aviv"
       }, {
         "description": null,
@@ -10218,15 +10218,15 @@
         "value": "Asia/Yerevan"
       }, {
         "description": null,
-        "label": "Atlantic/Azores (GMT+00:00)",
+        "label": "Atlantic/Azores (GMT-01:00)",
         "value": "Atlantic/Azores"
       }, {
         "description": null,
-        "label": "Atlantic/Bermuda (GMT-03:00)",
+        "label": "Atlantic/Bermuda (GMT-04:00)",
         "value": "Atlantic/Bermuda"
       }, {
         "description": null,
-        "label": "Atlantic/Canary (GMT+01:00)",
+        "label": "Atlantic/Canary (GMT+00:00)",
         "value": "Atlantic/Canary"
       }, {
         "description": null,
@@ -10234,19 +10234,19 @@
         "value": "Atlantic/Cape_Verde"
       }, {
         "description": null,
-        "label": "Atlantic/Faeroe (GMT+01:00)",
+        "label": "Atlantic/Faeroe (GMT+00:00)",
         "value": "Atlantic/Faeroe"
       }, {
         "description": null,
-        "label": "Atlantic/Faroe (GMT+01:00)",
+        "label": "Atlantic/Faroe (GMT+00:00)",
         "value": "Atlantic/Faroe"
       }, {
         "description": null,
-        "label": "Atlantic/Jan_Mayen (GMT+02:00)",
+        "label": "Atlantic/Jan_Mayen (GMT+01:00)",
         "value": "Atlantic/Jan_Mayen"
       }, {
         "description": null,
-        "label": "Atlantic/Madeira (GMT+01:00)",
+        "label": "Atlantic/Madeira (GMT+00:00)",
         "value": "Atlantic/Madeira"
       }, {
         "description": null,
@@ -10374,35 +10374,35 @@
         "value": "Brazil/West"
       }, {
         "description": null,
-        "label": "CET (GMT+02:00)",
+        "label": "CET (GMT+01:00)",
         "value": "CET"
       }, {
         "description": null,
-        "label": "CST6CDT (GMT-05:00)",
+        "label": "CST6CDT (GMT-06:00)",
         "value": "CST6CDT"
       }, {
         "description": null,
-        "label": "Canada/Atlantic (GMT-03:00)",
+        "label": "Canada/Atlantic (GMT-04:00)",
         "value": "Canada/Atlantic"
       }, {
         "description": null,
-        "label": "Canada/Central (GMT-05:00)",
+        "label": "Canada/Central (GMT-06:00)",
         "value": "Canada/Central"
       }, {
         "description": null,
-        "label": "Canada/Eastern (GMT-04:00)",
+        "label": "Canada/Eastern (GMT-05:00)",
         "value": "Canada/Eastern"
       }, {
         "description": null,
-        "label": "Canada/Mountain (GMT-06:00)",
+        "label": "Canada/Mountain (GMT-07:00)",
         "value": "Canada/Mountain"
       }, {
         "description": null,
-        "label": "Canada/Newfoundland (GMT-02:30)",
+        "label": "Canada/Newfoundland (GMT-03:30)",
         "value": "Canada/Newfoundland"
       }, {
         "description": null,
-        "label": "Canada/Pacific (GMT-07:00)",
+        "label": "Canada/Pacific (GMT-08:00)",
         "value": "Canada/Pacific"
       }, {
         "description": null,
@@ -10422,23 +10422,23 @@
         "value": "Chile/EasterIsland"
       }, {
         "description": null,
-        "label": "Cuba (GMT-04:00)",
+        "label": "Cuba (GMT-05:00)",
         "value": "Cuba"
       }, {
         "description": null,
-        "label": "EET (GMT+03:00)",
+        "label": "EET (GMT+02:00)",
         "value": "EET"
       }, {
         "description": null,
-        "label": "EST5EDT (GMT-04:00)",
+        "label": "EST5EDT (GMT-05:00)",
         "value": "EST5EDT"
       }, {
         "description": null,
-        "label": "Egypt (GMT+03:00)",
+        "label": "Egypt (GMT+02:00)",
         "value": "Egypt"
       }, {
         "description": null,
-        "label": "Eire (GMT+01:00)",
+        "label": "Eire (GMT+00:00)",
         "value": "Eire"
       }, {
         "description": null,
@@ -10582,11 +10582,11 @@
         "value": "Etc/Zulu"
       }, {
         "description": null,
-        "label": "Europe/Amsterdam (GMT+02:00)",
+        "label": "Europe/Amsterdam (GMT+01:00)",
         "value": "Europe/Amsterdam"
       }, {
         "description": null,
-        "label": "Europe/Andorra (GMT+02:00)",
+        "label": "Europe/Andorra (GMT+01:00)",
         "value": "Europe/Andorra"
       }, {
         "description": null,
@@ -10594,67 +10594,67 @@
         "value": "Europe/Astrakhan"
       }, {
         "description": null,
-        "label": "Europe/Athens (GMT+03:00)",
+        "label": "Europe/Athens (GMT+02:00)",
         "value": "Europe/Athens"
       }, {
         "description": null,
-        "label": "Europe/Belfast (GMT+01:00)",
+        "label": "Europe/Belfast (GMT+00:00)",
         "value": "Europe/Belfast"
       }, {
         "description": null,
-        "label": "Europe/Belgrade (GMT+02:00)",
+        "label": "Europe/Belgrade (GMT+01:00)",
         "value": "Europe/Belgrade"
       }, {
         "description": null,
-        "label": "Europe/Berlin (GMT+02:00)",
+        "label": "Europe/Berlin (GMT+01:00)",
         "value": "Europe/Berlin"
       }, {
         "description": null,
-        "label": "Europe/Bratislava (GMT+02:00)",
+        "label": "Europe/Bratislava (GMT+01:00)",
         "value": "Europe/Bratislava"
       }, {
         "description": null,
-        "label": "Europe/Brussels (GMT+02:00)",
+        "label": "Europe/Brussels (GMT+01:00)",
         "value": "Europe/Brussels"
       }, {
         "description": null,
-        "label": "Europe/Bucharest (GMT+03:00)",
+        "label": "Europe/Bucharest (GMT+02:00)",
         "value": "Europe/Bucharest"
       }, {
         "description": null,
-        "label": "Europe/Budapest (GMT+02:00)",
+        "label": "Europe/Budapest (GMT+01:00)",
         "value": "Europe/Budapest"
       }, {
         "description": null,
-        "label": "Europe/Busingen (GMT+02:00)",
+        "label": "Europe/Busingen (GMT+01:00)",
         "value": "Europe/Busingen"
       }, {
         "description": null,
-        "label": "Europe/Chisinau (GMT+03:00)",
+        "label": "Europe/Chisinau (GMT+02:00)",
         "value": "Europe/Chisinau"
       }, {
         "description": null,
-        "label": "Europe/Copenhagen (GMT+02:00)",
+        "label": "Europe/Copenhagen (GMT+01:00)",
         "value": "Europe/Copenhagen"
       }, {
         "description": null,
-        "label": "Europe/Dublin (GMT+01:00)",
+        "label": "Europe/Dublin (GMT+00:00)",
         "value": "Europe/Dublin"
       }, {
         "description": null,
-        "label": "Europe/Gibraltar (GMT+02:00)",
+        "label": "Europe/Gibraltar (GMT+01:00)",
         "value": "Europe/Gibraltar"
       }, {
         "description": null,
-        "label": "Europe/Guernsey (GMT+01:00)",
+        "label": "Europe/Guernsey (GMT+00:00)",
         "value": "Europe/Guernsey"
       }, {
         "description": null,
-        "label": "Europe/Helsinki (GMT+03:00)",
+        "label": "Europe/Helsinki (GMT+02:00)",
         "value": "Europe/Helsinki"
       }, {
         "description": null,
-        "label": "Europe/Isle_of_Man (GMT+01:00)",
+        "label": "Europe/Isle_of_Man (GMT+00:00)",
         "value": "Europe/Isle_of_Man"
       }, {
         "description": null,
@@ -10662,7 +10662,7 @@
         "value": "Europe/Istanbul"
       }, {
         "description": null,
-        "label": "Europe/Jersey (GMT+01:00)",
+        "label": "Europe/Jersey (GMT+00:00)",
         "value": "Europe/Jersey"
       }, {
         "description": null,
@@ -10670,7 +10670,7 @@
         "value": "Europe/Kaliningrad"
       }, {
         "description": null,
-        "label": "Europe/Kiev (GMT+03:00)",
+        "label": "Europe/Kiev (GMT+02:00)",
         "value": "Europe/Kiev"
       }, {
         "description": null,
@@ -10678,35 +10678,35 @@
         "value": "Europe/Kirov"
       }, {
         "description": null,
-        "label": "Europe/Kyiv (GMT+03:00)",
+        "label": "Europe/Kyiv (GMT+02:00)",
         "value": "Europe/Kyiv"
       }, {
         "description": null,
-        "label": "Europe/Lisbon (GMT+01:00)",
+        "label": "Europe/Lisbon (GMT+00:00)",
         "value": "Europe/Lisbon"
       }, {
         "description": null,
-        "label": "Europe/Ljubljana (GMT+02:00)",
+        "label": "Europe/Ljubljana (GMT+01:00)",
         "value": "Europe/Ljubljana"
       }, {
         "description": null,
-        "label": "Europe/London (GMT+01:00)",
+        "label": "Europe/London (GMT+00:00)",
         "value": "Europe/London"
       }, {
         "description": null,
-        "label": "Europe/Luxembourg (GMT+02:00)",
+        "label": "Europe/Luxembourg (GMT+01:00)",
         "value": "Europe/Luxembourg"
       }, {
         "description": null,
-        "label": "Europe/Madrid (GMT+02:00)",
+        "label": "Europe/Madrid (GMT+01:00)",
         "value": "Europe/Madrid"
       }, {
         "description": null,
-        "label": "Europe/Malta (GMT+02:00)",
+        "label": "Europe/Malta (GMT+01:00)",
         "value": "Europe/Malta"
       }, {
         "description": null,
-        "label": "Europe/Mariehamn (GMT+03:00)",
+        "label": "Europe/Mariehamn (GMT+02:00)",
         "value": "Europe/Mariehamn"
       }, {
         "description": null,
@@ -10714,7 +10714,7 @@
         "value": "Europe/Minsk"
       }, {
         "description": null,
-        "label": "Europe/Monaco (GMT+02:00)",
+        "label": "Europe/Monaco (GMT+01:00)",
         "value": "Europe/Monaco"
       }, {
         "description": null,
@@ -10722,31 +10722,31 @@
         "value": "Europe/Moscow"
       }, {
         "description": null,
-        "label": "Europe/Nicosia (GMT+03:00)",
+        "label": "Europe/Nicosia (GMT+02:00)",
         "value": "Europe/Nicosia"
       }, {
         "description": null,
-        "label": "Europe/Oslo (GMT+02:00)",
+        "label": "Europe/Oslo (GMT+01:00)",
         "value": "Europe/Oslo"
       }, {
         "description": null,
-        "label": "Europe/Paris (GMT+02:00)",
+        "label": "Europe/Paris (GMT+01:00)",
         "value": "Europe/Paris"
       }, {
         "description": null,
-        "label": "Europe/Podgorica (GMT+02:00)",
+        "label": "Europe/Podgorica (GMT+01:00)",
         "value": "Europe/Podgorica"
       }, {
         "description": null,
-        "label": "Europe/Prague (GMT+02:00)",
+        "label": "Europe/Prague (GMT+01:00)",
         "value": "Europe/Prague"
       }, {
         "description": null,
-        "label": "Europe/Riga (GMT+03:00)",
+        "label": "Europe/Riga (GMT+02:00)",
         "value": "Europe/Riga"
       }, {
         "description": null,
-        "label": "Europe/Rome (GMT+02:00)",
+        "label": "Europe/Rome (GMT+01:00)",
         "value": "Europe/Rome"
       }, {
         "description": null,
@@ -10754,11 +10754,11 @@
         "value": "Europe/Samara"
       }, {
         "description": null,
-        "label": "Europe/San_Marino (GMT+02:00)",
+        "label": "Europe/San_Marino (GMT+01:00)",
         "value": "Europe/San_Marino"
       }, {
         "description": null,
-        "label": "Europe/Sarajevo (GMT+02:00)",
+        "label": "Europe/Sarajevo (GMT+01:00)",
         "value": "Europe/Sarajevo"
       }, {
         "description": null,
@@ -10770,27 +10770,27 @@
         "value": "Europe/Simferopol"
       }, {
         "description": null,
-        "label": "Europe/Skopje (GMT+02:00)",
+        "label": "Europe/Skopje (GMT+01:00)",
         "value": "Europe/Skopje"
       }, {
         "description": null,
-        "label": "Europe/Sofia (GMT+03:00)",
+        "label": "Europe/Sofia (GMT+02:00)",
         "value": "Europe/Sofia"
       }, {
         "description": null,
-        "label": "Europe/Stockholm (GMT+02:00)",
+        "label": "Europe/Stockholm (GMT+01:00)",
         "value": "Europe/Stockholm"
       }, {
         "description": null,
-        "label": "Europe/Tallinn (GMT+03:00)",
+        "label": "Europe/Tallinn (GMT+02:00)",
         "value": "Europe/Tallinn"
       }, {
         "description": null,
-        "label": "Europe/Tirane (GMT+02:00)",
+        "label": "Europe/Tirane (GMT+01:00)",
         "value": "Europe/Tirane"
       }, {
         "description": null,
-        "label": "Europe/Tiraspol (GMT+03:00)",
+        "label": "Europe/Tiraspol (GMT+02:00)",
         "value": "Europe/Tiraspol"
       }, {
         "description": null,
@@ -10798,23 +10798,23 @@
         "value": "Europe/Ulyanovsk"
       }, {
         "description": null,
-        "label": "Europe/Uzhgorod (GMT+03:00)",
+        "label": "Europe/Uzhgorod (GMT+02:00)",
         "value": "Europe/Uzhgorod"
       }, {
         "description": null,
-        "label": "Europe/Vaduz (GMT+02:00)",
+        "label": "Europe/Vaduz (GMT+01:00)",
         "value": "Europe/Vaduz"
       }, {
         "description": null,
-        "label": "Europe/Vatican (GMT+02:00)",
+        "label": "Europe/Vatican (GMT+01:00)",
         "value": "Europe/Vatican"
       }, {
         "description": null,
-        "label": "Europe/Vienna (GMT+02:00)",
+        "label": "Europe/Vienna (GMT+01:00)",
         "value": "Europe/Vienna"
       }, {
         "description": null,
-        "label": "Europe/Vilnius (GMT+03:00)",
+        "label": "Europe/Vilnius (GMT+02:00)",
         "value": "Europe/Vilnius"
       }, {
         "description": null,
@@ -10822,27 +10822,27 @@
         "value": "Europe/Volgograd"
       }, {
         "description": null,
-        "label": "Europe/Warsaw (GMT+02:00)",
+        "label": "Europe/Warsaw (GMT+01:00)",
         "value": "Europe/Warsaw"
       }, {
         "description": null,
-        "label": "Europe/Zagreb (GMT+02:00)",
+        "label": "Europe/Zagreb (GMT+01:00)",
         "value": "Europe/Zagreb"
       }, {
         "description": null,
-        "label": "Europe/Zaporozhye (GMT+03:00)",
+        "label": "Europe/Zaporozhye (GMT+02:00)",
         "value": "Europe/Zaporozhye"
       }, {
         "description": null,
-        "label": "Europe/Zurich (GMT+02:00)",
+        "label": "Europe/Zurich (GMT+01:00)",
         "value": "Europe/Zurich"
       }, {
         "description": null,
-        "label": "GB (GMT+01:00)",
+        "label": "GB (GMT+00:00)",
         "value": "GB"
       }, {
         "description": null,
-        "label": "GB-Eire (GMT+01:00)",
+        "label": "GB-Eire (GMT+00:00)",
         "value": "GB-Eire"
       }, {
         "description": null,
@@ -10914,7 +10914,7 @@
         "value": "Iran"
       }, {
         "description": null,
-        "label": "Israel (GMT+03:00)",
+        "label": "Israel (GMT+02:00)",
         "value": "Israel"
       }, {
         "description": null,
@@ -10934,15 +10934,15 @@
         "value": "Libya"
       }, {
         "description": null,
-        "label": "MET (GMT+02:00)",
+        "label": "MET (GMT+01:00)",
         "value": "MET"
       }, {
         "description": null,
-        "label": "MST7MDT (GMT-06:00)",
+        "label": "MST7MDT (GMT-07:00)",
         "value": "MST7MDT"
       }, {
         "description": null,
-        "label": "Mexico/BajaNorte (GMT-07:00)",
+        "label": "Mexico/BajaNorte (GMT-08:00)",
         "value": "Mexico/BajaNorte"
       }, {
         "description": null,
@@ -10962,7 +10962,7 @@
         "value": "NZ-CHAT"
       }, {
         "description": null,
-        "label": "Navajo (GMT-06:00)",
+        "label": "Navajo (GMT-07:00)",
         "value": "Navajo"
       }, {
         "description": null,
@@ -10970,7 +10970,7 @@
         "value": "PRC"
       }, {
         "description": null,
-        "label": "PST8PDT (GMT-07:00)",
+        "label": "PST8PDT (GMT-08:00)",
         "value": "PST8PDT"
       }, {
         "description": null,
@@ -11150,11 +11150,11 @@
         "value": "Pacific/Yap"
       }, {
         "description": null,
-        "label": "Poland (GMT+02:00)",
+        "label": "Poland (GMT+01:00)",
         "value": "Poland"
       }, {
         "description": null,
-        "label": "Portugal (GMT+01:00)",
+        "label": "Portugal (GMT+00:00)",
         "value": "Portugal"
       }, {
         "description": null,
@@ -11170,7 +11170,7 @@
         "value": "SystemV/AST4"
       }, {
         "description": null,
-        "label": "SystemV/AST4ADT (GMT-03:00)",
+        "label": "SystemV/AST4ADT (GMT-04:00)",
         "value": "SystemV/AST4ADT"
       }, {
         "description": null,
@@ -11178,7 +11178,7 @@
         "value": "SystemV/CST6"
       }, {
         "description": null,
-        "label": "SystemV/CST6CDT (GMT-05:00)",
+        "label": "SystemV/CST6CDT (GMT-06:00)",
         "value": "SystemV/CST6CDT"
       }, {
         "description": null,
@@ -11186,7 +11186,7 @@
         "value": "SystemV/EST5"
       }, {
         "description": null,
-        "label": "SystemV/EST5EDT (GMT-04:00)",
+        "label": "SystemV/EST5EDT (GMT-05:00)",
         "value": "SystemV/EST5EDT"
       }, {
         "description": null,
@@ -11198,7 +11198,7 @@
         "value": "SystemV/MST7"
       }, {
         "description": null,
-        "label": "SystemV/MST7MDT (GMT-06:00)",
+        "label": "SystemV/MST7MDT (GMT-07:00)",
         "value": "SystemV/MST7MDT"
       }, {
         "description": null,
@@ -11206,7 +11206,7 @@
         "value": "SystemV/PST8"
       }, {
         "description": null,
-        "label": "SystemV/PST8PDT (GMT-07:00)",
+        "label": "SystemV/PST8PDT (GMT-08:00)",
         "value": "SystemV/PST8PDT"
       }, {
         "description": null,
@@ -11214,7 +11214,7 @@
         "value": "SystemV/YST9"
       }, {
         "description": null,
-        "label": "SystemV/YST9YDT (GMT-08:00)",
+        "label": "SystemV/YST9YDT (GMT-09:00)",
         "value": "SystemV/YST9YDT"
       }, {
         "description": null,
@@ -11226,11 +11226,11 @@
         "value": "UCT"
       }, {
         "description": null,
-        "label": "US/Alaska (GMT-08:00)",
+        "label": "US/Alaska (GMT-09:00)",
         "value": "US/Alaska"
       }, {
         "description": null,
-        "label": "US/Aleutian (GMT-09:00)",
+        "label": "US/Aleutian (GMT-10:00)",
         "value": "US/Aleutian"
       }, {
         "description": null,
@@ -11238,15 +11238,15 @@
         "value": "US/Arizona"
       }, {
         "description": null,
-        "label": "US/Central (GMT-05:00)",
+        "label": "US/Central (GMT-06:00)",
         "value": "US/Central"
       }, {
         "description": null,
-        "label": "US/East-Indiana (GMT-04:00)",
+        "label": "US/East-Indiana (GMT-05:00)",
         "value": "US/East-Indiana"
       }, {
         "description": null,
-        "label": "US/Eastern (GMT-04:00)",
+        "label": "US/Eastern (GMT-05:00)",
         "value": "US/Eastern"
       }, {
         "description": null,
@@ -11254,19 +11254,19 @@
         "value": "US/Hawaii"
       }, {
         "description": null,
-        "label": "US/Indiana-Starke (GMT-05:00)",
+        "label": "US/Indiana-Starke (GMT-06:00)",
         "value": "US/Indiana-Starke"
       }, {
         "description": null,
-        "label": "US/Michigan (GMT-04:00)",
+        "label": "US/Michigan (GMT-05:00)",
         "value": "US/Michigan"
       }, {
         "description": null,
-        "label": "US/Mountain (GMT-06:00)",
+        "label": "US/Mountain (GMT-07:00)",
         "value": "US/Mountain"
       }, {
         "description": null,
-        "label": "US/Pacific (GMT-07:00)",
+        "label": "US/Pacific (GMT-08:00)",
         "value": "US/Pacific"
       }, {
         "description": null,
@@ -11286,7 +11286,7 @@
         "value": "W-SU"
       }, {
         "description": null,
-        "label": "WET (GMT+01:00)",
+        "label": "WET (GMT+00:00)",
         "value": "WET"
       }, {
         "description": null,
@@ -11629,15 +11629,15 @@
         "value": "Africa/Bujumbura"
       }, {
         "description": null,
-        "label": "Africa/Cairo (GMT+03:00)",
+        "label": "Africa/Cairo (GMT+02:00)",
         "value": "Africa/Cairo"
       }, {
         "description": null,
-        "label": "Africa/Casablanca (GMT+01:00)",
+        "label": "Africa/Casablanca (GMT+00:00)",
         "value": "Africa/Casablanca"
       }, {
         "description": null,
-        "label": "Africa/Ceuta (GMT+02:00)",
+        "label": "Africa/Ceuta (GMT+01:00)",
         "value": "Africa/Ceuta"
       }, {
         "description": null,
@@ -11661,7 +11661,7 @@
         "value": "Africa/Douala"
       }, {
         "description": null,
-        "label": "Africa/El_Aaiun (GMT+01:00)",
+        "label": "Africa/El_Aaiun (GMT+00:00)",
         "value": "Africa/El_Aaiun"
       }, {
         "description": null,
@@ -11789,15 +11789,15 @@
         "value": "Africa/Tunis"
       }, {
         "description": null,
-        "label": "Africa/Windhoek (GMT+02:00)",
+        "label": "Africa/Windhoek (GMT+01:00)",
         "value": "Africa/Windhoek"
       }, {
         "description": null,
-        "label": "America/Adak (GMT-09:00)",
+        "label": "America/Adak (GMT-10:00)",
         "value": "America/Adak"
       }, {
         "description": null,
-        "label": "America/Anchorage (GMT-08:00)",
+        "label": "America/Anchorage (GMT-09:00)",
         "value": "America/Anchorage"
       }, {
         "description": null,
@@ -11877,7 +11877,7 @@
         "value": "America/Atikokan"
       }, {
         "description": null,
-        "label": "America/Atka (GMT-09:00)",
+        "label": "America/Atka (GMT-10:00)",
         "value": "America/Atka"
       }, {
         "description": null,
@@ -11913,7 +11913,7 @@
         "value": "America/Bogota"
       }, {
         "description": null,
-        "label": "America/Boise (GMT-06:00)",
+        "label": "America/Boise (GMT-07:00)",
         "value": "America/Boise"
       }, {
         "description": null,
@@ -11921,7 +11921,7 @@
         "value": "America/Buenos_Aires"
       }, {
         "description": null,
-        "label": "America/Cambridge_Bay (GMT-06:00)",
+        "label": "America/Cambridge_Bay (GMT-07:00)",
         "value": "America/Cambridge_Bay"
       }, {
         "description": null,
@@ -11949,7 +11949,7 @@
         "value": "America/Cayman"
       }, {
         "description": null,
-        "label": "America/Chicago (GMT-05:00)",
+        "label": "America/Chicago (GMT-06:00)",
         "value": "America/Chicago"
       }, {
         "description": null,
@@ -11957,7 +11957,7 @@
         "value": "America/Chihuahua"
       }, {
         "description": null,
-        "label": "America/Ciudad_Juarez (GMT-06:00)",
+        "label": "America/Ciudad_Juarez (GMT-07:00)",
         "value": "America/Ciudad_Juarez"
       }, {
         "description": null,
@@ -12001,11 +12001,11 @@
         "value": "America/Dawson_Creek"
       }, {
         "description": null,
-        "label": "America/Denver (GMT-06:00)",
+        "label": "America/Denver (GMT-07:00)",
         "value": "America/Denver"
       }, {
         "description": null,
-        "label": "America/Detroit (GMT-04:00)",
+        "label": "America/Detroit (GMT-05:00)",
         "value": "America/Detroit"
       }, {
         "description": null,
@@ -12013,7 +12013,7 @@
         "value": "America/Dominica"
       }, {
         "description": null,
-        "label": "America/Edmonton (GMT-06:00)",
+        "label": "America/Edmonton (GMT-07:00)",
         "value": "America/Edmonton"
       }, {
         "description": null,
@@ -12025,7 +12025,7 @@
         "value": "America/El_Salvador"
       }, {
         "description": null,
-        "label": "America/Ensenada (GMT-07:00)",
+        "label": "America/Ensenada (GMT-08:00)",
         "value": "America/Ensenada"
       }, {
         "description": null,
@@ -12033,7 +12033,7 @@
         "value": "America/Fort_Nelson"
       }, {
         "description": null,
-        "label": "America/Fort_Wayne (GMT-04:00)",
+        "label": "America/Fort_Wayne (GMT-05:00)",
         "value": "America/Fort_Wayne"
       }, {
         "description": null,
@@ -12041,19 +12041,19 @@
         "value": "America/Fortaleza"
       }, {
         "description": null,
-        "label": "America/Glace_Bay (GMT-03:00)",
+        "label": "America/Glace_Bay (GMT-04:00)",
         "value": "America/Glace_Bay"
       }, {
         "description": null,
-        "label": "America/Godthab (GMT-01:00)",
+        "label": "America/Godthab (GMT-02:00)",
         "value": "America/Godthab"
       }, {
         "description": null,
-        "label": "America/Goose_Bay (GMT-03:00)",
+        "label": "America/Goose_Bay (GMT-04:00)",
         "value": "America/Goose_Bay"
       }, {
         "description": null,
-        "label": "America/Grand_Turk (GMT-04:00)",
+        "label": "America/Grand_Turk (GMT-05:00)",
         "value": "America/Grand_Turk"
       }, {
         "description": null,
@@ -12077,11 +12077,11 @@
         "value": "America/Guyana"
       }, {
         "description": null,
-        "label": "America/Halifax (GMT-03:00)",
+        "label": "America/Halifax (GMT-04:00)",
         "value": "America/Halifax"
       }, {
         "description": null,
-        "label": "America/Havana (GMT-04:00)",
+        "label": "America/Havana (GMT-05:00)",
         "value": "America/Havana"
       }, {
         "description": null,
@@ -12089,47 +12089,47 @@
         "value": "America/Hermosillo"
       }, {
         "description": null,
-        "label": "America/Indiana/Indianapolis (GMT-04:00)",
+        "label": "America/Indiana/Indianapolis (GMT-05:00)",
         "value": "America/Indiana/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Indiana/Knox (GMT-05:00)",
+        "label": "America/Indiana/Knox (GMT-06:00)",
         "value": "America/Indiana/Knox"
       }, {
         "description": null,
-        "label": "America/Indiana/Marengo (GMT-04:00)",
+        "label": "America/Indiana/Marengo (GMT-05:00)",
         "value": "America/Indiana/Marengo"
       }, {
         "description": null,
-        "label": "America/Indiana/Petersburg (GMT-04:00)",
+        "label": "America/Indiana/Petersburg (GMT-05:00)",
         "value": "America/Indiana/Petersburg"
       }, {
         "description": null,
-        "label": "America/Indiana/Tell_City (GMT-05:00)",
+        "label": "America/Indiana/Tell_City (GMT-06:00)",
         "value": "America/Indiana/Tell_City"
       }, {
         "description": null,
-        "label": "America/Indiana/Vevay (GMT-04:00)",
+        "label": "America/Indiana/Vevay (GMT-05:00)",
         "value": "America/Indiana/Vevay"
       }, {
         "description": null,
-        "label": "America/Indiana/Vincennes (GMT-04:00)",
+        "label": "America/Indiana/Vincennes (GMT-05:00)",
         "value": "America/Indiana/Vincennes"
       }, {
         "description": null,
-        "label": "America/Indiana/Winamac (GMT-04:00)",
+        "label": "America/Indiana/Winamac (GMT-05:00)",
         "value": "America/Indiana/Winamac"
       }, {
         "description": null,
-        "label": "America/Indianapolis (GMT-04:00)",
+        "label": "America/Indianapolis (GMT-05:00)",
         "value": "America/Indianapolis"
       }, {
         "description": null,
-        "label": "America/Inuvik (GMT-06:00)",
+        "label": "America/Inuvik (GMT-07:00)",
         "value": "America/Inuvik"
       }, {
         "description": null,
-        "label": "America/Iqaluit (GMT-04:00)",
+        "label": "America/Iqaluit (GMT-05:00)",
         "value": "America/Iqaluit"
       }, {
         "description": null,
@@ -12141,19 +12141,19 @@
         "value": "America/Jujuy"
       }, {
         "description": null,
-        "label": "America/Juneau (GMT-08:00)",
+        "label": "America/Juneau (GMT-09:00)",
         "value": "America/Juneau"
       }, {
         "description": null,
-        "label": "America/Kentucky/Louisville (GMT-04:00)",
+        "label": "America/Kentucky/Louisville (GMT-05:00)",
         "value": "America/Kentucky/Louisville"
       }, {
         "description": null,
-        "label": "America/Kentucky/Monticello (GMT-04:00)",
+        "label": "America/Kentucky/Monticello (GMT-05:00)",
         "value": "America/Kentucky/Monticello"
       }, {
         "description": null,
-        "label": "America/Knox_IN (GMT-05:00)",
+        "label": "America/Knox_IN (GMT-06:00)",
         "value": "America/Knox_IN"
       }, {
         "description": null,
@@ -12169,11 +12169,11 @@
         "value": "America/Lima"
       }, {
         "description": null,
-        "label": "America/Los_Angeles (GMT-07:00)",
+        "label": "America/Los_Angeles (GMT-08:00)",
         "value": "America/Los_Angeles"
       }, {
         "description": null,
-        "label": "America/Louisville (GMT-04:00)",
+        "label": "America/Louisville (GMT-05:00)",
         "value": "America/Louisville"
       }, {
         "description": null,
@@ -12201,7 +12201,7 @@
         "value": "America/Martinique"
       }, {
         "description": null,
-        "label": "America/Matamoros (GMT-05:00)",
+        "label": "America/Matamoros (GMT-06:00)",
         "value": "America/Matamoros"
       }, {
         "description": null,
@@ -12213,7 +12213,7 @@
         "value": "America/Mendoza"
       }, {
         "description": null,
-        "label": "America/Menominee (GMT-05:00)",
+        "label": "America/Menominee (GMT-06:00)",
         "value": "America/Menominee"
       }, {
         "description": null,
@@ -12221,7 +12221,7 @@
         "value": "America/Merida"
       }, {
         "description": null,
-        "label": "America/Metlakatla (GMT-08:00)",
+        "label": "America/Metlakatla (GMT-09:00)",
         "value": "America/Metlakatla"
       }, {
         "description": null,
@@ -12229,11 +12229,11 @@
         "value": "America/Mexico_City"
       }, {
         "description": null,
-        "label": "America/Miquelon (GMT-02:00)",
+        "label": "America/Miquelon (GMT-03:00)",
         "value": "America/Miquelon"
       }, {
         "description": null,
-        "label": "America/Moncton (GMT-03:00)",
+        "label": "America/Moncton (GMT-04:00)",
         "value": "America/Moncton"
       }, {
         "description": null,
@@ -12245,7 +12245,7 @@
         "value": "America/Montevideo"
       }, {
         "description": null,
-        "label": "America/Montreal (GMT-04:00)",
+        "label": "America/Montreal (GMT-05:00)",
         "value": "America/Montreal"
       }, {
         "description": null,
@@ -12253,19 +12253,19 @@
         "value": "America/Montserrat"
       }, {
         "description": null,
-        "label": "America/Nassau (GMT-04:00)",
+        "label": "America/Nassau (GMT-05:00)",
         "value": "America/Nassau"
       }, {
         "description": null,
-        "label": "America/New_York (GMT-04:00)",
+        "label": "America/New_York (GMT-05:00)",
         "value": "America/New_York"
       }, {
         "description": null,
-        "label": "America/Nipigon (GMT-04:00)",
+        "label": "America/Nipigon (GMT-05:00)",
         "value": "America/Nipigon"
       }, {
         "description": null,
-        "label": "America/Nome (GMT-08:00)",
+        "label": "America/Nome (GMT-09:00)",
         "value": "America/Nome"
       }, {
         "description": null,
@@ -12273,23 +12273,23 @@
         "value": "America/Noronha"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Beulah (GMT-05:00)",
+        "label": "America/North_Dakota/Beulah (GMT-06:00)",
         "value": "America/North_Dakota/Beulah"
       }, {
         "description": null,
-        "label": "America/North_Dakota/Center (GMT-05:00)",
+        "label": "America/North_Dakota/Center (GMT-06:00)",
         "value": "America/North_Dakota/Center"
       }, {
         "description": null,
-        "label": "America/North_Dakota/New_Salem (GMT-05:00)",
+        "label": "America/North_Dakota/New_Salem (GMT-06:00)",
         "value": "America/North_Dakota/New_Salem"
       }, {
         "description": null,
-        "label": "America/Nuuk (GMT-01:00)",
+        "label": "America/Nuuk (GMT-02:00)",
         "value": "America/Nuuk"
       }, {
         "description": null,
-        "label": "America/Ojinaga (GMT-05:00)",
+        "label": "America/Ojinaga (GMT-06:00)",
         "value": "America/Ojinaga"
       }, {
         "description": null,
@@ -12297,7 +12297,7 @@
         "value": "America/Panama"
       }, {
         "description": null,
-        "label": "America/Pangnirtung (GMT-04:00)",
+        "label": "America/Pangnirtung (GMT-05:00)",
         "value": "America/Pangnirtung"
       }, {
         "description": null,
@@ -12309,7 +12309,7 @@
         "value": "America/Phoenix"
       }, {
         "description": null,
-        "label": "America/Port-au-Prince (GMT-04:00)",
+        "label": "America/Port-au-Prince (GMT-05:00)",
         "value": "America/Port-au-Prince"
       }, {
         "description": null,
@@ -12333,11 +12333,11 @@
         "value": "America/Punta_Arenas"
       }, {
         "description": null,
-        "label": "America/Rainy_River (GMT-05:00)",
+        "label": "America/Rainy_River (GMT-06:00)",
         "value": "America/Rainy_River"
       }, {
         "description": null,
-        "label": "America/Rankin_Inlet (GMT-05:00)",
+        "label": "America/Rankin_Inlet (GMT-06:00)",
         "value": "America/Rankin_Inlet"
       }, {
         "description": null,
@@ -12349,7 +12349,7 @@
         "value": "America/Regina"
       }, {
         "description": null,
-        "label": "America/Resolute (GMT-05:00)",
+        "label": "America/Resolute (GMT-06:00)",
         "value": "America/Resolute"
       }, {
         "description": null,
@@ -12361,7 +12361,7 @@
         "value": "America/Rosario"
       }, {
         "description": null,
-        "label": "America/Santa_Isabel (GMT-07:00)",
+        "label": "America/Santa_Isabel (GMT-08:00)",
         "value": "America/Santa_Isabel"
       }, {
         "description": null,
@@ -12381,15 +12381,15 @@
         "value": "America/Sao_Paulo"
       }, {
         "description": null,
-        "label": "America/Scoresbysund (GMT-01:00)",
+        "label": "America/Scoresbysund (GMT-02:00)",
         "value": "America/Scoresbysund"
       }, {
         "description": null,
-        "label": "America/Shiprock (GMT-06:00)",
+        "label": "America/Shiprock (GMT-07:00)",
         "value": "America/Shiprock"
       }, {
         "description": null,
-        "label": "America/Sitka (GMT-08:00)",
+        "label": "America/Sitka (GMT-09:00)",
         "value": "America/Sitka"
       }, {
         "description": null,
@@ -12397,7 +12397,7 @@
         "value": "America/St_Barthelemy"
       }, {
         "description": null,
-        "label": "America/St_Johns (GMT-02:30)",
+        "label": "America/St_Johns (GMT-03:30)",
         "value": "America/St_Johns"
       }, {
         "description": null,
@@ -12425,19 +12425,19 @@
         "value": "America/Tegucigalpa"
       }, {
         "description": null,
-        "label": "America/Thule (GMT-03:00)",
+        "label": "America/Thule (GMT-04:00)",
         "value": "America/Thule"
       }, {
         "description": null,
-        "label": "America/Thunder_Bay (GMT-04:00)",
+        "label": "America/Thunder_Bay (GMT-05:00)",
         "value": "America/Thunder_Bay"
       }, {
         "description": null,
-        "label": "America/Tijuana (GMT-07:00)",
+        "label": "America/Tijuana (GMT-08:00)",
         "value": "America/Tijuana"
       }, {
         "description": null,
-        "label": "America/Toronto (GMT-04:00)",
+        "label": "America/Toronto (GMT-05:00)",
         "value": "America/Toronto"
       }, {
         "description": null,
@@ -12445,7 +12445,7 @@
         "value": "America/Tortola"
       }, {
         "description": null,
-        "label": "America/Vancouver (GMT-07:00)",
+        "label": "America/Vancouver (GMT-08:00)",
         "value": "America/Vancouver"
       }, {
         "description": null,
@@ -12457,15 +12457,15 @@
         "value": "America/Whitehorse"
       }, {
         "description": null,
-        "label": "America/Winnipeg (GMT-05:00)",
+        "label": "America/Winnipeg (GMT-06:00)",
         "value": "America/Winnipeg"
       }, {
         "description": null,
-        "label": "America/Yakutat (GMT-08:00)",
+        "label": "America/Yakutat (GMT-09:00)",
         "value": "America/Yakutat"
       }, {
         "description": null,
-        "label": "America/Yellowknife (GMT-06:00)",
+        "label": "America/Yellowknife (GMT-07:00)",
         "value": "America/Yellowknife"
       }, {
         "description": null,
@@ -12509,7 +12509,7 @@
         "value": "Antarctica/Syowa"
       }, {
         "description": null,
-        "label": "Antarctica/Troll (GMT+02:00)",
+        "label": "Antarctica/Troll (GMT+00:00)",
         "value": "Antarctica/Troll"
       }, {
         "description": null,
@@ -12517,7 +12517,7 @@
         "value": "Antarctica/Vostok"
       }, {
         "description": null,
-        "label": "Arctic/Longyearbyen (GMT+02:00)",
+        "label": "Arctic/Longyearbyen (GMT+01:00)",
         "value": "Arctic/Longyearbyen"
       }, {
         "description": null,
@@ -12577,7 +12577,7 @@
         "value": "Asia/Barnaul"
       }, {
         "description": null,
-        "label": "Asia/Beirut (GMT+03:00)",
+        "label": "Asia/Beirut (GMT+02:00)",
         "value": "Asia/Beirut"
       }, {
         "description": null,
@@ -12637,11 +12637,11 @@
         "value": "Asia/Dushanbe"
       }, {
         "description": null,
-        "label": "Asia/Famagusta (GMT+03:00)",
+        "label": "Asia/Famagusta (GMT+02:00)",
         "value": "Asia/Famagusta"
       }, {
         "description": null,
-        "label": "Asia/Gaza (GMT+03:00)",
+        "label": "Asia/Gaza (GMT+02:00)",
         "value": "Asia/Gaza"
       }, {
         "description": null,
@@ -12649,7 +12649,7 @@
         "value": "Asia/Harbin"
       }, {
         "description": null,
-        "label": "Asia/Hebron (GMT+03:00)",
+        "label": "Asia/Hebron (GMT+02:00)",
         "value": "Asia/Hebron"
       }, {
         "description": null,
@@ -12681,7 +12681,7 @@
         "value": "Asia/Jayapura"
       }, {
         "description": null,
-        "label": "Asia/Jerusalem (GMT+03:00)",
+        "label": "Asia/Jerusalem (GMT+02:00)",
         "value": "Asia/Jerusalem"
       }, {
         "description": null,
@@ -12757,7 +12757,7 @@
         "value": "Asia/Muscat"
       }, {
         "description": null,
-        "label": "Asia/Nicosia (GMT+03:00)",
+        "label": "Asia/Nicosia (GMT+02:00)",
         "value": "Asia/Nicosia"
       }, {
         "description": null,
@@ -12853,7 +12853,7 @@
         "value": "Asia/Tehran"
       }, {
         "description": null,
-        "label": "Asia/Tel_Aviv (GMT+03:00)",
+        "label": "Asia/Tel_Aviv (GMT+02:00)",
         "value": "Asia/Tel_Aviv"
       }, {
         "description": null,
@@ -12917,15 +12917,15 @@
         "value": "Asia/Yerevan"
       }, {
         "description": null,
-        "label": "Atlantic/Azores (GMT+00:00)",
+        "label": "Atlantic/Azores (GMT-01:00)",
         "value": "Atlantic/Azores"
       }, {
         "description": null,
-        "label": "Atlantic/Bermuda (GMT-03:00)",
+        "label": "Atlantic/Bermuda (GMT-04:00)",
         "value": "Atlantic/Bermuda"
       }, {
         "description": null,
-        "label": "Atlantic/Canary (GMT+01:00)",
+        "label": "Atlantic/Canary (GMT+00:00)",
         "value": "Atlantic/Canary"
       }, {
         "description": null,
@@ -12933,19 +12933,19 @@
         "value": "Atlantic/Cape_Verde"
       }, {
         "description": null,
-        "label": "Atlantic/Faeroe (GMT+01:00)",
+        "label": "Atlantic/Faeroe (GMT+00:00)",
         "value": "Atlantic/Faeroe"
       }, {
         "description": null,
-        "label": "Atlantic/Faroe (GMT+01:00)",
+        "label": "Atlantic/Faroe (GMT+00:00)",
         "value": "Atlantic/Faroe"
       }, {
         "description": null,
-        "label": "Atlantic/Jan_Mayen (GMT+02:00)",
+        "label": "Atlantic/Jan_Mayen (GMT+01:00)",
         "value": "Atlantic/Jan_Mayen"
       }, {
         "description": null,
-        "label": "Atlantic/Madeira (GMT+01:00)",
+        "label": "Atlantic/Madeira (GMT+00:00)",
         "value": "Atlantic/Madeira"
       }, {
         "description": null,
@@ -13073,35 +13073,35 @@
         "value": "Brazil/West"
       }, {
         "description": null,
-        "label": "CET (GMT+02:00)",
+        "label": "CET (GMT+01:00)",
         "value": "CET"
       }, {
         "description": null,
-        "label": "CST6CDT (GMT-05:00)",
+        "label": "CST6CDT (GMT-06:00)",
         "value": "CST6CDT"
       }, {
         "description": null,
-        "label": "Canada/Atlantic (GMT-03:00)",
+        "label": "Canada/Atlantic (GMT-04:00)",
         "value": "Canada/Atlantic"
       }, {
         "description": null,
-        "label": "Canada/Central (GMT-05:00)",
+        "label": "Canada/Central (GMT-06:00)",
         "value": "Canada/Central"
       }, {
         "description": null,
-        "label": "Canada/Eastern (GMT-04:00)",
+        "label": "Canada/Eastern (GMT-05:00)",
         "value": "Canada/Eastern"
       }, {
         "description": null,
-        "label": "Canada/Mountain (GMT-06:00)",
+        "label": "Canada/Mountain (GMT-07:00)",
         "value": "Canada/Mountain"
       }, {
         "description": null,
-        "label": "Canada/Newfoundland (GMT-02:30)",
+        "label": "Canada/Newfoundland (GMT-03:30)",
         "value": "Canada/Newfoundland"
       }, {
         "description": null,
-        "label": "Canada/Pacific (GMT-07:00)",
+        "label": "Canada/Pacific (GMT-08:00)",
         "value": "Canada/Pacific"
       }, {
         "description": null,
@@ -13121,23 +13121,23 @@
         "value": "Chile/EasterIsland"
       }, {
         "description": null,
-        "label": "Cuba (GMT-04:00)",
+        "label": "Cuba (GMT-05:00)",
         "value": "Cuba"
       }, {
         "description": null,
-        "label": "EET (GMT+03:00)",
+        "label": "EET (GMT+02:00)",
         "value": "EET"
       }, {
         "description": null,
-        "label": "EST5EDT (GMT-04:00)",
+        "label": "EST5EDT (GMT-05:00)",
         "value": "EST5EDT"
       }, {
         "description": null,
-        "label": "Egypt (GMT+03:00)",
+        "label": "Egypt (GMT+02:00)",
         "value": "Egypt"
       }, {
         "description": null,
-        "label": "Eire (GMT+01:00)",
+        "label": "Eire (GMT+00:00)",
         "value": "Eire"
       }, {
         "description": null,
@@ -13281,11 +13281,11 @@
         "value": "Etc/Zulu"
       }, {
         "description": null,
-        "label": "Europe/Amsterdam (GMT+02:00)",
+        "label": "Europe/Amsterdam (GMT+01:00)",
         "value": "Europe/Amsterdam"
       }, {
         "description": null,
-        "label": "Europe/Andorra (GMT+02:00)",
+        "label": "Europe/Andorra (GMT+01:00)",
         "value": "Europe/Andorra"
       }, {
         "description": null,
@@ -13293,67 +13293,67 @@
         "value": "Europe/Astrakhan"
       }, {
         "description": null,
-        "label": "Europe/Athens (GMT+03:00)",
+        "label": "Europe/Athens (GMT+02:00)",
         "value": "Europe/Athens"
       }, {
         "description": null,
-        "label": "Europe/Belfast (GMT+01:00)",
+        "label": "Europe/Belfast (GMT+00:00)",
         "value": "Europe/Belfast"
       }, {
         "description": null,
-        "label": "Europe/Belgrade (GMT+02:00)",
+        "label": "Europe/Belgrade (GMT+01:00)",
         "value": "Europe/Belgrade"
       }, {
         "description": null,
-        "label": "Europe/Berlin (GMT+02:00)",
+        "label": "Europe/Berlin (GMT+01:00)",
         "value": "Europe/Berlin"
       }, {
         "description": null,
-        "label": "Europe/Bratislava (GMT+02:00)",
+        "label": "Europe/Bratislava (GMT+01:00)",
         "value": "Europe/Bratislava"
       }, {
         "description": null,
-        "label": "Europe/Brussels (GMT+02:00)",
+        "label": "Europe/Brussels (GMT+01:00)",
         "value": "Europe/Brussels"
       }, {
         "description": null,
-        "label": "Europe/Bucharest (GMT+03:00)",
+        "label": "Europe/Bucharest (GMT+02:00)",
         "value": "Europe/Bucharest"
       }, {
         "description": null,
-        "label": "Europe/Budapest (GMT+02:00)",
+        "label": "Europe/Budapest (GMT+01:00)",
         "value": "Europe/Budapest"
       }, {
         "description": null,
-        "label": "Europe/Busingen (GMT+02:00)",
+        "label": "Europe/Busingen (GMT+01:00)",
         "value": "Europe/Busingen"
       }, {
         "description": null,
-        "label": "Europe/Chisinau (GMT+03:00)",
+        "label": "Europe/Chisinau (GMT+02:00)",
         "value": "Europe/Chisinau"
       }, {
         "description": null,
-        "label": "Europe/Copenhagen (GMT+02:00)",
+        "label": "Europe/Copenhagen (GMT+01:00)",
         "value": "Europe/Copenhagen"
       }, {
         "description": null,
-        "label": "Europe/Dublin (GMT+01:00)",
+        "label": "Europe/Dublin (GMT+00:00)",
         "value": "Europe/Dublin"
       }, {
         "description": null,
-        "label": "Europe/Gibraltar (GMT+02:00)",
+        "label": "Europe/Gibraltar (GMT+01:00)",
         "value": "Europe/Gibraltar"
       }, {
         "description": null,
-        "label": "Europe/Guernsey (GMT+01:00)",
+        "label": "Europe/Guernsey (GMT+00:00)",
         "value": "Europe/Guernsey"
       }, {
         "description": null,
-        "label": "Europe/Helsinki (GMT+03:00)",
+        "label": "Europe/Helsinki (GMT+02:00)",
         "value": "Europe/Helsinki"
       }, {
         "description": null,
-        "label": "Europe/Isle_of_Man (GMT+01:00)",
+        "label": "Europe/Isle_of_Man (GMT+00:00)",
         "value": "Europe/Isle_of_Man"
       }, {
         "description": null,
@@ -13361,7 +13361,7 @@
         "value": "Europe/Istanbul"
       }, {
         "description": null,
-        "label": "Europe/Jersey (GMT+01:00)",
+        "label": "Europe/Jersey (GMT+00:00)",
         "value": "Europe/Jersey"
       }, {
         "description": null,
@@ -13369,7 +13369,7 @@
         "value": "Europe/Kaliningrad"
       }, {
         "description": null,
-        "label": "Europe/Kiev (GMT+03:00)",
+        "label": "Europe/Kiev (GMT+02:00)",
         "value": "Europe/Kiev"
       }, {
         "description": null,
@@ -13377,35 +13377,35 @@
         "value": "Europe/Kirov"
       }, {
         "description": null,
-        "label": "Europe/Kyiv (GMT+03:00)",
+        "label": "Europe/Kyiv (GMT+02:00)",
         "value": "Europe/Kyiv"
       }, {
         "description": null,
-        "label": "Europe/Lisbon (GMT+01:00)",
+        "label": "Europe/Lisbon (GMT+00:00)",
         "value": "Europe/Lisbon"
       }, {
         "description": null,
-        "label": "Europe/Ljubljana (GMT+02:00)",
+        "label": "Europe/Ljubljana (GMT+01:00)",
         "value": "Europe/Ljubljana"
       }, {
         "description": null,
-        "label": "Europe/London (GMT+01:00)",
+        "label": "Europe/London (GMT+00:00)",
         "value": "Europe/London"
       }, {
         "description": null,
-        "label": "Europe/Luxembourg (GMT+02:00)",
+        "label": "Europe/Luxembourg (GMT+01:00)",
         "value": "Europe/Luxembourg"
       }, {
         "description": null,
-        "label": "Europe/Madrid (GMT+02:00)",
+        "label": "Europe/Madrid (GMT+01:00)",
         "value": "Europe/Madrid"
       }, {
         "description": null,
-        "label": "Europe/Malta (GMT+02:00)",
+        "label": "Europe/Malta (GMT+01:00)",
         "value": "Europe/Malta"
       }, {
         "description": null,
-        "label": "Europe/Mariehamn (GMT+03:00)",
+        "label": "Europe/Mariehamn (GMT+02:00)",
         "value": "Europe/Mariehamn"
       }, {
         "description": null,
@@ -13413,7 +13413,7 @@
         "value": "Europe/Minsk"
       }, {
         "description": null,
-        "label": "Europe/Monaco (GMT+02:00)",
+        "label": "Europe/Monaco (GMT+01:00)",
         "value": "Europe/Monaco"
       }, {
         "description": null,
@@ -13421,31 +13421,31 @@
         "value": "Europe/Moscow"
       }, {
         "description": null,
-        "label": "Europe/Nicosia (GMT+03:00)",
+        "label": "Europe/Nicosia (GMT+02:00)",
         "value": "Europe/Nicosia"
       }, {
         "description": null,
-        "label": "Europe/Oslo (GMT+02:00)",
+        "label": "Europe/Oslo (GMT+01:00)",
         "value": "Europe/Oslo"
       }, {
         "description": null,
-        "label": "Europe/Paris (GMT+02:00)",
+        "label": "Europe/Paris (GMT+01:00)",
         "value": "Europe/Paris"
       }, {
         "description": null,
-        "label": "Europe/Podgorica (GMT+02:00)",
+        "label": "Europe/Podgorica (GMT+01:00)",
         "value": "Europe/Podgorica"
       }, {
         "description": null,
-        "label": "Europe/Prague (GMT+02:00)",
+        "label": "Europe/Prague (GMT+01:00)",
         "value": "Europe/Prague"
       }, {
         "description": null,
-        "label": "Europe/Riga (GMT+03:00)",
+        "label": "Europe/Riga (GMT+02:00)",
         "value": "Europe/Riga"
       }, {
         "description": null,
-        "label": "Europe/Rome (GMT+02:00)",
+        "label": "Europe/Rome (GMT+01:00)",
         "value": "Europe/Rome"
       }, {
         "description": null,
@@ -13453,11 +13453,11 @@
         "value": "Europe/Samara"
       }, {
         "description": null,
-        "label": "Europe/San_Marino (GMT+02:00)",
+        "label": "Europe/San_Marino (GMT+01:00)",
         "value": "Europe/San_Marino"
       }, {
         "description": null,
-        "label": "Europe/Sarajevo (GMT+02:00)",
+        "label": "Europe/Sarajevo (GMT+01:00)",
         "value": "Europe/Sarajevo"
       }, {
         "description": null,
@@ -13469,27 +13469,27 @@
         "value": "Europe/Simferopol"
       }, {
         "description": null,
-        "label": "Europe/Skopje (GMT+02:00)",
+        "label": "Europe/Skopje (GMT+01:00)",
         "value": "Europe/Skopje"
       }, {
         "description": null,
-        "label": "Europe/Sofia (GMT+03:00)",
+        "label": "Europe/Sofia (GMT+02:00)",
         "value": "Europe/Sofia"
       }, {
         "description": null,
-        "label": "Europe/Stockholm (GMT+02:00)",
+        "label": "Europe/Stockholm (GMT+01:00)",
         "value": "Europe/Stockholm"
       }, {
         "description": null,
-        "label": "Europe/Tallinn (GMT+03:00)",
+        "label": "Europe/Tallinn (GMT+02:00)",
         "value": "Europe/Tallinn"
       }, {
         "description": null,
-        "label": "Europe/Tirane (GMT+02:00)",
+        "label": "Europe/Tirane (GMT+01:00)",
         "value": "Europe/Tirane"
       }, {
         "description": null,
-        "label": "Europe/Tiraspol (GMT+03:00)",
+        "label": "Europe/Tiraspol (GMT+02:00)",
         "value": "Europe/Tiraspol"
       }, {
         "description": null,
@@ -13497,23 +13497,23 @@
         "value": "Europe/Ulyanovsk"
       }, {
         "description": null,
-        "label": "Europe/Uzhgorod (GMT+03:00)",
+        "label": "Europe/Uzhgorod (GMT+02:00)",
         "value": "Europe/Uzhgorod"
       }, {
         "description": null,
-        "label": "Europe/Vaduz (GMT+02:00)",
+        "label": "Europe/Vaduz (GMT+01:00)",
         "value": "Europe/Vaduz"
       }, {
         "description": null,
-        "label": "Europe/Vatican (GMT+02:00)",
+        "label": "Europe/Vatican (GMT+01:00)",
         "value": "Europe/Vatican"
       }, {
         "description": null,
-        "label": "Europe/Vienna (GMT+02:00)",
+        "label": "Europe/Vienna (GMT+01:00)",
         "value": "Europe/Vienna"
       }, {
         "description": null,
-        "label": "Europe/Vilnius (GMT+03:00)",
+        "label": "Europe/Vilnius (GMT+02:00)",
         "value": "Europe/Vilnius"
       }, {
         "description": null,
@@ -13521,27 +13521,27 @@
         "value": "Europe/Volgograd"
       }, {
         "description": null,
-        "label": "Europe/Warsaw (GMT+02:00)",
+        "label": "Europe/Warsaw (GMT+01:00)",
         "value": "Europe/Warsaw"
       }, {
         "description": null,
-        "label": "Europe/Zagreb (GMT+02:00)",
+        "label": "Europe/Zagreb (GMT+01:00)",
         "value": "Europe/Zagreb"
       }, {
         "description": null,
-        "label": "Europe/Zaporozhye (GMT+03:00)",
+        "label": "Europe/Zaporozhye (GMT+02:00)",
         "value": "Europe/Zaporozhye"
       }, {
         "description": null,
-        "label": "Europe/Zurich (GMT+02:00)",
+        "label": "Europe/Zurich (GMT+01:00)",
         "value": "Europe/Zurich"
       }, {
         "description": null,
-        "label": "GB (GMT+01:00)",
+        "label": "GB (GMT+00:00)",
         "value": "GB"
       }, {
         "description": null,
-        "label": "GB-Eire (GMT+01:00)",
+        "label": "GB-Eire (GMT+00:00)",
         "value": "GB-Eire"
       }, {
         "description": null,
@@ -13613,7 +13613,7 @@
         "value": "Iran"
       }, {
         "description": null,
-        "label": "Israel (GMT+03:00)",
+        "label": "Israel (GMT+02:00)",
         "value": "Israel"
       }, {
         "description": null,
@@ -13633,15 +13633,15 @@
         "value": "Libya"
       }, {
         "description": null,
-        "label": "MET (GMT+02:00)",
+        "label": "MET (GMT+01:00)",
         "value": "MET"
       }, {
         "description": null,
-        "label": "MST7MDT (GMT-06:00)",
+        "label": "MST7MDT (GMT-07:00)",
         "value": "MST7MDT"
       }, {
         "description": null,
-        "label": "Mexico/BajaNorte (GMT-07:00)",
+        "label": "Mexico/BajaNorte (GMT-08:00)",
         "value": "Mexico/BajaNorte"
       }, {
         "description": null,
@@ -13661,7 +13661,7 @@
         "value": "NZ-CHAT"
       }, {
         "description": null,
-        "label": "Navajo (GMT-06:00)",
+        "label": "Navajo (GMT-07:00)",
         "value": "Navajo"
       }, {
         "description": null,
@@ -13669,7 +13669,7 @@
         "value": "PRC"
       }, {
         "description": null,
-        "label": "PST8PDT (GMT-07:00)",
+        "label": "PST8PDT (GMT-08:00)",
         "value": "PST8PDT"
       }, {
         "description": null,
@@ -13849,11 +13849,11 @@
         "value": "Pacific/Yap"
       }, {
         "description": null,
-        "label": "Poland (GMT+02:00)",
+        "label": "Poland (GMT+01:00)",
         "value": "Poland"
       }, {
         "description": null,
-        "label": "Portugal (GMT+01:00)",
+        "label": "Portugal (GMT+00:00)",
         "value": "Portugal"
       }, {
         "description": null,
@@ -13869,7 +13869,7 @@
         "value": "SystemV/AST4"
       }, {
         "description": null,
-        "label": "SystemV/AST4ADT (GMT-03:00)",
+        "label": "SystemV/AST4ADT (GMT-04:00)",
         "value": "SystemV/AST4ADT"
       }, {
         "description": null,
@@ -13877,7 +13877,7 @@
         "value": "SystemV/CST6"
       }, {
         "description": null,
-        "label": "SystemV/CST6CDT (GMT-05:00)",
+        "label": "SystemV/CST6CDT (GMT-06:00)",
         "value": "SystemV/CST6CDT"
       }, {
         "description": null,
@@ -13885,7 +13885,7 @@
         "value": "SystemV/EST5"
       }, {
         "description": null,
-        "label": "SystemV/EST5EDT (GMT-04:00)",
+        "label": "SystemV/EST5EDT (GMT-05:00)",
         "value": "SystemV/EST5EDT"
       }, {
         "description": null,
@@ -13897,7 +13897,7 @@
         "value": "SystemV/MST7"
       }, {
         "description": null,
-        "label": "SystemV/MST7MDT (GMT-06:00)",
+        "label": "SystemV/MST7MDT (GMT-07:00)",
         "value": "SystemV/MST7MDT"
       }, {
         "description": null,
@@ -13905,7 +13905,7 @@
         "value": "SystemV/PST8"
       }, {
         "description": null,
-        "label": "SystemV/PST8PDT (GMT-07:00)",
+        "label": "SystemV/PST8PDT (GMT-08:00)",
         "value": "SystemV/PST8PDT"
       }, {
         "description": null,
@@ -13913,7 +13913,7 @@
         "value": "SystemV/YST9"
       }, {
         "description": null,
-        "label": "SystemV/YST9YDT (GMT-08:00)",
+        "label": "SystemV/YST9YDT (GMT-09:00)",
         "value": "SystemV/YST9YDT"
       }, {
         "description": null,
@@ -13925,11 +13925,11 @@
         "value": "UCT"
       }, {
         "description": null,
-        "label": "US/Alaska (GMT-08:00)",
+        "label": "US/Alaska (GMT-09:00)",
         "value": "US/Alaska"
       }, {
         "description": null,
-        "label": "US/Aleutian (GMT-09:00)",
+        "label": "US/Aleutian (GMT-10:00)",
         "value": "US/Aleutian"
       }, {
         "description": null,
@@ -13937,15 +13937,15 @@
         "value": "US/Arizona"
       }, {
         "description": null,
-        "label": "US/Central (GMT-05:00)",
+        "label": "US/Central (GMT-06:00)",
         "value": "US/Central"
       }, {
         "description": null,
-        "label": "US/East-Indiana (GMT-04:00)",
+        "label": "US/East-Indiana (GMT-05:00)",
         "value": "US/East-Indiana"
       }, {
         "description": null,
-        "label": "US/Eastern (GMT-04:00)",
+        "label": "US/Eastern (GMT-05:00)",
         "value": "US/Eastern"
       }, {
         "description": null,
@@ -13953,19 +13953,19 @@
         "value": "US/Hawaii"
       }, {
         "description": null,
-        "label": "US/Indiana-Starke (GMT-05:00)",
+        "label": "US/Indiana-Starke (GMT-06:00)",
         "value": "US/Indiana-Starke"
       }, {
         "description": null,
-        "label": "US/Michigan (GMT-04:00)",
+        "label": "US/Michigan (GMT-05:00)",
         "value": "US/Michigan"
       }, {
         "description": null,
-        "label": "US/Mountain (GMT-06:00)",
+        "label": "US/Mountain (GMT-07:00)",
         "value": "US/Mountain"
       }, {
         "description": null,
-        "label": "US/Pacific (GMT-07:00)",
+        "label": "US/Pacific (GMT-08:00)",
         "value": "US/Pacific"
       }, {
         "description": null,
@@ -13985,7 +13985,7 @@
         "value": "W-SU"
       }, {
         "description": null,
-        "label": "WET (GMT+01:00)",
+        "label": "WET (GMT+00:00)",
         "value": "WET"
       }, {
         "description": null,

@@ -18,18 +18,70 @@ package com.bytechef.component.schedule.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.definition.Option;
 import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.TextStyle;
+import java.time.zone.ZoneRules;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Nikolina Spehar
  */
 class ScheduleUtilsTest {
+
+    @Test
+    void testGetTimeZoneOptionsLabelsStandardOffsetNotTheCurrentOne() {
+        Instant now = Instant.now();
+
+        List<Option<String>> options = ScheduleUtils.getTimeZoneOptions();
+
+        Optional<String> zoneInDaylightSaving = options.stream()
+            .map(Option::getValue)
+            .filter(zoneId -> {
+                ZoneId zone = ZoneId.of(zoneId);
+
+                ZoneRules zoneRules = zone.getRules();
+
+                return zoneRules.isDaylightSavings(now);
+            })
+            .findFirst();
+
+        assertTrue(zoneInDaylightSaving.isPresent(), "no zone is observing daylight saving, cannot assert on one");
+
+        String zoneId = zoneInDaylightSaving.get();
+
+        ZoneId zone = ZoneId.of(zoneId);
+
+        ZoneRules zoneRules = zone.getRules();
+
+        ZoneOffset standardOffset = zoneRules.getStandardOffset(now);
+
+        String expectedLabel = zoneId + " (GMT" + standardOffset.getId()
+            .replace("Z", "+00:00") + ")";
+
+        Option<String> option = options.stream()
+            .filter(candidate -> zoneId.equals(candidate.getValue()))
+            .findFirst()
+            .orElseThrow();
+
+        assertEquals(expectedLabel, option.getLabel());
+    }
+
+    @Test
+    void testGetTimeZoneOptionsCoversEveryAvailableZone() {
+        List<Option<String>> options = ScheduleUtils.getTimeZoneOptions();
+
+        assertEquals(ZoneId.getAvailableZoneIds()
+            .size(), options.size());
+    }
 
     @Test
     void testGetDayOfWeekOptions() {
