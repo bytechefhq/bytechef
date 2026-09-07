@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,6 +47,10 @@ import org.junit.jupiter.api.Test;
  * Both directions are asserted. The reverse direction — every registered resolver is named by some gate — catches the
  * mirror-image mistake of renaming a token and leaving its resolver behind answering for a discriminator nobody asks
  * about.
+ * <p>
+ * {@link #testEveryOwnerPopulatingResolverHasAMatchingVisibilityProvider} pins the adjacent invariant: a resolver may
+ * fill {@code ownerUserId} only for a type that also registers a {@code ResourceVisibilityProvider}, since without one
+ * CE falls through to owner-isolation and hides the resource from everyone but its creator.
  * <p>
  * Guard expressions come from {@link MainSourceScan}, which reads them as source text rather than off the classpath:
  * tokens and resolvers are spread across CE, EE and the AI modules, and no single module's test classpath contains them
@@ -84,6 +89,11 @@ class ResourceOwnershipResolverTest {
         Pattern.compile("implements\\s+[^{;]*\\bResourceOwnershipResolver\\b");
     private static final Pattern ENVIRONMENT_RESOLVER_DECLARATION =
         Pattern.compile("implements\\s+[^{;]*\\bResourceEnvironmentResolver\\b");
+    private static final Pattern VISIBILITY_PROVIDER_DECLARATION =
+        Pattern.compile("implements\\s+[^{;]*\\bResourceVisibilityProvider\\b");
+    // ofWorkspace and unknown do not match: after "of" comes a word character, so there is no boundary there.
+    private static final Pattern OWNER_POPULATING_FACTORY =
+        Pattern.compile("ResourceOwner\\s*(?:\\.|::)\\s*(?:of|ofUser)\\b");
     private static final Pattern SPRING_STEREOTYPE = Pattern.compile("@(?:Component|Service)\\b");
     private static final Pattern CLASS_KEYWORD = Pattern.compile("\\bclass\\b");
     private static final Pattern RESOURCE_TYPE_METHOD =
@@ -105,6 +115,8 @@ class ResourceOwnershipResolverTest {
     private static Map<String, Set<String>> unreadableGuardArgumentsByFile;
     private static Map<String, String> ownershipResolverTypes;
     private static Map<String, String> environmentResolverTypes;
+    private static Map<String, String> ownerPopulatingResolverTypes;
+    private static Map<String, String> visibilityProviderTypes;
 
     // Scanned once for the whole class: JUnit builds a fresh test instance per method, and the tree is several thousand
     // files.
@@ -118,6 +130,11 @@ class ResourceOwnershipResolverTest {
         unreadableGuardArgumentsByFile = guardExpressionScan.unreadableArgumentsByFile();
         ownershipResolverTypes = collectResolverTypes(mainSourceFiles, OWNERSHIP_RESOLVER_DECLARATION);
         environmentResolverTypes = collectResolverTypes(mainSourceFiles, ENVIRONMENT_RESOLVER_DECLARATION);
+        ownerPopulatingResolverTypes = collectResolverTypes(
+            mainSourceFiles, OWNERSHIP_RESOLVER_DECLARATION,
+            strippedSource -> OWNER_POPULATING_FACTORY.matcher(strippedSource)
+                .find());
+        visibilityProviderTypes = collectResolverTypes(mainSourceFiles, VISIBILITY_PROVIDER_DECLARATION);
     }
 
     @Test
@@ -134,6 +151,15 @@ class ResourceOwnershipResolverTest {
 
         assertThat(ownershipResolverTypes)
             .as("no ResourceOwnershipResolver implementation was found, so the scan is broken")
+            .isNotEmpty();
+
+        assertThat(visibilityProviderTypes)
+            .as("no ResourceVisibilityProvider implementation was found, so the scan is broken")
+            .isNotEmpty();
+
+        assertThat(ownerPopulatingResolverTypes)
+            .as("no resolver was seen populating an owner, so testEveryOwnerPopulatingResolverHasAMatchingVisibility"
+                + "Provider would be vacuously true")
             .isNotEmpty();
     }
 
@@ -219,6 +245,46 @@ class ResourceOwnershipResolverTest {
     }
 
     /**
+     * The invariant that makes an owner-populating resolver safe, and whose violation would be the worst outcome in
+     * this file: resources silently invisible to everyone but whoever created them.
+     * <p>
+     * CE {@code PermissionServiceImpl.hasResourceScope} branches on whether the type registered a
+     * {@code ResourceVisibilityProvider}. With one, it stops as soon as the resource exists, because visibility has
+     * already answered the stricter question — a colleague the list has shown a WORKSPACE connection is not then asked
+     * to own it. Without one, it falls through to owner-isolation and answers {@code isCurrentUser(ownerUserId)}, which
+     * hides every row from all but its creator, by-id and list alike. So filling {@code ownerUserId} is safe for
+     * {@code Connection} precisely because {@code ConnectionVisibilityProvider} exists, and would be catastrophic for a
+     * type with no provider.
+     * <p>
+     * It holds by construction today, which is exactly why it is asserted: nothing else would notice a provider being
+     * moved, renamed or dropped while its ownership resolver kept filling an owner. A resolver that fills only the
+     * workspace — {@code ProjectOwnershipResolver} deliberately does, via {@code ofWorkspace} — never reaches that
+     * branch and is not subject to this. Populating is read off the factory the resolver calls, so a resolver that has
+     * no owner to give should say {@code ofWorkspace} or {@code unknown} rather than
+     * {@code of(…, OptionalLong.empty())}.
+     */
+    @Test
+    void testEveryOwnerPopulatingResolverHasAMatchingVisibilityProvider() {
+        Set<String> ownerPopulatingTypesWithoutProvider = new TreeSet<>();
+
+        for (Map.Entry<String, String> entry : ownerPopulatingResolverTypes.entrySet()) {
+            if (visibilityProviderTypes.containsKey(entry.getKey())) {
+                continue;
+            }
+
+            ownerPopulatingTypesWithoutProvider.add(entry.getKey() + " (" + entry.getValue() + ")");
+        }
+
+        assertThat(ownerPopulatingTypesWithoutProvider)
+            .as(
+                "a resolver that fills ownerUserId for a type with no ResourceVisibilityProvider puts CE "
+                    + "hasResourceScope on its owner-isolation branch, hiding every one of those resources from "
+                    + "everyone but its creator. Registered providers: %s",
+                new TreeSet<>(visibilityProviderTypes.keySet()))
+            .isEmpty();
+    }
+
+    /**
      * A resolver Spring never instantiates is the same lockout as a resolver that does not exist: the constructor
      * collects {@code List<ResourceOwnershipResolver>} from the context, so an implementation with no stereotype is
      * simply absent from the registry. Should a resolver ever be registered by an explicit {@code @Bean} factory method
@@ -236,14 +302,15 @@ class ResourceOwnershipResolverTest {
         for (Path sourceFile : mainSourceFiles) {
             String source = MainSourceScan.readSource(sourceFile);
 
-            if (!source.contains("Resolver")) {
+            if (!source.contains("Resolver") && !source.contains("Provider")) {
                 continue;
             }
 
             String strippedSource = MainSourceScan.stripComments(source);
 
             for (Pattern declarationPattern : List.of(
-                OWNERSHIP_RESOLVER_DECLARATION, ENVIRONMENT_RESOLVER_DECLARATION)) {
+                OWNERSHIP_RESOLVER_DECLARATION, ENVIRONMENT_RESOLVER_DECLARATION,
+                VISIBILITY_PROVIDER_DECLARATION)) {
 
                 Matcher declarationMatcher = declarationPattern.matcher(strippedSource);
 
@@ -257,8 +324,8 @@ class ResourceOwnershipResolverTest {
 
         assertThat(resolverFilesWithoutStereotype)
             .as(
-                "a resolver with no @Component/@Service on its own class declaration is never contributed to the "
-                    + "registry, so its token denies every non-tenant-admin exactly as an unregistered one does")
+                "a resolver or visibility provider with no @Component/@Service on its own class declaration is never "
+                    + "contributed to the registry, so its token behaves exactly as an unregistered one does")
             .isEmpty();
     }
 
@@ -394,12 +461,22 @@ class ResourceOwnershipResolverTest {
      * registries build a {@code Map} the same way and would throw on a duplicate key.
      */
     private static Map<String, String> collectResolverTypes(List<Path> sourceFiles, Pattern declarationPattern) {
+        return collectResolverTypes(sourceFiles, declarationPattern, strippedSource -> true);
+    }
+
+    /**
+     * As above, but counting only implementations whose source also satisfies {@code sourceRequirement} — used to pick
+     * out the resolvers that populate an owner.
+     */
+    private static Map<String, String> collectResolverTypes(
+        List<Path> sourceFiles, Pattern declarationPattern, Predicate<String> sourceRequirement) {
+
         Map<String, String> resolverTypes = new LinkedHashMap<>();
 
         for (Path sourceFile : sourceFiles) {
             String source = MainSourceScan.readSource(sourceFile);
 
-            if (!source.contains("Resolver")) {
+            if (!source.contains("Resolver") && !source.contains("Provider")) {
                 continue;
             }
 
@@ -408,6 +485,10 @@ class ResourceOwnershipResolverTest {
             Matcher declarationMatcher = declarationPattern.matcher(strippedSource);
 
             if (!declarationMatcher.find()) {
+                continue;
+            }
+
+            if (!sourceRequirement.test(strippedSource)) {
                 continue;
             }
 
