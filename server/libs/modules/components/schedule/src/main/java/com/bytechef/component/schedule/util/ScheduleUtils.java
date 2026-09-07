@@ -20,11 +20,11 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
+import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,13 +47,15 @@ public class ScheduleUtils {
 
     public static List<Option<String>> getTimeZoneOptions() {
         List<Option<String>> options = new ArrayList<>();
-        LocalDateTime now = LocalDateTime.now();
+        Instant now = Instant.now();
         Set<String> zoneIds = ZoneId.getAvailableZoneIds();
 
         for (String zoneId : zoneIds) {
-            ZonedDateTime zonedDateTime = now.atZone(ZoneId.of(zoneId));
+            ZoneId zone = ZoneId.of(zoneId);
 
-            ZoneOffset zoneOffset = zonedDateTime.getOffset();
+            ZoneRules zoneRules = zone.getRules();
+
+            ZoneOffset zoneOffset = zoneRules.getStandardOffset(now);
 
             String zoneOffsetId = zoneOffset.getId();
 
