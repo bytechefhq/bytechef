@@ -4,6 +4,8 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="00000000000001" author="Ivica Cardic">
+        <validCheckSum>9:140d8298767f9f041c99e7dfe9a87685</validCheckSum>
+
         <createTable tableName="project">
             <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
                 <constraints primaryKey="true" nullable="false"/>
@@ -293,10 +295,10 @@
             <column name="id" value="1049" />
             <column name="name" value="Default" />
             <column name="description" value="The default workspace" />
-            <column name="created_date" value="now" />
+            <column name="created_date" valueComputed="CURRENT_TIMESTAMP" />
             <column name="created_by" value="system" />
             <column name="last_modified_by" value="system" />
-            <column name="last_modified_date" value="now" />
+            <column name="last_modified_date" valueComputed="CURRENT_TIMESTAMP" />
             <column name="version" value="1049" />
         </insert>
     </changeSet>
