@@ -72,13 +72,13 @@ const WorkflowExecutionContent = ({
 
         return (
             <div className="space-y-2 rounded-md">
-                <div className="overflow-x-auto text-nowrap">
-                    {typeof input === 'object' ? (
+                {typeof input === 'object' ? (
+                    <div className="overflow-x-auto text-nowrap">
                         <JsonView src={input as object} />
-                    ) : (
-                        <span className="text-sm">{input}</span>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <span className="block text-sm break-words whitespace-pre-wrap">{input}</span>
+                )}
             </div>
         );
     }
@@ -94,13 +94,13 @@ const WorkflowExecutionContent = ({
 
         return (
             <div className="space-y-2 rounded-md">
-                <div className="overflow-x-auto text-nowrap">
-                    {typeof filteredOutput === 'object' && filteredOutput !== null ? (
+                {typeof filteredOutput === 'object' && filteredOutput !== null ? (
+                    <div className="overflow-x-auto text-nowrap">
                         <JsonView src={filteredOutput as object} />
-                    ) : (
-                        <span className="text-sm">{String(filteredOutput)}</span>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <span className="block text-sm break-words whitespace-pre-wrap">{String(filteredOutput)}</span>
+                )}
             </div>
         );
     }
