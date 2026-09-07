@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -33,6 +34,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -60,9 +62,9 @@ class ContextTest {
 
     @Test
     void testEntriesAreHeldUntilFlushedAndWrittenAsOneBatchInOrder() {
-        context.log(log -> log.debug("first"));
-        context.log(log -> log.info("second"));
-        context.log(log -> log.warn("third"));
+        context.log(log -> log.trace("first"));
+        context.log(log -> log.debug("second"));
+        context.log(log -> log.info("third"));
 
         verify(logFileStorageWriter, never()).storeLogEntries(anyLong(), anyLong(), anyList());
 
@@ -74,7 +76,7 @@ class ContextTest {
             .map(LogEntry::message)
             .toList());
         assertEquals(
-            List.of(LogEntry.Level.DEBUG, LogEntry.Level.INFO, LogEntry.Level.WARN), stored.stream()
+            List.of(LogEntry.Level.TRACE, LogEntry.Level.DEBUG, LogEntry.Level.INFO), stored.stream()
                 .map(LogEntry::level)
                 .toList());
     }
@@ -99,10 +101,11 @@ class ContextTest {
     }
 
     @Test
-    void testFlushingAnEmptyBufferWritesNothing() {
+    void testFlushingAnEmptyBufferWritesNothingButStillWaitsForDurability() {
         context.flushLogEntries();
 
-        verifyNoMoreInteractions(logFileStorageWriter);
+        verify(logFileStorageWriter, never()).storeLogEntries(anyLong(), anyLong(), anyList());
+        verify(logFileStorageWriter).awaitPendingWrites(JOB_ID, TASK_EXECUTION_ID);
     }
 
     @Test
@@ -127,6 +130,37 @@ class ContextTest {
         assertEquals(100, batches.get(0)
             .size());
         assertEquals(List.of("one more"), messagesOf(batches.get(1)));
+    }
+
+    @Test
+    void testFlushingWaitsUntilTheJobsEntriesAreDurable() {
+        context.log(log -> log.debug("done"));
+
+        context.flushLogEntries();
+
+        InOrder inOrder = inOrder(logFileStorageWriter);
+
+        inOrder.verify(logFileStorageWriter)
+            .storeLogEntries(eq(JOB_ID), eq(TASK_EXECUTION_ID), anyList());
+        inOrder.verify(logFileStorageWriter)
+            .awaitPendingWrites(JOB_ID, TASK_EXECUTION_ID);
+    }
+
+    @Test
+    void testAWarningIsWrittenOutWithoutWaitingForTheFlush() {
+        context.log(log -> log.debug("setting up"));
+        context.log(log -> log.warn("something looks off"));
+
+        ArgumentCaptor<List<LogEntry>> batchArgumentCaptor = batchCaptor();
+
+        verify(logFileStorageWriter, times(1)).storeLogEntries(
+            eq(JOB_ID), eq(TASK_EXECUTION_ID), batchArgumentCaptor.capture());
+
+        assertEquals(List.of("setting up", "something looks off"), messagesOf(batchArgumentCaptor.getValue()));
+
+        context.flushLogEntries();
+
+        verify(logFileStorageWriter, times(1)).storeLogEntries(eq(JOB_ID), eq(TASK_EXECUTION_ID), anyList());
     }
 
     @Test

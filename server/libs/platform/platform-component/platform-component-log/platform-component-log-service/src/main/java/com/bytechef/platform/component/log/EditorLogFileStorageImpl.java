@@ -17,15 +17,54 @@
 package com.bytechef.platform.component.log;
 
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.platform.component.log.domain.LogEntry;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public class EditorLogFileStorageImpl extends LogFileStorageImpl implements EditorLogFileStorage {
+public class EditorLogFileStorageImpl implements EditorLogFileStorage {
 
     private static final String EDITOR_LOG_FILES_DIR = "editor/logs";
 
+    private final LogFileStorageImpl logFileStorage;
+
     public EditorLogFileStorageImpl(FileStorageService fileStorageService) {
-        super(fileStorageService, EDITOR_LOG_FILES_DIR);
+        this.logFileStorage = new LogFileStorageImpl(fileStorageService, EDITOR_LOG_FILES_DIR);
+    }
+
+    @Override
+    public void awaitPendingWrites(long jobId) {
+        logFileStorage.awaitPendingWrites(jobId);
+    }
+
+    @Override
+    public void awaitPendingWrites(long jobId, long taskExecutionId) {
+        logFileStorage.awaitPendingWrites(jobId, taskExecutionId);
+    }
+
+    @Override
+    public void deleteLogEntries(long jobId) {
+        logFileStorage.deleteLogEntries(jobId);
+    }
+
+    @Override
+    public boolean logsExist(long jobId) {
+        return logFileStorage.logsExist(jobId);
+    }
+
+    @Override
+    public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
+        return logFileStorage.readLogEntries(jobId, taskExecutionId);
+    }
+
+    @Override
+    public List<LogEntry> readLogEntriesByJobId(long jobId) {
+        return logFileStorage.readLogEntriesByJobId(jobId);
+    }
+
+    @Override
+    public void storeLogEntries(long jobId, long taskExecutionId, List<LogEntry> logEntries) {
+        logFileStorage.storeLogEntries(jobId, taskExecutionId, logEntries);
     }
 }

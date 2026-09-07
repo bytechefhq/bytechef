@@ -32,6 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;
@@ -48,7 +49,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final FileStorageService fileStorageService;
     private final String logFilesDirectory;
-    private final Map<Long, CompletableFuture<Void>> pendingWrites = new ConcurrentHashMap<>();
+    private final Map<Long, Map<Long, CompletableFuture<Void>>> pendingWrites = new ConcurrentHashMap<>();
 
     @SuppressFBWarnings("EI")
     public LogFileStorageImpl(FileStorageService fileStorageService) {
@@ -56,7 +57,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @SuppressFBWarnings("EI")
-    protected LogFileStorageImpl(FileStorageService fileStorageService, String logFilesDirectory) {
+    public LogFileStorageImpl(FileStorageService fileStorageService, String logFilesDirectory) {
         this.fileStorageService = fileStorageService;
         this.logFilesDirectory = logFilesDirectory;
     }
@@ -69,27 +70,70 @@ public class LogFileStorageImpl implements LogFileStorage {
 
         List<LogEntry> logEntriesToStore = List.copyOf(logEntries);
         String tenantId = TenantContext.getCurrentTenantId();
+        AtomicReference<CompletableFuture<Void>> pendingWriteReference = new AtomicReference<>();
 
-        CompletableFuture<Void> pendingWrite = pendingWrites.compute(jobId, (key, previousWrite) -> {
-            CompletableFuture<Void> previous = previousWrite == null
-                ? CompletableFuture.completedFuture(null)
-                : previousWrite;
+        pendingWrites.compute(jobId, (jobKey, taskWrites) -> {
+            Map<Long, CompletableFuture<Void>> jobTaskWrites =
+                taskWrites == null ? new ConcurrentHashMap<>() : taskWrites;
 
-            return previous
-                .thenRunAsync(
-                    () -> TenantContext.runWithTenantId(
-                        tenantId, () -> appendLogEntries(jobId, taskExecutionId, logEntriesToStore)),
-                    asyncExecutor)
-                .exceptionally(throwable -> {
-                    log.error(
-                        "Failed to append {} log entries for task execution {} of job {}",
-                        logEntriesToStore.size(), taskExecutionId, jobId, throwable);
+            jobTaskWrites.compute(taskExecutionId, (taskKey, previousWrite) -> {
+                CompletableFuture<Void> previous = previousWrite == null
+                    ? CompletableFuture.completedFuture(null)
+                    : previousWrite;
 
-                    return null;
-                });
+                CompletableFuture<Void> pendingWrite = previous
+                    .thenRunAsync(
+                        () -> TenantContext.runWithTenantId(
+                            tenantId, () -> appendLogEntries(jobId, taskExecutionId, logEntriesToStore)),
+                        asyncExecutor)
+                    .exceptionally(throwable -> {
+                        log.error(
+                            "Failed to append {} log entries for task execution {} of job {}",
+                            logEntriesToStore.size(), taskExecutionId, jobId, throwable);
+
+                        return null;
+                    });
+
+                pendingWriteReference.set(pendingWrite);
+
+                return pendingWrite;
+            });
+
+            return jobTaskWrites;
         });
 
-        pendingWrite.whenComplete((result, throwable) -> pendingWrites.remove(jobId, pendingWrite));
+        CompletableFuture<Void> pendingWrite = pendingWriteReference.get();
+
+        pendingWrite.whenComplete(
+            (result, throwable) -> pendingWrites.computeIfPresent(jobId, (jobKey, taskWrites) -> {
+                taskWrites.remove(taskExecutionId, pendingWrite);
+
+                return taskWrites.isEmpty() ? null : taskWrites;
+            }));
+    }
+
+    @Override
+    public void awaitPendingWrites(long jobId) {
+        Map<Long, CompletableFuture<Void>> taskWrites = pendingWrites.get(jobId);
+
+        if (taskWrites != null) {
+            for (CompletableFuture<Void> pendingWrite : List.copyOf(taskWrites.values())) {
+                pendingWrite.join();
+            }
+        }
+    }
+
+    @Override
+    public void awaitPendingWrites(long jobId, long taskExecutionId) {
+        Map<Long, CompletableFuture<Void>> taskWrites = pendingWrites.get(jobId);
+
+        if (taskWrites != null) {
+            CompletableFuture<Void> pendingWrite = taskWrites.get(taskExecutionId);
+
+            if (pendingWrite != null) {
+                pendingWrite.join();
+            }
+        }
     }
 
     @Override
@@ -178,14 +222,6 @@ public class LogFileStorageImpl implements LogFileStorage {
             log.error(
                 "Failed to append {} log entries for task execution {} of job {}", logEntries.size(), taskExecutionId,
                 jobId, exception);
-        }
-    }
-
-    private void awaitPendingWrites(long jobId) {
-        CompletableFuture<Void> pendingWrite = pendingWrites.get(jobId);
-
-        if (pendingWrite != null) {
-            pendingWrite.join();
         }
     }
 
