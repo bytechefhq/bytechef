@@ -14,6 +14,7 @@ interface CreateUpdatedElementProps {
     currentOperationProperties?: Array<PropertyAllType>;
     element: ClusterElementItemType | NodeDataType;
     fieldUpdate: FieldUpdateType;
+    parameters?: NonNullable<NodeDataType['parameters']>;
 }
 
 export function createUpdatedElement({
@@ -21,6 +22,7 @@ export function createUpdatedElement({
     currentOperationProperties,
     element,
     fieldUpdate,
+    parameters,
 }: CreateUpdatedElementProps) {
     switch (fieldUpdate.field) {
         case 'operation':
@@ -35,9 +37,11 @@ export function createUpdatedElement({
                     },
                 },
                 operationName: fieldUpdate.value,
-                parameters: getParametersWithDefaultValues({
-                    properties: currentOperationProperties as Array<PropertyAllType>,
-                }),
+                parameters:
+                    parameters ??
+                    getParametersWithDefaultValues({
+                        properties: currentOperationProperties as Array<PropertyAllType>,
+                    }),
                 type: `${currentComponentDefinition.name}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
             };
         case 'label':
@@ -60,6 +64,7 @@ interface UpdateClusterRootElementFieldProps {
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
     mainRootElement: NodeDataType;
+    parameters?: NonNullable<NodeDataType['parameters']>;
 }
 
 export function updateClusterRootElementField({
@@ -67,12 +72,14 @@ export function updateClusterRootElementField({
     currentOperationProperties,
     fieldUpdate,
     mainRootElement,
+    parameters,
 }: UpdateClusterRootElementFieldProps): NodeDataType {
     const updatedElementData = createUpdatedElement({
         currentComponentDefinition,
         currentOperationProperties,
         element: mainRootElement,
         fieldUpdate,
+        parameters,
     });
 
     return {
@@ -90,6 +97,7 @@ interface UpdateNestedClusterElementFieldProps {
     currentOperationProperties?: Array<PropertyAllType>;
     elementName: string;
     fieldUpdate: FieldUpdateType;
+    parameters?: NonNullable<NodeDataType['parameters']>;
 }
 
 export function updateNestedClusterElementField({
@@ -98,6 +106,7 @@ export function updateNestedClusterElementField({
     currentOperationProperties,
     elementName,
     fieldUpdate,
+    parameters,
 }: UpdateNestedClusterElementFieldProps): ClusterElementsType {
     if (!clusterElements || Object.keys(clusterElements).length === 0) {
         return clusterElements;
@@ -112,6 +121,7 @@ export function updateNestedClusterElementField({
                 currentOperationProperties,
                 element,
                 fieldUpdate,
+                parameters,
             }) as ClusterElementItemType;
         }
 
@@ -125,6 +135,7 @@ export function updateNestedClusterElementField({
                     currentOperationProperties,
                     elementName,
                     fieldUpdate,
+                    parameters,
                 }),
             };
         }

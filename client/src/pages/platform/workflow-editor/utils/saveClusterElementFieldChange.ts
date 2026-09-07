@@ -18,6 +18,7 @@ interface SaveClusterElementFieldChangeProps {
     currentComponentDefinition: ComponentDefinition;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
+    parameters?: NonNullable<NodeDataType['parameters']>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -25,6 +26,7 @@ export default function saveClusterElementFieldChange({
     currentComponentDefinition,
     currentOperationProperties,
     fieldUpdate,
+    parameters,
     updateWorkflowMutation,
 }: SaveClusterElementFieldChangeProps): void {
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
@@ -71,6 +73,7 @@ export default function saveClusterElementFieldChange({
                 componentName: rootClusterElementNodeData.componentName,
                 workflowNodeName: rootClusterElementNodeData.workflowNodeName,
             },
+            parameters,
         });
     } else if (
         currentNode.clusterElementType &&
@@ -88,6 +91,7 @@ export default function saveClusterElementFieldChange({
             currentOperationProperties,
             elementName: workflowNodeName,
             fieldUpdate,
+            parameters,
         });
 
         updatedMainRootData = {
@@ -124,10 +128,13 @@ export default function saveClusterElementFieldChange({
                         },
                     },
                     operationName: fieldUpdate.value,
-                    parameters: getParametersWithDefaultValues({
-                        properties: currentOperationProperties as Array<PropertyAllType>,
-                    }),
+                    parameters:
+                        parameters ??
+                        getParametersWithDefaultValues({
+                            properties: currentOperationProperties as Array<PropertyAllType>,
+                        }),
                     type: `${currentComponentDefinition.name}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
+                    version: currentComponentDefinition.version,
                 };
             } else {
                 commonUpdates[fieldUpdate.field] = fieldUpdate.value;

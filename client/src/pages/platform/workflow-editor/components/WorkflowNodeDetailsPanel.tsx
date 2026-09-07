@@ -17,12 +17,13 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {ChevronDownIcon, ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+import {ReactNode, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import {getClusterElementsLabel} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import getAvailableComponentVersions from '../utils/getAvailableComponentVersions';
 import getNodeOperationDescription from '../utils/getNodeOperationDescription';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
 import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
@@ -51,6 +52,7 @@ const WorkflowNodeDetailsPanel = ({
         activeDisplayConditionsQuery,
         activeTab,
         awaitingFirstSave,
+        componentDefinitionVersions,
         currentActionDefinition,
         currentComponentDefinition,
         currentNode,
@@ -68,6 +70,7 @@ const WorkflowNodeDetailsPanel = ({
         getNodeVersion,
         handleOperationSelectChange,
         handlePanelClose,
+        handleVersionSelectChange,
         nodeDefinition,
         nodeTabs,
         operationDataMissing,
@@ -85,6 +88,13 @@ const WorkflowNodeDetailsPanel = ({
         updateWorkflowMutation,
         workflowNodeOutputs,
     });
+
+    const nodeVersion = getNodeVersion(currentWorkflowNode);
+
+    const availableVersions = useMemo(
+        () => getAvailableComponentVersions({componentDefinitionVersions, nodeVersion}),
+        [componentDefinitionVersions, nodeVersion]
+    );
 
     if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
         return <></>;
@@ -368,13 +378,20 @@ const WorkflowNodeDetailsPanel = ({
                         </main>
 
                         <footer className="z-50 mt-auto flex items-center justify-between bg-background px-4 py-2">
-                            <Select defaultValue={getNodeVersion(currentWorkflowNode)}>
-                                <SelectTrigger className="w-auto border-none shadow-none">
+                            <Select onValueChange={handleVersionSelectChange} value={nodeVersion}>
+                                <SelectTrigger
+                                    aria-label="Component version"
+                                    className="w-auto border-none shadow-none"
+                                >
                                     <SelectValue placeholder="Choose version..." />
                                 </SelectTrigger>
 
                                 <SelectContent>
-                                    <SelectItem value="1">v1</SelectItem>
+                                    {availableVersions.map((version) => (
+                                        <SelectItem key={version} value={String(version)}>
+                                            v{version}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
 
