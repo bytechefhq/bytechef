@@ -41,9 +41,12 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         List<Object> arguments = new ArrayList<>();
         String query = "SELECT DISTINCT project.*, LOWER(project.name) AS lower_name FROM project ";
 
+        if (apiCollections != null || status != null) {
+            query += "JOIN project_version ON project.id = project_version.project_id ";
+        }
+
         if (apiCollections != null) {
             query += """
-                JOIN project_version ON project.id = project_version.project_id
                 JOIN project_workflow ON project.id = project_workflow.project_id
                 JOIN workflow ON project_workflow.workflow_id = workflow.id
                 """;
