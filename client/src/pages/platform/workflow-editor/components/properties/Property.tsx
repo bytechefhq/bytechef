@@ -5,6 +5,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
+import {useFormDisplayConditionsContext} from '@/pages/platform/workflow-editor/components/properties/FormDisplayConditionsContext';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
 import FormControlledArrayItems from '@/pages/platform/workflow-editor/components/properties/components/FormControlledArrayItems';
 import FormControlledObjectEntries from '@/pages/platform/workflow-editor/components/properties/components/FormControlledObjectEntries';
@@ -165,6 +166,8 @@ const Property = ({
 
     const clusterElementContext = useClusterElementContext();
 
+    const formDisplayConditions = useFormDisplayConditionsContext();
+
     if (hidden && !control) {
         return <></>;
     }
@@ -180,6 +183,10 @@ const Property = ({
     }
 
     if (!control && displayCondition && !currentNode?.displayConditions?.[displayCondition]) {
+        return <></>;
+    }
+
+    if (control && displayCondition && formDisplayConditions && !formDisplayConditions[displayCondition]) {
         return <></>;
     }
 
