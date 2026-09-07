@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PopoverContent} from '@/components/ui/popover';
 import useMcpComponentToolPropertiesPopover from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentToolPropertiesPopover';
+import useMcpToolFormDisplayConditions from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpToolFormDisplayConditions';
 import {ClusterElementProvider} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {McpTool} from '@/shared/middleware/graphql';
@@ -26,6 +27,8 @@ const McpComponentToolPropertiesPopover = ({
         useMcpComponentToolPropertiesPopover(componentName, componentVersion, mcpTool, onClose);
 
     const formValues = form.watch();
+
+    const formDisplayConditions = useMcpToolFormDisplayConditions(componentName, componentVersion, mcpTool, formValues);
 
     return (
         <PopoverContent
@@ -69,6 +72,7 @@ const McpComponentToolPropertiesPopover = ({
                                     <Properties
                                         control={control}
                                         controlPath=""
+                                        formDisplayConditions={formDisplayConditions}
                                         formState={formState}
                                         properties={properties}
                                         toolsMode

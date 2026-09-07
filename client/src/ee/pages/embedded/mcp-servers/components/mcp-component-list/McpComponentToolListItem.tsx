@@ -1,11 +1,11 @@
 import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
+import McpComponentToolPropertiesPopover from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolPropertiesPopover';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
 import {McpTool} from '@/shared/middleware/graphql';
 import {BoltIcon, Trash2Icon} from 'lucide-react';
 
-import McpComponentToolPropertiesPopover from './McpComponentToolPropertiesPopover';
 import useMcpComponentToolDropdownMenu from './hooks/useMcpComponentToolDropdownMenu';
 
 interface McpComponentToolListItemProps {
