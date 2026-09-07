@@ -5,10 +5,6 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
     <changeSet id="20260429000000-1" author="Matija Petanjek">
-        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <changeLogPropertyDefined property="billing.enabled" value="true"/>
-        </preConditions>
-
         <createTable tableName="billing_subscription">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -69,7 +65,6 @@
 
     <changeSet id="20260625000000-1" author="Matija Petanjek">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <changeLogPropertyDefined property="billing.enabled" value="true"/>
             <sqlCheck expectedResult="0">SELECT COUNT(*) FROM billing_subscription</sqlCheck>
         </preConditions>
 
