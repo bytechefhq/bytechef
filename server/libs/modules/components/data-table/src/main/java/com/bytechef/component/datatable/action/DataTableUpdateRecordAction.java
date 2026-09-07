@@ -115,7 +115,8 @@ public class DataTableUpdateRecordAction {
         long id = inputParameters.getRequiredLong(ID);
         Map<String, Object> values = (Map<String, Object>) inputParameters.getRequired(VALUES, Map.class);
 
-        return dataTableRowService.updateRow(
-            baseName, id, values, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+        return DataTableUtils.flattenRow(
+            dataTableRowService.updateRow(
+                baseName, id, values, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

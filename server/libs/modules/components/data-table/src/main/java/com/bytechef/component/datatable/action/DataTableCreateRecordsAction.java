@@ -128,6 +128,6 @@ public class DataTableCreateRecordsAction {
             }
         }
 
-        return created;
+        return DataTableUtils.flattenRows(created);
     }
 }
