@@ -2096,6 +2096,9 @@ components:
           type: "object"
           additionalProperties:
             type: "integer"
+        clusterRoot:
+          description: "Is the component cluster root."
+          type: "boolean"
         componentCategories:
           description: "The list of categories the component belongs to."
           type: "array"
