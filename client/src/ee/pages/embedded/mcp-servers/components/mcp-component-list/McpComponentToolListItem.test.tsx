@@ -14,7 +14,7 @@ vi.mock('./hooks/useMcpComponentToolDropdownMenu', () => ({
     }),
 }));
 
-vi.mock('./McpComponentToolPropertiesPopover', () => ({
+vi.mock('@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolPropertiesPopover', () => ({
     default: () => <div>tool-properties-popover</div>,
 }));
 
