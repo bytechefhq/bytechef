@@ -3,14 +3,15 @@ title: Local Docker
 description: Run ByteChef locally with Docker for development
 ---
 
-This guide covers running ByteChef locally using Docker. There are two approaches depending on your needs.
+This guide covers running ByteChef locally using Docker. There are three approaches depending on your needs.
 
 ## Run ByteChef locally
 
-Two paths, same result. Docker Compose is the fastest; the manual path is for environments where
-Compose is unavailable.
+Docker Compose is the usual choice. The single-container path drops the database entirely and is
+the quickest way to try ByteChef out; the manual path is for environments where Compose is
+unavailable.
 
-<Tabs items={['Docker Compose', 'Docker (manual)']}>
+<Tabs items={['Docker Compose', 'Single container (H2)', 'Docker (manual)']}>
 <Tab value="Docker Compose">
 
 The fastest way to run ByteChef locally. This starts both PostgreSQL and ByteChef in a single command.
@@ -38,6 +39,11 @@ rather than inside the container has three consequences: it survives recreating 
 `docker compose down -v` does not touch it, and a server you run outside Docker uses the very same
 key - the same connections stay readable either way.
 
+That same directory holds anything else ByteChef keeps on the host, so running on H2 puts the
+database file there too - see the **Single container (H2)** tab. The path is identical whether
+ByteChef runs in Docker or directly on your machine, because it resolves against the home directory
+of the user the server runs as.
+
 Back the key up alongside the database. A database restored without its key is a database of
 undecryptable credentials.
 
@@ -62,6 +68,60 @@ services:
       BYTECHEF_DATASOURCE_USERNAME: postgres
       BYTECHEF_DATASOURCE_PASSWORD: your_password
 ```
+
+To drop the database server altogether, run ByteChef on H2 with a Compose file holding a single
+service. The `~/.bytechef` mount carries both the encryption key and the H2 database, so there is no
+named volume to manage:
+
+```yaml
+services:
+  bytechef:
+    container_name: bytechef
+    image: docker.bytechef.io/bytechef/bytechef:latest
+    environment:
+      - BYTECHEF_DATABASE=h2
+      - BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48keep1this1safe3ffb2
+    volumes:
+      - ~/.bytechef:/root/.bytechef
+    ports:
+      - "8080:8080"
+```
+
+H2 is for evaluation only - see the **Single container (H2)** tab for what it does and does not
+support.
+
+</Tab>
+<Tab value="Single container (H2)">
+
+To try ByteChef without running a database at all, set `BYTECHEF_DATABASE=h2`. ByteChef then stores
+everything in an embedded [H2](https://www.h2database.com) file inside the mounted `~/.bytechef`
+directory, and no PostgreSQL container is needed.
+
+```bash
+docker run --name bytechef -it -p 8080:8080 \
+    --env BYTECHEF_DATABASE=h2 \
+    --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
+    -v ~/.bytechef:/root/.bytechef \
+    docker.bytechef.io/bytechef/bytechef:latest
+```
+
+Open [http://localhost:8080/login](http://localhost:8080/login) and click **Create account**, exactly
+as with the Compose path.
+
+The database file lives at `~/.bytechef/bytechef.mv.db`, next to the encryption key, so both survive
+recreating the container. Deleting that file discards every workflow, connection, and execution
+record; the key beside it is separate and worth keeping.
+
+<Callout type="warn">
+H2 is for evaluation and local development, not production. PostgreSQL is the only supported
+production database. An H2 file is held open by a single process, so you cannot run more than one
+ByteChef replica against it, nor inspect it with another tool while ByteChef is running. Features
+built on vector search - the AI knowledge base and copilot - require PostgreSQL with the pgvector
+extension and stay unavailable on H2.
+</Callout>
+
+To move to PostgreSQL later, drop `BYTECHEF_DATABASE` and set the datasource variables instead.
+There is no migration path between the two - a PostgreSQL instance starts empty.
 
 </Tab>
 <Tab value="Docker (manual)">
@@ -193,3 +253,15 @@ docker compose -f server/docker-compose.dev.server.yml down -v
 
 `-v` removes the database volume, so this discards every workflow, connection, and execution record
 in that stack. It is the right move on a development database and the wrong one anywhere else.
+
+### Resetting an H2 database
+
+`docker compose down -v` removes named volumes, and an H2 database is not one - it is a file in the
+bind-mounted `~/.bytechef` directory, so it survives. Stop the container and delete the file:
+
+```bash
+rm ~/.bytechef/bytechef.mv.db
+```
+
+Leave `~/.bytechef/key` in place unless you also want to discard the stored connection credentials,
+which cannot be decrypted without it.
