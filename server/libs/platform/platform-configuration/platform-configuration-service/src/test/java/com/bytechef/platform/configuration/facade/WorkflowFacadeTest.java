@@ -17,22 +17,27 @@
 package com.bytechef.platform.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
+import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +74,9 @@ public class WorkflowFacadeTest {
     public void beforeEach() {
         workflowFacade = new WorkflowFacadeImpl(
             componentConnectionFacade, componentDefinitionService, workflowValidatorFacade, workflowService);
+    }
 
+    private void stubTestWorkflow() {
         when(testWorkflow.getId()).thenReturn("test-workflow-id");
         when(testWorkflow.getDefinition())
             .thenReturn("{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}");
@@ -87,6 +94,8 @@ public class WorkflowFacadeTest {
 
     @Test
     public void testGetWorkflow() {
+        stubTestWorkflow();
+
         when(testWorkflow.getTasks(true)).thenReturn(Collections.emptyList());
 
         WorkflowDTO workflowDTO = workflowFacade.getWorkflow(testWorkflow.getId());
@@ -100,6 +109,8 @@ public class WorkflowFacadeTest {
 
     @Test
     public void testGetWorkflowWithClusterRoot() {
+        stubTestWorkflow();
+
         WorkflowTask mockTask = mock(WorkflowTask.class);
 
         when(mockTask.getName()).thenReturn("testTask");
@@ -132,5 +143,47 @@ public class WorkflowFacadeTest {
         assertThat(taskDTO).isNotNull();
         assertThat(taskDTO.getName()).isEqualTo("testTask");
         assertThat(taskDTO.isClusterRoot()).isTrue();
+    }
+
+    @Test
+    public void testUpdateRejectsDuplicateNodeNamesAndDoesNotPersist() {
+        doThrow(
+            new ConfigurationException(
+                "Workflow node names must be unique. Duplicate node names: task_1",
+                WorkflowValidatorErrorType.DUPLICATE_NODE_NAMES))
+                    .when(workflowValidatorFacade)
+                    .validateNoDuplicateNodeNames(anyString());
+
+        assertThatThrownBy(() -> workflowFacade.update("workflow-1", "{}", 1))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("task_1");
+
+        verify(workflowService, never()).update(anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    public void testUpdateRejectsInvalidInputNameAndDoesNotPersist() {
+        doThrow(
+            new ConfigurationException(
+                "Workflow input names must start with a letter or underscore and contain only letters, digits and " +
+                    "underscores. Invalid input names: my input",
+                WorkflowValidatorErrorType.INVALID_INPUT_NAME))
+                    .when(workflowValidatorFacade)
+                    .validateInputNames(anyString());
+
+        assertThatThrownBy(() -> workflowFacade.update("workflow-1", "{}", 1))
+            .isInstanceOf(ConfigurationException.class)
+            .hasMessageContaining("my input");
+
+        verify(workflowService, never()).update(anyString(), anyString(), anyInt());
+    }
+
+    @Test
+    public void testUpdatePersistsWhenValidationPasses() {
+        workflowFacade.update("workflow-1", "{}", 1);
+
+        verify(workflowValidatorFacade).validateNoDuplicateNodeNames("{}");
+        verify(workflowValidatorFacade).validateInputNames("{}");
+        verify(workflowService).update("workflow-1", "{}", 1);
     }
 }

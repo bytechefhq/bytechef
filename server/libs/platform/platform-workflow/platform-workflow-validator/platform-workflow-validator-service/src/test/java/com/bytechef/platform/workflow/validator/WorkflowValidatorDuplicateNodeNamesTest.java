@@ -344,6 +344,11 @@ class WorkflowValidatorDuplicateNodeNamesTest {
             public List<String> getDuplicateNodeNames(String workflow) {
                 return WorkflowValidator.getDuplicateNodeNames(workflow);
             }
+
+            @Override
+            public List<String> getInvalidInputNames(String workflow) {
+                return List.of();
+            }
         };
     }
 

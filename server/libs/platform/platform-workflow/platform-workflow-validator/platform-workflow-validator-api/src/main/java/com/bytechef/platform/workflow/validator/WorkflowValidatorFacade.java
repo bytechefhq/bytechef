@@ -60,6 +60,42 @@ public interface WorkflowValidatorFacade {
     List<String> getDuplicateNodeNames(String workflow);
 
     /**
+     * Returns the workflow input names that the expression evaluator cannot resolve. An input is referenced from other
+     * nodes as <code>${inputName}</code>, and the evaluator only accepts an accessor whose root matches
+     * <code>[a-zA-Z_][a-zA-Z0-9_]*</code>. A name outside that set leaves the literal <code>${...}</code> text in place
+     * instead of the input's value, so the workflow runs and silently feeds the wrong data downstream.
+     *
+     * <p>
+     * Blank names are left to the required-field validation, and workflow JSON that cannot be parsed yields an empty
+     * list: like {@link #getDuplicateNodeNames(String)}, this guard fails open so it only ever rejects genuinely
+     * unresolvable input names.
+     *
+     * @param workflow the workflow JSON string to inspect
+     * @return the invalid input names, or an empty list when all input names are resolvable (or the JSON cannot be
+     *         parsed)
+     */
+    List<String> getInvalidInputNames(String workflow);
+
+    /**
+     * Save-time guard that rejects a workflow whose input names the expression evaluator cannot resolve. Delegates to
+     * {@link #getInvalidInputNames(String)} so the guard and the editor's inline validation agree on what counts as a
+     * valid name.
+     *
+     * @param workflow the workflow JSON string to inspect
+     * @throws ConfigurationException if any input name is not resolvable as an expression accessor
+     */
+    default void validateInputNames(String workflow) {
+        List<String> invalidInputNames = getInvalidInputNames(workflow);
+
+        if (!invalidInputNames.isEmpty()) {
+            throw new ConfigurationException(
+                "Workflow input names must start with a letter or underscore and contain only letters, digits and " +
+                    "underscores. Invalid input names: " + String.join(", ", invalidInputNames),
+                WorkflowValidatorErrorType.INVALID_INPUT_NAME);
+        }
+    }
+
+    /**
      * Save-time guard that rejects a workflow whose node names are not unique. Delegates to
      * {@link #getDuplicateNodeNames(String)} so the guard and the editor's inline validation agree on what counts as a
      * duplicate. Consistent with that method, it fails open on workflow JSON that cannot be parsed (left to structure

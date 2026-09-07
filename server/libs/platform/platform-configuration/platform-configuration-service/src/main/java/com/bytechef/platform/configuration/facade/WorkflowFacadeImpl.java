@@ -87,6 +87,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     @Override
     public void update(String id, String definition, Integer version) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+        workflowValidatorFacade.validateInputNames(definition);
 
         workflowService.update(id, definition, version);
     }
