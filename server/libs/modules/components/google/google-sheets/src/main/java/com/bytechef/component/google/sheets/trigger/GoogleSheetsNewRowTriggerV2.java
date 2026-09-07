@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.APPLICATION_VND_GOOGLE_APPS_SPREADSHEET;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
@@ -35,30 +36,29 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.google.sheets.util.GoogleSheetsRowDiffUtils;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.sheets.v4.Sheets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * @author Anshul Goel
  */
 public class GoogleSheetsNewRowTriggerV2 {
 
-    private static final String KNOWN_ROW_IDS = "knownRowIds";
+    private static final String KNOWN_ROW_HASHES = "knownRowHashes";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
         .description(
-            "Triggers when a new row is added. Tracks rows by 1-based sheet row index so editing an existing row " +
-                "does not fire the trigger again.")
+            "Triggers when a new row is added. Rows are tracked by their content, so a row inserted in the " +
+                "middle of the sheet is reported and editing an existing row does not fire the trigger.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(SPREADSHEET_ID)
@@ -112,41 +112,50 @@ public class GoogleSheetsNewRowTriggerV2 {
             return Collections.emptyList();
         }
 
-        Optional<Object> knownRowIdsOptional = context.data(data -> data.fetch(WORKFLOW, KNOWN_ROW_IDS));
+        int firstDataRowIndex = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER) ? 1 : 0;
 
-        Set<Integer> knownRowIds = knownRowIdsOptional
-            .map(GoogleSheetsNewRowTriggerV2::toRowIdSet)
-            .orElseGet(Set::of);
+        List<List<Object>> dataRows = new ArrayList<>();
+        List<String> currentRowHashes = new ArrayList<>();
 
-        List<Integer> currentRowIds = new ArrayList<>();
-        List<Map<String, Object>> newRows = new ArrayList<>();
+        for (int index = firstDataRowIndex; index < values.size(); index++) {
+            List<Object> row = values.get(index);
 
-        for (int i = 0; i < values.size(); i++) {
-            int rowId = i + 1;
-
-            currentRowIds.add(rowId);
-
-            if (!knownRowIds.contains(rowId)) {
-                newRows.add(getMapOfValuesForRow(inputParameters, sheets, values.get(i)));
+            if (GoogleSheetsRowDiffUtils.isBlankRow(row)) {
+                continue;
             }
+
+            dataRows.add(row);
+            currentRowHashes.add(GoogleSheetsRowDiffUtils.getRowHash(row));
         }
 
-        context.data(data -> data.put(WORKFLOW, KNOWN_ROW_IDS, currentRowIds));
+        Optional<Object> knownRowHashesOptional = context.data(data -> data.fetch(WORKFLOW, KNOWN_ROW_HASHES));
+
+        List<String> knownRowHashes = knownRowHashesOptional
+            .map(GoogleSheetsNewRowTriggerV2::toRowHashList)
+            .orElseGet(List::of);
+
+        List<Map<String, Object>> newRows = new ArrayList<>();
+
+        for (int index : GoogleSheetsRowDiffUtils.getInsertedRowIndexes(knownRowHashes, currentRowHashes)) {
+            newRows.add(getMapOfValuesForRow(inputParameters, sheets, dataRows.get(index)));
+        }
+
+        context.data(data -> data.put(WORKFLOW, KNOWN_ROW_HASHES, currentRowHashes));
 
         return newRows;
     }
 
-    private static Set<Integer> toRowIdSet(Object storedRowIds) {
-        Set<Integer> rowIds = new HashSet<>();
+    private static List<String> toRowHashList(Object storedRowHashes) {
+        List<String> rowHashes = new ArrayList<>();
 
-        if (storedRowIds instanceof List<?> list) {
-            for (Object rowId : list) {
-                if (rowId instanceof Number number) {
-                    rowIds.add(number.intValue());
+        if (storedRowHashes instanceof List<?> list) {
+            for (Object rowHash : list) {
+                if (rowHash != null) {
+                    rowHashes.add(String.valueOf(rowHash));
                 }
             }
         }
 
-        return rowIds;
+        return rowHashes;
     }
 }
