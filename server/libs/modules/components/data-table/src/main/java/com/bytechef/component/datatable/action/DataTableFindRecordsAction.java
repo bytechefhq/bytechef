@@ -115,7 +115,8 @@ public class DataTableFindRecordsAction {
         int limit = inputParameters.getInteger(LIMIT, 100);
         int offset = inputParameters.getInteger(OFFSET, 0);
 
-        return dataTableRowService.listRows(
-            baseName, limit, offset, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+        return DataTableUtils.flattenRows(
+            dataTableRowService.listRows(
+                baseName, limit, offset, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

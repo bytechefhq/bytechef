@@ -199,6 +199,40 @@ public final class DataTableUtils {
         return sampleOutput;
     }
 
+    public static Map<String, Object> flattenRow(DataTableRow dataTableRow) {
+        Map<String, Object> flattenedRow = new HashMap<>();
+
+        flattenedRow.put("id", dataTableRow.id());
+        flattenedRow.putAll(dataTableRow.values());
+
+        return flattenedRow;
+    }
+
+    public static List<Map<String, Object>> flattenRows(List<DataTableRow> dataTableRows) {
+        return dataTableRows.stream()
+            .map(DataTableUtils::flattenRow)
+            .toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Object flattenPayload(Object payload) {
+        if (!(payload instanceof Map<?, ?> payloadMap) || !(payloadMap.get(VALUES) instanceof Map<?, ?> values)) {
+            return payload;
+        }
+
+        Map<String, Object> flattenedPayload = new HashMap<>();
+
+        for (Map.Entry<?, ?> entry : payloadMap.entrySet()) {
+            if (!Objects.equals(entry.getKey(), VALUES)) {
+                flattenedPayload.put((String) entry.getKey(), entry.getValue());
+            }
+        }
+
+        flattenedPayload.putAll((Map<String, Object>) values);
+
+        return flattenedPayload;
+    }
+
     /**
      * Creates a PropertiesFunction for dynamic properties lookup based on table columns.
      *

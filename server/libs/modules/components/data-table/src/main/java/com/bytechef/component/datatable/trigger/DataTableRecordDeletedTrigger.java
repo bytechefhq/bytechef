@@ -122,6 +122,6 @@ public class DataTableRecordDeletedTrigger {
 
         Object payload = content.get("payload");
 
-        return payload != null ? payload : content;
+        return payload == null ? content : DataTableUtils.flattenPayload(payload);
     }
 }

@@ -106,7 +106,7 @@ public class DataTableGetRecordAction {
         String baseName = inputParameters.getRequiredString(TABLE);
         long id = inputParameters.getRequiredLong(ID);
 
-        return dataTableRowService.getRow(
-            baseName, id, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+        return DataTableUtils.flattenRow(
+            dataTableRowService.getRow(baseName, id, Objects.requireNonNull(actionContextAware.getEnvironmentId())));
     }
 }

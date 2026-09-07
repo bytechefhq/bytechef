@@ -132,6 +132,6 @@ public class DataTableRecordUpdatedTrigger {
 
         Object payload = content.get("payload");
 
-        return payload != null ? payload : content;
+        return payload == null ? content : DataTableUtils.flattenPayload(payload);
     }
 }
