@@ -91,6 +91,23 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
     }
 
     @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, ActionContextAware actionContext) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections,
+        ActionContextAware actionContext) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Object executeApprovalChannel(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         String formUrl, @Nullable ComponentConnection componentConnection, ActionContextAware actionContext) {

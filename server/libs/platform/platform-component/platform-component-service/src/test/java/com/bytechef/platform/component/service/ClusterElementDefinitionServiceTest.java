@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ClusterElementContext;
@@ -36,6 +37,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import java.util.List;
@@ -230,6 +232,46 @@ class ClusterElementDefinitionServiceTest {
         verify(toolFunction).apply(
             any(Parameters.class), any(Parameters.class), any(Parameters.class), eq(componentConnections),
             eq(clusterElementContext));
+    }
+
+    @Test
+    void testExecuteToolWithAGivenContextUsesItInsteadOfTheFactory() throws Exception {
+        String clusterElementName = "aiAgent";
+        Object expectedResult = new Object();
+
+        MultipleConnectionsToolFunction toolFunction = mock(MultipleConnectionsToolFunction.class);
+
+        when(toolFunction.apply(any(), any(), any(), any(), any())).thenReturn(expectedResult);
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(elementDefinition.getName()).thenReturn(clusterElementName);
+        when(elementDefinition.getElement()).thenAnswer(ignored -> toolFunction);
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.getClusterElements()).thenReturn(Optional.of(List.of(elementDefinition)));
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        ClusterElementContext parentDerivedContext = mock(ClusterElementContext.class);
+        ActionContextAware parentContext = mock(ActionContextAware.class);
+        Map<String, ComponentConnection> componentConnections = Map.of();
+
+        when(parentContext.toClusterElementContext(COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, null))
+            .thenReturn(parentDerivedContext);
+
+        Object result = clusterElementDefinitionService.executeTool(
+            COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, Map.of("userPrompt", "hi"), Map.of(),
+            componentConnections, parentContext);
+
+        assertSame(expectedResult, result);
+
+        verify(toolFunction).apply(
+            any(Parameters.class), any(Parameters.class), any(Parameters.class), eq(componentConnections),
+            eq(parentDerivedContext));
+        verifyNoInteractions(contextFactory);
     }
 
     private com.bytechef.component.definition.ClusterElementDefinition<?> createMatchableClusterElementDefinition(
