@@ -158,9 +158,10 @@ public class PermissionServiceImpl implements PermissionService {
                     .isPresent();
         }
 
-        // Resource families that have not opted into visibility keep CE owner-isolation unchanged. API keys are
-        // user-owned and have no visibility concept; relaxing them here would hand every authenticated user a
-        // colleague's key.
+        // Resource families that have not opted into visibility keep CE owner-isolation unchanged, but only if they
+        // also have a registered ResourceOwnershipResolver. API keys are not actually among the families this
+        // protects: no resolver claims their "ApiKey" token, so this branch is never reached for them. See the
+        // API_KEY_* entry in PermissionScopeGateCoverageTest for the gap this leaves open.
         OptionalLong ownerUserId = resourceOwner.ownerUserId();
 
         if (ownerUserId.isPresent()) {
