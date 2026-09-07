@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {WorkflowInputType} from '@/shared/types';
-import {RefObject, useEffect} from 'react';
+import {RefObject, useEffect, useRef} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
 interface WorkflowInputsEditDialogProps {
@@ -36,6 +36,8 @@ const WorkflowInputsEditDialog = ({
     openEditDialog,
     saveWorkflowInput,
 }: WorkflowInputsEditDialogProps) => {
+    const previousTypeRef = useRef<string | undefined>(form.getValues('type'));
+
     const selectedType = useWatch({control: form.control, name: 'type'});
 
     const testValueInputTypeMap: Record<string, string> = {
@@ -49,6 +51,12 @@ const WorkflowInputsEditDialog = ({
     const testValueInputType = (selectedType && testValueInputTypeMap[selectedType]) ?? 'text';
 
     useEffect(() => {
+        if (previousTypeRef.current === selectedType) {
+            return;
+        }
+
+        previousTypeRef.current = selectedType;
+
         form.setValue('testValue', '');
     }, [form, selectedType]);
 
