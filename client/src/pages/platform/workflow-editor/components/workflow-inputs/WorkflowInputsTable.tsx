@@ -16,52 +16,65 @@ const WorkflowInputsTable = ({
     workflowInputs,
     workflowTestConfigurationInputs,
 }: WorkflowInputsTableProps) => (
-    <Table>
+    <Table className="table-fixed">
         <TableHeader>
             <TableRow className="border-b-border/50">
-                <TableHead>Name</TableHead>
+                <TableHead className="w-[16%] truncate">Name</TableHead>
 
-                <TableHead>Label</TableHead>
+                <TableHead className="w-[16%] truncate">Label</TableHead>
 
-                <TableHead>Type</TableHead>
+                <TableHead className="w-[12%] truncate">Type</TableHead>
 
-                <TableHead>Required</TableHead>
+                <TableHead className="w-[12%] truncate">Required</TableHead>
 
-                <TableHead>Test Value</TableHead>
+                <TableHead className="w-[30%] truncate">Test Value</TableHead>
 
-                <TableHead>Actions</TableHead>
+                <TableHead className="w-[14%] truncate">Actions</TableHead>
             </TableRow>
         </TableHeader>
 
         <TableBody>
-            {workflowInputs?.map((input, index) => (
-                <TableRow className="cursor-pointer border-b-border/50" key={`${input.name}-${index}`}>
-                    <TableCell>{input.name}</TableCell>
+            {workflowInputs?.map((input, index) => {
+                const testValue = workflowTestConfigurationInputs?.[input.name]?.toString();
 
-                    <TableCell>{input.label}</TableCell>
+                return (
+                    <TableRow className="cursor-pointer border-b-border/50" key={`${input.name}-${index}`}>
+                        <TableCell className="truncate" title={input.name}>
+                            {input.name}
+                        </TableCell>
 
-                    <TableCell>{input.type}</TableCell>
+                        <TableCell className="truncate" title={input.label}>
+                            {input.label}
+                        </TableCell>
 
-                    <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
+                        <TableCell className="truncate" title={input.type}>
+                            {input.type}
+                        </TableCell>
 
-                    <TableCell>
-                        {workflowTestConfigurationInputs
-                            ? workflowTestConfigurationInputs[workflowInputs![index]?.name]?.toString()
-                            : undefined}
-                    </TableCell>
+                        <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
 
-                    <TableCell className="flex justify-end">
-                        <Button icon={<EditIcon />} onClick={() => openEditDialog(index)} size="icon" variant="ghost" />
+                        <TableCell className="truncate" title={testValue}>
+                            {testValue}
+                        </TableCell>
 
-                        <Button
-                            icon={<Trash2Icon className="text-destructive" />}
-                            onClick={() => openDeleteDialog(index)}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TableCell>
-                </TableRow>
-            ))}
+                        <TableCell className="flex justify-end">
+                            <Button
+                                icon={<EditIcon />}
+                                onClick={() => openEditDialog(index)}
+                                size="icon"
+                                variant="ghost"
+                            />
+
+                            <Button
+                                icon={<Trash2Icon className="text-destructive" />}
+                                onClick={() => openDeleteDialog(index)}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TableCell>
+                    </TableRow>
+                );
+            })}
         </TableBody>
     </Table>
 );
