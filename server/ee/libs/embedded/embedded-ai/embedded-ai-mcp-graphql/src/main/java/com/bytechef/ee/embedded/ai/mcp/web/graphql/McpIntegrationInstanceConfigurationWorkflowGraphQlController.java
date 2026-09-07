@@ -166,18 +166,19 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
             Property.toProperty(
                 string(TOOL_NAME)
                     .label("Name")
-                    .description("The tool name exposed to the AI model.")
+                    .description("The tool name exposed to the AI model. Leave empty to use the workflow name.")
                     .expressionEnabled(false)
-                    .required(true)));
+                    .required(false)));
 
         properties.add(
             Property.toProperty(
                 string(TOOL_DESCRIPTION)
                     .label("Description")
-                    .description("The tool description exposed to the AI model.")
+                    .description(
+                        "The tool description exposed to the AI model. Leave empty to use the workflow description.")
                     .controlType(ControlType.TEXT_AREA)
                     .expressionEnabled(false)
-                    .required(true)));
+                    .required(false)));
 
         String inputSchema = MapUtils.getString(trigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
 

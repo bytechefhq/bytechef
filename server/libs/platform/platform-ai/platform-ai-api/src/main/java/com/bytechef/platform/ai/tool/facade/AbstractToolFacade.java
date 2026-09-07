@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
@@ -31,6 +32,8 @@ import org.jspecify.annotations.Nullable;
  * @author Matija Petanjek
  */
 public abstract class AbstractToolFacade {
+
+    private static final Pattern NON_TOOL_NAME_CHARACTERS = Pattern.compile("[^a-zA-Z0-9_-]+");
 
     private final Evaluator evaluator;
 
@@ -91,6 +94,137 @@ public abstract class AbstractToolFacade {
         }
 
         return new ArrayList<>(fromAiResultsByName.values());
+    }
+
+    protected static List<String> extractFromAiCallStrings(String expression) {
+        List<String> calls = new ArrayList<>();
+
+        String marker = "fromAi(";
+        int searchFrom = 0;
+
+        while (searchFrom < expression.length()) {
+            int callStart = expression.indexOf(marker, searchFrom);
+
+            if (callStart == -1) {
+                break;
+            }
+
+            int parenStart = callStart + marker.length() - 1;
+            int depth = 1;
+            boolean inSingleQuote = false;
+            int position = parenStart + 1;
+
+            while (position < expression.length() && depth > 0) {
+                char character = expression.charAt(position);
+
+                if (inSingleQuote) {
+                    if (character == '\'') {
+                        if (position + 1 < expression.length() && expression.charAt(position + 1) == '\'') {
+                            position++;
+                        } else {
+                            inSingleQuote = false;
+                        }
+                    }
+                } else {
+                    if (character == '\'') {
+                        inSingleQuote = true;
+                    } else if (character == '(') {
+                        depth++;
+                    } else if (character == ')') {
+                        depth--;
+                    }
+                }
+
+                position++;
+            }
+
+            if (depth == 0) {
+                calls.add(expression.substring(callStart, position));
+            }
+
+            searchFrom = position;
+        }
+
+        return calls;
+    }
+
+    @Nullable
+    private FromAiResult evaluateSingleFromAi(String fromAiCall) {
+        Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", "=" + fromAiCall), Map.of());
+
+        if (evaluated.get("value") instanceof FromAiResult fromAiResult) {
+            return fromAiResult;
+        }
+
+        return null;
+    }
+
+    protected static @Nullable String getToolDescription(
+        Map<String, ?> parameters, @Nullable Map<String, ?> extensions) {
+
+        String toolDescription = null;
+
+        if (parameters != null) {
+            Object description = parameters.get(ToolConstants.TOOL_DESCRIPTION);
+
+            if (description instanceof String string && !string.isBlank()) {
+                toolDescription = string;
+            }
+        }
+
+        if (toolDescription == null && extensions != null) {
+            Object description = extensions.get(ToolConstants.TOOL_DESCRIPTION);
+
+            if (description instanceof String string && !string.isBlank()) {
+                toolDescription = string;
+            }
+        }
+
+        return toolDescription;
+    }
+
+    protected String getToolName(
+        String componentName, String clusterElementName, Map<String, ?> inputParameters) {
+
+        if (inputParameters != null) {
+            Object toolName = inputParameters.get(ToolConstants.TOOL_NAME);
+
+            if (toolName instanceof String string && !string.isBlank()) {
+                return string;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(componentName.toUpperCase());
+        sb.append("_");
+
+        sb.append(Character.toUpperCase(clusterElementName.charAt(0)));
+
+        for (int i = 1; i < clusterElementName.length(); i++) {
+            char c = clusterElementName.charAt(i);
+
+            if (Character.isUpperCase(c)) {
+                sb.append('_')
+                    .append(c);
+            } else {
+                sb.append(Character.toUpperCase(c));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    protected static @Nullable String getWorkflowToolName(@Nullable Map<String, ?> parameters, @Nullable String label) {
+        if (parameters != null) {
+            Object toolName = parameters.get(ToolConstants.TOOL_NAME);
+
+            if (toolName instanceof String string && !string.isBlank()) {
+                return string;
+            }
+        }
+
+        return toToolName(label);
     }
 
     protected Object resolveParameterValue(Object value, Map<String, Object> request) {
@@ -180,114 +314,6 @@ public abstract class AbstractToolFacade {
         return evaluated.get("value");
     }
 
-    protected static @Nullable String getToolDescription(
-        Map<String, ?> toolParameters, @Nullable Map<String, ?> toolExtensions) {
-
-        String toolDescription = null;
-
-        if (toolParameters != null) {
-            Object description = toolParameters.get(ToolConstants.TOOL_DESCRIPTION);
-
-            if (description instanceof String string && !string.isBlank()) {
-                toolDescription = string;
-            }
-        }
-
-        if (toolDescription == null && toolExtensions != null) {
-            Object description = toolExtensions.get(ToolConstants.TOOL_DESCRIPTION);
-
-            if (description instanceof String string && !string.isBlank()) {
-                toolDescription = string;
-            }
-        }
-
-        return toolDescription;
-    }
-
-    protected String getToolName(
-        String componentName, String clusterElementName, Map<String, ?> inputParameters) {
-
-        if (inputParameters != null) {
-            Object toolName = inputParameters.get(ToolConstants.TOOL_NAME);
-
-            if (toolName instanceof String string && !string.isBlank()) {
-                return string;
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(componentName.toUpperCase());
-        sb.append("_");
-
-        sb.append(Character.toUpperCase(clusterElementName.charAt(0)));
-
-        for (int i = 1; i < clusterElementName.length(); i++) {
-            char c = clusterElementName.charAt(i);
-
-            if (Character.isUpperCase(c)) {
-                sb.append('_')
-                    .append(c);
-            } else {
-                sb.append(Character.toUpperCase(c));
-            }
-        }
-
-        return sb.toString();
-    }
-
-    protected static List<String> extractFromAiCallStrings(String expression) {
-        List<String> calls = new ArrayList<>();
-
-        String marker = "fromAi(";
-        int searchFrom = 0;
-
-        while (searchFrom < expression.length()) {
-            int callStart = expression.indexOf(marker, searchFrom);
-
-            if (callStart == -1) {
-                break;
-            }
-
-            int parenStart = callStart + marker.length() - 1;
-            int depth = 1;
-            boolean inSingleQuote = false;
-            int position = parenStart + 1;
-
-            while (position < expression.length() && depth > 0) {
-                char character = expression.charAt(position);
-
-                if (inSingleQuote) {
-                    if (character == '\'') {
-                        if (position + 1 < expression.length() && expression.charAt(position + 1) == '\'') {
-                            position++;
-                        } else {
-                            inSingleQuote = false;
-                        }
-                    }
-                } else {
-                    if (character == '\'') {
-                        inSingleQuote = true;
-                    } else if (character == '(') {
-                        depth++;
-                    } else if (character == ')') {
-                        depth--;
-                    }
-                }
-
-                position++;
-            }
-
-            if (depth == 0) {
-                calls.add(expression.substring(callStart, position));
-            }
-
-            searchFrom = position;
-        }
-
-        return calls;
-    }
-
     protected static String toSpElLiteral(Object value) {
         if (value == null) {
             return "null";
@@ -302,14 +328,16 @@ public abstract class AbstractToolFacade {
         return "'" + string.replace("'", "''") + "'";
     }
 
-    @Nullable
-    private FromAiResult evaluateSingleFromAi(String fromAiCall) {
-        Map<String, Object> evaluated = evaluator.evaluate(Map.of("value", "=" + fromAiCall), Map.of());
-
-        if (evaluated.get("value") instanceof FromAiResult fromAiResult) {
-            return fromAiResult;
+    protected static @Nullable String toToolName(@Nullable String label) {
+        if (label == null) {
+            return null;
         }
 
-        return null;
+        String toolName = NON_TOOL_NAME_CHARACTERS.matcher(label.trim())
+            .replaceAll("_");
+
+        toolName = StringUtils.strip(toolName, "_");
+
+        return toolName.isBlank() ? null : toolName;
     }
 }

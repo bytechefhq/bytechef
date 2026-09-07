@@ -37,7 +37,6 @@ import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.ai.tool.FromAiResult;
-import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.ai.tool.facade.AbstractToolFacade;
 import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -176,8 +175,14 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             .inputType(Map.class)
             .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
-        if (clusterElementDefinition.getDescription() != null) {
-            builder.description(clusterElementDefinition.getDescription());
+        String toolDescription = getToolDescription(mcpTool.getParameters(), null);
+
+        if (toolDescription == null) {
+            toolDescription = clusterElementDefinition.getDescription();
+        }
+
+        if (toolDescription != null) {
+            builder.description(toolDescription);
         }
 
         return builder.build();
@@ -227,17 +232,20 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             Map<String, ?> workflowParameters = mcpIntegrationInstanceConfigurationWorkflow.getParameters();
 
-            String toolName = MapUtils.getString(workflowParameters, ToolConstants.TOOL_NAME);
+            String toolName = getWorkflowToolName(workflowParameters, null);
 
             if (toolName == null) {
-                toolName = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_NAME);
+                toolName = getWorkflowToolName(trigger.getParameters(), workflow.getLabel());
             }
 
             List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
 
             FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
                 .builder(
-                    Objects.requireNonNull(toolName),
+                    Objects.requireNonNull(
+                        toolName,
+                        () -> "Workflow %s exposes no tool name: configure one or give the workflow a label"
+                            .formatted(workflow.getId())),
                     getWorkflowToolCallbackFunction(
                         externalUserId, integration.getComponentName(), integration.getId(),
                         integrationInstanceConfigurationWorkflow,
@@ -246,10 +254,10 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
-            String description = MapUtils.getString(workflowParameters, ToolConstants.TOOL_DESCRIPTION);
+            String description = getToolDescription(workflowParameters, null);
 
             if (description == null) {
-                description = MapUtils.getString(trigger.getParameters(), ToolConstants.TOOL_DESCRIPTION);
+                description = workflow.getDescription();
             }
 
             if (description != null) {
