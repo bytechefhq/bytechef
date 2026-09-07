@@ -12,9 +12,21 @@ const useMcpComponentDialogComponentSelectionStep = (open: boolean) => {
     );
 
     const filteredComponents = components.filter((component) => {
-        const hasTools = component.clusterElementsCount?.TOOLS && component.clusterElementsCount.TOOLS > 0;
+        const clusterElementsCount = component.clusterElementsCount ?? {};
 
-        if (!hasTools) {
+        if (!clusterElementsCount.TOOLS) {
+            return false;
+        }
+
+        if (component.clusterRoot) {
+            return false;
+        }
+
+        const contributesNonToolElements = Object.entries(clusterElementsCount).some(
+            ([clusterElementType, count]) => clusterElementType !== 'TOOLS' && count > 0
+        );
+
+        if (contributesNonToolElements) {
             return false;
         }
 
