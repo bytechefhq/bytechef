@@ -35,16 +35,15 @@ import {
     ClusterElementDefinitionKeys,
     useGetClusterElementDefinitionQuery,
 } from '@/shared/queries/platform/clusterElementDefinitions.queries';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {
+    useGetComponentDefinitionQuery,
+    useGetComponentDefinitionVersionsQuery,
+} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {
     TriggerDefinitionKeys,
     useGetTriggerDefinitionQuery,
 } from '@/shared/queries/platform/triggerDefinitions.queries';
-import {
-    ClusterElementDynamicPropertyKeys,
-    WorkflowNodeDynamicPropertyKeys,
-} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
@@ -76,9 +75,11 @@ import {
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
+import changeComponentVersion from '../../utils/changeComponentVersion';
 import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
 import getParametersWithDefaultValues from '../../utils/getParametersWithDefaultValues';
+import invalidateOperationQueries from '../../utils/invalidateOperationQueries';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
@@ -188,6 +189,11 @@ export default function useWorkflowNodeDetailsPanel({
         !!currentNode && !currentNode.taskDispatcher
     );
 
+    const {data: componentDefinitionVersions} = useGetComponentDefinitionVersionsQuery(
+        {componentName: currentNode?.componentName || ''},
+        !!currentNode?.componentName && !currentNode.taskDispatcher
+    );
+
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
         {
             environmentId: currentEnvironmentId,
@@ -252,14 +258,14 @@ export default function useWorkflowNodeDetailsPanel({
     );
 
     const fetchClusterElementDefinition = useCallback(
-        async (operationName?: string) => {
+        async (operationName?: string, componentVersion?: number) => {
             const clusterElementDefinitionRequest: GetComponentClusterElementDefinitionRequest = {
                 clusterElementName: operationName ?? currentOperationName ?? currentNode?.operationName,
                 clusterElementType: currentNode?.clusterElementType
                     ? convertNameToSnakeCase(currentNode.clusterElementType)
                     : undefined,
                 componentName: currentComponentDefinition?.name as string,
-                componentVersion: currentComponentDefinition?.version as number,
+                componentVersion: componentVersion ?? (currentComponentDefinition?.version as number),
             };
 
             const clusterElementDefinition = await queryClient.fetchQuery({
@@ -290,11 +296,11 @@ export default function useWorkflowNodeDetailsPanel({
     );
 
     const fetchActionDefinition = useCallback(
-        async (operationName?: string) => {
+        async (operationName?: string, componentVersion?: number) => {
             const actionDefinitionRequest: GetComponentActionDefinitionRequest = {
                 actionName: operationName ?? currentOperationName ?? currentNode?.operationName,
                 componentName: currentComponentDefinition?.name as string,
-                componentVersion: currentComponentDefinition?.version as number,
+                componentVersion: componentVersion ?? (currentComponentDefinition?.version as number),
             };
 
             const actionDefinition = await queryClient.fetchQuery({
@@ -321,10 +327,10 @@ export default function useWorkflowNodeDetailsPanel({
     );
 
     const fetchTriggerDefinition = useCallback(
-        async (operationName?: string) => {
+        async (operationName?: string, componentVersion?: number) => {
             const triggerDefinitionRequest: GetComponentTriggerDefinitionRequest = {
                 componentName: currentComponentDefinition?.name as string,
-                componentVersion: currentComponentDefinition?.version as number,
+                componentVersion: componentVersion ?? (currentComponentDefinition?.version as number),
                 triggerName: operationName ?? currentOperationName ?? currentNode?.operationName,
             };
 
@@ -988,21 +994,7 @@ export default function useWorkflowNodeDetailsPanel({
                 workflowNodeName: currentNode!.name,
             });
 
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: ClusterElementDynamicPropertyKeys.clusterElementDynamicProperties,
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions,
-            });
+            invalidateOperationQueries(queryClient);
 
             const {componentName, description, label, workflowNodeName} = currentNode;
 
@@ -1092,6 +1084,43 @@ export default function useWorkflowNodeDetailsPanel({
             currentNodeIndex,
             setCurrentNode,
             setOperationChangeInProgress,
+        ]
+    );
+
+    const handleVersionSelectChange = useCallback(
+        async (newComponentVersionValue: string) => {
+            if (!currentComponentDefinition) {
+                return;
+            }
+
+            await changeComponentVersion({
+                currentComponentDefinition,
+                currentNodeIndex,
+                currentOperationName,
+                deleteWorkflowNodeTestOutputMutation,
+                environmentId: currentEnvironmentId,
+                fetchActionDefinition,
+                fetchClusterElementDefinition,
+                fetchTriggerDefinition,
+                newComponentVersion: Number(newComponentVersionValue),
+                queryClient,
+                setCurrentOperationName,
+                updateWorkflowMutation,
+                workflowId: workflow.id!,
+            });
+        },
+        [
+            currentComponentDefinition,
+            currentEnvironmentId,
+            currentNodeIndex,
+            currentOperationName,
+            deleteWorkflowNodeTestOutputMutation,
+            fetchActionDefinition,
+            fetchClusterElementDefinition,
+            fetchTriggerDefinition,
+            queryClient,
+            updateWorkflowMutation,
+            workflow.id,
         ]
     );
 
@@ -1454,6 +1483,7 @@ export default function useWorkflowNodeDetailsPanel({
         activeDisplayConditionsQuery,
         activeTab,
         awaitingFirstSave,
+        componentDefinitionVersions,
         currentActionDefinition,
         currentComponentDefinition,
         currentNode,
@@ -1471,6 +1501,7 @@ export default function useWorkflowNodeDetailsPanel({
         getNodeVersion,
         handleOperationSelectChange,
         handlePanelClose,
+        handleVersionSelectChange,
         nodeDefinition,
         nodeTabs,
         operationDataMissing,

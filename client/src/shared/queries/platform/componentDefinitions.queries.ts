@@ -2,7 +2,9 @@
 import {
     ComponentDefinition,
     ComponentDefinitionApi,
+    ComponentDefinitionBasic,
     GetComponentDefinitionRequest,
+    GetComponentDefinitionVersionsRequest,
     GetConnectionComponentDefinitionRequest,
 } from '@/shared/middleware/platform/configuration';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
@@ -21,6 +23,11 @@ export const ComponentDefinitionKeys = {
         ...ComponentDefinitionKeys.componentDefinitions,
         request.componentName,
         request.componentVersion,
+    ],
+    componentDefinitionVersions: (request: GetComponentDefinitionVersionsRequest) => [
+        ...ComponentDefinitionKeys.componentDefinitions,
+        request.componentName,
+        'versions',
     ],
     componentDefinitions: ['componentDefinitions'] as const,
     connectionComponentDefinition: (request: GetConnectionComponentDefinitionRequest) => [
@@ -50,5 +57,16 @@ export const useGetConnectionComponentDefinitionQuery = (
         queryKey: ComponentDefinitionKeys.connectionComponentDefinition(request),
         queryFn: () => new ComponentDefinitionApi().getConnectionComponentDefinition(request),
         enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
+    });
+
+export const useGetComponentDefinitionVersionsQuery = (
+    request: GetComponentDefinitionVersionsRequest,
+    enabled?: boolean
+) =>
+    useQuery<Array<ComponentDefinitionBasic>, Error>({
+        queryKey: ComponentDefinitionKeys.componentDefinitionVersions(request),
+        queryFn: () => new ComponentDefinitionApi().getComponentDefinitionVersions(request),
+        enabled: enabled ?? true,
         staleTime: DEFINITION_STALE_TIME,
     });

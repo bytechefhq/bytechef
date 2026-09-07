@@ -20,6 +20,7 @@ interface SaveTaskDispatcherSubtaskFieldChangeProps {
     currentNodeIndex: number;
     currentOperationProperties?: Array<PropertyAllType>;
     fieldUpdate: FieldUpdateType;
+    parameters?: NonNullable<NodeDataType['parameters']>;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -29,6 +30,7 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
         currentNodeIndex,
         currentOperationProperties,
         fieldUpdate,
+        parameters,
         updateWorkflowMutation,
     } = props;
 
@@ -214,9 +216,11 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
             case 'operation':
                 updatedTask = {
                     ...parentTaskDispatcherTask,
-                    parameters: getParametersWithDefaultValues({
-                        properties: currentOperationProperties as Array<PropertyAllType>,
-                    }),
+                    parameters:
+                        parameters ??
+                        getParametersWithDefaultValues({
+                            properties: currentOperationProperties as Array<PropertyAllType>,
+                        }),
                     type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
                 };
                 break;
@@ -257,9 +261,11 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
                     case 'operation':
                         return {
                             ...subtask,
-                            parameters: getParametersWithDefaultValues({
-                                properties: currentOperationProperties as Array<PropertyAllType>,
-                            }),
+                            parameters:
+                                parameters ??
+                                getParametersWithDefaultValues({
+                                    properties: currentOperationProperties as Array<PropertyAllType>,
+                                }),
                             type: `${currentNode.componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
                         };
                     case 'label':
@@ -308,10 +314,13 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
                     displayConditions: {},
                     metadata: {},
                     operationName: fieldUpdate.value as string,
-                    parameters: getParametersWithDefaultValues({
-                        properties: currentOperationProperties as Array<PropertyAllType>,
-                    }),
+                    parameters:
+                        parameters ??
+                        getParametersWithDefaultValues({
+                            properties: currentOperationProperties as Array<PropertyAllType>,
+                        }),
                     type: `${componentName}/v${currentComponentDefinition.version}/${fieldUpdate.value}`,
+                    version: currentComponentDefinition.version,
                 };
             } else if (fieldUpdate.field === 'maxRetries') {
                 commonUpdates.maxRetries = fieldUpdate.value as number;
