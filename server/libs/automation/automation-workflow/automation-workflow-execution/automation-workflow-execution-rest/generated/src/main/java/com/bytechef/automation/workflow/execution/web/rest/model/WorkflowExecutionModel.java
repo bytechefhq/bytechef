@@ -22,12 +22,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.769779+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-04T22:06:08.943670+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class WorkflowExecutionModel {
 
   private Long id;
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
+  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
@@ -44,9 +44,8 @@ public class WorkflowExecutionModel {
   /**
    * Constructor with only required parameters
    */
-  public WorkflowExecutionModel(Long id, com.bytechef.platform.workflow.execution.web.rest.model.JobModel job, com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project, com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment, com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
+  public WorkflowExecutionModel(Long id, com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project, com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment, com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow) {
     this.id = id;
-    this.job = job;
     this.project = project;
     this.projectDeployment = projectDeployment;
     this.workflow = workflow;
@@ -73,7 +72,7 @@ public class WorkflowExecutionModel {
     this.id = id;
   }
 
-  public WorkflowExecutionModel job(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
+  public WorkflowExecutionModel job(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
     return this;
   }
@@ -82,15 +81,15 @@ public class WorkflowExecutionModel {
    * Get job
    * @return job
    */
-  @NotNull @Valid 
-  @Schema(name = "job", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Valid 
+  @Schema(name = "job", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("job")
-  public com.bytechef.platform.workflow.execution.web.rest.model.JobModel getJob() {
+  public @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel getJob() {
     return job;
   }
 
   @JsonProperty("job")
-  public void setJob(com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
+  public void setJob(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job) {
     this.job = job;
   }
 
