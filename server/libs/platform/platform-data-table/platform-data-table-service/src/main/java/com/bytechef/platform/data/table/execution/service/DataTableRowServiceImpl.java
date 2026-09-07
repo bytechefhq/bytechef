@@ -32,6 +32,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -85,22 +86,36 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(physicalName);
 
-        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
+        List<String> columnNames = listColumns(physicalName).stream()
+            .map(ColumnSpec::name)
+            .filter(name -> !"id".equalsIgnoreCase(name))
+            .toList();
 
-        int count = jdbcTemplate.update(sql, ps -> ps.setLong(1, id));
+        String returningColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
+            .map(this::escapeIdentifier)
+            .collect(Collectors.joining(", ")));
 
-        if (count > 0) {
-            Map<String, Object> payload = new HashMap<>();
+        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ? RETURNING " +
+            returningColumns;
 
-            payload.put("id", id);
+        List<DataTableRow> deletedDataTableRows = jdbcTemplate.query(
+            sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
-            applicationEventPublisher.publishEvent(
-                new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, payload, environmentId));
-
-            return true;
+        if (deletedDataTableRows.isEmpty()) {
+            return false;
         }
 
-        return false;
+        DataTableRow deletedDataTableRow = deletedDataTableRows.getFirst();
+
+        Map<String, Object> payload = new HashMap<>();
+
+        payload.put("id", deletedDataTableRow.id());
+        payload.put("values", deletedDataTableRow.values());
+
+        applicationEventPublisher.publishEvent(
+            new DataTableWebhookEvent(baseName, DataTableWebhookType.RECORD_DELETED, payload, environmentId));
+
+        return true;
     }
 
     /**
@@ -131,16 +146,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         String sql = "SELECT " + selectColumns + " FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
 
-        List<DataTableRow> rows = jdbcTemplate.query(sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> {
-            long rowId = resultSet.getLong("id");
-            Map<String, Object> values = new HashMap<>();
-
-            for (String columnName : columnNames) {
-                values.put(columnName, resultSet.getObject(columnName));
-            }
-
-            return new DataTableRow(rowId, values);
-        });
+        List<DataTableRow> rows = jdbcTemplate.query(
+            sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
 
         return rows.isEmpty() ? null : rows.getFirst();
     }
@@ -405,16 +412,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return jdbcTemplate.query(sql, ps -> {
             ps.setInt(1, Math.max(0, limit));
             ps.setInt(2, Math.max(0, offset));
-        }, (rs, rowNum) -> {
-            long id = rs.getLong("id");
-            Map<String, Object> values = new HashMap<>();
-
-            for (String column : columnNames) {
-                values.put(column, rs.getObject(column));
-            }
-
-            return new DataTableRow(id, values);
-        });
+        }, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
     }
 
     /**
@@ -632,6 +630,16 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         return null;
+    }
+
+    private static DataTableRow toDataTableRow(ResultSet resultSet, List<String> columnNames) throws SQLException {
+        Map<String, Object> values = new HashMap<>();
+
+        for (String columnName : columnNames) {
+            values.put(columnName, resultSet.getObject(columnName));
+        }
+
+        return new DataTableRow(resultSet.getLong("id"), values);
     }
 
     private List<ColumnSpec> listColumns(String physicalName) {

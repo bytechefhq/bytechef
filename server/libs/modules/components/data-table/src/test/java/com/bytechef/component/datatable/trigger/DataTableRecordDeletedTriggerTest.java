@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-class DataTableRecordUpdatedTriggerTest extends AbstractDataTableTriggerTest {
+class DataTableRecordDeletedTriggerTest extends AbstractDataTableTriggerTest {
 
     @Test
     void testWebhookRequestFlattensRowPayload() throws Exception {
         assertEquals(
-            Map.of("id", 7, "phone", "385916039814", "staff_reply", "on my way"),
+            Map.of("id", 7, "status", "CLOSED"),
             webhookRequest(
-                DataTableRecordUpdatedTrigger.of(null, null, null),
-                rowContent("RECORD_UPDATED", Map.of("phone", "385916039814", "staff_reply", "on my way"))));
+                DataTableRecordDeletedTrigger.of(null, null, null),
+                rowContent("RECORD_DELETED", Map.of("status", "CLOSED"))));
     }
 
     @Test
     void testWebhookRequestWithoutPayloadReturnsContent() throws Exception {
-        Map<String, Object> content = Map.of("type", "RECORD_UPDATED", "table", "conversations");
+        Map<String, Object> content = Map.of("type", "RECORD_DELETED", "table", "conversations");
 
-        assertEquals(content, webhookRequest(DataTableRecordUpdatedTrigger.of(null, null, null), content));
+        assertEquals(content, webhookRequest(DataTableRecordDeletedTrigger.of(null, null, null), content));
     }
 }
