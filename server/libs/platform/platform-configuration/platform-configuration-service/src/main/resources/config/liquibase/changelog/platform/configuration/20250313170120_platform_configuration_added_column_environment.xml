@@ -9,7 +9,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20250313170120-5" author="Ivica Cardic" context="mono">
+    <changeSet id="20250313170120-5" author="Ivica Cardic" context="mono" dbms="postgresql">
         <sql>
             UPDATE workflow_test_configuration
             SET environment = c.environment
