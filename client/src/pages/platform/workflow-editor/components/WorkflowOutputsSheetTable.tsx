@@ -50,15 +50,15 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     return (
         <>
             {workflow.outputs && workflow.outputs.length > 0 ? (
-                <Table>
+                <Table className="table-fixed">
                     <TableHeader>
                         <TableRow className="border-b-border/50">
-                            <TableHead>Name</TableHead>
+                            <TableHead className="w-[25%] truncate">Name</TableHead>
 
-                            <TableHead>Value</TableHead>
+                            <TableHead className="w-[60%] truncate">Value</TableHead>
 
-                            <TableHead>
-                                <span className="sr-only">Edit</span>
+                            <TableHead className="w-[15%]">
+                                <span className="sr-only">Actions</span>
                             </TableHead>
                         </TableRow>
                     </TableHeader>
@@ -67,9 +67,11 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                         {workflow.outputs &&
                             workflow.outputs.map((output, index) => (
                                 <TableRow className="cursor-pointer border-b-border/50" key={output.name}>
-                                    <TableCell>{output.name}</TableCell>
+                                    <TableCell className="truncate" title={output.name}>
+                                        {output.name}
+                                    </TableCell>
 
-                                    <TableCell>
+                                    <TableCell className="overflow-hidden" title={output.value.toString()}>
                                         <WorkflowOutputValue
                                             componentDefinitions={componentDefinitions}
                                             value={output.value.toString()}
