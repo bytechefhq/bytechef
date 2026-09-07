@@ -23,14 +23,13 @@ import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * LogFileStorage implementation for writing logs in editor/test environments. Writes logs using FileStorageService in
- * JSONL format asynchronously using virtual threads.
+ * JSONL format. Writes are performed synchronously so that a log entry is readable as soon as
+ * {@link #storeLogEntry(long, long, LogEntry)} returns.
  *
  * @author Ivica Cardic
  */
@@ -40,7 +39,6 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
     private static final Logger log = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
 
-    private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
@@ -50,7 +48,7 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
     @Override
     public void storeLogEntry(long jobId, long taskExecutionId, LogEntry logEntry) {
-        asyncExecutor.submit(() -> appendLogEntry(jobId, logEntry));
+        appendLogEntry(jobId, logEntry);
     }
 
     @Override

@@ -16,13 +16,13 @@
 
 package com.bytechef.platform.component.context;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +35,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -75,7 +76,7 @@ class EditorLogFileStorageWriterTest {
 
         editorLogFileStorageWriter.storeLogEntry(jobId, 100L, logEntry);
 
-        verify(fileStorageService, timeout(5000)).storeFileContent(
+        verify(fileStorageService).storeFileContent(
             eq(EDITOR_LOG_DIR), eq(jobId + ".jsonl"), any(byte[].class), eq(false));
     }
 
@@ -98,7 +99,7 @@ class EditorLogFileStorageWriterTest {
 
         editorLogFileStorageWriter.storeLogEntry(jobId, 200L, logEntry);
 
-        verify(fileStorageService, timeout(5000)).storeFileContent(
+        verify(fileStorageService).storeFileContent(
             eq(EDITOR_LOG_DIR), eq(jobId + ".jsonl"), any(byte[].class), eq(false));
     }
 
@@ -118,9 +119,33 @@ class EditorLogFileStorageWriterTest {
 
         editorLogFileStorageWriter.storeLogEntry(jobId, 300L, logEntry);
 
-        verify(fileStorageService, timeout(5000)).fileExists(EDITOR_LOG_DIR, jobId + ".jsonl");
+        verify(fileStorageService).fileExists(EDITOR_LOG_DIR, jobId + ".jsonl");
         verify(fileStorageService, never()).storeFileContent(
             anyString(), anyString(), any(byte[].class), anyBoolean());
+    }
+
+    @Test
+    void testStoreLogEntryIsVisibleToAReaderOnceItReturns() {
+        long jobId = 8L;
+        LogEntry logEntry = LogEntry.builder()
+            .timestamp(Instant.now())
+            .level(LogEntry.Level.DEBUG)
+            .componentName("httpClient")
+            .taskExecutionId(800L)
+            .message("Readable right away")
+            .build();
+
+        when(fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl")).thenReturn(false);
+
+        editorLogFileStorageWriter.storeLogEntry(jobId, 800L, logEntry);
+
+        ArgumentCaptor<byte[]> contentArgumentCaptor = ArgumentCaptor.forClass(byte[].class);
+
+        verify(fileStorageService).storeFileContent(
+            eq(EDITOR_LOG_DIR), eq(jobId + ".jsonl"), contentArgumentCaptor.capture(), eq(false));
+
+        assertTrue(new String(contentArgumentCaptor.getValue(), StandardCharsets.UTF_8)
+            .contains("Readable right away"));
     }
 
     @Test
