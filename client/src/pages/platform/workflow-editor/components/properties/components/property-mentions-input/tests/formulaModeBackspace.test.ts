@@ -1,169 +1,164 @@
-import {describe, expect, it} from 'vitest';
+import {fireEvent} from '@testing-library/react';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Text from '@tiptap/extension-text';
+import {Editor} from '@tiptap/react';
+import {type Mock, afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {FormulaMode, FormulaModeOptionsI} from '../FormulaMode.extension';
 
 /**
- * Tests for the FormulaMode extension's Backspace handler and the
- * expressionEnabled gate that controls formula mode entry.
+ * The FormulaMode extension's contract, exercised against a real editor.
  *
- * Bug: When the user types `=` in a numerical input and presses Backspace
- * to delete it, the formula mode sometimes persists (the `=` icon stays in
- * the input). This happens because the FormulaMode extension's storage
- * resets to `isFormulaMode: false` when extensions recreate (e.g., when
- * `getComponentIcon` changes after a data fetch), and the sync useEffect
- * hasn't run yet when Backspace fires.
- *
- * Fix: `getIsFormulaMode` ref-based getter in the Backspace handler
- * always reads the current React state via a ref, bypassing stale
- * storage entirely. `onCreate()` also initializes storage from options
- * as a secondary safeguard.
+ * Emptying the field is what leaves formula mode. The handler reads the current mode through a getter rather
+ * than the extension's own storage, because storage resets to its default whenever the extensions are rebuilt
+ * (a component icon arriving from a fetch is enough) and the sync effect has not necessarily run by the time
+ * the key lands.
  */
 
-describe('formulaModeBackspace', () => {
-    describe('backspace exit condition', () => {
-        /**
-         * Replicates the Backspace handler logic from FormulaMode.extension.ts.
-         * Uses `getIsFormulaMode()` (ref-based getter) with `storage.isFormulaMode` as fallback.
-         * Uses `doc.textContent.trim() === ''` instead of `editor.isEmpty`
-         * for robustness against TipTap structural artifacts.
-         */
-        const shouldExitFormulaMode = (
-            textContent: string,
-            storageIsFormulaMode: boolean,
-            getIsFormulaMode?: () => boolean
-        ): boolean => {
-            const hasNoContent = textContent.trim() === '';
-            const currentFormulaMode = getIsFormulaMode?.() ?? storageIsFormulaMode;
+let element: HTMLElement;
+let editor: Editor;
 
-            return hasNoContent && currentFormulaMode;
-        };
+// The editor creates its view on a timer, so onCreate - and with it the storage seeding - has not run when
+// the constructor returns. That window is precisely why the handler reads the mode through a getter.
+const createEditor = async ({content = '', options}: {content?: string; options: Partial<FormulaModeOptionsI>}) => {
+    element = document.createElement('div');
 
-        it('should exit formula mode when editor is empty and getter says formula mode', () => {
-            expect(shouldExitFormulaMode('', false, () => true)).toBe(true);
+    document.body.appendChild(element);
+
+    editor = new Editor({
+        content,
+        element,
+        extensions: [Document, Paragraph, Text, FormulaMode.configure(options as FormulaModeOptionsI)],
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    return editor;
+};
+
+const pressKey = (key: string, keyCode: number) =>
+    fireEvent.keyDown(editor.view.dom, {charCode: keyCode, code: key, key, keyCode});
+
+describe('FormulaMode extension', () => {
+    let setIsFormulaMode: Mock<(value: boolean) => void>;
+    let saveNullValue: Mock<() => void>;
+
+    beforeEach(() => {
+        setIsFormulaMode = vi.fn();
+        saveNullValue = vi.fn();
+    });
+
+    afterEach(() => {
+        editor?.destroy();
+
+        element?.remove();
+    });
+
+    describe('leaving formula mode', () => {
+        it.each([
+            ['Backspace', 8],
+            ['Delete', 46],
+        ])('leaves formula mode when %s lands on an empty editor', async (key, keyCode) => {
+            await createEditor({options: {getIsFormulaMode: () => true, saveNullValue, setIsFormulaMode}});
+
+            pressKey(key, keyCode);
+
+            expect(setIsFormulaMode).toHaveBeenCalledWith(false);
+            expect(saveNullValue).toHaveBeenCalled();
+            expect(editor.storage.FormulaMode.isFormulaMode).toBe(false);
         });
 
-        it('should exit formula mode when editor is empty and storage says formula mode (no getter)', () => {
-            expect(shouldExitFormulaMode('', true)).toBe(true);
+        it('stays in formula mode while the editor still holds content', async () => {
+            await createEditor({
+                content: "<p>concat('a', 'b')</p>",
+                options: {getIsFormulaMode: () => true, saveNullValue, setIsFormulaMode},
+            });
+
+            pressKey('Backspace', 8);
+
+            expect(setIsFormulaMode).not.toHaveBeenCalled();
+            expect(saveNullValue).not.toHaveBeenCalled();
         });
 
-        it('should exit when editor has only whitespace', () => {
-            expect(shouldExitFormulaMode('  \n  ', false, () => true)).toBe(true);
+        it('leaves formula mode when only whitespace is left', async () => {
+            await createEditor({content: '<p>   </p>', options: {getIsFormulaMode: () => true, setIsFormulaMode}});
+
+            pressKey('Backspace', 8);
+
+            expect(setIsFormulaMode).toHaveBeenCalledWith(false);
         });
 
-        it('should NOT exit when editor has content', () => {
-            expect(shouldExitFormulaMode('3+3', true, () => true)).toBe(false);
+        it('does nothing when the field was not in formula mode', async () => {
+            await createEditor({options: {getIsFormulaMode: () => false, saveNullValue, setIsFormulaMode}});
+
+            pressKey('Backspace', 8);
+
+            expect(setIsFormulaMode).not.toHaveBeenCalled();
+            expect(saveNullValue).not.toHaveBeenCalled();
         });
 
-        it('should NOT exit when not in formula mode (getter returns false)', () => {
-            expect(shouldExitFormulaMode('', false, () => false)).toBe(false);
-        });
+        it('leaves formula mode without a save callback configured', async () => {
+            await createEditor({options: {getIsFormulaMode: () => true, setIsFormulaMode}});
 
-        it('should NOT exit when not in formula mode (no getter, storage false)', () => {
-            expect(shouldExitFormulaMode('', false)).toBe(false);
-        });
+            pressKey('Backspace', 8);
 
-        it('should NOT exit when editor has a mention text', () => {
-            expect(shouldExitFormulaMode('${trigger_1.output}', true, () => true)).toBe(false);
-        });
-
-        it('getter takes priority over stale storage', () => {
-            // Storage is false (stale after extension recreation), but getter reads current React state
-            expect(shouldExitFormulaMode('', false, () => true)).toBe(true);
-            // Storage is true (stale), but getter says formula mode was exited
-            expect(shouldExitFormulaMode('', true, () => false)).toBe(false);
+            expect(setIsFormulaMode).toHaveBeenCalledWith(false);
         });
     });
 
-    describe('onCreate storage initialization', () => {
-        /**
-         * Replicates the onCreate behavior that initializes storage from
-         * options to prevent the timing gap bug.
-         */
-        const initializeStorage = (initialFormulaMode?: boolean): boolean => {
-            return initialFormulaMode ?? false;
-        };
+    describe('reading the current mode', () => {
+        // Storage resets to its default when the extensions are rebuilt, so it cannot be the source of truth.
+        it('prefers the getter over stale storage', async () => {
+            await createEditor({options: {getIsFormulaMode: () => true, initialFormulaMode: false, setIsFormulaMode}});
 
-        it('should initialize storage to true when initialFormulaMode is true', () => {
-            expect(initializeStorage(true)).toBe(true);
+            expect(editor.storage.FormulaMode.isFormulaMode).toBe(false);
+
+            pressKey('Backspace', 8);
+
+            expect(setIsFormulaMode).toHaveBeenCalledWith(false);
         });
 
-        it('should initialize storage to false when initialFormulaMode is false', () => {
-            expect(initializeStorage(false)).toBe(false);
+        it('does not exit on stale storage when the getter says the field left formula mode', async () => {
+            await createEditor({options: {getIsFormulaMode: () => false, initialFormulaMode: true, setIsFormulaMode}});
+
+            expect(editor.storage.FormulaMode.isFormulaMode).toBe(true);
+
+            pressKey('Backspace', 8);
+
+            expect(setIsFormulaMode).not.toHaveBeenCalled();
         });
 
-        it('should initialize storage to false when initialFormulaMode is undefined', () => {
-            expect(initializeStorage(undefined)).toBe(false);
-        });
-    });
+        it('falls back to storage without a getter', async () => {
+            await createEditor({options: {initialFormulaMode: true, setIsFormulaMode}});
 
-    describe('timing gap scenario', () => {
-        /**
-         * Demonstrates why onCreate is needed:
-         * When extensions recreate, storage resets to default (false).
-         * Without onCreate, backspace check fails even though React state
-         * says formula mode is active.
-         */
-        it('without onCreate: storage resets to false after extension recreation', () => {
-            const defaultStorage = {isFormulaMode: false};
-            const reactStateIsFormulaMode = true;
+            pressKey('Backspace', 8);
 
-            // Extension recreated — storage uses default
-            const storageAfterRecreation = {...defaultStorage};
-
-            // Backspace fires BEFORE sync useEffect
-            const wouldExit = storageAfterRecreation.isFormulaMode && true;
-
-            expect(wouldExit).toBe(false); // BUG: doesn't exit
-            expect(reactStateIsFormulaMode).toBe(true); // React says we should be in formula mode
-        });
-
-        it('with onCreate: storage initializes from options after extension recreation', () => {
-            const reactStateIsFormulaMode = true;
-
-            // Extension recreated — onCreate sets storage from options
-            const storageAfterRecreation = {isFormulaMode: reactStateIsFormulaMode};
-
-            // Backspace fires BEFORE sync useEffect — still works
-            const wouldExit = storageAfterRecreation.isFormulaMode && true;
-
-            expect(wouldExit).toBe(true); // FIXED: exits correctly
+            expect(setIsFormulaMode).toHaveBeenCalledWith(false);
         });
     });
 
-    describe('value-based formula mode re-entry race condition', () => {
-        /**
-         * Root cause of the persistent "can't delete =" bug:
-         *
-         * Old sync useEffect checked `value.startsWith('=')` and called
-         * `setIsFormulaMode(true)` on every render. When Backspace exited
-         * formula mode, the async saveNullValue hadn't updated the value
-         * prop yet, so the effect immediately re-enabled formula mode.
-         *
-         * Fix: The sync useEffect should only sync the current isFormulaMode
-         * state to editor storage — it should NOT derive formula mode from
-         * the value prop. Formula mode entry is handled elsewhere.
-         */
-        it('old sync effect re-enables formula mode when value still starts with =', () => {
-            const value = '='; // Stale value, saveNullValue hasn't completed
+    describe('storage', () => {
+        it.each([
+            [true, true],
+            [false, false],
+            [undefined, false],
+        ])('initializes from initialFormulaMode %s', async (initialFormulaMode, expected) => {
+            await createEditor({options: {initialFormulaMode, setIsFormulaMode}});
 
-            // Backspace handler sets isFormulaMode to false (simulates state after handler)
-            const isFormulaMode = false;
-
-            // Old sync effect checks value — BUG: re-enables formula mode
-            const oldEffectReEnables = typeof value === 'string' && value.startsWith('=') && isFormulaMode === false;
-
-            expect(oldEffectReEnables).toBe(true); // condition was true, would call setIsFormulaMode(true)
+            expect(editor.storage.FormulaMode.isFormulaMode).toBe(expected);
         });
 
-        it('new sync effect only syncs current state without checking value', () => {
-            const value = '='; // Stale value
+        it('follows the toggleFormulaMode command', async () => {
+            await createEditor({options: {setIsFormulaMode}});
 
-            // Backspace handler sets isFormulaMode to false (simulates state after handler)
-            const isFormulaMode = false;
+            editor.commands.toggleFormulaMode(true);
 
-            // New sync effect only syncs isFormulaMode to storage
-            const storageIsFormulaMode = isFormulaMode;
+            expect(editor.storage.FormulaMode.isFormulaMode).toBe(true);
 
-            expect(storageIsFormulaMode).toBe(false); // Stays false, no re-entry
-            expect(value).toBe('='); // Value is stale but doesn't matter
+            editor.commands.toggleFormulaMode(false);
+
+            expect(editor.storage.FormulaMode.isFormulaMode).toBe(false);
         });
     });
 });

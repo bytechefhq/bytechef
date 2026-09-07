@@ -1,5 +1,5 @@
 import {ComponentOperationType, useComponentPropertyDisplayConditionsQuery} from '@/shared/middleware/graphql';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 interface UseFormDisplayConditionsPropsI {
     componentName?: string;
@@ -8,6 +8,11 @@ interface UseFormDisplayConditionsPropsI {
     operationName?: string;
     operationType?: ComponentOperationType;
     parameters: Record<string, unknown>;
+}
+
+interface UseFormDisplayConditionsReturnI {
+    displayConditions: Record<string, boolean> | undefined;
+    isEvaluating: boolean;
 }
 
 const DEBOUNCE_MS = 300;
@@ -19,8 +24,10 @@ const useFormDisplayConditions = ({
     operationName,
     operationType,
     parameters,
-}: UseFormDisplayConditionsPropsI): Record<string, boolean> | undefined => {
+}: UseFormDisplayConditionsPropsI): UseFormDisplayConditionsReturnI => {
     const [debouncedParameters, setDebouncedParameters] = useState(parameters);
+
+    const lastDisplayConditionsRef = useRef<Record<string, boolean> | undefined>(undefined);
 
     const serializedParameters = JSON.stringify(parameters);
 
@@ -49,7 +56,16 @@ const useFormDisplayConditions = ({
         return () => clearTimeout(timeout);
     }, [serializedParameters]);
 
-    return data?.componentPropertyDisplayConditions as Record<string, boolean> | undefined;
+    const displayConditions = data?.componentPropertyDisplayConditions as Record<string, boolean> | undefined;
+
+    if (displayConditions) {
+        lastDisplayConditionsRef.current = displayConditions;
+    }
+
+    return {
+        displayConditions: displayConditions ?? lastDisplayConditionsRef.current,
+        isEvaluating: queryEnabled && lastDisplayConditionsRef.current === undefined,
+    };
 };
 
 export default useFormDisplayConditions;

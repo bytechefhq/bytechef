@@ -1,5 +1,6 @@
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
+import getInitialControlledDynamicMode from '@/pages/platform/workflow-editor/components/properties/getInitialControlledDynamicMode';
 import {
     INPUT_PROPERTY_CONTROL_TYPES,
     ParameterValueContextI,
@@ -51,32 +52,14 @@ import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
 import {getTask} from '../../../utils/getTask';
-
-function getInitialControlledDynamicMode(
-    control: Control<FieldValues, FieldValues> | undefined,
-    controlPath: string,
-    propertyName: string | undefined
-): boolean {
-    if (!control?._formValues || !propertyName) {
-        return false;
-    }
-
-    const fieldPath = controlPath ? `${controlPath}.${propertyName}` : propertyName;
-    const fieldValue = fieldPath
-        .split('.')
-        .reduce<unknown>(
-            (currentObject, key) => (currentObject as Record<string, unknown>)?.[key],
-            control._formValues
-        );
-
-    return typeof fieldValue === 'string' && fieldValue.startsWith('=');
-}
+import {computeFromAiToggle} from './fromAiToggle';
 
 type UsePropertyReturnType = {
     calculatedPath: string | undefined;
     controlledBlurError: string | undefined;
     controlledDynamicMode: boolean;
     controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
+    controlledExpressionExitRef: RefObject<boolean>;
     controlledFromAi: boolean | undefined;
     controlType?: ControlType;
     currentNode: NodeDataType | undefined;
@@ -198,11 +181,18 @@ export const useProperty = ({
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
     const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
     const [controlledDynamicMode, setControlledDynamicMode] = useState(() =>
-        getInitialControlledDynamicMode(control, controlPath, property.name?.replace(/\s/g, '_'))
+        getInitialControlledDynamicMode({
+            control,
+            controlPath,
+            propertyName: property.name?.replace(/\s/g, '_'),
+            propertyType: property.type,
+            toolsMode,
+        })
     );
     const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
     const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
+    const controlledExpressionExitRef = useRef(false);
     const editorRef = useRef<Editor>(null!);
 
     const inputRef = useRef<HTMLInputElement>(null!);
@@ -704,11 +694,18 @@ export const useProperty = ({
         (fromAi: boolean, fieldOnChange: (value: string) => void) => {
             setControlledFromAi(fromAi);
 
-            const value = fromAi ? fromAiExpression : '';
+            const {savePayload, value} = computeFromAiToggle({
+                custom,
+                fromAi,
+                fromAiExpression,
+                hasPath: !!path,
+                hasWorkflowId: !!workflow.id,
+            });
 
             fieldOnChange(value);
 
             if (
+                !savePayload ||
                 !path ||
                 !workflow.id ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
@@ -717,13 +714,11 @@ export const useProperty = ({
             }
 
             saveProperty({
-                fromAi,
-                includeInMetadata: custom || fromAi,
+                ...savePayload,
                 path,
                 type,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
-                value,
                 workflowId: workflow.id,
             });
         },
@@ -957,6 +952,10 @@ export const useProperty = ({
             type: 'inputTypeSwitched',
         });
 
+        if (!switchingToDynamic) {
+            setIsFormulaMode(false);
+        }
+
         if (mentionInput) {
             setTimeout(() => {
                 if (inputRef.current) {
@@ -1175,42 +1174,55 @@ export const useProperty = ({
 
             setControlledFromAi(fromAi);
 
-            let value = propertyParameterValue;
+            const {savePayload, value} = computeFromAiToggle({
+                custom,
+                fromAi,
+                fromAiExpression,
+                hasPath: !!path,
+                hasWorkflowId: !!workflow.id,
+            });
+
+            dispatchValueAction({
+                context: parameterValueContextRef.current,
+                syncDisplayValues: false,
+                type: 'parameterValueResolved',
+                value,
+            });
+
+            const editorContent = value.startsWith('=') ? value.substring(1) : value;
 
             if (fromAi) {
-                if (editorRef.current) {
-                    editorRef.current.commands.setContent(fromAiExpression);
-                    editorRef.current.setEditable(false);
-
-                    value = fromAiExpression;
-                }
+                editorRef.current?.commands.setContent(value);
+                editorRef.current?.setEditable(false);
             } else {
-                if (editorRef.current) {
-                    editorRef.current.setEditable(true);
+                // "Customize AI generation": reveal the =fromAi(...) expression as an editable formula.
+                // Raw setter (not the setIsFormulaMode wrapper, declared below) to avoid a TDZ reference.
+                setIsFormulaModeInternal(true);
 
-                    editorRef.current.commands.focus();
+                editorRef.current?.commands.setContent(editorContent);
+                editorRef.current?.setEditable(true);
+                editorRef.current?.commands.focus();
 
-                    setFocusedInput(editorRef.current);
-                }
+                setFocusedInput(editorRef.current);
             }
 
-            saveProperty({
-                fromAi,
-                includeInMetadata: custom || fromAi,
-                path,
-                type,
-                updateClusterElementParameterMutation,
-                updateWorkflowNodeParameterMutation,
-                value,
-                workflowId: workflow.id,
-            });
+            if (savePayload) {
+                saveProperty({
+                    ...savePayload,
+                    path,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    workflowId: workflow.id,
+                });
+            }
         },
         [
             custom,
             fromAiExpression,
             path,
-            propertyParameterValue,
             setFocusedInput,
+            setIsFormulaModeInternal,
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
@@ -1702,6 +1714,7 @@ export const useProperty = ({
         controlledBlurError,
         controlledDynamicMode,
         controlledDynamicOnChangeRef,
+        controlledExpressionExitRef,
         controlledFromAi,
         currentNode,
         defaultValue,
