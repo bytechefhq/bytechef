@@ -34,6 +34,11 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.util.Locale;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -55,6 +60,9 @@ class ServerApplicationIntTest {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Test
     void testContextLoads() {
@@ -84,6 +92,31 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseFacade.class)).isEmpty();
+    }
+
+    @Test
+    void testSpringBatchTablesAreCreated() throws Exception {
+        try (Connection connection = dataSource.getConnection()) {
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+            assertThat(tableExists(databaseMetaData, "batch_job_instance")).isTrue();
+            assertThat(tableExists(databaseMetaData, "batch_job_execution")).isTrue();
+            assertThat(tableExists(databaseMetaData, "batch_step_execution")).isTrue();
+        }
+    }
+
+    private static boolean tableExists(DatabaseMetaData databaseMetaData, String tableName) throws Exception {
+        try (ResultSet resultSet = databaseMetaData.getTables(null, null, tableName, null)) {
+            if (resultSet.next()) {
+                return true;
+            }
+        }
+
+        try (ResultSet resultSet = databaseMetaData.getTables(
+            null, null, tableName.toUpperCase(Locale.ROOT), null)) {
+
+            return resultSet.next();
+        }
     }
 
     @TestConfiguration

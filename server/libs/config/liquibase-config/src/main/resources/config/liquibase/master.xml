@@ -7,6 +7,9 @@
     <property name="uuid_type" value="uuid" dbms="h2"/>
     <property name="uuid_type" value="uuid" dbms="postgresql"/>
 
+    <property name="batch_changelog_path" value="classpath:config/liquibase/changelog/batch_h2/" dbms="h2"/>
+    <property name="batch_changelog_path" value="classpath:config/liquibase/changelog/batch/" dbms="postgresql"/>
+
     <!-- core -->
     <includeAll path="classpath:config/liquibase/changelog/core/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
 
@@ -52,7 +55,7 @@
     <includeAll path="classpath:config/liquibase/changelog/audit/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or connection or multitenant" />
 
     <!-- spring batch -->
-    <includeAll path="classpath:config/liquibase/changelog/batch/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or batch" />
+    <includeAll path="${batch_changelog_path}" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or batch" />
 
     <!-- quartz -->
     <includeAll path="classpath:config/liquibase/changelog/quartz/" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or scheduler" />
