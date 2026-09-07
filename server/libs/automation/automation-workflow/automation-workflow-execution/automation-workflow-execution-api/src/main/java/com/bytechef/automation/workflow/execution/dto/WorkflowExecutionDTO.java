@@ -22,12 +22,17 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, Project project, ProjectDeployment projectDeployment, JobDTO job, Workflow workflow,
-    TriggerExecutionDTO triggerExecution) {
+    long id, Project project, ProjectDeployment projectDeployment, @Nullable JobDTO job, Workflow workflow,
+    @Nullable TriggerExecutionDTO triggerExecution) {
+
+    public boolean isTriggerOnly() {
+        return job == null;
+    }
 }
