@@ -220,9 +220,15 @@ The Context Store sync engine writes records to Postgres by default (the same da
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_DATABASE` | Set to `h2` to run on an embedded H2 file database under `~/.bytechef`, with no PostgreSQL server. Evaluation and local development only; leave unset for PostgreSQL. | - |
 | `BYTECHEF_DATASOURCE_URL` | Database URL | - |
 | `BYTECHEF_DATASOURCE_USERNAME` | Database username (sensitive) | - |
 | `BYTECHEF_DATASOURCE_PASSWORD` | Database password (sensitive) | - |
+
+`BYTECHEF_DATABASE=h2` supplies the datasource itself, so the three `BYTECHEF_DATASOURCE_*`
+variables are unnecessary alongside it. See
+[Local Docker](/platform/use-bytechef/self-hosted/installation/local-docker) for what H2 does and
+does not support.
 
 ## Data Storage Configuration
 
