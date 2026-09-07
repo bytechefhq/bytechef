@@ -17,6 +17,11 @@ import {WorkflowInputType} from '@/shared/types';
 import {RefObject, useEffect, useRef} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';
 
+const INPUT_NAME_PATTERN = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+const INPUT_NAME_MESSAGE =
+    'Name must start with a letter or underscore and contain only letters, digits and underscores';
+
 interface WorkflowInputsEditDialogProps {
     closeDialog: () => void;
     currentInputIndex?: number;
@@ -106,7 +111,10 @@ const WorkflowInputsEditDialog = ({
                                     <FormMessage />
                                 </FormItem>
                             )}
-                            rules={{required: true}}
+                            rules={{
+                                pattern: {message: INPUT_NAME_MESSAGE, value: INPUT_NAME_PATTERN},
+                                required: true,
+                            }}
                         />
 
                         <FormField

@@ -14,7 +14,17 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import WorkflowInputsEditDialog from './WorkflowInputsEditDialog';
 
-const EditDialogHarness = ({defaultValues}: {defaultValues: WorkflowInputType}) => {
+interface EditDialogHarnessProps {
+    currentInputIndex?: number;
+    defaultValues: WorkflowInputType;
+    saveWorkflowInput?: (input: WorkflowInputType) => void;
+}
+
+const EditDialogHarness = ({
+    currentInputIndex = 0,
+    defaultValues,
+    saveWorkflowInput = vi.fn(),
+}: EditDialogHarnessProps) => {
     const nameInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm<WorkflowInputType, unknown, WorkflowInputType>({defaultValues});
@@ -22,15 +32,23 @@ const EditDialogHarness = ({defaultValues}: {defaultValues: WorkflowInputType}) 
     return (
         <WorkflowInputsEditDialog
             closeDialog={vi.fn()}
-            currentInputIndex={0}
+            currentInputIndex={currentInputIndex}
             form={form}
             isEditDialogOpen={true}
             nameInputRef={nameInputRef}
             openEditDialog={vi.fn()}
-            saveWorkflowInput={vi.fn()}
+            saveWorkflowInput={saveWorkflowInput}
         />
     );
 };
+
+const newInputDefaultValues = (name: string): WorkflowInputType => ({
+    label: 'Label',
+    name,
+    required: false,
+    testValue: '',
+    type: 'string',
+});
 
 beforeEach(() => {
     windowResizeObserver();
@@ -83,5 +101,46 @@ describe('WorkflowInputsEditDialog', () => {
         fireEvent.click(screen.getByRole('option', {name: 'Number'}));
 
         await waitFor(() => expect(screen.getByLabelText('Test Value')).toHaveValue(null));
+    });
+
+    it.each(['my input', 'my-input', '1input', 'my.input', 'my@input'])(
+        'should reject the name %s, which the expression evaluator cannot resolve',
+        async (name) => {
+            const saveWorkflowInput = vi.fn();
+
+            render(
+                <EditDialogHarness
+                    currentInputIndex={-1}
+                    defaultValues={newInputDefaultValues(name)}
+                    saveWorkflowInput={saveWorkflowInput}
+                />
+            );
+
+            fireEvent.click(await screen.findByRole('button', {name: 'Save'}));
+
+            expect(
+                await screen.findByText(
+                    'Name must start with a letter or underscore and contain only letters, digits and underscores'
+                )
+            ).toBeInTheDocument();
+
+            expect(saveWorkflowInput).not.toHaveBeenCalled();
+        }
+    );
+
+    it.each(['myInput', 'my_input', '_leading', 'input1', 'INPUT_2'])('should accept the name %s', async (name) => {
+        const saveWorkflowInput = vi.fn();
+
+        render(
+            <EditDialogHarness
+                currentInputIndex={-1}
+                defaultValues={newInputDefaultValues(name)}
+                saveWorkflowInput={saveWorkflowInput}
+            />
+        );
+
+        fireEvent.click(await screen.findByRole('button', {name: 'Save'}));
+
+        await waitFor(() => expect(saveWorkflowInput).toHaveBeenCalled());
     });
 });
