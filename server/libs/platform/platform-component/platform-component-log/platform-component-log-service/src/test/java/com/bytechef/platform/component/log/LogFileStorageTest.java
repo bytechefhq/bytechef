@@ -18,10 +18,12 @@ package com.bytechef.platform.component.log;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +34,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -39,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,6 +88,34 @@ class LogFileStorageTest {
         verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("10.jsonl"), any(byte[].class), eq(false));
         verify(fileStorageService).storeFileContent(eq(JOB_DIR), eq("20.jsonl"), any(byte[].class), eq(false));
         verify(fileStorageService, never()).readFileToBytes(anyString(), any(FileEntry.class));
+    }
+
+    @Test
+    void testWritesRunOffThreadUnderTheCallersTenant() {
+        AtomicReference<String> writeTenantId = new AtomicReference<>();
+        AtomicReference<Thread> writeThread = new AtomicReference<>();
+
+        when(fileStorageService.fileExists(JOB_DIR, "10.jsonl")).thenReturn(false);
+        doAnswer(invocation -> {
+            writeTenantId.set(TenantContext.getCurrentTenantId());
+            writeThread.set(Thread.currentThread());
+
+            return null;
+        }).when(fileStorageService)
+            .storeFileContent(eq(JOB_DIR), eq("10.jsonl"), any(byte[].class), eq(false));
+
+        TenantContext.setCurrentTenantId("000001");
+
+        try {
+            logFileStorage.storeLogEntries(JOB_ID, 10L, List.of(logEntry(10L, "tenant one")));
+
+            logFileStorage.awaitPendingWrites(JOB_ID);
+        } finally {
+            TenantContext.resetCurrentTenantId();
+        }
+
+        assertNotSame(Thread.currentThread(), writeThread.get());
+        assertEquals("000001", writeTenantId.get());
     }
 
     @Test
