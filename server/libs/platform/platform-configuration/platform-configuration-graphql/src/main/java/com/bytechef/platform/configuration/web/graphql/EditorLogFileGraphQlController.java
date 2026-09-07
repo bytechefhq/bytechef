@@ -17,10 +17,10 @@
 package com.bytechef.platform.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.component.log.EditorLogFileStorage;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import com.bytechef.platform.component.log.web.graphql.LogFileGraphQlController.LogFilterInput;
 import com.bytechef.platform.component.log.web.graphql.LogFileGraphQlController.LogPage;
-import com.bytechef.platform.configuration.log.EditorLogFileStorageReader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Comparator;
@@ -30,26 +30,24 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for querying and managing component execution logs used in editor/test environments.
- *
  * @author Ivica Cardic
  */
 @Controller
 @ConditionalOnCoordinator
 public class EditorLogFileGraphQlController {
 
-    private final EditorLogFileStorageReader editorLogFileStorageReader;
+    private final EditorLogFileStorage editorLogFileStorage;
 
     @SuppressFBWarnings("EI")
-    public EditorLogFileGraphQlController(EditorLogFileStorageReader editorLogFileStorageReader) {
-        this.editorLogFileStorageReader = editorLogFileStorageReader;
+    public EditorLogFileGraphQlController(EditorLogFileStorage editorLogFileStorage) {
+        this.editorLogFileStorage = editorLogFileStorage;
     }
 
     @QueryMapping
     public LogPage editorJobFileLogs(
         @Argument long jobId, @Argument LogFilterInput filter, @Argument Integer page, @Argument Integer size) {
 
-        List<LogEntry> allEntries = editorLogFileStorageReader.readLogEntriesByJobId(jobId);
+        List<LogEntry> allEntries = editorLogFileStorage.readLogEntriesByJobId(jobId);
 
         List<LogEntry> filteredEntries = applyFilters(allEntries, filter);
 
@@ -75,12 +73,12 @@ public class EditorLogFileGraphQlController {
 
     @QueryMapping
     public List<LogEntry> editorTaskExecutionFileLogs(@Argument long jobId, @Argument long taskExecutionId) {
-        return editorLogFileStorageReader.readLogEntries(jobId, taskExecutionId);
+        return editorLogFileStorage.readLogEntries(jobId, taskExecutionId);
     }
 
     @QueryMapping
     public boolean editorJobFileLogsExist(@Argument long jobId) {
-        return editorLogFileStorageReader.logsExist(jobId);
+        return editorLogFileStorage.logsExist(jobId);
     }
 
     private List<LogEntry> applyFilters(List<LogEntry> entries, LogFilterInput filter) {

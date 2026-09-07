@@ -47,11 +47,18 @@ public class LogFileStorageImpl implements LogFileStorage {
 
     private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final FileStorageService fileStorageService;
+    private final String logFilesDirectory;
     private final Map<Long, CompletableFuture<Void>> pendingWrites = new ConcurrentHashMap<>();
 
     @SuppressFBWarnings("EI")
     public LogFileStorageImpl(FileStorageService fileStorageService) {
+        this(fileStorageService, LOG_FILES_DIR);
+    }
+
+    @SuppressFBWarnings("EI")
+    protected LogFileStorageImpl(FileStorageService fileStorageService, String logFilesDirectory) {
         this.fileStorageService = fileStorageService;
+        this.logFilesDirectory = logFilesDirectory;
     }
 
     @Override
@@ -92,7 +99,7 @@ public class LogFileStorageImpl implements LogFileStorage {
         List<LogEntry> logEntries = new ArrayList<>(
             readLogFile(getJobDirectory(jobId), getLogFilename(taskExecutionId)));
 
-        for (LogEntry legacyLogEntry : readLogFile(LOG_FILES_DIR, getLogFilename(jobId))) {
+        for (LogEntry legacyLogEntry : readLogFile(logFilesDirectory, getLogFilename(jobId))) {
             if (legacyLogEntry.taskExecutionId() == taskExecutionId) {
                 logEntries.add(legacyLogEntry);
             }
@@ -112,7 +119,7 @@ public class LogFileStorageImpl implements LogFileStorage {
             logEntries.addAll(readLogFile(jobDirectory, getBareFilename(fileEntry)));
         }
 
-        logEntries.addAll(readLogFile(LOG_FILES_DIR, getLogFilename(jobId)));
+        logEntries.addAll(readLogFile(logFilesDirectory, getLogFilename(jobId)));
 
         return logEntries;
     }
@@ -123,7 +130,7 @@ public class LogFileStorageImpl implements LogFileStorage {
 
         Set<FileEntry> taskLogFiles = listTaskLogFiles(getJobDirectory(jobId));
 
-        return !taskLogFiles.isEmpty() || fileStorageService.fileExists(LOG_FILES_DIR, getLogFilename(jobId));
+        return !taskLogFiles.isEmpty() || fileStorageService.fileExists(logFilesDirectory, getLogFilename(jobId));
     }
 
     @Override
@@ -136,7 +143,7 @@ public class LogFileStorageImpl implements LogFileStorage {
             deleteLogFile(jobDirectory, getBareFilename(fileEntry));
         }
 
-        deleteLogFile(LOG_FILES_DIR, getLogFilename(jobId));
+        deleteLogFile(logFilesDirectory, getLogFilename(jobId));
     }
 
     private void appendLogEntries(long jobId, long taskExecutionId, List<LogEntry> logEntries) {
@@ -196,8 +203,8 @@ public class LogFileStorageImpl implements LogFileStorage {
         return filename.startsWith("/") ? filename.substring(1) : filename;
     }
 
-    private static String getJobDirectory(long jobId) {
-        return LOG_FILES_DIR + "/" + jobId;
+    private String getJobDirectory(long jobId) {
+        return logFilesDirectory + "/" + jobId;
     }
 
     private static String getLogFilename(long id) {
@@ -233,8 +240,14 @@ public class LogFileStorageImpl implements LogFileStorage {
         String[] lines = content.split("\n");
 
         for (String line : lines) {
-            if (!line.isBlank()) {
+            if (line.isBlank()) {
+                continue;
+            }
+
+            try {
                 logEntries.add(JsonUtils.read(line, new TypeReference<>() {}));
+            } catch (Exception exception) {
+                log.warn("Skipping unreadable log line: {}", line, exception);
             }
         }
 
