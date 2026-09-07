@@ -30,8 +30,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import tools.jackson.core.type.TypeReference;
@@ -52,6 +56,7 @@ import tools.jackson.core.type.TypeReference;
 public class ConditionTaskUtils {
 
     private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+    private static final Pattern UNRESOLVED_ACCESSOR_PATTERN = Pattern.compile("\\$\\{[^}]*}");
     private static final Map<String, Map<String, String>> CONDITION_TEMPLATES = new HashMap<>();
 
     static {
@@ -141,10 +146,28 @@ public class ConditionTaskUtils {
 
         variables.forEach(evaluationContext::setVariable);
 
-        Boolean result = EXPRESSION_PARSER.parseExpression(expression)
-            .getValue(evaluationContext, Boolean.class);
+        Expression parsedExpression;
+
+        try {
+            parsedExpression = EXPRESSION_PARSER.parseExpression(expression);
+        } catch (ParseException parseException) {
+            throw new IllegalArgumentException(getParseErrorMessage(expression), parseException);
+        }
+
+        Boolean result = parsedExpression.getValue(evaluationContext, Boolean.class);
 
         return result != null && result;
+    }
+
+    private static String getParseErrorMessage(String expression) {
+        Matcher matcher = UNRESOLVED_ACCESSOR_PATTERN.matcher(expression);
+
+        if (matcher.find()) {
+            return "Condition expression contains the unresolved reference " + matcher.group() +
+                ", which the workflow context does not provide: " + expression;
+        }
+
+        return "Unparseable condition expression: " + expression;
     }
 
     private static List<String> getConditionExpressions(

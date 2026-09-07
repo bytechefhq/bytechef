@@ -16,6 +16,7 @@
 
 package com.bytechef.task.dispatcher.condition.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -94,6 +95,30 @@ public class ConditionTaskUtilsTest {
     public void testRawExpressionInstanceMethod() {
         assertTrue(ConditionTaskUtils.resolveCase(buildRawExpressionTask("'hello'.startsWith('he')")));
         assertFalse(ConditionTaskUtils.resolveCase(buildRawExpressionTask("'hello'.startsWith('xx')")));
+    }
+
+    @Test
+    public void testRawExpressionReportsUnresolvedReference() {
+        TaskExecution taskExecution = buildRawExpressionTask(
+            "${dataTable_1.staff_reply} != null && ${dataTable_1.staff_reply} != ''");
+
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class, () -> ConditionTaskUtils.resolveCase(taskExecution));
+
+        assertEquals(
+            "Condition expression contains the unresolved reference ${dataTable_1.staff_reply}, which the workflow " +
+                "context does not provide: ${dataTable_1.staff_reply} != null && ${dataTable_1.staff_reply} != ''",
+            illegalArgumentException.getMessage());
+    }
+
+    @Test
+    public void testRawExpressionReportsUnparseableExpression() {
+        TaskExecution taskExecution = buildRawExpressionTask("1 +");
+
+        IllegalArgumentException illegalArgumentException = assertThrows(
+            IllegalArgumentException.class, () -> ConditionTaskUtils.resolveCase(taskExecution));
+
+        assertEquals("Unparseable condition expression: 1 +", illegalArgumentException.getMessage());
     }
 
     @Test
