@@ -75,7 +75,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         super(
             builder.componentName, builder.componentVersion, builder.actionName, builder.componentConnection,
             builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
-            builder.tempFileStorage, builder.logFileStorageWriter);
+            builder.tempFileStorage, builder.logFileStorageWriter, true);
 
         this.actionName = builder.actionName;
         this.cacheManager = builder.cacheManager;

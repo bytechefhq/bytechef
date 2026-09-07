@@ -230,6 +230,40 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
     @Override
     @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_PERFORM")
+    public Object executeTool(
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection,
+        ActionContextAware actionContext) {
+
+        ClusterElementContext clusterElementContext = actionContext.toClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection);
+
+        return doExecuteTool(
+            componentName, componentVersion, clusterElementName, inputParameters, componentConnection,
+            clusterElementContext);
+    }
+
+    @Override
+    public Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections,
+        ActionContextAware actionContext) {
+
+        ComponentConnection firstConnection = componentConnections.isEmpty()
+            ? null : componentConnections.values()
+                .iterator()
+                .next();
+
+        ClusterElementContext clusterElementContext = actionContext.toClusterElementContext(
+            componentName, componentVersion, clusterElementName, firstConnection);
+
+        return doExecuteTool(
+            componentName, componentVersion, clusterElementName, inputParameters, extensions, componentConnections,
+            clusterElementContext);
+    }
+
+    @Override
+    @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_PERFORM")
     public Object executeApprovalChannel(
         @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
         Map<String, ?> inputParameters, String formUrl,

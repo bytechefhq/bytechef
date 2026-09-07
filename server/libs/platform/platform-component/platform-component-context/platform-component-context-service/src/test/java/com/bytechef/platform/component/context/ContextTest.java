@@ -57,7 +57,7 @@ class ContextTest {
         context = new ContextImpl(
             "httpClient", 1, "get", null, JOB_ID, TASK_EXECUTION_ID, true,
             new HttpClientExecutor(mock(ApplicationContext.class), tempFileStorage), tempFileStorage,
-            logFileStorageWriter);
+            logFileStorageWriter, true);
     }
 
     @Test
@@ -161,6 +161,36 @@ class ContextTest {
         context.flushLogEntries();
 
         verify(logFileStorageWriter, times(1)).storeLogEntries(eq(JOB_ID), eq(TASK_EXECUTION_ID), anyList());
+    }
+
+    @Test
+    void testAWriteThroughContextStoresEveryEntryAtOnceAndFlushingAddsNothing() {
+        TempFileStorage tempFileStorage = mock(TempFileStorage.class);
+
+        ContextImpl clusterElementContext = new ContextImpl(
+            "openai", 1, "model", null, JOB_ID, TASK_EXECUTION_ID, true,
+            new HttpClientExecutor(mock(ApplicationContext.class), tempFileStorage), tempFileStorage,
+            logFileStorageWriter, false);
+
+        clusterElementContext.log(log -> log.debug("prompt sent"));
+        clusterElementContext.log(log -> log.debug("completion received"));
+
+        ArgumentCaptor<List<LogEntry>> batchArgumentCaptor = batchCaptor();
+
+        verify(logFileStorageWriter, times(2)).storeLogEntries(
+            eq(JOB_ID), eq(TASK_EXECUTION_ID), batchArgumentCaptor.capture());
+
+        List<List<LogEntry>> batches = batchArgumentCaptor.getAllValues();
+
+        assertEquals(List.of("prompt sent"), messagesOf(batches.get(0)));
+        assertEquals(List.of("completion received"), messagesOf(batches.get(1)));
+        assertEquals("openai", batches.get(0)
+            .get(0)
+            .componentName());
+
+        clusterElementContext.flushLogEntries();
+
+        verify(logFileStorageWriter, times(2)).storeLogEntries(eq(JOB_ID), eq(TASK_EXECUTION_ID), anyList());
     }
 
     @Test

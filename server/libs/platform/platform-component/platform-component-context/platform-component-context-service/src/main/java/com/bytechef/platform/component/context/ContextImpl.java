@@ -83,7 +83,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
 
         this(
             componentName, componentVersion, componentOperationName, componentConnection, null, 0, editorEnvironment,
-            httpClientExecutor, tempFileStorage, null);
+            httpClientExecutor, tempFileStorage, null, false);
     }
 
     @SuppressFBWarnings("EI")
@@ -91,7 +91,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
         String componentName, int componentVersion, @Nullable String componentOperationName,
         @Nullable ComponentConnection componentConnection, @Nullable Long jobId, long taskExecutionId,
         boolean editorEnvironment, HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
-        @Nullable LogFileStorageWriter logFileStorageWriter) {
+        @Nullable LogFileStorageWriter logFileStorageWriter, boolean bufferLogEntries) {
 
         this.converter = new ConverterImpl();
         this.editorEnvironment = editorEnvironment;
@@ -101,7 +101,8 @@ class ContextImpl implements Context, LogEntryBufferAware {
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, componentConnection, this, httpClientExecutor);
         this.json = new JsonImpl();
-        this.log = new LogImpl(componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId);
+        this.log = new LogImpl(
+            componentName, componentOperationName, logFileStorageWriter, jobId, taskExecutionId, bufferLogEntries);
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
@@ -670,7 +671,7 @@ class ContextImpl implements Context, LogEntryBufferAware {
         private static final int MAX_BUFFERED_LOG_ENTRIES = 100;
 
         private final List<LogEntry> bufferedLogEntries = new ArrayList<>();
-        private boolean buffering = true;
+        private boolean buffering;
         private final String componentName;
         private final @Nullable String componentOperationName;
         private final @Nullable Long jobId;
@@ -681,8 +682,10 @@ class ContextImpl implements Context, LogEntryBufferAware {
 
         public LogImpl(
             String componentName, @Nullable String componentOperationName,
-            @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId) {
+            @Nullable LogFileStorageWriter logFileStorageWriter, @Nullable Long jobId, long taskExecutionId,
+            boolean buffering) {
 
+            this.buffering = buffering;
             this.componentName = componentName;
             this.componentOperationName = componentOperationName;
             this.jobId = jobId;
