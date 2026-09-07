@@ -16,6 +16,12 @@
 
 package com.bytechef.platform.scheduler;
 
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.CONNECTION_ID;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.ONE_TIME_TASK;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.POLLING_TRIGGER;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.SCHEDULE_TRIGGER;
+
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.scheduler.job.DynamicWebhookTriggerRefreshJob;
@@ -61,17 +67,17 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
     }
 
     public void cancelDynamicWebhookTriggerRefresh(String workflowExecutionId) {
-        deleteJob(workflowExecutionId, "DynamicWebhookTriggerRefresh");
+        deleteJob(workflowExecutionId, DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
     }
 
     @Override
     public void cancelScheduleTrigger(String workflowExecutionId) {
-        deleteJob(workflowExecutionId, "ScheduleTrigger");
+        deleteJob(workflowExecutionId, SCHEDULE_TRIGGER);
     }
 
     @Override
     public void cancelPollingTrigger(String workflowExecutionId) {
-        deleteJob(workflowExecutionId, "PollingTrigger");
+        deleteJob(workflowExecutionId, POLLING_TRIGGER);
     }
 
     @Override
@@ -80,13 +86,13 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         WorkflowExecutionId workflowExecutionId, Long connectionId) {
 
         JobDetail jobDetail = JobBuilder.newJob(DynamicWebhookTriggerRefreshJob.class)
-            .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger"))
+            .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH))
             .usingJobData("workflowExecutionId", workflowExecutionId.toString())
-            .usingJobData("connectionId", connectionId)
+            .usingJobData(CONNECTION_ID, connectionId)
             .build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
+            .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH))
             .startAt(Date.from(webhookExpirationDate))
             .build();
 
@@ -98,7 +104,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         String pattern, String zoneId, Map<String, Object> output, WorkflowExecutionId workflowExecutionId) {
 
         JobDetail jobDetail = JobBuilder.newJob(ScheduleTriggerJob.class)
-            .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger"))
+            .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), SCHEDULE_TRIGGER))
             .usingJobData("output", JsonUtils.write(output))
             .usingJobData("workflowExecutionId", workflowExecutionId.toString())
             .build();
@@ -107,7 +113,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
             .inTimeZone(TimeZone.getTimeZone(ZoneId.of(zoneId)));
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger"))
+            .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), SCHEDULE_TRIGGER))
             .withSchedule(cronScheduleBuilder)
             .startNow()
             .build();
@@ -118,12 +124,12 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
     @Override
     public void schedulePollingTrigger(WorkflowExecutionId workflowExecutionId) {
         JobDetail jobDetail = JobBuilder.newJob(PollingTriggerJob.class)
-            .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), "PollingTrigger"))
+            .withIdentity(JobKey.jobKey(workflowExecutionId.toString(), POLLING_TRIGGER))
             .usingJobData("workflowExecutionId", workflowExecutionId.toString())
             .build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), "PollingTrigger"))
+            .withIdentity(TriggerKey.triggerKey(workflowExecutionId.toString(), POLLING_TRIGGER))
             .withSchedule(
                 SimpleScheduleBuilder.repeatMinutelyForever(pollingTriggerCheckPeriod))
             .startNow()
@@ -137,7 +143,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         String jobIdStr = String.valueOf(jobId);
 
         JobBuilder jobBuilder = JobBuilder.newJob(OneTimeSchedulerJob.class)
-            .withIdentity(JobKey.jobKey(jobIdStr, "OneTimeTask"))
+            .withIdentity(JobKey.jobKey(jobIdStr, ONE_TIME_TASK))
             .usingJobData("jobId", jobId);
 
         if (output != null && !output.isEmpty()) {
@@ -147,32 +153,30 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
         JobDetail jobDetail = jobBuilder.build();
 
         Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(TriggerKey.triggerKey(jobIdStr, "OneTimeTask"))
+            .withIdentity(TriggerKey.triggerKey(jobIdStr, ONE_TIME_TASK))
             .startAt(Date.from(executeAt))
             .build();
 
         schedule(jobDetail, trigger);
     }
 
-    private void deleteJob(String workflowExecutionId, String pollingTrigger) {
+    private void deleteJob(String workflowExecutionId, String jobGroup) {
         try {
-            JobKey jobKey = JobKey.jobKey(workflowExecutionId, pollingTrigger);
+            JobKey jobKey = JobKey.jobKey(workflowExecutionId, jobGroup);
 
             if (scheduler.checkExists(jobKey) && scheduler.deleteJob(jobKey)) {
                 log.trace(
-                    "Trigger job removed for workflowExecutionId: {}, pollingTrigger: {}", workflowExecutionId,
-                    pollingTrigger);
+                    "Trigger job removed for workflowExecutionId: {}, jobGroup: {}", workflowExecutionId, jobGroup);
 
                 return;
             }
 
-            log.error(
-                "Trigger job not found for workflowExecutionId: {}, pollingTrigger: {}", workflowExecutionId,
-                pollingTrigger);
+            log.debug(
+                "Trigger job not found for workflowExecutionId: {}, jobGroup: {}", workflowExecutionId, jobGroup);
         } catch (SchedulerException e) {
             log.error(
-                "Unable to delete trigger job for workflowExecutionId: {}, pollingTrigger: {}", workflowExecutionId,
-                pollingTrigger);
+                "Unable to delete trigger job for workflowExecutionId: {}, jobGroup: {}", workflowExecutionId,
+                jobGroup, e);
         }
     }
 
@@ -186,7 +190,7 @@ public class QuartzTriggerScheduler implements TriggerScheduler {
 
             log.trace("Re-scheduled trigger job with key: {}", jobDetail.getKey());
         } catch (SchedulerException e) {
-            log.error("Unable to re-schedule trigger job with key: {}", jobDetail.getKey());
+            log.error("Unable to re-schedule trigger job with key: {}", jobDetail.getKey(), e);
         }
     }
 }

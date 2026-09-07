@@ -16,6 +16,10 @@
 
 package com.bytechef.platform.scheduler;
 
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.CONNECTION_ID;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+import static com.bytechef.platform.scheduler.constant.QuartzTriggerSchedulerConstants.SCHEDULE_TRIGGER;
+
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.scheduler.config.QuartzTriggerSchedulerTestConfiguration;
@@ -50,8 +54,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
 /**
- * Integration test for QuartzTriggerScheduler
- *
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
@@ -92,8 +94,8 @@ public class QuartzTriggerSchedulerIntTest {
             webhookExpirationDate, componentName, componentVersion, workflowExecutionId, connectionId);
 
         // Then
-        JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger");
-        TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId.toString(), "ScheduleTrigger");
+        JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
+        TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
 
         // Verify job was created
         Assertions.assertTrue(scheduler.checkExists(jobKey));
@@ -105,7 +107,7 @@ public class QuartzTriggerSchedulerIntTest {
         JobDataMap jobDataMap = jobDetail.getJobDataMap();
 
         Assertions.assertEquals(workflowExecutionId.toString(), jobDataMap.getString("workflowExecutionId"));
-        Assertions.assertEquals(connectionId, jobDataMap.getLong("connectionId"));
+        Assertions.assertEquals(connectionId, jobDataMap.get(CONNECTION_ID));
 
         // Verify trigger timing
         Trigger trigger = scheduler.getTrigger(triggerKey);
@@ -224,6 +226,64 @@ public class QuartzTriggerSchedulerIntTest {
     }
 
     @Test
+    public void testScheduleDynamicWebhookTriggerRefreshWithoutConnection() throws Exception {
+        // Given
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 321L, "test-webhook-workflow-without-connection", "testTrigger");
+        Instant webhookExpirationDate = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
+
+        // When
+        quartzTriggerScheduler.scheduleDynamicWebhookTriggerRefresh(
+            webhookExpirationDate, "testComponent", 1, workflowExecutionId, null);
+
+        // Then
+        JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
+
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+        Assertions.assertNotNull(jobDetail);
+
+        JobDataMap jobDataMap = jobDetail.getJobDataMap();
+
+        Assertions.assertEquals(workflowExecutionId.toString(), jobDataMap.getString("workflowExecutionId"));
+        Assertions.assertNull(jobDataMap.get(CONNECTION_ID));
+
+        // Clean up
+        scheduler.deleteJob(jobKey);
+    }
+
+    @Test
+    public void testScheduleDynamicWebhookTriggerRefreshDoesNotEvictScheduleTrigger() throws Exception {
+        // Given
+        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
+            PlatformType.AUTOMATION, 654L, "test-webhook-and-schedule-workflow", "testTrigger");
+        Instant webhookExpirationDate = LocalDateTime.now()
+            .plus(Duration.ofMinutes(5))
+            .toInstant(ZoneOffset.UTC);
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        quartzTriggerScheduler.scheduleScheduleTrigger(
+            "0 0 12 * * ?", zoneId.getId(), Map.of("test", "data"), workflowExecutionId);
+
+        // When
+        quartzTriggerScheduler.scheduleDynamicWebhookTriggerRefresh(
+            webhookExpirationDate, "testComponent", 1, workflowExecutionId, 456L);
+
+        // Then - the two paths use distinct groups, so neither evicts the other
+        JobKey scheduleTriggerJobKey = JobKey.jobKey(workflowExecutionId.toString(), SCHEDULE_TRIGGER);
+        JobKey refreshJobKey = JobKey.jobKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
+
+        Assertions.assertTrue(scheduler.checkExists(scheduleTriggerJobKey));
+        Assertions.assertTrue(scheduler.checkExists(refreshJobKey));
+
+        // Clean up
+        scheduler.deleteJob(scheduleTriggerJobKey);
+        scheduler.deleteJob(refreshJobKey);
+    }
+
+    @Test
     public void testCancelDynamicWebhookTriggerRefresh() throws Exception {
         // Given
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
@@ -236,24 +296,17 @@ public class QuartzTriggerSchedulerIntTest {
         quartzTriggerScheduler.scheduleDynamicWebhookTriggerRefresh(
             webhookExpirationDate, "testComponent", 1, workflowExecutionId, 123L);
 
-        JobKey scheduledJobKey = JobKey.jobKey(workflowExecutionId.toString(), "ScheduleTrigger");
-        JobKey cancelJobKey = JobKey.jobKey(workflowExecutionId.toString(), "DynamicWebhookTriggerRefresh");
+        JobKey jobKey = JobKey.jobKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
+        TriggerKey triggerKey = TriggerKey.triggerKey(workflowExecutionId.toString(), DYNAMIC_WEBHOOK_TRIGGER_REFRESH);
 
-        // Verify job was created with "ScheduleTrigger" group
-        Assertions.assertTrue(scheduler.checkExists(scheduledJobKey));
-        // Verify the cancel job key doesn't exist (this reveals the bug in the existing code)
-        Assertions.assertFalse(scheduler.checkExists(cancelJobKey));
+        Assertions.assertTrue(scheduler.checkExists(jobKey));
 
-        // When - This will try to cancel using "DynamicWebhookTriggerRefresh" group
+        // When
         quartzTriggerScheduler.cancelDynamicWebhookTriggerRefresh(workflowExecutionId.toString());
 
-        // Then - The scheduled job should still exist because the cancel used wrong group
-        // This test demonstrates the bug in the existing code
-        Assertions.assertTrue(scheduler.checkExists(scheduledJobKey));
-        Assertions.assertFalse(scheduler.checkExists(cancelJobKey));
-
-        // Clean up manually
-        scheduler.deleteJob(scheduledJobKey);
+        // Then
+        Assertions.assertFalse(scheduler.checkExists(jobKey));
+        Assertions.assertFalse(scheduler.checkExists(triggerKey));
     }
 
     @Test
