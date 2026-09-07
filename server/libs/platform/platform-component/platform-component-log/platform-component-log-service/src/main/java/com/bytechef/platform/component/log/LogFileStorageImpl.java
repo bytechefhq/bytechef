@@ -24,13 +24,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.jackson.core.type.TypeReference;
 
 /**
  * Persistent implementation of LogFileStorage that stores logs using FileStorageService. Uses JSONL (JSON Lines) format
- * for efficient appending. Writes are performed asynchronously using virtual threads.
+ * for efficient appending. Writes are performed synchronously so that a log entry is readable as soon as
+ * {@link #storeLogEntry(long, long, LogEntry)} returns.
  *
  * @author Ivica Cardic
  */
@@ -38,7 +39,8 @@ public class LogFileStorageImpl implements LogFileStorage {
 
     private static final String LOG_FILES_DIR = "logs/component_execution";
 
-    private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
+    private static final Logger log = LoggerFactory.getLogger(LogFileStorageImpl.class);
+
     private final FileStorageService fileStorageService;
 
     @SuppressFBWarnings("EI")
@@ -48,7 +50,7 @@ public class LogFileStorageImpl implements LogFileStorage {
 
     @Override
     public void storeLogEntry(long jobId, long taskExecutionId, LogEntry logEntry) {
-        asyncExecutor.submit(() -> appendLogEntry(jobId, logEntry));
+        appendLogEntry(jobId, logEntry);
     }
 
     @Override
@@ -93,22 +95,26 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     private synchronized void appendLogEntry(long jobId, LogEntry logEntry) {
-        String filename = jobId + ".jsonl";
-        byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
+        try {
+            String filename = jobId + ".jsonl";
+            byte[] logLineBytes = (JsonUtils.write(logEntry) + "\n").getBytes(StandardCharsets.UTF_8);
 
-        if (fileStorageService.fileExists(LOG_FILES_DIR, filename)) {
-            FileEntry fileEntry = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
+            if (fileStorageService.fileExists(LOG_FILES_DIR, filename)) {
+                FileEntry fileEntry = fileStorageService.getFileEntry(LOG_FILES_DIR, filename);
 
-            byte[] existingContent = fileStorageService.readFileToBytes(LOG_FILES_DIR, fileEntry);
+                byte[] existingContent = fileStorageService.readFileToBytes(LOG_FILES_DIR, fileEntry);
 
-            byte[] newContent = new byte[existingContent.length + logLineBytes.length];
+                byte[] newContent = new byte[existingContent.length + logLineBytes.length];
 
-            System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
-            System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
+                System.arraycopy(existingContent, 0, newContent, 0, existingContent.length);
+                System.arraycopy(logLineBytes, 0, newContent, existingContent.length, logLineBytes.length);
 
-            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, newContent, false);
-        } else {
-            fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLineBytes, false);
+                fileStorageService.storeFileContent(LOG_FILES_DIR, filename, newContent, false);
+            } else {
+                fileStorageService.storeFileContent(LOG_FILES_DIR, filename, logLineBytes, false);
+            }
+        } catch (Exception exception) {
+            log.error("Failed to append log entry for job {}", jobId, exception);
         }
     }
 
