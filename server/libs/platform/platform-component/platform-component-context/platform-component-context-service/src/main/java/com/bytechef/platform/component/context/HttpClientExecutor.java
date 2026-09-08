@@ -85,7 +85,7 @@ import tools.jackson.core.type.TypeReference;
  */
 class HttpClientExecutor {
 
-    static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(5);
+    private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(5);
 
     private final ApplicationContext applicationContext;
     private final TempFileStorage tempFileStorage;
@@ -210,10 +210,19 @@ class HttpClientExecutor {
         return builder.build();
     }
 
+    Duration defaultRequestTimeout() {
+        return DEFAULT_REQUEST_TIMEOUT;
+    }
+
     Duration resolveRequestTimeout(Configuration configuration) {
+        Duration defaultRequestTimeout = defaultRequestTimeout();
         Duration timeout = configuration.getTimeout();
 
-        return timeout == null ? DEFAULT_REQUEST_TIMEOUT : timeout;
+        if (timeout == null || timeout.compareTo(defaultRequestTimeout) < 0) {
+            return defaultRequestTimeout;
+        }
+
+        return timeout;
     }
 
     HttpRequest createHttpRequest(
