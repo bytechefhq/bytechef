@@ -155,8 +155,10 @@ vi.mock('@tanstack/react-query', async () => {
     };
 });
 
+const mockNavigate = vi.hoisted(() => vi.fn());
+
 vi.mock('react-router-dom', async () => ({
-    useNavigate: () => vi.fn(),
+    useNavigate: () => mockNavigate,
 }));
 
 // Helper to set default mocks per test scenario
@@ -444,5 +446,25 @@ describe('ProjectsLeftSidebar', () => {
         const menuItem = (await screen.findByText('Import n8n Workflow')).closest('[role="menuitem"]');
 
         expect(menuItem).not.toHaveAttribute('aria-disabled');
+    });
+
+    it('opens the template pages with absolute routes', () => {
+        setupQueries({selectedProjectId: 5});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+
+        const templateItems = screen
+            .getAllByRole('menuitem')
+            .filter((menuItem) => /From Template/.test(menuItem.textContent ?? ''));
+
+        expect(templateItems).toHaveLength(2);
+
+        fireEvent.click(templateItems[0]);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/templates');
+
+        fireEvent.click(templateItems[1]);
+
+        expect(mockNavigate).toHaveBeenCalledWith('/automation/projects/5/templates');
     });
 });

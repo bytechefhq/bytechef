@@ -193,7 +193,10 @@ const ProjectsLeftSidebar = ({
                                         From Scratch
                                     </DropdownMenuItem>
 
-                                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`templates`)}>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => navigate('/automation/projects/templates')}
+                                    >
                                         <LayoutTemplateIcon className="mr-2 size-4" />
                                         From Template
                                     </DropdownMenuItem>
@@ -247,7 +250,7 @@ const ProjectsLeftSidebar = ({
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem
                                 className="cursor-pointer"
-                                onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}
+                                onClick={() => navigate(`/automation/projects/${selectedProjectId}/templates`)}
                             >
                                 <LayoutTemplateIcon /> From Template
                             </DropdownMenuItem>
@@ -309,7 +312,7 @@ const ProjectsLeftSidebar = ({
                                     />
                                 ))
                             ) : (
-                                <span className="text-sm text-muted-foreground">No workflows found</span>
+                                <span className="w-full py-2 text-sm text-muted-foreground">No workflows found</span>
                             ))}
 
                         {selectedProjectId !== 0 && filteredWorkflowsList.length > 0 ? (
@@ -325,7 +328,7 @@ const ProjectsLeftSidebar = ({
                                 />
                             ))
                         ) : (
-                            <span className="text-sm text-muted-foreground">No workflows found</span>
+                            <span className="w-full py-2 text-sm text-muted-foreground">No workflows found</span>
                         )}
                     </ul>
                 )}

@@ -5,6 +5,7 @@ import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Dialog, DialogCloseButton, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import {TEMPLATE_SHARING_DOCUMENTATION_URL} from '@/shared/constants';
 import {
     useDeleteSharedWorkflowMutation,
     useExportSharedWorkflowMutation,
@@ -112,6 +113,8 @@ export function WorkflowShareDialog({
         }
     }, [sharedWorkflow, workflowUuid]);
 
+    const handleLearnMoreClick = () => window.open(TEMPLATE_SHARING_DOCUMENTATION_URL, '_blank', 'noopener,noreferrer');
+
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
             <DialogContent className="flex flex-col">
@@ -143,11 +146,16 @@ export function WorkflowShareDialog({
                                         time.
                                     </p>
 
-                                    <Button className="h-auto p-0" label="Learn more" variant="link" />
+                                    <Button
+                                        className="h-auto p-0"
+                                        label="Learn more"
+                                        onClick={handleLearnMoreClick}
+                                        variant="link"
+                                    />
                                 </div>
                             ) : shareState === 'exported' ? (
                                 <>
-                                    <div className="flex items-center justify-between pb-4 font-semibold text-primary">
+                                    <div className="flex w-full items-center justify-between pb-4 font-semibold text-primary">
                                         {sharedWorkflow?.projectVersion === projectVersion ? (
                                             <span className="text-sm font-medium text-primary">
                                                 This workflow has been exported
@@ -170,8 +178,8 @@ export function WorkflowShareDialog({
                                         </p>
                                     )}
 
-                                    <div className="flex items-center gap-2">
-                                        <Input className="text-primary" readOnly value={templateUrl!} />
+                                    <div className="flex w-full items-center gap-2">
+                                        <Input className="grow text-primary" readOnly value={templateUrl!} />
 
                                         {isCopied ? (
                                             <div className="flex items-center text-sm font-medium">
@@ -207,7 +215,12 @@ export function WorkflowShareDialog({
                                             the link.
                                         </p>
 
-                                        <Button className="h-auto p-0" label="Learn more" variant="link" />
+                                        <Button
+                                            className="h-auto p-0"
+                                            label="Learn more"
+                                            onClick={handleLearnMoreClick}
+                                            variant="link"
+                                        />
                                     </div>
                                 </div>
                             )}
@@ -270,7 +283,13 @@ export function WorkflowShareDialog({
                             share, and you may disable and re-enable them at any time.
                         </span>
 
-                        <Button className="h-auto p-0" label="Learn more" size="sm" variant="link" />
+                        <Button
+                            className="h-auto p-0"
+                            label="Learn more"
+                            onClick={handleLearnMoreClick}
+                            size="sm"
+                            variant="link"
+                        />
                     </p>
                 </div>
             </DialogContent>
