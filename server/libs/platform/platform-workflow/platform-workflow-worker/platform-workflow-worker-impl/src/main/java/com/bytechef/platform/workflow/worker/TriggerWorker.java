@@ -59,6 +59,13 @@ public class TriggerWorker {
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
+    /**
+     * Ceiling on the wait for the submitted runnable to signal completion. Cancellation can win before the runnable
+     * body is entered, in which case its {@code finally} never counts the latch down; without a bound the caller — a
+     * broker dispatch thread — would wait forever.
+     */
+    private static final long LATCH_TIME_OUT = 30 * 1000; // 30 seconds
+
     private final ApplicationEventPublisher eventPublisher;
     private final Map<WorkflowExecutionId, TriggerExecutionFuture<?>> triggerExecutions = new ConcurrentHashMap<>();
     private final TriggerFileStorage triggerFileStorage;
@@ -117,12 +124,18 @@ public class TriggerWorker {
         try {
             future.get(calculateTimeout(triggerExecution), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            future.cancel(true);
+
             handleException(triggerExecution, e);
         } catch (CancellationException e) {
             log.debug("Cancelled trigger: {}", triggerExecution.getWorkflowExecutionId());
         } finally {
             try {
-                latch.await();
+                if (!latch.await(LATCH_TIME_OUT, TimeUnit.MILLISECONDS)) {
+                    log.warn(
+                        "Trigger execution did not signal completion within {} ms: {}", LATCH_TIME_OUT,
+                        triggerExecution.getWorkflowExecutionId());
+                }
             } catch (InterruptedException e) {
                 handleException(triggerExecution, e);
             }
