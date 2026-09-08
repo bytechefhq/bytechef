@@ -206,7 +206,7 @@ spring:
     password: ${bytechef.datasource.password}
     hikari:
       connection-test-query: SELECT 1
-      maximum-pool-size: 20
+      maximum-pool-size: ${bytechef.datasource.maximum-pool-size}
       poolName: Hikari
   h2:
     console:
