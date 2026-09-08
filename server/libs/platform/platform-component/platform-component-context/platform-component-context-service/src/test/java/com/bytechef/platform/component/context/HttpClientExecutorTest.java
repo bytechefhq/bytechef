@@ -46,6 +46,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -3849,13 +3850,23 @@ public class HttpClientExecutorTest {
     class RequestTimeoutTests {
 
         @Test
-        @DisplayName("Should use the configured timeout as the request timeout")
-        void testResolveRequestTimeoutFromConfiguration() {
+        @DisplayName("Should floor a configured timeout shorter than the default")
+        void testResolveRequestTimeoutFloorsShortConfiguredValue() {
             Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
                 Http.timeout(Duration.ofSeconds(7))
                     .build());
 
-            assertEquals(Duration.ofSeconds(7), requestTimeout);
+            assertEquals(Duration.ofMinutes(5), requestTimeout);
+        }
+
+        @Test
+        @DisplayName("Should honour a configured timeout longer than the default")
+        void testResolveRequestTimeoutHonoursLongerConfiguredValue() {
+            Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
+                Http.timeout(Duration.ofMinutes(10))
+                    .build());
+
+            assertEquals(Duration.ofMinutes(10), requestTimeout);
         }
 
         @Test
@@ -3869,15 +3880,26 @@ public class HttpClientExecutorTest {
         }
 
         @Test
-        @DisplayName("Should fail within the configured timeout when the server accepts and never responds")
+        @DisplayName("Should fail within the default timeout when the server accepts and never responds")
         @Timeout(15)
         @SuppressFBWarnings(
             value = "UNENCRYPTED_SERVER_SOCKET",
             justification = "Loopback-only test server that deliberately never responds, to exercise the request timeout")
-        void testSilentServerFailsWithinConfiguredTimeout() throws Exception {
+        void testSilentServerFailsWithinDefaultRequestTimeout() throws Exception {
             List<Socket> acceptedSockets = new CopyOnWriteArrayList<>();
 
-            try (ServerSocket serverSocket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+            HttpClientExecutor shortDefaultTimeoutHttpClientExecutor = new HttpClientExecutor(
+                applicationContext, tempFileStorage) {
+
+                @Override
+                Duration defaultRequestTimeout() {
+                    return Duration.ofMillis(500);
+                }
+            };
+
+            InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
+
+            try (ServerSocket serverSocket = new ServerSocket(0, 1, loopbackAddress)) {
                 Thread acceptorThread = Thread.ofVirtual()
                     .start(() -> {
                         try {
@@ -3888,14 +3910,19 @@ public class HttpClientExecutorTest {
                         }
                     });
 
-                String url = "http://127.0.0.1:" + serverSocket.getLocalPort() + "/silent";
+                // The URL must name the address the socket is actually bound to: on an IPv6-preferring host the
+                // loopback is ::1, and connecting elsewhere would fail before the response timeout is exercised.
+                String host = loopbackAddress instanceof Inet6Address
+                    ? "[" + loopbackAddress.getHostAddress() + "]" : loopbackAddress.getHostAddress();
 
-                Http.Configuration configuration = Http.timeout(Duration.ofMillis(500))
+                String url = "http://" + host + ":" + serverSocket.getLocalPort() + "/silent";
+
+                Http.Configuration configuration = Http.Configuration.newConfiguration()
                     .build();
 
                 assertThrows(
                     HttpTimeoutException.class,
-                    () -> httpClientExecutor.execute(
+                    () -> shortDefaultTimeoutHttpClientExecutor.execute(
                         url, new HashMap<>(), new HashMap<>(), null, configuration, Http.RequestMethod.GET,
                         "componentName", 1, "componentOperationName", null, Mockito.mock(ActionContext.class)));
 
