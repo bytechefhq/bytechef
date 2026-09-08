@@ -66,6 +66,10 @@ bytechef:
   data-storage:
     # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
     provider: jdbc
+  datasource:
+    # Maximum JDBC connections. Shared by Quartz's 10 job-store threads, workflow task execution and request
+    # threads, so it must stay comfortably above Quartz's thread count on its own.
+    maximum-pool-size: 30
   # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
   edition: EE
   # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
