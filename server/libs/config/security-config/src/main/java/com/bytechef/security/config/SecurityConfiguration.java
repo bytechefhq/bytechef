@@ -20,7 +20,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Security;
-import com.bytechef.config.ApplicationProperties.Security.RememberMe;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
@@ -86,6 +85,7 @@ public class SecurityConfiguration {
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final List<OAuth2LoginCustomizer> oAuth2LoginCustomizers;
     private final PasswordEncoder passwordEncoder;
+    private final RememberMeKey rememberMeKey;
     private final RememberMeServices rememberMeServices;
     private final List<Saml2LoginCustomizer> saml2LoginCustomizers;
     private final Security security;
@@ -96,13 +96,15 @@ public class SecurityConfiguration {
         ApplicationProperties applicationProperties, AuthenticationFailureHandler authenticationFailureHandler,
         AuthenticationSuccessHandler authenticationSuccessHandler,
         ObjectProvider<List<OAuth2LoginCustomizer>> oAuth2LoginCustomizersProvider, PasswordEncoder passwordEncoder,
-        RememberMeServices rememberMeServices, ObjectProvider<List<Saml2LoginCustomizer>> saml2LoginCustomizersProvider,
+        RememberMeKey rememberMeKey, RememberMeServices rememberMeServices,
+        ObjectProvider<List<Saml2LoginCustomizer>> saml2LoginCustomizersProvider,
         ObjectProvider<TwoFactorVerificationFilter> twoFactorVerificationFilterProvider) {
 
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.oAuth2LoginCustomizers = oAuth2LoginCustomizersProvider.getIfAvailable(List::of);
         this.passwordEncoder = passwordEncoder;
+        this.rememberMeKey = rememberMeKey;
         this.rememberMeServices = rememberMeServices;
         this.saml2LoginCustomizers = saml2LoginCustomizersProvider.getIfAvailable(List::of);
         this.security = applicationProperties.getSecurity();
@@ -248,7 +250,7 @@ public class SecurityConfiguration {
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .rememberMeParameter("remember-me")
-                .key(getRememberMeKey()))
+                .key(rememberMeKey.getKey()))
             .exceptionHandling(exceptionHanding -> exceptionHanding
                 .defaultAuthenticationEntryPointFor(
                     new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
@@ -389,12 +391,6 @@ public class SecurityConfiguration {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
 
         return daoAuthenticationProvider;
-    }
-
-    private String getRememberMeKey() {
-        RememberMe rememberMe = security.getRememberMe();
-
-        return rememberMe.getKey();
     }
 
     private static boolean isGraphiqlBasicAuthRequest(HttpServletRequest request) {

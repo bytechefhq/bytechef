@@ -25,6 +25,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
+import com.bytechef.security.config.RememberMeKey;
 import com.bytechef.security.config.SecurityConfiguration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @WithMockUser
 @SpringBootTest(
     classes = {
-        SecurityConfiguration.class, ApplicationProperties.class,
+        SecurityConfiguration.class, ApplicationProperties.class, RememberMeKey.class,
         SpaWebFilterIntTest.SpaWebFilterIntTestConfiguration.class
     })
 public class SpaWebFilterIntTest {

@@ -17,12 +17,11 @@
 package com.bytechef.security.web.rememberme;
 
 import com.bytechef.commons.util.RandomUtils;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Security;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.security.config.RememberMeKey;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.service.TenantService;
@@ -99,10 +98,10 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
     @SuppressFBWarnings("EI")
     public PersistentTokenRememberMeServices(
-        ApplicationProperties applicationProperties, UserDetailsService userDetailsService,
+        RememberMeKey rememberMeKey, UserDetailsService userDetailsService,
         PersistentTokenService persistentTokenService, TenantService tenantService) {
 
-        super(getKey(applicationProperties.getSecurity()), userDetailsService);
+        super(rememberMeKey.getKey(), userDetailsService);
 
         this.persistentTokenService = persistentTokenService;
         this.tenantService = tenantService;
@@ -347,12 +346,6 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         }
 
         return userService;
-    }
-
-    private static String getKey(Security security) {
-        Security.RememberMe rememberMe = security.getRememberMe();
-
-        return rememberMe.getKey();
     }
 
     private record UpgradedRememberMeToken(String[] upgradedToken, String userLogin) implements Serializable {
