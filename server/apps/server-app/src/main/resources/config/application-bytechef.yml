@@ -153,8 +153,14 @@ bytechef:
   # bootstraps.
   worker:
     task:
+      # Per-route consumer concurrency for the AMQP/Kafka/Redis/JMS/SQS brokers; the memory broker ignores it.
+      # `default` additionally caps concurrent task execution process-wide, so on a monolith this is simply
+      # "max concurrent workflow tasks".
       subscriptions:
         default: 10
+      # Concurrent executions in the synchronous, interactive lane (API Platform sync path, editor Test button),
+      # kept separate so a burst of scheduled runs cannot leave an interactive caller waiting for a permit.
+      sync-concurrency-limit: 5
   workflow:
     output-storage:
       # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
