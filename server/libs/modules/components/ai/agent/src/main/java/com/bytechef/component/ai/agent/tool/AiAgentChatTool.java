@@ -22,11 +22,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPE
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
-import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -49,17 +45,6 @@ public class AiAgentChatTool {
             .description("AI Agent tool")
             .properties(
                 List.of(
-                    string(TOOL_NAME)
-                        .label("Name")
-                        .description("The tool name exposed to the AI model.")
-                        .expressionEnabled(false)
-                        .required(true),
-                    string(TOOL_DESCRIPTION)
-                        .label("Description")
-                        .description("The tool description exposed to the AI model.")
-                        .controlType(TEXT_AREA)
-                        .expressionEnabled(false)
-                        .required(true),
                     FORMAT_PROPERTY,
                     PROMPT_PROPERTY,
                     SYSTEM_PROMPT_PROPERTY,

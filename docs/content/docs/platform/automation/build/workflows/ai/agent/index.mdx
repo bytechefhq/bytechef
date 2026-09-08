@@ -106,6 +106,8 @@ The agent rejects configurations with more than one Check For Violations parent 
 
 In the **Tools this agent can use** section, click **+ Add Tool** to expose a workflow component, custom function, or another AI Agent as a callable tool. Each tool's name and description become part of the prompt the model sees, so the model can decide which to invoke.
 
+Every tool offers an optional **Tool Name** and **Tool Description** above its own properties. Left blank, the underlying operation's name and description are used - set them when the default reads poorly to a model, or when two tools would otherwise be hard to tell apart.
+
 {/* TODO screenshot: - agent/agent-create-tools.png showing the Tools section with two tools attached. */}
 
 ### Step 8 - Test in the Right Panel
