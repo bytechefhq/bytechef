@@ -27,30 +27,27 @@ vi.mock('@/components/ui/tooltip', async () => {
     return actual;
 });
 
-vi.mock(
-    '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentToolPropertiesPopover',
-    async () => {
-        const {useForm} = await import('react-hook-form');
+vi.mock('@/pages/platform/mcp-servers/hooks/useMcpComponentToolPropertiesPopover', async () => {
+    const {useForm} = await import('react-hook-form');
 
-        const useMcpComponentToolPropertiesPopover = () => {
-            const form = useForm({defaultValues: {toolName: ''}});
+    const useMcpComponentToolPropertiesPopover = () => {
+        const form = useForm({defaultValues: {toolName: ''}});
 
-            return {
-                control: form.control,
-                form,
-                formState: form.formState,
-                handleFormSubmit: vi.fn(),
-                handleSubmit: form.handleSubmit,
-                isLoading: hoisted.isLoading,
-                properties: hoisted.properties,
-            };
+        return {
+            control: form.control,
+            form,
+            formState: form.formState,
+            handleFormSubmit: vi.fn(),
+            handleSubmit: form.handleSubmit,
+            isLoading: hoisted.isLoading,
+            properties: hoisted.properties,
         };
+    };
 
-        return {default: useMcpComponentToolPropertiesPopover};
-    }
-);
+    return {default: useMcpComponentToolPropertiesPopover};
+});
 
-vi.mock('@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpToolFormDisplayConditions', () => ({
+vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolFormDisplayConditions', () => ({
     default: () => ({displayConditions: hoisted.displayConditions, isEvaluating: hoisted.isEvaluating}),
 }));
 

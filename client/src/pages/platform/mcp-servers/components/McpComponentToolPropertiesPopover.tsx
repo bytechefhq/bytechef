@@ -1,12 +1,13 @@
 import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PopoverContent} from '@/components/ui/popover';
-import useMcpComponentToolPropertiesPopover from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentToolPropertiesPopover';
-import useMcpToolFormDisplayConditions from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpToolFormDisplayConditions';
+import useMcpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/hooks/useMcpComponentToolPropertiesPopover';
+import useMcpToolFormDisplayConditions from '@/pages/platform/mcp-servers/hooks/useMcpToolFormDisplayConditions';
 import {ClusterElementProvider} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {McpTool} from '@/shared/middleware/graphql';
 import {XIcon} from 'lucide-react';
+import {useMemo} from 'react';
 
 interface McpComponentToolPropertiesPopoverProps {
     componentName: string;
@@ -35,6 +36,51 @@ const McpComponentToolPropertiesPopover = ({
         formValues
     );
 
+    const propertiesContent = useMemo(() => {
+        if (isLoading || isEvaluating) {
+            return <p className="text-sm text-muted-foreground">Loading properties...</p>;
+        }
+
+        if (properties.length === 0) {
+            return <p className="text-sm text-muted-foreground">No configurable properties for this tool.</p>;
+        }
+
+        return (
+            <fieldset className="space-y-4 border-0 p-0">
+                <ClusterElementProvider
+                    value={{
+                        clusterElementName: mcpTool.name,
+                        componentName,
+                        componentVersion,
+                        connectionId: connectionId ? Number(connectionId) : undefined,
+                        inputParameters: formValues,
+                    }}
+                >
+                    <Properties
+                        control={control}
+                        controlPath=""
+                        formDisplayConditions={displayConditions}
+                        formState={formState}
+                        properties={properties}
+                        toolsMode
+                    />
+                </ClusterElementProvider>
+            </fieldset>
+        );
+    }, [
+        componentName,
+        componentVersion,
+        connectionId,
+        control,
+        displayConditions,
+        formState,
+        formValues,
+        isEvaluating,
+        isLoading,
+        mcpTool.name,
+        properties,
+    ]);
+
     return (
         <PopoverContent
             align="end"
@@ -60,34 +106,7 @@ const McpComponentToolPropertiesPopover = ({
 
             <Form {...form}>
                 <form className="flex min-h-0 flex-col" noValidate onSubmit={handleSubmit(handleFormSubmit)}>
-                    <div className="min-h-0 flex-1 overflow-y-auto p-3">
-                        {isLoading || isEvaluating ? (
-                            <p className="text-sm text-muted-foreground">Loading properties...</p>
-                        ) : properties.length > 0 ? (
-                            <fieldset className="space-y-4 border-0 p-0">
-                                <ClusterElementProvider
-                                    value={{
-                                        clusterElementName: mcpTool.name,
-                                        componentName,
-                                        componentVersion,
-                                        connectionId: connectionId ? Number(connectionId) : undefined,
-                                        inputParameters: formValues,
-                                    }}
-                                >
-                                    <Properties
-                                        control={control}
-                                        controlPath=""
-                                        formDisplayConditions={displayConditions}
-                                        formState={formState}
-                                        properties={properties}
-                                        toolsMode
-                                    />
-                                </ClusterElementProvider>
-                            </fieldset>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">No configurable properties for this tool.</p>
-                        )}
-                    </div>
+                    <div className="min-h-0 flex-1 overflow-y-auto p-3">{propertiesContent}</div>
 
                     <div className="flex justify-end gap-2 p-3">
                         <Button label="Cancel" onClick={onClose} type="button" variant="outline" />

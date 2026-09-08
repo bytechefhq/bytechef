@@ -1,4 +1,4 @@
-import McpToolListSkeleton from '@/pages/automation/mcp-servers/components/McpToolListSkeleton';
+import McpToolListSkeleton from '@/pages/platform/mcp-servers/components/McpToolListSkeleton';
 import {McpServer} from '@/shared/middleware/graphql';
 
 import McpProjectListItem from './McpProjectListItem';
