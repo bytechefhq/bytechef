@@ -59,6 +59,12 @@ fragment while this heading was hidden - give it back.
 |---|---|---|
 | `BYTECHEF_AI_HUB_ENABLED` | Enable or disable the AI Hub surface (REST/GraphQL controllers, JDBC repositories, service beans) | `false` |
 
+## AI Chat Memory Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_MEMORY_PROVIDER` | Where AI agent chat memory is stored (`inmemory`, `jdbc`, `redis`, `aws`). The `jdbc` provider requires PostgreSQL - its table is not created on H2, so `BYTECHEF_DATABASE=h2` defaults this to `inmemory` | `jdbc` (`inmemory` on H2) |
+
 ## AI Knowledge Base Configuration
 
 | Environment Variable | Description | Default Value |
