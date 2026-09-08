@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("com.h2database:h2")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc")
