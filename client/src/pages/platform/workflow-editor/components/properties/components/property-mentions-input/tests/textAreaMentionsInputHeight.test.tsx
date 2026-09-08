@@ -13,8 +13,9 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import PropertyMentionsInput from '../PropertyMentionsInput';
 
 /**
- * A TEXT_AREA property renders as a mentions input outside a form, and as a five row text area inside one.
- * The mentions input opened one row tall, so the same property looked like a different control per surface.
+ * A TEXT_AREA property renders as a mentions input outside a form, and as a text area inside one. The text
+ * area sits on the min-h-16 floor its own primitive sets, while the mentions input opened one row tall, so
+ * the same property looked like a different control per surface.
  */
 
 const renderInput = (controlType: ControlType, isFormulaMode = false) =>
@@ -47,18 +48,18 @@ describe('text area mentions input height', () => {
     it('opens a text area taller than a single row', () => {
         const {container} = renderInput('TEXT_AREA');
 
-        expect(getEditorContainer(container)).toHaveClass('min-h-28');
+        expect(getEditorContainer(container)).toHaveClass('min-h-16');
     });
 
     it('leaves a plain text property one row tall', () => {
         const {container} = renderInput('TEXT');
 
-        expect(getEditorContainer(container)).not.toHaveClass('min-h-28');
+        expect(getEditorContainer(container)).not.toHaveClass('min-h-16');
     });
 
     it('keeps a text area in formula mode one row tall', () => {
         const {container} = renderInput('TEXT_AREA', true);
 
-        expect(getEditorContainer(container)).not.toHaveClass('min-h-28');
+        expect(getEditorContainer(container)).not.toHaveClass('min-h-16');
     });
 });
