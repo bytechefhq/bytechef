@@ -4,6 +4,36 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
+const toFormParameters = (record: Record<string, unknown>): Record<string, unknown> =>
+    Object.fromEntries(
+        Object.entries(record).map(([key, value]) => {
+            if (value === null) {
+                return [key, ''];
+            }
+
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+                return [key, toFormParameters(value as Record<string, unknown>)];
+            }
+
+            return [key, value];
+        })
+    );
+
+const toStoredParameters = (record: Record<string, unknown>): Record<string, unknown> =>
+    Object.fromEntries(
+        Object.entries(record).map(([key, value]) => {
+            if (value === '') {
+                return [key, null];
+            }
+
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+                return [key, toStoredParameters(value as Record<string, unknown>)];
+            }
+
+            return [key, value];
+        })
+    );
+
 export default function useMcpComponentToolPropertiesPopover(
     componentName: string,
     componentVersion: number,
@@ -58,7 +88,7 @@ export default function useMcpComponentToolPropertiesPopover(
             }
         }
 
-        const savedParameters = (mcpTool.parameters as Record<string, unknown>) ?? {};
+        const savedParameters = toFormParameters((mcpTool.parameters as Record<string, unknown>) ?? {});
 
         return {...propertyDefaults, ...savedParameters};
     }, [mcpTool.parameters, properties]);
@@ -74,27 +104,12 @@ export default function useMcpComponentToolPropertiesPopover(
     const {control, formState, handleSubmit} = form;
 
     const handleFormSubmit = (values: Record<string, unknown>) => {
-        const sanitize = (record: Record<string, unknown>): Record<string, unknown> =>
-            Object.fromEntries(
-                Object.entries(record).map(([key, value]) => {
-                    if (value === '') {
-                        return [key, null];
-                    }
-
-                    if (value && typeof value === 'object' && !Array.isArray(value)) {
-                        return [key, sanitize(value as Record<string, unknown>)];
-                    }
-
-                    return [key, value];
-                })
-            );
-
         updateMcpToolMutation.mutate({
             id: mcpTool.id,
             input: {
                 mcpComponentId: mcpTool.mcpComponentId,
                 name: mcpTool.name,
-                parameters: sanitize(values),
+                parameters: toStoredParameters(values),
                 version: mcpTool.version,
             },
         });

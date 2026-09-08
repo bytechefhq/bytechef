@@ -224,10 +224,7 @@ export const useProperty = ({
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
-    const defaultValue = useMemo(
-        () => (property.defaultValue !== undefined ? property.defaultValue : ''),
-        [property.defaultValue]
-    );
+    const defaultValue = useMemo(() => property.defaultValue ?? '', [property.defaultValue]);
 
     const {
         controlType,
