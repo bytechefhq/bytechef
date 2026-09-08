@@ -16,6 +16,10 @@
 
 package com.bytechef.platform.component.service;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
+import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
+
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -37,6 +41,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.annotation.WithTokenRefresh;
@@ -59,6 +64,7 @@ import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,6 +77,24 @@ import org.springframework.stereotype.Service;
  */
 @Service("clusterElementDefinitionService")
 public class ClusterElementDefinitionServiceImpl implements ClusterElementDefinitionService {
+
+    private static final Property TOOL_NAME_PROPERTY = Property.toProperty(
+        string(ToolConstants.TOOL_NAME)
+            .label("Tool Name")
+            .description("The tool name exposed to the AI model. Defaults to the tool name when left blank.")
+            .placeholder("Defaults to tool name")
+            .expressionEnabled(false)
+            .required(false));
+
+    private static final Property TOOL_DESCRIPTION_PROPERTY = Property.toProperty(
+        string(ToolConstants.TOOL_DESCRIPTION)
+            .label("Tool Description")
+            .description(
+                "The tool description exposed to the AI model. Defaults to the tool description when left blank.")
+            .placeholder("Defaults to tool description")
+            .controlType(TEXT_AREA)
+            .expressionEnabled(false)
+            .required(false));
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
@@ -318,7 +342,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         ComponentDefinition componentDefinition = result.componentDefinition;
 
-        return new ClusterElementDefinition(
+        return toClusterElementDefinition(
             result.clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
             getIcon(componentDefinition));
     }
@@ -332,7 +356,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
 
         ComponentDefinition componentDefinition = result.componentDefinition;
 
-        return new ClusterElementDefinition(
+        return toClusterElementDefinition(
             result.clusterElementDefinition, componentDefinition.getName(), componentVersion,
             getIcon(componentDefinition));
     }
@@ -361,7 +385,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                     "Cluster element definition " + clusterElementName + " with type " + clusterElementTypeName +
                         " not found in component " + componentName));
 
-        return new ClusterElementDefinition(
+        return toClusterElementDefinition(
             matchedDefinition, componentDefinition.getName(), componentVersion, getIcon(componentDefinition));
     }
 
@@ -377,7 +401,7 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
                         "Cluster elements not found in component %s".formatted(componentDefinition.getName())))
                     .stream()
                     .filter(clusterElementDefinition -> clusterElementType.equals(clusterElementDefinition.getType()))
-                    .map(clusterElementDefinition -> new ClusterElementDefinition(
+                    .map(clusterElementDefinition -> toClusterElementDefinition(
                         clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
                         getIcon(componentDefinition)))
                     .toList()))
@@ -398,9 +422,47 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
             .orElse(List.of())
             .stream()
             .filter(clusterElementDefinition -> clusterElementType == clusterElementDefinition.getType())
-            .map(clusterElementDefinition -> new ClusterElementDefinition(
+            .map(clusterElementDefinition -> toClusterElementDefinition(
                 clusterElementDefinition, componentDefinition.getName(), componentVersion, icon))
             .toList();
+    }
+
+    private static ClusterElementDefinition toClusterElementDefinition(
+        com.bytechef.component.definition.ClusterElementDefinition<?> clusterElementDefinition, String componentName,
+        int componentVersion, String icon) {
+
+        return injectToolOverrideProperties(
+            new ClusterElementDefinition(clusterElementDefinition, componentName, componentVersion, icon));
+    }
+
+    private static ClusterElementDefinition injectToolOverrideProperties(
+        ClusterElementDefinition clusterElementDefinition) {
+
+        ClusterElementType type = clusterElementDefinition.getType();
+
+        if (type == null || !TOOLS.name()
+            .equals(type.name())) {
+
+            return clusterElementDefinition;
+        }
+
+        List<String> propertyNames = CollectionUtils.map(clusterElementDefinition.getProperties(), Property::getName);
+
+        List<Property> additionalProperties = new ArrayList<>();
+
+        if (!propertyNames.contains(ToolConstants.TOOL_NAME)) {
+            additionalProperties.add(TOOL_NAME_PROPERTY);
+        }
+
+        if (!propertyNames.contains(ToolConstants.TOOL_DESCRIPTION)) {
+            additionalProperties.add(TOOL_DESCRIPTION_PROPERTY);
+        }
+
+        if (additionalProperties.isEmpty()) {
+            return clusterElementDefinition;
+        }
+
+        return clusterElementDefinition.withPrependedProperties(additionalProperties);
     }
 
     @Override

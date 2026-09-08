@@ -20,10 +20,7 @@ import static com.bytechef.atlas.configuration.constant.WorkflowConstants.INPUTS
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
-import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
@@ -61,17 +58,6 @@ public class WorkflowCallWorkflowTool {
             .description("Calls another workflow as an AI agent tool.")
             .type(TOOLS)
             .properties(
-                string(TOOL_NAME)
-                    .label("Name")
-                    .description("The tool name exposed to the AI model.")
-                    .expressionEnabled(false)
-                    .required(true),
-                string(TOOL_DESCRIPTION)
-                    .label("Description")
-                    .description("The tool description exposed to the AI model.")
-                    .controlType(TEXT_AREA)
-                    .expressionEnabled(false)
-                    .required(true),
                 string(WORKFLOW_UUID)
                     .label("Workflow")
                     .description("The workflow to call when this tool is invoked.")

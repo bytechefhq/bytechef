@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.component.service;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,6 +42,7 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Property;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -272,6 +275,89 @@ class ClusterElementDefinitionServiceTest {
             any(Parameters.class), any(Parameters.class), any(Parameters.class), eq(componentConnections),
             eq(parentDerivedContext));
         verifyNoInteractions(contextFactory);
+    }
+
+    @Test
+    void testToolClusterElementDefinitionGetsTheToolNameAndDescriptionProperties() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(Optional.empty());
+
+        assertEquals(List.of("toolName", "toolDescription"), getPropertyNames(result));
+    }
+
+    @Test
+    void testTheContributedToolPropertiesAreOptional() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(Optional.empty());
+
+        List<? extends Property> properties = result.getProperties();
+
+        assertEquals(2, properties.size());
+
+        for (Property property : properties) {
+            assertFalse(property.getRequired());
+        }
+    }
+
+    @Test
+    void testTheContributedToolPropertiesArePrependedToTheDeclaredOnes() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(Optional.of(List.of(string("url"))));
+
+        assertEquals(List.of("toolName", "toolDescription", "url"), getPropertyNames(result));
+    }
+
+    @Test
+    void testADeclaredToolPropertyIsNotContributedTwice() {
+        ClusterElementDefinition result = getToolClusterElementDefinition(
+            Optional.of(List.of(string("toolName"), string("url"))));
+
+        assertEquals(List.of("toolDescription", "toolName", "url"), getPropertyNames(result));
+    }
+
+    @Test
+    void testANonToolClusterElementDefinitionIsNotGivenTheToolProperties() {
+        ClusterElementType chatMemoryType = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Chat Memory");
+
+        ClusterElementDefinition result = getClusterElementDefinition(
+            chatMemoryType, "CHAT_MEMORY", Optional.of(List.of(string("url"))));
+
+        assertEquals(List.of("url"), getPropertyNames(result));
+    }
+
+    private ClusterElementDefinition getToolClusterElementDefinition(
+        Optional<List<? extends com.bytechef.component.definition.Property>> properties) {
+
+        return getClusterElementDefinition(
+            new ClusterElementType("TOOLS", "tools", "Tools"), "TOOLS", properties);
+    }
+
+    private ClusterElementDefinition getClusterElementDefinition(
+        ClusterElementType clusterElementType, String clusterElementTypeName,
+        Optional<List<? extends com.bytechef.component.definition.Property>> properties) {
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(elementDefinition.getName()).thenReturn("post");
+        when(elementDefinition.getType()).thenReturn(clusterElementType);
+        when(elementDefinition.getDescription()).thenReturn(Optional.empty());
+        when(elementDefinition.getHelp()).thenReturn(Optional.empty());
+        when(elementDefinition.getTitle()).thenReturn(Optional.of("post"));
+        when(elementDefinition.getProperties()).thenReturn(properties);
+        when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        return clusterElementDefinitionService.getClusterElementDefinition(
+            COMPONENT_NAME, COMPONENT_VERSION, "post", clusterElementTypeName);
+    }
+
+    private static List<String> getPropertyNames(ClusterElementDefinition clusterElementDefinition) {
+        return clusterElementDefinition.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
     }
 
     private com.bytechef.component.definition.ClusterElementDefinition<?> createMatchableClusterElementDefinition(
