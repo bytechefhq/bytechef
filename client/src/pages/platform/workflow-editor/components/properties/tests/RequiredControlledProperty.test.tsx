@@ -70,7 +70,9 @@ describe('required controlled properties', () => {
 
         fireEvent.click(screen.getByText('Save'));
 
-        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED));
+        await waitFor(() =>
+            expect(screen.getByRole('alert')).toHaveTextContent(ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED)
+        );
     });
 
     // The text area was the one control that passed no field state through, so its block was silent.
@@ -91,6 +93,8 @@ describe('required controlled properties', () => {
 
         fireEvent.click(screen.getByText('Save'));
 
-        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED));
+        await waitFor(() =>
+            expect(screen.getByRole('alert')).toHaveTextContent(ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED)
+        );
     });
 });
