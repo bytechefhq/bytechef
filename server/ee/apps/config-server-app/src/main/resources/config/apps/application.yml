@@ -127,7 +127,7 @@ spring:
   task:
     execution:
       simple:
-        concurrency-limit: 200
+        concurrency-limit: ${bytechef.async.concurrency-limit}
   threads:
     virtual:
       enabled: true
@@ -140,6 +140,10 @@ bytechef:
       chat:
         options:
           model: gpt-4o
+  async:
+    # Upper bound on concurrent @Async tasks on the default executor. There is no queue: a submitter waits for a
+    # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
+    concurrency-limit: 200
   cache:
     # Cache provider (redis) default: redis
     provider: redis

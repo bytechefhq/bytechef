@@ -282,7 +282,7 @@ spring:
     execution:
       thread-name-prefix: server-app-task-
       simple:
-        concurrency-limit: 200
+        concurrency-limit: ${bytechef.async.concurrency-limit}
     scheduling:
       thread-name-prefix: server-app-scheduling-
       pool:
