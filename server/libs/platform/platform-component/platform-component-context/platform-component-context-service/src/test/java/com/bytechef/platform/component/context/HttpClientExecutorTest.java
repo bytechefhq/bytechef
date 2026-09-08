@@ -42,8 +42,13 @@ import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.MediaType;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import com.github.mizosoft.methanol.internal.extensions.MimeBodyPublisherAdapter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -51,6 +56,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
@@ -58,12 +64,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.net.ssl.SSLSession;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationContext;
 import tools.jackson.databind.ObjectMapper;
@@ -3833,6 +3841,70 @@ public class HttpClientExecutorTest {
             Http.Response response = httpClientExecutor.handleResponse(testHttpResponse, configuration, context);
 
             assertNotNull(response.getBody());
+        }
+    }
+
+    @Nested
+    @DisplayName("Request timeout tests")
+    class RequestTimeoutTests {
+
+        @Test
+        @DisplayName("Should use the configured timeout as the request timeout")
+        void testResolveRequestTimeoutFromConfiguration() {
+            Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
+                Http.timeout(Duration.ofSeconds(7))
+                    .build());
+
+            assertEquals(Duration.ofSeconds(7), requestTimeout);
+        }
+
+        @Test
+        @DisplayName("Should fall back to the five-minute default request timeout")
+        void testResolveRequestTimeoutDefault() {
+            Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
+                Http.Configuration.newConfiguration()
+                    .build());
+
+            assertEquals(Duration.ofMinutes(5), requestTimeout);
+        }
+
+        @Test
+        @DisplayName("Should fail within the configured timeout when the server accepts and never responds")
+        @Timeout(15)
+        @SuppressFBWarnings(
+            value = "UNENCRYPTED_SERVER_SOCKET",
+            justification = "Loopback-only test server that deliberately never responds, to exercise the request timeout")
+        void testSilentServerFailsWithinConfiguredTimeout() throws Exception {
+            List<Socket> acceptedSockets = new CopyOnWriteArrayList<>();
+
+            try (ServerSocket serverSocket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+                Thread acceptorThread = Thread.ofVirtual()
+                    .start(() -> {
+                        try {
+                            acceptedSockets.add(serverSocket.accept());
+                        } catch (IOException ioException) {
+                            // The server socket is closed when the test ends; nothing to report.
+                            acceptedSockets.clear();
+                        }
+                    });
+
+                String url = "http://127.0.0.1:" + serverSocket.getLocalPort() + "/silent";
+
+                Http.Configuration configuration = Http.timeout(Duration.ofMillis(500))
+                    .build();
+
+                assertThrows(
+                    HttpTimeoutException.class,
+                    () -> httpClientExecutor.execute(
+                        url, new HashMap<>(), new HashMap<>(), null, configuration, Http.RequestMethod.GET,
+                        "componentName", 1, "componentOperationName", null, Mockito.mock(ActionContext.class)));
+
+                acceptorThread.interrupt();
+            } finally {
+                for (Socket socket : acceptedSockets) {
+                    socket.close();
+                }
+            }
         }
     }
 
