@@ -60,7 +60,7 @@ spring:
         size: 2
   threads:
     virtual:
-#      enabled: true
+      enabled: true
 
 #####
 
