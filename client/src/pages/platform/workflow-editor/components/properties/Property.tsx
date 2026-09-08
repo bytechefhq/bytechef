@@ -23,6 +23,7 @@ import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/componen
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {reconstructControlledExpressionValue} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/controlledExpressionValue';
 import {getMentionsInputPlaceholder} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/mentionsInputPlaceholder';
+import getControlledToolFieldState from '@/pages/platform/workflow-editor/components/properties/getControlledToolFieldState';
 import getPropertyKey from '@/pages/platform/workflow-editor/components/properties/getPropertyKey';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
@@ -456,32 +457,21 @@ const Property = ({
                                 defaultValue={defaultValue}
                                 name={calculatedPath}
                                 render={({field, fieldState}) => {
-                                    const showControlledSwitch = isToolsClusterElement && type !== 'STRING';
-                                    const showFromAi = isToolsClusterElement && type === 'STRING';
-
-                                    const valueIsFromAi =
-                                        showFromAi &&
-                                        typeof field.value === 'string' &&
-                                        field.value.startsWith('=fromAi(');
-
-                                    const isFieldFromAi =
-                                        showFromAi &&
-                                        (controlledFromAi !== undefined ? controlledFromAi : valueIsFromAi);
-
-                                    const displayValue =
-                                        typeof field.value === 'string'
-                                            ? field.value
-                                            : field.value != null
-                                              ? String(field.value)
-                                              : '';
-
-                                    const isExpressionMode = showFromAi && displayValue.startsWith('=');
-                                    const strippedDisplayValue = isExpressionMode
-                                        ? displayValue.substring(1)
-                                        : displayValue;
-                                    const strippedFromAiValue = fromAiExpression.startsWith('=')
-                                        ? fromAiExpression.substring(1)
-                                        : fromAiExpression;
+                                    const {
+                                        displayValue,
+                                        isExpressionMode,
+                                        isFieldFromAi,
+                                        showControlledSwitch,
+                                        showFromAi,
+                                        strippedDisplayValue,
+                                        strippedFromAiValue,
+                                    } = getControlledToolFieldState({
+                                        controlledFromAi,
+                                        fieldValue: field.value,
+                                        fromAiExpression,
+                                        isToolsClusterElement,
+                                        type,
+                                    });
 
                                     const {onChange: fieldOnChange, ...fieldRest} = field;
 
@@ -744,19 +734,99 @@ const Property = ({
                             control={control}
                             defaultValue={defaultValue}
                             name={calculatedPath}
-                            render={({field, fieldState}) => (
-                                <PropertyTextArea
-                                    deletePropertyButton={deletePropertyButton}
-                                    description={description}
-                                    error={!!fieldState.error || hasError}
-                                    errorMessage={fieldState.error?.message || errorMessage}
-                                    label={label || name}
-                                    leadingIcon={typeIcon}
-                                    placeholder={placeholder}
-                                    required={required}
-                                    {...field}
-                                />
-                            )}
+                            render={({field, fieldState}) => {
+                                const {
+                                    displayValue,
+                                    isExpressionMode,
+                                    isFieldFromAi,
+                                    showFromAi,
+                                    strippedDisplayValue,
+                                } = getControlledToolFieldState({
+                                    controlledFromAi,
+                                    fieldValue: field.value,
+                                    fromAiExpression,
+                                    isToolsClusterElement,
+                                    type,
+                                });
+
+                                const {onChange: fieldOnChange, ...fieldRest} = field;
+
+                                if (showFromAi && (isExpressionMode || isFieldFromAi)) {
+                                    return (
+                                        <PropertyMentionsInput
+                                            autoFocus={displayValue === '='}
+                                            controlType="TEXT_AREA"
+                                            deletePropertyButton={deletePropertyButton}
+                                            description={description}
+                                            disableAutoSave
+                                            error={!!fieldState.error || !!controlledBlurError}
+                                            errorMessage={fieldState.error?.message || controlledBlurError}
+                                            expressionEnabled={expressionEnabled}
+                                            handleFromAiClick={(fromAi) => handleFromAiToggle(fromAi, fieldOnChange)}
+                                            isFormulaMode
+                                            isFromAi={isFieldFromAi}
+                                            label={label || name}
+                                            leadingIcon={typeIcon}
+                                            onValueChange={(value) =>
+                                                fieldOnChange(reconstructControlledExpressionValue(value))
+                                            }
+                                            path={calculatedPath}
+                                            placeholder={placeholder}
+                                            required={required}
+                                            setIsFormulaMode={(formulaMode) => {
+                                                if (!formulaMode) {
+                                                    controlledExpressionExitRef.current = true;
+
+                                                    fieldOnChange('');
+                                                }
+                                            }}
+                                            toolProperty
+                                            type={type}
+                                            value={displayValue}
+                                        />
+                                    );
+                                }
+
+                                return (
+                                    <PropertyTextArea
+                                        {...fieldRest}
+                                        deletePropertyButton={deletePropertyButton}
+                                        description={description}
+                                        error={!!fieldState.error || hasError}
+                                        errorMessage={fieldState.error?.message || errorMessage}
+                                        label={label || name}
+                                        leadingIcon={typeIcon}
+                                        onChange={(event) => {
+                                            if (!showFromAi) {
+                                                fieldOnChange(event);
+
+                                                return;
+                                            }
+
+                                            fieldOnChange(resolveExpressionValue(event.target.value, field.value));
+                                        }}
+                                        placeholder={
+                                            showFromAi
+                                                ? getMentionsInputPlaceholder({
+                                                      expressionEnabled,
+                                                      placeholder,
+                                                      toolProperty: true,
+                                                  })
+                                                : placeholder
+                                        }
+                                        required={required}
+                                        trailingAction={
+                                            showFromAi && expressionEnabled !== false ? (
+                                                <FromAiToggleButton
+                                                    isFromAi={!!isFieldFromAi}
+                                                    onToggle={(fromAi) => handleFromAiToggle(fromAi, fieldOnChange)}
+                                                />
+                                            ) : undefined
+                                        }
+                                        value={strippedDisplayValue}
+                                    />
+                                );
+                            }}
                             rules={{required: requiredRule}}
                         />
                     )}
