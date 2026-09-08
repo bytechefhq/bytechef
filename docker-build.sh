@@ -1,17 +1,15 @@
 #!/bin/sh
 
-if [ -z "$1" ]; then
-    echo "Required argument misses. Please provide docker image tag or registry url flag."
+usage() {
+    echo "Required argument misses. Please provide at least one docker image tag."
     echo ""
     echo "USAGE"
     echo "    docker-build.sh [--registry-url url] [--no-push] tag1 [tag2 tag3 ...]"
     echo "DESCRIPTION"
-    echo "    --registry-url url\t- optional flag to push image to registry other than dockerhub.io If AWS ECR URL script would attemt AWS login."
+    echo "    --registry-url url\t- optional flag to push image to registry other than dockerhub.io If AWS ECR URL script would attempt AWS login."
     echo "    --no-push\t\t- optional flag to build the images without pushing them to the registry."
     echo "    tag\t\t- arbitrary docker image tag(s). In bytechef we use yyyyMMdd to reflect date of image build."
-
-    exit 1
-fi
+}
 
 dckr_img_registry_bytechef_server="bytechef/bytechef-server"
 dckr_img_registry_bytechef="bytechef/bytechef"
@@ -49,7 +47,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$tags" ]; then
-    echo "No docker image tag provided."
+    usage
 
     exit 1
 fi
