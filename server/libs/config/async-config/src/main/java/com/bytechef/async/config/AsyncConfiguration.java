@@ -32,7 +32,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -73,7 +72,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
     @Override
     @Bean(name = TASK_EXECUTOR)
     @Primary
-    public TaskExecutor getAsyncExecutor() {
+    public AsyncTaskExecutor getAsyncExecutor() {
         TaskExecutionProperties.Simple simple = taskExecutionProperties.getSimple();
 
         Integer concurrencyLimit = simple.getConcurrencyLimit();
@@ -84,12 +83,12 @@ public class AsyncConfiguration implements AsyncConfigurer {
     }
 
     @Bean(name = MESSAGE_EVENT_EXECUTOR)
-    TaskExecutor messageEventExecutor() {
+    AsyncTaskExecutor messageEventExecutor() {
         return createExecutor("message-event-", SimpleAsyncTaskExecutor.UNBOUNDED_CONCURRENCY);
     }
 
     @Bean(name = WORKER_EXECUTOR)
-    TaskExecutor workerExecutor() {
+    AsyncTaskExecutor workerExecutor() {
         int concurrencyLimit = environment.getProperty(
             WORKER_CONCURRENCY_PROPERTY, Integer.class, DEFAULT_WORKER_CONCURRENCY);
 
