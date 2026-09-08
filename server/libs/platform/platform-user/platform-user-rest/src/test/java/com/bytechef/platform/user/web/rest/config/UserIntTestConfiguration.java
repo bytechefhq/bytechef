@@ -22,6 +22,7 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.security.config.RememberMeKey;
 import com.bytechef.security.config.SecurityConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -48,7 +49,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import({
     AuditingJdbcConfiguration.class, CacheConfiguration.class, JacksonConfiguration.class,
-    LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, SecurityConfiguration.class
+    LiquibaseConfiguration.class, PostgreSQLContainerConfiguration.class, RememberMeKey.class,
+    SecurityConfiguration.class
 })
 @Configuration
 public class UserIntTestConfiguration extends AbstractJdbcConfiguration {
