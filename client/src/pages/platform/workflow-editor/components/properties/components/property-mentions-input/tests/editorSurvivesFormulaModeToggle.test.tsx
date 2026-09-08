@@ -12,7 +12,7 @@ import {useState} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyMentionsInput from '../PropertyMentionsInput';
-import {TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER} from '../mentionsInputPlaceholder';
+import {TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER, TOOL_PROPERTY_PLACEHOLDER} from '../mentionsInputPlaceholder';
 
 /**
  * The placeholder differs per formula mode, and the Placeholder extension resolves it per decoration from a
@@ -80,7 +80,7 @@ describe('editor identity across a formula mode toggle', () => {
 
         await waitFor(() =>
             expect(container.querySelector('[data-placeholder]')?.getAttribute('data-placeholder')).toBe(
-                'https://example.com/index.html'
+                TOOL_PROPERTY_PLACEHOLDER
             )
         );
     });

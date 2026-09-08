@@ -27,9 +27,13 @@ export function getMentionsInputPlaceholder({
         return toolProperty ? TOOL_PROPERTY_FORMULA_MODE_PLACEHOLDER : FORMULA_MODE_PLACEHOLDER;
     }
 
+    if (toolProperty) {
+        return TOOL_PROPERTY_PLACEHOLDER;
+    }
+
     if (placeholder) {
         return placeholder;
     }
 
-    return toolProperty ? TOOL_PROPERTY_PLACEHOLDER : DEFAULT_PLACEHOLDER;
+    return DEFAULT_PLACEHOLDER;
 }
