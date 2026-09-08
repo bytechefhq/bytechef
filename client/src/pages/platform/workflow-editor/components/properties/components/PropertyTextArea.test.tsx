@@ -10,6 +10,20 @@ describe('PropertyTextArea', () => {
         expect(screen.getByText('Description')).toBeInTheDocument();
     });
 
+    it('renders the placeholder on the textarea', () => {
+        render(
+            <PropertyTextArea
+                error={false}
+                errorMessage=""
+                label="Tool Description"
+                name="toolDescription"
+                placeholder="Defaults to tool description"
+            />
+        );
+
+        expect(screen.getByPlaceholderText('Defaults to tool description')).toBeInTheDocument();
+    });
+
     it('renders trailingAction when provided', () => {
         render(
             <PropertyTextArea

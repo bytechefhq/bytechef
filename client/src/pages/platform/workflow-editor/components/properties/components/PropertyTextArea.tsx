@@ -18,6 +18,7 @@ interface PropertyTextAreaProps {
     leadingIcon?: ReactNode;
     name: string;
     onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+    placeholder?: string;
     required?: boolean;
     title?: string;
     trailingAction?: ReactNode;
@@ -37,6 +38,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
             leadingIcon,
             name,
             onChange,
+            placeholder,
             required,
             title,
             trailingAction,
@@ -97,6 +99,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                         id={name}
                         name={name}
                         onChange={onChange}
+                        placeholder={placeholder}
                         ref={ref}
                         rows={5}
                         value={value}
