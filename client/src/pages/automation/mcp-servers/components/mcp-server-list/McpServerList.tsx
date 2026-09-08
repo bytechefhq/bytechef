@@ -53,11 +53,11 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                                         <TabsTrigger value="connect">Connect</TabsTrigger>
                                     </TabsList>
 
-                                    <TabsContent className="py-2" value="tools">
+                                    <TabsContent className="pt-2" value="tools">
                                         <McpServerToolsContent mcpServer={mcpServer} />
                                     </TabsContent>
 
-                                    <TabsContent className="max-w-(--breakpoint-lg) py-3" value="connect">
+                                    <TabsContent className="max-w-(--breakpoint-lg) pt-3" value="connect">
                                         <McpServerConfiguration
                                             mcpServerUrl={mcpServer.url}
                                             onRefresh={handleRefresh}
