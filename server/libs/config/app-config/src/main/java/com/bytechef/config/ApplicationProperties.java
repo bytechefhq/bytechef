@@ -58,6 +58,11 @@ public class ApplicationProperties {
     private Analytics analytics = new Analytics();
 
     /**
+     * Default @Async executor configuration
+     */
+    private Async async = new Async();
+
+    /**
      * Cache provider configuration
      */
     private Cache cache = new Cache();
@@ -216,6 +221,10 @@ public class ApplicationProperties {
         return analytics;
     }
 
+    public Async getAsync() {
+        return async;
+    }
+
     public Cache getCache() {
         return cache;
     }
@@ -346,6 +355,10 @@ public class ApplicationProperties {
 
     public void setAnalytics(Analytics analytics) {
         this.analytics = analytics;
+    }
+
+    public void setAsync(Async async) {
+        this.async = async;
     }
 
     public void setCache(Cache cache) {
@@ -2600,6 +2613,27 @@ public class ApplicationProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    /**
+     * Configuration of the default {@code @Async} executor, which carries mail, notifications and other background
+     * work. Workflow task and trigger execution are bounded separately by the worker task properties.
+     */
+    public static class Async {
+
+        /**
+         * Upper bound on concurrent tasks on the default @Async executor. There is no queue: a submitter waits for a
+         * permit
+         */
+        private int concurrencyLimit;
+
+        public int getConcurrencyLimit() {
+            return concurrencyLimit;
+        }
+
+        public void setConcurrencyLimit(int concurrencyLimit) {
+            this.concurrencyLimit = concurrencyLimit;
         }
     }
 

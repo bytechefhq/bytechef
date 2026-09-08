@@ -55,6 +55,11 @@ bytechef:
       provider: pgvector
   analytics:
     enabled: false
+  async:
+    # Upper bound on concurrent @Async tasks on the default executor (mail, notifications, background work).
+    # There is no queue: a submitter waits for a permit. Workflow task and trigger execution are bounded
+    # separately by bytechef.worker.task.*.
+    concurrency-limit: 200
   cache:
     # Cache provider (redis | caffeine) default: caffeine
     provider: caffeine
