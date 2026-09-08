@@ -1,6 +1,6 @@
-import McpToolListSkeleton from '@/pages/automation/mcp-servers/components/McpToolListSkeleton';
 import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItem';
 import useMcpComponentList from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
+import McpToolListSkeleton from '@/pages/platform/mcp-servers/components/McpToolListSkeleton';
 import {McpServer} from '@/shared/middleware/graphql';
 import {useMemo} from 'react';
 

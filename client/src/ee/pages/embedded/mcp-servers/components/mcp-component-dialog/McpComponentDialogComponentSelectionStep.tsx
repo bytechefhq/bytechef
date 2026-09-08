@@ -1,4 +1,4 @@
-import McpComponentSelectionGrid from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentSelectionGrid';
+import McpComponentSelectionGrid from '@/pages/platform/mcp-servers/components/McpComponentSelectionGrid';
 import {ComponentDefinition} from '@/shared/middleware/graphql';
 
 import useMcpComponentDialogComponentSelectionStep from './hooks/useMcpComponentDialogComponentSelectionStep';
