@@ -169,6 +169,12 @@ The Context Store sync engine writes records to Postgres by default (the same da
 | `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_USERNAME` | ClickHouse username (sensitive) | - |
 | `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_PASSWORD` | ClickHouse password (sensitive) | - |
 -->
+## Async Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_ASYNC_CONCURRENCY_LIMIT` | Upper bound on concurrent tasks on the default async executor, which carries mail, notifications and other background work. There is no queue: a submitter waits for a permit. Workflow task and trigger execution are bounded separately by the worker variables below | `200` |
+
 ## Cache Configuration
 
 | Environment Variable | Description | Default Value |
@@ -230,6 +236,7 @@ The Context Store sync engine writes records to Postgres by default (the same da
 | `BYTECHEF_DATASOURCE_URL` | Database URL | - |
 | `BYTECHEF_DATASOURCE_USERNAME` | Database username (sensitive) | - |
 | `BYTECHEF_DATASOURCE_PASSWORD` | Database password (sensitive) | - |
+| `BYTECHEF_DATASOURCE_MAXIMUM_POOL_SIZE` | Maximum JDBC connections in the pool. Shared by Quartz's 10 job-store threads, workflow task execution and request threads, so it must stay comfortably above Quartz's thread count on its own | `30` |
 
 `BYTECHEF_DATABASE=h2` supplies the datasource itself, so the three `BYTECHEF_DATASOURCE_*`
 variables are unnecessary alongside it. See
@@ -478,7 +485,8 @@ System administrator is used for accessing protected data reachable through /act
 |---|---|---|
 | `BYTECHEF_WORKER_ENABLED` | Enable or disable the worker | `true` |
 | `BYTECHEF_WORKER_TASK_DEFAULT_TIMEOUT` | Default timeout for task execution in milliseconds. Unset falls back to the built-in 24-hour ceiling; a task's own `timeout` parameter overrides both. | - (24 hours) |
-| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | Number of concurrent consumers for the `default` worker queue | `10` |
+| `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_DEFAULT` | Number of concurrent consumers for the `default` worker queue, and the cap on concurrent task execution process-wide. On a single-node deployment this is simply "max concurrent workflow tasks" | `10` |
+| `BYTECHEF_WORKER_TASK_SYNC_CONCURRENCY_LIMIT` | Concurrent executions allowed in the synchronous, interactive lane — the API Platform sync request path and the workflow editor's Test button. Kept separate from the queue above so a burst of scheduled runs cannot leave an interactive caller waiting | `5` |
 | `BYTECHEF_WORKER_TASK_SUBSCRIPTIONS_<QUEUE_NAME>` | Number of concurrent consumers for an additional worker queue (e.g., `captions` for tasks routed via `node: captions`). The queue must be created before tasks can be routed to it; ByteChef creates the queue automatically when the worker bootstraps if it doesn't already exist. | - |
 
 ## Workflow Configuration
