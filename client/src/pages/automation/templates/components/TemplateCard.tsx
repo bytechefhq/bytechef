@@ -27,8 +27,8 @@ export function TemplateCard({authorName, categories, description, icons, templa
 
     return (
         <Link to={templateId}>
-            <Card className="flex min-h-[230px] flex-col transition-all hover:border-primary/20 hover:shadow-lg">
-                <CardHeader>
+            <Card className="flex min-h-[230px] flex-col p-4 transition-all hover:border-primary/20 hover:shadow-lg">
+                <CardHeader className="px-0">
                     <div className="flex items-center justify-end">
                         {categories.map((category, index) => (
                             <Badge
@@ -56,7 +56,7 @@ export function TemplateCard({authorName, categories, description, icons, templa
                     </CardDescription>
                 </CardHeader>
 
-                <CardContent className="flex-1">
+                <CardContent className="flex-1 px-0">
                     <div className="flex size-full items-end">
                         <div className="flex flex-wrap gap-1">
                             {icons.map((icon, index) => (
@@ -74,7 +74,7 @@ export function TemplateCard({authorName, categories, description, icons, templa
                     </div>
                 </CardContent>
 
-                <CardFooter>{authorName}</CardFooter>
+                <CardFooter className="px-0">{authorName}</CardFooter>
             </Card>
         </Link>
     );

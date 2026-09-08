@@ -233,3 +233,5 @@ export const WORKFLOW_NODES_SIDEBAR_WIDTH = 384;
 export const PROJECT_LEFT_SIDEBAR_WIDTH = 355;
 
 export const CANVAS_BACKGROUND_COLOR = '#E2E8F0';
+
+export const TEMPLATE_SHARING_DOCUMENTATION_URL = 'https://docs.bytechef.io';
