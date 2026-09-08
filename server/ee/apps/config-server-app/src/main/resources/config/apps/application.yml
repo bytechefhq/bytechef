@@ -126,10 +126,8 @@ spring:
         prefetch: 1
   task:
     execution:
-      pool:
-        core-size: 2
-        max-size: 50
-        queue-capacity: 10000
+      simple:
+        concurrency-limit: 200
   threads:
     virtual:
       enabled: true
