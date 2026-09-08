@@ -50,8 +50,13 @@ public class AsyncConfiguration implements AsyncConfigurer {
     public static final String MESSAGE_EVENT_EXECUTOR = "messageEventExecutor";
     public static final String TASK_EXECUTOR = "taskExecutor";
     public static final String WORKER_EXECUTOR = "workerExecutor";
+    public static final String SYNC_WORKER_EXECUTOR = "syncWorkerExecutor";
+
+    private static final int DEFAULT_SYNC_WORKER_CONCURRENCY = 5;
     private static final int DEFAULT_WORKER_CONCURRENCY = 10;
+    private static final String SYNC_WORKER_CONCURRENCY_PROPERTY = "bytechef.worker.task.sync-concurrency-limit";
     private static final String WORKER_CONCURRENCY_PROPERTY = "bytechef.worker.task.subscriptions.default";
+
     private final Environment environment;
     private final TaskDecorator taskDecorator;
     private final TaskExecutionProperties taskExecutionProperties;
@@ -85,6 +90,14 @@ public class AsyncConfiguration implements AsyncConfigurer {
     @Bean(name = MESSAGE_EVENT_EXECUTOR)
     AsyncTaskExecutor messageEventExecutor() {
         return createExecutor("message-event-", SimpleAsyncTaskExecutor.UNBOUNDED_CONCURRENCY);
+    }
+
+    @Bean(name = SYNC_WORKER_EXECUTOR)
+    AsyncTaskExecutor syncWorkerExecutor() {
+        int concurrencyLimit = environment.getProperty(
+            SYNC_WORKER_CONCURRENCY_PROPERTY, Integer.class, DEFAULT_SYNC_WORKER_CONCURRENCY);
+
+        return createExecutor("sync-worker-", concurrencyLimit);
     }
 
     @Bean(name = WORKER_EXECUTOR)

@@ -18,6 +18,8 @@ package com.bytechef.async.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.tenant.TenantContext;
@@ -54,6 +56,7 @@ class AsyncConfigurationTest {
         environment = new MockEnvironment();
 
         environment.setProperty("bytechef.worker.task.subscriptions.default", "3");
+        environment.setProperty("bytechef.worker.task.sync-concurrency-limit", "2");
         environment.setProperty("spring.threads.virtual.enabled", "true");
 
         TaskExecutionProperties taskExecutionProperties = new TaskExecutionProperties();
@@ -76,6 +79,39 @@ class AsyncConfigurationTest {
         SimpleAsyncTaskExecutor workerExecutor = (SimpleAsyncTaskExecutor) asyncConfiguration.workerExecutor();
 
         assertEquals(3, workerExecutor.getConcurrencyLimit());
+    }
+
+    @Test
+    void testSyncWorkerExecutorLimitMatchesSyncConcurrencyProperty() {
+        SimpleAsyncTaskExecutor syncWorkerExecutor = (SimpleAsyncTaskExecutor) asyncConfiguration.syncWorkerExecutor();
+
+        assertEquals(2, syncWorkerExecutor.getConcurrencyLimit());
+    }
+
+    @Test
+    void testSyncWorkerExecutorIsADistinctBeanWithItsOwnLimit() {
+        new ApplicationContextRunner()
+            .withUserConfiguration(AsyncConfiguration.class)
+            .withBean(ContextPropagatingTaskDecorator.class, ContextPropagatingTaskDecorator::new)
+            .withBean(TaskExecutionProperties.class, TaskExecutionProperties::new)
+            .withPropertyValues(
+                "bytechef.worker.task.subscriptions.default=3",
+                "bytechef.worker.task.sync-concurrency-limit=2",
+                "spring.threads.virtual.enabled=true")
+            .run(context -> {
+                assertNull(context.getStartupFailure(), "context failed to start");
+
+                SimpleAsyncTaskExecutor workerExecutor = context.getBean(
+                    "workerExecutor", SimpleAsyncTaskExecutor.class);
+                SimpleAsyncTaskExecutor syncWorkerExecutor = context.getBean(
+                    "syncWorkerExecutor", SimpleAsyncTaskExecutor.class);
+
+                assertNotSame(
+                    workerExecutor, syncWorkerExecutor,
+                    "the sync lane must be its own executor, or a saturated worker lane starves it");
+                assertEquals(3, workerExecutor.getConcurrencyLimit());
+                assertEquals(2, syncWorkerExecutor.getConcurrencyLimit());
+            });
     }
 
     @Test
@@ -182,7 +218,7 @@ class AsyncConfigurationTest {
     void testEveryExecutorPropagatesTenantId() throws Exception {
         List<TaskExecutor> executors = List.of(
             asyncConfiguration.getAsyncExecutor(), asyncConfiguration.messageEventExecutor(),
-            asyncConfiguration.workerExecutor());
+            asyncConfiguration.syncWorkerExecutor(), asyncConfiguration.workerExecutor());
 
         for (TaskExecutor executor : executors) {
             CompletableFuture<String> tenantIdSeenByTask = new CompletableFuture<>();
@@ -211,7 +247,7 @@ class AsyncConfigurationTest {
 
         List<TaskExecutor> executors = List.of(
             recordingAsyncConfiguration.getAsyncExecutor(), recordingAsyncConfiguration.messageEventExecutor(),
-            recordingAsyncConfiguration.workerExecutor());
+            recordingAsyncConfiguration.syncWorkerExecutor(), recordingAsyncConfiguration.workerExecutor());
 
         for (TaskExecutor executor : executors) {
             CompletableFuture<Boolean> taskRan = new CompletableFuture<>();
@@ -221,7 +257,7 @@ class AsyncConfigurationTest {
             assertTrue(taskRan.get(5, TimeUnit.SECONDS));
         }
 
-        assertEquals(3, recordingContextPropagatingTaskDecorator.decorateCount.get());
+        assertEquals(4, recordingContextPropagatingTaskDecorator.decorateCount.get());
     }
 
     @Test
