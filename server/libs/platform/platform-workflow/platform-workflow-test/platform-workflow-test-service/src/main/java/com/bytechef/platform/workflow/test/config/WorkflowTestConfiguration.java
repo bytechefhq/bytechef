@@ -88,6 +88,7 @@ import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEvent
 import com.bytechef.task.dispatcher.terminate.TerminateTaskDispatcher;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -116,7 +117,8 @@ public class WorkflowTestConfiguration {
     TestWorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
         ObjectMapper objectMapper, SubflowResolver subflowResolver,
-        TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutor taskExecutor,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        @Qualifier("workerExecutor") TaskExecutor workerExecutor,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
@@ -149,7 +151,7 @@ public class WorkflowTestConfiguration {
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
                     subflowResolver, taskExecutionService, taskFileStorage, workflowService),
-                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, workerExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
     }

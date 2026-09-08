@@ -51,7 +51,7 @@ public class MessageEventListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
-    @Async
+    @Async("messageEventExecutor")
     public void onMessageEvent(MessageEvent<?> messageEvent) {
         if (log.isTraceEnabled()) {
             log.trace("onMessageEvent: " + messageEvent);
