@@ -85,6 +85,8 @@ import tools.jackson.core.type.TypeReference;
  */
 class HttpClientExecutor {
 
+    static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(5);
+
     private final ApplicationContext applicationContext;
     private final TempFileStorage tempFileStorage;
 
@@ -106,8 +108,10 @@ class HttpClientExecutor {
             headers, queryParameters, configuration, componentName, componentVersion, componentOperationName,
             componentConnection, context)) {
 
-            HttpRequest httpRequest = createHttpRequest(
-                urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context);
+            HttpRequest httpRequest = createHttpRequestBuilder(
+                urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context)
+                    .timeout(resolveRequestTimeout(configuration))
+                    .build();
 
             context.log(log -> log.debug(
                 "uri: {}, requestMethod: {}, headers: {}, queryParameters: {}, responseType: {}",
@@ -206,7 +210,23 @@ class HttpClientExecutor {
         return builder.build();
     }
 
+    Duration resolveRequestTimeout(Configuration configuration) {
+        Duration timeout = configuration.getTimeout();
+
+        return timeout == null ? DEFAULT_REQUEST_TIMEOUT : timeout;
+    }
+
     HttpRequest createHttpRequest(
+        String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
+        @Nullable Map<String, List<String>> queryParameters, @Nullable Body body, String componentName,
+        @Nullable ComponentConnection componentConnection, Context context) {
+
+        return createHttpRequestBuilder(
+            urlString, requestMethod, headers, queryParameters, body, componentName, componentConnection, context)
+                .build();
+    }
+
+    HttpRequest.Builder createHttpRequestBuilder(
         String urlString, RequestMethod requestMethod, Map<String, List<String>> headers,
         @Nullable Map<String, List<String>> queryParameters, @Nullable Body body, String componentName,
         @Nullable ComponentConnection componentConnection, Context context) {
@@ -225,7 +245,7 @@ class HttpClientExecutor {
                 getConnectionUrl(urlString, componentName, componentConnection, context),
                 queryParameters == null ? Collections.emptyMap() : queryParameters));
 
-        return httpRequestBuilder.build();
+        return httpRequestBuilder;
     }
 
     Response handleResponse(HttpResponse<?> httpResponse, Configuration configuration, Context context) {
