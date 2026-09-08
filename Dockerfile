@@ -1,6 +1,8 @@
 # docker/dockerfile:1
 FROM bytechef/bytechef-server:latest
 
+ARG ARG_APPLICATION_HOME=/opt/bytechef
+
 RUN mkdir ${ARG_APPLICATION_HOME}/client
 RUN mkdir ${ARG_APPLICATION_HOME}/client/assets
 
