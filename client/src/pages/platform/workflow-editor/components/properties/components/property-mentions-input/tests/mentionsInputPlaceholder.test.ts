@@ -20,12 +20,20 @@ describe('getMentionsInputPlaceholder', () => {
         );
     });
 
-    // The property's placeholder says what the value should look like, which neither generic hint can, so a
-    // tool property that defines one keeps it.
-    it('keeps a defined placeholder over the tool-property hint', () => {
+    it('keeps the tool-property hint over a defined placeholder', () => {
         expect(getMentionsInputPlaceholder({expressionEnabled: true, placeholder: 'Custom', toolProperty: true})).toBe(
-            'Custom'
+            TOOL_PROPERTY_PLACEHOLDER
         );
+    });
+
+    it('keeps a defined placeholder for a tool property that has expressions disabled', () => {
+        expect(
+            getMentionsInputPlaceholder({
+                expressionEnabled: false,
+                placeholder: 'Defaults to tool name',
+                toolProperty: true,
+            })
+        ).toBe('Defaults to tool name');
     });
 
     it('keeps a defined placeholder for a plain property', () => {
