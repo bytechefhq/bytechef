@@ -32,8 +32,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,14 +74,15 @@ public class TaskWorkerConfiguration {
     @Bean
     TaskWorker taskWorker(
         ApplicationProperties applicationProperties, Evaluator evaluator, ApplicationEventPublisher eventPublisher,
-        Executor taskExecutor, TaskFileStorage taskFileStorage, TaskHandlerResolver taskHandlerResolver,
+        @Qualifier("workerExecutor") AsyncTaskExecutor workerExecutor, TaskFileStorage taskFileStorage,
+        TaskHandlerResolver taskHandlerResolver,
         List<TaskExecutionPostOutputProcessor> taskExecutionPostOutputProcessors) {
 
         ApplicationProperties.Worker.Task task = applicationProperties.getWorker()
             .getTask();
 
         return new TaskWorker(
-            task.getDefaultTimeout(), evaluator, eventPublisher, (AsyncTaskExecutor) taskExecutor, taskHandlerResolver,
+            task.getDefaultTimeout(), evaluator, eventPublisher, workerExecutor, taskHandlerResolver,
             taskFileStorage, taskExecutionPostOutputProcessors);
     }
 }

@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerWorkerExecutor {
 
-    @Async
+    @Async("workerExecutor")
     public Future<?> submit(Runnable runnable) {
         runnable.run();
 
