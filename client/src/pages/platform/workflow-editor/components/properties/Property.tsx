@@ -752,6 +752,7 @@ const Property = ({
                                     errorMessage={fieldState.error?.message || errorMessage}
                                     label={label || name}
                                     leadingIcon={typeIcon}
+                                    placeholder={placeholder}
                                     required={required}
                                     {...field}
                                 />
@@ -923,6 +924,7 @@ const Property = ({
                             leadingIcon={typeIcon}
                             name={name!}
                             onChange={handleInputChange}
+                            placeholder={placeholder}
                             required={required}
                             value={inputValue}
                         />
