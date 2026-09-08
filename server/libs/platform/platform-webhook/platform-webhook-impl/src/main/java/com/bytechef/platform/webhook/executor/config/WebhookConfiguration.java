@@ -95,7 +95,7 @@ public class WebhookConfiguration {
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
-        TaskExecutionService taskExecutionService, @Qualifier("taskExecutor") TaskExecutor taskExecutor,
+        TaskExecutionService taskExecutionService, @Qualifier("workerExecutor") TaskExecutor workerExecutor,
         TaskHandlerRegistry taskHandlerRegistry, TriggerDefinitionService triggerDefinitionService,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
@@ -116,7 +116,7 @@ public class WebhookConfiguration {
                 getTaskDispatcherResolverFactories(
                     childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
                     jobService, subflowResolver, taskExecutionService, taskFileStorage),
-                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, workerExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
             principalJobFacade, sseStreamBridgeRegistry, triggerSyncExecutor, taskFileStorage,
             triggerDefinitionService, workflowService);
     }
