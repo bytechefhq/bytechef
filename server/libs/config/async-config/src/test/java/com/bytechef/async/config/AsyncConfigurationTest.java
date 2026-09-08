@@ -30,7 +30,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
@@ -219,6 +224,24 @@ class AsyncConfigurationTest {
         assertEquals(3, recordingContextPropagatingTaskDecorator.decorateCount.get());
     }
 
+    @Test
+    void testWorkerExecutorResolvesForNarrowerAsyncTaskExecutorQualifiedInjection() {
+        new ApplicationContextRunner()
+            .withUserConfiguration(WorkerExecutorConsumerConfiguration.class, AsyncConfiguration.class)
+            .withBean(ContextPropagatingTaskDecorator.class, ContextPropagatingTaskDecorator::new)
+            .withBean(TaskExecutionProperties.class, TaskExecutionProperties::new)
+            .withPropertyValues(
+                "bytechef.worker.task.subscriptions.default=3",
+                "spring.threads.virtual.enabled=true")
+            .run(context -> {
+                assertTrue(context.getStartupFailure() == null, "context failed to start");
+
+                WorkerExecutorConsumer workerExecutorConsumer = context.getBean(WorkerExecutorConsumer.class);
+
+                assertTrue(workerExecutorConsumer.getWorkerExecutor() instanceof SimpleAsyncTaskExecutor);
+            });
+    }
+
     private static final class RecordingContextPropagatingTaskDecorator extends ContextPropagatingTaskDecorator {
 
         private final AtomicInteger decorateCount = new AtomicInteger();
@@ -228,6 +251,28 @@ class AsyncConfigurationTest {
             decorateCount.incrementAndGet();
 
             return super.decorate(runnable);
+        }
+    }
+
+    @Configuration
+    static class WorkerExecutorConsumerConfiguration {
+
+        @Bean
+        WorkerExecutorConsumer workerExecutorConsumer(@Qualifier("workerExecutor") AsyncTaskExecutor workerExecutor) {
+            return new WorkerExecutorConsumer(workerExecutor);
+        }
+    }
+
+    private static final class WorkerExecutorConsumer {
+
+        private final AsyncTaskExecutor workerExecutor;
+
+        WorkerExecutorConsumer(AsyncTaskExecutor workerExecutor) {
+            this.workerExecutor = workerExecutor;
+        }
+
+        AsyncTaskExecutor getWorkerExecutor() {
+            return workerExecutor;
         }
     }
 }
