@@ -52,10 +52,8 @@ spring:
   task:
     execution:
       thread-name-prefix: server-app-task-
-      pool:
-        core-size: 2
-        max-size: 50
-        queue-capacity: 10000
+      simple:
+        concurrency-limit: 200
     scheduling:
       thread-name-prefix: server-app-scheduling-
       pool:
