@@ -361,6 +361,26 @@ public class ExampleComponentHandler implements ComponentHandler {
     - Resolve collection dependencies via `context.beanProvider(Class).orderedStream().toList()` (replaces `beanFactory.getBeansOfType()`)
     - Resolve named beans via `context.bean("beanName", Class)` in supplier
     - Test `BeanRegistrar` specs by capturing `Consumer<Spec<T>>` with `ArgumentCaptor`, applying to mock `Spec`, and verifying fluent calls
+- **Four executors, no queues.** `AsyncConfiguration` defines `taskExecutor` (default `@Async`, limit
+  `bytechef.async.concurrency-limit`), `workerExecutor` (task handlers + trigger executions, limit
+  `bytechef.worker.task.subscriptions.default`), `syncWorkerExecutor` (the API-Platform sync path and the editor's
+  Test button, limit `bytechef.worker.task.sync-concurrency-limit`) and `messageEventExecutor` (Spring-event→broker
+  bridge, unbounded). The sync lane is a bulkhead, not extra capacity: without it a burst of scheduled runs
+  saturates the worker lane and an interactive caller blocks on a permit while holding a request thread.
+  All are queue-less `SimpleAsyncTaskExecutor`s: a submitter waits for a permit. Anything that runs component code
+  or blocks on I/O goes on `workerExecutor`, never the default. Virtual threads change only the thread factory —
+  they do not lift a limit, which is why these are not `ThreadPoolTaskExecutor`s. The bridge stays unbounded
+  because it only hands messages to the broker: starving it stalls every workflow, while the real work is already
+  bounded at `workerExecutor` (and DB connections at Hikari's `maximum-pool-size`). Don't bound
+  `AsyncMessageBroker`'s own dispatch executor either — it carries work-initiating and completion events together,
+  and each `JobSyncExecutor` builds a private instance whose latch waits on events from it, so a bound there can
+  wedge the API-Platform sync path and the editor's Test button. Its per-route ordered executors (single thread,
+  bounded queue, blocking put) are a separate, deliberate case and stay bounded. `AsyncConfigurationTest`
+  enumerates them, so it catches the decorator being dropped from `createExecutor` — a fourth executor built
+  outside that factory isn't covered; every executor must go through `createExecutor`. The one deliberate exception is
+  `WorkflowSubflowSyncExecutorConfiguration`, which builds its own unbounded executor: subflows nest through a
+  `SubflowTaskDispatcher`, so a parent holds a permit while its child needs one, and a shared bounded lane would
+  deadlock past the nesting depth.
 
 ## Access and Authentication
 
