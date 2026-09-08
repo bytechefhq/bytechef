@@ -1,4 +1,5 @@
 import {NewSubPropertyI} from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
+import getPropertyKey from '@/pages/platform/workflow-editor/components/properties/getPropertyKey';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
@@ -28,14 +29,6 @@ interface BuildPropertyFromParameterKeyProps {
     path: string;
     properties?: Array<PropertyAllType>;
 }
-
-const getPropertyKey = (name: string | undefined, displayCondition?: string): string => {
-    if (!name) {
-        return '';
-    }
-
-    return displayCondition ? `${name}::${displayCondition}` : name;
-};
 
 interface UseObjectPropertyProps {
     onDeleteClick?: (path: string) => void;

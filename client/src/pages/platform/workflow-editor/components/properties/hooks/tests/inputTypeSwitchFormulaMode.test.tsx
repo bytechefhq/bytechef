@@ -39,6 +39,39 @@ describe('handleInputTypeSwitchButtonClick formula mode', () => {
         } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
     });
 
+    // Property definitions carry an explicit null defaultValue when none is set, and a controlled input handed
+    // null is uncontrolled as far as React is concerned.
+    it('resolves a null property default to an empty string', () => {
+        const {result} = renderHook(
+            () =>
+                useProperty({
+                    path: 'parameters.uri',
+                    property: {...uriProperty, defaultValue: null} as unknown as PropertyAllType,
+                }),
+            {wrapper}
+        );
+
+        expect(result.current.defaultValue).toBe('');
+    });
+
+    it('keeps a falsy property default that is not null', () => {
+        const {result} = renderHook(
+            () =>
+                useProperty({
+                    path: 'parameters.timeout',
+                    property: {
+                        controlType: 'INTEGER',
+                        defaultValue: 0,
+                        name: 'timeout',
+                        type: 'INTEGER',
+                    } as unknown as PropertyAllType,
+                }),
+            {wrapper}
+        );
+
+        expect(result.current.defaultValue).toBe(0);
+    });
+
     it('enters formula mode for a saved expression value', () => {
         const {result} = renderUriProperty("=concat('a', 'b')");
 
