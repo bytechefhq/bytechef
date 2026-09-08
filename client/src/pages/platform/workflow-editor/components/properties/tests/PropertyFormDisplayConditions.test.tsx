@@ -1,7 +1,7 @@
 import {PropertyAllType} from '@/shared/types';
 import {render, screen} from '@testing-library/react';
 import {useForm} from 'react-hook-form';
-import {describe, expect, it, vi} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import Properties from '../Properties';
 
@@ -53,7 +53,24 @@ const bodyProperty = {
     type: 'OBJECT',
 } as unknown as PropertyAllType;
 
-const Wrapper = ({formDisplayConditions}: {formDisplayConditions?: Record<string, boolean>}) => {
+const sameNamedBodyProperty = {
+    controlType: 'OBJECT_BUILDER',
+    name: 'body',
+    properties: [
+        {controlType: 'TEXT', displayCondition: "body.bodyContentType == 'JSON'", name: 'bodyContent', type: 'STRING'},
+        {controlType: 'TEXT', displayCondition: "body.bodyContentType == 'XML'", name: 'bodyContent', type: 'STRING'},
+        {controlType: 'TEXT', displayCondition: "body.bodyContentType == 'RAW'", name: 'bodyContent', type: 'STRING'},
+    ],
+    type: 'OBJECT',
+} as unknown as PropertyAllType;
+
+const Wrapper = ({
+    formDisplayConditions,
+    property = bodyProperty,
+}: {
+    formDisplayConditions?: Record<string, boolean>;
+    property?: PropertyAllType;
+}) => {
     const form = useForm({defaultValues: {parameters: {body: {bodyContentType: 'JSON'}}}});
 
     return (
@@ -62,12 +79,16 @@ const Wrapper = ({formDisplayConditions}: {formDisplayConditions?: Record<string
             controlPath="parameters"
             formDisplayConditions={formDisplayConditions}
             formState={form.formState}
-            properties={[bodyProperty]}
+            properties={[property]}
         />
     );
 };
 
 describe('Property form display conditions', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it('keeps every nested conditional property visible while conditions are unevaluated', () => {
         render(<Wrapper />);
 
@@ -81,5 +102,17 @@ describe('Property form display conditions', () => {
         expect(screen.getByLabelText('bodyContentType property')).toBeInTheDocument();
         expect(screen.getByLabelText('bodyContent property')).toBeInTheDocument();
         expect(screen.queryByLabelText('rawContent property')).not.toBeInTheDocument();
+    });
+
+    // HTTP Client declares seven sibling properties all named bodyContent, told apart only by their display
+    // condition. React drops or duplicates children whose keys collide, so the name alone cannot be the key.
+    it('renders same-named sub-properties without colliding keys', () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        render(<Wrapper property={sameNamedBodyProperty} />);
+
+        const duplicateKeyWarnings = consoleErrorSpy.mock.calls.filter((call) => String(call[0]).includes('same key'));
+
+        expect(duplicateKeyWarnings).toHaveLength(0);
     });
 });

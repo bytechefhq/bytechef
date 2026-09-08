@@ -23,6 +23,7 @@ import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/componen
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {reconstructControlledExpressionValue} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/controlledExpressionValue';
 import {getMentionsInputPlaceholder} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/mentionsInputPlaceholder';
+import getPropertyKey from '@/pages/platform/workflow-editor/components/properties/getPropertyKey';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
@@ -420,7 +421,10 @@ const Property = ({
                                         customClassName="w-full pl-2"
                                         formState={formState}
                                         hideFromAi={hideFromAi}
-                                        key={subProperty.name || `${property.name}_${index}`}
+                                        key={
+                                            getPropertyKey(subProperty.name, subProperty.displayCondition) ||
+                                            `${property.name}_${index}`
+                                        }
                                         property={subProperty}
                                         toolsMode={isToolsClusterElement}
                                     />
