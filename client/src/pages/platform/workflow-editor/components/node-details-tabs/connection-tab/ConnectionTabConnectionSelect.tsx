@@ -86,9 +86,9 @@ const ConnectionTabConnectionSelect = ({
     const {data: componentConnections} = useGetConnectionsQuery!(
         {
             componentName: componentConnection?.componentName,
-            connectionVersion: componentConnection?.componentVersion,
+            connectionVersion: connectionDefinition?.version,
         },
-        !!componentDefinition
+        !!componentDefinition && !!connectionDefinition
     );
 
     const queryClient = useQueryClient();
