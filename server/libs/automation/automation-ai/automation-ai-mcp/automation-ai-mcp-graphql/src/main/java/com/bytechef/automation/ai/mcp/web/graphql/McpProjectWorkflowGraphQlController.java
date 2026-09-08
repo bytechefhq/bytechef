@@ -142,17 +142,20 @@ public class McpProjectWorkflowGraphQlController {
         properties.add(
             Property.toProperty(
                 string(TOOL_NAME)
-                    .label("Name")
-                    .description("The tool name exposed to the AI model. Leave empty to use the workflow name.")
+                    .label("Tool Name")
+                    .description(
+                        "The tool name exposed to the AI model. Defaults to the workflow name when left blank.")
+                    .placeholder("Defaults to workflow name")
                     .expressionEnabled(false)
                     .required(false)));
 
         properties.add(
             Property.toProperty(
                 string(TOOL_DESCRIPTION)
-                    .label("Description")
+                    .label("Tool Description")
                     .description(
-                        "The tool description exposed to the AI model. Leave empty to use the workflow description.")
+                        "The tool description exposed to the AI model. Defaults to the workflow description when left blank.")
+                    .placeholder("Defaults to workflow description")
                     .controlType(ControlType.TEXT_AREA)
                     .expressionEnabled(false)
                     .required(false)));

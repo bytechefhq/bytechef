@@ -54,14 +54,14 @@ For each exposed action you decide which parameters you fix yourself (a constant
 1. From the server's row menu, choose **Add Workflows**.
 2. **Select a project** and a **published version**.
 3. **Select the workflows** from that deployment you want to expose.
-4. Complete each workflow's **tool mapping**, from the properties control on its row in the expanded server. The mapping asks for a **Name** and a **Description** - both required, both what the model sees - plus one field per input declared on the workflow's trigger schema.
+4. Complete each workflow's **tool mapping**, from the properties control on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both optional, both what the model sees - plus one field per input declared on the workflow's trigger schema. Left blank, the workflow's own name and description are used.
 
 Each exposed workflow becomes one tool. Per-input values can be fixed constants or `fromAi(...)` expressions the assistant fills at call time. When the assistant calls the tool, ByteChef runs the workflow with those inputs and returns the result.
 
 The mapping lives on the MCP server's attachment to the workflow, not in the workflow definition - so the same workflow can be exposed under different tool names on different servers, and adding a workflow does not by itself make it callable.
 
 <Callout type="warn" title="Why a workflow might not appear in the tool list">
-    A workflow is silently skipped when the server lists its tools if any of three things is true:
+    A workflow is silently skipped when the server lists its tools if either of two things is true:
 
     - It does **not** start with the **Workflow → New Workflow Call** trigger
       (`workflow/v1/newWorkflowCall`). Only that trigger makes a workflow callable as a tool.
@@ -69,8 +69,8 @@ The mapping lives on the MCP server's attachment to the workflow, not in the wor
       [Deploy Project](/platform/automation/deploy/workflows#deploy-project). This is a
       different switch from the deployment's own enabled state; the deployment-level flag is not
       consulted here, so a fully enabled deployment can still expose nothing.
-    - Its **tool mapping has no tool name** yet. Finish the mapping before pointing an assistant at
-      the server.
+
+    A missing tool name is **not** one of them - the name falls back to the workflow's own name.
 </Callout>
 
 ### Choosing what to expose
