@@ -21,9 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.tenant.TenantContext;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -168,5 +170,64 @@ class AsyncConfigurationTest {
         assertTrue(fourthTaskStarted.get(5, TimeUnit.SECONDS));
 
         submitterThread.join(5000);
+    }
+
+    @Test
+    @Timeout(15)
+    void testEveryExecutorPropagatesTenantId() throws Exception {
+        List<TaskExecutor> executors = List.of(
+            asyncConfiguration.getAsyncExecutor(), asyncConfiguration.messageEventExecutor(),
+            asyncConfiguration.workerExecutor());
+
+        for (TaskExecutor executor : executors) {
+            CompletableFuture<String> tenantIdSeenByTask = new CompletableFuture<>();
+
+            TenantContext.setCurrentTenantId("tenant_1");
+
+            executor.execute(() -> tenantIdSeenByTask.complete(TenantContext.getCurrentTenantId()));
+
+            assertEquals("tenant_1", tenantIdSeenByTask.get(5, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    @Timeout(15)
+    void testContextPropagatingTaskDecoratorAppliedByEveryExecutor() throws Exception {
+        MockEnvironment recordingEnvironment = new MockEnvironment();
+
+        recordingEnvironment.setProperty("bytechef.worker.task.subscriptions.default", "3");
+        recordingEnvironment.setProperty("spring.threads.virtual.enabled", "true");
+
+        RecordingContextPropagatingTaskDecorator recordingContextPropagatingTaskDecorator =
+            new RecordingContextPropagatingTaskDecorator();
+
+        AsyncConfiguration recordingAsyncConfiguration = new AsyncConfiguration(
+            recordingContextPropagatingTaskDecorator, recordingEnvironment, new TaskExecutionProperties());
+
+        List<TaskExecutor> executors = List.of(
+            recordingAsyncConfiguration.getAsyncExecutor(), recordingAsyncConfiguration.messageEventExecutor(),
+            recordingAsyncConfiguration.workerExecutor());
+
+        for (TaskExecutor executor : executors) {
+            CompletableFuture<Boolean> taskRan = new CompletableFuture<>();
+
+            executor.execute(() -> taskRan.complete(true));
+
+            assertTrue(taskRan.get(5, TimeUnit.SECONDS));
+        }
+
+        assertEquals(3, recordingContextPropagatingTaskDecorator.decorateCount.get());
+    }
+
+    private static final class RecordingContextPropagatingTaskDecorator extends ContextPropagatingTaskDecorator {
+
+        private final AtomicInteger decorateCount = new AtomicInteger();
+
+        @Override
+        public Runnable decorate(Runnable runnable) {
+            decorateCount.incrementAndGet();
+
+            return super.decorate(runnable);
+        }
     }
 }
