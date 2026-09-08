@@ -298,7 +298,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             // Data pill chips size themselves, so the editor's own text-xs does not
                             // reach them. The modifier lets the stylesheet bring them down to match.
                             isFormulaMode && 'property-mentions-editor--formula-mode',
-                            controlType === 'TEXT_AREA' && !isFormulaMode && 'min-h-28',
+                            controlType === 'TEXT_AREA' && !isFormulaMode && 'min-h-16',
                             leadingIcon && 'border-0 pr-0.5 pl-10',
                             className
                         )}
