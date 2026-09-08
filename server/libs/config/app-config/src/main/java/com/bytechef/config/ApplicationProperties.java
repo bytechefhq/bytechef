@@ -3067,6 +3067,12 @@ public class ApplicationProperties {
     public static class Datasource {
 
         /**
+         * Maximum JDBC connections in the pool, shared by Quartz's job-store threads, workflow task execution and
+         * request threads
+         */
+        private int maximumPoolSize;
+
+        /**
          * Database password
          */
         private String password;
@@ -3081,6 +3087,10 @@ public class ApplicationProperties {
          */
         private String username;
 
+        public int getMaximumPoolSize() {
+            return maximumPoolSize;
+        }
+
         public String getPassword() {
             return password;
         }
@@ -3091,6 +3101,10 @@ public class ApplicationProperties {
 
         public String getUsername() {
             return username;
+        }
+
+        public void setMaximumPoolSize(int maximumPoolSize) {
+            this.maximumPoolSize = maximumPoolSize;
         }
 
         public void setPassword(String password) {
@@ -4316,6 +4330,13 @@ public class ApplicationProperties {
              */
             private Map<String, Integer> subscriptions = new HashMap<>();
 
+            /**
+             * Concurrent executions allowed in the synchronous, interactive lane — the API Platform sync request path
+             * and the editor's Test button. Separate from subscriptions.default so a burst of scheduled runs cannot
+             * leave an interactive caller waiting for a permit.
+             */
+            private int syncConcurrencyLimit;
+
             public Long getDefaultTimeout() {
                 return defaultTimeout;
             }
@@ -4324,8 +4345,16 @@ public class ApplicationProperties {
                 return subscriptions;
             }
 
+            public int getSyncConcurrencyLimit() {
+                return syncConcurrencyLimit;
+            }
+
             public void setDefaultTimeout(Long defaultTimeout) {
                 this.defaultTimeout = defaultTimeout;
+            }
+
+            public void setSyncConcurrencyLimit(int syncConcurrencyLimit) {
+                this.syncConcurrencyLimit = syncConcurrencyLimit;
             }
 
             public void setSubscriptions(Map<String, Integer> subscriptions) {
