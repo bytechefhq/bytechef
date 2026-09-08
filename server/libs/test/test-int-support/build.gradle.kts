@@ -10,6 +10,7 @@ dependencies {
     implementation("org.testcontainers:postgresql")
     implementation("org.springframework.boot:spring-boot-testcontainers")
 
+    runtimeOnly("com.h2database:h2")
     runtimeOnly("com.zaxxer:HikariCP")
     runtimeOnly("org.postgresql:postgresql")
 }

@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,11 +46,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -62,6 +68,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JdbcTemplate jdbcTemplate;
+
+    private Boolean returningSupported;
 
     @SuppressFBWarnings("EI")
     public DataTableRowServiceImpl(ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate) {
@@ -86,26 +94,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
         checkHasId(physicalName);
 
-        List<String> columnNames = listColumns(physicalName).stream()
-            .map(ColumnSpec::name)
-            .filter(name -> !"id".equalsIgnoreCase(name))
-            .toList();
+        DataTableRow deletedDataTableRow;
 
-        String returningColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
-            .map(this::escapeIdentifier)
-            .collect(Collectors.joining(", ")));
-
-        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ? RETURNING " +
-            returningColumns;
-
-        List<DataTableRow> deletedDataTableRows = jdbcTemplate.query(
-            sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
-
-        if (deletedDataTableRows.isEmpty()) {
-            return false;
+        if (isReturningSupported()) {
+            deletedDataTableRow = deleteRowReturningValues(physicalName, id);
+        } else {
+            deletedDataTableRow = deleteRowAfterReadingValues(baseName, physicalName, id, environmentId);
         }
 
-        DataTableRow deletedDataTableRow = deletedDataTableRows.getFirst();
+        if (deletedDataTableRow == null) {
+            return false;
+        }
 
         Map<String, Object> payload = new HashMap<>();
 
@@ -321,26 +320,12 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .map(k -> "?")
             .collect(Collectors.joining(", "));
 
-        List<String> returningColumnNames = new ArrayList<>();
-
-        returningColumnNames.add("id");
-        returningColumnNames.addAll(allColumnNames.stream()
-            .filter(columnName -> !"id".equalsIgnoreCase(columnName))
-            .toList());
-
-        String returningClause = returningColumnNames.stream()
-            .map(this::escapeIdentifier)
-            .collect(Collectors.joining(", "));
-
         String valuesClause = insertableColumnNames.isEmpty()
             ? " DEFAULT VALUES" : (" (" + columnsClause + ") VALUES (" + placeholders + ")");
 
-        String sql =
-            "INSERT INTO " + escapeIdentifier(physicalName) + valuesClause + " RETURNING " + returningClause;
-
         Map<String, ColumnType> typeMap = columnTypeMap(physicalName);
 
-        DataTableRow result = jdbcTemplate.query(sql, ps -> {
+        PreparedStatementSetter preparedStatementSetter = ps -> {
             int i = 1;
 
             for (String columnName : insertableColumnNames) {
@@ -351,21 +336,20 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
                 setParam(ps, i++, columnType, coercedValue);
             }
-        }, resultSet -> {
-            if (resultSet.next()) {
-                long id = resultSet.getLong("id");
-                Map<String, Object> map = new HashMap<>();
+        };
 
-                for (String columnName : returningColumnNames) {
-                    if (!"id".equalsIgnoreCase(columnName)) {
-                        map.put(columnName, resultSet.getObject(columnName));
-                    }
-                }
+        DataTableRow result;
 
-                return new DataTableRow(id, map);
-            }
+        if (isReturningSupported()) {
+            result = insertRowReturningValues(physicalName, valuesClause, allColumnNames, preparedStatementSetter);
+        } else {
+            result = insertRowAfterInserting(
+                baseName, physicalName, valuesClause, environmentId, preparedStatementSetter);
+        }
+
+        if (result == null) {
             throw new IllegalStateException("Failed to insert row");
-        });
+        }
 
         // Dispatch event for webhooks
         Map<String, Object> payload = new HashMap<>();
@@ -379,14 +363,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         return result;
     }
 
-    /**
-     * Lists rows from a data table with pagination.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection. LIMIT/OFFSET values are parameterized.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public List<DataTableRow> listRows(String baseName, int limit, int offset, long environmentId) {
@@ -415,14 +391,6 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
     }
 
-    /**
-     * Updates an existing row in a data table.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL_INJECTION_SPRING_JDBC suppression is safe because all identifiers are validated
-     * through {@link #escapeIdentifier(String)} and {@link #validateBaseName(String)} which enforce a strict allowlist
-     * pattern {@code [a-z_][a-z0-9_]*}, preventing SQL injection. User-provided row values use parameterized queries.
-     */
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
@@ -464,24 +432,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             .map(c -> escapeIdentifier(c) + " = ?")
             .collect(Collectors.joining(", "));
 
-        List<String> returningColumnNames = new ArrayList<>();
-
-        returningColumnNames.add("id");
-        returningColumnNames.addAll(allColumnNames.stream()
-            .filter(c -> !"id".equalsIgnoreCase(c))
-            .toList());
-
-        String returningClause = returningColumnNames.stream()
-            .map(this::escapeIdentifier)
-            .collect(Collectors.joining(", "));
-
-        String sql =
-            "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause + " WHERE \"id\" = ? RETURNING " +
-                returningClause;
-
         Map<String, ColumnType> columnTypeMap = columnTypeMap(physicalName);
 
-        DataTableRow updatedDataTableRow = jdbcTemplate.query(sql, ps -> {
+        PreparedStatementSetter preparedStatementSetter = ps -> {
             int i = 1;
 
             for (String columnName : updatableColumnNames) {
@@ -496,22 +449,21 @@ public class DataTableRowServiceImpl implements DataTableRowService {
             }
 
             ps.setLong(i, id);
-        }, rs -> {
-            if (rs.next()) {
-                long curId = rs.getLong("id");
-                Map<String, Object> map = new HashMap<>();
+        };
 
-                for (String columnName : returningColumnNames) {
-                    if (!"id".equalsIgnoreCase(columnName)) {
-                        map.put(columnName, rs.getObject(columnName));
-                    }
-                }
+        DataTableRow updatedDataTableRow;
 
-                return new DataTableRow(curId, map);
-            }
+        if (isReturningSupported()) {
+            updatedDataTableRow = updateRowReturningValues(
+                physicalName, setClause, allColumnNames, preparedStatementSetter);
+        } else {
+            updatedDataTableRow = updateRowAfterUpdating(
+                baseName, physicalName, setClause, id, environmentId, preparedStatementSetter);
+        }
 
+        if (updatedDataTableRow == null) {
             throw new IllegalArgumentException("Row not found: id=" + id);
-        });
+        }
 
         Map<String, Object> payload = new HashMap<>();
 
@@ -749,5 +701,166 @@ public class DataTableRowServiceImpl implements DataTableRowService {
         }
 
         return new BigDecimal(String.valueOf(number));
+    }
+
+    @SuppressFBWarnings({
+        "SQL_INJECTION_JDBC", "OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE"
+    })
+    private PreparedStatement createInsertPreparedStatement(
+        Connection connection, String sql, PreparedStatementSetter preparedStatementSetter) throws SQLException {
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, new String[] {
+            "id"
+        });
+
+        preparedStatementSetter.setValues(preparedStatement);
+
+        return preparedStatement;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow deleteRowReturningValues(String physicalName, long id) {
+        List<String> columnNames = listColumns(physicalName).stream()
+            .map(ColumnSpec::name)
+            .filter(name -> !"id".equalsIgnoreCase(name))
+            .toList();
+
+        String returningColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
+            .map(this::escapeIdentifier)
+            .collect(Collectors.joining(", ")));
+
+        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ? RETURNING " +
+            returningColumns;
+
+        List<DataTableRow> deletedDataTableRows = jdbcTemplate.query(
+            sql, ps -> ps.setLong(1, id), (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+
+        return deletedDataTableRows.isEmpty() ? null : deletedDataTableRows.getFirst();
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow deleteRowAfterReadingValues(
+        String baseName, String physicalName, long id, long environmentId) {
+
+        DataTableRow dataTableRow = getRow(baseName, id, environmentId);
+
+        if (dataTableRow == null) {
+            return null;
+        }
+
+        String sql = "DELETE FROM " + escapeIdentifier(physicalName) + " WHERE \"id\" = ?";
+
+        int deletedRowCount = jdbcTemplate.update(sql, (PreparedStatementSetter) ps -> ps.setLong(1, id));
+
+        return deletedRowCount == 0 ? null : dataTableRow;
+    }
+
+    private boolean isReturningSupported() {
+        if (returningSupported == null) {
+            returningSupported = resolveReturningSupported();
+        }
+
+        return returningSupported;
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow insertRowReturningValues(
+        String physicalName, String valuesClause, List<String> allColumnNames,
+        PreparedStatementSetter preparedStatementSetter) {
+
+        List<String> columnNames = allColumnNames.stream()
+            .filter(columnName -> !"id".equalsIgnoreCase(columnName))
+            .toList();
+
+        String returningColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
+            .map(this::escapeIdentifier)
+            .collect(Collectors.joining(", ")));
+
+        String sql = "INSERT INTO " + escapeIdentifier(physicalName) + valuesClause + " RETURNING " + returningColumns;
+
+        List<DataTableRow> insertedDataTableRows = jdbcTemplate.query(
+            sql, preparedStatementSetter, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+
+        return insertedDataTableRows.isEmpty() ? null : insertedDataTableRows.getFirst();
+    }
+
+    private DataTableRow insertRowAfterInserting(
+        String baseName, String physicalName, String valuesClause, long environmentId,
+        PreparedStatementSetter preparedStatementSetter) {
+
+        String sql = "INSERT INTO " + escapeIdentifier(physicalName) + valuesClause;
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(
+            connection -> createInsertPreparedStatement(connection, sql, preparedStatementSetter), keyHolder);
+
+        Number generatedKey = keyHolder.getKey();
+
+        if (generatedKey == null) {
+            return null;
+        }
+
+        return getRow(baseName, generatedKey.longValue(), environmentId);
+    }
+
+    private boolean resolveReturningSupported() {
+        DataSource dataSource = jdbcTemplate.getDataSource();
+
+        if (dataSource == null) {
+            return true;
+        }
+
+        try (Connection connection = dataSource.getConnection()) {
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+            String databaseProductName = databaseMetaData.getDatabaseProductName();
+
+            databaseProductName = databaseProductName.toLowerCase(Locale.ROOT);
+
+            return !databaseProductName.contains("h2");
+        } catch (SQLException sqlException) {
+            log.warn("Unable to determine the database product name, assuming RETURNING is supported", sqlException);
+
+            return true;
+        }
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow updateRowAfterUpdating(
+        String baseName, String physicalName, String setClause, long id, long environmentId,
+        PreparedStatementSetter preparedStatementSetter) {
+
+        String sql = "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause + " WHERE \"id\" = ?";
+
+        int updatedRowCount = jdbcTemplate.update(sql, preparedStatementSetter);
+
+        if (updatedRowCount == 0) {
+            return null;
+        }
+
+        return getRow(baseName, id, environmentId);
+    }
+
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRow updateRowReturningValues(
+        String physicalName, String setClause, List<String> allColumnNames,
+        PreparedStatementSetter preparedStatementSetter) {
+
+        List<String> columnNames = allColumnNames.stream()
+            .filter(columnName -> !"id".equalsIgnoreCase(columnName))
+            .toList();
+
+        String returningColumns = "\"id\"" + (columnNames.isEmpty() ? "" : ", " + columnNames.stream()
+            .map(this::escapeIdentifier)
+            .collect(Collectors.joining(", ")));
+
+        String sql = "UPDATE " + escapeIdentifier(physicalName) + " SET " + setClause +
+            " WHERE \"id\" = ? RETURNING " + returningColumns;
+
+        List<DataTableRow> updatedDataTableRows = jdbcTemplate.query(
+            sql, preparedStatementSetter, (resultSet, rowNum) -> toDataTableRow(resultSet, columnNames));
+
+        return updatedDataTableRows.isEmpty() ? null : updatedDataTableRows.getFirst();
     }
 }
