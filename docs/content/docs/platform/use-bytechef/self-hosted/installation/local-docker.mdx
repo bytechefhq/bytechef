@@ -115,7 +115,9 @@ H2 is for evaluation and local development, not production. PostgreSQL is the on
 production database. An H2 file is held open by a single process, so you cannot run more than one
 ByteChef replica against it, nor inspect it with another tool while ByteChef is running. Features
 built on vector search - the AI knowledge base and copilot - require PostgreSQL with the pgvector
-extension and stay unavailable on H2.
+extension and stay unavailable on H2. Persistent AI chat memory is also PostgreSQL-only, so the H2
+profile switches chat memory to `inmemory` for you - AI agents work, but conversations are forgotten
+when the process restarts.
 </Callout>
 
 To move to PostgreSQL later, drop `BYTECHEF_DATABASE` and set the datasource variables instead.
