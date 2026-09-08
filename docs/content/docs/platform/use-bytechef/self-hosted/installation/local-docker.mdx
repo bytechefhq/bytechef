@@ -80,7 +80,6 @@ services:
     image: docker.bytechef.io/bytechef/bytechef:latest
     environment:
       - BYTECHEF_DATABASE=h2
-      - BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48keep1this1safe3ffb2
     volumes:
       - ~/.bytechef:/root/.bytechef
     ports:
@@ -100,7 +99,6 @@ directory, and no PostgreSQL container is needed.
 ```bash
 docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATABASE=h2 \
-    --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
     -v ~/.bytechef:/root/.bytechef \
     docker.bytechef.io/bytechef/bytechef:latest
 ```
@@ -108,8 +106,8 @@ docker run --name bytechef -it -p 8080:8080 \
 Open [http://localhost:8080/login](http://localhost:8080/login) and click **Create account**, exactly
 as with the Compose path.
 
-The database file lives at `~/.bytechef/bytechef.mv.db`, next to the encryption key, so both survive
-recreating the container. Deleting that file discards every workflow, connection, and execution
+The database file lives at `~/.bytechef/bytechef.mv.db`, next to the encryption key and the
+generated remember-me key, so all three survive recreating the container. Deleting that file discards every workflow, connection, and execution
 record; the key beside it is separate and worth keeping.
 
 <Callout type="warn">
