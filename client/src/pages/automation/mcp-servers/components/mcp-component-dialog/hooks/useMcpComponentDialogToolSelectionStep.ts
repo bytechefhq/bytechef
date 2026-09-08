@@ -54,11 +54,11 @@ const useMcpComponentDialogToolSelectionStep = ({
     } = useGetWorkspaceConnectionsQuery(
         {
             componentName: selectedComponent?.name,
-            connectionVersion: selectedComponent?.version,
+            connectionVersion: componentDefinition?.connection?.version,
             environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
         },
-        open && !!currentWorkspaceId && !!selectedComponent
+        open && !!currentWorkspaceId && !!selectedComponent && !!componentDefinition
     );
 
     const toolElements = useMemo(
