@@ -232,11 +232,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             Map<String, ?> workflowParameters = mcpIntegrationInstanceConfigurationWorkflow.getParameters();
 
-            String toolName = getWorkflowToolName(workflowParameters, null);
-
-            if (toolName == null) {
-                toolName = getWorkflowToolName(trigger.getParameters(), workflow.getLabel());
-            }
+            String toolName = getWorkflowToolName(workflowParameters, workflow.getLabel());
 
             List<FromAiResult> fromAiResults = extractFromAiResults(workflowParameters);
 
