@@ -37,7 +37,7 @@ const WorkflowListItemDropdownMenu = ({
                 <DropdownMenuTrigger asChild>
                     <Button
                         aria-label={ariaLabel}
-                        className="-mr-1"
+                        className="-mr-px w-6 px-0"
                         icon={<EllipsisVerticalIcon />}
                         onClick={(event) => event.stopPropagation()}
                         size="icon"
