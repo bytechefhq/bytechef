@@ -17,7 +17,6 @@ import {ReactNode, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useAiAgentTestingChatStore, useTestingModeStore} from '../../../stores';
-import useAiAgentTestDataPills from '../hooks/useAiAgentTestDataPills';
 
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => message;
 
@@ -57,8 +56,6 @@ export default function AiAgentTestRuntimeProvider({children}: Readonly<{childre
         }))
     );
     const {setJobKey} = useTestingModeStore();
-
-    useAiAgentTestDataPills();
 
     const {connectionState, error: sseError} = useSSE(streamRequest, {
         eventHandlers: {

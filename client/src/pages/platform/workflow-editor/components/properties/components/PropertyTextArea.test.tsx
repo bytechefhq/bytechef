@@ -58,6 +58,12 @@ describe('PropertyTextArea', () => {
         expect(screen.getByText('*')).toBeInTheDocument();
     });
 
+    it('opens on the shared text area floor', () => {
+        render(<PropertyTextArea error={false} errorMessage="" label="Notes" name="notes" />);
+
+        expect(screen.getByRole('textbox')).toHaveClass('min-h-14');
+    });
+
     it('renders error state with error icon', () => {
         render(<PropertyTextArea error={true} errorMessage="Something went wrong" label="Broken" name="broken" />);
 

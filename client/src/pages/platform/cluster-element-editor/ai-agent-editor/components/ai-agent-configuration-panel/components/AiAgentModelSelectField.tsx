@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import RequiredMark from '@/components/RequiredMark';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {BrainIcon, ComponentIcon, SettingsIcon} from 'lucide-react';
@@ -10,9 +11,14 @@ import useAiAgentModelSelectField from './hooks/useAiAgentModelSelectField';
 export default function AiAgentModelSelectField() {
     const {handleConfigureModel, isConnectionMissing, model, rootWorkflowNodeName} = useAiAgentModelSelectField();
 
+    const modelInvalid = !model || isConnectionMissing;
+
     return (
         <div>
-            <h2 className="mb-2 flex items-center font-normal">Model:</h2>
+            <h2 className="mb-2 flex items-center font-normal">
+                Model:
+                <RequiredMark />
+            </h2>
 
             {rootWorkflowNodeName && (
                 <WorkflowNodesPopoverMenu
@@ -23,10 +29,7 @@ export default function AiAgentModelSelectField() {
                     sourceNodeId={rootWorkflowNodeName}
                 >
                     <Button
-                        className={twMerge(
-                            'w-full justify-start gap-2 font-normal',
-                            isConnectionMissing && 'border-red-500'
-                        )}
+                        className={twMerge('w-full justify-start gap-2 font-normal', modelInvalid && 'border-red-500')}
                         size="sm"
                         variant="outline"
                     >
