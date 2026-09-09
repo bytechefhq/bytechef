@@ -15,6 +15,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SquareIcon} from 'lucide-react';
+import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -24,6 +25,8 @@ export enum Type {
 }
 
 const Integrations = () => {
+    const [newlyCreatedIntegrationId, setNewlyCreatedIntegrationId] = useState<number | undefined>();
+
     const [searchParams] = useSearchParams();
 
     const categoryId = searchParams.get('categoryId');
@@ -79,6 +82,9 @@ const Integrations = () => {
                                             );
                                         }
                                     }}
+                                    onSuccess={(integrationId) =>
+                                        integrationId && setNewlyCreatedIntegrationId(integrationId)
+                                    }
                                     triggerNode={<Button label="New Integration" />}
                                 />
                             )
@@ -112,6 +118,7 @@ const Integrations = () => {
                     <IntegrationList
                         componentDefinitions={componentDefinitions}
                         integrations={integrations}
+                        newlyCreatedIntegrationId={newlyCreatedIntegrationId}
                         tags={tags}
                         taskDispatcherDefinitions={taskDispatcherDefinitions}
                     />
@@ -127,6 +134,9 @@ const Integrations = () => {
                                         );
                                     }
                                 }}
+                                onSuccess={(integrationId) =>
+                                    integrationId && setNewlyCreatedIntegrationId(integrationId)
+                                }
                                 triggerNode={<Button label="Create Integration" />}
                             />
                         }
