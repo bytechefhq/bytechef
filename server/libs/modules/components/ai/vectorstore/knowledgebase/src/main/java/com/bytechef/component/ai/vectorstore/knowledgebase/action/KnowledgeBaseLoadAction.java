@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
@@ -86,6 +87,7 @@ public final class KnowledgeBaseLoadAction {
             .properties(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
+                    .resourceReference(ResourceType.KNOWLEDGE_BASE)
                     .description("The knowledge base to load documents into.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),

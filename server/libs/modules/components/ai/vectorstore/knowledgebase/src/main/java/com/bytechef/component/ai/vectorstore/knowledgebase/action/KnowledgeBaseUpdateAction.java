@@ -44,6 +44,7 @@ import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOpt
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
@@ -98,6 +99,7 @@ public final class KnowledgeBaseUpdateAction {
                     .required(true),
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
+                    .resourceReference(ResourceType.KNOWLEDGE_BASE)
                     .description("The knowledge base to update documents in.")
                     .options(KnowledgeBaseOptionsUtils.knowledgeBaseActionOptions(knowledgeBaseService))
                     .required(true),
