@@ -4,6 +4,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
 import WorkflowNodeDropdownMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu';
+import WorkflowNodeIssueBadge from '@/pages/platform/workflow-editor/components/WorkflowNodeIssueBadge';
 import {CLUSTER_ROOT_NODE_LABEL_WIDTH} from '@/shared/constants';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -352,126 +353,132 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     </div>
                 )}
 
-                <Popover
-                    onOpenChange={(open) => {
-                        if (!open) setInfoCardOpen(false);
-                    }}
-                    open={infoCardOpen}
-                >
-                    <PopoverTrigger asChild>
-                        <Button
-                            className="flex h-auto min-h-18 flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
-                            onClick={handleNodeClick}
-                        >
-                            <span className="self-center text-content-neutral-primary [&_svg]:size-9">
-                                {data.icon ? (
-                                    data.icon
-                                ) : (
-                                    <ComponentIcon className="size-9 text-content-neutral-primary" />
-                                )}
-                            </span>
+                <div className="relative w-fit">
+                    <WorkflowNodeIssueBadge nodeName={data.name} />
 
-                            {memoizedIconsList.iconsToShow.length > 0 && (
-                                <ul
-                                    className={twMerge(
-                                        'mt-2 flex min-w-52 items-center justify-center',
-                                        !hasIcons && 'hidden'
-                                    )}
-                                >
-                                    {memoizedIconsList.iconsToShow.map((iconUrlObject, index) => (
-                                        <Tooltip key={index}>
-                                            <TooltipTrigger asChild>
-                                                <li
-                                                    className="mr-2 flex items-center justify-center rounded-full border bg-surface-neutral-primary p-1 [&_svg]:size-5"
-                                                    key={index}
-                                                >
-                                                    {iconUrlObject ? (
-                                                        <InlineSVG
-                                                            className="size-9 flex-none text-content-neutral-primary"
-                                                            src={iconUrlObject.icon}
-                                                        />
-                                                    ) : (
-                                                        <Skeleton className="size-9 rounded-full" />
-                                                    )}
-                                                </li>
-                                            </TooltipTrigger>
-
-                                            <TooltipContent
-                                                className="border border-stroke-neutral-tertiary bg-surface-neutral-primary text-pretty text-content-neutral-primary"
-                                                side="bottom"
-                                            >
-                                                {iconUrlObject?.label}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    ))}
-
-                                    {memoizedIconsList.remainingIcons.length > 0 && (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-surface-neutral-primary p-1">
-                                                    <span className="self-center text-xs font-bold text-content-neutral-secondary">
-                                                        +{memoizedIconsList.remainingIcons.length}
-                                                    </span>
-                                                </div>
-                                            </TooltipTrigger>
-
-                                            <TooltipContent
-                                                className="max-w-36 border border-stroke-neutral-tertiary bg-surface-neutral-primary text-pretty text-content-neutral-primary"
-                                                side="bottom"
-                                            >
-                                                <ul>
-                                                    {memoizedIconsList.remainingIcons.map((iconUrlObject, index) => (
-                                                        <li className="my-2" key={index}>
-                                                            {iconUrlObject.label}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    )}
-                                </ul>
-                            )}
-                        </Button>
-                    </PopoverTrigger>
-
-                    <PopoverContent
-                        className="w-fit max-w-xl min-w-72 text-sm"
-                        onFocusOutside={(event) => event.preventDefault()}
-                        onOpenAutoFocus={(event) => event.preventDefault()}
-                        side="right"
+                    <Popover
+                        onOpenChange={(open) => {
+                            if (!open) setInfoCardOpen(false);
+                        }}
+                        open={infoCardOpen}
                     >
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                            <h3 className="text-lg font-semibold">{nodeLabel}</h3>
-
+                        <PopoverTrigger asChild>
                             <Button
-                                className="hover:bg-transparent active:bg-transparent"
-                                icon={<XIcon />}
-                                onClick={() => setInfoCardOpen(false)}
-                                size="iconXs"
-                                title="Close"
-                                variant="ghost"
-                            />
-                        </div>
+                                className="flex h-auto min-h-18 flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
+                                onClick={handleNodeClick}
+                            >
+                                <span className="self-center text-content-neutral-primary [&_svg]:size-9">
+                                    {data.icon ? (
+                                        data.icon
+                                    ) : (
+                                        <ComponentIcon className="size-9 text-content-neutral-primary" />
+                                    )}
+                                </span>
 
-                        {workflowNodeDescription?.description ? (
-                            <div
-                                className="flex"
-                                dangerouslySetInnerHTML={{
-                                    __html: sanitize(workflowNodeDescription.description, {
-                                        allowedAttributes: {
-                                            div: ['class'],
-                                            table: ['class'],
-                                            td: ['class'],
-                                            tr: ['class'],
-                                        },
-                                    }),
-                                }}
-                            />
-                        ) : (
-                            <p className="text-xs text-content-neutral-secondary">No description available.</p>
-                        )}
-                    </PopoverContent>
-                </Popover>
+                                {memoizedIconsList.iconsToShow.length > 0 && (
+                                    <ul
+                                        className={twMerge(
+                                            'mt-2 flex min-w-52 items-center justify-center',
+                                            !hasIcons && 'hidden'
+                                        )}
+                                    >
+                                        {memoizedIconsList.iconsToShow.map((iconUrlObject, index) => (
+                                            <Tooltip key={index}>
+                                                <TooltipTrigger asChild>
+                                                    <li
+                                                        className="mr-2 flex items-center justify-center rounded-full border bg-surface-neutral-primary p-1 [&_svg]:size-5"
+                                                        key={index}
+                                                    >
+                                                        {iconUrlObject ? (
+                                                            <InlineSVG
+                                                                className="size-9 flex-none text-content-neutral-primary"
+                                                                src={iconUrlObject.icon}
+                                                            />
+                                                        ) : (
+                                                            <Skeleton className="size-9 rounded-full" />
+                                                        )}
+                                                    </li>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent
+                                                    className="border border-stroke-neutral-tertiary bg-surface-neutral-primary text-pretty text-content-neutral-primary"
+                                                    side="bottom"
+                                                >
+                                                    {iconUrlObject?.label}
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        ))}
+
+                                        {memoizedIconsList.remainingIcons.length > 0 && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="flex size-7 items-center justify-center self-center rounded-full border border-stroke-neutral-secondary bg-surface-neutral-primary p-1">
+                                                        <span className="self-center text-xs font-bold text-content-neutral-secondary">
+                                                            +{memoizedIconsList.remainingIcons.length}
+                                                        </span>
+                                                    </div>
+                                                </TooltipTrigger>
+
+                                                <TooltipContent
+                                                    className="max-w-36 border border-stroke-neutral-tertiary bg-surface-neutral-primary text-pretty text-content-neutral-primary"
+                                                    side="bottom"
+                                                >
+                                                    <ul>
+                                                        {memoizedIconsList.remainingIcons.map(
+                                                            (iconUrlObject, index) => (
+                                                                <li className="my-2" key={index}>
+                                                                    {iconUrlObject.label}
+                                                                </li>
+                                                            )
+                                                        )}
+                                                    </ul>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                    </ul>
+                                )}
+                            </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent
+                            className="w-fit max-w-xl min-w-72 text-sm"
+                            onFocusOutside={(event) => event.preventDefault()}
+                            onOpenAutoFocus={(event) => event.preventDefault()}
+                            side="right"
+                        >
+                            <div className="mb-2 flex items-center justify-between gap-2">
+                                <h3 className="text-lg font-semibold">{nodeLabel}</h3>
+
+                                <Button
+                                    className="hover:bg-transparent active:bg-transparent"
+                                    icon={<XIcon />}
+                                    onClick={() => setInfoCardOpen(false)}
+                                    size="iconXs"
+                                    title="Close"
+                                    variant="ghost"
+                                />
+                            </div>
+
+                            {workflowNodeDescription?.description ? (
+                                <div
+                                    className="flex"
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitize(workflowNodeDescription.description, {
+                                            allowedAttributes: {
+                                                div: ['class'],
+                                                table: ['class'],
+                                                td: ['class'],
+                                                tr: ['class'],
+                                            },
+                                        }),
+                                    }}
+                                />
+                            ) : (
+                                <p className="text-xs text-content-neutral-secondary">No description available.</p>
+                            )}
+                        </PopoverContent>
+                    </Popover>
+                </div>
 
                 <div
                     className={twMerge(

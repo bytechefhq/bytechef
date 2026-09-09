@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
 import WorkflowNodeDropdownMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu';
+import WorkflowNodeIssueBadge from '@/pages/platform/workflow-editor/components/WorkflowNodeIssueBadge';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
@@ -162,123 +163,133 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 />
             )}
 
-            <Popover
-                onOpenChange={(open) => {
-                    if (!open) onInfoClose();
-                }}
-                open={infoCardOpen}
-            >
-                <PopoverTrigger asChild>
-                    <Button
-                        aria-label={`${data.workflowNodeName} node`}
-                        className={twMerge(
-                            'h-auto min-h-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
-                            // Roots size via the inline width style; w-18 (!important) would otherwise clobber it.
-                            !isMainRootClusterElement && !isNestedClusterRoot && 'w-18',
-                            isSelected &&
-                                workflowNodeDetailsPanelOpen &&
-                                'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
-                            isMainRootClusterElement && 'nodrag',
-                            isNestedClusterRoot && 'overflow-hidden rounded-2xl px-6',
-                            isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot && 'rounded-full',
-                            isClusterElement &&
-                                !isNestedClusterRoot &&
-                                !hasSavedClusterElementPosition &&
-                                'border-dashed'
-                        )}
-                        onClick={handleNodeClick}
-                        style={
-                            isMainRootClusterElement
-                                ? {minWidth: `${nodeWidth}px`}
-                                : isNestedClusterRoot
-                                  ? {width: `${nodeWidth}px`}
-                                  : undefined
-                        }
-                    >
-                        <div
+            <div className="relative w-fit">
+                <WorkflowNodeIssueBadge clusterElement={!!isClusterElement} nodeName={data.name} />
+
+                <Popover
+                    onOpenChange={(open) => {
+                        if (!open) onInfoClose();
+                    }}
+                    open={infoCardOpen}
+                >
+                    <PopoverTrigger asChild>
+                        <Button
+                            aria-label={`${data.workflowNodeName} node`}
                             className={twMerge(
-                                (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4',
-                                isNestedClusterRoot && 'min-w-0'
+                                'h-auto min-h-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
+                                !isMainRootClusterElement && !isNestedClusterRoot && 'w-18',
+                                isSelected &&
+                                    workflowNodeDetailsPanelOpen &&
+                                    'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
+                                isMainRootClusterElement && 'nodrag',
+                                isNestedClusterRoot && 'overflow-hidden rounded-2xl px-6',
+                                isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot && 'rounded-full',
+                                isClusterElement &&
+                                    !isNestedClusterRoot &&
+                                    !hasSavedClusterElementPosition &&
+                                    'border-dashed'
                             )}
+                            data-node-box
+                            onClick={handleNodeClick}
+                            style={
+                                isMainRootClusterElement
+                                    ? {minWidth: `${nodeWidth}px`}
+                                    : isNestedClusterRoot
+                                      ? {width: `${nodeWidth}px`}
+                                      : undefined
+                            }
                         >
-                            {data.icon ? data.icon : <ComponentIcon className="size-9 text-content-neutral-primary" />}
-
-                            {(isMainRootClusterElement || isNestedClusterRoot) && (
-                                <div
-                                    className={twMerge(
-                                        'flex w-full flex-col items-start',
-                                        isMainRootClusterElement && 'min-w-max',
-                                        isNestedClusterRoot && 'min-w-0 overflow-hidden'
-                                    )}
-                                >
-                                    {!(isNestedClusterRoot && isRenaming) && (
-                                        <span
-                                            className={twMerge(
-                                                'font-semibold',
-                                                isNestedClusterRoot && 'w-full truncate'
-                                            )}
-                                        >
-                                            {nodeLabel}
-                                        </span>
-                                    )}
-
-                                    {data.operationName && (
-                                        <pre className={twMerge('text-sm', isNestedClusterRoot && 'w-full truncate')}>
-                                            {data.operationName}
-                                        </pre>
-                                    )}
-
-                                    {isNestedClusterRoot && (
-                                        <span className="w-full truncate text-xs text-content-neutral-secondary">
-                                            {data.workflowNodeName}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </Button>
-                </PopoverTrigger>
-
-                {!isMainRootClusterElement && (
-                    <PopoverContent
-                        className="w-fit max-w-xl min-w-72 text-sm"
-                        onFocusOutside={(event) => event.preventDefault()}
-                        onOpenAutoFocus={(event) => event.preventDefault()}
-                        side="right"
-                    >
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                            <h3 className="text-lg font-semibold">{nodeLabel}</h3>
-
-                            <Button
-                                className="hover:bg-transparent active:bg-transparent"
-                                icon={<XIcon />}
-                                onClick={onInfoClose}
-                                size="iconXs"
-                                title="Close"
-                                variant="ghost"
-                            />
-                        </div>
-
-                        {nodeDescription ? (
                             <div
-                                className="flex"
-                                dangerouslySetInnerHTML={{
-                                    __html: sanitize(nodeDescription, {
-                                        allowedAttributes: {
-                                            div: ['class'],
-                                            table: ['class'],
-                                            td: ['class'],
-                                            tr: ['class'],
-                                        },
-                                    }),
-                                }}
-                            />
-                        ) : (
-                            <p className="text-xs text-content-neutral-secondary">No description available.</p>
-                        )}
-                    </PopoverContent>
-                )}
-            </Popover>
+                                className={twMerge(
+                                    (isMainRootClusterElement || isNestedClusterRoot) && 'flex items-center gap-4',
+                                    isNestedClusterRoot && 'min-w-0'
+                                )}
+                            >
+                                {data.icon ? (
+                                    data.icon
+                                ) : (
+                                    <ComponentIcon className="size-9 text-content-neutral-primary" />
+                                )}
+
+                                {(isMainRootClusterElement || isNestedClusterRoot) && (
+                                    <div
+                                        className={twMerge(
+                                            'flex w-full flex-col items-start',
+                                            isMainRootClusterElement && 'min-w-max',
+                                            isNestedClusterRoot && 'min-w-0 overflow-hidden'
+                                        )}
+                                    >
+                                        {!(isNestedClusterRoot && isRenaming) && (
+                                            <span
+                                                className={twMerge(
+                                                    'font-semibold',
+                                                    isNestedClusterRoot && 'w-full truncate'
+                                                )}
+                                            >
+                                                {nodeLabel}
+                                            </span>
+                                        )}
+
+                                        {data.operationName && (
+                                            <pre
+                                                className={twMerge('text-sm', isNestedClusterRoot && 'w-full truncate')}
+                                            >
+                                                {data.operationName}
+                                            </pre>
+                                        )}
+
+                                        {isNestedClusterRoot && (
+                                            <span className="w-full truncate text-xs text-content-neutral-secondary">
+                                                {data.workflowNodeName}
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </Button>
+                    </PopoverTrigger>
+
+                    {!isMainRootClusterElement && (
+                        <PopoverContent
+                            className="w-fit max-w-xl min-w-72 text-sm"
+                            onFocusOutside={(event) => event.preventDefault()}
+                            onOpenAutoFocus={(event) => event.preventDefault()}
+                            side="right"
+                        >
+                            <div className="mb-2 flex items-center justify-between gap-2">
+                                <h3 className="text-lg font-semibold">{nodeLabel}</h3>
+
+                                <Button
+                                    className="hover:bg-transparent active:bg-transparent"
+                                    icon={<XIcon />}
+                                    onClick={onInfoClose}
+                                    size="iconXs"
+                                    title="Close"
+                                    variant="ghost"
+                                />
+                            </div>
+
+                            {nodeDescription ? (
+                                <div
+                                    className="flex"
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitize(nodeDescription, {
+                                            allowedAttributes: {
+                                                div: ['class'],
+                                                table: ['class'],
+                                                td: ['class'],
+                                                tr: ['class'],
+                                            },
+                                        }),
+                                    }}
+                                />
+                            ) : (
+                                <p className="text-xs text-content-neutral-secondary">No description available.</p>
+                            )}
+                        </PopoverContent>
+                    )}
+                </Popover>
+            </div>
 
             {isNestedClusterRoot && isRenaming && (
                 <div className="absolute top-full left-0 z-10 mt-1 flex max-h-7 items-center rounded-md border-2 bg-surface-neutral-primary p-1">
