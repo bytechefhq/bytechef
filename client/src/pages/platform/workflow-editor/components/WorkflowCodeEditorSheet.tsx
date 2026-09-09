@@ -14,6 +14,7 @@ import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
+    AlertTriangleIcon,
     ChevronDownIcon,
     CodeXmlIcon,
     InfoIcon,
@@ -71,10 +72,12 @@ const WorkflowCodeEditorSheet = ({
         handleWorkflowTestConfigurationDialog,
         hasErrors,
         projectName,
-        setErrorPanelRef,
         setErrorsAccordionOpen,
+        setWarningsAccordionOpen,
         showWorkflowTestConfigurationDialog,
         unsavedChangesAlertDialogOpen,
+        warnings,
+        warningsAccordionOpen,
         workflowIsRunning,
         workflowTestExecution,
     } = useWorkflowCodeEditorSheet({invalidateWorkflowQueries, onSheetOpenClose, workflow});
@@ -93,7 +96,7 @@ const WorkflowCodeEditorSheet = ({
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <div className="flex w-[60vw] min-w-0 flex-col">
+                <div className="flex w-[75vw] min-w-0 flex-col">
                     <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
                         <div className="flex items-center gap-2">
                             <CodeXmlIcon />
@@ -202,11 +205,8 @@ const WorkflowCodeEditorSheet = ({
                         </div>
                     </header>
 
-                    <div className="flex min-h-0 flex-1 rounded-lg bg-surface-neutral-secondary">
-                        <ResizablePanelGroup
-                            className="gap-3 rounded-lg bg-surface-neutral-secondary p-3"
-                            orientation="vertical"
-                        >
+                    <div className="flex min-h-0 flex-1 flex-col gap-3 rounded-lg bg-surface-neutral-secondary p-3">
+                        <ResizablePanelGroup className="min-h-0 flex-1 gap-3" orientation="vertical">
                             <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={750}>
                                 <Suspense fallback={<MonacoEditorLoader />}>
                                     <MonacoEditor
@@ -223,48 +223,6 @@ const WorkflowCodeEditorSheet = ({
                                     />
                                 </Suspense>
                             </ResizablePanel>
-
-                            {errors?.length > 0 && (
-                                <ResizablePanel
-                                    className="flex w-full cursor-pointer flex-col overflow-hidden rounded-lg border border-stroke-destructive-primary bg-surface-destructive-secondary transition-all"
-                                    collapsedSize={42}
-                                    collapsible
-                                    defaultSize={42}
-                                    onClick={() => setErrorsAccordionOpen(!errorsAccordionOpen)}
-                                    panelRef={setErrorPanelRef}
-                                >
-                                    <div className="sticky right-0 left-0 flex w-auto items-center gap-2 px-3 py-2">
-                                        <InfoIcon className="text-content-destructive-primary" />
-
-                                        <span className="text-sm font-semibold">Errors ({errors.length})</span>
-
-                                        <Button className="ml-auto" size="xxs" variant="link">
-                                            Show all
-                                            <ChevronDownIcon
-                                                className={twMerge(
-                                                    'transition-all',
-                                                    errorsAccordionOpen && 'rotate-180'
-                                                )}
-                                            />
-                                        </Button>
-                                    </div>
-
-                                    {errorsAccordionOpen && (
-                                        <ScrollArea>
-                                            <ul className="flex flex-col gap-2 px-3 py-2">
-                                                {errors.map((error, index) => (
-                                                    <li
-                                                        className="gap-1.5 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
-                                                        key={`${error}_${index}`}
-                                                    >
-                                                        {error}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </ScrollArea>
-                                    )}
-                                </ResizablePanel>
-                            )}
 
                             {(workflowIsRunning || (workflowTestExecution && showBottomPanel)) && (
                                 <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={500}>
@@ -289,6 +247,80 @@ const WorkflowCodeEditorSheet = ({
                                 </ResizablePanel>
                             )}
                         </ResizablePanelGroup>
+
+                        {errors?.length > 0 && (
+                            <div className="flex w-full shrink-0 flex-col overflow-hidden rounded-lg border border-stroke-destructive-primary bg-surface-destructive-secondary">
+                                <button
+                                    aria-expanded={errorsAccordionOpen}
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left"
+                                    onClick={() => setErrorsAccordionOpen(!errorsAccordionOpen)}
+                                    type="button"
+                                >
+                                    <InfoIcon className="text-content-destructive-primary" />
+
+                                    <span className="text-sm font-semibold">Errors ({errors.length})</span>
+
+                                    <span className="ml-auto flex items-center gap-1 text-xs font-medium underline">
+                                        Show all
+                                        <ChevronDownIcon
+                                            className={twMerge('transition-all', errorsAccordionOpen && 'rotate-180')}
+                                        />
+                                    </span>
+                                </button>
+
+                                {errorsAccordionOpen && (
+                                    <ScrollArea className="max-h-52">
+                                        <ul className="flex flex-col gap-2 px-3 py-2">
+                                            {errors.map((error, index) => (
+                                                <li
+                                                    className="gap-1.5 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
+                                                    key={`${error}_${index}`}
+                                                >
+                                                    {error}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </ScrollArea>
+                                )}
+                            </div>
+                        )}
+
+                        {warnings?.length > 0 && (
+                            <div className="flex w-full shrink-0 flex-col overflow-hidden rounded-lg border border-stroke-warning-secondary bg-surface-warning-secondary">
+                                <button
+                                    aria-expanded={warningsAccordionOpen}
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left"
+                                    onClick={() => setWarningsAccordionOpen(!warningsAccordionOpen)}
+                                    type="button"
+                                >
+                                    <AlertTriangleIcon className="text-content-onwarning" />
+
+                                    <span className="text-sm font-semibold">Warnings ({warnings.length})</span>
+
+                                    <span className="ml-auto flex items-center gap-1 text-xs font-medium underline">
+                                        Show all
+                                        <ChevronDownIcon
+                                            className={twMerge('transition-all', warningsAccordionOpen && 'rotate-180')}
+                                        />
+                                    </span>
+                                </button>
+
+                                {warningsAccordionOpen && (
+                                    <ScrollArea className="max-h-52">
+                                        <ul className="flex flex-col gap-2 px-3 py-2">
+                                            {warnings.map((warning, index) => (
+                                                <li
+                                                    className="gap-1.5 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
+                                                    key={`${warning}_${index}`}
+                                                >
+                                                    {warning}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </ScrollArea>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
