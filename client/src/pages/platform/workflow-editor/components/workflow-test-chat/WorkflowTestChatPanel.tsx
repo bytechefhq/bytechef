@@ -1,25 +1,35 @@
+import Button from '@/components/Button/Button';
 import {Thread} from '@/components/assistant-ui/thread';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/components/workflow-test-chat/runtime-providers/WorkflowTestChatRuntimeProvider';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
-import {XIcon} from 'lucide-react';
+import {MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowTestChatPanel = () => {
-    const {generateConversationId, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore(
-        useShallow((state) => ({
-            generateConversationId: state.generateConversationId,
-            setWorkflowTestChatPanelOpen: state.setWorkflowTestChatPanelOpen,
-            workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
-        }))
-    );
+    const {generateConversationId, resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} =
+        useWorkflowTestChatStore(
+            useShallow((state) => ({
+                generateConversationId: state.generateConversationId,
+                resetMessages: state.resetMessages,
+                setWorkflowTestChatPanelOpen: state.setWorkflowTestChatPanelOpen,
+                workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
+            }))
+        );
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
 
     const handlePanelClose = () => {
         setWorkflowTestChatPanelOpen(false);
+    };
+
+    const handleResetChatClick = () => {
+        resetMessages();
+
+        generateConversationId();
     };
 
     useEffect(() => {
@@ -41,13 +51,29 @@ const WorkflowTestChatPanel = () => {
                 <header className="flex items-center p-4 text-lg font-medium">
                     <span>Playground</span>
 
-                    <button
-                        aria-label="Close the node details dialog"
-                        className="ml-auto pr-0"
-                        onClick={handlePanelClose}
-                    >
-                        <XIcon aria-hidden="true" className="size-4 cursor-pointer" />
-                    </button>
+                    <div className="ml-auto flex items-center gap-2">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    aria-label="Reset the conversation"
+                                    icon={<MessageSquareXIcon />}
+                                    onClick={handleResetChatClick}
+                                    size="iconSm"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Reset conversation</TooltipContent>
+                        </Tooltip>
+
+                        <Button
+                            aria-label="Close the playground panel"
+                            icon={<XIcon />}
+                            onClick={handlePanelClose}
+                            size="iconSm"
+                            variant="ghost"
+                        />
+                    </div>
                 </header>
 
                 <div className="absolute inset-x-0 top-16 bottom-0">
