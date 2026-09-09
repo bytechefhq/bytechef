@@ -36,10 +36,11 @@ import {useForm} from 'react-hook-form';
 interface IntegrationDialogProps {
     integration: Integration | undefined;
     onClose?: (integration?: Integration) => void;
+    onSuccess?: (integrationId: number | void) => void;
     triggerNode?: ReactNode;
 }
 
-const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialogProps) => {
+const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: IntegrationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const {captureIntegrationCreated} = useAnalytics();
@@ -74,7 +75,7 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
 
     const queryClient = useQueryClient();
 
-    const onSuccess = (integrationId: number | void) => {
+    const onSuccessHandler = (integrationId: number | void) => {
         captureIntegrationCreated();
 
         if (!integrationId && integration) {
@@ -97,15 +98,19 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
             queryKey: IntegrationTagKeys.integrationTags,
         });
 
+        if (onSuccess) {
+            onSuccess(integrationId);
+        }
+
         closeDialog();
     };
 
     const createIntegrationMutation = useCreateIntegrationMutation({
-        onSuccess,
+        onSuccess: onSuccessHandler,
     });
 
     const updateIntegrationMutation = useUpdateIntegrationMutation({
-        onSuccess,
+        onSuccess: onSuccessHandler,
     });
 
     const tagNames = integration?.tags?.map((tag) => tag.name);
