@@ -18,8 +18,6 @@ package com.bytechef.platform.workflow.validator;
 
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
 
@@ -57,22 +55,6 @@ class ObjectPropertyValidator {
         if (nestedProperties != null && !nestedProperties.isEmpty()) {
             PropertyValidator.validateProperties(
                 valueJsonNode, nestedProperties, propertyPath, originalCurrentParameters, errors, warnings);
-        } else {
-            generateWarningsForUndefinedNestedProperties(valueJsonNode, propertyPath, warnings);
         }
-    }
-
-    private static void generateWarningsForUndefinedNestedProperties(
-        JsonNode valueJsonNode, String propertyPath, StringBuilder warnings) {
-
-        Collection<String> propertyNames = valueJsonNode.propertyNames();
-
-        Iterator<String> propertyNamesIterator = propertyNames.iterator();
-
-        propertyNamesIterator.forEachRemaining(curPropertyName -> {
-            String curPropertyPath = PropertyUtils.buildPropertyPath(propertyPath, curPropertyName);
-
-            StringUtils.appendWithNewline(ValidationErrorUtils.notDefined(curPropertyPath), warnings);
-        });
     }
 }
