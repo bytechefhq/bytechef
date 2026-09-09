@@ -11,6 +11,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
     DropdownMenu,
@@ -203,9 +204,9 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
-                            <div className="flex items-center">
+                            <div className="flex items-center gap-2">
                                 <CollapsibleTrigger
-                                    className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground"
+                                    className="group flex min-w-28 items-center text-xs font-semibold text-muted-foreground"
                                     ref={workflowsCollapsibleTriggerRef}
                                 >
                                     <div className="mr-1">
@@ -216,6 +217,51 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
+
+                                <ButtonGroup aria-label="Workflow Creation Actions">
+                                    <Button
+                                        aria-label="Create Workflow"
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+
+                                            setShowWorkflowDialog(true);
+                                        }}
+                                        size="xs"
+                                        variant="outline"
+                                    >
+                                        <PlusIcon />
+                                        Workflow
+                                    </Button>
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                aria-label="More Workflow Creation Actions"
+                                                icon={<ChevronDownIcon />}
+                                                size="xs"
+                                                variant="outline"
+                                            >
+                                                {' '}
+                                            </Button>
+                                        </DropdownMenuTrigger>
+
+                                        <DropdownMenuContent align="end" className="p-0">
+                                            <DropdownMenuItem
+                                                aria-label="Import Workflow"
+                                                className="dropdown-menu-item"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+
+                                                    if (hiddenFileInputRef.current) {
+                                                        hiddenFileInputRef.current.click();
+                                                    }
+                                                }}
+                                            >
+                                                <UploadIcon /> Import Workflow
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
 
                                 <div onClick={(event) => event.preventDefault()}>
                                     {integration.tags && (
@@ -301,27 +347,9 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                                 <DropdownMenuItem
                                     className="dropdown-menu-item"
-                                    onClick={() => setShowWorkflowDialog(true)}
-                                >
-                                    <PlusIcon /> New Workflow
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
                                     onClick={() => setShowPublishIntegrationDialog(true)}
                                 >
                                     <SendIcon /> Publish
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                    className="dropdown-menu-item"
-                                    onClick={() => {
-                                        if (hiddenFileInputRef.current) {
-                                            hiddenFileInputRef.current.click();
-                                        }
-                                    }}
-                                >
-                                    <UploadIcon /> Import Workflow
                                 </DropdownMenuItem>
 
                                 <DropdownMenuSeparator className="m-0" />
