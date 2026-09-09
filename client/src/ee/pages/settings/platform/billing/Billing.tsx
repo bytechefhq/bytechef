@@ -1,4 +1,3 @@
-import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -6,11 +5,13 @@ import {
     useReactivateSubscriptionMutation,
 } from '@/shared/mutations/platform/billing.mutations';
 import {useGetCurrentSubscriptionQuery} from '@/shared/queries/platform/billing.queries';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
 
 import CancelPlanDialog from './components/CancelPlanDialog';
+import ManageBillingCard from './components/ManageBillingCard';
 import PlanCard from './components/PlanCard';
 import ReactivatePlanDialog from './components/ReactivatePlanDialog';
 import SelectPlanDialog from './components/SelectPlanDialog';
@@ -25,6 +26,8 @@ const Billing = () => {
     const [reactivateDialogOpen, setReactivateDialogOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectPlanOpen, setSelectPlanOpen] = useState(false);
+
+    const customerPortalUrl = useApplicationInfoStore((state) => state.billing.customerPortalUrl);
 
     const {isPending: isCancelPending, mutate: cancelSubscription} = useCancelSubscriptionMutation();
     const {isPending: isReactivateMutationPending, mutate: reactivateSubscription} =
@@ -217,32 +220,20 @@ const Billing = () => {
                         </div>
                     )}
 
-                    <Tabs defaultValue="overview">
-                        <TabsList>
-                            <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <PlanCard
+                        {...planCardProps}
+                        onCancelPlan={
+                            subscription && !isTrialSubscription && !subscription.cancelAtPeriodEnd
+                                ? () => setCancelDialogOpen(true)
+                                : undefined
+                        }
+                        onChangePlan={() => setSelectPlanOpen(true)}
+                        onReactivatePlan={
+                            subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
+                        }
+                    />
 
-                            <TabsTrigger value="invoices">Invoices</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent className="mt-4 space-y-4" value="overview">
-                            <PlanCard
-                                {...planCardProps}
-                                onCancelPlan={
-                                    subscription && !isTrialSubscription && !subscription.cancelAtPeriodEnd
-                                        ? () => setCancelDialogOpen(true)
-                                        : undefined
-                                }
-                                onChangePlan={() => setSelectPlanOpen(true)}
-                                onReactivatePlan={
-                                    subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
-                                }
-                            />
-                        </TabsContent>
-
-                        <TabsContent className="mt-4" value="invoices">
-                            <p className="text-sm text-muted-foreground">No invoices yet.</p>
-                        </TabsContent>
-                    </Tabs>
+                    {customerPortalUrl && <ManageBillingCard customerPortalUrl={customerPortalUrl} />}
 
                     <CancelPlanDialog
                         isPending={isCancelPending}
