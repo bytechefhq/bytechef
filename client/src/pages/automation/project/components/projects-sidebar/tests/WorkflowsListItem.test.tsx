@@ -75,7 +75,7 @@ it('should not select the workflow when the actions menu is used', async () => {
     expect(mockOnProjectClick).not.toHaveBeenCalled();
 });
 
-it('should render component icons for workflow', () => {
+it('should render the trigger apart from the task component icons', () => {
     const mockWorkflowWithComponents = {
         ...mockWorkflow,
         workflowTaskComponentNames: ['Task1', 'Task2', 'Task3', 'Task4'],
@@ -98,10 +98,10 @@ it('should render component icons for workflow', () => {
         </MemoryRouter>
     );
 
-    expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(5);
+    expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(4);
 });
 
-it('should show +X indicator when there are more than 7 components', () => {
+it('should show +X indicator when there are more task components than fit', () => {
     const mockWorkflowWithComponents = {
         ...mockWorkflow,
         workflowTaskComponentNames: ['Task1', 'Task2', 'Task3', 'Task4', 'Task5', 'Task6', 'Task7', 'Task8'],
@@ -124,5 +124,5 @@ it('should show +X indicator when there are more than 7 components', () => {
         </MemoryRouter>
     );
 
-    expect(screen.getByText('+2')).toBeInTheDocument();
+    expect(screen.getByText('+1')).toBeInTheDocument();
 });
