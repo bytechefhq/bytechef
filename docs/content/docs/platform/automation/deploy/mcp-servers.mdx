@@ -54,7 +54,7 @@ For each exposed action you decide which parameters you fix yourself (a constant
 1. From the server's row menu, choose **Add Workflows**.
 2. **Select a project** and a **published version**.
 3. **Select the workflows** from that deployment you want to expose.
-4. Complete each workflow's **tool mapping**, from the properties control on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both optional, both what the model sees - plus one field per input declared on the workflow's trigger schema. Left blank, the workflow's own name and description are used.
+4. Complete each workflow's **tool mapping**, from the properties control on its row in the expanded server. The mapping offers a **Tool Name** and a **Tool Description** - both optional, both what the model sees - plus one field per input declared on the workflow's trigger schema. Left blank, the workflow's own name and description are used. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
 
 Each exposed workflow becomes one tool. Per-input values can be fixed constants or `fromAi(...)` expressions the assistant fills at call time. When the assistant calls the tool, ByteChef runs the workflow with those inputs and returns the result.
 
