@@ -251,18 +251,6 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         return componentDefinitionRegistry.hasComponentDefinition(name, version);
     }
 
-    private static List<ComponentDefinition> filterLatestVersions(List<ComponentDefinition> componentDefinitions) {
-        Map<String, ComponentDefinition> latestComponentDefinitions = new LinkedHashMap<>();
-
-        for (ComponentDefinition componentDefinition : componentDefinitions) {
-            latestComponentDefinitions.merge(
-                componentDefinition.getName(), componentDefinition,
-                (first, second) -> first.getVersion() >= second.getVersion() ? first : second);
-        }
-
-        return List.copyOf(latestComponentDefinitions.values());
-    }
-
     private static Predicate<ComponentDefinition> filter(
         @Nullable Boolean actionDefinitions, @Nullable Boolean clusterElementDefinitions,
         @Nullable Boolean connectionDefinitions, @Nullable Boolean triggerDefinitions, @Nullable List<String> include) {
