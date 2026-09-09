@@ -33,12 +33,20 @@ public record PropertyInfo(
     @JsonProperty("expressionEnabled") @JsonPropertyDescription("Whether expressions are enabled for this property") boolean expressionEnabled,
     @JsonProperty("displayCondition") @JsonPropertyDescription("The display condition for the property") String displayCondition,
     @JsonProperty("options") @JsonPropertyDescription("Available options for the property") List<String> options,
-    @JsonProperty("nestedProperties") @JsonPropertyDescription("Nested properties for object/array/file_entry types") List<PropertyInfo> nestedProperties) {
+    @JsonProperty("nestedProperties") @JsonPropertyDescription("Nested properties for object/array/file_entry types") List<PropertyInfo> nestedProperties,
+    @JsonProperty("resourceType") @JsonPropertyDescription("The internal resource type the property value references, if any") String resourceType) {
 
     public PropertyInfo(
         String name, String type, String description, boolean required, boolean expressionEnabled,
         String displayCondition, List<PropertyInfo> nestedProperties) {
 
-        this(name, type, description, required, expressionEnabled, displayCondition, null, nestedProperties);
+        this(name, type, description, required, expressionEnabled, displayCondition, null, nestedProperties, null);
+    }
+
+    public PropertyInfo(
+        String name, String type, String description, boolean required, boolean expressionEnabled,
+        String displayCondition, List<String> options, List<PropertyInfo> nestedProperties) {
+
+        this(name, type, description, required, expressionEnabled, displayCondition, options, nestedProperties, null);
     }
 }

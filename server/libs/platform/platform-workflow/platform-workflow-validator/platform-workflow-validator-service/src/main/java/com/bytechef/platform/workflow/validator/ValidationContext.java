@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 
 /**
@@ -37,6 +38,8 @@ class ValidationContext {
     private final Map<String, PropertyInfo> taskOutputMap;
     private final Map<String, PropertyInfo> nodeOutputMap;
     private final Map<String, List<String>> clusterTypesProviderMap;
+    private final WorkflowValidator.@Nullable ClusterTypesProvider clusterTypesProvider;
+    private final WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider;
     private final StringBuilder errors;
     private final StringBuilder warnings;
     private final List<String> taskNames = new ArrayList<>();
@@ -47,7 +50,9 @@ class ValidationContext {
         List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
         Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
         Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesProviderMap,
-        StringBuilder errors, StringBuilder warnings) {
+        WorkflowValidator.@Nullable ClusterTypesProvider clusterTypesProvider,
+        WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors,
+        StringBuilder warnings) {
 
         this.taskJsonNodes = taskJsonNodes;
         this.inputJsonNodes = inputJsonNodes;
@@ -55,6 +60,8 @@ class ValidationContext {
         this.taskOutputMap = taskOutputMap;
         this.nodeOutputMap = nodeOutputMap;
         this.clusterTypesProviderMap = clusterTypesProviderMap;
+        this.clusterTypesProvider = clusterTypesProvider;
+        this.resourceReferenceProvider = resourceReferenceProvider;
         this.errors = errors;
         this.warnings = warnings;
 
@@ -76,17 +83,31 @@ class ValidationContext {
 
         return of(
             taskJsonNodes, List.of(), taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesProviderMap,
-            errors, warnings);
+            WorkflowValidator.NO_RESOURCE_REFERENCE_PROVIDER, errors, warnings);
     }
 
     public static ValidationContext of(
         List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
         Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
         Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesProviderMap,
-        StringBuilder errors, StringBuilder warnings) {
+        WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors,
+        StringBuilder warnings) {
+
+        return of(
+            taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesProviderMap,
+            null, resourceReferenceProvider, errors, warnings);
+    }
+
+    public static ValidationContext of(
+        List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesProviderMap,
+        WorkflowValidator.@Nullable ClusterTypesProvider clusterTypesProvider,
+        WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors,
+        StringBuilder warnings) {
 
         return new ValidationContext(taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap,
-            clusterTypesProviderMap, errors, warnings);
+            clusterTypesProviderMap, clusterTypesProvider, resourceReferenceProvider, errors, warnings);
     }
 
     private void buildTaskMaps() {
@@ -154,5 +175,21 @@ class ValidationContext {
 
     public Map<String, List<String>> getClusterTypesProviderMap() {
         return clusterTypesProviderMap;
+    }
+
+    public List<String> getRequiredClusterElementTypes(String taskType) {
+        List<String> clusterElementTypes = clusterTypesProviderMap.getOrDefault(taskType, List.of());
+
+        if (clusterTypesProvider == null) {
+            return clusterElementTypes;
+        }
+
+        List<String> requiredClusterElementTypes = clusterTypesProvider.getRequiredClusterElementTypes(taskType);
+
+        return requiredClusterElementTypes == null ? clusterElementTypes : requiredClusterElementTypes;
+    }
+
+    public WorkflowValidator.ResourceReferenceProvider getResourceReferenceProvider() {
+        return resourceReferenceProvider;
     }
 }
