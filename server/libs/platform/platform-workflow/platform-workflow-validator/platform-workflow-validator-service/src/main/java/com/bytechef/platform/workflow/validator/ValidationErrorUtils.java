@@ -58,6 +58,14 @@ class ValidationErrorUtils {
         return "Missing required property: " + propertyPath;
     }
 
+    public static String missingResource(String propertyPath, String reason) {
+        return "Resource referenced by property '" + propertyPath + "' is not available: " + reason;
+    }
+
+    public static String resourceCheckFailed(String propertyPath, String reason) {
+        return "Could not verify the resource referenced by property '" + propertyPath + "': " + reason;
+    }
+
     /**
      * Creates property not defined a warning message.
      */
