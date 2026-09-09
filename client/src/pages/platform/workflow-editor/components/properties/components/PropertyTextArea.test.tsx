@@ -58,10 +58,10 @@ describe('PropertyTextArea', () => {
         expect(screen.getByText('*')).toBeInTheDocument();
     });
 
-    it('opens on the shared text area floor', () => {
+    it('opens at the height of a single line input', () => {
         render(<PropertyTextArea error={false} errorMessage="" label="Notes" name="notes" />);
 
-        expect(screen.getByRole('textbox')).toHaveClass('min-h-14');
+        expect(screen.getByRole('textbox')).toHaveClass('min-h-9');
     });
 
     it('renders error state with error icon', () => {
