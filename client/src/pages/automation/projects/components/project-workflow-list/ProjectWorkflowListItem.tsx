@@ -1,4 +1,3 @@
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -9,8 +8,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
-import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
@@ -25,30 +24,13 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 
 import '@/shared/styles/dropdownMenu.css';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {
-    ComponentIcon,
-    CopyIcon,
-    DownloadIcon,
-    EditIcon,
-    EllipsisVerticalIcon,
-    Share2Icon,
-    Trash2Icon,
-} from 'lucide-react';
-import {useMemo, useState} from 'react';
-import InlineSVG from 'react-inlinesvg';
+import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
+import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
-
-type TriggerDataType = {
-    componentName: string;
-    description: string;
-    iconSrc: string;
-    label: string;
-};
 
 const ProjectWorkflowListItem = ({
     filteredComponentNames,
@@ -78,58 +60,6 @@ const ProjectWorkflowListItem = ({
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
-
-    const triggerComponentName = workflow.workflowTriggerComponentNames?.[0];
-    const triggerType = workflow.triggers?.[0]?.type;
-
-    const triggerVersionNumber = triggerType ? +triggerType.split('/')[1].replace('v', '') : 1;
-
-    const {data: triggerComponentDefinition} = useGetComponentDefinitionQuery(
-        {
-            componentName: triggerComponentName || '',
-            componentVersion: triggerVersionNumber,
-        },
-        !!triggerComponentName
-    );
-
-    const triggerData = useMemo<TriggerDataType | null>(() => {
-        if (!triggerComponentName && !workflow.triggers?.[0]) {
-            return null;
-        }
-
-        const triggerFromWorkflow = workflow.triggers?.[0];
-        const triggerDefinition = workflowComponentDefinitions[triggerComponentName || ''];
-
-        const matchedTrigger = triggerComponentDefinition?.triggers?.find(
-            (trigger) => trigger.name === triggerFromWorkflow?.type?.split('/')[2]
-        );
-
-        if (!matchedTrigger && !triggerFromWorkflow) {
-            return null;
-        }
-
-        const description = matchedTrigger?.description || triggerFromWorkflow?.description || '';
-        const label = matchedTrigger?.title || triggerFromWorkflow?.label || '';
-        const componentName = triggerDefinition?.title || triggerComponentName || 'Unknown Trigger';
-        const iconSrc = triggerDefinition?.icon || '';
-
-        return {
-            componentName,
-            description,
-            iconSrc,
-            label,
-        };
-    }, [workflow, workflowComponentDefinitions, triggerComponentName, triggerComponentDefinition]);
-
-    const taskOnlyComponentNames = useMemo(() => {
-        if (!filteredComponentNames) {
-            return [];
-        }
-
-        const triggerCount = workflow.workflowTriggerComponentNames?.length ?? 0;
-
-        return filteredComponentNames.slice(triggerCount);
-    }, [filteredComponentNames, workflow.workflowTriggerComponentNames]);
 
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
@@ -205,62 +135,13 @@ const ProjectWorkflowListItem = ({
                     </div>
                 </div>
 
-                <div className="hidden items-center gap-1 sm:flex">
-                    {triggerData && (
-                        <div className="flex shrink-0 items-center gap-1">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
-                                        {triggerData.iconSrc ? (
-                                            <InlineSVG
-                                                className="size-5"
-                                                loader={<ComponentIcon className="size-5 flex-none" />}
-                                                src={triggerData.iconSrc}
-                                                title={null}
-                                            />
-                                        ) : (
-                                            <ComponentIcon className="size-3 flex-none text-content-neutral-primary" />
-                                        )}
-                                    </div>
-                                </TooltipTrigger>
-
-                                <TooltipContent>{triggerData.componentName}</TooltipContent>
-                            </Tooltip>
-
-                            {triggerData.description ? (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className="shrink-0">
-                                            <Badge
-                                                label={triggerData.label || triggerData.componentName}
-                                                styleType="outline-outline"
-                                                weight="semibold"
-                                            />
-                                        </div>
-                                    </TooltipTrigger>
-
-                                    <TooltipContent className="max-w-xs text-sm" side="right">
-                                        {triggerData.description}
-                                    </TooltipContent>
-                                </Tooltip>
-                            ) : (
-                                <div className="shrink-0">
-                                    <Badge
-                                        label={triggerData.label || triggerData.componentName}
-                                        styleType="outline-outline"
-                                        weight="semibold"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <WorkflowComponentsList
-                        filteredComponentNames={taskOnlyComponentNames}
-                        workflowComponentDefinitions={workflowComponentDefinitions}
-                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                    />
-                </div>
+                <WorkflowTriggerAndComponentsRow
+                    className="hidden sm:flex"
+                    filteredComponentNames={filteredComponentNames}
+                    workflow={workflow}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
             </Link>
 
             <div className="flex justify-end gap-x-6">
