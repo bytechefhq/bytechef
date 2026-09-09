@@ -66,6 +66,7 @@ import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +106,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     OAuth2ParametersFacade.class,
     OAuth2Service.class, PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class,
-    TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,
+    TaskDispatcherDefinitionService.class, TaskExecutionService.class, TriggerDefinitionService.class,
+    TriggerExecutionService.class,
     TriggerLifecycleFacade.class, UserService.class, WorkflowCacheManager.class,
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class,
     WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
@@ -374,6 +376,65 @@ public class AutomationWorkflowProjectFacadeIntTest {
             .getFirst();
 
         assertThat(connectedUserWorkflowTemplateDTO.components()).isNotNull();
+    }
+
+    @Test
+    void testWorkflowComponentsIncludeTaskDispatchers() {
+        String workflowDefinitionWithTaskDispatcher = """
+            {
+                "label": "Branching Workflow",
+                "description": "Branches",
+                "inputs": [],
+                "triggers": [],
+                "tasks": [
+                    {
+                        "label": "Check",
+                        "name": "condition_1",
+                        "type": "condition/v1",
+                        "parameters": {}
+                    }
+                ]
+            }
+            """;
+
+        long projectId = automationWorkflowProjectFacade.createProject("BranchCatalog", "", null, List.of(), null);
+
+        automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithTaskDispatcher, null);
+
+        AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
+
+        ConnectedUserWorkflowTemplateDTO workflowTemplate = project.workflowTemplates()
+            .getFirst();
+
+        assertThat(workflowTemplate.components())
+            .extracting(ConnectedUserWorkflowTemplateDTO.Component::name)
+            .containsExactly("condition");
+    }
+
+    @Test
+    void testWorkflowTriggersFallBackToManual() {
+        String workflowDefinitionWithoutTrigger = """
+            {
+                "label": "Manual Workflow",
+                "description": "Runs manually",
+                "inputs": [],
+                "triggers": [],
+                "tasks": []
+            }
+            """;
+
+        long projectId = automationWorkflowProjectFacade.createProject("ManualCatalog", "", null, List.of(), null);
+
+        automationWorkflowProjectFacade.createProjectWorkflow(projectId, workflowDefinitionWithoutTrigger, null);
+
+        AutomationWorkflowProjectDTO project = automationWorkflowProjectFacade.getProject(projectId);
+
+        ConnectedUserWorkflowTemplateDTO workflowTemplate = project.workflowTemplates()
+            .getFirst();
+
+        assertThat(workflowTemplate.triggers())
+            .extracting(ConnectedUserWorkflowTemplateDTO.Component::name)
+            .containsExactly("manual");
     }
 
     @Test

@@ -39,6 +39,8 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -77,6 +79,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
         """;
 
+    private static final String MANUAL_COMPONENT_NAME = "manual";
+
     private final CategoryService categoryService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
@@ -85,6 +89,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -95,6 +100,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         ConnectedUserService connectedUserService, EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectWorkflowService projectWorkflowService, TagService tagService,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
@@ -106,6 +112,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -403,57 +410,71 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     private List<ConnectedUserWorkflowTemplateDTO.Component> getTaskComponents(Workflow workflow) {
-        Map<String, WorkflowNodeType> componentsByName = new LinkedHashMap<>();
+        Map<String, WorkflowNodeType> workflowNodeTypesByName = new LinkedHashMap<>();
 
         for (WorkflowTask workflowTask : workflow.getTasks(true)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-            if (workflowNodeType.operation() != null
-                && !componentsByName.containsKey(workflowNodeType.name())) {
-
-                componentsByName.put(workflowNodeType.name(), workflowNodeType);
-            }
+            workflowNodeTypesByName.putIfAbsent(workflowNodeType.name(), workflowNodeType);
         }
 
-        return resolveComponents(componentsByName);
+        return resolveComponents(workflowNodeTypesByName);
     }
 
     private List<ConnectedUserWorkflowTemplateDTO.Component> getTriggerComponents(Workflow workflow) {
-        Map<String, WorkflowNodeType> componentsByName = new LinkedHashMap<>();
+        Map<String, WorkflowNodeType> workflowNodeTypesByName = new LinkedHashMap<>();
 
         for (WorkflowTrigger workflowTrigger : WorkflowTrigger.of(workflow)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            if (workflowNodeType.operation() != null
-                && !componentsByName.containsKey(workflowNodeType.name())) {
-
-                componentsByName.put(workflowNodeType.name(), workflowNodeType);
-            }
+            workflowNodeTypesByName.putIfAbsent(workflowNodeType.name(), workflowNodeType);
         }
 
-        return resolveComponents(componentsByName);
+        if (workflowNodeTypesByName.isEmpty()) {
+            workflowNodeTypesByName.put(
+                MANUAL_COMPONENT_NAME, new WorkflowNodeType(MANUAL_COMPONENT_NAME, 1, MANUAL_COMPONENT_NAME));
+        }
+
+        return resolveComponents(workflowNodeTypesByName);
     }
 
     private List<ConnectedUserWorkflowTemplateDTO.Component> resolveComponents(
-        Map<String, WorkflowNodeType> componentsByName) {
+        Map<String, WorkflowNodeType> workflowNodeTypesByName) {
 
         List<ConnectedUserWorkflowTemplateDTO.Component> components = new ArrayList<>();
 
-        for (WorkflowNodeType workflowNodeType : componentsByName.values()) {
-            Optional<ComponentDefinition> componentDefinitionOptional =
-                componentDefinitionService.fetchComponentDefinition(
-                    workflowNodeType.name(), workflowNodeType.version());
-
-            if (componentDefinitionOptional.isPresent()) {
-                ComponentDefinition componentDefinition = componentDefinitionOptional.get();
-
-                components.add(
-                    new ConnectedUserWorkflowTemplateDTO.Component(
-                        componentDefinition.getName(), componentDefinition.getTitle(), componentDefinition.getIcon()));
-            }
+        for (WorkflowNodeType workflowNodeType : workflowNodeTypesByName.values()) {
+            components.add(resolveComponent(workflowNodeType));
         }
 
         return components;
+    }
+
+    private ConnectedUserWorkflowTemplateDTO.Component resolveComponent(WorkflowNodeType workflowNodeType) {
+        Optional<ComponentDefinition> componentDefinitionOptional =
+            componentDefinitionService.fetchComponentDefinition(workflowNodeType.name(), workflowNodeType.version());
+
+        if (componentDefinitionOptional.isPresent()) {
+            ComponentDefinition componentDefinition = componentDefinitionOptional.get();
+
+            return new ConnectedUserWorkflowTemplateDTO.Component(
+                componentDefinition.getName(), componentDefinition.getTitle(), componentDefinition.getIcon());
+        }
+
+        Optional<TaskDispatcherDefinition> taskDispatcherDefinitionOptional =
+            taskDispatcherDefinitionService.fetchTaskDispatcherDefinition(
+                workflowNodeType.name(), workflowNodeType.version());
+
+        if (taskDispatcherDefinitionOptional.isPresent()) {
+            TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionOptional.get();
+
+            return new ConnectedUserWorkflowTemplateDTO.Component(
+                taskDispatcherDefinition.getName(), taskDispatcherDefinition.getTitle(),
+                taskDispatcherDefinition.getIcon());
+        }
+
+        return new ConnectedUserWorkflowTemplateDTO.Component(
+            workflowNodeType.name(), workflowNodeType.name(), null);
     }
 
     private Project getMarkedProject(long projectId) {
