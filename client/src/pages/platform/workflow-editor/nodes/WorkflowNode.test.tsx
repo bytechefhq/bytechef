@@ -5,6 +5,7 @@ import {ReactFlowProvider} from '@xyflow/react';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useWorkflowIssuesStore from '../stores/useWorkflowIssuesStore';
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
@@ -138,5 +139,29 @@ describe('WorkflowNode', () => {
         renderNode();
 
         expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    });
+
+    it('shows an issue badge when the issues store has an issue for this node', () => {
+        useWorkflowIssuesStore.getState().setValidatorIssues([
+            {
+                kind: 'MISSING_REQUIRED',
+                message: 'Missing required property: model',
+                nodeName: 'approval_1',
+                severity: 'ERROR',
+                source: 'VALIDATOR',
+            },
+        ]);
+
+        renderNode();
+
+        expect(screen.getByLabelText('1 issue')).toHaveAttribute('title', 'Missing required property: model');
+
+        useWorkflowIssuesStore.getState().reset();
+    });
+
+    it('shows no badge for a node without issues', () => {
+        renderNode();
+
+        expect(screen.queryByLabelText(/issue/)).not.toBeInTheDocument();
     });
 });
