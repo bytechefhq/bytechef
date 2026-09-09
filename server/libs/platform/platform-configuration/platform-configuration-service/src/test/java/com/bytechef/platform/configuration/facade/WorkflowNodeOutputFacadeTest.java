@@ -36,6 +36,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -221,6 +222,115 @@ class WorkflowNodeOutputFacadeTest {
                 .workflowNodeName());
             assertNotNull(result.getFirst()
                 .taskDispatcherDefinition());
+        }
+    }
+
+    @Test
+    void testNodeWhoseDynamicOutputFailsDoesNotBreakTheOutputsOfTheNodesAfterIt() {
+        WorkflowTask task1 = new WorkflowTask(
+            Map.of("name", "action1", "type", "component/v1/action1"));
+        WorkflowTask task2 = new WorkflowTask(
+            Map.of("name", "action2", "type", "component/v1/action2"));
+        WorkflowTask task3 = new WorkflowTask(
+            Map.of("name", "action3", "type", "component/v1/action3"));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("action3"))).thenReturn(List.of(task1, task2, task3));
+        when(workflow.getTasks(eq("action2"))).thenReturn(List.of(task1, task2));
+
+        ActionDefinition action1Definition = mock(ActionDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(eq(WORKFLOW_ID), eq("action1"), anyLong()))
+            .thenReturn(Optional.empty());
+        when(actionDefinitionService.getActionDefinition("component", 1, "action1"))
+            .thenReturn(action1Definition);
+        when(action1Definition.getOutputResponse())
+            .thenReturn(new OutputResponse(null, Map.of("field1", "value1"), null));
+
+        ActionDefinition action2Definition = mock(ActionDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(eq(WORKFLOW_ID), eq("action2"), anyLong()))
+            .thenReturn(Optional.empty());
+        when(actionDefinitionService.getActionDefinition("component", 1, "action2"))
+            .thenReturn(action2Definition);
+        when(action2Definition.getOutputResponse()).thenReturn(null);
+        when(actionDefinitionService.isDynamicOutputDefined("component", 1, "action2")).thenReturn(true);
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            WORKFLOW_ID, "action2", ENVIRONMENT_ID))
+                .thenReturn(List.of());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(actionDefinitionFacade.executeOutput(eq("component"), eq(1), eq("action2"), any(), any()))
+            .thenThrow(new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of());
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "action3", ENVIRONMENT_ID);
+
+            assertEquals(2, result.size());
+            assertEquals("action1", result.get(0)
+                .workflowNodeName());
+            assertNotNull(result.get(0)
+                .getSampleOutput());
+            assertEquals("action2", result.get(1)
+                .workflowNodeName());
+
+            Map<String, ?> sampleOutputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
+                WORKFLOW_ID, "action3", ENVIRONMENT_ID);
+
+            assertEquals(Map.of("field1", "value1"), sampleOutputs.get("action1"));
+        }
+    }
+
+    @Test
+    void testTriggerWhoseDynamicOutputFailsDoesNotBreakTheOutputsOfTheNodesAfterIt() {
+        WorkflowTrigger workflowTrigger = new WorkflowTrigger(
+            Map.of("name", "trigger_1", "type", "dataTable/v1/recordUpdated"));
+        WorkflowTask task1 = new WorkflowTask(
+            Map.of("name", "action1", "type", "component/v1/action1"));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(eq("action1"))).thenReturn(List.of(task1));
+
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(eq(WORKFLOW_ID), eq("trigger_1"), anyLong()))
+            .thenReturn(Optional.empty());
+        when(triggerDefinitionService.getTriggerDefinition("dataTable", 1, "recordUpdated"))
+            .thenReturn(triggerDefinition);
+        when(triggerDefinition.getOutputResponse())
+            .thenReturn(new OutputResponse(null, Map.of("row", "value"), null));
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Map.of());
+        when(workflowTestConfigurationService.fetchWorkflowTestConfigurationConnectionId(
+            WORKFLOW_ID, "trigger_1", ENVIRONMENT_ID))
+                .thenReturn(Optional.empty());
+        when(evaluator.evaluate(any(), any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(triggerDefinitionFacade.executeOutput(
+            eq("dataTable"), eq(1), eq("recordUpdated"), any(), any()))
+                .thenThrow(
+                    new IllegalStateException("Table does not have primary key column 'id': dt_0_conversations"));
+
+        try (MockedStatic<WorkflowTrigger> workflowTriggerStatic = mockStatic(WorkflowTrigger.class)) {
+            workflowTriggerStatic.when(() -> WorkflowTrigger.of(workflow))
+                .thenReturn(List.of(workflowTrigger));
+
+            List<WorkflowNodeOutputDTO> result = workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(
+                WORKFLOW_ID, "action1", ENVIRONMENT_ID);
+
+            assertEquals(1, result.size());
+            assertEquals("trigger_1", result.get(0)
+                .workflowNodeName());
         }
     }
 
