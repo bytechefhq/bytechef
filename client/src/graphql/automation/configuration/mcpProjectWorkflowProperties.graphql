@@ -12,7 +12,10 @@ query mcpProjectWorkflowProperties($mcpProjectWorkflowId: ID!) {
             controlType
             defaultValue
             label
+            maxLength
+            minLength
             placeholder
+            regex
         }
         ... on IntegerProperty {
             controlType
