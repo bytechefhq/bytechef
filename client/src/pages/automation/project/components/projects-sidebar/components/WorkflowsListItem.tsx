@@ -1,7 +1,7 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowsListItemDropdownMenu from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItemDropdownMenu';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {MouseEvent, useMemo} from 'react';
@@ -87,8 +87,9 @@ const WorkflowsListItem = ({
         >
             <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 flex-col gap-3 overflow-hidden">
-                    <WorkflowComponentsList
+                    <WorkflowTriggerAndComponentsRow
                         filteredComponentNames={filteredComponentNames}
+                        workflow={workflow}
                         workflowComponentDefinitions={workflowComponentDefinitions}
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                     />

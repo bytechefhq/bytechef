@@ -2,7 +2,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationWorkflowsListItemDropdownMenu from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListItemDropdownMenu';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {MouseEvent, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -87,8 +87,9 @@ const IntegrationWorkflowsListItem = ({
         >
             <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 flex-col gap-3 overflow-hidden">
-                    <WorkflowComponentsList
+                    <WorkflowTriggerAndComponentsRow
                         filteredComponentNames={filteredComponentNames}
+                        workflow={workflow}
                         workflowComponentDefinitions={workflowComponentDefinitions}
                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
                     />
