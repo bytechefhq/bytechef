@@ -1,19 +1,11 @@
-import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {
     CANVAS_TOP_OFFSET,
     COPILOT_PANEL_WIDTH,
-    DATA_PILL_PANEL_WIDTH,
     FINAL_PLACEHOLDER_NODE_ID,
-    NODE_DETAILS_PANEL_WIDTH,
     PROJECT_LEFT_SIDEBAR_WIDTH,
-    WORKFLOW_NODES_SIDEBAR_WIDTH,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -31,6 +23,7 @@ import RoundedSmoothStepEdge from '../edges/RoundedSmoothStepEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
+import useOverlayPanelsViewport from '../hooks/useOverlayPanelsViewport';
 import AiAgentNode from '../nodes/AiAgentNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import ReadOnlyNode from '../nodes/ReadOnlyNode';
@@ -94,14 +87,7 @@ const useWorkflowEditorCanvas = ({
             }))
         );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
-    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
-    const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
-    const issuesSidebarOpen = useWorkflowIssuesStore((state) => state.issuesSidebarOpen);
     const resetWorkflowLayout = useWorkflowEditorStore((state) => state.resetWorkflowLayout);
-    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
-        (state) => state.workflowNodeDetailsPanelOpen
-    );
-    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
 
     const {setViewport} = useReactFlow();
 
@@ -497,24 +483,8 @@ const useWorkflowEditorCanvas = ({
         canvasWidth -= COPILOT_PANEL_WIDTH;
     }
 
-    if (dataPillPanelOpen) {
-        canvasWidth -= DATA_PILL_PANEL_WIDTH;
-    }
-
     if (leftSidebarOpen) {
         canvasWidth -= PROJECT_LEFT_SIDEBAR_WIDTH;
-    }
-
-    if (rightSidebarOpen) {
-        canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
-    }
-
-    if (issuesSidebarOpen) {
-        canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
-    }
-
-    if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
-        canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
     }
 
     const canvasHeight = window.innerHeight - 60;
@@ -562,6 +532,8 @@ const useWorkflowEditorCanvas = ({
         taskDispatcherDefinitions,
     });
 
+    const {getViewportOffsetX} = useOverlayPanelsViewport({enabled: !readOnlyWorkflow});
+
     const workflowUuid = workflow.workflowUuid;
 
     useEffect(() => {
@@ -585,7 +557,7 @@ const useWorkflowEditorCanvas = ({
 
         setViewport(
             {
-                x: 0,
+                x: getViewportOffsetX(),
                 y: CANVAS_TOP_OFFSET,
                 zoom: 1,
             },

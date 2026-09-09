@@ -1,15 +1,12 @@
 import {
     COPILOT_PANEL_WIDTH,
-    DATA_PILL_PANEL_WIDTH,
     EDGE_STYLES,
     FINAL_PLACEHOLDER_NODE_ID,
     LayoutDirectionType,
-    NODE_DETAILS_PANEL_WIDTH,
     ON_ERROR_WIRE_KEY_ERROR_BRANCH,
     ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     PROJECT_LEFT_SIDEBAR_WIDTH,
     TASK_DISPATCHER_NAMES,
-    WORKFLOW_NODES_SIDEBAR_WIDTH,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -24,14 +21,9 @@ import {useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 import {useStoreWithEqualityFn} from 'zustand/traditional';
 
-import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
-import useRightSidebarStore from '../stores/useRightSidebarStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
-import useWorkflowIssuesStore from '../stores/useWorkflowIssuesStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import useWorkflowTestChatStore from '../stores/useWorkflowTestChatStore';
 import animateNodePositions from '../utils/animateNodePositions';
 import createBranchEdges from '../utils/createBranchEdges';
 import createBranchNode from '../utils/createBranchNode';
@@ -176,13 +168,6 @@ export default function useLayout({
             setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
         }))
     );
-    const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
-    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
-        (state) => state.workflowNodeDetailsPanelOpen
-    );
-    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
-    const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
-    const issuesSidebarOpen = useWorkflowIssuesStore((state) => state.issuesSidebarOpen);
     const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
@@ -192,12 +177,7 @@ export default function useLayout({
     const canvasWidthRef = useRef(canvasWidth);
     const canvasHeightRef = useRef(canvasHeight);
     const previousCopilotPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
-    const previousTestChatPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
-    const previousRightSidebarOpenRef = useRef<boolean | undefined>(undefined);
-    const previousIssuesSidebarOpenRef = useRef<boolean | undefined>(undefined);
 
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
@@ -643,12 +623,7 @@ export default function useLayout({
     useEffect(() => {
         if (!useWorkflowDataStore.getState().isWorkflowLoaded) {
             previousCopilotPanelOpenRef.current = copilotPanelOpen;
-            previousDataPillPanelOpenRef.current = dataPillPanelOpen;
-            previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
-            previousRightSidebarOpenRef.current = rightSidebarOpen;
-            previousIssuesSidebarOpenRef.current = issuesSidebarOpen;
 
             return;
         }
@@ -672,66 +647,18 @@ export default function useLayout({
         }
 
         if (
-            previousNodeDetailsPanelOpenRef.current !== undefined &&
-            previousNodeDetailsPanelOpenRef.current !== workflowNodeDetailsPanelOpen
-        ) {
-            widthDelta += workflowNodeDetailsPanelOpen ? NODE_DETAILS_PANEL_WIDTH : -NODE_DETAILS_PANEL_WIDTH;
-        }
-
-        if (
-            previousTestChatPanelOpenRef.current !== undefined &&
-            previousTestChatPanelOpenRef.current !== workflowTestChatPanelOpen
-        ) {
-            widthDelta += workflowTestChatPanelOpen ? NODE_DETAILS_PANEL_WIDTH : -NODE_DETAILS_PANEL_WIDTH;
-        }
-
-        if (
-            previousDataPillPanelOpenRef.current !== undefined &&
-            previousDataPillPanelOpenRef.current !== dataPillPanelOpen
-        ) {
-            widthDelta += dataPillPanelOpen ? DATA_PILL_PANEL_WIDTH : -DATA_PILL_PANEL_WIDTH;
-        }
-
-        if (
             previousLeftSidebarOpenRef.current !== undefined &&
             previousLeftSidebarOpenRef.current !== leftSidebarOpen
         ) {
             widthDelta += leftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
         }
 
-        if (
-            previousRightSidebarOpenRef.current !== undefined &&
-            previousRightSidebarOpenRef.current !== rightSidebarOpen
-        ) {
-            widthDelta += rightSidebarOpen ? WORKFLOW_NODES_SIDEBAR_WIDTH : -WORKFLOW_NODES_SIDEBAR_WIDTH;
-        }
-
-        if (
-            previousIssuesSidebarOpenRef.current !== undefined &&
-            previousIssuesSidebarOpenRef.current !== issuesSidebarOpen
-        ) {
-            widthDelta += issuesSidebarOpen ? WORKFLOW_NODES_SIDEBAR_WIDTH : -WORKFLOW_NODES_SIDEBAR_WIDTH;
-        }
+        previousCopilotPanelOpenRef.current = copilotPanelOpen;
+        previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
         if (widthDelta === 0) {
-            previousCopilotPanelOpenRef.current = copilotPanelOpen;
-            previousDataPillPanelOpenRef.current = dataPillPanelOpen;
-            previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-            previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
-            previousLeftSidebarOpenRef.current = leftSidebarOpen;
-            previousRightSidebarOpenRef.current = rightSidebarOpen;
-            previousIssuesSidebarOpenRef.current = issuesSidebarOpen;
-
             return;
         }
-
-        previousCopilotPanelOpenRef.current = copilotPanelOpen;
-        previousDataPillPanelOpenRef.current = dataPillPanelOpen;
-        previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
-        previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
-        previousLeftSidebarOpenRef.current = leftSidebarOpen;
-        previousRightSidebarOpenRef.current = rightSidebarOpen;
-        previousIssuesSidebarOpenRef.current = issuesSidebarOpen;
 
         if (cancelAnimationRef.current) {
             cancelAnimationRef.current();
@@ -758,15 +685,7 @@ export default function useLayout({
         }));
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
-    }, [
-        copilotPanelOpen,
-        dataPillPanelOpen,
-        leftSidebarOpen,
-        issuesSidebarOpen,
-        rightSidebarOpen,
-        workflowNodeDetailsPanelOpen,
-        workflowTestChatPanelOpen,
-    ]);
+    }, [copilotPanelOpen, leftSidebarOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
