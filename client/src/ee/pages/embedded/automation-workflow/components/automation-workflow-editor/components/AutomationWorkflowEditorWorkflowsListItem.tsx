@@ -1,8 +1,9 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorWorkflowsListItemDropdownMenu from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowsListItemDropdownMenu';
+import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {MouseEvent} from 'react';
-import InlineSVG from 'react-inlinesvg';
+import {MouseEvent, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
@@ -31,6 +32,27 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
         onWorkflowClick(workflow.workflowUuid);
     };
 
+    const {filteredComponentNames, workflowComponentDefinitions} = useMemo(() => {
+        const componentNames: string[] = [];
+        const componentDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined> = {};
+
+        [...workflow.triggers, ...workflow.components].forEach((workflowComponent) => {
+            if (componentDefinitions[workflowComponent.name]) {
+                return;
+            }
+
+            componentNames.push(workflowComponent.name);
+
+            componentDefinitions[workflowComponent.name] = {
+                icon: workflowComponent.icon ?? undefined,
+                name: workflowComponent.name,
+                title: workflowComponent.title ?? undefined,
+            };
+        });
+
+        return {filteredComponentNames: componentNames, workflowComponentDefinitions: componentDefinitions};
+    }, [workflow.components, workflow.triggers]);
+
     return (
         <li
             className={twMerge(
@@ -41,19 +63,11 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
         >
             <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 flex-col gap-3 overflow-hidden">
-                    {(workflow.triggers.length > 0 || workflow.components.length > 0) && (
-                        <div className="flex flex-wrap gap-2">
-                            {[...workflow.triggers, ...workflow.components].map((item, index) => (
-                                <div
-                                    className="flex shrink-0 items-center justify-center rounded-full border bg-background p-1"
-                                    key={`${index}-${item.name}`}
-                                    title={item.title ?? item.name}
-                                >
-                                    {item.icon && <InlineSVG className="size-5 flex-none" src={item.icon} />}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <WorkflowComponentsList
+                        filteredComponentNames={filteredComponentNames}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={{}}
+                    />
 
                     <Tooltip>
                         <TooltipTrigger asChild>
