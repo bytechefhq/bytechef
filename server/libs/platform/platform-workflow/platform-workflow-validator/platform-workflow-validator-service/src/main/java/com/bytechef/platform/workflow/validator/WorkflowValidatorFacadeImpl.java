@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -34,6 +35,7 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -46,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -66,10 +70,27 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private final ActionDefinitionService actionDefinitionService;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
+    private final Map<ResourceType, ResourceReferenceResolver> resourceReferenceResolverMap;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
+
+    private final WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
+        new WorkflowValidator.ClusterTypesProvider() {
+
+            @Override
+            @Nullable
+            public List<String> getClusterElementTypes(String taskType) {
+                return getClusterElementTypeKeys(taskType, false);
+            }
+
+            @Override
+            @Nullable
+            public List<String> getRequiredClusterElementTypes(String taskType) {
+                return getClusterElementTypeKeys(taskType, true);
+            }
+        };
 
     @SuppressFBWarnings("EI2")
     public WorkflowValidatorFacadeImpl(
@@ -78,7 +99,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        WorkflowService workflowService) {
+        WorkflowService workflowService, List<ResourceReferenceResolver> resourceReferenceResolvers) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
@@ -88,16 +109,24 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
+        this.resourceReferenceResolverMap = resourceReferenceResolvers.stream()
+            .collect(Collectors.toMap(ResourceReferenceResolver::getResourceType, Function.identity()));
     }
 
     @Override
     public WorkflowValidationResult validateWorkflow(String workflow) {
+        return validateWorkflow(workflow, Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Override
+    public WorkflowValidationResult validateWorkflow(String workflow, long environmentId) {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
         WorkflowValidator.validateWorkflow(
-            workflow, this::getTaskProperties, this::getTaskOutputProperty, this::getClusterElementTypes,
-            new HashMap<>(), new HashMap<>(), buildNodeOutputMap(workflow), new HashMap<>(), errors, warnings);
+            workflow, this::getTaskProperties, this::getTaskOutputProperty, clusterTypesProvider,
+            createResourceReferenceProvider(resourceReferenceResolverMap, environmentId), new HashMap<>(),
+            new HashMap<>(), buildNodeOutputMap(workflow), new HashMap<>(), errors, warnings);
 
         String errorsString = errors.toString();
 
@@ -111,14 +140,32 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             .filter(line -> !line.isBlank())
             .toList();
 
-        return new WorkflowValidationResult(errorList, warningList);
+        return new WorkflowValidationResult(
+            errorList, warningList, NodeValidationIssueParser.parse(errorList, warningList));
     }
 
     @Override
     public WorkflowValidationResult validateWorkflowById(String workflowId) {
+        return validateWorkflowById(workflowId, Environment.DEVELOPMENT.ordinal());
+    }
+
+    @Override
+    public WorkflowValidationResult validateWorkflowById(String workflowId, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        return validateWorkflow(workflow.getDefinition());
+        return validateWorkflow(workflow.getDefinition(), environmentId);
+    }
+
+    static WorkflowValidator.ResourceReferenceProvider createResourceReferenceProvider(
+        Map<ResourceType, ResourceReferenceResolver> resourceReferenceResolverMap, long environmentId) {
+
+        return (resourceType, reference) -> {
+            ResourceReferenceResolver resourceReferenceResolver =
+                resourceReferenceResolverMap.get(ResourceType.valueOf(resourceType));
+
+            return resourceReferenceResolver == null
+                ? null : resourceReferenceResolver.findProblem(reference, environmentId);
+        };
     }
 
     @Override
@@ -304,7 +351,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     @Nullable
-    private List<String> getClusterElementTypes(String taskType) {
+    private List<String> getClusterElementTypeKeys(String taskType, boolean requiredOnly) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskType);
 
         if (workflowNodeType.operation() != null) {
@@ -312,19 +359,26 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 componentDefinitionService.getComponentDefinition(workflowNodeType.name(), workflowNodeType.version());
 
             if (componentDefinition.isClusterElement()) {
-                return componentDefinition.getClusterElementTypes()
-                    .stream()
-                    .map(ClusterElementDefinition.ClusterElementType::key)
-                    .toList();
+                return toClusterElementTypeKeys(componentDefinition.getClusterElementTypes(), requiredOnly);
             }
         }
 
         return null;
     }
 
+    static List<String> toClusterElementTypeKeys(
+        List<ClusterElementDefinition.ClusterElementType> clusterElementTypes, boolean requiredOnly) {
+
+        return clusterElementTypes.stream()
+            .filter(clusterElementType -> !requiredOnly || clusterElementType.required())
+            .map(ClusterElementDefinition.ClusterElementType::key)
+            .toList();
+    }
+
     private static PropertyInfo toPropertyInfo(BaseProperty baseProperty) {
         String type;
         List<PropertyInfo> nestedPropertyInfos = null;
+        String resourceType = null;
 
         switch (baseProperty) {
             case ObjectProperty objectProperty -> {
@@ -361,6 +415,12 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 com.bytechef.component.definition.Property.Type propertyType = property.getType();
 
                 type = propertyType.name();
+
+                ResourceType propertyResourceType = property.getResourceType();
+
+                if (propertyResourceType != null) {
+                    resourceType = propertyResourceType.name();
+                }
             }
             case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty -> {
                 type = "OBJECT";
@@ -407,6 +467,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
         return new PropertyInfo(
             baseProperty.getName(), type, baseProperty.getDescription(), baseProperty.getRequired(),
-            baseProperty.getExpressionEnabled(), baseProperty.getDisplayCondition(), nestedPropertyInfos);
+            baseProperty.getExpressionEnabled(), baseProperty.getDisplayCondition(), null, nestedPropertyInfos,
+            resourceType);
     }
 }

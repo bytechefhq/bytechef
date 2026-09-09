@@ -341,6 +341,16 @@ class WorkflowValidatorDuplicateNodeNamesTest {
             }
 
             @Override
+            public WorkflowValidationResult validateWorkflow(String workflow, long environmentId) {
+                return new WorkflowValidationResult(List.of(), List.of());
+            }
+
+            @Override
+            public WorkflowValidationResult validateWorkflowById(String workflowId, long environmentId) {
+                return new WorkflowValidationResult(List.of(), List.of());
+            }
+
+            @Override
             public List<String> getDuplicateNodeNames(String workflow) {
                 return WorkflowValidator.getDuplicateNodeNames(workflow);
             }

@@ -20,6 +20,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for workflow validation operations.
@@ -43,6 +44,10 @@ public interface WorkflowValidatorFacade {
      * @return a {@link WorkflowValidationResult} containing lists of errors and warnings
      */
     WorkflowValidationResult validateWorkflowById(String workflowId);
+
+    WorkflowValidationResult validateWorkflow(String workflow, long environmentId);
+
+    WorkflowValidationResult validateWorkflowById(String workflowId, long environmentId);
 
     /**
      * Returns the node names (the trigger plus all tasks, including tasks nested inside condition, loop, branch,
@@ -114,15 +119,34 @@ public interface WorkflowValidatorFacade {
         }
     }
 
-    /**
-     * Holds the result of a workflow validation, containing lists of error messages and warning messages.
-     */
+    enum WorkflowIssueKind {
+        BROKEN_REFERENCE, DUPLICATE_NODE_NAME, MISSING_CLUSTER_ELEMENT, MISSING_REQUIRED, MISSING_RESOURCE, OTHER,
+        TASK_ORDER, TYPE_MISMATCH
+    }
+
+    enum WorkflowIssueSeverity {
+        ERROR, WARNING
+    }
+
+    record NodeValidationIssue(
+        String nodeName, @Nullable String propertyPath, WorkflowIssueKind kind, WorkflowIssueSeverity severity,
+        String message) {
+    }
+
     @SuppressFBWarnings("EI")
-    record WorkflowValidationResult(List<String> errors, List<String> warnings) {
+    record WorkflowValidationResult(
+        List<String> errors, List<String> warnings, List<NodeValidationIssue> nodeIssues) {
 
         public WorkflowValidationResult(List<String> errors, List<String> warnings) {
+            this(errors, warnings, List.of());
+        }
+
+        public WorkflowValidationResult(
+            List<String> errors, List<String> warnings, List<NodeValidationIssue> nodeIssues) {
+
             this.errors = List.copyOf(errors);
             this.warnings = List.copyOf(warnings);
+            this.nodeIssues = List.copyOf(nodeIssues);
         }
     }
 }
