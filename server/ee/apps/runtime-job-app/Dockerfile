@@ -12,11 +12,13 @@ WORKDIR /opt/bytechef
 
 COPY build/libs/runtime-job-app.jar runtime-job/
 
-ENTRYPOINT exec \
-     java \
-     -Dfile.encoding=UTF-8 -Duser.timezone=GMT \
-     -Djava.io.tmpdir=/opt/bytechef/runtime-job/tmp \
-     -jar runtime-job/runtime-job-app.jar \
-     "$@"
+ENTRYPOINT [ \
+    "java", \
+    "-Dfile.encoding=UTF-8", \
+    "-Duser.timezone=GMT", \
+    "-Djava.io.tmpdir=/opt/bytechef/runtime-job/tmp", \
+    "-jar", \
+    "runtime-job/runtime-job-app.jar" \
+]
 
 FROM bytechef-runtime-job-base AS bytechef-runtime-job
