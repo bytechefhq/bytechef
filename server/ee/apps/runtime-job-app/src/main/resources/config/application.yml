@@ -21,6 +21,29 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${bytechef.observability.tracing.endpoint}
+    logging:
+      export:
+        otlp:
+          endpoint: ${bytechef.observability.logging.endpoint}
+  logging:
+    export:
+      enabled: ${bytechef.observability.logging.enabled}
+  tracing:
+    export:
+      enabled: ${bytechef.observability.tracing.enabled}
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        enabled: ${bytechef.observability.metrics.enabled}
+        step: 10s
+        url: ${bytechef.observability.metrics.endpoint}
   # Prometheus is the default metrics backend
   prometheus:
     metrics:
@@ -93,6 +116,16 @@ bytechef:
   message-broker:
     # Messaging provider between Coordinator and Workers (memory) default: memory
     provider: memory
+  observability:
+    logging:
+      enabled: false
+      endpoint: http://localhost:4318/v1/logs
+    metrics:
+      enabled: false
+      endpoint: http://localhost:4318/v1/metrics
+    tracing:
+      enabled: false
+      endpoint: http://localhost:4318/v1/traces
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.
