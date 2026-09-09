@@ -86,6 +86,8 @@ const ProjectsLeftSidebar = ({
 
     const findProjectIdByWorkflow = getWorkflowsProjectId(projects || []);
 
+    const selectedProject = projects?.find((project) => project.id === selectedProjectId);
+
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
@@ -323,6 +325,7 @@ const ProjectsLeftSidebar = ({
                                     findProjectIdByWorkflow={findProjectIdByWorkflow}
                                     key={workflow.id}
                                     onProjectClick={onProjectClick}
+                                    project={selectedProject}
                                     setSelectedProjectId={setSelectedProjectId}
                                     workflow={workflow}
                                 />

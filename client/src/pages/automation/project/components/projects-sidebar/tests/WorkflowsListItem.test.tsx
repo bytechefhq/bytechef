@@ -1,27 +1,41 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import WorkflowsListItem from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItem';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {expect, it, vi} from 'vitest';
+import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
+import {MemoryRouter} from 'react-router-dom';
+import {beforeEach, expect, it, vi} from 'vitest';
 
 const mockOnProjectClick = vi.fn();
+
+const mockProject = {
+    id: 1050,
+    name: 'Project One',
+    workspaceId: 1,
+};
 
 const mockWorkflow = {
     label: 'Workflow One',
     projectWorkflowId: 1001,
 };
 
+beforeEach(() => {
+    vi.clearAllMocks();
+});
+
 const renderWorkflowsListItem = () => {
     render(
-        <TooltipProvider>
-            <WorkflowsListItem
-                calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
-                currentWorkflowId="1001"
-                findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
-                onProjectClick={mockOnProjectClick}
-                setSelectedProjectId={vi.fn()}
-                workflow={mockWorkflow}
-            />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <WorkflowsListItem
+                    calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
+                    currentWorkflowId="1001"
+                    findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
+                    onProjectClick={mockOnProjectClick}
+                    project={mockProject}
+                    setSelectedProjectId={vi.fn()}
+                    workflow={mockWorkflow}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 };
 
@@ -45,6 +59,22 @@ it('should call onProjectClick with correct projectId and selectedProjectId when
     expect(mockOnProjectClick).toHaveBeenCalledWith(1050, 1001);
 });
 
+it('should not select the workflow when the actions menu is used', async () => {
+    renderWorkflowsListItem();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Workflow actions for Workflow One'}));
+
+    expect(mockOnProjectClick).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole('menuitem', {name: 'Delete'}));
+
+    expect(screen.getByText('Are you absolutely sure?')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}));
+
+    expect(mockOnProjectClick).not.toHaveBeenCalled();
+});
+
 it('should render component icons for workflow', () => {
     const mockWorkflowWithComponents = {
         ...mockWorkflow,
@@ -53,16 +83,19 @@ it('should render component icons for workflow', () => {
     };
 
     render(
-        <TooltipProvider>
-            <WorkflowsListItem
-                calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
-                currentWorkflowId="1001"
-                findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
-                onProjectClick={mockOnProjectClick}
-                setSelectedProjectId={vi.fn()}
-                workflow={mockWorkflowWithComponents}
-            />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <WorkflowsListItem
+                    calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
+                    currentWorkflowId="1001"
+                    findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
+                    onProjectClick={mockOnProjectClick}
+                    project={mockProject}
+                    setSelectedProjectId={vi.fn()}
+                    workflow={mockWorkflowWithComponents}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
     expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(5);
@@ -76,16 +109,19 @@ it('should show +X indicator when there are more than 7 components', () => {
     };
 
     render(
-        <TooltipProvider>
-            <WorkflowsListItem
-                calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
-                currentWorkflowId="1001"
-                findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
-                onProjectClick={mockOnProjectClick}
-                setSelectedProjectId={vi.fn()}
-                workflow={mockWorkflowWithComponents}
-            />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <WorkflowsListItem
+                    calculateTimeDifference={vi.fn().mockReturnValue('1 hour ago')}
+                    currentWorkflowId="1001"
+                    findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
+                    onProjectClick={mockOnProjectClick}
+                    project={mockProject}
+                    setSelectedProjectId={vi.fn()}
+                    workflow={mockWorkflowWithComponents}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 
     expect(screen.getByText('+2')).toBeInTheDocument();

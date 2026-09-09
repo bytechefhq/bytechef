@@ -70,6 +70,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useDuplicateAutomationWorkflowProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
     usePublishAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: hoisted.publishMutationMock}),
     useUpdateAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useUpdateAutomationWorkflowProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
 vi.mock('@/shared/queries/automation/workflows.queries', () => ({
