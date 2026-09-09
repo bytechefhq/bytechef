@@ -2401,6 +2401,15 @@ export type MutationUpdateWorkspaceApiKeyArgs = {
   name: Scalars['String']['input'];
 };
 
+export type NodeValidationIssue = {
+  __typename?: 'NodeValidationIssue';
+  kind: WorkflowIssueKind;
+  message: Scalars['String']['output'];
+  nodeName: Scalars['String']['output'];
+  propertyPath?: Maybe<Scalars['String']['output']>;
+  severity: WorkflowIssueSeverity;
+};
+
 export type NullProperty = Property & {
   __typename?: 'NullProperty';
   advancedOption?: Maybe<Scalars['Boolean']['output']>;
@@ -3412,11 +3421,13 @@ export type QueryUsersArgs = {
 
 
 export type QueryValidateWorkflowArgs = {
+  environmentId?: InputMaybe<Scalars['Long']['input']>;
   workflow: Scalars['String']['input'];
 };
 
 
 export type QueryValidateWorkflowByIdArgs = {
+  environmentId?: InputMaybe<Scalars['Long']['input']>;
   workflowId: Scalars['String']['input'];
 };
 
@@ -3727,6 +3738,22 @@ export type WorkflowInfo = {
   label: Scalars['String']['output'];
 };
 
+export enum WorkflowIssueKind {
+  BrokenReference = 'BROKEN_REFERENCE',
+  DuplicateNodeName = 'DUPLICATE_NODE_NAME',
+  MissingClusterElement = 'MISSING_CLUSTER_ELEMENT',
+  MissingRequired = 'MISSING_REQUIRED',
+  MissingResource = 'MISSING_RESOURCE',
+  Other = 'OTHER',
+  TaskOrder = 'TASK_ORDER',
+  TypeMismatch = 'TYPE_MISMATCH'
+}
+
+export enum WorkflowIssueSeverity {
+  Error = 'ERROR',
+  Warning = 'WARNING'
+}
+
 export type WorkflowNodeTestOutputResult = {
   __typename?: 'WorkflowNodeTestOutputResult';
   id: Scalars['Long']['output'];
@@ -3785,5 +3812,6 @@ export type WorkflowTrigger = {
 export type WorkflowValidationResult = {
   __typename?: 'WorkflowValidationResult';
   errors: Array<Scalars['String']['output']>;
+  nodeIssues: Array<NodeValidationIssue>;
   warnings: Array<Scalars['String']['output']>;
 };
