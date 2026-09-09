@@ -2,10 +2,12 @@ import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDa
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {
+    CANVAS_TOP_OFFSET,
     COPILOT_PANEL_WIDTH,
     DATA_PILL_PANEL_WIDTH,
     FINAL_PLACEHOLDER_NODE_ID,
@@ -94,6 +96,7 @@ const useWorkflowEditorCanvas = ({
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
+    const issuesSidebarOpen = useWorkflowIssuesStore((state) => state.issuesSidebarOpen);
     const resetWorkflowLayout = useWorkflowEditorStore((state) => state.resetWorkflowLayout);
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
@@ -506,6 +509,10 @@ const useWorkflowEditorCanvas = ({
         canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
     }
 
+    if (issuesSidebarOpen) {
+        canvasWidth -= WORKFLOW_NODES_SIDEBAR_WIDTH;
+    }
+
     if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
         canvasWidth -= NODE_DETAILS_PANEL_WIDTH;
     }
@@ -579,7 +586,7 @@ const useWorkflowEditorCanvas = ({
         setViewport(
             {
                 x: 0,
-                y: 0,
+                y: CANVAS_TOP_OFFSET,
                 zoom: 1,
             },
             {

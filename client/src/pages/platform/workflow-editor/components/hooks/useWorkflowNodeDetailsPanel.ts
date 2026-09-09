@@ -1261,7 +1261,12 @@ export default function useWorkflowNodeDetailsPanel({
             return;
         }
 
-        if (activeTab === 'properties' && !operationDataMissing && !currentOperationProperties?.length) {
+        if (
+            activeTab === 'properties' &&
+            !operationDataMissing &&
+            currentOperationDefinition &&
+            !currentOperationDefinition.properties?.length
+        ) {
             setActiveTab('description');
 
             return;
@@ -1270,6 +1275,7 @@ export default function useWorkflowNodeDetailsPanel({
     }, [
         activeTab,
         currentActionDefinition?.outputDefined,
+        currentOperationDefinition,
         currentActionFetched,
         currentOperationProperties?.length,
         currentComponentDefinition?.name,
