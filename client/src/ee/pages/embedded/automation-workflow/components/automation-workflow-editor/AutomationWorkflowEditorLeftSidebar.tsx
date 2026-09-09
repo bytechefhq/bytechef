@@ -206,7 +206,7 @@ const AutomationWorkflowEditorLeftSidebar = ({currentWorkflowId}: AutomationWork
                 )}
 
                 {!projectsIsLoading && selectedProject && filteredAndSortedWorkflows.length > 0 && (
-                    <ul className="flex flex-col items-center gap-4">
+                    <ul className="flex flex-col gap-4">
                         {filteredAndSortedWorkflows.map((workflow) => (
                             <AutomationWorkflowEditorWorkflowsListItem
                                 currentWorkflowId={currentWorkflowId}

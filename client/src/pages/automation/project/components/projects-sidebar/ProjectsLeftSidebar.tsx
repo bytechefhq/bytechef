@@ -298,7 +298,7 @@ const ProjectsLeftSidebar = ({
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (
-                    <ul className="flex flex-col items-center gap-4">
+                    <ul className="flex flex-col gap-4">
                         {selectedProjectId === 0 &&
                             (projects ? (
                                 projects.map((project) => (
