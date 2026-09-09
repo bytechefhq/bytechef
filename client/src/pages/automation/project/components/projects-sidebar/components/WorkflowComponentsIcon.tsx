@@ -3,10 +3,12 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
+export type WorkflowComponentIconDefinitionType = Pick<ComponentDefinitionBasic, 'icon' | 'name' | 'title'>;
+
 interface WorkflowComponentsIconsProps {
-    workflowComponentDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
+    workflowComponentDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
     name: string;
-    workflowTaskDispatcherDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
+    workflowTaskDispatcherDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
 }
 
 const WorkflowComponentsIcon = ({
