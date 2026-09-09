@@ -1,3 +1,4 @@
+import useClusterRootDataPills from '@/pages/platform/cluster-element-editor/hooks/useClusterRootDataPills';
 import {twMerge} from 'tailwind-merge';
 
 import DataStreamDestinationStep from './components/DataStreamDestinationStep';
@@ -7,7 +8,6 @@ import DataStreamSourceStep from './components/DataStreamSourceStep';
 import DataStreamStepNav from './components/DataStreamStepNav';
 import DataStreamTestStep from './components/DataStreamTestStep';
 import DataStreamWizardFooter from './components/DataStreamWizardFooter';
-import useDataStreamDataPills from './hooks/useDataStreamDataPills';
 import useDataStreamEditor from './hooks/useDataStreamEditor';
 
 const STEP_LABELS = ['Source', 'Destination', 'Mapping', 'Test'];
@@ -29,7 +29,7 @@ export default function DataStreamEditor({
 }: DataStreamEditorProps) {
     const {configuredSteps, currentStep, handleGoToStep, handleNext, handlePrevious} = useDataStreamEditor();
 
-    useDataStreamDataPills();
+    useClusterRootDataPills();
 
     function renderCurrentStep() {
         switch (currentStep) {

@@ -8,7 +8,7 @@ import {ComponentPropertiesType} from '@/shared/types';
 import {useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/shallow';
 
-export default function useAiAgentTestDataPills() {
+export default function useClusterRootDataPills() {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
