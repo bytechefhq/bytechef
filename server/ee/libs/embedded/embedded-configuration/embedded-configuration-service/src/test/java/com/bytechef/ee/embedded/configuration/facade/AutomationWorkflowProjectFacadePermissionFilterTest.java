@@ -30,6 +30,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,8 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
     private final ProjectWorkflowFacade projectWorkflowFacade = mock(ProjectWorkflowFacade.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
     private final TagService tagService = mock(TagService.class);
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService =
+        mock(TaskDispatcherDefinitionService.class);
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService =
         mock(WorkflowNodeTestOutputService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
@@ -65,8 +68,8 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
 
     private final AutomationWorkflowProjectFacadeImpl facade = new AutomationWorkflowProjectFacadeImpl(
         categoryService, componentDefinitionService, connectedUserService, embeddedPermissionEvaluator,
-        projectService, projectWorkflowFacade, projectWorkflowService, tagService, workflowNodeTestOutputService,
-        workflowService, workflowTestConfigurationService);
+        projectService, projectWorkflowFacade, projectWorkflowService, tagService, taskDispatcherDefinitionService,
+        workflowNodeTestOutputService, workflowService, workflowTestConfigurationService);
 
     @Test
     void testGetPublishedProjectsHidesProjectWhenExpressionIsFalse() {
