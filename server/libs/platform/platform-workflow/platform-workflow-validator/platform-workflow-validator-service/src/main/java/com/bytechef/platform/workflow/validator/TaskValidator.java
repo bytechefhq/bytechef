@@ -19,8 +19,10 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
@@ -72,13 +74,69 @@ class TaskValidator {
 
             processTaskDispatcher(taskJsonNode, context);
             validateDataPills(taskJsonNode, taskDefinition, context);
-            validateClusterElements(taskJsonNode, taskName, context);
+            validateClusterElements(taskJsonNode, "", context);
+
+            removeDynamicPropertyWarnings(taskJsonNode, warnings, warningsStart);
 
             if (!taskName.isEmpty()) {
                 prefixTaskMessages(errors, errorsStart, taskName);
                 prefixTaskMessages(warnings, warningsStart, taskName);
             }
         }
+    }
+
+    private static void removeDynamicPropertyWarnings(
+        JsonNode taskJsonNode, StringBuilder warnings, int warningsStart) {
+
+        Set<String> dynamicPropertyPaths = getDynamicPropertyPaths(taskJsonNode);
+
+        if (dynamicPropertyPaths.isEmpty() || warnings.length() <= warningsStart) {
+            return;
+        }
+
+        Set<String> dynamicPropertyWarnings = new LinkedHashSet<>();
+
+        for (String dynamicPropertyPath : dynamicPropertyPaths) {
+            dynamicPropertyWarnings.add(ValidationErrorUtils.notDefined(dynamicPropertyPath));
+        }
+
+        String content = warnings.substring(warningsStart);
+
+        warnings.delete(warningsStart, warnings.length());
+
+        if (content.startsWith("\n")) {
+            content = content.substring(1);
+        }
+
+        for (String line : content.split("\n", -1)) {
+            if (line.isEmpty() || dynamicPropertyWarnings.contains(line)) {
+                continue;
+            }
+
+            StringUtils.appendWithNewline(line, warnings);
+        }
+    }
+
+    private static Set<String> getDynamicPropertyPaths(JsonNode taskJsonNode) {
+        JsonNode metadataJsonNode = taskJsonNode.get("metadata");
+
+        if (metadataJsonNode == null || !metadataJsonNode.isObject()) {
+            return Set.of();
+        }
+
+        JsonNode uiJsonNode = metadataJsonNode.get("ui");
+
+        if (uiJsonNode == null || !uiJsonNode.isObject()) {
+            return Set.of();
+        }
+
+        JsonNode dynamicPropertyTypesJsonNode = uiJsonNode.get("dynamicPropertyTypes");
+
+        if (dynamicPropertyTypesJsonNode == null || !dynamicPropertyTypesJsonNode.isObject()) {
+            return Set.of();
+        }
+
+        return new LinkedHashSet<>(dynamicPropertyTypesJsonNode.propertyNames());
     }
 
     private static void prefixTaskMessages(StringBuilder builder, int startPosition, String taskName) {
@@ -113,23 +171,37 @@ class TaskValidator {
         for (String fieldName : clusterElementsJsonNode.propertyNames()) {
             JsonNode clusterElementJsonNode = clusterElementsJsonNode.get(fieldName);
 
-            if (clusterElementJsonNode == null || !clusterElementJsonNode.isObject()) {
+            if (clusterElementJsonNode == null) {
                 continue;
             }
 
-            if (!clusterElementJsonNode.has("type") || !clusterElementJsonNode.has("name")) {
-                continue;
+            if (clusterElementJsonNode.isArray()) {
+                for (JsonNode clusterElementItemJsonNode : clusterElementJsonNode) {
+                    validateClusterElement(clusterElementItemJsonNode, parentPath, context);
+                }
+            } else {
+                validateClusterElement(clusterElementJsonNode, parentPath, context);
             }
-
-            JsonNode nameJsonNode = clusterElementJsonNode.get("name");
-
-            String elementName = nameJsonNode.asString();
-
-            String elementPath = PropertyUtils.buildPropertyPath(parentPath, elementName);
-
-            validateClusterElementParameters(clusterElementJsonNode, elementPath, context);
-            validateClusterElements(clusterElementJsonNode, elementPath, context);
         }
+    }
+
+    private static void validateClusterElement(
+        JsonNode clusterElementJsonNode, String parentPath, ValidationContext context) {
+
+        if (!clusterElementJsonNode.isObject() || !clusterElementJsonNode.has("type") ||
+            !clusterElementJsonNode.has("name")) {
+
+            return;
+        }
+
+        JsonNode nameJsonNode = clusterElementJsonNode.get("name");
+
+        String elementName = nameJsonNode.asString();
+
+        String elementPath = PropertyUtils.buildPropertyPath(parentPath, elementName);
+
+        validateClusterElementParameters(clusterElementJsonNode, elementPath, context);
+        validateClusterElements(clusterElementJsonNode, elementPath, context);
     }
 
     private static void checkClusterElementKeys(JsonNode taskJsonNode, ValidationContext context) {
@@ -143,11 +215,13 @@ class TaskValidator {
 
         Map<String, List<String>> clusterTypesProviderMap = context.getClusterTypesProviderMap();
 
-        List<String> requiredKeys = clusterTypesProviderMap.get(taskType);
+        List<String> clusterElementKeys = clusterTypesProviderMap.get(taskType);
 
-        if (requiredKeys == null || requiredKeys.isEmpty()) {
+        if (clusterElementKeys == null || clusterElementKeys.isEmpty()) {
             return;
         }
+
+        List<String> requiredKeys = context.getRequiredClusterElementTypes(taskType);
 
         boolean isVectorStore = taskType.endsWith("/vectorStore");
         String taskName = taskJsonNode.has("name") ? taskJsonNode.get("name")
@@ -169,7 +243,7 @@ class TaskValidator {
 
         if (clusterElementsJsonNode != null && clusterElementsJsonNode.isObject()) {
             for (String presentKey : clusterElementsJsonNode.propertyNames()) {
-                if (!requiredKeys.contains(presentKey)) {
+                if (!clusterElementKeys.contains(presentKey)) {
                     StringUtils.appendWithNewline(
                         ValidationErrorUtils.undefinedClusterElement(presentKey, taskName),
                         context.getWarnings());
@@ -203,6 +277,10 @@ class TaskValidator {
             PropertyValidator.validateProperties(
                 parametersNode, elementDefinition, elementPath, parameters, context.getErrors(), new StringBuilder());
         }
+
+        ResourceReferenceValidator.validate(
+            parametersJsonNode, elementDefinition, "", context.getResourceReferenceProvider(), context.getErrors(),
+            context.getWarnings());
 
         DataPillValidator.validateTaskDataPills(clusterElementJsonNode, context, elementDefinition, true);
     }
@@ -458,11 +536,12 @@ class TaskValidator {
                 boolean isInMainLoop = context.getAllTasksMap()
                     .containsKey(nestedTaskName);
 
-                processIndividualNestedTask(nestedTaskJsonNode, context);
-
-                if (!isInMainLoop) {
-                    validateClusterElements(nestedTaskJsonNode, nestedTaskName, context);
+                if (isInMainLoop) {
+                    continue;
                 }
+
+                processIndividualNestedTask(nestedTaskJsonNode, context);
+                validateClusterElements(nestedTaskJsonNode, nestedTaskName, context);
             }
         }
     }
@@ -598,6 +677,10 @@ class TaskValidator {
             }
 
             validateTaskParameters(taskParameters, taskDefinition, context.getErrors(), context.getWarnings());
+
+            ResourceReferenceValidator.validate(
+                jsonNode, taskDefinition, "", context.getResourceReferenceProvider(), context.getErrors(),
+                context.getWarnings());
         }
 
         return taskDefinition;
