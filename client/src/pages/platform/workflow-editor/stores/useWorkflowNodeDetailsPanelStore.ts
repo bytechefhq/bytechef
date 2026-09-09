@@ -36,6 +36,8 @@ interface WorkflowNodeDetailsPanelStoreI {
     reset: () => void;
 
     workflowNodeDetailsPanelOpen: boolean;
+    panelOpenedFromIssuesSidebar: boolean;
+    setPanelOpenedFromIssuesSidebar: (panelOpenedFromIssuesSidebar: boolean) => void;
     setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 }
 
@@ -94,6 +96,10 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
                 })),
 
             workflowNodeDetailsPanelOpen: false,
+            panelOpenedFromIssuesSidebar: false,
+            setPanelOpenedFromIssuesSidebar: (panelOpenedFromIssuesSidebar) =>
+                set((state) => ({...state, panelOpenedFromIssuesSidebar})),
+
             setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen) =>
                 set((state) => ({
                     ...state,
