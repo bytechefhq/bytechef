@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.validator.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -38,12 +39,24 @@ public class WorkflowValidatorGraphQlController {
     }
 
     @QueryMapping
-    public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflow(@Argument String workflow) {
-        return workflowValidatorFacade.validateWorkflow(workflow);
+    public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflow(
+        @Argument String workflow, @Argument @Nullable Long environmentId) {
+
+        if (environmentId == null) {
+            return workflowValidatorFacade.validateWorkflow(workflow);
+        }
+
+        return workflowValidatorFacade.validateWorkflow(workflow, environmentId);
     }
 
     @QueryMapping
-    public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflowById(@Argument String workflowId) {
-        return workflowValidatorFacade.validateWorkflowById(workflowId);
+    public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflowById(
+        @Argument String workflowId, @Argument @Nullable Long environmentId) {
+
+        if (environmentId == null) {
+            return workflowValidatorFacade.validateWorkflowById(workflowId);
+        }
+
+        return workflowValidatorFacade.validateWorkflowById(workflowId, environmentId);
     }
 }

@@ -1,9 +1,34 @@
 extend type Query {
-    validateWorkflow(workflow: String!): WorkflowValidationResult!
-    validateWorkflowById(workflowId: String!): WorkflowValidationResult!
+    validateWorkflow(workflow: String!, environmentId: Long): WorkflowValidationResult!
+    validateWorkflowById(workflowId: String!, environmentId: Long): WorkflowValidationResult!
 }
 
 type WorkflowValidationResult {
     errors: [String!]!
     warnings: [String!]!
+    nodeIssues: [NodeValidationIssue!]!
+}
+
+type NodeValidationIssue {
+    nodeName: String!
+    propertyPath: String
+    kind: WorkflowIssueKind!
+    severity: WorkflowIssueSeverity!
+    message: String!
+}
+
+enum WorkflowIssueKind {
+    BROKEN_REFERENCE
+    DUPLICATE_NODE_NAME
+    MISSING_CLUSTER_ELEMENT
+    MISSING_REQUIRED
+    MISSING_RESOURCE
+    OTHER
+    TASK_ORDER
+    TYPE_MISMATCH
+}
+
+enum WorkflowIssueSeverity {
+    ERROR
+    WARNING
 }
