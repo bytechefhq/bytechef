@@ -17,6 +17,7 @@
 package com.bytechef.platform.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.definition.BaseProperty.ResourceType;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -29,6 +30,9 @@ public abstract class BaseProperty {
     protected boolean advancedOption;
     protected String description;
     protected String displayCondition;
+
+    @Nullable
+    protected ResourceType resourceType;
     protected boolean expressionEnabled; // Defaults to true
     protected boolean hidden;
     protected Map<String, Object> metadata;
@@ -45,6 +49,8 @@ public abstract class BaseProperty {
         this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
         this.hidden = OptionalUtils.orElse(property.getHidden(), false);
         this.metadata = property.getMetadata();
+
+        this.resourceType = getResourceType(property.getMetadata());
         this.required = property.getRequired();
         this.name = property.getName();
     }
@@ -63,12 +69,13 @@ public abstract class BaseProperty {
             && hidden == that.hidden && required == that.required
             && Objects.equals(displayCondition, that.displayCondition)
             && Objects.equals(name, that.name)
-            && Objects.equals(metadata, that.metadata);
+            && Objects.equals(metadata, that.metadata) && resourceType == that.resourceType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(advancedOption, displayCondition, expressionEnabled, hidden, metadata, required, name);
+        return Objects.hash(
+            advancedOption, displayCondition, expressionEnabled, hidden, metadata, required, name, resourceType);
     }
 
     public boolean getAdvancedOption() {
@@ -83,6 +90,11 @@ public abstract class BaseProperty {
     @Nullable
     public String getDisplayCondition() {
         return displayCondition;
+    }
+
+    @Nullable
+    public ResourceType getResourceType() {
+        return resourceType;
     }
 
     public boolean getExpressionEnabled() {
@@ -103,5 +115,28 @@ public abstract class BaseProperty {
 
     public Map<String, Object> getMetadata() {
         return metadata;
+    }
+
+    @Nullable
+    private static ResourceType getResourceType(@Nullable Map<String, Object> metadata) {
+        if (metadata == null) {
+            return null;
+        }
+
+        Object value = metadata.get(com.bytechef.definition.BaseProperty.RESOURCE_REFERENCE_METADATA_KEY);
+
+        if (value == null) {
+            return null;
+        }
+
+        String resourceTypeName = value.toString();
+
+        for (ResourceType resourceType : ResourceType.values()) {
+            if (resourceTypeName.equals(resourceType.name())) {
+                return resourceType;
+            }
+        }
+
+        return null;
     }
 }

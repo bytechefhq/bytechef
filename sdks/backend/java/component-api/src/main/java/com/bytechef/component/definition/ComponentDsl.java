@@ -3119,6 +3119,10 @@ public final class ComponentDsl {
             return (M) this;
         }
 
+        public M resourceReference(ResourceType resourceType) {
+            return metadata(RESOURCE_REFERENCE_METADATA_KEY, resourceType.name());
+        }
+
         @SuppressWarnings("unchecked")
         public M hidden(boolean hidden) {
             this.hidden = hidden;
