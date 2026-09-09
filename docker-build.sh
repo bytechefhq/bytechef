@@ -10,10 +10,18 @@ usage() {
     echo "    \t\t\t  Builds for the host architecture only and loads the images into the local docker image store."
     echo "    --registry-url url\t- optional flag to push image to registry other than dockerhub.io If AWS ECR URL script would attempt AWS login."
     echo "    tag\t\t- arbitrary docker image tag(s). In bytechef we use yyyyMMdd to reflect date of image build."
+    echo ""
+    echo "IMAGES"
+    echo "    bytechef/bytechef-server\t\t- the ByteChef server without the client bundle."
+    echo "    bytechef/bytechef\t\t\t- the ByteChef server with the client bundle."
+    echo "    bytechef/bytechef-runtime-job\t- the standalone runtime job app that executes a single workflow."
 }
+
+root_dir=$(cd "$(dirname "$0")" && pwd)
 
 dckr_img_registry_bytechef_server="bytechef/bytechef-server"
 dckr_img_registry_bytechef="bytechef/bytechef"
+dckr_img_registry_bytechef_runtime_job="bytechef/bytechef-runtime-job"
 
 push_images=true
 tags=""
@@ -120,19 +128,31 @@ else
 fi
 
 echo "Validating Node.js version required for client build..."
-node client/scripts/check-node-version.mjs || exit 1
+node "$root_dir/client/scripts/check-node-version.mjs" || exit 1
 
-cd server/apps/server-app || exit 1
+cd "$root_dir/server/apps/server-app" || exit 1
 
-../../../gradlew clean build -Pprod || exit 1
+"$root_dir/gradlew" clean build -Pprod || exit 1
 
 for tag in $tags; do
-    echo "Building docker image with tag \`$tag\` for platform(s) \`$platforms\`"
+    echo "Building docker image \`$dckr_img_registry_bytechef_server:$tag\` for platform(s) \`$platforms\`"
+
     $docker_build_command --progress=plain --no-cache \
         -t $dckr_img_registry_bytechef_server:$tag . || exit 1
 done
 
-cd ../../../client || exit 1
+cd "$root_dir/server/ee/apps/runtime-job-app" || exit 1
+
+"$root_dir/gradlew" :server:ee:apps:runtime-job-app:clean :server:ee:apps:runtime-job-app:build -Pprod || exit 1
+
+for tag in $tags; do
+    echo "Building docker image \`$dckr_img_registry_bytechef_runtime_job:$tag\` for platform(s) \`$platforms\`"
+
+    $docker_build_command --progress=plain --no-cache \
+        -t $dckr_img_registry_bytechef_runtime_job:$tag . || exit 1
+done
+
+cd "$root_dir/client" || exit 1
 
 rm -rf node_modules
 
@@ -140,10 +160,11 @@ npm install || exit 1
 
 npm run build || exit 1
 
-cd .. || exit 1
+cd "$root_dir" || exit 1
 
 for tag in $tags; do
-    echo "Building docker image with tag \`$tag\` for platform(s) \`$platforms\`"
+    echo "Building docker image \`$dckr_img_registry_bytechef:$tag\` for platform(s) \`$platforms\`"
+
     $docker_build_command --progress=plain --no-cache \
         --build-arg BASE_IMAGE="$dckr_img_registry_bytechef_server:$tag" \
         -t $dckr_img_registry_bytechef:$tag . || exit 1
@@ -156,4 +177,4 @@ if [ "$push_images" = "false" ]; then
     exit 0
 fi
 
-echo "Pushed images to the remote docker registry \`$dckr_img_registry_bytechef\`"
+echo "Pushed images to the remote docker registry"
