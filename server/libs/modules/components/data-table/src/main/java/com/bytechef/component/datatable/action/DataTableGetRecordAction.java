@@ -28,6 +28,7 @@ import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT
 import com.bytechef.component.datatable.util.DataTableUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -66,6 +67,7 @@ public class DataTableGetRecordAction {
             .properties(
                 string(TABLE)
                     .label("Table")
+                    .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
                     .options(DataTableUtils.getActionTableOptions(dataTableService)),
                 integer(ID)
