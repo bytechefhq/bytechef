@@ -1,6 +1,6 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import AutomationWorkflowProjectListItem from './AutomationWorkflowProjectListItem';
 import AutomationWorkflowProjectWorkflowList from './AutomationWorkflowProjectWorkflowList';
@@ -9,6 +9,7 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowProjectTags'][number];
 
 interface AutomationWorkflowProjectListProps {
+    newlyCreatedProjectId?: string;
     onCreateWorkflow: (projectId: string) => void;
     onDeleteProject: (projectId: string) => void;
     onDeleteWorkflow: (workflowUuid: string) => void;
@@ -22,6 +23,7 @@ interface AutomationWorkflowProjectListProps {
 }
 
 const AutomationWorkflowProjectList = ({
+    newlyCreatedProjectId,
     onCreateWorkflow,
     onDeleteProject,
     onDeleteWorkflow,
@@ -34,6 +36,18 @@ const AutomationWorkflowProjectList = ({
     tags,
 }: AutomationWorkflowProjectListProps) => {
     const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
+
+    useEffect(() => {
+        if (newlyCreatedProjectId) {
+            setOpenProjectIds((previousOpenProjectIds) => {
+                const nextOpenProjectIds = new Set(previousOpenProjectIds);
+
+                nextOpenProjectIds.add(newlyCreatedProjectId);
+
+                return nextOpenProjectIds;
+            });
+        }
+    }, [newlyCreatedProjectId]);
 
     return (
         <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">

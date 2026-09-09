@@ -36,6 +36,7 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 
 const AutomationWorkflows = () => {
     const [editProject, setEditProject] = useState<AutomationWorkflowProjectType | undefined>();
+    const [newlyCreatedProjectId, setNewlyCreatedProjectId] = useState<string | undefined>();
     const [pendingWorkflowProjectId, setPendingWorkflowProjectId] = useState<string | null>(null);
     const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -134,7 +135,9 @@ const AutomationWorkflows = () => {
                     tags: values.tags,
                 },
                 {
-                    onSuccess: () => {
+                    onSuccess: (data) => {
+                        setNewlyCreatedProjectId(data.createAutomationWorkflowProject);
+
                         invalidateProjects();
 
                         closeProjectDialog();
@@ -283,6 +286,7 @@ const AutomationWorkflows = () => {
             <PageLoader errors={[projectsError]} loading={projectsIsLoading}>
                 {filteredProjects.length > 0 ? (
                     <AutomationWorkflowProjectList
+                        newlyCreatedProjectId={newlyCreatedProjectId}
                         onCreateWorkflow={handleCreateWorkflow}
                         onDeleteProject={handleDeleteProject}
                         onDeleteWorkflow={handleDeleteWorkflow}
