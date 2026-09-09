@@ -39,7 +39,7 @@ const ProjectWorkflowsList = ({
     return (
         <Fragment key={project.id}>
             <li className="max-w-full pb-2 last:pb-0">
-                <div className="flex w-80 items-center justify-between">
+                <div className="flex w-full items-center justify-between">
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <span className="inline-block w-56 truncate overflow-hidden rounded-md px-1 py-2 text-lg font-medium">
@@ -71,7 +71,7 @@ const ProjectWorkflowsList = ({
                     )}
                 </div>
 
-                <ul className="flex flex-col items-center gap-2">
+                <ul className="flex flex-col gap-2">
                     {projectWorkflows.map((workflow) => (
                         <WorkflowsListItem
                             calculateTimeDifference={calculateTimeDifference}

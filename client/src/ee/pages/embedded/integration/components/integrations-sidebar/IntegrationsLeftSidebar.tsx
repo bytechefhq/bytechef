@@ -175,7 +175,7 @@ const IntegrationsLeftSidebar = ({
                 {isLoading && <IntegrationWorkflowsListSkeleton />}
 
                 {!isLoading && (
-                    <ul className="flex flex-col items-center gap-4">
+                    <ul className="flex flex-col gap-4">
                         {selectedIntegrationId === 0 &&
                             (integrations ? (
                                 integrations.map((integration) => (
