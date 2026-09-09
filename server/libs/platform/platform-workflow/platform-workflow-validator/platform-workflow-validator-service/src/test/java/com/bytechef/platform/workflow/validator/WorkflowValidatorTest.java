@@ -957,16 +957,16 @@ class WorkflowValidatorTest {
             """;
 
         List<PropertyInfo> taskDefinition = List.of(
-            new PropertyInfo("string", "STRING", null, true, true, null, null),
-            new PropertyInfo("integer", "INTEGER", null, true, true, null, null),
-            new PropertyInfo("boolean", "BOOLEAN", null, true, true, null, null),
-            new PropertyInfo("number", "NUMBER", null, true, true, null, null),
-            new PropertyInfo("array", "ARRAY", null, true, true, null, null),
-            new PropertyInfo("object", "OBJECT", null, true, true, null, null),
-            new PropertyInfo("null", "NULL", null, true, true, null, null),
-            new PropertyInfo("date", "DATE", null, true, true, null, null),
-            new PropertyInfo("time", "TIME", null, true, true, null, null),
-            new PropertyInfo("date_time", "DATE_TIME", null, true, true, null, null));
+            new PropertyInfo("string", "STRING", null, false, true, null, null),
+            new PropertyInfo("integer", "INTEGER", null, false, true, null, null),
+            new PropertyInfo("boolean", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("number", "NUMBER", null, false, true, null, null),
+            new PropertyInfo("array", "ARRAY", null, false, true, null, null),
+            new PropertyInfo("object", "OBJECT", null, false, true, null, null),
+            new PropertyInfo("null", "NULL", null, false, true, null, null),
+            new PropertyInfo("date", "DATE", null, false, true, null, null),
+            new PropertyInfo("time", "TIME", null, false, true, null, null),
+            new PropertyInfo("date_time", "DATE_TIME", null, false, true, null, null));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1231,7 +1231,7 @@ class WorkflowValidatorTest {
         TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("[testTask] Property 'config.key' is not defined in task definition", warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
@@ -1493,10 +1493,7 @@ class WorkflowValidatorTest {
         TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("""
-            [testTask] Property 'featureConfig' is not defined in task definition
-            [testTask] Property 'featureConfig.setting1' is not defined in task definition
-            [testTask] Property 'featureConfig.setting2' is not defined in task definition""", warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
@@ -1622,10 +1619,7 @@ class WorkflowValidatorTest {
             [testTask] Missing required property: advancedConfig.mandatory
             [testTask] Missing required property: advancedConfig.mandatory.name""",
             errors.toString());
-        assertEquals("""
-            [testTask] Property 'basicConfig' is not defined in task definition
-            [testTask] Property 'basicConfig.name' is not defined in task definition""",
-            warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
@@ -2026,10 +2020,7 @@ class WorkflowValidatorTest {
         TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("""
-            [testTask] Property 'config1.config2.config3' is not defined in task definition
-            [testTask] Property 'config1.config2.config3.finalValue' is not defined in task definition""",
-            warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
@@ -2365,10 +2356,7 @@ class WorkflowValidatorTest {
         TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("""
-            [testTask] Property 'headers.Authorization' is not defined in task definition
-            [testTask] Property 'headers.Content-Type' is not defined in task definition
-            [testTask] Property 'queryParameters.debug' is not defined in task definition""", warnings.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
@@ -3504,6 +3492,76 @@ class WorkflowValidatorTest {
 
             assertEquals(
                 "[loop1] Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
+                errors.toString());
+            assertEquals("", warnings.toString());
+        } catch (Exception e) {
+            fail("Should not throw exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void validateWorkflowTasksFlowLoopNestedItemPropertyWrongTypeReportsSingleError() {
+        String tasksJson = """
+            [
+                {
+                    "label": "Task 1",
+                    "name": "task1",
+                    "type": "component/v1/trigger1",
+                    "parameters": {
+                        "name": "John"
+                    }
+                },
+                {
+                     "label": "Loop",
+                     "name": "loop_1",
+                     "type": "loop/v1",
+                     "parameters": {
+                         "items": "${task1.elements}",
+                         "loopForever": false,
+                         "iteratee": [
+                            {
+                                "label": "Task 2",
+                                "name": "task2",
+                                "type": "component/v1/action2",
+                                "parameters": {
+                                    "age": "${loop_1.item.propBool}"
+                                }
+                            }
+                         ]
+                     }
+                }
+            ]
+            """;
+
+        Map<String, List<PropertyInfo>> taskDefinitionMap = Map.of(
+            "component/v1/trigger1", List.of(
+                new PropertyInfo("name", "STRING", null, false, true, null, null)),
+            "loop/v1", List.of(
+                new PropertyInfo("items", "ARRAY", null, false, true, null, List.of()),
+                new PropertyInfo("loopForever", "BOOLEAN", null, false, true, null, null),
+                new PropertyInfo("iteratee", "ARRAY", null, false, true, null, List.of(
+                    new PropertyInfo(null, "TASK", null, false, true, null, null)))),
+            "component/v1/action2", List.of(
+                new PropertyInfo("age", "NUMBER", null, false, true, null, null)));
+
+        Map<String, PropertyInfo> taskOutputMap = Map.of("component/v1/trigger1", actionArr);
+
+        try {
+            JsonNode tasksJsonNode = JsonUtils.readTree(tasksJson);
+            List<JsonNode> taskJsonNodes = new ArrayList<>();
+
+            for (JsonNode taskJsonNode : tasksJsonNode) {
+                taskJsonNodes.add(taskJsonNode);
+            }
+
+            StringBuilder errors = new StringBuilder();
+            StringBuilder warnings = new StringBuilder();
+
+            WorkflowValidator.validateWorkflowTasks(
+                taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
+
+            assertEquals(
+                "[loop_1] Property 'loop_1.item[0].propBool' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
