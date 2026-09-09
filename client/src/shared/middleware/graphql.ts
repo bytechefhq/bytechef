@@ -1703,10 +1703,11 @@ export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string,
 
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
+  environmentId?: any;
 }>;
 
 
-export type ValidateWorkflowQuery = { validateWorkflow: { errors: Array<string>, warnings: Array<string> } };
+export type ValidateWorkflowQuery = { validateWorkflow: { errors: Array<string>, warnings: Array<string>, nodeIssues: Array<{ nodeName: string, propertyPath: string | null, kind: Types.WorkflowIssueKind, severity: Types.WorkflowIssueSeverity, message: string }> } };
 
 export type ValidateWorkflowByIdQueryVariables = Exact<{
   workflowId: string;
@@ -8264,10 +8265,17 @@ export const useUpdateMcpToolMutation = <
     )};
 
 export const ValidateWorkflowDocument = new TypedDocumentString(`
-    query ValidateWorkflow($workflowDefinition: String!) {
-  validateWorkflow(workflow: $workflowDefinition) {
+    query ValidateWorkflow($workflowDefinition: String!, $environmentId: Long) {
+  validateWorkflow(workflow: $workflowDefinition, environmentId: $environmentId) {
     errors
     warnings
+    nodeIssues {
+      nodeName
+      propertyPath
+      kind
+      severity
+      message
+    }
   }
 }
     `);
