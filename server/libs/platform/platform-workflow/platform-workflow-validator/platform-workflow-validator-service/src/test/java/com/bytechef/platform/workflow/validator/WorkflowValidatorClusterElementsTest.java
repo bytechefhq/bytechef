@@ -139,7 +139,7 @@ class WorkflowValidatorClusterElementsTest {
                 errors, warnings);
 
             assertEquals(
-                "[aiAgent_1] Missing required property: aiAgent_1.questionAnswerRag_1.couchbase_1.openAi_3.model",
+                "[aiAgent_1] Missing required property: questionAnswerRag_1.couchbase_1.openAi_3.model",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -239,7 +239,7 @@ class WorkflowValidatorClusterElementsTest {
                 errors, warnings);
 
             assertEquals(
-                "[aiAgent_1] Property 'aiAgent_1.questionAnswerRag_1.couchbase_1.openAi_3.model' has incorrect type. Expected: string, but got: number",
+                "[aiAgent_1] Property 'questionAnswerRag_1.couchbase_1.openAi_3.model' has incorrect type. Expected: string, but got: number",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -555,7 +555,6 @@ class WorkflowValidatorClusterElementsTest {
 
             assertEquals("", errors.toString());
             assertEquals("""
-                [condition_1] Property 'expression' is not defined in task definition
                 [condition_1] Cluster element 'model' is missing from task aiAgent_1
                 [condition_1] Cluster element 'chatMemory' is missing from task aiAgent_1
                 [condition_1] Cluster element 'rag' is missing from task aiAgent_1
@@ -798,7 +797,6 @@ class WorkflowValidatorClusterElementsTest {
             clusterElementTypesMap.toString());
         assertEquals("", errors.toString());
         assertEquals("""
-            [condition_1] Property 'expression' is not defined in task definition
             [aiAgent_1] Cluster element 'model' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'chatMemory' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'rag' is missing from task aiAgent_1
