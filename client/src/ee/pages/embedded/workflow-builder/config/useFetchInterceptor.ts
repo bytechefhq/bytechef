@@ -1,6 +1,7 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import recordWorkflowNodeLookupResult from '@/shared/util/recordWorkflowNodeLookupResult';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
 import {toast} from 'sonner';
@@ -83,6 +84,10 @@ export default function useFetchInterceptor() {
                     clearCurrentEnvironmentId();
                     clearCurrentWorkspaceId();
 
+                    return response;
+                }
+
+                if (recordWorkflowNodeLookupResult(response)) {
                     return response;
                 }
 

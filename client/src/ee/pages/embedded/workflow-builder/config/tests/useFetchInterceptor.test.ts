@@ -1,3 +1,4 @@
+import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import {act, renderHook} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -265,6 +266,47 @@ describe('useFetchInterceptor (embedded)', () => {
                 onAutoClose: expect.any(Function),
                 onDismiss: expect.any(Function),
             });
+        });
+    });
+
+    describe('workflow node lookups', () => {
+        const lookupUrl = 'http://localhost/internal/workflows/1052/workflow-nodes/dataTable_2/options/table';
+
+        beforeEach(() => {
+            useWorkflowIssuesStore.getState().reset();
+        });
+
+        it('records a failed lookup against the node instead of toasting', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: "Table does not have primary key column 'id': dt_0_conversations", title: 'Error'},
+                status: 500,
+                url: lookupUrl,
+            });
+
+            await act(async () => {
+                hoisted.registeredHandlers!.response(response);
+
+                await Promise.resolve();
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+            expect(useWorkflowIssuesStore.getState().liveIssues['dataTable_2|table|LOOKUP_FAILED'].message).toBe(
+                "Table does not have primary key column 'id': dt_0_conversations"
+            );
+        });
+
+        it('clears the recorded failure when the same lookup succeeds', async () => {
+            useWorkflowIssuesStore.getState().recordLookupFailure('dataTable_2', 'table', 'stale');
+
+            renderHook(() => useFetchInterceptor());
+
+            await act(async () => {
+                hoisted.registeredHandlers!.response(createMockResponse({status: 200, url: lookupUrl}));
+            });
+
+            expect(useWorkflowIssuesStore.getState().liveIssues).toEqual({});
         });
     });
 });

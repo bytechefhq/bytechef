@@ -2,6 +2,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
+import recordWorkflowNodeLookupResult from '@/shared/util/recordWorkflowNodeLookupResult';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
@@ -165,6 +166,10 @@ export default function useFetchInterceptor() {
                 // csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
                 // log out here, otherwise the recovered request would still flash an error.
                 if (response.status === 403 && isCsrfProtectedUrl(response.url)) {
+                    return response;
+                }
+
+                if (recordWorkflowNodeLookupResult(response)) {
                     return response;
                 }
 
