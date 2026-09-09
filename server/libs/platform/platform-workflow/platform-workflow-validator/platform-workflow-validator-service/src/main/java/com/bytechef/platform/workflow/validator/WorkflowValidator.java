@@ -103,6 +103,18 @@ public class WorkflowValidator {
         Map<String, PropertyInfo> taskOutputMap, Map<String, PropertyInfo> nodeOutputMap,
         Map<String, List<String>> clusterTypesMap, StringBuilder errors, StringBuilder warnings) {
 
+        validateWorkflow(
+            workflow, taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, NO_RESOURCE_REFERENCE_PROVIDER,
+            taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesMap, errors, warnings);
+    }
+
+    public static void validateWorkflow(
+        String workflow, TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
+        @Nullable ClusterTypesProvider clusterTypesProvider, ResourceReferenceProvider resourceReferenceProvider,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesMap, StringBuilder errors,
+        StringBuilder warnings) {
+
         try {
             validateWorkflowStructure(workflow, errors, warnings);
 
@@ -125,7 +137,7 @@ public class WorkflowValidator {
                 taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
             validateWorkflowTasks(
                 taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesMap,
-                errors, warnings);
+                clusterTypesProvider, resourceReferenceProvider, errors, warnings);
         } catch (Exception e) {
             errors.append("Failed to validate workflow: ");
             errors.append(e.getMessage()
@@ -157,18 +169,19 @@ public class WorkflowValidator {
         Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
 
         validateWorkflowTasks(
-            taskJsonNodes, List.of(), taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap, errors,
-            warnings);
+            taskJsonNodes, List.of(), taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap, null,
+            NO_RESOURCE_REFERENCE_PROVIDER, errors, warnings);
     }
 
     private static void validateWorkflowTasks(
         List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
         Map<String, PropertyInfo> taskOutput, Map<String, PropertyInfo> nodeOutputMap,
-        Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
+        Map<String, List<String>> clusterTypesProviderMap, @Nullable ClusterTypesProvider clusterTypesProvider,
+        ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors, StringBuilder warnings) {
 
         ValidationContext context = ValidationContext.of(
             taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap,
-            errors, warnings);
+            clusterTypesProvider, resourceReferenceProvider, errors, warnings);
 
         TaskValidator.validateAllTasks(context);
     }
@@ -394,9 +407,7 @@ public class WorkflowValidator {
                             taskOutputProvider.getTaskOutputProperty(type, "clusterElement", warnings));
                     }
                 }
-            } else if (clusterElementJsonNode.isObject() &&
-                clusterElementJsonNode.has("clusterElements") && clusterElementJsonNode.has("type")) {
-
+            } else if (clusterElementJsonNode.isObject() && clusterElementJsonNode.has("type")) {
                 JsonNode typeJsonNode = clusterElementJsonNode.get("type");
 
                 String type = typeJsonNode.asString();
@@ -404,6 +415,10 @@ public class WorkflowValidator {
                 taskDefinitionMap.putIfAbsent(type, taskDefinitionProvider.getTaskProperties(type, "clusterElement"));
                 taskOutputMap.putIfAbsent(
                     type, taskOutputProvider.getTaskOutputProperty(type, "clusterElement", warnings));
+
+                if (!clusterElementJsonNode.has("clusterElements")) {
+                    continue;
+                }
 
                 List<String> clusterElementTypes = clusterTypesProvider.getClusterElementTypes(type);
 
@@ -839,5 +854,19 @@ public class WorkflowValidator {
     public interface ClusterTypesProvider {
         @Nullable
         List<String> getClusterElementTypes(String taskType);
+
+        @Nullable
+        default List<String> getRequiredClusterElementTypes(String taskType) {
+            return getClusterElementTypes(taskType);
+        }
     }
+
+    @FunctionalInterface
+    public interface ResourceReferenceProvider {
+
+        @Nullable
+        String findProblem(String resourceType, String reference);
+    }
+
+    public static final ResourceReferenceProvider NO_RESOURCE_REFERENCE_PROVIDER = (resourceType, reference) -> null;
 }
