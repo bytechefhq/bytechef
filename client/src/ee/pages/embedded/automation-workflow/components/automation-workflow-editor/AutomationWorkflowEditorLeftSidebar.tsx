@@ -20,7 +20,7 @@ import {
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import {useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
@@ -148,6 +148,14 @@ const AutomationWorkflowEditorLeftSidebar = ({currentWorkflowId}: AutomationWork
 
         setShowWorkflowDialog(false);
     };
+
+    useEffect(() => {
+        if (!currentProject) {
+            return;
+        }
+
+        setSelectedProjectId((previousSelectedProjectId) => previousSelectedProjectId || currentProject.id);
+    }, [currentProject]);
 
     return (
         <aside className="flex h-full min-w-[355px] flex-col items-center gap-2 bg-surface-main px-4 pt-3">
