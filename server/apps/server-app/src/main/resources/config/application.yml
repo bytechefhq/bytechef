@@ -39,6 +39,7 @@ info:
       host: ${post-hog.host:}
   billing:
     enabled: ${billing.enabled}
+    customerPortalUrl: ${billing.stripe.customer-portal-url:}
   application:
     edition: ${bytechef.edition:}
   featureFlags: ${bytechef.feature-flags}

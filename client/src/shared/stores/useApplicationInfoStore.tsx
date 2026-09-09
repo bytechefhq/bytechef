@@ -28,6 +28,7 @@ export interface ApplicationInfoI {
         edition: EditionType;
     } | null;
     billing: {
+        customerPortalUrl: string | undefined;
         enabled: boolean;
     };
     featureFlags: Record<string, boolean>;
@@ -84,6 +85,7 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                 },
                 application: null,
                 billing: {
+                    customerPortalUrl: undefined,
                     enabled: false,
                 },
                 featureFlags: {},
@@ -119,6 +121,7 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             },
                             application: json.application,
                             billing: {
+                                customerPortalUrl: json.billing?.customerPortalUrl || undefined,
                                 enabled: json.billing?.enabled === 'true',
                             },
                             featureFlags: json.featureFlags,
