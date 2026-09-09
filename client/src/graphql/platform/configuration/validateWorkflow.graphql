@@ -1,6 +1,13 @@
-query ValidateWorkflow($workflowDefinition: String!) {
-    validateWorkflow(workflow: $workflowDefinition) {
+query ValidateWorkflow($workflowDefinition: String!, $environmentId: Long) {
+    validateWorkflow(workflow: $workflowDefinition, environmentId: $environmentId) {
         errors
         warnings
+        nodeIssues {
+            nodeName
+            propertyPath
+            kind
+            severity
+            message
+        }
     }
 }
