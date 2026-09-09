@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.component.service;
 
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 
 import com.bytechef.commons.util.CollectionUtils;
@@ -42,6 +40,7 @@ import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
+import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.annotation.WithTokenRefresh;
@@ -78,23 +77,9 @@ import org.springframework.stereotype.Service;
 @Service("clusterElementDefinitionService")
 public class ClusterElementDefinitionServiceImpl implements ClusterElementDefinitionService {
 
-    private static final Property TOOL_NAME_PROPERTY = Property.toProperty(
-        string(ToolConstants.TOOL_NAME)
-            .label("Tool Name")
-            .description("The tool name exposed to the AI model. Defaults to the tool name when left blank.")
-            .placeholder("Defaults to tool name")
-            .expressionEnabled(false)
-            .required(false));
+    private static final Property TOOL_NAME_PROPERTY = ToolPropertyUtils.toolNameProperty("tool");
 
-    private static final Property TOOL_DESCRIPTION_PROPERTY = Property.toProperty(
-        string(ToolConstants.TOOL_DESCRIPTION)
-            .label("Tool Description")
-            .description(
-                "The tool description exposed to the AI model. Defaults to the tool description when left blank.")
-            .placeholder("Defaults to tool description")
-            .controlType(TEXT_AREA)
-            .expressionEnabled(false)
-            .required(false));
+    private static final Property TOOL_DESCRIPTION_PROPERTY = ToolPropertyUtils.toolDescriptionProperty("tool");
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
