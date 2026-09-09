@@ -356,7 +356,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                                 name="description"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Description (Optional)</FormLabel>
+                                        <FormLabel>Description</FormLabel>
 
                                         <FormControl>
                                             <Textarea {...field} placeholder="Describe this MCP project..." />
