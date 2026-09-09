@@ -43,13 +43,14 @@ workflow itself sent it.
 
 ## Exit codes
 
-The process exit code is the workflow outcome. A `JobStatusApplicationEvent` listener shuts the
-Spring context down as soon as the job reaches a terminal status:
+The process exit code is the workflow outcome. The app blocks until the job reaches a terminal
+status, then shuts the Spring context down and exits:
 
 | Exit code | Meaning |
 |---|---|
 | `0` | The job completed. |
-| non-zero | The job failed, or the app could not start - missing `--workflow`, unparseable `--parameters` / `--connections` JSON, or a workflow the configured sources cannot resolve. |
+| `1` | The job failed or was stopped, or `--timeout` elapsed before the job finished. |
+| non-zero | The app could not start - missing `--workflow`, unparseable `--parameters` / `--connections` JSON, or a workflow the configured sources cannot resolve. |
 
 This is what makes the app composable with external orchestrators: a Kubernetes `Job` with
 `restartPolicy: Never` retries per its `backoffLimit`, Airflow marks the task failed, a CI step goes
@@ -59,9 +60,10 @@ red - all driven by the exit code alone.
 
 | Argument | Required | Description |
 |---|---|---|
-| `--workflow=<file>` | Yes | The workflow file. Only the base name without its extension is used to look the workflow up, so `--workflow=/workflows/daily-sync.json` and `--workflow=daily-sync.json` resolve identically. The file itself must be discoverable through one of the configured [workflow sources](#workflow-sources). |
+| `--workflow=<file>` | Yes | A lookup key, not a path. The directory part is discarded and the base name minus the extension becomes the workflow id, so `--workflow=/anything/at/all/daily-sync.json` and `--workflow=daily-sync.json` are equivalent. Passing a host path does **not** make the file reachable - it must be discoverable through one of the configured [workflow sources](#workflow-sources). |
 | `--parameters=<json>` | No | JSON object of the workflow's input values, e.g. `'{"batchDate": "2026-07-09"}'`. |
 | `--connections=<json>` | No | JSON object mapping connection names to their parameters - see [Connections](#connections). |
+| `--timeout=<duration>` | No | Give up and exit `1` if the job has not finished within this duration, e.g. `30s`, `15m`, `1h`. Without it the app waits indefinitely, which for a wedged job means a pod that never terminates. |
 
 ```bash
 java -jar runtime-job-app.jar \
@@ -79,7 +81,7 @@ java -jar runtime-job-app.jar \
 ./gradlew :server:ee:apps:runtime-job-app:build
 
 # Run
-java -jar server/ee/apps/runtime-job-app/build/libs/runtime-job-app-*.jar \
+java -jar server/ee/apps/runtime-job-app/build/libs/runtime-job-app.jar \
   --workflow=workflow.json \
   --parameters='{"message": "Processing batch job"}' \
   --connections='{"openAi": {"token": "sk-your-openai-token"}}'
@@ -94,26 +96,38 @@ java -jar server/ee/apps/runtime-job-app/build/libs/runtime-job-app-*.jar \
 
 ### Docker
 
-There is **no published image** for the Runtime Job app - build it yourself from the Dockerfile
-shipped with the app and, for Kubernetes, push it to your own registry.
+The app is published as `bytechef/bytechef-runtime-job`. Tags follow the same `yyyyMMdd` scheme as
+the other ByteChef images.
 
 ```bash
-# Build the application and the image
-./gradlew :server:ee:apps:runtime-job-app:build
-docker build -t bytechef-runtime-job server/ee/apps/runtime-job-app/
-
 # Run a workflow, mounting the workflows directory
 docker run --rm \
   -v $(pwd)/workflows:/workflows \
   -e BYTECHEF_WORKFLOW_REPOSITORY_FILESYSTEM_LOCATION_PATTERN='/workflows/*.json' \
-  bytechef-runtime-job \
+  bytechef/bytechef-runtime-job \
   --workflow=daily-sync.json \
   --connections='{"openAi": {"token": "sk-..."}}'
 
 echo $?   # 0 on success, non-zero on failure
+```
 
-# For Kubernetes: tag and push to your own registry
-docker tag bytechef-runtime-job your-registry.example.com/bytechef-runtime-job:latest
+Without the location-pattern override the app reads its default filesystem location, which inside the
+container is `/root/bytechef/data/workflows`. Mounting there works just as well:
+
+```bash
+docker run --rm \
+  -v $(pwd)/workflows:/root/bytechef/data/workflows \
+  bytechef/bytechef-runtime-job \
+  --workflow=daily-sync.json
+```
+
+To build the image yourself instead, for a private registry or a patched build:
+
+```bash
+./gradlew :server:ee:apps:runtime-job-app:build
+docker build -t bytechef/bytechef-runtime-job server/ee/apps/runtime-job-app/
+
+docker tag bytechef/bytechef-runtime-job your-registry.example.com/bytechef-runtime-job:latest
 docker push your-registry.example.com/bytechef-runtime-job:latest
 ```
 
@@ -136,8 +150,21 @@ The app resolves the workflow by base name against the repositories enabled in c
   `BYTECHEF_WORKFLOW_REPOSITORY_GIT_ENABLED=true` plus `..._GIT_URL`, `..._GIT_BRANCH`,
   `..._GIT_SEARCH_PATHS`, `..._GIT_USERNAME`, `..._GIT_PASSWORD`.
 
+At startup each enabled repository is scanned and every file it finds is indexed under
+`base64(base name without extension)`; `--workflow` looks that id up. When nothing matches, the run
+fails with `Workflow with id: <base64> does not exist` - which in a container almost always means
+the directory was never mounted, or was mounted somewhere the location pattern does not cover.
+
 Subworkflows reached through the `subflow` dispatcher resolve through the same sources as the main
 workflow.
+
+<Callout type="warn">
+  **Export workflows from the editor rather than hand-writing them.** Component property defaults are
+  written into the workflow JSON by the editor as a node is added - nothing applies them at execution
+  time. A hand-written file, or one exported before a component gained a new required property, fails
+  mid-run with `Unknown value for : <property>`. Re-exporting from a current ByteChef instance fills
+  the gaps in; editing the JSON by hand invites the next one.
+</Callout>
 
 ## Connections
 
@@ -219,11 +246,12 @@ spec:
       restartPolicy: Never
       containers:
         - name: runtime-job
-          image: your-registry.example.com/bytechef-runtime-job:latest
+          image: bytechef/bytechef-runtime-job:latest
           args:
             - --workflow=daily-sync.json
             - --parameters={"batchDate": "2026-07-09"}
             - --connections=$(CONNECTIONS)
+            - --timeout=30m
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod
@@ -242,6 +270,11 @@ spec:
           configMap:
             name: daily-sync-workflow
 ```
+
+`--timeout` matters more here than it looks: `backoffLimit` retries a pod that *failed*, and does
+nothing for one that is merely stuck. Without it a wedged workflow holds the pod open indefinitely.
+`activeDeadlineSeconds` is the blunter Kubernetes-side equivalent, but it kills the pod rather than
+letting the app exit `1` on its own.
 
 Wrap the same template in a `CronJob` for recurring batch runs - the external scheduler owns the
 cadence; ByteChef owns the execution.
@@ -267,12 +300,25 @@ Deliberately absent, because a single-shot process has no use for them:
 
 Observability is thinner here than on the server, and worth checking before you rely on it. Spring
 Boot Actuator is on the classpath, so the health and `/actuator/metrics` endpoints exist for the life
-of the process. What is **not** there: no Micrometer Prometheus registry ships with the app, so there
-is no `/actuator/prometheus` endpoint and the `management.prometheus.*` keys in its configuration have
-nothing to act on; and unlike the server, the app maps no `bytechef.observability.*` block onto the
-`management.*` OTLP keys, so no signal is exported by default. To export from a run, set the Spring
-Boot `management.*` OTLP properties directly - see
-[Observability](/platform/use-bytechef/self-hosted/management/observability) for their names.
+of the process. No Micrometer Prometheus registry ships with the app, so there is no
+`/actuator/prometheus` endpoint and the `management.prometheus.*` keys in its configuration have
+nothing to act on.
+
+The app does ship the Micrometer OTLP registry, but export is **off by default**, exactly as on the
+server. The app maps the same `bytechef.observability.*` block onto the Spring Boot `management.*`
+OTLP keys, so metrics, tracing and logging export are each disabled until you turn them on:
+
+| Environment variable | Default | Purpose |
+|---|---|---|
+| `BYTECHEF_OBSERVABILITY_METRICS_ENABLED` | `false` | Export metrics over OTLP. |
+| `BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT` | `http://localhost:4318/v1/metrics` | Collector endpoint for metrics. |
+| `BYTECHEF_OBSERVABILITY_TRACING_ENABLED` | `false` | Export traces over OTLP. |
+| `BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT` | `http://localhost:4318/v1/traces` | Collector endpoint for traces. |
+| `BYTECHEF_OBSERVABILITY_LOGGING_ENABLED` | `false` | Export logs over OTLP. |
+| `BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT` | `http://localhost:4318/v1/logs` | Collector endpoint for logs. |
+
+See [Observability](/platform/use-bytechef/self-hosted/management/observability) for the wider
+picture.
 
 In practice a run is over before a scrape interval elapses, which is why the container log and the
 exit code are the record.
@@ -282,6 +328,12 @@ exit code are the record.
 The process exits non-zero when the `--workflow` argument is missing, when the workflow file cannot
 be found or parsed, when a task fails for want of a connection it needs, or when workflow execution
 fails for any other reason. Pair that with your CI's failure handling: a non-zero exit fails the step.
+
+| Symptom | Cause |
+|---|---|
+| `Workflow with id: <base64> does not exist` | No repository indexed a file under that name. Check the volume is mounted, that the extension matches the location pattern, and remember the directory part of `--workflow` is ignored. |
+| `Unknown value for : <property>` | The workflow JSON omits a component property the action requires - re-export it from the editor. |
+| The run never finishes | The app waits indefinitely for a terminal status. Bound it with `--timeout`. |
 
 Raise the log level for a single run without changing the image:
 
