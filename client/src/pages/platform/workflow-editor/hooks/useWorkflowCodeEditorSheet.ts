@@ -11,8 +11,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {MarkerSeverity} from 'monaco-editor';
-import {Ref, useCallback, useEffect, useState} from 'react';
-import {PanelImperativeHandle, usePanelCallbackRef} from 'react-resizable-panels';
+import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -43,10 +42,12 @@ type UseWorkflowCodeEditorSheetReturnType = {
     handleWorkflowTestConfigurationDialog: (open: boolean) => void;
     hasErrors: boolean;
     projectName: string;
-    setErrorPanelRef: Ref<PanelImperativeHandle | null>;
     setErrorsAccordionOpen: (open: boolean) => void;
+    setWarningsAccordionOpen: (open: boolean) => void;
     showWorkflowTestConfigurationDialog: boolean;
     unsavedChangesAlertDialogOpen: boolean;
+    warnings: string[];
+    warningsAccordionOpen: boolean;
     workflowIsRunning: boolean;
     workflowTestExecution: WorkflowTestExecution | undefined;
 };
@@ -66,6 +67,7 @@ const useWorkflowCodeEditorSheet = ({
     const [definition, setDefinition] = useState<string>(workflow.definition!);
     const [dirty, setDirty] = useState<boolean>(false);
     const [errorsAccordionOpen, setErrorsAccordionOpen] = useState(false);
+    const [warningsAccordionOpen, setWarningsAccordionOpen] = useState(false);
     const [jobId, setJobId] = useState<string | null>(null);
     const [showWorkflowTestConfigurationDialog, setShowWorkflowTestConfigurationDialog] = useState(false);
     const [unsavedChangesAlertDialogOpen, setUnsavedChangesAlertDialogOpen] = useState(false);
@@ -107,8 +109,6 @@ const useWorkflowCodeEditorSheet = ({
         workflowId: workflow.id!,
     });
     const {updateWorkflowMutation} = useWorkflowEditor();
-
-    const [errorPanelRef, setErrorPanelRef] = usePanelCallbackRef();
 
     const handleCopilotClick = useCallback(() => {
         const {
@@ -223,7 +223,7 @@ const useWorkflowCodeEditorSheet = ({
         {enabled: !!definition}
     );
 
-    const {errors} = validateWorkflowData?.validateWorkflow ?? {errors: [], warnings: []};
+    const {errors, warnings} = validateWorkflowData?.validateWorkflow ?? {errors: [], warnings: []};
 
     const handleValidate = useCallback(
         (newMarkers: editor.IMarkerData[]) => {
@@ -262,18 +262,6 @@ const useWorkflowCodeEditorSheet = ({
         setStreamRequest(getTestWorkflowAttachRequest({jobId}));
     }, [workflow.id, currentEnvironmentId, getPersistedJobId, setWorkflowIsRunning, setJobId, setStreamRequest]);
 
-    useEffect(() => {
-        if (!errorPanelRef) {
-            return;
-        }
-
-        if (errorsAccordionOpen) {
-            errorPanelRef.resize('250px');
-        } else {
-            errorPanelRef.collapse();
-        }
-    }, [errorPanelRef, errorsAccordionOpen]);
-
     return {
         copilotEnabled,
         copilotPanelOpen,
@@ -294,10 +282,12 @@ const useWorkflowCodeEditorSheet = ({
         handleWorkflowTestConfigurationDialog: setShowWorkflowTestConfigurationDialog,
         hasErrors,
         projectName,
-        setErrorPanelRef,
         setErrorsAccordionOpen,
+        setWarningsAccordionOpen,
         showWorkflowTestConfigurationDialog,
         unsavedChangesAlertDialogOpen,
+        warnings,
+        warningsAccordionOpen,
         workflowIsRunning,
         workflowTestExecution,
     };
