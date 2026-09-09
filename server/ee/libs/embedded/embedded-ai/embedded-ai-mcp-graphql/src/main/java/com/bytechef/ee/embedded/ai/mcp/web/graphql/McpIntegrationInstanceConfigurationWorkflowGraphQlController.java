@@ -7,15 +7,10 @@
 
 package com.bytechef.ee.embedded.ai.mcp.web.graphql;
 
-import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPTION;
-import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceConfigurationWorkflowFacade;
@@ -26,6 +21,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -162,26 +158,9 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
         List<Property> properties = new ArrayList<>();
 
-        properties.add(
-            Property.toProperty(
-                string(TOOL_NAME)
-                    .label("Tool Name")
-                    .description(
-                        "The tool name exposed to the AI model. Defaults to the workflow name when left blank.")
-                    .placeholder("Defaults to workflow name")
-                    .expressionEnabled(false)
-                    .required(false)));
+        properties.add(ToolPropertyUtils.toolNameProperty("workflow"));
 
-        properties.add(
-            Property.toProperty(
-                string(TOOL_DESCRIPTION)
-                    .label("Tool Description")
-                    .description(
-                        "The tool description exposed to the AI model. Defaults to the workflow description when left blank.")
-                    .placeholder("Defaults to workflow description")
-                    .controlType(ControlType.TEXT_AREA)
-                    .expressionEnabled(false)
-                    .required(false)));
+        properties.add(ToolPropertyUtils.toolDescriptionProperty("workflow"));
 
         String inputSchema = MapUtils.getString(trigger.getParameters(), WorkflowConstants.INPUT_SCHEMA);
 
