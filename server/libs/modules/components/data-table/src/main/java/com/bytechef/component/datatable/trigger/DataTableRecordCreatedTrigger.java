@@ -32,6 +32,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.TriggerContextAware;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -78,6 +79,7 @@ public class DataTableRecordCreatedTrigger {
             .properties(
                 string(TABLE)
                     .label("Table")
+                    .resourceReference(ResourceType.DATA_TABLE)
                     .description("Select a Data Table.")
                     .required(true)
                     .options(DataTableUtils.getTriggerTableOptions(dataTableService)))
