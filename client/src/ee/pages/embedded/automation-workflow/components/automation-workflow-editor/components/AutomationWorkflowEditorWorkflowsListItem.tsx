@@ -56,7 +56,7 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
     return (
         <li
             className={twMerge(
-                'w-80 cursor-pointer self-start rounded-md border border-transparent p-3 hover:bg-background',
+                'w-full cursor-pointer rounded-md border border-transparent py-3 pr-1 pl-3 hover:bg-background',
                 workflow.workflowUuid === currentWorkflowId && 'border-stroke-brand-primary bg-background'
             )}
             onClick={handleCardClick}
