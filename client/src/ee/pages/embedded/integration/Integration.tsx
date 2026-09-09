@@ -55,7 +55,7 @@ const Integration = () => {
             <div className="h-full shrink-0 overflow-hidden">
                 <div
                     className={twMerge(
-                        'h-full w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
+                        'h-full w-[355px] transition-[margin-left,opacity] duration-300 ease-[cubic-bezier(0.33,1,0.68,1)]',
                         leftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
                     )}
                 >
