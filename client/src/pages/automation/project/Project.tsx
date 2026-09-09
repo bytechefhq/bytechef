@@ -134,14 +134,12 @@ const Project = () => {
                             defaultSize={0}
                             panelRef={bottomResizablePanelRef}
                         >
-                            {(workflowIsRunning || workflowTestExecution) && (
-                                <WorkflowExecutionsTestOutput
-                                    onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                                    onEditSubflowClick={handleEditSubflowClick}
-                                    workflowIsRunning={workflowIsRunning}
-                                    workflowTestExecution={workflowTestExecution}
-                                />
-                            )}
+                            <WorkflowExecutionsTestOutput
+                                onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                onEditSubflowClick={handleEditSubflowClick}
+                                workflowIsRunning={workflowIsRunning}
+                                workflowTestExecution={workflowTestExecution}
+                            />
                         </ResizablePanel>
                     </ResizablePanelGroup>
                 </div>
