@@ -5,16 +5,22 @@ import './WorkflowEditorLayout.css';
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
+import useDelayedUnmount from '@/pages/platform/workflow-editor/hooks/useDelayedUnmount';
 import useWorkflowEditorLayout from '@/pages/platform/workflow-editor/hooks/useWorkflowEditorLayout';
+import useWorkflowIssues from '@/pages/platform/workflow-editor/hooks/useWorkflowIssues';
+import useWorkflowIssuesSweep from '@/pages/platform/workflow-editor/hooks/useWorkflowIssuesSweep';
+import useWorkflowIssuesValidation from '@/pages/platform/workflow-editor/hooks/useWorkflowIssuesValidation';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {ISSUES_SIDEBAR_EXIT_DURATION} from '@/shared/constants';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {Suspense, lazy, useEffect, useState} from 'react';
@@ -22,7 +28,6 @@ import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
-import ErrorsBanner from './components/ErrorsBanner';
 import SubflowBanner from './components/SubflowBanner';
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
@@ -39,6 +44,7 @@ import {clearAllWorkflowMutations} from './utils/workflowMutationGuard';
 
 const DataPillPanel = lazy(() => import('./components/datapills/DataPillPanel'));
 const WorkflowEditor = lazy(() => import('./components/WorkflowEditor'));
+const WorkflowIssuesSidebar = lazy(() => import('./components/WorkflowIssuesSidebar'));
 const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSidebar'));
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
 
@@ -64,14 +70,16 @@ const WorkflowEditorLayout = ({
     workflowReferenceId,
 }: WorkflowEditorLayoutProps) => {
     const [clusterDialogMounted, setClusterDialogMounted] = useState(false);
-    const [rightSidebarMounted, setRightSidebarMounted] = useState(false);
-    const [rightSidebarVisible, setRightSidebarVisible] = useState(false);
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const issuesSidebarOpen = useWorkflowIssuesStore((state) => state.issuesSidebarOpen);
+    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
+        (state) => state.workflowNodeDetailsPanelOpen
+    );
     const {
         clusterElementsCanvasOpen,
         setShowWorkflowCodeEditorSheet,
@@ -100,6 +108,7 @@ const WorkflowEditorLayout = ({
         handleCopilotClick,
         handleWorkflowCodeEditorClick,
         handleWorkflowInputsClick,
+        handleWorkflowIssuesClick,
         handleWorkflowOutputsClick,
         isWorkflowNodeOutputsPending,
         previousComponentDefinitions,
@@ -108,11 +117,22 @@ const WorkflowEditorLayout = ({
         workflowTestConfiguration,
     } = useWorkflowLayout(includeComponents);
 
+    useWorkflowIssuesSweep();
+    useWorkflowIssuesValidation();
+
+    const issues = useWorkflowIssues();
+
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
     const {projectId, projectWorkflowId} = useParams();
+
+    const {mounted: rightSidebarMounted, visible: rightSidebarVisible} = useDelayedUnmount(rightSidebarOpen);
+    const {mounted: issuesSidebarMounted, visible: issuesSidebarVisible} = useDelayedUnmount(
+        issuesSidebarOpen,
+        workflowNodeDetailsPanelOpen ? 0 : ISSUES_SIDEBAR_EXIT_DURATION
+    );
 
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
@@ -140,40 +160,6 @@ const WorkflowEditorLayout = ({
     }, [projectId, projectWorkflowId, queryClient]);
 
     useEffect(() => {
-        let outerRafId: number | undefined;
-        let innerRafId: number | undefined;
-        let timerId: ReturnType<typeof setTimeout> | undefined;
-
-        if (rightSidebarOpen) {
-            setRightSidebarMounted(true);
-
-            outerRafId = requestAnimationFrame(() => {
-                innerRafId = requestAnimationFrame(() => {
-                    setRightSidebarVisible(true);
-                });
-            });
-        } else {
-            setRightSidebarVisible(false);
-
-            timerId = setTimeout(() => setRightSidebarMounted(false), 300);
-        }
-
-        return () => {
-            if (outerRafId !== undefined) {
-                cancelAnimationFrame(outerRafId);
-            }
-
-            if (innerRafId !== undefined) {
-                cancelAnimationFrame(innerRafId);
-            }
-
-            if (timerId !== undefined) {
-                clearTimeout(timerId);
-            }
-        };
-    }, [rightSidebarOpen]);
-
-    useEffect(() => {
         if (clusterElementsCanvasOpen) {
             setClusterDialogMounted(true);
         } else {
@@ -188,6 +174,7 @@ const WorkflowEditorLayout = ({
             clearAllWorkflowMutations();
 
             useWorkflowNodeDetailsPanelStore.getState().clearPendingSaveNodeNames();
+            useWorkflowIssuesStore.getState().reset();
         };
     }, []);
 
@@ -202,8 +189,6 @@ const WorkflowEditorLayout = ({
             >
                 <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
                     <SubflowBanner />
-
-                    <ErrorsBanner />
                 </div>
 
                 {componentDefinitions && taskDispatcherDefinitions && (
@@ -229,18 +214,28 @@ const WorkflowEditorLayout = ({
                     </Suspense>
                 )}
 
+                {issuesSidebarMounted && (
+                    <Suspense>
+                        <WorkflowIssuesSidebar visible={issuesSidebarVisible} />
+                    </Suspense>
+                )}
+
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense
                         fallback={
-                            <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 2 : 4} />
+                            <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 3 : 5} />
                         }
                     >
                         <WorkflowRightSidebar
                             copilotPanelOpen={copilotPanelOpen}
+                            issueCount={issues.length}
+                            issueSeverity={issues[0]?.severity}
+                            issuesSidebarOpen={issuesSidebarOpen}
                             onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
                             onCopilotClick={handleCopilotClick}
                             onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
                             onWorkflowInputsClick={handleWorkflowInputsClick}
+                            onWorkflowIssuesClick={handleWorkflowIssuesClick}
                             onWorkflowOutputsClick={handleWorkflowOutputsClick}
                             rightSidebarOpen={rightSidebarOpen}
                             showCopilot={showCopilot}

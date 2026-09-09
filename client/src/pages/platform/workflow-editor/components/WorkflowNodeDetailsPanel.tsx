@@ -9,6 +9,7 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {
     ActionDefinition,
@@ -89,6 +90,10 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeOutputs,
     });
 
+    const panelOpenedFromIssuesSidebar = useWorkflowNodeDetailsPanelStore(
+        (state) => state.panelOpenedFromIssuesSidebar
+    );
+
     const nodeVersion = getNodeVersion(currentWorkflowNode);
 
     const availableVersions = useMemo(
@@ -108,7 +113,7 @@ const WorkflowNodeDetailsPanel = ({
             className={twMerge(
                 'absolute top-2 bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]',
-                !className && 'animate-[slideInFromRight_300ms_ease-out]',
+                !className && !panelOpenedFromIssuesSidebar && 'animate-[slideInFromRight_300ms_ease-out]',
                 className
             )}
         >

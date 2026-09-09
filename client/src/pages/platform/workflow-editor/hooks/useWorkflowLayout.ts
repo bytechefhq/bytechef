@@ -3,9 +3,11 @@ import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDa
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import filterWorkflowNodeOutputs from '@/pages/platform/workflow-editor/utils/filterWorkflowNodeOutputs';
+import openIssuesSidebar from '@/pages/platform/workflow-editor/utils/openIssuesSidebar';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -30,6 +32,12 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         useShallow((state) => ({
             rightSidebarOpen: state.rightSidebarOpen,
             setRightSidebarOpen: state.setRightSidebarOpen,
+        }))
+    );
+    const {issuesSidebarOpen, setIssuesSidebarOpen} = useWorkflowIssuesStore(
+        useShallow((state) => ({
+            issuesSidebarOpen: state.issuesSidebarOpen,
+            setIssuesSidebarOpen: state.setIssuesSidebarOpen,
         }))
     );
     const {workflow, workflowNodes} = useWorkflowDataStore(
@@ -132,9 +140,20 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
     }
 
     const handleComponentsAndFlowControlsClick = () => {
+        setIssuesSidebarOpen(false);
         setWorkflowNodeDetailsPanelOpen(false);
         setWorkflowTestChatPanelOpen(false);
         setRightSidebarOpen(!rightSidebarOpen);
+    };
+
+    const handleWorkflowIssuesClick = () => {
+        if (issuesSidebarOpen) {
+            setIssuesSidebarOpen(false);
+
+            return;
+        }
+
+        openIssuesSidebar();
     };
 
     const handleCopilotClick = () => {
@@ -181,6 +200,7 @@ export const useWorkflowLayout = (includeComponents?: string[]) => {
         handleCopilotClick,
         handleWorkflowCodeEditorClick,
         handleWorkflowInputsClick,
+        handleWorkflowIssuesClick,
         handleWorkflowOutputsClick,
         isWorkflowNodeOutputsPending,
         previousComponentDefinitions,

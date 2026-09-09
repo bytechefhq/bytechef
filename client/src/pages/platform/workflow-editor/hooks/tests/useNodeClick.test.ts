@@ -14,10 +14,20 @@ vi.mock('../../cluster-element-editor/stores/useClusterElementsDataStore', () =>
 }));
 
 vi.mock('../../stores/useWorkflowEditorStore', () => ({
-    default: () => ({
-        clusterElementsCanvasOpen: false,
-        setClusterElementsCanvasOpen: vi.fn(),
-    }),
+    default: Object.assign(
+        () => ({
+            clusterElementsCanvasOpen: false,
+            setClusterElementsCanvasOpen: vi.fn(),
+        }),
+        {
+            getState: () => ({
+                clusterElementsCanvasOpen: false,
+                setClusterElementsCanvasOpen: vi.fn(),
+            }),
+            setState: vi.fn(),
+            subscribe: vi.fn(),
+        }
+    ),
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useDataPillPanelStore', () => ({
