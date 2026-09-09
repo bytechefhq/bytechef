@@ -51,7 +51,7 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
         expect(screen.getByText('Mailer')).toBeInTheDocument();
         expect(screen.getByText(/Edited/)).toBeInTheDocument();
         expect(screen.getByText(new Date('2026-02-11T09:30:00Z').toLocaleDateString())).toBeInTheDocument();
-        expect(screen.getByTitle('Gmail')).toBeInTheDocument();
+        expect(screen.getAllByLabelText('Workflow component icon')).toHaveLength(1);
     });
 
     it('marks the card as current when the ids match', () => {

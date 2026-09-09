@@ -1,13 +1,14 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import WorkflowComponentsIcon from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import WorkflowComponentsIcon, {
+    WorkflowComponentIconDefinitionType,
+} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import {useMemo} from 'react';
 
 interface WorkflowComponentsListProps {
     filteredComponentNames: string[];
     maxIcons?: number;
-    workflowComponentDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
-    workflowTaskDispatcherDefinitions: Record<string, ComponentDefinitionBasic | undefined>;
+    workflowComponentDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
+    workflowTaskDispatcherDefinitions: Record<string, WorkflowComponentIconDefinitionType | undefined>;
 }
 
 const WorkflowComponentsList = ({
