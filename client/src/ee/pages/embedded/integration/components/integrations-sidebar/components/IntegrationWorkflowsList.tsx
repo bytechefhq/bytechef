@@ -77,6 +77,7 @@ const IntegrationWorkflowsList = ({
                             calculateTimeDifference={calculateTimeDifference}
                             currentWorkflowId={currentWorkflowId}
                             findIntegrationIdByWorkflow={findIntegrationIdByWorkflow}
+                            integration={integration}
                             key={workflow.id}
                             onIntegrationClick={onIntegrationClick}
                             setSelectedIntegrationId={setSelectedIntegrationId}

@@ -1,0 +1,3 @@
+mutation updateAutomationWorkflowProjectWorkflow($workflowUuid: ID!, $label: String!, $description: String) {
+    updateAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid, label: $label, description: $description)
+}

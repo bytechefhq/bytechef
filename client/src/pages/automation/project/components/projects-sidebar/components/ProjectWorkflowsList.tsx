@@ -79,6 +79,7 @@ const ProjectWorkflowsList = ({
                             findProjectIdByWorkflow={findProjectIdByWorkflow}
                             key={workflow.id}
                             onProjectClick={onProjectClick}
+                            project={project}
                             setSelectedProjectId={setSelectedProjectId}
                             workflow={workflow}
                         />

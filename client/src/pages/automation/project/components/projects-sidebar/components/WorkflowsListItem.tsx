@@ -1,9 +1,10 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import WorkflowsListItemDropdownMenu from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListItemDropdownMenu';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
-import {Workflow} from '@/shared/middleware/automation/configuration';
+import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useMemo} from 'react';
+import {MouseEvent, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -13,6 +14,7 @@ interface WorkflowsListItemProps {
     currentWorkflowId: string;
     onProjectClick: (projectId: number, projectWorkflowId: number) => void;
     findProjectIdByWorkflow: (workflow: Workflow) => number;
+    project?: Project;
     setSelectedProjectId: (projectId: number) => void;
 }
 
@@ -21,6 +23,7 @@ const WorkflowsListItem = ({
     currentWorkflowId,
     findProjectIdByWorkflow,
     onProjectClick,
+    project,
     setSelectedProjectId,
     workflow,
 }: WorkflowsListItemProps) => {
@@ -63,7 +66,11 @@ const WorkflowsListItem = ({
         [calculateTimeDifference, workflow?.lastModifiedDate]
     );
 
-    const handleSelectWorkflowClick = () => {
+    const handleCardClick = (event: MouseEvent<HTMLLIElement>) => {
+        if (!event.currentTarget.contains(event.target as Node)) {
+            return;
+        }
+
         onProjectClick(projectId, projectWorkflowId);
 
         setSelectedProjectId(projectId);
@@ -76,32 +83,42 @@ const WorkflowsListItem = ({
                 workflow.id === currentWorkflowId && 'border-stroke-brand-primary bg-background'
             )}
             key={workflow.id}
-            onClick={() => handleSelectWorkflowClick()}
+            onClick={handleCardClick}
         >
-            <div className="flex flex-col gap-3 overflow-hidden">
-                <WorkflowComponentsList
-                    filteredComponentNames={filteredComponentNames}
-                    workflowComponentDefinitions={workflowComponentDefinitions}
-                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                />
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 flex-col gap-3 overflow-hidden">
+                    <WorkflowComponentsList
+                        filteredComponentNames={filteredComponentNames}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <div className="flex flex-col gap-1 text-start">
-                            <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="flex flex-col gap-1 text-start">
+                                <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
 
-                            <div className="flex gap-1 text-xs text-content-neutral-secondary">
-                                <span>Edited</span>
+                                <div className="flex gap-1 text-xs text-content-neutral-secondary">
+                                    <span>Edited</span>
 
-                                {timeAgo}
+                                    {timeAgo}
+                                </div>
                             </div>
-                        </div>
-                    </TooltipTrigger>
+                        </TooltipTrigger>
 
-                    {workflow.label && workflow.label.length > 40 && (
-                        <TooltipContent className="max-w-96">{workflow.label}</TooltipContent>
-                    )}
-                </Tooltip>
+                        {workflow.label && workflow.label.length > 40 && (
+                            <TooltipContent className="max-w-96">{workflow.label}</TooltipContent>
+                        )}
+                    </Tooltip>
+                </div>
+
+                {project && (
+                    <WorkflowsListItemDropdownMenu
+                        currentWorkflowId={currentWorkflowId}
+                        project={project}
+                        workflow={workflow}
+                    />
+                )}
             </div>
         </li>
     );
