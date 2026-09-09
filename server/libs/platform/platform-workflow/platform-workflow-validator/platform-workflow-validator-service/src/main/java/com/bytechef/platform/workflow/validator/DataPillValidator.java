@@ -32,6 +32,7 @@ import tools.jackson.databind.JsonNode;
 class DataPillValidator {
 
     private static final Pattern DATA_PILL_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
+    private static final Pattern LOOP_ITEM_SEGMENT_PATTERN = Pattern.compile("\\.item(?!\\w)");
 
     private DataPillValidator() {
     }
@@ -328,7 +329,7 @@ class DataPillValidator {
                         continue;
                     }
 
-                    String indexedExpression = dataPillExpression.replace(".item", ".item[" + i + "]");
+                    String indexedExpression = indexLoopItem(dataPillExpression, i);
 
                     String errorMessage = "Property '" + indexedExpression + "' in output of 'loop/v1' is of type " +
                         actualType.toLowerCase() + ", not " + expectedType.toLowerCase();
@@ -350,6 +351,12 @@ class DataPillValidator {
                     dataPillExpression, items, expectedType, allTasksMap, errors, taskOutput);
             }
         }
+    }
+
+    private static String indexLoopItem(String dataPillExpression, int index) {
+        Matcher matcher = LOOP_ITEM_SEGMENT_PATTERN.matcher(dataPillExpression);
+
+        return matcher.replaceFirst(".item[" + index + "]");
     }
 
     private static void validateLoopItemTypesFromDataPill(
@@ -411,16 +418,11 @@ class DataPillValidator {
                                 String actualType = mapTypeToString(targetProperty.type());
 
                                 if (!isTypeCompatible(expectedType, actualType)) {
-                                    // Generate errors for each array element (simulating 3 elements based on test
-                                    // expectations)
-                                    for (int i = 0; i < 3; i++) {
-                                        String errorMessage = String.format(
-                                            "Property 'loop1.item[%d].%s' in output of 'loop/v1' is of type %s, " +
-                                                "not %s",
-                                            i, propertyName, actualType, expectedType.toLowerCase());
+                                    String errorMessage = String.format(
+                                        "Property '%s' in output of 'loop/v1' is of type %s, not %s",
+                                        indexLoopItem(dataPillExpression, 0), actualType, expectedType.toLowerCase());
 
-                                        StringUtils.appendWithNewline(errorMessage, errors);
-                                    }
+                                    StringUtils.appendWithNewline(errorMessage, errors);
                                 }
                             }
                         }
@@ -440,8 +442,8 @@ class DataPillValidator {
 
                         if (!isTypeCompatible(expectedType, actualType)) {
                             String errorMessage = String.format(
-                                "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
-                                actualType, expectedType.toLowerCase());
+                                "Property '%s' in output of 'loop/v1' is of type %s, not %s",
+                                indexLoopItem(dataPillExpression, 0), actualType, expectedType.toLowerCase());
 
                             StringUtils.appendWithNewline(errorMessage, errors);
                         }
@@ -451,8 +453,8 @@ class DataPillValidator {
 
                         if (!isTypeCompatible(expectedType, actualType)) {
                             String errorMessage = String.format(
-                                "Property 'loop1.item[0]' in output of 'loop/v1' is of type %s, not %s",
-                                actualType, expectedType.toLowerCase());
+                                "Property '%s' in output of 'loop/v1' is of type %s, not %s",
+                                indexLoopItem(dataPillExpression, 0), actualType, expectedType.toLowerCase());
 
                             StringUtils.appendWithNewline(errorMessage, errors);
                         }

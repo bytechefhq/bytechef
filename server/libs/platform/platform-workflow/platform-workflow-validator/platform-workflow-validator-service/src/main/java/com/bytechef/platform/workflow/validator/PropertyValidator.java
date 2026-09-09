@@ -51,18 +51,16 @@ class PropertyValidator {
             return;
         }
 
-        Set<String> validatedPropertyNames = new HashSet<>();
+        Set<String> definedPropertyNames = new HashSet<>();
 
         for (PropertyInfo propertyInfo : propertyInfos) {
-            ValidationResult result = validatePropertyWithDisplayCondition(
+            validatePropertyWithDisplayCondition(
                 taskParametersJsonNode, propertyInfo, path, originalCurrentParameters, errors, warnings);
 
-            if (result.wasProcessed()) {
-                validatedPropertyNames.add(propertyInfo.name());
-            }
+            definedPropertyNames.add(propertyInfo.name());
         }
 
-        checkForUndefinedProperties(taskParametersJsonNode, validatedPropertyNames, path, warnings);
+        checkForUndefinedProperties(taskParametersJsonNode, definedPropertyNames, path, warnings);
     }
 
     private static ValidationResult validatePropertyWithDisplayCondition(
@@ -188,7 +186,9 @@ class PropertyValidator {
 
         boolean isRequired = propertyInfo.required();
 
-        if (!taskParametersJsonNode.has(fieldName)) {
+        if (!taskParametersJsonNode.has(fieldName) ||
+            (!"NULL".equalsIgnoreCase(type) && isEmptyValue(taskParametersJsonNode.get(fieldName)))) {
+
             if (isRequired) {
                 StringUtils.appendWithNewline(ValidationErrorUtils.missingProperty(propertyPath), errors);
 
@@ -207,6 +207,11 @@ class PropertyValidator {
         }
 
         validatePropertyByType(valueJsonNode, propertyInfo, propertyPath, originalCurrentParameters, errors, warnings);
+    }
+
+    private static boolean isEmptyValue(JsonNode valueJsonNode) {
+        return valueJsonNode.isNull() || (valueJsonNode.isString() && org.apache.commons.lang3.StringUtils.isBlank(
+            valueJsonNode.asString()));
     }
 
     private static void validatePropertyByType(
