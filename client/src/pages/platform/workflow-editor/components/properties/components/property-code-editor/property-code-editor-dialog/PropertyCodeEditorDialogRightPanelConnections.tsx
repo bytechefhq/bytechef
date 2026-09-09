@@ -36,7 +36,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
     });
 
     return (
-        <Card className="border-none shadow-none">
+        <Card className="gap-0 border-none py-0 shadow-none">
             <CardContent className="px-4">
                 <CardHeader className="px-0 py-4">
                     <CardTitle>Connections</CardTitle>

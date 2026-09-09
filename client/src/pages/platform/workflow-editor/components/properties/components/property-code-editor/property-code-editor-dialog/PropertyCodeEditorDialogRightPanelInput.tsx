@@ -18,7 +18,7 @@ const PropertyCodeEditorDialogRightPanelInput = ({input}: PropertyCodeEditorDial
         usePropertyCodeEditorDialogRightPanelInput({input});
 
     return (
-        <Card className="flex h-full flex-col border-none shadow-none">
+        <Card className="flex h-full flex-col gap-0 border-none py-0 shadow-none">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-4">
                 <div className="flex h-5 w-full items-center justify-between">
                     <CardTitle>Input</CardTitle>
