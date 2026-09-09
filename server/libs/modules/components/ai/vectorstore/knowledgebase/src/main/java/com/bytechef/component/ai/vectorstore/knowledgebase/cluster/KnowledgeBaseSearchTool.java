@@ -31,6 +31,7 @@ import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
@@ -59,6 +60,7 @@ public class KnowledgeBaseSearchTool {
                         Stream.of(
                             integer(KNOWLEDGE_BASE_ID)
                                 .label("Knowledge Base")
+                                .resourceReference(ResourceType.KNOWLEDGE_BASE)
                                 .description("The knowledge base to search.")
                                 .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
                                 .required(true),

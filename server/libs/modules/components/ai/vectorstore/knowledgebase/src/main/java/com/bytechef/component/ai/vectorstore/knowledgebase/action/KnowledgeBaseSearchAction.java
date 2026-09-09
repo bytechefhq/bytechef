@@ -36,6 +36,7 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
@@ -78,6 +79,7 @@ public final class KnowledgeBaseSearchAction {
             .properties(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
+                    .resourceReference(ResourceType.KNOWLEDGE_BASE)
                     .description("The knowledge base to search.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),

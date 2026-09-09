@@ -40,6 +40,7 @@ import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
@@ -83,6 +84,7 @@ public class KnowledgeBaseUpdateTool {
                     .required(true),
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
+                    .resourceReference(ResourceType.KNOWLEDGE_BASE)
                     .description("The knowledge base to update documents in.")
                     .options(KnowledgeBaseOptionsUtils.knowledgeBaseOptions(knowledgeBaseService))
                     .required(true),

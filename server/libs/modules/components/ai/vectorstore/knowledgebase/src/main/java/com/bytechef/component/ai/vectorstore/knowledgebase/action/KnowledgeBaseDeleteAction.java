@@ -28,6 +28,7 @@ import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
@@ -56,6 +57,7 @@ public final class KnowledgeBaseDeleteAction {
             .properties(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
+                    .resourceReference(ResourceType.KNOWLEDGE_BASE)
                     .description("The knowledge base to delete documents from.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
