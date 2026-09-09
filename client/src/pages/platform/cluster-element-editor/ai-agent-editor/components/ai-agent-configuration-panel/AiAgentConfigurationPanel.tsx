@@ -2,6 +2,7 @@ import AiAgentModelSelectField from '@/pages/platform/cluster-element-editor/ai-
 import AiAgentPromptField from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentPromptField';
 import AiAgentStreamResponseField from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentStreamResponseField';
 import AiAgentTools from '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-configuration-panel/components/AiAgentTools';
+import useClusterRootDataPills from '@/pages/platform/cluster-element-editor/hooks/useClusterRootDataPills';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useShallow} from 'zustand/shallow';
 
@@ -37,6 +38,8 @@ export function AiAgentConfigurationPanel() {
             workflow: state.workflow,
         }))
     );
+
+    useClusterRootDataPills();
 
     return (
         <div className="flex flex-col gap-4">
