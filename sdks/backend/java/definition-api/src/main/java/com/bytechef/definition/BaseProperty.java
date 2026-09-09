@@ -28,6 +28,12 @@ import java.util.Optional;
  */
 public interface BaseProperty {
 
+    String RESOURCE_REFERENCE_METADATA_KEY = "resourceReference";
+
+    enum ResourceType {
+        DATA_TABLE, KNOWLEDGE_BASE
+    }
+
     /**
      *
      */
