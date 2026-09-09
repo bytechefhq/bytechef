@@ -13,8 +13,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import PropertyMentionsInput from '../PropertyMentionsInput';
 
 /**
- * A TEXT_AREA property renders as a mentions input outside a form, and as a text area inside one. Both sit on
- * the same min-h-14 floor, so the same property looks like the same control on either surface.
+ * A TEXT_AREA property renders as a mentions input outside a form, and as a text area inside one. Both open at
+ * the height of a single line input and grow with their content.
  */
 
 const renderInput = (controlType: ControlType, isFormulaMode = false) =>
@@ -44,21 +44,22 @@ describe('text area mentions input height', () => {
         } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
     });
 
-    it('opens a text area taller than a single row', () => {
+    it('opens a text area at the height of a single line input', () => {
         const {container} = renderInput('TEXT_AREA');
 
-        expect(getEditorContainer(container)).toHaveClass('min-h-14');
+        expect(getEditorContainer(container)).toHaveClass('min-h-9');
     });
 
-    it('leaves a plain text property one row tall', () => {
+    it('opens a plain text property at the same height', () => {
         const {container} = renderInput('TEXT');
 
-        expect(getEditorContainer(container)).not.toHaveClass('min-h-14');
+        expect(getEditorContainer(container)).toHaveClass('min-h-9');
     });
 
-    it('keeps a text area in formula mode one row tall', () => {
-        const {container} = renderInput('TEXT_AREA', true);
+    it('grows with its content instead of reserving rows', () => {
+        const {container} = renderInput('TEXT_AREA');
 
         expect(getEditorContainer(container)).not.toHaveClass('min-h-14');
+        expect(getEditorContainer(container)).not.toHaveClass('min-h-16');
     });
 });

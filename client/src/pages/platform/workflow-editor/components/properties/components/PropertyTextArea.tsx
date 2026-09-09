@@ -88,7 +88,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
 
                     <Textarea
                         className={twMerge(
-                            'min-h-14',
+                            'min-h-9',
                             error &&
                                 'border-stroke-destructive-secondary pr-10 text-rose-900 placeholder-stroke-destructive-secondary focus:border-rose-500 focus:ring-rose-500',
                             disabled && 'bg-gray-100 text-content-neutral-secondary',
@@ -102,7 +102,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                         onChange={onChange}
                         placeholder={placeholder}
                         ref={ref}
-                        rows={5}
+                        rows={1}
                         value={value}
                         {...props}
                     />
