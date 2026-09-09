@@ -59,6 +59,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.expression.EvaluationException;
 import org.springframework.stereotype.Service;
@@ -71,6 +73,8 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(WorkflowNodeOutputFacadeImpl.class);
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
@@ -278,7 +282,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 break;
             }
 
-            workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId));
+            workflowNodeOutputDTOs.add(
+                getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId, true));
         }
 
         List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
@@ -310,14 +315,16 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
                 if (containsWorkflowTask(childWorkflowTasks, lastWorkflowNodeName)) {
                     workflowNodeOutputDTOs.add(
-                        getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId, sampleOutputsCache));
+                        getWorkflowNodeOutputDTO(workflowId, workflowTask, false, environmentId, sampleOutputsCache,
+                            true));
                 } else {
                     workflowNodeOutputDTOs.add(
-                        getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache));
+                        getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache,
+                            true));
                 }
             } else {
                 workflowNodeOutputDTOs.add(
-                    getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache));
+                    getWorkflowNodeOutputDTO(workflowId, workflowTask, true, environmentId, sampleOutputsCache, true));
             }
         }
 
@@ -423,6 +430,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
         Map<String, Map<String, ?>> sampleOutputsCache) {
 
+        return getWorkflowNodeOutputDTO(
+            workflowId, workflowTask, taskDispatcherOutput, environmentId, sampleOutputsCache, false);
+    }
+
+    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+        String workflowId, WorkflowTask workflowTask, Boolean taskDispatcherOutput, long environmentId,
+        Map<String, Map<String, ?>> sampleOutputsCache, boolean previousNode) {
+
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         ActionDefinition actionDefinition = null;
@@ -463,8 +478,17 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 outputResponse = checkOutputSchemaIsFileEntryProperty(actionDefinition.getOutputResponse());
 
                 if (outputResponse == null) {
-                    outputResponse = getWorkflowTaskDynamicOutputResponse(
-                        workflowId, workflowTask, environmentId, sampleOutputsCache);
+                    try {
+                        outputResponse = getWorkflowTaskDynamicOutputResponse(
+                            workflowId, workflowTask, environmentId, sampleOutputsCache);
+                    } catch (RuntimeException e) {
+                        if (!previousNode) {
+                            throw e;
+                        }
+
+                        log.debug(
+                            "Dynamic output of node {} was not resolved: {}", workflowTask.getName(), e.getMessage());
+                    }
                 }
             }
         } else {
@@ -480,6 +504,12 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
         String workflowId, WorkflowTrigger workflowTrigger, long environmentId) {
 
+        return getWorkflowNodeOutputDTO(workflowId, workflowTrigger, environmentId, false);
+    }
+
+    private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(
+        String workflowId, WorkflowTrigger workflowTrigger, long environmentId, boolean previousNode) {
+
         boolean testoutputResponse = false;
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
@@ -491,7 +521,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName(), environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
-            .or(() -> getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger, environmentId))
+            .or(() -> fetchWorkflowTriggerDynamicOutputResponse(
+                workflowId, workflowTrigger, environmentId, previousNode))
             .orElse(null);
 
         if (outputResponse == null) {
@@ -609,6 +640,23 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         }
 
         return new WorkflowTaskDispatcherDynamicOutputResponse(outputResponse, variableOutputResponse);
+    }
+
+    private Optional<OutputResponse> fetchWorkflowTriggerDynamicOutputResponse(
+        String workflowId, WorkflowTrigger workflowTrigger, long environmentId, boolean previousNode) {
+
+        if (!previousNode) {
+            return getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger, environmentId);
+        }
+
+        try {
+            return getWorkflowTriggerDynamicOutputResponse(workflowId, workflowTrigger, environmentId);
+        } catch (RuntimeException e) {
+            log.debug(
+                "Dynamic output of trigger {} was not resolved: {}", workflowTrigger.getName(), e.getMessage());
+
+            return Optional.empty();
+        }
     }
 
     private Optional<OutputResponse> getWorkflowTriggerDynamicOutputResponse(
