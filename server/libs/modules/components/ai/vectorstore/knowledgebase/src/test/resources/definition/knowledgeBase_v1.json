@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
-    "search": [ ],
+    "delete": [ ],
     "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
-    "delete": [ ]
+    "search": [ ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ]
   },
   "actions": [ {
     "batch": null,
@@ -29,7 +29,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
@@ -247,7 +249,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
@@ -449,7 +453,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
@@ -800,7 +806,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
@@ -1254,7 +1262,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
@@ -1426,7 +1436,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
@@ -1868,7 +1880,9 @@
       "hidden": null,
       "label": "Knowledge Base",
       "maxValue": null,
-      "metadata": { },
+      "metadata": {
+        "resourceReference": "KNOWLEDGE_BASE"
+      },
       "minValue": null,
       "name": "knowledgeBaseId",
       "options": null,
