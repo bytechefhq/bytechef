@@ -1,6 +1,7 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorWorkflowsListItem from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowsListItem';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {MemoryRouter} from 'react-router-dom';
 import {describe, expect, it, vi} from 'vitest';
 
 const workflow = {
@@ -18,18 +19,33 @@ const workflow = {
     workflowUuid: 'wf-1',
 };
 
+const project = {
+    categoryId: null,
+    description: null,
+    id: 'project-1',
+    lastPublishedVersion: null,
+    name: 'Project One',
+    published: false,
+    tagIds: [],
+    version: 1,
+    workflowTemplates: [workflow],
+};
+
 describe('AutomationWorkflowEditorWorkflowsListItem', () => {
     it('renders the workflow label, the edited date, and a component icon', () => {
         render(
-            <TooltipProvider>
-                <ul>
-                    <AutomationWorkflowEditorWorkflowsListItem
-                        currentWorkflowId="wf-other"
-                        onWorkflowClick={vi.fn()}
-                        workflow={workflow}
-                    />
-                </ul>
-            </TooltipProvider>
+            <MemoryRouter>
+                <TooltipProvider>
+                    <ul>
+                        <AutomationWorkflowEditorWorkflowsListItem
+                            currentWorkflowId="wf-other"
+                            onWorkflowClick={vi.fn()}
+                            project={project}
+                            workflow={workflow}
+                        />
+                    </ul>
+                </TooltipProvider>
+            </MemoryRouter>
         );
 
         expect(screen.getByText('Mailer')).toBeInTheDocument();
@@ -40,15 +56,18 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
 
     it('marks the card as current when the ids match', () => {
         const {container} = render(
-            <TooltipProvider>
-                <ul>
-                    <AutomationWorkflowEditorWorkflowsListItem
-                        currentWorkflowId="wf-1"
-                        onWorkflowClick={vi.fn()}
-                        workflow={workflow}
-                    />
-                </ul>
-            </TooltipProvider>
+            <MemoryRouter>
+                <TooltipProvider>
+                    <ul>
+                        <AutomationWorkflowEditorWorkflowsListItem
+                            currentWorkflowId="wf-1"
+                            onWorkflowClick={vi.fn()}
+                            project={project}
+                            workflow={workflow}
+                        />
+                    </ul>
+                </TooltipProvider>
+            </MemoryRouter>
         );
 
         expect(container.querySelector('li')).toHaveClass('border-stroke-brand-primary');
@@ -58,15 +77,18 @@ describe('AutomationWorkflowEditorWorkflowsListItem', () => {
         const onWorkflowClick = vi.fn();
 
         const {container} = render(
-            <TooltipProvider>
-                <ul>
-                    <AutomationWorkflowEditorWorkflowsListItem
-                        currentWorkflowId="wf-other"
-                        onWorkflowClick={onWorkflowClick}
-                        workflow={workflow}
-                    />
-                </ul>
-            </TooltipProvider>
+            <MemoryRouter>
+                <TooltipProvider>
+                    <ul>
+                        <AutomationWorkflowEditorWorkflowsListItem
+                            currentWorkflowId="wf-other"
+                            onWorkflowClick={onWorkflowClick}
+                            project={project}
+                            workflow={workflow}
+                        />
+                    </ul>
+                </TooltipProvider>
+            </MemoryRouter>
         );
 
         fireEvent.click(container.querySelector('li')!);

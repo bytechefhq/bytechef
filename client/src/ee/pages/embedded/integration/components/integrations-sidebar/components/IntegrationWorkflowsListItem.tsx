@@ -1,9 +1,10 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import IntegrationWorkflowsListItemDropdownMenu from '@/ee/pages/embedded/integration/components/integrations-sidebar/components/IntegrationWorkflowsListItemDropdownMenu';
+import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {useMemo} from 'react';
+import {MouseEvent, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -11,6 +12,7 @@ interface IntegrationWorkflowsListItemProps {
     calculateTimeDifference: (date: string) => string;
     currentWorkflowId: string;
     findIntegrationIdByWorkflow: (workflow: Workflow) => number;
+    integration?: Integration;
     onIntegrationClick: (integrationId: number, integrationWorkflowId: number) => void;
     setSelectedIntegrationId: (integrationId: number) => void;
     workflow: Workflow;
@@ -20,6 +22,7 @@ const IntegrationWorkflowsListItem = ({
     calculateTimeDifference,
     currentWorkflowId,
     findIntegrationIdByWorkflow,
+    integration,
     onIntegrationClick,
     setSelectedIntegrationId,
     workflow,
@@ -63,7 +66,11 @@ const IntegrationWorkflowsListItem = ({
         [calculateTimeDifference, workflow?.lastModifiedDate]
     );
 
-    const handleSelectWorkflowClick = () => {
+    const handleCardClick = (event: MouseEvent<HTMLLIElement>) => {
+        if (!event.currentTarget.contains(event.target as Node)) {
+            return;
+        }
+
         onIntegrationClick(integrationId, integrationWorkflowId);
 
         setSelectedIntegrationId(integrationId);
@@ -76,32 +83,42 @@ const IntegrationWorkflowsListItem = ({
                 workflow.id === currentWorkflowId && 'border-stroke-brand-primary bg-background'
             )}
             key={workflow.id}
-            onClick={() => handleSelectWorkflowClick()}
+            onClick={handleCardClick}
         >
-            <div className="flex flex-col gap-3 overflow-hidden">
-                <WorkflowComponentsList
-                    filteredComponentNames={filteredComponentNames}
-                    workflowComponentDefinitions={workflowComponentDefinitions}
-                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                />
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 flex-col gap-3 overflow-hidden">
+                    <WorkflowComponentsList
+                        filteredComponentNames={filteredComponentNames}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <div className="flex flex-col gap-1 text-start">
-                            <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div className="flex flex-col gap-1 text-start">
+                                <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
 
-                            <div className="flex gap-1 text-xs text-content-neutral-secondary">
-                                <span>Edited</span>
+                                <div className="flex gap-1 text-xs text-content-neutral-secondary">
+                                    <span>Edited</span>
 
-                                {timeAgo}
+                                    {timeAgo}
+                                </div>
                             </div>
-                        </div>
-                    </TooltipTrigger>
+                        </TooltipTrigger>
 
-                    {workflow.label && workflow.label.length > 40 && (
-                        <TooltipContent className="max-w-96">{workflow.label}</TooltipContent>
-                    )}
-                </Tooltip>
+                        {workflow.label && workflow.label.length > 40 && (
+                            <TooltipContent className="max-w-96">{workflow.label}</TooltipContent>
+                        )}
+                    </Tooltip>
+                </div>
+
+                {integration && (
+                    <IntegrationWorkflowsListItemDropdownMenu
+                        currentWorkflowId={currentWorkflowId}
+                        integration={integration}
+                        workflow={workflow}
+                    />
+                )}
             </div>
         </li>
     );

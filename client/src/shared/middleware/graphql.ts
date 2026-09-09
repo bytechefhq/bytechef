@@ -1132,6 +1132,15 @@ export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
 
 export type ToolEligibleIntegrationVersionWorkflowsQuery = { toolEligibleIntegrationVersionWorkflows: Array<{ id: string, integrationWorkflowId: string, label: string }> };
 
+export type UpdateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
+  workflowUuid: string | number;
+  label: string;
+  description?: string | null | undefined;
+}>;
+
+
+export type UpdateAutomationWorkflowProjectWorkflowMutation = { updateAutomationWorkflowProjectWorkflow: boolean };
+
 export type UpdateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
   id: string | number;
   input: Types.UpdateMcpIntegrationInstanceConfigurationInput;
@@ -5889,6 +5898,29 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
       {
     queryKey: ['toolEligibleIntegrationVersionWorkflows', variables],
     queryFn: fetcher<ToolEligibleIntegrationVersionWorkflowsQuery, ToolEligibleIntegrationVersionWorkflowsQueryVariables>(ToolEligibleIntegrationVersionWorkflowsDocument, variables),
+    ...options
+  }
+    )};
+
+export const UpdateAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
+    mutation updateAutomationWorkflowProjectWorkflow($workflowUuid: ID!, $label: String!, $description: String) {
+  updateAutomationWorkflowProjectWorkflow(
+    workflowUuid: $workflowUuid
+    label: $label
+    description: $description
+  )
+}
+    `);
+
+export const useUpdateAutomationWorkflowProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectWorkflowMutation, TError, UpdateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAutomationWorkflowProjectWorkflowMutation, TError, UpdateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAutomationWorkflowProjectWorkflow'],
+    mutationFn: (variables?: UpdateAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<UpdateAutomationWorkflowProjectWorkflowMutation, UpdateAutomationWorkflowProjectWorkflowMutationVariables>(UpdateAutomationWorkflowProjectWorkflowDocument, variables)(),
     ...options
   }
     )};

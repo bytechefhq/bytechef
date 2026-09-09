@@ -159,6 +159,7 @@ const mockNavigate = vi.hoisted(() => vi.fn());
 
 vi.mock('react-router-dom', async () => ({
     useNavigate: () => mockNavigate,
+    useSearchParams: () => [new URLSearchParams(), vi.fn()],
 }));
 
 // Helper to set default mocks per test scenario

@@ -2,6 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectWorkflowsList from '@/pages/automation/project/components/projects-sidebar/components/ProjectWorkflowsList';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {render, screen} from '@/shared/util/test-utils';
+import {MemoryRouter} from 'react-router-dom';
 import {expect, it, vi} from 'vitest';
 
 const mockProject: Project = {
@@ -27,17 +28,19 @@ const mockFilteredWorkflowsList: Workflow[] = [
 
 const renderProjectWorkflowsList = (mockUnpublishedProject?: Project) => {
     render(
-        <TooltipProvider>
-            <ProjectWorkflowsList
-                calculateTimeDifference={vi.fn()}
-                currentWorkflowId="1001"
-                filteredWorkflowsList={mockFilteredWorkflowsList}
-                findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
-                onProjectClick={vi.fn()}
-                project={mockUnpublishedProject ?? mockProject}
-                setSelectedProjectId={vi.fn()}
-            />
-        </TooltipProvider>
+        <MemoryRouter>
+            <TooltipProvider>
+                <ProjectWorkflowsList
+                    calculateTimeDifference={vi.fn()}
+                    currentWorkflowId="1001"
+                    filteredWorkflowsList={mockFilteredWorkflowsList}
+                    findProjectIdByWorkflow={vi.fn().mockReturnValue(1050)}
+                    onProjectClick={vi.fn()}
+                    project={mockUnpublishedProject ?? mockProject}
+                    setSelectedProjectId={vi.fn()}
+                />
+            </TooltipProvider>
+        </MemoryRouter>
     );
 };
 

@@ -86,6 +86,8 @@ const IntegrationsLeftSidebar = ({
 
     const findIntegrationIdByWorkflow = getWorkflowsIntegrationId(integrations || []);
 
+    const selectedIntegration = integrations?.find((integration) => integration.id === selectedIntegrationId);
+
     const filteredWorkflowsList = useMemo(
         () => getFilteredWorkflows(workflows, sortBy, searchValue),
         [workflows, sortBy, searchValue, getFilteredWorkflows]
@@ -198,6 +200,7 @@ const IntegrationsLeftSidebar = ({
                                     calculateTimeDifference={calculateTimeDifference}
                                     currentWorkflowId={currentWorkflowId}
                                     findIntegrationIdByWorkflow={findIntegrationIdByWorkflow}
+                                    integration={selectedIntegration}
                                     key={workflow.id}
                                     onIntegrationClick={onIntegrationClick}
                                     setSelectedIntegrationId={setSelectedIntegrationId}
