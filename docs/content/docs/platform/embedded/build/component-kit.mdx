@@ -1,50 +1,108 @@
 ---
 title: "Component Kit"
-description: A Java SDK that turns a connected user's component actions into AI tools your own LLM application can call.
+description: One API that exposes a connected user's integrations twice - as actions your code calls, and as tools a language model calls.
 ---
 
-**AI ComponentKit** is a backend Java SDK for AI-native products: it fetches the component actions a [connected user](/platform/embedded/monitor/connected-users) has access to and exposes them as **tools** your own LLM application can call - so your agent acts through the user's ByteChef connections without you writing per-integration glue.
+**AI ComponentKit** is one API for AI-native products: it exposes what a [connected user](/platform/embedded/monitor/connected-users) has connected as operations you can execute under that user's own credentials. One API covers every integration, so your product acts through the user's ByteChef connections without you writing per-integration glue.
 
-The tools it returns are the connected user's **component actions** - not their workflows. To let an agent run a whole workflow instead, expose the workflow through an [MCP server](/platform/embedded/configure/mcp-servers) or trigger it with an [App Event](/platform/embedded/build/app-events).
+It exposes them twice, for two different callers - **actions** for your code, **tools** for a model - and the difference is worth getting straight before you pick an endpoint.
 
-## `ToolClient`
+## Actions and tools
 
-The core client wraps the embedded execution API:
+An **action** is the unit ByteChef executes: one operation on one component, such as Slack's `sendChannelMessage`. Your code names it, supplies its input, and gets the result.
 
-```java
-ToolClient toolClient = new ToolClient(apiKey, "https://your-bytechef-host.example.com", Environment.DEVELOPMENT);
+A **tool** is an action projected for a language model. A component publishes selected actions as tools; the platform gives each one a flat name, a description, and a JSON Schema, hands that catalogue to your model, and the model chooses.
 
-// The connected user's available actions, as tool definitions (name, description, JSON-schema parameters),
-// grouped by the component they belong to.
-Map<String, List<ToolModel>> toolsByComponent = toolClient.getTools(externalUserId);
+The execution underneath is the same, and so is the connection. The caller is not, so the two surfaces differ in more than their URL:
 
-// Execute one tool with the connected user's own credentials.
-Object result = toolClient.executeTool(externalUserId, toolName, Map.of(/* parameters */));
+|  | Action | Tool |
+|---|---|---|
+| **Who chooses it** | Your code, before the call | The model, at inference time |
+| **Endpoint** | `POST /{externalUserId}/components/{componentName}/versions/{componentVersion}/actions/{actionName}` | `POST /{externalUserId}/tools` |
+| **Address** | Component, version, and action name, in the path | One flat name in the body - `SLACK_SEND_CHANNEL_MESSAGE` |
+| **Coverage** | Every action the component defines | Only the actions the component publishes as tools |
+| **Versioning** | Pinned in the path | Resolved server-side, always the component's current version |
+| **Discovery** | None - your code already knows what it is calling | `GET /{externalUserId}/tools`, scoped to that user |
+| **Request body** | `{ "input": { ... } }` | `{ "name": ..., "parameters": { ... } }` |
+| **Response** | `{ "result": ... }` | The result, unwrapped |
+| **File input** | Binary and form-data uploads supported | Not supported |
+
+The rule of thumb: **if a model is choosing, use tools; if your code has already decided, call the action.**
+
+Both live under `/api/embedded/v1`, authenticate with an embedded **[API key](/platform/embedded/administration/api-keys)** (`Authorization: Bearer`), and take an `X-Environment` header selecting `DEVELOPMENT`, `STAGING`, or `PRODUCTION`. Neither ever sees the user's credential: it is resolved server-side from the connected user, and if that user has more than one instance of the same integration, the optional `X-Instance-Id` header picks which.
+
+The same tool catalogue is also reachable over **MCP**: an [MCP Server](/platform/embedded/configure/mcp-servers) wraps the same actions - and, unlike ComponentKit, whole workflows - for agents that speak that protocol. ComponentKit is the plain-HTTP path, MCP is the protocol path; pick whichever your agent already talks.
+
+## Listing a user's tools
+
+`GET /tools` returns the tools grouped by the component they belong to, each already in function-calling shape:
+
+```json
+{
+  "slack": [
+    {
+      "type": "function",
+      "function": {
+        "name": "SLACK_SEND_CHANNEL_MESSAGE",
+        "description": "Sends a message to a public channel.",
+        "parameters": "{\"type\":\"object\",\"properties\":{ ... }}"
+      }
+    }
+  ]
+}
 ```
 
-- Authentication is an embedded **API key** (`Authorization: Bearer`), created under **Embedded → Settings → API Keys**.
-- `Environment` selects the target environment (`DEVELOPMENT`, `STAGING`, `PRODUCTION`), sent as the `X-Environment` header.
-- `getTools` fetches from `GET /api/embedded/v1/{externalUserId}/tools` and returns the tools keyed by component name; `executeTool` POSTs `{ "name": ..., "parameters": ... }` to the matching `/tools` endpoint - each call runs the component action with the connected user's own credentials.
+Two things about that shape are worth knowing before you wire it up:
 
-## Spring AI integration
+- **`parameters` is a JSON Schema carried as a string**, not a nested object. Parse it before handing it to your model client.
+- **A tool name is an address, not a label.** It is the component name uppercased, then the action name in `SCREAMING_SNAKE_CASE` - `sendChannelMessage` on `slack` becomes `SLACK_SEND_CHANNEL_MESSAGE`. Executing a tool splits that name back apart to find the component and the action, which is why the call carries no component field and no version.
 
-The `ai-componentkit-spring` module adapts the client to Spring AI, so the user's actions plug straight into a `ChatClient` as tools:
+Narrow the catalogue with the `categories`, `components`, and `tools` query parameters. Useful when a user has connected far more than a given conversation should be allowed to reach.
 
-```java
-ToolCallbackProvider toolCallbackProvider = toolCallbackProviderFactory.create(externalUserId, Environment.PRODUCTION);
+### What ends up in the catalogue
 
-chatClient.prompt(userMessage)
-    .toolCallbacks(toolCallbackProvider)
-    .call();
+- **Only actions published as tools.** A component opts its actions in one at a time; an action it does not opt in never appears in `GET /tools`, though your own code can still call it as an action.
+- **Only integrations that user has connected.** The catalogue is derived from that user's own integration instances, so it differs per user and grows the moment they connect something new - with no redeploy on your side.
+- **Actions, not workflows.** To let an agent run a whole workflow, expose it through an [MCP server](/platform/embedded/configure/mcp-servers) or trigger it with an [App Event](/platform/embedded/build/app-events).
+
+## Running a tool
+
+```http
+POST /api/embedded/v1/{externalUserId}/tools
+Authorization: Bearer <api-key>
+X-Environment: PRODUCTION
+Content-Type: application/json
+
+{
+  "name": "SLACK_SEND_CHANNEL_MESSAGE",
+  "parameters": { "channel": "#general", "text": "Deploy finished." }
+}
 ```
 
-The LLM now sees every action the user has connected - send a Slack message, create a CRM contact - and invocations execute server-side in ByteChef under that user's connections.
+The response is the provider's own response, returned as-is.
+
+## Calling an action
+
+When your code has already decided what to run, address the action directly. The input goes under `input`, and the result comes back wrapped in `result`:
+
+```http
+POST /api/embedded/v1/{externalUserId}/components/slack/versions/1/actions/sendChannelMessage
+Authorization: Bearer <api-key>
+X-Environment: PRODUCTION
+Content-Type: application/json
+
+{
+  "input": { "channel": "#general", "text": "Deploy finished." }
+}
+```
+
+This is also the surface to use when an operation takes a **file**: set `bodyContentType` to `BINARY` or `FORM_DATA` in the input and the endpoint resolves the referenced content into a file entry before the action runs. The tools endpoint has no equivalent, so file-bearing operations stay in your code rather than in the model's hands.
 
 <Callout title="ComponentKit in the Sample App">
-    The [Sample App](/platform/embedded/get-started/quick-start/sample-app) includes a "ComponentKit Playground" and a tool-based AI chat page that demonstrate this exact flow end to end.
+    The [Sample App](/platform/embedded/get-started/quick-start/sample-app) includes a "ComponentKit Playground" that calls a single action directly, and a tool-based AI chat page that runs the full catalogue-and-choose flow.
 </Callout>
 
 ## Sample projects
 
-- [ComponentKit + Spring AI (Java)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-spring-ai) - a Java LLM app calling a connected user's actions as Spring AI tools.
-- [ComponentKit + Vercel AI SDK (TypeScript)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-vercel-ai-sdk) - the same tools consumed from a TypeScript app via the `/tools` REST endpoints and the Vercel AI SDK.
+- [ComponentKit + Vercel AI SDK (TypeScript)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-vercel-ai-sdk) - the `/tools` endpoints consumed from a TypeScript app through the Vercel AI SDK.
+- [ComponentKit + Spring AI (Java)](https://github.com/bytechefhq/bytechef-embedded-ai-componentkit-spring-ai) - the same tools bound into a Spring AI `ChatClient`.
