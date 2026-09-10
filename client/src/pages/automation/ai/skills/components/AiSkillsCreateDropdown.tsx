@@ -33,9 +33,6 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
         }
     };
 
-    // A fresh conversation, not a continuation: the panel may still hold whatever surface it was last opened
-    // for, and replaying those messages against the skills_build agent would generate against the wrong
-    // subject. The context is replaced outright rather than merged for the same reason.
     const handleCreateWithAi = () => {
         const {generateConversationId, resetMessages, setContext} = useCopilotStore.getState();
 
