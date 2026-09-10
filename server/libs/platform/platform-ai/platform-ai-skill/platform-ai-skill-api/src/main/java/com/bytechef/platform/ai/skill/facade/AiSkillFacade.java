@@ -17,6 +17,7 @@
 package com.bytechef.platform.ai.skill.facade;
 
 import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +87,16 @@ public interface AiSkillFacade {
 
     List<AiSkill> getAiSkills();
 
+    /** Resolves {@link Tag} entities for the given tag ids (empty list for an empty input). */
+    List<Tag> getTags(List<Long> tagIds);
+
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
+
+    /**
+     * Replaces a skill's tags. Tags without an id are created (or reused by name) through the platform tag registry
+     * before being linked.
+     */
+    AiSkill updateAiSkillTags(long id, List<Tag> tags);
 
     /**
      * Replaces the content of a single file inside the skill zip archive. If {@code path} is {@code null}, defaults to

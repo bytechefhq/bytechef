@@ -18,7 +18,10 @@ package com.bytechef.platform.ai.skill.domain;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,6 +30,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -45,6 +49,9 @@ public final class AiSkill {
 
     @Column("skill_file")
     private FileEntry skillFile;
+
+    @MappedCollection(idColumn = "ai_skill_id")
+    private Set<AiSkillTag> aiSkillTags = new HashSet<>();
 
     @CreatedDate
     private Instant createdDate;
@@ -95,6 +102,23 @@ public final class AiSkill {
 
     public void setSkillFile(FileEntry skillFile) {
         this.skillFile = skillFile;
+    }
+
+    public List<Long> getTagIds() {
+        return aiSkillTags
+            .stream()
+            .map(AiSkillTag::getTagId)
+            .toList();
+    }
+
+    public void setTagIds(@Nullable List<Long> tagIds) {
+        aiSkillTags = new HashSet<>();
+
+        if (tagIds != null) {
+            for (Long tagId : tagIds) {
+                aiSkillTags.add(new AiSkillTag(tagId));
+            }
+        }
     }
 
     public Instant getCreatedDate() {
