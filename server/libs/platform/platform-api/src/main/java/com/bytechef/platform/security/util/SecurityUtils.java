@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -67,6 +68,21 @@ public final class SecurityUtils {
      */
     public static String getCurrentUserLogin() {
         return fetchCurrentUserLogin().orElseThrow(() -> new IllegalStateException("Current user is not set!"));
+    }
+
+    /**
+     * Verifies that {@code expectedLogin} matches the currently authenticated principal's login. Fails closed: an
+     * unauthenticated caller, or one whose login differs, is denied.
+     *
+     * @param expectedLogin the login the caller must be acting as, e.g. the owner recorded on a per-user resource
+     * @throws AccessDeniedException if no user is authenticated or the logins differ
+     */
+    public static void checkCurrentUserLogin(String expectedLogin) {
+        String currentUserLogin = fetchCurrentUserLogin().orElse(null);
+
+        if (currentUserLogin == null || !currentUserLogin.equals(expectedLogin)) {
+            throw new AccessDeniedException("Access is denied");
+        }
     }
 
     /**

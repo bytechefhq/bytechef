@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.skill.remote.client.facade;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -78,6 +79,11 @@ public class RemoteAiSkillFacadeClient implements AiSkillFacade {
     }
 
     @Override
+    public List<Tag> getTags(List<Long> tagIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public AiSkill removeFileInSkill(long id, String path) {
         throw new UnsupportedOperationException();
     }
@@ -89,6 +95,11 @@ public class RemoteAiSkillFacadeClient implements AiSkillFacade {
 
     @Override
     public AiSkill updateAiSkillContent(long id, String path, String content) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AiSkill updateAiSkillTags(long id, List<Tag> tags) {
         throw new UnsupportedOperationException();
     }
 }
