@@ -2,10 +2,14 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import AiSkillUploadDialog from '@/pages/automation/ai/skills/components/AiSkillUploadDialog';
 import AiSkillWriteDialog from '@/pages/automation/ai/skills/components/AiSkillWriteDialog';
+import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
 interface AiSkillsCreateDropdownProps {
     trigger?: ReactNode;
@@ -17,19 +21,34 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+
+    const location = useLocation();
     const navigate = useNavigate();
-    const {skillId: currentDetailSkillId} = useParams<{skillId?: string}>();
 
     const handleCreated = (createdSkillId: string | null) => {
-        if (currentDetailSkillId && createdSkillId) {
-            navigate(`/automation/ai/skills/${createdSkillId}`);
+        if (createdSkillId) {
+            navigate(`${getAiSkillsBasePath(location.pathname)}/${createdSkillId}`);
         }
     };
 
-    const openCreateWithAi = () => {
-        navigate('/automation/ai/skills/create/ai', {
-            state: {origin: currentDetailSkillId ? 'detail' : 'list'},
+    // A fresh conversation, not a continuation: the panel may still hold whatever surface it was last opened
+    // for, and replaying those messages against the skills_build agent would generate against the wrong
+    // subject. The context is replaced outright rather than merged for the same reason.
+    const handleCreateWithAi = () => {
+        const {generateConversationId, resetMessages, setContext} = useCopilotStore.getState();
+
+        resetMessages();
+        generateConversationId();
+
+        setContext({
+            mode: MODE.BUILD,
+            parameters: {intent: 'create_skill'},
+            source: Source.SKILLS,
         });
+
+        setCopilotPanelOpen(true);
     };
 
     return (
@@ -45,8 +64,11 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-72">
-                    {ff_4554 && (
-                        <DropdownMenuItem className="flex flex-col items-start gap-0.5 p-3" onClick={openCreateWithAi}>
+                    {ff_4554 && copilotEnabled && (
+                        <DropdownMenuItem
+                            className="flex flex-col items-start gap-0.5 p-3"
+                            onClick={handleCreateWithAi}
+                        >
                             <div className="flex items-center gap-2 font-medium">
                                 <SparklesIcon className="size-4" />
                                 Create With AI

@@ -40,6 +40,7 @@ const LeftSidebarNav = ({body, className, loading = false, loadingRows = 4, titl
 );
 
 interface LeftSidebarNavItemProps {
+    className?: string;
     disabled?: boolean;
     item: {
         current: boolean;
@@ -52,6 +53,7 @@ interface LeftSidebarNavItemProps {
 }
 
 const LeftSidebarNavItem = ({
+    className,
     disabled = false,
     icon,
     item: {current, id, name, onItemClick},
@@ -64,7 +66,8 @@ const LeftSidebarNavItem = ({
             buttonVariants({variant: 'ghost'}),
             current ? 'bg-accent hover:bg-accent' : 'hover:bg-accent',
             'w-full justify-start px-2 font-normal',
-            disabled && 'pointer-events-none opacity-50'
+            disabled && 'pointer-events-none opacity-50',
+            className
         )}
         onClick={(event) => {
             if (disabled) {
