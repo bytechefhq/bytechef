@@ -1,3 +1,4 @@
+import ImportApp from '@/ImportApp';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
@@ -533,6 +534,7 @@ export const getRouter = (queryClient: QueryClient) =>
                     path: 'template/workflows/:id',
                 },
             ],
+            element: <ImportApp />,
             path: 'import',
         },
         {
