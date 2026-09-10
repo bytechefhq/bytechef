@@ -42,7 +42,6 @@ const ProjectTabButtons = ({
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.projects);
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -79,17 +78,13 @@ const ProjectTabButtons = ({
                 variant="ghost"
             />
 
-            {ff_2939 && (
+            {templatesSubmissionForm && (
                 <Button
                     aria-label="Share Project with Community Button"
                     className="dropdown-menu-item"
                     icon={<Share2Icon />}
                     label="Share with Community"
-                    onClick={() => {
-                        if (templatesSubmissionForm) {
-                            window.open(templatesSubmissionForm, '_blank');
-                        }
-                    }}
+                    onClick={() => window.open(templatesSubmissionForm, '_blank')}
                     variant="ghost"
                 />
             )}
