@@ -61,7 +61,7 @@ const Chats = lazy(() => import('@/pages/automation/chats/Chats'));
 const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow-template/WorkflowTemplate'));
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
-const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
+const AiProviders = lazy(() => import('@/pages/settings/platform/ai-providers/AiProviders'));
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
 const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
 const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
@@ -227,11 +227,9 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <EEVersion>
-                        <LazyLoadWrapper>
-                            <AiProviders />
-                        </LazyLoadWrapper>
-                    </EEVersion>
+                    <LazyLoadWrapper>
+                        <AiProviders />
+                    </LazyLoadWrapper>
                 </PrivateRoute>
             ),
             path: 'ai-providers',

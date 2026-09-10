@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
-import com.bytechef.ee.platform.configuration.dto.AiDefaultModelDTO;
-import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.provider.dto.AiDefaultModelDTO;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

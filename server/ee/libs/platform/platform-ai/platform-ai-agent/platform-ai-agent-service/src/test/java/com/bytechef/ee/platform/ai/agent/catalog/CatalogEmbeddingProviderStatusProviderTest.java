@@ -11,9 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
-import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
-import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

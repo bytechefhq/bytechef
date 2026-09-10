@@ -14,9 +14,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
-import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import org.junit.jupiter.api.AfterEach;
