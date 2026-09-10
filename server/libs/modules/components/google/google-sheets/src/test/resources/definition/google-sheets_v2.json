@@ -4111,6 +4111,112 @@
     "batch": null,
     "deduplicate": null,
     "deprecated": null,
+    "description": "Triggers when an existing row is modified. Rows are tracked by their position, so only rows whose content changes at the same position are reported; rows that are inserted, removed, or moved do not fire the trigger.",
+    "dynamicWebhookRefresh": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-sheets_v2#modified-row"
+    },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "name": "modifiedRow",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "poll": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The spreadsheet to apply the updates to.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Spreadsheet",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "spreadsheetId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "If the first row is header.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Is the First Row Headers?",
+      "metadata": { },
+      "name": "isTheFirstRowHeader",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": true,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The name of the sheet",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sheet",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "sheetName",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": [ "spreadsheetId" ]
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Modified Row",
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookDisable": { },
+    "webhookEnable": { },
+    "webhookRawBody": null,
+    "webhookRequest": { },
+    "webhookValidate": null,
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null,
+    "workflowSyncExecution": null
+  }, {
+    "batch": null,
+    "deduplicate": null,
+    "deprecated": null,
     "description": "Triggers when a new row is added. Rows are tracked by their content, so a row inserted in the middle of the sheet is reported and editing an existing row does not fire the trigger.",
     "dynamicWebhookRefresh": null,
     "help": {

@@ -36,6 +36,7 @@ import com.bytechef.component.google.sheets.action.GoogleSheetsInsertMultipleRow
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertRowAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsListSheetsAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsUpdateRowAction;
+import com.bytechef.component.google.sheets.trigger.GoogleSheetsModifiedRowTriggerV2;
 import com.bytechef.component.google.sheets.trigger.GoogleSheetsNewRowTriggerV2;
 import com.google.auto.service.AutoService;
 
@@ -85,7 +86,9 @@ public class GoogleSheetsComponentHandlerV2 implements ComponentHandler {
             tool(GoogleSheetsInsertRowAction.ACTION_DEFINITION),
             tool(GoogleSheetsListSheetsAction.ACTION_DEFINITION),
             tool(GoogleSheetsUpdateRowAction.ACTION_DEFINITION))
-        .triggers(GoogleSheetsNewRowTriggerV2.TRIGGER_DEFINITION)
+        .triggers(
+            GoogleSheetsModifiedRowTriggerV2.TRIGGER_DEFINITION,
+            GoogleSheetsNewRowTriggerV2.TRIGGER_DEFINITION)
         .version(2);
 
     @Override
