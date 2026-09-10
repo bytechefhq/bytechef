@@ -89,6 +89,42 @@ class GoogleSheetsRowDiffUtilsTest {
     }
 
     @Test
+    void testGetModifiedRowIndexesForEditedRow() {
+        assertEquals(List.of(1),
+            GoogleSheetsRowDiffUtils.getModifiedRowIndexes(List.of("a", "b", "c"), List.of("a", "x", "c")));
+    }
+
+    @Test
+    void testGetModifiedRowIndexesForUnchangedRows() {
+        assertEquals(List.of(),
+            GoogleSheetsRowDiffUtils.getModifiedRowIndexes(List.of("a", "b", "c"), List.of("a", "b", "c")));
+    }
+
+    @Test
+    void testGetModifiedRowIndexesIgnoresAppendedRows() {
+        assertEquals(List.of(),
+            GoogleSheetsRowDiffUtils.getModifiedRowIndexes(List.of("a", "b"), List.of("a", "b", "c")));
+    }
+
+    @Test
+    void testGetModifiedRowIndexesIgnoresRemovedRows() {
+        assertEquals(List.of(),
+            GoogleSheetsRowDiffUtils.getModifiedRowIndexes(List.of("a", "b", "c"), List.of("a", "b")));
+    }
+
+    @Test
+    void testGetModifiedRowIndexesIgnoresUnchangedRowShiftedByAnUnrelatedInsertion() {
+        String sparseRowHash = GoogleSheetsRowDiffUtils.getRowHash(
+            Arrays.asList("", "", "", "", "", "", "dfsdfs"));
+
+        List<String> knownRowHashes = List.of("a", sparseRowHash);
+        List<String> currentRowHashes = List.of("a", "inserted", sparseRowHash);
+
+        assertEquals(List.of(), GoogleSheetsRowDiffUtils.getModifiedRowIndexes(knownRowHashes, currentRowHashes));
+        assertEquals(List.of(1), GoogleSheetsRowDiffUtils.getInsertedRowIndexes(knownRowHashes, currentRowHashes));
+    }
+
+    @Test
     void testGetInsertedRowIndexesFallsBackWhenTooManyRowsDiffer() {
         List<String> knownRowHashes = new ArrayList<>();
         List<String> currentRowHashes = new ArrayList<>();

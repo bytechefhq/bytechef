@@ -76,6 +76,20 @@ public class GoogleSheetsRowDiffUtils {
     }
 
     public static List<Integer> getInsertedRowIndexes(List<String> knownRowHashes, List<String> currentRowHashes) {
+        return diff(knownRowHashes, currentRowHashes).insertedRowIndexes();
+    }
+
+    /**
+     * Returns the indexes of rows whose content changed while their relative position among the surrounding unchanged
+     * rows stayed the same, i.e. rows that align with a known row but hash differently. This is computed from the same
+     * alignment as {@link #getInsertedRowIndexes}, so a row insertion/removal elsewhere in the sheet shifting later
+     * rows does not cause those unrelated rows to be reported as modified.
+     */
+    public static List<Integer> getModifiedRowIndexes(List<String> knownRowHashes, List<String> currentRowHashes) {
+        return diff(knownRowHashes, currentRowHashes).modifiedRowIndexes();
+    }
+
+    private static RowDiffResult diff(List<String> knownRowHashes, List<String> currentRowHashes) {
         int prefixLength = getCommonPrefixLength(knownRowHashes, currentRowHashes);
         int suffixLength = getCommonSuffixLength(knownRowHashes, currentRowHashes, prefixLength);
 
@@ -83,19 +97,27 @@ public class GoogleSheetsRowDiffUtils {
         List<String> currentMiddle = currentRowHashes.subList(prefixLength, currentRowHashes.size() - suffixLength);
 
         if (knownMiddle.size() > MAX_DIFFED_ROWS || currentMiddle.size() > MAX_DIFFED_ROWS) {
-            return getSurplusRowIndexes(knownRowHashes, currentRowHashes);
+            return new RowDiffResult(getSurplusRowIndexes(knownRowHashes, currentRowHashes), List.of());
         }
+
+        RowDiffResult middleResult = diffMiddle(knownMiddle, currentMiddle);
 
         List<Integer> insertedRowIndexes = new ArrayList<>();
 
-        for (int index : diffMiddle(knownMiddle, currentMiddle)) {
+        for (int index : middleResult.insertedRowIndexes()) {
             insertedRowIndexes.add(index + prefixLength);
         }
 
-        return insertedRowIndexes;
+        List<Integer> modifiedRowIndexes = new ArrayList<>();
+
+        for (int index : middleResult.modifiedRowIndexes()) {
+            modifiedRowIndexes.add(index + prefixLength);
+        }
+
+        return new RowDiffResult(insertedRowIndexes, modifiedRowIndexes);
     }
 
-    private static List<Integer> diffMiddle(List<String> knownRowHashes, List<String> currentRowHashes) {
+    private static RowDiffResult diffMiddle(List<String> knownRowHashes, List<String> currentRowHashes) {
         int knownSize = knownRowHashes.size();
         int currentSize = currentRowHashes.size();
 
@@ -116,6 +138,7 @@ public class GoogleSheetsRowDiffUtils {
         }
 
         List<Integer> insertedRowIndexes = new ArrayList<>();
+        List<Integer> modifiedRowIndexes = new ArrayList<>();
         List<Integer> unalignedRowIndexes = new ArrayList<>();
 
         int knownIndex = 0;
@@ -127,7 +150,7 @@ public class GoogleSheetsRowDiffUtils {
                 knownRowHashes.get(knownIndex)
                     .equals(currentRowHashes.get(currentIndex))) {
 
-                addSurplusRowIndexes(insertedRowIndexes, unalignedRowIndexes, removedRowCount);
+                addSurplusRowIndexes(insertedRowIndexes, modifiedRowIndexes, unalignedRowIndexes, removedRowCount);
 
                 unalignedRowIndexes.clear();
 
@@ -148,17 +171,32 @@ public class GoogleSheetsRowDiffUtils {
             }
         }
 
-        addSurplusRowIndexes(insertedRowIndexes, unalignedRowIndexes, removedRowCount);
+        addSurplusRowIndexes(insertedRowIndexes, modifiedRowIndexes, unalignedRowIndexes, removedRowCount);
 
-        return insertedRowIndexes;
+        return new RowDiffResult(insertedRowIndexes, modifiedRowIndexes);
     }
 
+    /**
+     * Splits a run of unaligned current-side rows against the known rows removed in the same run: the first
+     * {@code removedRowCount} of them line up with a removed row each and are reported as modified, and any surplus
+     * beyond that is reported as inserted.
+     */
     private static void addSurplusRowIndexes(
-        List<Integer> insertedRowIndexes, List<Integer> unalignedRowIndexes, int removedRowCount) {
+        List<Integer> insertedRowIndexes, List<Integer> modifiedRowIndexes, List<Integer> unalignedRowIndexes,
+        int removedRowCount) {
 
-        for (int index = removedRowCount; index < unalignedRowIndexes.size(); index++) {
+        int pairedCount = Math.min(removedRowCount, unalignedRowIndexes.size());
+
+        for (int index = 0; index < pairedCount; index++) {
+            modifiedRowIndexes.add(unalignedRowIndexes.get(index));
+        }
+
+        for (int index = pairedCount; index < unalignedRowIndexes.size(); index++) {
             insertedRowIndexes.add(unalignedRowIndexes.get(index));
         }
+    }
+
+    private record RowDiffResult(List<Integer> insertedRowIndexes, List<Integer> modifiedRowIndexes) {
     }
 
     private static int getCommonPrefixLength(List<String> knownRowHashes, List<String> currentRowHashes) {
