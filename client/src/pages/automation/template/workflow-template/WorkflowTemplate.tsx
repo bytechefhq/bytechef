@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {ComboBoxItemType} from '@/components/ComboBox';
+import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
 import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
 import WorkflowTemplatePreview from '@/pages/automation/template/components/WorkflowTemplatePreview';
@@ -7,6 +8,7 @@ import ProjectsComboBox from '@/pages/automation/template/workflow-template/comp
 import {useImportWorkflowTemplateMutation, useWorkflowTemplateQuery} from '@/shared/middleware/graphql';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
+import {PlusIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
@@ -49,6 +51,12 @@ const WorkflowTemplate = ({
 
     const handleOnChange = (item?: ComboBoxItemType) => {
         setSelectedProjectId(item?.value);
+    };
+
+    const handleProjectCreated = (projectId: number | void) => {
+        if (projectId) {
+            setSelectedProjectId(String(projectId));
+        }
     };
 
     const previewWorkflow = useMemo<Workflow | undefined>(() => {
@@ -96,10 +104,28 @@ const WorkflowTemplate = ({
                     <div className="flex flex-col space-y-2">
                         <div>Choose Project:</div>
 
-                        <ProjectsComboBox
-                            onChange={handleOnChange}
-                            value={selectedProjectId ? +selectedProjectId : undefined}
-                        />
+                        <div className="flex items-center gap-2">
+                            <div className="flex-1">
+                                <ProjectsComboBox
+                                    onChange={handleOnChange}
+                                    value={selectedProjectId ? +selectedProjectId : undefined}
+                                />
+                            </div>
+
+                            <ProjectDialog
+                                onSuccess={handleProjectCreated}
+                                project={undefined}
+                                triggerNode={
+                                    <Button
+                                        aria-label="Create Project"
+                                        icon={<PlusIcon />}
+                                        size="icon"
+                                        title="Create project"
+                                        variant="outline"
+                                    />
+                                }
+                            />
+                        </div>
                     </div>
                 )}
 

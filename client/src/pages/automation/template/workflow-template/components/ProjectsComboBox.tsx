@@ -17,14 +17,13 @@ const ProjectsComboBox = ({onChange, value}: {onChange: (item?: ComboBoxItemType
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
-        apiCollections: false,
         id: currentWorkspaceId!,
         includeAllFields: false,
     });
 
     return projects ? (
         <ComboBox
-            emptyMessage="No published projects found. Please publish a project first."
+            emptyMessage="No projects found. Create a project first."
             items={projects.map(
                 (project) =>
                     ({
