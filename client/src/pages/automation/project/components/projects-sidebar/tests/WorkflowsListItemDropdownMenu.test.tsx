@@ -5,8 +5,8 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const hoisted = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
     duplicateMutate: vi.fn(),
-    featureFlagEnabled: false,
     navigate: vi.fn(),
+    templatesSubmissionForm: 'https://templates.example.com' as string | undefined,
     toast: vi.fn(),
     updateMutate: vi.fn(),
 }));
@@ -45,12 +45,8 @@ vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
     }),
 }));
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => hoisted.featureFlagEnabled,
-}));
-
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => 'https://templates.example.com',
+    useApplicationInfoStore: () => hoisted.templatesSubmissionForm,
 }));
 
 vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({
@@ -129,7 +125,7 @@ const deleteWorkflow = async () => {
 
 beforeEach(() => {
     windowResizeObserver();
-    hoisted.featureFlagEnabled = false;
+    hoisted.templatesSubmissionForm = 'https://templates.example.com';
 });
 
 afterEach(() => {
@@ -138,7 +134,7 @@ afterEach(() => {
 });
 
 describe('WorkflowsListItemDropdownMenu', () => {
-    it('offers Edit, Duplicate, Share, Export and Delete', async () => {
+    it('offers Edit, Duplicate, Share, Share with Community, Export and Delete', async () => {
         renderMenu();
 
         await openMenu();
@@ -147,14 +143,13 @@ describe('WorkflowsListItemDropdownMenu', () => {
             'Edit',
             'Duplicate',
             'Share',
+            'Share with Community',
             'Export',
             'Delete',
         ]);
     });
 
-    it('opens the community template form when ff-2939 is on', async () => {
-        hoisted.featureFlagEnabled = true;
-
+    it('opens the community template form', async () => {
         const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
 
         renderMenu();
@@ -165,6 +160,16 @@ describe('WorkflowsListItemDropdownMenu', () => {
         expect(openSpy).toHaveBeenCalledWith('https://templates.example.com', '_blank');
 
         openSpy.mockRestore();
+    });
+
+    it('hides the community entry when no submission form is configured', async () => {
+        hoisted.templatesSubmissionForm = undefined;
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.queryByRole('menuitem', {name: 'Share with Community'})).not.toBeInTheDocument();
     });
 
     it('exports through the automation endpoint', async () => {

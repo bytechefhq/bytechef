@@ -111,7 +111,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     );
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
 
@@ -545,15 +544,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <Share2Icon /> Share
                                 </DropdownMenuItem>
 
-                                {ff_2939 && (
+                                {templatesSubmissionForm && (
                                     <DropdownMenuItem
                                         aria-label="Share with Community"
                                         className="dropdown-menu-item"
-                                        onClick={() => {
-                                            if (templatesSubmissionForm) {
-                                                window.open(templatesSubmissionForm, '_blank');
-                                            }
-                                        }}
+                                        onClick={() => window.open(templatesSubmissionForm, '_blank')}
                                     >
                                         <Share2Icon /> Share with Community
                                     </DropdownMenuItem>

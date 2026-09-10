@@ -25,7 +25,6 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import '@/shared/styles/dropdownMenu.css';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
@@ -56,8 +55,6 @@ const ProjectWorkflowListItem = ({
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
 
     const [searchParams] = useSearchParams();
-
-    const ff_2939 = useFeatureFlagsStore()('ff-2939');
 
     const queryClient = useQueryClient();
 
@@ -191,14 +188,10 @@ const ProjectWorkflowListItem = ({
                             <Share2Icon /> Share
                         </DropdownMenuItem>
 
-                        {ff_2939 && (
+                        {templatesSubmissionForm && (
                             <DropdownMenuItem
                                 className="dropdown-menu-item"
-                                onClick={() => {
-                                    if (templatesSubmissionForm) {
-                                        window.open(templatesSubmissionForm, '_blank');
-                                    }
-                                }}
+                                onClick={() => window.open(templatesSubmissionForm, '_blank')}
                             >
                                 <Share2Icon /> Share with Community
                             </DropdownMenuItem>
