@@ -243,10 +243,15 @@ export type AiSkillFilePathsQueryVariables = Exact<{
 
 export type AiSkillFilePathsQuery = { aiSkillFilePaths: Array<string> };
 
+export type AiSkillTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AiSkillTagsQuery = { aiSkillTags: Array<{ id: string, name: string }> };
+
 export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any }> };
+export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any, tags: Array<{ id: string, name: string }> }> };
 
 export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
   id: string | number;
@@ -307,6 +312,14 @@ export type UpdateAiSkillContentMutationVariables = Exact<{
 
 
 export type UpdateAiSkillContentMutation = { updateAiSkillContent: { description: string | null, id: string, lastModifiedDate: any, name: string } };
+
+export type UpdateAiSkillTagsMutationVariables = Exact<{
+  id: string | number;
+  tags?: Array<Types.AiSkillTagInput> | Types.AiSkillTagInput | null | undefined;
+}>;
+
+
+export type UpdateAiSkillTagsMutation = { updateAiSkillTags: { id: string } };
 
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
@@ -2723,12 +2736,41 @@ export const useAiSkillFilePathsQuery = <
   }
     )};
 
+export const AiSkillTagsDocument = new TypedDocumentString(`
+    query aiSkillTags {
+  aiSkillTags {
+    id
+    name
+  }
+}
+    `);
+
+export const useAiSkillTagsQuery = <
+      TData = AiSkillTagsQuery,
+      TError = unknown
+    >(
+      variables?: AiSkillTagsQueryVariables,
+      options?: Omit<UseQueryOptions<AiSkillTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiSkillTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiSkillTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['aiSkillTags'] : ['aiSkillTags', variables],
+    queryFn: fetcher<AiSkillTagsQuery, AiSkillTagsQueryVariables>(AiSkillTagsDocument, variables),
+    ...options
+  }
+    )};
+
 export const AiSkillsDocument = new TypedDocumentString(`
     query aiSkills {
   aiSkills {
     id
     name
     description
+    tags {
+      id
+      name
+    }
     createdDate
     lastModifiedDate
   }
@@ -2922,6 +2964,27 @@ export const useUpdateAiSkillContentMutation = <
       {
     mutationKey: ['updateAiSkillContent'],
     mutationFn: (variables?: UpdateAiSkillContentMutationVariables) => fetcher<UpdateAiSkillContentMutation, UpdateAiSkillContentMutationVariables>(UpdateAiSkillContentDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiSkillTagsDocument = new TypedDocumentString(`
+    mutation updateAiSkillTags($id: ID!, $tags: [AiSkillTagInput!]) {
+  updateAiSkillTags(id: $id, tags: $tags) {
+    id
+  }
+}
+    `);
+
+export const useUpdateAiSkillTagsMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiSkillTagsMutation, TError, UpdateAiSkillTagsMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiSkillTagsMutation, TError, UpdateAiSkillTagsMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiSkillTags'],
+    mutationFn: (variables?: UpdateAiSkillTagsMutationVariables) => fetcher<UpdateAiSkillTagsMutation, UpdateAiSkillTagsMutationVariables>(UpdateAiSkillTagsDocument, variables)(),
     ...options
   }
     )};
