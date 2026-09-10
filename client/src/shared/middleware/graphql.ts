@@ -600,7 +600,7 @@ export type WorkflowTemplateQueryVariables = Exact<{
 }>;
 
 
-export type WorkflowTemplateQuery = { workflowTemplate: { description: string | null, projectVersion: number | null, publicUrl: string | null, workflow: { label: string }, components: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { componentName: string, version: number } | null }> } | null };
+export type WorkflowTemplateQuery = { workflowTemplate: { description: string | null, projectVersion: number | null, publicUrl: string | null, workflow: { description: string | null, label: string, tasks: Array<{ clusterElements: any, clusterRoot: boolean, description: string | null, label: string | null, metadata: any, name: string, node: string | null, parameters: any, type: string }>, triggers: Array<{ description: string | null, label: string | null, name: string, parameters: any, type: string }> }, components: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { componentName: string, version: number } | null }> } | null };
 
 export type WorkspaceApiKeysQueryVariables = Exact<{
   workspaceId: string | number;
@@ -3988,7 +3988,26 @@ export const WorkflowTemplateDocument = new TypedDocumentString(`
     projectVersion
     publicUrl
     workflow {
+      description
       label
+      tasks {
+        clusterElements
+        clusterRoot
+        description
+        label
+        metadata
+        name
+        node
+        parameters
+        type
+      }
+      triggers {
+        description
+        label
+        name
+        parameters
+        type
+      }
     }
     components {
       connection {

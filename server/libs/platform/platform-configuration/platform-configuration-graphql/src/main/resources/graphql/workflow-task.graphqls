@@ -1,0 +1,11 @@
+type WorkflowTask {
+    name: String!
+    label: String
+    type: String!
+    description: String
+    node: String
+    parameters: Map
+    metadata: Map
+    clusterRoot: Boolean!
+    clusterElements: Map
+}

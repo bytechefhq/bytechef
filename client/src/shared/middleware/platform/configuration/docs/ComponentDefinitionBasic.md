@@ -9,6 +9,7 @@ Name | Type
 ------------ | -------------
 `actionsCount` | number
 `clusterElementsCount` | { [key: string]: number; }
+`clusterRoot` | boolean
 `componentCategories` | [Array&lt;ComponentCategory&gt;](ComponentCategory.md)
 `description` | string
 `icon` | string
@@ -27,6 +28,7 @@ import type { ComponentDefinitionBasic } from ''
 const example = {
   "actionsCount": null,
   "clusterElementsCount": null,
+  "clusterRoot": null,
   "componentCategories": null,
   "description": null,
   "icon": null,

@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -27,7 +28,6 @@ import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
-import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO.WorkflowInfo;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -42,13 +42,16 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
+import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateAuthor;
@@ -285,11 +288,11 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         }
 
         if (StringUtils.isNotEmpty(query)) {
-            WorkflowTemplateDTO.WorkflowInfo workflow = workflowTemplateDTO.workflow();
+            WorkflowDTO workflowDTO = workflowTemplateDTO.workflow();
 
             if (Strings.CI.contains(workflowTemplateDTO.description(), query) ||
-                Strings.CI.contains(workflow.label(), query) ||
-                Strings.CI.contains(workflow.description(), query)) {
+                Strings.CI.contains(workflowDTO.getLabel(), query) ||
+                Strings.CI.contains(workflowDTO.getDescription(), query)) {
 
                 return true;
             }
@@ -451,7 +454,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         return new WorkflowTemplateDTO(
             template.authorName, template.authorEmail, template.authorRole, template.authorSocialLinks,
             categories, componentDefinitions, template.description, id, template.lastModifiedDate,
-            template.projectVersion, publicUrl, new WorkflowInfo(workflow.getLabel(), workflow.getDescription()));
+            template.projectVersion, publicUrl, toWorkflowDTO(workflow, componentDefinitions));
     }
 
     @Override
@@ -501,20 +504,47 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
         WorkflowTemplateAuthor author = workflowTemplate.author();
 
+        List<ComponentDefinition> componentDefinitions = componentDefinitionHelper.getComponentDefinitions(workflow);
+
         return new WorkflowTemplateDTO(
             author == null ? "" : author.name(), author == null ? "" : author.email(),
             author == null ? "" : author.role(), author == null ? "" : author.socialLinks(),
-            toCategories(workflowTemplate.category()), componentDefinitionHelper.getComponentDefinitions(workflow),
-            workflowTemplate.description(), workflowTemplate.slug(), null, null, publicUrl,
-            new WorkflowInfo(workflow.getLabel(), workflow.getDescription()));
+            toCategories(workflowTemplate.category()), componentDefinitions, workflowTemplate.description(),
+            workflowTemplate.slug(), null, null, publicUrl, toWorkflowDTO(workflow, componentDefinitions));
     }
 
     private WorkflowTemplateDTO toWorkflowTemplateDTO(WorkflowTemplateSummary workflowTemplateSummary) {
+        Workflow workflow = new Workflow(
+            JsonUtils.write(
+                Map.of(
+                    "label", workflowTemplateSummary.title(), "description",
+                    workflowTemplateSummary.description() == null ? "" : workflowTemplateSummary.description())),
+            Workflow.Format.JSON);
+
         return new WorkflowTemplateDTO(
             "", "", "", "", toCategories(workflowTemplateSummary.category()),
             componentDefinitionHelper.getComponentDefinitions(workflowTemplateSummary.components()),
             workflowTemplateSummary.description(), workflowTemplateSummary.slug(), null, null, publicUrl,
-            new WorkflowInfo(workflowTemplateSummary.title(), workflowTemplateSummary.description()));
+            toWorkflowDTO(workflow, List.of()));
+    }
+
+    private static WorkflowDTO toWorkflowDTO(Workflow workflow, List<ComponentDefinition> componentDefinitions) {
+        List<WorkflowTaskDTO> workflowTaskDTOs = CollectionUtils.map(
+            workflow.getTasks(true),
+            workflowTask -> new WorkflowTaskDTO(
+                workflowTask, isClusterRoot(workflowTask, componentDefinitions),
+                ClusterElementMap.of(workflowTask.getExtensions()), List.of()));
+
+        return new WorkflowDTO(workflow, workflowTaskDTOs, List.of());
+    }
+
+    private static boolean isClusterRoot(WorkflowTask workflowTask, List<ComponentDefinition> componentDefinitions) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+        return componentDefinitions.stream()
+            .filter(Objects::nonNull)
+            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), workflowNodeType.name()))
+            .anyMatch(ComponentDefinition::isClusterRoot);
     }
 
     private static List<String> toCategories(String category) {

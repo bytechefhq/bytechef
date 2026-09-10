@@ -6,7 +6,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {
-    ConnectedUserProjectWorkflow,
+    ConnectedUserProjectsQuery,
     useDeleteConnectedUserProjectWorkflowMutation,
     useEnableConnectedUserProjectWorkflowMutation,
 } from '@/shared/middleware/graphql';
@@ -14,10 +14,13 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
+export type ConnectedUserProjectWorkflowType =
+    ConnectedUserProjectsQuery['connectedUserProjects'][number]['connectedUserProjectWorkflows'][number];
+
 const ConnectedUserProjectWorkflowListItem = ({
     connectedUserProjectWorkflow,
 }: {
-    connectedUserProjectWorkflow: ConnectedUserProjectWorkflow;
+    connectedUserProjectWorkflow: ConnectedUserProjectWorkflowType;
 }) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 

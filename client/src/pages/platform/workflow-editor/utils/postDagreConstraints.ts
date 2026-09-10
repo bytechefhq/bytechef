@@ -945,12 +945,16 @@ export function hasConfiguredClusterElements(node: Node): boolean {
     );
 }
 
+export function rendersClusterElements(node: Node): boolean {
+    return (node.type === 'clusterRoot' || node.type === 'readonly') && hasConfiguredClusterElements(node);
+}
+
 function getNodeCrossSize(node: Node, crossAxis: 'x' | 'y'): number {
     if (crossAxis === 'y') {
         return NODE_HEIGHT;
     }
 
-    return node.type === 'clusterRoot' && hasConfiguredClusterElements(node) ? CLUSTER_ROOT_NODE_WIDTH : NODE_WIDTH;
+    return rendersClusterElements(node) ? CLUSTER_ROOT_NODE_WIDTH : NODE_WIDTH;
 }
 
 export const REGULAR_NODE_HANDLE_OFFSET = 36;
@@ -961,9 +965,7 @@ function getNodeHandleOffset(node: Node, crossAxis: 'x' | 'y'): number {
         return REGULAR_NODE_HANDLE_OFFSET;
     }
 
-    return node.type === 'clusterRoot' && hasConfiguredClusterElements(node)
-        ? CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET
-        : REGULAR_NODE_HANDLE_OFFSET;
+    return rendersClusterElements(node) ? CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET : REGULAR_NODE_HANDLE_OFFSET;
 }
 
 export function getConditionBranchCaseOffset(
@@ -2226,15 +2228,8 @@ function computeMinGapToBottomGhost(sourceNode: Node, direction: LayoutDirection
 }
 
 function getLRDagreWidth(node: Node): number {
-    if (node.type === 'clusterRoot') {
-        const nodeData = node.data as NodeDataType;
-        const hasClusterElements =
-            nodeData.clusterElements &&
-            Object.entries(nodeData.clusterElements).some(
-                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-            );
-
-        return hasClusterElements ? 292 : 120;
+    if (node.type === 'clusterRoot' || node.type === 'readonly') {
+        return rendersClusterElements(node) ? 292 : 120;
     }
 
     return 120;

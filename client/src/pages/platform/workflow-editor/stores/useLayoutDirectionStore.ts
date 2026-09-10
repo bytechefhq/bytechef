@@ -3,9 +3,11 @@ import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
 interface LayoutDirectionStateI {
+    applyStoredLayoutDirection: () => void;
     currentWorkflowUuid: string;
     directionsByWorkflowUuid: Record<string, LayoutDirectionType>;
     layoutDirection: LayoutDirectionType;
+    resetLayoutDirection: () => void;
     setCurrentWorkflowUuid: (workflowUuid: string) => void;
     setLayoutDirection: (layoutDirection: LayoutDirectionType) => void;
 }
@@ -14,9 +16,17 @@ const useLayoutDirectionStore = create<LayoutDirectionStateI>()(
     devtools(
         persist(
             (set, get) => ({
+                applyStoredLayoutDirection: () =>
+                    set((state) => ({
+                        layoutDirection:
+                            state.directionsByWorkflowUuid[state.currentWorkflowUuid] ?? DEFAULT_LAYOUT_DIRECTION,
+                    })),
+
                 currentWorkflowUuid: '',
                 directionsByWorkflowUuid: {},
                 layoutDirection: DEFAULT_LAYOUT_DIRECTION,
+
+                resetLayoutDirection: () => set({layoutDirection: DEFAULT_LAYOUT_DIRECTION}),
 
                 setCurrentWorkflowUuid: (workflowUuid) => {
                     if (workflowUuid === get().currentWorkflowUuid) {
