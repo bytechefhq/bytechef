@@ -3,11 +3,11 @@ title: Skills
 description: Package expert instructions, coding guidelines, and process documentation into reusable modules for your AI agents
 ---
 
-Skills are your way of giving AI agents domain expertise. The **Skills** workspace lets you create, edit, and manage knowledge modules - covering anything from coding standards and troubleshooting runbooks to business process documentation - and attach them to any AI Agent so it responds with context-specific accuracy.
+Skills are your way of giving AI agents domain expertise. The **Skills** page lets you create, edit, and manage knowledge modules - covering anything from coding standards and troubleshooting runbooks to business process documentation - and attach them to any AI Agent so it responds with context-specific accuracy.
 
 Skills follow the [agentskills.io](https://agentskills.io) SKILL.md format, so a `.skill` archive you author in ByteChef can be shared with other agentskills.io-compatible tooling and vice-versa.
 
-![Skills page with sidebar list and detail view](skills/skills-list.png)
+![Skills page listing every skill in the organization](skills/skills-list.png)
 
 ---
 
@@ -19,11 +19,11 @@ Package specialized knowledge - coding guidelines, API references, troubleshooti
 
 ### Reuse Across Agents
 
-Skills are shared across all agents in your workspace. Create a skill once and attach it to any agent that needs that knowledge.
+Skills are shared across every agent in your organization. They are not scoped to a workspace, so a skill created once is available to attach in any project, in any workflow.
 
 ### Edit in Place
 
-Open any skill, switch between a rendered **Preview** and the raw **Source**, edit either markdown or arbitrary archive files inline, and save without leaving the page. Frontmatter (`name`, `description`) syncs to the database on save, so renames are reflected immediately in the sidebar, search, and skill list.
+Open any skill, switch between a rendered **Preview** and the raw **Source**, edit either markdown or arbitrary archive files inline, and save without leaving the page. Frontmatter (`name`, `description`) syncs to the database on save, so renames are reflected immediately in the page header, search, and skill list.
 
 ### Choose Your Creation Method
 
@@ -33,26 +33,29 @@ Create skills the way that works best for you: write instructions directly, uplo
 
 ## Accessing Skills
 
-Skills live under **AI → Skills** in the automation navigation. The page has two layouts:
+Skills live under **Settings → AI → Skills**. They belong to the organization rather than to one workspace, so the page is mounted under both platforms' settings - `/automation/settings/ai/skills` and `/embedded/settings/ai/skills` - and either mount lists the same skills. Links inside the page keep you on the mount you arrived from.
 
-- **List view** - opens by default. Shows every skill in the workspace as a clickable row with name, description, and modified date.
-- **Detail view** - opens when you click a skill. Replaces the AI section nav with a **Skills sidebar** (search + clickable entries with the current skill highlighted) so you can switch between skills without going back to the list.
+The page has two layouts:
 
-The sidebar header has a **+** icon that opens the same **Create Skill** dropdown as the list page, so you can create a new skill without leaving the detail surface.
+- **List view** - opens by default. Shows every skill as a clickable row with name, description, tags, and modified date.
+- **Detail view** - opens when you click a skill. The header swaps to the skill's name behind a **back arrow** that returns to the list, and the toolbar swaps to the editing controls described below.
 
 ---
 
 ## Viewing Skills
 
-The Skills list shows all skills in your workspace. Each row displays:
+The Skills list shows every skill in your organization. Each row displays:
 
 | Field | Description |
 |---|---|
 | **Name** | The skill's name (must follow the agentskills.io format - see [Skill File Format](#skill-file-format)) |
 | **Description** | A brief summary of what the skill covers |
+| **Tags** | The tags assigned to the skill, editable inline on the row |
 | **Modified Date** | When the skill was last updated |
 
-Use the **search bar** at the top to filter skills by name.
+Use the **search bar** at the top to filter skills by name, and the **filter** button beside it to narrow the list to a single tag.
+
+An active tag appears as a chip above the list, with its own clear button and a **Clear all** link. The selection is held in the URL as `?tagId=`, so a filtered list survives a reload and can be bookmarked or handed to a colleague as a link.
 
 Click any skill to open the **detail view**. The detail view contains:
 
@@ -83,7 +86,7 @@ For non-markdown files (`.json`, `.yaml`, `.txt`, code files, etc.) the Monaco e
 
 The **Save** button in the header enables as soon as the editor content differs from what was last loaded. Click it to persist the change.
 
-When you save a `SKILL.md` file, ByteChef parses the YAML frontmatter and writes the `name` / `description` fields back to the database **before** writing the file body - so any validation error (invalid kebab-case name, description over 1024 chars, etc.) surfaces *before* the on-disk file is touched. The sidebar, page header, and skill list all read the DB-backed metadata, so a frontmatter rename is reflected everywhere immediately.
+When you save a `SKILL.md` file, ByteChef parses the YAML frontmatter and writes the `name` / `description` fields back to the database **before** writing the file body - so any validation error (invalid kebab-case name, description over 1024 chars, etc.) surfaces *before* the on-disk file is touched. The page header and skill list both read the DB-backed metadata, so a frontmatter rename is reflected everywhere immediately.
 
 ### Skill Actions
 
@@ -135,7 +138,7 @@ Supported file formats:
 
 You can drag and drop or click to browse. Multiple files can be uploaded at once - each file creates a separate skill. For `.md` files, the skill `name` and `description` are extracted from YAML frontmatter when present.
 
-If you upload a single file from the **detail view**, ByteChef navigates straight to the newly-created skill once the upload completes. Multi-file uploads instead refresh the sidebar and leave you on the current skill.
+If you upload a single file from the **detail view**, ByteChef navigates straight to the newly-created skill once the upload completes. Multi-file uploads instead refresh the skill list and leave you where you are.
 
 ### Create With AI
 
@@ -304,7 +307,7 @@ There is no hard limit. Keep in mind that attaching many large skills to a singl
 
 <Accordion title="Can I share skills between agents?">
 
-Yes. Skills are shared across your workspace. Any skill you create is available to attach to any AI agent in any workflow, and to the Skills tool in [aiAgentUtils/v1](/reference/components/ai_agent-utils_v1).
+Yes. Skills are shared across your organization. Any skill you create is available to attach to any AI agent in any workflow, and to the Skills tool in [aiAgentUtils/v1](/reference/components/ai_agent-utils_v1).
 
 </Accordion>
 
@@ -322,19 +325,19 @@ When a skill is attached to an agent (via the Skills tool), the agent receives t
 
 <Accordion title="Can I edit a skill after creating it?">
 
-Yes - both metadata (name, description) and file contents are editable directly from the detail view. Renames sync to the database on save so the change is reflected in the sidebar and skill list immediately.
+Yes - both metadata (name, description) and file contents are editable directly from the detail view. Renames sync to the database on save so the change is reflected in the page header and skill list immediately.
 
 </Accordion>
 
 <Accordion title="What happens if I delete a skill that's attached to an agent?">
 
-The skill is removed from the workspace and no longer appears in the agent's Skills tool catalogue. Agents continue to function but without the knowledge that skill provided.
+The skill is removed from the organization and no longer appears in the agent's Skills tool catalogue. Agents continue to function but without the knowledge that skill provided.
 
 </Accordion>
 
 <Accordion title="Why does ByteChef enforce the agentskills.io name/description rules?">
 
-Two reasons. First, it keeps `.skill` archives portable to (and from) any agentskills.io-compatible tool. Second, the constraints - short kebab-case names, bounded descriptions - keep the agent's tool catalogue legible at scale; a workspace with 200 skills is still skimmable when names follow a predictable shape.
+Two reasons. First, it keeps `.skill` archives portable to (and from) any agentskills.io-compatible tool. Second, the constraints - short kebab-case names, bounded descriptions - keep the agent's tool catalogue legible at scale; an organization with 200 skills is still skimmable when names follow a predictable shape.
 
 </Accordion>
 
