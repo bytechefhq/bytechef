@@ -236,6 +236,29 @@ const platformSettingsRoutes = {
             ),
             path: 'ai-providers',
         },
+        // Tenant-wide, unlike the workspace-scoped settings pages: ai_skill carries no workspace_id and
+        // AiSkillApiFacade.getAiSkills() takes no scope argument, so the page belongs to the organization
+        // group — and therefore appears under BOTH the /automation and /embedded settings mounts.
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <LazyLoadWrapper>
+                        <AiSkills />
+                    </LazyLoadWrapper>
+                </PrivateRoute>
+            ),
+            path: 'ai/skills',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <LazyLoadWrapper>
+                        <AiSkills />
+                    </LazyLoadWrapper>
+                </PrivateRoute>
+            ),
+            path: 'ai/skills/:skillId',
+        },
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
@@ -359,8 +382,17 @@ const platformSettingsRoutes = {
             title: 'Billing',
         },
         {
-            href: 'ai-providers',
-            title: 'AI Providers',
+            items: [
+                {
+                    href: 'ai-providers',
+                    title: 'Providers',
+                },
+                {
+                    href: 'ai/skills',
+                    title: 'Skills',
+                },
+            ],
+            title: 'AI',
         },
         {
             href: 'mcp-server',
@@ -759,49 +791,32 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'approval-tasks',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/ai/skills'),
+                                    loader: async () => redirect('/automation/settings/ai/skills'),
                                     path: 'ai',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AiSkills />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
+                                    loader: async () => redirect('/automation/settings/ai/skills'),
                                     path: 'ai/skills',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/ai/skills'),
+                                    loader: async () => redirect('/automation/settings/ai/skills'),
                                     path: 'ai/skills/create',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/ai/skills'),
+                                    loader: async () => redirect('/automation/settings/ai/skills'),
                                     path: 'ai/skills/create/write',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/ai/skills'),
+                                    loader: async () => redirect('/automation/settings/ai/skills'),
                                     path: 'ai/skills/create/upload',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AiSkills />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
+                                    loader: async () => redirect('/automation/settings/ai/skills'),
                                     path: 'ai/skills/create/ai',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AiSkills />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
+                                    loader: async ({params}) =>
+                                        redirect(`/automation/settings/ai/skills/${params.skillId}`),
                                     path: 'ai/skills/:skillId',
                                 },
                                 {

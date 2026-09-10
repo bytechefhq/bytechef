@@ -8,47 +8,51 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
-import AiSkillsLeftSidebar from '@/pages/automation/ai/skills/components/AiSkillsLeftSidebar';
+import useAiSkillsTagFilterGroups from '@/pages/automation/ai/skills/hooks/useAiSkillsTagFilterGroups';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
+import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import FilterBadges from '@/shared/components/filters/FilterBadges';
+import FilterMenu, {hasActiveFilters} from '@/shared/components/filters/FilterMenu';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
+    ArrowLeftIcon,
     CodeIcon,
     DownloadIcon,
     EyeIcon,
     MoreVerticalIcon,
-    Plus,
     SaveIcon,
     SearchIcon,
     SparklesIcon,
     Trash2Icon,
 } from 'lucide-react';
 import {useEffect} from 'react';
-import {useLocation, useParams} from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-type AiSkillsRouteType = 'createWithAi' | 'detail' | 'list';
+type AiSkillsRouteType = 'detail' | 'list';
 
-const determineRoute = (skillId: string | undefined, pathname: string): AiSkillsRouteType => {
-    if (pathname.endsWith('/create/ai')) {
-        return 'createWithAi';
-    }
-
+const determineRoute = (skillId: string | undefined): AiSkillsRouteType => {
     return skillId ? 'detail' : 'list';
 };
 
 const AiSkills = () => {
     const {skillId} = useParams<{skillId?: string}>();
+
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const tagFilterGroups = useAiSkillsTagFilterGroups();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
@@ -72,13 +76,15 @@ const AiSkills = () => {
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        return useCopilotPostTurnRegistry.getState().register(Source.SKILLS, () => {
-            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+        return registerPostTurn(Source.SKILLS, () => {
+            invalidateSkillQueries(queryClient);
         });
-    }, [queryClient, skillsView]);
+    }, [queryClient, registerPostTurn]);
 
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
@@ -95,46 +101,44 @@ const AiSkills = () => {
         });
     }, []);
 
-    const route = determineRoute(skillId, location.pathname);
-
-    const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
+    const route = determineRoute(skillId);
 
     useEffect(() => {
         if (route === 'detail' && skillId && selectedSkillId !== skillId) {
             openSkillDetail(skillId, '');
-        } else if (route === 'createWithAi' && skillsView !== 'createWithAi') {
-            setSkillsView('createWithAi');
-        } else if (route === 'list' && (skillsView === 'detail' || skillsView === 'createWithAi')) {
+        } else if (route === 'list' && skillsView === 'detail') {
             closeSkillDetail();
         }
-    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, setSkillsView, skillId, skillsView]);
+    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, skillId, skillsView]);
 
-    const headerTitle =
-        route === 'detail'
-            ? (skillsHeaderInfo.title ?? 'Skill')
-            : route === 'createWithAi'
-              ? 'Create Skill with AI'
-              : 'Skills';
+    const headerTitle = route === 'detail' ? (skillsHeaderInfo.title ?? 'Skill') : 'AI Skills';
 
-    const showToolbar = route === 'list' && skillsView !== 'empty';
+    const showToolbar = route === 'list';
+    const showSearchAndCreate = skillsView !== 'empty';
 
     let toolbarRight: React.ReactNode = undefined;
 
     if (showToolbar) {
         toolbarRight = (
             <div className="flex items-center gap-2">
-                <div className="relative">
-                    <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
+                {showSearchAndCreate && (
+                    <div className="relative">
+                        <SearchIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-content-neutral-tertiary" />
 
-                    <Input
-                        className="w-64 pl-9"
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        placeholder="Search skills..."
-                        value={searchQuery}
-                    />
-                </div>
+                        <Input
+                            className="w-64 pl-9"
+                            onChange={(event) => setSearchQuery(event.target.value)}
+                            placeholder="Search skills..."
+                            value={searchQuery}
+                        />
+                    </div>
+                )}
 
-                <AiSkillsCreateDropdown />
+                {showSearchAndCreate && <FilterMenu groups={tagFilterGroups} title="Filter Skills" />}
+
+                <CopilotButton source={Source.SKILLS} />
+
+                {showSearchAndCreate && <AiSkillsCreateDropdown />}
             </div>
         );
     } else if (route === 'detail' && handlers) {
@@ -205,10 +209,7 @@ const AiSkills = () => {
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem
-                            className="text-content-destructive focus:text-content-destructive-primary"
-                            onClick={handlers.onDelete}
-                        >
+                        <DropdownMenuItem onClick={handlers.onDelete} variant="destructive">
                             <Trash2Icon className="mr-2 size-4" /> Delete Skill
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -218,44 +219,47 @@ const AiSkills = () => {
     }
 
     const isDetailView = route === 'detail';
-    const createWithAiOrigin = (location.state as {origin?: 'detail' | 'list'} | null)?.origin;
-    const showSkillsSidebar = isDetailView || (route === 'createWithAi' && createWithAiOrigin === 'detail');
 
-    const leftSidebarBody = showSkillsSidebar ? (
-        <AiSkillsLeftSidebar currentId={skillId} />
-    ) : (
-        <AiSidebarNav currentSection="skills" />
-    );
+    const skillsBasePath = getAiSkillsBasePath(location.pathname);
 
-    const leftSidebarHeader = showSkillsSidebar ? (
-        <Header
-            position="sidebar"
-            right={
-                <AiSkillsCreateDropdown
-                    trigger={
-                        <Button
-                            aria-label="Create skill"
-                            icon={<Plus className="size-4" />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    }
-                />
-            }
-            title="Skills"
-        />
+    // The detail view used to keep a skills-list sidebar for switching between skills. Inside Settings the
+    // only sidebar on screen is the settings nav, so the way back to the list is an explicit control instead
+    // — the CustomComponentDetail idiom, which solves the same problem one settings entry over.
+    const headerTitleContent = isDetailView ? (
+        <div className="flex items-center gap-2">
+            <Button
+                aria-label="Back to skills"
+                icon={<ArrowLeftIcon className="size-5" />}
+                onClick={() => navigate(skillsBasePath)}
+                size="icon"
+                variant="ghost"
+            />
+
+            <span>{headerTitle}</span>
+        </div>
     ) : (
-        <Header position="sidebar" title="AI" />
+        headerTitle
     );
 
     return (
         <LayoutContainer
-            header={<Header centerTitle position="main" right={toolbarRight} title={headerTitle} />}
-            leftSidebarBody={leftSidebarBody}
-            leftSidebarHeader={leftSidebarHeader}
-            leftSidebarWidth="64"
+            header={
+                <Header
+                    description={isDetailView ? undefined : 'Reusable instructions any AI agent can load.'}
+                    position="main"
+                    right={toolbarRight}
+                    title={headerTitleContent}
+                />
+            }
+            leftSidebarOpen={false}
         >
             <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
+                {showToolbar && showSearchAndCreate && hasActiveFilters(tagFilterGroups) && (
+                    <div className="flex flex-wrap items-center gap-2 pt-0 pb-4">
+                        <FilterBadges groups={tagFilterGroups} />
+                    </div>
+                )}
+
                 <AiSkillsPanel />
             </div>
         </LayoutContainer>

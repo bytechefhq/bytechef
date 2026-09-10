@@ -9,6 +9,7 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
+import AiSkillListItemTagList from '@/pages/automation/ai/skills/components/AiSkillListItemTagList';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
 import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon} from 'lucide-react';
@@ -35,7 +36,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
     return (
         <>
             <div
-                className="mb-2 flex cursor-pointer items-center justify-between gap-6 rounded border border-border/50 px-2 py-4 hover:bg-destructive-foreground"
+                className="mb-2 flex cursor-pointer items-center justify-between gap-6 rounded border border-border/50 px-2 py-3 hover:bg-surface-neutral-primary-hover"
                 onClick={handleClick}
             >
                 <div className="min-w-0 flex-1">
@@ -46,6 +47,14 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                             {skill.description}
                         </div>
                     )}
+
+                    <div
+                        className="mt-2 flex items-center"
+                        onClick={(event) => event.stopPropagation()}
+                        role="presentation"
+                    >
+                        <AiSkillListItemTagList skillId={skill.id} tags={skill.tags ?? []} />
+                    </div>
                 </div>
 
                 <div className="flex shrink-0 items-center gap-4">
@@ -83,8 +92,8 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                                <TrashIcon className="mr-2 size-4" />
+                            <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} variant="destructive">
+                                <TrashIcon className="mr-2 size-4 text-content-destructive" />
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
