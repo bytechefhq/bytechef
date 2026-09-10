@@ -19,6 +19,7 @@ const PROMPT_FIELDS = [
         editorClassName: 'min-h-[100px]',
         path: 'userPrompt',
         placeholder: "The message sent to the agent on each execution. Use '$' to insert data pills.",
+        required: true,
         title: 'User input:',
     },
     {
@@ -58,6 +59,7 @@ export function AiAgentConfigurationPanel() {
                     key={field.path}
                     path={field.path}
                     placeholder={field.placeholder}
+                    required={field.required}
                     taskDispatcherDefinitions={taskDispatcherDefinitions}
                     title={field.title}
                     workflow={workflow}
