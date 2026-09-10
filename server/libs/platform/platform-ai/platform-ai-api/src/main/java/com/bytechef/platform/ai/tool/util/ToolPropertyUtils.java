@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.platform.ai.tool.constant.ToolConstants;
 import com.bytechef.platform.component.domain.Property;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
@@ -57,5 +58,17 @@ public class ToolPropertyUtils {
                 .controlType(ControlType.TEXT_AREA)
                 .expressionEnabled(false)
                 .required(false));
+    }
+
+    public static boolean isToolOverrideProperty(Property property) {
+        String name = property.getName();
+
+        return ToolConstants.TOOL_NAME.equals(name) || ToolConstants.TOOL_DESCRIPTION.equals(name);
+    }
+
+    public static List<? extends Property> withoutToolOverrideProperties(List<? extends Property> properties) {
+        return properties.stream()
+            .filter(property -> !isToolOverrideProperty(property))
+            .toList();
     }
 }
