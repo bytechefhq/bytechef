@@ -59,7 +59,12 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                 </div>
             ) : (
                 <ResizablePanelGroup className="px-2" orientation="horizontal">
-                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
+                    <ResizablePanel
+                        className="flex min-h-0 flex-col overflow-hidden"
+                        defaultSize={40}
+                        groupResizeBehavior="preserve-pixel-size"
+                        minSize={15}
+                    >
                         <ScrollArea className="mb-4 h-full pr-4">
                             <Accordion
                                 className="ml-2 space-y-2"
@@ -94,7 +99,7 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
 
                     <ResizableHandle />
 
-                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
+                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={60} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
                             dialogOpen={dialogOpen}

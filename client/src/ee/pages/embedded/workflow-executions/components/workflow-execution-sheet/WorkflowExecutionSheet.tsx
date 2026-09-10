@@ -91,8 +91,9 @@ const WorkflowExecutionSheet = () => {
                     <div className="flex min-h-0 flex-1 p-3">
                         <ResizablePanelGroup className="h-full" orientation="horizontal">
                             <ResizablePanel
-                                className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
-                                defaultSize={50}
+                                className="flex min-h-0 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
+                                defaultSize={65}
+                                minSize={35}
                             >
                                 {workflowExecution?.job && (
                                     <WorkflowExecutionSheetContent
@@ -104,7 +105,11 @@ const WorkflowExecutionSheet = () => {
 
                             <ResizableHandle className="mx-2.5" withHandle />
 
-                            <ResizablePanel className="flex min-h-0 w-1/2 flex-col overflow-hidden" defaultSize={50}>
+                            <ResizablePanel
+                                className="flex min-h-0 flex-col overflow-hidden"
+                                defaultSize={35}
+                                minSize={15}
+                            >
                                 {workflowExecution && (
                                     <WorkflowReadOnlyProvider
                                         value={{
