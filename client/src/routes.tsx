@@ -201,6 +201,10 @@ const currentWorkspaceSettingsRoutes = {
     ],
 };
 
+const organizationSettingsNavItem = {
+    title: 'Organization',
+};
+
 // Platform settings routes
 const platformSettingsRoutes = {
     children: [
@@ -234,9 +238,6 @@ const platformSettingsRoutes = {
             ),
             path: 'ai-providers',
         },
-        // Tenant-wide, unlike the workspace-scoped settings pages: ai_skill carries no workspace_id and
-        // AiSkillApiFacade.getAiSkills() takes no scope argument, so the page belongs to the organization
-        // group — and therefore appears under BOTH the /automation and /embedded settings mounts.
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
@@ -368,9 +369,6 @@ const platformSettingsRoutes = {
         },
     ],
     navItems: [
-        {
-            title: 'Organization',
-        },
         {
             href: 'users',
             title: 'Users',
@@ -843,11 +841,12 @@ export const getRouter = (queryClient: QueryClient) =>
                                     element: (
                                         <Settings
                                             sidebarNavItems={[
+                                                ...currentWorkspaceSettingsRoutes.navItems,
+                                                organizationSettingsNavItem,
                                                 {
                                                     href: '/automation/settings/workspaces',
                                                     title: 'Workspaces',
                                                 },
-                                                ...currentWorkspaceSettingsRoutes.navItems,
                                                 ...platformSettingsRoutes.navItems,
                                             ]}
                                         />
@@ -1040,6 +1039,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                                     href: '/embedded/settings/api-keys',
                                                     title: 'API Keys',
                                                 },
+                                                organizationSettingsNavItem,
                                                 ...platformSettingsRoutes.navItems,
                                             ]}
                                         />

@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const SidebarSubtitle = ({title}: {title: string}) => (
-    <h4 className="px-2 py-1 pr-4 text-sm font-medium tracking-tight text-muted-foreground">{title}</h4>
+    <h4 className="px-2 pr-4 pb-1 text-sm font-medium tracking-tight text-muted-foreground">{title}</h4>
 );
 
 const SKELETON_ROW_WIDTHS = ['w-3/4', 'w-1/2', 'w-2/3', 'w-3/5', 'w-4/5'];
