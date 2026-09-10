@@ -226,6 +226,12 @@ export type AiSkill = {
   /** Epoch milliseconds (UTC) */
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   name: Scalars['String']['output'];
+  tags: Array<Tag>;
+};
+
+export type AiSkillTagInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name: Scalars['String']['input'];
 };
 
 export type ApiCollectionSearchResult = SearchResult & {
@@ -1585,6 +1591,7 @@ export type Mutation = {
   updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
   updateAiSkill: AiSkill;
   updateAiSkillContent: AiSkill;
+  updateAiSkillTags: AiSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
@@ -2235,6 +2242,12 @@ export type MutationUpdateAiSkillContentArgs = {
 };
 
 
+export type MutationUpdateAiSkillTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags?: InputMaybe<Array<AiSkillTagInput>>;
+};
+
+
 export type MutationUpdateApiConnectorArgs = {
   id: Scalars['ID']['input'];
   input: UpdateApiConnectorInput;
@@ -2646,6 +2659,7 @@ export type Query = {
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
   aiSkillFilePaths: Array<Scalars['String']['output']>;
+  aiSkillTags: Array<Tag>;
   aiSkills: Array<AiSkill>;
   apiConnector?: Maybe<ApiConnector>;
   apiConnectors: Array<ApiConnector>;
