@@ -32,7 +32,7 @@ import {
     WorkflowExecution as AutomationWorkflowExecution,
     WorkflowExecutionFromJSON as AutomationWorkflowExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
-import {ConnectedUserProject} from '@/shared/middleware/graphql';
+import {ConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -68,7 +68,9 @@ const jobStatusOptions = [
     },
 ];
 
-const ConnectedUserLabel = ({project}: {project: ConnectedUserProject}) => (
+type ConnectedUserProjectType = ConnectedUserProjectsQuery['connectedUserProjects'][number];
+
+const ConnectedUserLabel = ({project}: {project: ConnectedUserProjectType}) => (
     <div className="flex items-center">
         <span className="mr-1">User {project.connectedUser.externalId}</span>
     </div>

@@ -64,6 +64,7 @@ import {
     positionConditionCasePlaceholders,
     positionOnErrorCasePlaceholders,
     pullSimpleOnErrorChildrenInward,
+    rendersClusterElements,
     separateOverlappingConditionChildren,
     separateOverlappingOnErrorChildren,
     shiftConditionBranchContent,
@@ -124,8 +125,8 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
         return 2;
     }
 
-    if (node.type === 'clusterRoot') {
-        return hasConfiguredClusterElements(node) ? 240 : 72;
+    if (rendersClusterElements(node)) {
+        return 240;
     }
 
     return 72;
@@ -148,14 +149,14 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
             width = PLACEHOLDER_NODE_HEIGHT;
         } else if (node.type === 'placeholder') {
             width = height;
-        } else if (node.type === 'clusterRoot') {
-            width = hasConfiguredClusterElements(node) ? 292 : 120;
+        } else if (rendersClusterElements(node)) {
+            width = 292;
         }
 
         return {height: NODE_WIDTH, width};
     }
 
-    if (node.type === 'clusterRoot' && hasConfiguredClusterElements(node)) {
+    if (rendersClusterElements(node)) {
         return {height, width: CLUSTER_ROOT_NODE_WIDTH};
     }
 

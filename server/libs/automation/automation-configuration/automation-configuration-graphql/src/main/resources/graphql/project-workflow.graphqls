@@ -32,11 +32,6 @@ type SharedWorkflow {
     publicUrl: String
 }
 
-type SharedWorkflowInfo {
-    description: String
-    label: String!
-}
-
 type WorkflowTemplate {
     authorEmail: String
     authorName: String
@@ -49,5 +44,5 @@ type WorkflowTemplate {
     description: String
     projectVersion: Int
     publicUrl: String
-    workflow: SharedWorkflowInfo!
+    workflow: Workflow!
 }

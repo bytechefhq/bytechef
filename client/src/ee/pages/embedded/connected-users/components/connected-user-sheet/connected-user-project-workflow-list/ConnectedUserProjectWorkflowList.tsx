@@ -1,10 +1,11 @@
-import ConnectedUserProjectWorkflowListItem from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
-import {ConnectedUserProjectWorkflow} from '@/shared/middleware/graphql';
+import ConnectedUserProjectWorkflowListItem, {
+    ConnectedUserProjectWorkflowType,
+} from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-project-workflow-list/ConnectedUserProjectWorkflowListItem';
 
 const ConnectedUserProjectWorkflowList = ({
     connectedUserProjectWorkflows,
 }: {
-    connectedUserProjectWorkflows: ConnectedUserProjectWorkflow[];
+    connectedUserProjectWorkflows: ConnectedUserProjectWorkflowType[];
 }) => {
     return (
         <ul>

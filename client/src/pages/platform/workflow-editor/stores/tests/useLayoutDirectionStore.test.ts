@@ -134,4 +134,58 @@ describe('useLayoutDirectionStore', () => {
 
         expect(result.current.layoutDirection).toBe('TB');
     });
+    it('resets to TB without forgetting the workflow saved direction', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            result.current.setCurrentWorkflowUuid('workflow-1');
+        });
+
+        act(() => {
+            result.current.setLayoutDirection('LR');
+        });
+
+        act(() => {
+            result.current.resetLayoutDirection();
+        });
+
+        expect(result.current.layoutDirection).toBe('TB');
+        expect(result.current.directionsByWorkflowUuid['workflow-1']).toBe('LR');
+    });
+
+    it('applies the saved direction of the current workflow again', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            useLayoutDirectionStore.setState({
+                currentWorkflowUuid: 'workflow-1',
+                directionsByWorkflowUuid: {'workflow-1': 'LR'},
+                layoutDirection: 'TB',
+            });
+        });
+
+        act(() => {
+            result.current.applyStoredLayoutDirection();
+        });
+
+        expect(result.current.layoutDirection).toBe('LR');
+    });
+
+    it('applies TB when the current workflow has no saved direction', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            useLayoutDirectionStore.setState({
+                currentWorkflowUuid: 'workflow-2',
+                directionsByWorkflowUuid: {'workflow-1': 'LR'},
+                layoutDirection: 'LR',
+            });
+        });
+
+        act(() => {
+            result.current.applyStoredLayoutDirection();
+        });
+
+        expect(result.current.layoutDirection).toBe('TB');
+    });
 });

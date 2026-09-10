@@ -2,11 +2,12 @@ import Button from '@/components/Button/Button';
 import {ComboBoxItemType} from '@/components/ComboBox';
 import ComponentRow from '@/pages/automation/template/components/ComponentRow';
 import TemplateLayoutContainer from '@/pages/automation/template/components/TemplateLayoutContainer';
+import WorkflowTemplatePreview from '@/pages/automation/template/components/WorkflowTemplatePreview';
 import ProjectsComboBox from '@/pages/automation/template/workflow-template/components/ProjectsComboBox';
-import WorkflowPreviewSvg from '@/pages/automation/template/workflow-template/components/WorkflowPreviewSvg';
 import {useImportWorkflowTemplateMutation, useWorkflowTemplateQuery} from '@/shared/middleware/graphql';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
 const WorkflowTemplate = ({
@@ -49,6 +50,30 @@ const WorkflowTemplate = ({
     const handleOnChange = (item?: ComboBoxItemType) => {
         setSelectedProjectId(item?.value);
     };
+
+    const previewWorkflow = useMemo<Workflow | undefined>(() => {
+        const templateWorkflow = workflowTemplate?.workflow;
+
+        if (!templateWorkflow) {
+            return undefined;
+        }
+
+        return {
+            description: templateWorkflow.description ?? undefined,
+            label: templateWorkflow.label,
+            tasks: templateWorkflow.tasks.map((task) => ({
+                ...task,
+                description: task.description ?? undefined,
+                label: task.label ?? undefined,
+                node: task.node ?? undefined,
+            })),
+            triggers: templateWorkflow.triggers.map((trigger) => ({
+                ...trigger,
+                description: trigger.description ?? undefined,
+                label: trigger.label ?? undefined,
+            })),
+        };
+    }, [workflowTemplate?.workflow]);
 
     return (
         <TemplateLayoutContainer fromInternalFlow={fromInternalFlow}>
@@ -101,9 +126,7 @@ const WorkflowTemplate = ({
             </div>
 
             <div className="flex w-5/12 flex-col bg-muted">
-                <div className="flex flex-1 items-center justify-center">
-                    <WorkflowPreviewSvg className="h-auto max-w-full opacity-90" />
-                </div>
+                {previewWorkflow && <WorkflowTemplatePreview workflow={previewWorkflow} />}
             </div>
         </TemplateLayoutContainer>
     );

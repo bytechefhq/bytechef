@@ -53,6 +53,7 @@ import {isWorkflowMutating} from '../utils/workflowMutationGuard';
 interface UseWorkflowEditorCanvasParamsI {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
+    fitViewOnLoad?: boolean;
     leftSidebarOpen?: boolean;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
@@ -61,6 +62,7 @@ interface UseWorkflowEditorCanvasParamsI {
 const useWorkflowEditorCanvas = ({
     componentDefinitions,
     customCanvasWidth,
+    fitViewOnLoad,
     leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -80,12 +82,15 @@ const useWorkflowEditorCanvas = ({
             setNodes: state.setNodes,
         }))
     );
-    const {layoutDirection, setCurrentWorkflowUuid} = useLayoutDirectionStore(
-        useShallow((state) => ({
-            layoutDirection: state.layoutDirection,
-            setCurrentWorkflowUuid: state.setCurrentWorkflowUuid,
-        }))
-    );
+    const {applyStoredLayoutDirection, layoutDirection, resetLayoutDirection, setCurrentWorkflowUuid} =
+        useLayoutDirectionStore(
+            useShallow((state) => ({
+                applyStoredLayoutDirection: state.applyStoredLayoutDirection,
+                layoutDirection: state.layoutDirection,
+                resetLayoutDirection: state.resetLayoutDirection,
+                setCurrentWorkflowUuid: state.setCurrentWorkflowUuid,
+            }))
+        );
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
@@ -553,8 +558,22 @@ const useWorkflowEditorCanvas = ({
     const workflowUuid = workflow.workflowUuid;
 
     useEffect(() => {
-        if (workflowUuid) {
+        if (!readOnlyWorkflow) {
+            return;
+        }
+
+        resetLayoutDirection();
+
+        return () => applyStoredLayoutDirection();
+    }, [applyStoredLayoutDirection, readOnlyWorkflow, resetLayoutDirection]);
+
+    useEffect(() => {
+        if (workflowUuid && !readOnlyWorkflow) {
             setCurrentWorkflowUuid(workflowUuid);
+        }
+
+        if (fitViewOnLoad) {
+            return;
         }
 
         setViewport(

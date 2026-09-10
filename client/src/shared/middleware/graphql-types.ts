@@ -552,7 +552,6 @@ export type ComponentDefinitionTuple = {
   value: Array<Maybe<ComponentDefinition>>;
 };
 
-/** Which kind of operation a component's properties belong to. */
 export enum ComponentOperationType {
   Action = 'ACTION',
   ClusterElement = 'CLUSTER_ELEMENT',
@@ -2685,11 +2684,6 @@ export type Query = {
   componentDefinitionSearch: Array<ComponentDefinition>;
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
-  /**
-   * Display conditions for an operation's properties evaluated against a standalone parameter map, for property
-   * forms that have no workflow — a tool config dialog, an MCP tool popover, a connection dialog. Returns the
-   * conditions that hold; a condition absent from the map is false.
-   */
   componentPropertyDisplayConditions: Scalars['Map']['output'];
   connectedUser?: Maybe<ConnectedUser>;
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
@@ -3565,12 +3559,6 @@ export type SharedWorkflow = {
   publicUrl?: Maybe<Scalars['String']['output']>;
 };
 
-export type SharedWorkflowInfo = {
-  __typename?: 'SharedWorkflowInfo';
-  description?: Maybe<Scalars['String']['output']>;
-  label: Scalars['String']['output'];
-};
-
 export type StringProperty = Property & {
   __typename?: 'StringProperty';
   advancedOption?: Maybe<Scalars['Boolean']['output']>;
@@ -3727,6 +3715,7 @@ export type Workflow = {
   label: Scalars['String']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  tasks: Array<WorkflowTask>;
   triggers: Array<WorkflowTrigger>;
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -3755,6 +3744,19 @@ export type WorkflowSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+export type WorkflowTask = {
+  __typename?: 'WorkflowTask';
+  clusterElements?: Maybe<Scalars['Map']['output']>;
+  clusterRoot: Scalars['Boolean']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<Scalars['Map']['output']>;
+  name: Scalars['String']['output'];
+  node?: Maybe<Scalars['String']['output']>;
+  parameters?: Maybe<Scalars['Map']['output']>;
+  type: Scalars['String']['output'];
+};
+
 export type WorkflowTemplate = {
   __typename?: 'WorkflowTemplate';
   authorEmail?: Maybe<Scalars['String']['output']>;
@@ -3768,7 +3770,7 @@ export type WorkflowTemplate = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   projectVersion?: Maybe<Scalars['Int']['output']>;
   publicUrl?: Maybe<Scalars['String']['output']>;
-  workflow: SharedWorkflowInfo;
+  workflow: Workflow;
 };
 
 export type WorkflowTrigger = {
