@@ -2,6 +2,7 @@ type Workflow {
     id: ID!
     description: String
     label: String!
+    tasks: [WorkflowTask!]!
     triggers: [WorkflowTrigger!]!
     createdBy: String
     createdDate: Long

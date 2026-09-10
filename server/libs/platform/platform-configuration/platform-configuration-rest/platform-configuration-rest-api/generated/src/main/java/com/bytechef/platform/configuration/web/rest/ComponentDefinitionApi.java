@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.504637+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-10T08:14:40.409512+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition Internal API")
 public interface ComponentDefinitionApi {
@@ -117,7 +117,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 } ]";
+                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"clusterRoot\" : true, \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"clusterRoot\" : true, \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -201,7 +201,7 @@ public interface ComponentDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 } ]";
+                    String exampleString = "[ { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"clusterRoot\" : true, \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 }, { \"componentCategories\" : [ { \"name\" : \"name\", \"label\" : \"label\" }, { \"name\" : \"name\", \"label\" : \"label\" } ], \"clusterRoot\" : true, \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"clusterElementsCount\" : { \"key\" : 6 }, \"description\" : \"description\", \"inputsCount\" : 1, \"title\" : \"title\", \"version\" : 5, \"triggersCount\" : 5 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

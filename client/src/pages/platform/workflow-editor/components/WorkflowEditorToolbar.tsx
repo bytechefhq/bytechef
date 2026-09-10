@@ -42,7 +42,7 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
     const {canRedo, canUndo, handleRedo, handleUndo} = useWorkflowUndoRedo();
 
     const taskCount = nodes.filter(
-        (node) => node.type === 'workflow' && !(node.data as NodeDataType).taskDispatcher
+        (node) => (node.type === 'workflow' || node.type === 'readonly') && !(node.data as NodeDataType).taskDispatcher
     ).length;
 
     const handleZoomIn = useCallback(() => zoomIn({duration: 300}), [zoomIn]);
@@ -151,24 +151,25 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
                         </TooltipContent>
                     </Tooltip>
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                disabled={readOnly}
-                                icon={<BrushCleaningIcon />}
-                                onClick={handleClear}
-                                size="icon"
-                                variant="outline"
-                            />
-                        </TooltipTrigger>
+                    {!readOnly && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    icon={<BrushCleaningIcon />}
+                                    onClick={handleClear}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
 
-                        <TooltipContent
-                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
-                            side="top"
-                        >
-                            Reset layout
-                        </TooltipContent>
-                    </Tooltip>
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                Reset layout
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
                 </ButtonGroup>
 
                 {enableUndoRedo && !readOnly && (

@@ -21,14 +21,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.dto.SharedWorkflowDTO;
 import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -41,6 +47,7 @@ import org.springframework.test.context.ContextConfiguration;
     AutomationConfigurationGraphQlTestConfiguration.class,
     ProjectWorkflowGraphQlController.class,
 })
+@ExtendWith(ObjectMapperSetupExtension.class)
 @GraphQlTest(
     controllers = ProjectWorkflowGraphQlController.class,
     properties = {
@@ -138,10 +145,10 @@ public class ProjectWorkflowGraphQlControllerIntTest {
         // Given
         WorkflowTemplateDTO w1 = new WorkflowTemplateDTO(
             null, null, null, null, List.of("cat"), List.of(), "W Desc 1", "w-tpl-1", Instant.now(), 1, null,
-            new WorkflowTemplateDTO.WorkflowInfo("WF Label 1", "WF D1"));
+            workflowDTO("WF Label 1", "WF D1"));
         WorkflowTemplateDTO w2 = new WorkflowTemplateDTO(
             null, null, null, null, List.of("cat"), List.of(), "W Desc 2", "w-tpl-2", Instant.now(), 1, null,
-            new WorkflowTemplateDTO.WorkflowInfo("WF Label 2", "WF D2"));
+            workflowDTO("WF Label 2", "WF D2"));
 
         when(projectWorkflowFacade.getPreBuiltWorkflowTemplates(anyString(), anyString())).thenReturn(List.of(w1, w2));
 
@@ -170,7 +177,7 @@ public class ProjectWorkflowGraphQlControllerIntTest {
         // Given
         WorkflowTemplateDTO dto = new WorkflowTemplateDTO(
             null, null, null, null, List.of(), List.of(), "WT Desc", "w-tpl-3", Instant.now(), 2, null,
-            new WorkflowTemplateDTO.WorkflowInfo("Main", "Desc"));
+            workflowDTO("Main", "Desc"));
 
         when(projectWorkflowFacade.getWorkflowTemplate(eq("w-tpl-3"), eq(true))).thenReturn(dto);
 
@@ -196,5 +203,12 @@ public class ProjectWorkflowGraphQlControllerIntTest {
             .path("workflowTemplate.workflow.label")
             .entity(String.class)
             .isEqualTo("Main");
+    }
+
+    private static WorkflowDTO workflowDTO(String label, String description) {
+        return new WorkflowDTO(
+            new Workflow(
+                JsonUtils.write(Map.of("label", label, "description", description)), Workflow.Format.JSON),
+            List.of(), List.of());
     }
 }

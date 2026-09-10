@@ -23,6 +23,7 @@ import {
     containsNodePosition,
     getConditionBranchCaseOffset,
     positionConditionCasePlaceholders,
+    rendersClusterElements,
     separateOverlappingConditionChildren,
     shiftConditionBranchContent,
 } from './postDagreConstraints';
@@ -5062,5 +5063,53 @@ describe('getConditionBranchCaseOffset', () => {
 
         expect(2 * offset - CLUSTER_ROOT_NODE_WIDTH).toBeGreaterThanOrEqual(nodesep);
         expect(offset).toBeGreaterThan(defaultOffset);
+    });
+});
+
+describe('rendersClusterElements', () => {
+    const clusterElements = {model: {label: 'OpenAI', name: 'model_1', type: 'openAi/v1/model'}};
+
+    it('is true for a configured cluster root', () => {
+        expect(
+            rendersClusterElements({
+                data: {clusterElements},
+                id: 'aiAgent_1',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            } as unknown as Node)
+        ).toBe(true);
+    });
+
+    it('is true for a read-only node that carries cluster elements', () => {
+        expect(
+            rendersClusterElements({
+                data: {clusterElements},
+                id: 'aiAgent_1',
+                position: {x: 0, y: 0},
+                type: 'readonly',
+            } as unknown as Node)
+        ).toBe(true);
+    });
+
+    it('is false for a read-only node without cluster elements', () => {
+        expect(
+            rendersClusterElements({
+                data: {},
+                id: 'logger_1',
+                position: {x: 0, y: 0},
+                type: 'readonly',
+            } as unknown as Node)
+        ).toBe(false);
+    });
+
+    it('is false for a cluster root whose elements are all empty', () => {
+        expect(
+            rendersClusterElements({
+                data: {clusterElements: {tools: []}},
+                id: 'aiAgent_1',
+                position: {x: 0, y: 0},
+                type: 'clusterRoot',
+            } as unknown as Node)
+        ).toBe(false);
     });
 });

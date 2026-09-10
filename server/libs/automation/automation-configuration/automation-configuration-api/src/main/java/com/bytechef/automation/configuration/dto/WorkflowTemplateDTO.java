@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.dto;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -28,8 +29,5 @@ import java.util.List;
 public record WorkflowTemplateDTO(
     String authorName, String authorEmail, String authorRole, String authorSocialLinks, List<String> categories,
     List<ComponentDefinition> components, String description, String id, Instant lastModifiedDate,
-    Integer projectVersion, String publicUrl, WorkflowInfo workflow) {
-
-    public record WorkflowInfo(String label, String description) {
-    }
+    Integer projectVersion, String publicUrl, WorkflowDTO workflow) {
 }

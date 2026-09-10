@@ -773,11 +773,6 @@ export default function useLayout({
                 if (node.type === 'workflow' || node.type === 'clusterRoot') {
                     return {
                         ...node,
-                        data: {
-                            ...node.data,
-                            clusterElements: undefined,
-                            clusterRoot: undefined,
-                        },
                         type: 'readonly',
                     };
                 }

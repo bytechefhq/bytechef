@@ -39,6 +39,8 @@ import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.configuration.dto.WorkflowDTO;
+import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
@@ -257,10 +259,10 @@ public class ProjectWorkflowFacadeIntTest {
         assertThat(importTemplate.description()).isEqualTo("WF Template PB");
         assertThat(importTemplate.categories()).containsExactly("ai");
 
-        WorkflowTemplateDTO.WorkflowInfo workflow = importTemplate.workflow();
+        WorkflowDTO workflow = importTemplate.workflow();
 
         assertThat(workflow).isNotNull();
-        assertThat(workflow.label()).isEqualTo("WF Label PB");
+        assertThat(workflow.getLabel()).isEqualTo("WF Label PB");
     }
 
     @Test
@@ -313,10 +315,10 @@ public class ProjectWorkflowFacadeIntTest {
         assertThat(importTemplate.description()).isEqualTo("WF Template");
         assertThat(importTemplate.projectVersion()).isEqualTo(2);
 
-        WorkflowTemplateDTO.WorkflowInfo workflow = importTemplate.workflow();
+        WorkflowDTO workflow = importTemplate.workflow();
 
         assertThat(workflow).isNotNull();
-        assertThat(workflow.label()).isEqualTo("WF Label");
+        assertThat(workflow.getLabel()).isEqualTo("WF Label");
     }
 
     @Test
@@ -335,9 +337,9 @@ public class ProjectWorkflowFacadeIntTest {
         WorkflowTemplateDTO workflowTemplateDTO = templates.getFirst();
         assertThat(workflowTemplateDTO.id()).isEqualTo("pb-workflow-slug");
 
-        WorkflowTemplateDTO.WorkflowInfo workflow = workflowTemplateDTO.workflow();
+        WorkflowDTO workflow = workflowTemplateDTO.workflow();
 
-        assertThat(workflow.label()).isEqualTo("PB Label");
+        assertThat(workflow.getLabel()).isEqualTo("PB Label");
 
         assertThat(workflowTemplateDTO.categories()).containsExactly("ai");
 
@@ -440,5 +442,81 @@ public class ProjectWorkflowFacadeIntTest {
         List<ProjectWorkflowDTO> updatedWorkflows = projectWorkflowFacade.getProjectWorkflows(project.getId());
 
         assertThat(updatedWorkflows).hasSize(initialCount + 1);
+    }
+
+    @Test
+    public void testGetWorkflowTemplateSharedFlattensTaskDispatcherChildTasks() {
+        byte[] workflowZip;
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+
+            String workflowJson = """
+                {
+                    "label": "WF Label",
+                    "description": "WF Desc",
+                    "tasks": [
+                        {
+                            "name": "branch_1",
+                            "type": "branch/v1",
+                            "parameters": {
+                                "cases": [
+                                    {
+                                        "key": "sales",
+                                        "tasks": [
+                                            {"name": "slack_1", "type": "slack/v1/sendMessage", "parameters": {}}
+                                        ]
+                                    }
+                                ],
+                                "default": [
+                                    {"name": "googleMail_1", "type": "googleMail/v1/sendEmail", "parameters": {}}
+                                ]
+                            }
+                        }
+                    ]
+                }
+                """;
+
+            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+
+            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
+
+            String templateJson = "{\"description\":\"WF Template\",\"projectVersion\":2}";
+
+            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
+
+            zipOutputStream.closeEntry();
+            zipOutputStream.finish();
+
+            workflowZip = byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        FileEntry templateFileEntry = new FileEntry(
+            "workflow.zip", "zip", "application/zip", "http://localhost/shared/workflow.zip");
+        SharedTemplate sharedTemplate = new SharedTemplate();
+
+        sharedTemplate.setTemplate(templateFileEntry);
+
+        when(sharedTemplateFileStorage.getInputStream(any(FileEntry.class)))
+            .thenReturn(new ByteArrayInputStream(workflowZip));
+
+        UUID uuid = UUID.randomUUID();
+
+        when(sharedTemplateService.getSharedTemplate(uuid))
+            .thenReturn(sharedTemplate);
+
+        WorkflowTemplateDTO importTemplate = projectWorkflowFacade.getWorkflowTemplate(uuid.toString(), true);
+
+        WorkflowDTO workflow = importTemplate.workflow();
+
+        assertThat(workflow.getTasks())
+            .extracting(WorkflowTaskDTO::getName)
+            .containsExactlyInAnyOrder("branch_1", "slack_1", "googleMail_1");
     }
 }

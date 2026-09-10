@@ -4,7 +4,26 @@ query workflowTemplate($id: String!, $sharedWorkflow: Boolean!) {
         projectVersion
         publicUrl
         workflow {
+            description
             label
+            tasks {
+                clusterElements
+                clusterRoot
+                description
+                label
+                metadata
+                name
+                node
+                parameters
+                type
+            }
+            triggers {
+                description
+                label
+                name
+                parameters
+                type
+            }
         }
         components {
             connection {

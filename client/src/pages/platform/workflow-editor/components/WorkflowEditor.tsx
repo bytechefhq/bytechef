@@ -6,7 +6,9 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {Background, BackgroundVariant, ReactFlow} from '@xyflow/react';
+import {Background, BackgroundVariant, ReactFlow, useNodesInitialized, useReactFlow} from '@xyflow/react';
+import {useEffect} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
@@ -24,21 +26,33 @@ type ConditionalWorkflowEditorPropsType =
       };
 
 type WorkflowEditorPropsType = {
+    className?: string;
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
     enableUndoRedo?: boolean;
+    fitViewOnLoad?: boolean;
     leftSidebarOpen?: boolean;
+    onFitView?: () => void;
+    preview?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 };
 
 const WorkflowEditor = ({
+    className,
     componentDefinitions,
     customCanvasWidth,
     enableUndoRedo,
+    fitViewOnLoad,
     leftSidebarOpen,
+    onFitView,
+    preview,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: WorkflowEditorPropsType & ConditionalWorkflowEditorPropsType) => {
+    const fitsViewOnLoad = fitViewOnLoad || preview;
+
+    const {fitView} = useReactFlow();
+    const nodesInitialized = useNodesInitialized();
     const {edges, nodes, onEdgesChange} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
@@ -51,13 +65,24 @@ const WorkflowEditor = ({
         useWorkflowEditorCanvas({
             componentDefinitions,
             customCanvasWidth,
+            fitViewOnLoad: fitsViewOnLoad,
             leftSidebarOpen,
             readOnlyWorkflow,
             taskDispatcherDefinitions,
         });
 
+    useEffect(() => {
+        if (!fitsViewOnLoad || !nodesInitialized) {
+            return;
+        }
+
+        fitView({duration: 0, maxZoom: 1, minZoom: 0.1, padding: 0.15});
+
+        onFitView?.();
+    }, [fitsViewOnLoad, fitView, nodes, nodesInitialized, onFitView]);
+
     return (
-        <div className="flex h-full flex-1 flex-col rounded-lg bg-background">
+        <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-background', className)}>
             <ReactFlow
                 deleteKeyCode={null}
                 edgeTypes={edgeTypes}
@@ -75,17 +100,18 @@ const WorkflowEditor = ({
                 onNodeDragStop={handleNodeDragStop}
                 onNodesChange={handleNodesChange}
                 panActivationKeyCode={null}
-                panOnDrag
-                panOnScroll
+                panOnDrag={!preview}
+                panOnScroll={!preview}
                 proOptions={{hideAttribution: true}}
                 zoomOnDoubleClick={false}
+                zoomOnPinch={!preview}
                 zoomOnScroll={false}
             >
                 <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
                 {!readOnlyWorkflow && nodes.length > 0 && <NodeActionsHint />}
 
-                <WorkflowEditorToolbar enableUndoRedo={enableUndoRedo} readOnly={!!readOnlyWorkflow} />
+                {!preview && <WorkflowEditorToolbar enableUndoRedo={enableUndoRedo} readOnly={!!readOnlyWorkflow} />}
             </ReactFlow>
         </div>
     );
