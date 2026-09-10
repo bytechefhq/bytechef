@@ -33,6 +33,7 @@ const Notifications = () => {
             header={
                 <Header
                     centerTitle
+                    description="Send an email, Slack message, or webhook when a workflow run reaches a given status."
                     position="main"
                     right={<Button icon={<PlusIcon />} label="New Notification" onClick={() => openEditDialog()} />}
                     title="Notifications"

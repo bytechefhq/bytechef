@@ -17,7 +17,13 @@ const NotificationsTable = ({columns, notifications}: {columns: []; notification
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
-                                <TableHead className="w-1/4 min-w-[25%] whitespace-nowrap" key={header.id}>
+                                <TableHead
+                                    className={twMerge(
+                                        'w-1/4 min-w-[25%] whitespace-nowrap',
+                                        header.id === 'actions' && 'text-center'
+                                    )}
+                                    key={header.id}
+                                >
                                     {!header.isPlaceholder &&
                                         flexRender(header.column.columnDef.header, header.getContext())}
                                 </TableHead>
