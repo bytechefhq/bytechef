@@ -61,43 +61,45 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
     };
 
     return (
-        <li className="relative flex items-center justify-between px-2 py-5 hover:bg-gray-50" key={workspace.id}>
-            <div className="flex-1">
-                <span className="text-base">{workspace.name}</span>
-            </div>
+        <li className="mb-2 rounded border border-border/50" key={workspace.id}>
+            <div className="flex items-center justify-between rounded-md bg-surface-neutral-primary px-3 py-3 hover:bg-surface-neutral-primary-hover">
+                <div className="flex-1">
+                    <span className="text-base font-semibold">{workspace.name}</span>
+                </div>
 
-            <div className="flex justify-end gap-x-6">
-                {workspace.createdDate && (
-                    <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                            <span className="text-xs">
-                                {`Created at ${workspace.createdDate?.toLocaleDateString()} ${workspace.createdDate?.toLocaleTimeString()}`}
-                            </span>
-                        </TooltipTrigger>
+                <div className="flex items-center justify-end gap-x-6">
+                    {workspace.createdDate && (
+                        <Tooltip>
+                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <span className="text-xs">
+                                    {`Created at ${workspace.createdDate?.toLocaleDateString()} ${workspace.createdDate?.toLocaleTimeString()}`}
+                                </span>
+                            </TooltipTrigger>
 
-                        <TooltipContent>Created Date</TooltipContent>
-                    </Tooltip>
-                )}
+                            <TooltipContent>Created Date</TooltipContent>
+                        </Tooltip>
+                    )}
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
 
-                        <DropdownMenuSeparator />
+                            <DropdownMenuSeparator />
 
-                        <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            <DropdownMenuItem className="text-destructive" onClick={() => setShowDeleteDialog(true)}>
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
             <AlertDialog open={showDeleteDialog}>
