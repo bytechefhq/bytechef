@@ -21,6 +21,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.ee.embedded.execution.util.ConnectionIdHelper;
+import com.bytechef.platform.ai.tool.util.ToolPropertyUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -111,7 +112,9 @@ public class ToolFacadeImpl implements ToolFacade {
                             getToolName(
                                 clusterElementDefinition.getComponentName(), clusterElementDefinition.getName()),
                             clusterElementDefinition.getDescription(),
-                            JsonSchemaGeneratorUtils.generateInputSchema(clusterElementDefinition.getProperties())),
+                            JsonSchemaGeneratorUtils.generateInputSchema(
+                                ToolPropertyUtils.withoutToolOverrideProperties(
+                                    clusterElementDefinition.getProperties()))),
                         Collectors.toList())));
     }
 
