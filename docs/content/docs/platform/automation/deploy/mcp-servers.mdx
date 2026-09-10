@@ -43,7 +43,13 @@ A server exposes nothing until you add components or workflows to it.
 
 You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has its own **Enabled** toggle, and a disabled tool disappears from the server's tool list - connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. This complements the server-level toggle, which turns the whole server on or off at once.
 
+{/* TODO screenshot: tool properties popover on a component action row - the Tool Name and Tool Description fields above the action's own parameters */}
+
 For each exposed action you decide which parameters you fix yourself (a constant the assistant can't change) and which the assistant fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
+
+The same properties control also offers a **Tool Name** and a **Tool Description**, both optional and both what the model sees. Left blank, the name falls back to `COMPONENT_ACTION` in upper snake case - `sendChannelMessage` on Slack becomes `SLACK_SEND_CHANNEL_MESSAGE` - and the description falls back to the action's own. A tool name is limited to 64 characters made up of letters, digits, `_`, `-`, `.` and `/`; anything else, a space included, is rejected as you type.
+
+Rename an action when its generated name would not tell the model what it does in your context, or when two servers should surface the same action differently. The override is stored on the server's attachment to the tool, not on the component, so it does not follow the action anywhere else.
 
 ---
 
