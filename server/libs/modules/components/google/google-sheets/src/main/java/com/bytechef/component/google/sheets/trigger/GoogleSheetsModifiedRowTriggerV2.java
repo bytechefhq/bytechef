@@ -32,24 +32,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Anshul Goel
+ * @author Marko Kriskovic
  */
-public class GoogleSheetsNewRowTriggerV2 {
+public class GoogleSheetsModifiedRowTriggerV2 {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
-        .title("New Row")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("modifiedRow")
+        .title("Modified Row")
         .description(
-            "Triggers when a new row is added. Rows are tracked by their content, so a row inserted in the " +
-                "middle of the sheet is reported and editing an existing row does not fire the trigger.")
+            "Triggers when an existing row is modified. Rows are tracked by their position, so only rows whose " +
+                "content changes at the same position are reported; rows that are inserted, removed, or moved " +
+                "do not fire the trigger.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(GoogleSheetsRowTriggerUtils.getSpreadsheetAndSheetProperties())
         .output()
         .webhookEnable(GoogleSheetsNewRowTrigger::webhookEnable)
         .webhookDisable(GoogleSheetsNewRowTrigger::webhookDisable)
-        .webhookRequest(GoogleSheetsNewRowTriggerV2::webhookRequest)
-        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v2#new-row");
+        .webhookRequest(GoogleSheetsModifiedRowTriggerV2::webhookRequest)
+        .help("", "https://docs.bytechef.io/reference/components/google-sheets_v2#modified-row");
 
-    private GoogleSheetsNewRowTriggerV2() {
+    private GoogleSheetsModifiedRowTriggerV2() {
     }
 
     protected static List<Map<String, Object>> webhookRequest(
@@ -58,6 +59,6 @@ public class GoogleSheetsNewRowTriggerV2 {
         TriggerContext context) {
 
         return GoogleSheetsRowTriggerUtils.getChangedRows(
-            inputParameters, connectionParameters, context, GoogleSheetsRowDiffUtils::getInsertedRowIndexes);
+            inputParameters, connectionParameters, context, GoogleSheetsRowDiffUtils::getModifiedRowIndexes);
     }
 }
