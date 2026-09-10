@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
-import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
-import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.ai.llm.Provider;
+import com.bytechef.platform.ai.provider.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.platform.ai.provider.facade.AiProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;

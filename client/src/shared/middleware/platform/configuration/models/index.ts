@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ActionDefinition';
 export * from './ActionDefinitionBasic';
+export * from './AiProvider';
 export * from './ArrayProperty';
 export * from './Authorization';
 export * from './AuthorizationType';
@@ -61,6 +62,7 @@ export * from './TriggerDefinition';
 export * from './TriggerDefinitionBasic';
 export * from './TriggerType';
 export * from './UnifiedApiCategory';
+export * from './UpdateAiProviderRequest';
 export * from './UpdateClusterElementParameterRequest';
 export * from './UpdateWorkflowNodeParameterRequest';
 export * from './ValueProperty';

@@ -1,0 +1,11 @@
+@reference '../../../../../styles/index.css';
+
+.ai-provider {
+    h3 {
+        @apply w-full;
+    }
+
+    svg.duration-200 {
+        @apply invisible;
+    }
+}

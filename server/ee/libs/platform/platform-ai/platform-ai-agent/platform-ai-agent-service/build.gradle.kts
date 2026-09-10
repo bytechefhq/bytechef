@@ -15,11 +15,11 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:ollama"))
     implementation(project(":server:libs:modules:components:ai:llm:open-ai"))
     implementation(project(":server:libs:modules:components:ai:llm:perplexity"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-provider:platform-ai-provider-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))
-    implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
