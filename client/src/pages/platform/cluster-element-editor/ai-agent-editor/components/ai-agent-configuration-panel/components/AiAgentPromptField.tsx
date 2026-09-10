@@ -1,3 +1,4 @@
+import RequiredMark from '@/components/RequiredMark';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
@@ -17,6 +18,7 @@ interface AiAgentPromptFieldProps {
     editorClassName?: string;
     path: string;
     placeholder: string;
+    required?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     title: string;
     workflow: Workflow;
@@ -29,6 +31,7 @@ export default function AiAgentPromptField({
     editorClassName,
     path,
     placeholder,
+    required,
     taskDispatcherDefinitions,
     title,
     workflow,
@@ -54,7 +57,11 @@ export default function AiAgentPromptField({
 
     return (
         <div className={twMerge('flex flex-col', containerClassName)}>
-            <h2 className="mb-2">{title}</h2>
+            <h2 className="mb-2 flex items-center">
+                {title}
+
+                {required && <RequiredMark />}
+            </h2>
 
             <div
                 className={twMerge(
