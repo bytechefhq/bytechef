@@ -2,15 +2,19 @@ import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatfor
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import SettingsNavGroup, {SettingsNavGroupItemI} from '@/shared/layout/SettingsNavGroup';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Outlet, useLocation} from 'react-router-dom';
 
+export interface SettingsNavItemI {
+    href?: string;
+    items?: SettingsNavItemI[];
+    title: string;
+}
+
 interface SettingsProps {
-    sidebarNavItems: {
-        href?: string;
-        title: string;
-    }[];
+    sidebarNavItems: SettingsNavItemI[];
     title?: string;
 }
 
@@ -22,7 +26,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
     const location = useLocation();
 
-    sidebarNavItems = sidebarNavItems.filter((navItem) => {
+    const isNavItemVisible = (navItem: SettingsNavItemI) => {
         if (navItem.href === 'api-connectors') {
             return isFeatureFlagEnabled('ff-207');
         }
@@ -66,31 +70,58 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         }
 
         return true;
-    });
+    };
+
+    sidebarNavItems = sidebarNavItems
+        .filter(isNavItemVisible)
+        .map((navItem) => (navItem.items ? {...navItem, items: navItem.items.filter(isNavItemVisible)} : navItem))
+        .filter((navItem) => !navItem.items || navItem.items.length > 0);
+
+    const isHeading = (navItem: SettingsNavItemI) => navItem.href === undefined && navItem.items === undefined;
+
+    sidebarNavItems = sidebarNavItems.filter(
+        (navItem, index, visibleNavItems) =>
+            !isHeading(navItem) || (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
+    );
 
     return (
         <LayoutContainer
             leftSidebarBody={
                 <LeftSidebarNav
-                    body={sidebarNavItems.map((navItem) =>
-                        navItem.href ? (
-                            <LeftSidebarNavItem
-                                item={{
-                                    current: location.pathname.includes(navItem.href),
-                                    name: navItem.title,
-                                }}
-                                key={navItem.href}
-                                toLink={navItem.href}
-                            />
-                        ) : (
+                    body={sidebarNavItems.map((navItem) => {
+                        if (navItem.items) {
+                            return (
+                                <SettingsNavGroup
+                                    isCurrent={(href) => location.pathname.includes(href)}
+                                    items={navItem.items as SettingsNavGroupItemI[]}
+                                    key={navItem.title}
+                                    title={navItem.title}
+                                />
+                            );
+                        }
+
+                        if (navItem.href) {
+                            return (
+                                <LeftSidebarNavItem
+                                    item={{
+                                        current: location.pathname.includes(navItem.href),
+                                        name: navItem.title,
+                                    }}
+                                    key={navItem.href}
+                                    toLink={navItem.href}
+                                />
+                            );
+                        }
+
+                        return (
                             <h3
-                                className="px-2 pt-4 pb-1 text-sm font-semibold text-muted-foreground"
+                                className="px-2 pt-4 pb-1 text-sm font-semibold text-muted-foreground first:pt-0"
                                 key={navItem.title}
                             >
                                 {navItem.title}
                             </h3>
-                        )
-                    )}
+                        );
+                    })}
                 />
             }
             leftSidebarHeader={<Header position="sidebar" title={title} />}
