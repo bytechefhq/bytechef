@@ -96,7 +96,12 @@ const WorkflowExecutionSheetContent = ({
                 </div>
             ) : (
                 <ResizablePanelGroup orientation="horizontal">
-                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
+                    <ResizablePanel
+                        className="flex min-h-0 flex-col overflow-hidden"
+                        defaultSize={40}
+                        groupResizeBehavior="preserve-pixel-size"
+                        minSize={15}
+                    >
                         {subflowStack.length === 0 && rootJob && (
                             <div className="flex h-9 items-center gap-1 px-3 py-2">
                                 <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
@@ -152,7 +157,7 @@ const WorkflowExecutionSheetContent = ({
 
                     <ResizableHandle />
 
-                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
+                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={60} minSize={20}>
                         <WorkflowExecutionsTabsPanel
                             activeTab={activeTab}
                             dialogOpen={dialogOpen}
