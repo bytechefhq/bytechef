@@ -40,7 +40,9 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
                 <div
                     className={twMerge(
                         'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 transition-colors',
-                        dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                        dragActive
+                            ? 'border-blue-500 bg-surface-brand-secondary'
+                            : 'border-stroke-neutral-tertiary hover:border-gray-400'
                     )}
                     onClick={() => fileInputRef.current?.click()}
                     onDragLeave={handleDragLeave}
@@ -48,13 +50,16 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
                     onDrop={handleDrop}
                 >
                     <div className="flex flex-col items-center gap-2">
-                        <UploadIcon className="size-10 text-gray-400" />
+                        <UploadIcon className="size-10 text-content-neutral-tertiary" />
 
-                        <p className="text-sm text-gray-600">
-                            <span className="font-medium text-blue-600">Pick file(s)</span> to upload or drag and drop
+                        <p className="text-sm text-content-neutral-secondary">
+                            <span className="font-medium text-content-brand-primary">Pick file(s)</span> to upload or
+                            drag and drop
                         </p>
 
-                        <p className="text-xs text-gray-400">Accepted formats: {acceptedExtensions.join(', ')}</p>
+                        <p className="text-xs text-content-neutral-tertiary">
+                            Accepted formats: {acceptedExtensions.join(', ')}
+                        </p>
                     </div>
 
                     <input
@@ -74,7 +79,7 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
                                 className="flex items-center gap-2 rounded border px-3 py-2"
                                 key={`${file.name}-${index}`}
                             >
-                                <FileIcon className="size-4 shrink-0 text-gray-400" />
+                                <FileIcon className="size-4 shrink-0 text-content-neutral-tertiary" />
 
                                 <span className="flex-1 truncate text-sm">{file.name}</span>
 
@@ -83,7 +88,7 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
                                 </span>
 
                                 <Button
-                                    className="shrink-0 text-gray-400 hover:text-gray-600 [&_svg]:size-4"
+                                    className="shrink-0 text-content-neutral-tertiary hover:text-content-neutral-secondary-hover [&_svg]:size-4"
                                     icon={<XIcon />}
                                     onClick={() => handleRemoveFile(index)}
                                     size="iconXs"

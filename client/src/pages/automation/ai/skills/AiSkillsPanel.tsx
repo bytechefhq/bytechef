@@ -1,4 +1,3 @@
-import AiSkillCreateWithAi from '@/pages/automation/ai/skills/components/AiSkillCreateWithAi';
 import AiSkillDetail from '@/pages/automation/ai/skills/components/AiSkillDetail';
 import AiSkillsEmptyState from '@/pages/automation/ai/skills/components/AiSkillsEmptyState';
 import AiSkillsList from '@/pages/automation/ai/skills/components/AiSkillsList';
@@ -11,7 +10,7 @@ const AiSkillsPanel = () => {
     if (isLoading) {
         return (
             <div className="flex flex-1 items-center justify-center">
-                <Loader2Icon className="size-6 animate-spin text-gray-400" />
+                <Loader2Icon className="size-6 animate-spin text-content-neutral-tertiary" />
             </div>
         );
     }
@@ -19,7 +18,7 @@ const AiSkillsPanel = () => {
     if (isError) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-content-neutral-secondary">
-                <AlertTriangleIcon className="size-6 text-red-400" />
+                <AlertTriangleIcon className="size-6 text-content-destructive" />
 
                 <span>Failed to load skills. Please try again.</span>
             </div>
@@ -27,14 +26,12 @@ const AiSkillsPanel = () => {
     }
 
     return (
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
             {currentView === 'empty' && <AiSkillsEmptyState />}
 
             {currentView === 'list' && <AiSkillsList skills={skills} />}
 
             {currentView === 'detail' && <AiSkillDetail />}
-
-            {currentView === 'createWithAi' && <AiSkillCreateWithAi />}
         </div>
     );
 };

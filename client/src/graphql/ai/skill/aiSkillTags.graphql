@@ -1,0 +1,6 @@
+query aiSkillTags {
+    aiSkillTags {
+        id
+        name
+    }
+}
