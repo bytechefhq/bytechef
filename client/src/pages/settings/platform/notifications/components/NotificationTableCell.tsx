@@ -26,7 +26,7 @@ interface ActionsCellProps {
 }
 
 export const ActionsCell = ({notification, openDeleteDialog, openEditDialog}: ActionsCellProps) => (
-    <div className="flex space-x-1">
+    <div className="flex justify-center space-x-1">
         <Button
             className="text-content-neutral-primary/50 hover:bg-surface-neutral-primary-hover"
             icon={<PenIcon />}
