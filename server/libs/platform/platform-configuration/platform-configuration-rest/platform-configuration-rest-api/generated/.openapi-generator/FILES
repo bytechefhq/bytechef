@@ -1,6 +1,7 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/platform/configuration/web/rest/ActionDefinitionApi.java
+src/main/java/com/bytechef/platform/configuration/web/rest/AiProviderApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ClusterElementDefinitionApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/ComponentDefinitionApi.java
@@ -18,6 +19,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowNodeTestOutpu
 src/main/java/com/bytechef/platform/configuration/web/rest/WorkflowTestConfigurationApi.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ActionDefinitionModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/AiProviderModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ArrayPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTypeModel.java
@@ -77,6 +79,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefiniti
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/TriggerTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UnifiedApiCategoryModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateAiProviderRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateClusterElementParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ValuePropertyModel.java

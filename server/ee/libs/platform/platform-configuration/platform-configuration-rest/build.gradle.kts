@@ -41,17 +41,11 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
     implementation(libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations)
-    implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
-    implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
-    implementation(project(":server:libs:modules:components:ai:llm"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
-    implementation(project(":server:libs:platform:platform-api"))
 
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 

@@ -1,18 +1,14 @@
 ---
 title: AI Providers
 description: Activate LLM and AI providers once, per environment, and reuse them across Universal AI components, the Copilot, the Knowledge Base, and the AI Hub.
-ee: true
 ---
-
-<EEBadge />
 
 **AI Providers** is the central catalog where an admin activates the AI providers (OpenAI, Anthropic, Mistral, and others) that power ByteChef's AI features. You enter a provider's API key once, and every AI feature that needs a model resolves its credentials from this catalog - so keys live in one place instead of being re-entered per workflow.
 
-> AI Providers is an Enterprise Edition feature, and activating providers is restricted to **admins**.
+> Activating providers is restricted to **admins**.
 
-<Callout title="Community Edition">
-    The AI Providers page is not available in CE. Providers and models are configured exclusively through configuration properties / environment variables - for example `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` and `BYTECHEF_AI_PROVIDER_CHAT_OPEN_AI_OPTIONS_MODEL`. See the [environment variables reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-provider-api-keys). AI features use those keys directly.
-</Callout>
+> A provider can also be configured without the UI, through configuration properties / environment variables
+> such as `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY`. See [Self-hosting: static keys](#self-hosting-static-keys).
 
 Keys are stored **per environment**, so Development, Staging, and Production can each use their own provider and credentials.
 
@@ -92,11 +88,11 @@ the full list of embedding keys see the
 Anthropic publishes no embedding models - an Anthropic-backed deployment still needs OpenAI, Mistral,
 or Ollama activated for embeddings.
 
-<Callout title="Community Edition">
-    The model itself is configuration in **both** editions - the AI Providers page stores credentials
-    and enablement, never model names. On CE, where the page is unavailable, the provider's API key is
-    configuration too (`BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` and friends), so the embedding model and
-    the key it authenticates with are both set by property.
+<Callout title="Models are configuration">
+    The model itself is always configuration - the AI Providers page stores credentials and
+    enablement, never model names. The API key can be configuration too
+    (`BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` and friends), so a deployment can set the embedding model
+    and the key it authenticates with entirely by property.
 </Callout>
 
 ### Vector dimensions are fixed per deployment
@@ -121,6 +117,6 @@ and do it per environment so a Production knowledge base is not half-migrated.
 
 Instead of (or in addition to) activating providers through the UI, a self-hosted deployment can supply provider keys as configuration - for example `BYTECHEF_AI_PROVIDER_OPEN_AI_API_KEY` or `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY`. See the [environment variables reference](/platform/use-bytechef/self-hosted/configuration/environment-variables#ai-provider-api-keys).
 
-**Precedence:** a provider activated through the UI for an environment always wins. The static configuration key is used only as a fallback when no provider is activated for that environment. This lets an operator ship a default key while still letting each environment override it through the UI. On the Community Edition there is no catalog to override with, so the static keys are the sole source.
+**Precedence:** a provider activated through the UI for an environment always wins. The static configuration key is used only as a fallback when no provider is activated for that environment. This lets an operator ship a default key while still letting each environment override it through the UI.
 
 > The Copilot documentation corpus is a special case: it is instance-global and embeds with its own dedicated key rather than the per-environment catalog. See [AI Copilot → Documentation embeddings](/platform/automation/build/ai-copilot#documentation-embeddings).
