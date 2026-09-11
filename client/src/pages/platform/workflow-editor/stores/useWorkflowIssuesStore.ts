@@ -6,6 +6,7 @@ export type WorkflowIssueKindType =
     | 'DUPLICATE_NODE_NAME'
     | 'LOOKUP_FAILED'
     | 'MISSING_CLUSTER_ELEMENT'
+    | 'MISSING_CONNECTION'
     | 'MISSING_REQUIRED'
     | 'MISSING_RESOURCE'
     | 'OTHER'
