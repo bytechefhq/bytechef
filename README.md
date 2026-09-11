@@ -74,11 +74,36 @@ Build AI agents and workflows by talking to ByteChef. The Copilot generates work
 
 ## Quick Start
 
-### Docker Compose (Fastest Setup)
+### One command
 
 **Requirement:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-This is the fastest way to start ByteChef. Download the `docker-compose.yml` file from the repository:
+No database to set up. ByteChef stores everything in an embedded H2 file under `~/.bytechef`, next to the generated encryption keys:
+
+```bash
+docker run --name bytechef -it -p 8080:8080 \
+    --env BYTECHEF_DATABASE=h2 \
+    -v ~/.bytechef:/root/.bytechef \
+    docker.bytechef.io/bytechef/bytechef:latest
+```
+
+On Windows PowerShell:
+
+```powershell
+docker run --name bytechef -it -p 8080:8080 --env BYTECHEF_DATABASE=h2 -v "$HOME\.bytechef:/root/.bytechef" docker.bytechef.io/bytechef/bytechef:latest
+```
+
+Open <http://localhost:8080/login> → **Create Account** → sign in.
+
+**First workflow, no credentials needed:** import [Learn ByteChef by doing](https://www.bytechef.io/workflow-templates/learn-bytechef-by-doing) from the [template library](https://www.bytechef.io/workflow-templates) and run it.
+
+H2 is for evaluation only. The AI knowledge base and Copilot need PostgreSQL with pgvector, and there is no migration path from H2 to PostgreSQL, so use Docker Compose for anything you intend to keep.
+
+### Docker Compose (PostgreSQL)
+
+**Requirement:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+This is the recommended setup. Download the `docker-compose.yml` file from the repository:
 ```bash
 curl -O https://raw.githubusercontent.com/bytechefhq/bytechef/master/docker-compose.yml
 docker compose -f docker-compose.yml up
@@ -110,29 +135,24 @@ docker run --name postgres -d -p 5432:5432 \
 
 #### 3. Start ByteChef Container
 
-ByteChef generates the key that encrypts stored connection credentials on first start. Mounting
-`~/.bytechef` keeps that key on the host, so it survives recreating the container:
+ByteChef generates the key that encrypts stored connection credentials and the remember-me key on first start. Mounting
+`~/.bytechef` keeps them on the host, so they survive recreating the container:
 
 ```bash
 docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
-    --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=<random-secret> \
     -v ~/.bytechef:/root/.bytechef \
     --network bytechef_network \
     docker.bytechef.io/bytechef/bytechef:latest
 ```
-
-`BYTECHEF_SECURITY_REMEMBER_ME_KEY` signs the remember-me cookie. Generate your own value, for example with `openssl rand -hex 20`, and keep it stable across restarts.
 
 **Note:** Use `-d` flag instead of `-it` to run in detached mode.
 
 Open <http://localhost:8080/login> → **Create Account** → sign in.
 
 ### Build your first agent in 60 seconds
-
-Prefer a head start? Import a ready-made workflow from the [template library](https://www.bytechef.io/workflow-templates) and adapt it.
 
 1. **New Project → New Workflow**,
 2. Add a trigger
@@ -170,6 +190,8 @@ Prefer a head start? Import a ready-made workflow from the [template library](ht
 ## 250+ connectors
 
 CRM · marketing · communication · e-commerce · cloud storage · databases · AI/ML · helpdesk · finance. Every connector is **also an agent tool, also an MCP tool**. Browse the [integrations catalog](https://www.bytechef.io/integrations) or the [component reference](https://docs.bytechef.io/reference/components).
+
+Want a connector we don't have? [Build it in an afternoon](https://docs.bytechef.io/developer-guide/build-component), or pick one from the [open connector requests](https://github.com/bytechefhq/bytechef/issues?q=is%3Aissue+is%3Aopen+label%3Aworkflow-component).
 
 ---
 
@@ -248,7 +270,7 @@ Only for the rows marked EE in the table above. Everything outside `server/ee/` 
 
 ## Contributing
 
-If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started. Adding a connector is the most common first contribution; the [connector developer guide](https://docs.bytechef.io/developer-guide/build-component) walks through setup, the component definition, actions, triggers, connections and tests.
+If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started. Want a connector we don't have? [Build it in an afternoon](https://docs.bytechef.io/developer-guide/build-component): the guide walks through setup, the component definition, actions, triggers, connections and tests. The [open connector requests](https://github.com/bytechefhq/bytechef/issues?q=is%3Aissue+is%3Aopen+label%3Aworkflow-component) are a good place to start.
 
 ---
 
