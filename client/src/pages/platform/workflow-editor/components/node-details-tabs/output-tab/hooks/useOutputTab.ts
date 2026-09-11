@@ -1,5 +1,6 @@
 import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
 import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
 import {
@@ -103,6 +104,8 @@ export default function useOutputTab({
         queryClient.invalidateQueries({
             queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflowId],
         });
+
+        invalidateWorkflowValidation(queryClient);
     }, [queryClient, workflowId]);
 
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
@@ -218,6 +221,8 @@ export default function useOutputTab({
                                             }),
                                         ],
                                     });
+
+                                    invalidateWorkflowValidation(queryClient);
 
                                     workflowNodeOutputRefetch().then(() => {
                                         setStartWebhookTest(false);
