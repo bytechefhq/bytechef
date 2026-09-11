@@ -557,6 +557,21 @@ public interface Context {
         }
 
         /**
+         * Maximum duration to wait for the whole response, as distinct from {@link #timeout(Duration)}, which bounds
+         * only establishing the connection. Defaults to five minutes when unset.
+         *
+         * @param requestTimeout
+         * @return
+         */
+        static ConfigurationBuilder requestTimeout(Duration requestTimeout) {
+            ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.requestTimeout = requestTimeout;
+
+            return configurationBuilder;
+        }
+
+        /**
          *
          * @param disableAuthorization
          * @return
@@ -792,6 +807,7 @@ public interface Context {
             private boolean followAllRedirects;
             private boolean followRedirect;
             private String proxy;
+            private Duration requestTimeout;
             private ResponseType responseType;
             private Duration timeout;
             private boolean disableAuthorization;
@@ -848,6 +864,13 @@ public interface Context {
             /**
              * @return
              */
+            public Duration getRequestTimeout() {
+                return requestTimeout;
+            }
+
+            /**
+             * @return
+             */
             public Duration getTimeout() {
                 return timeout;
             }
@@ -866,6 +889,7 @@ public interface Context {
                 private boolean followAllRedirects;
                 private boolean followRedirect;
                 private String proxy;
+                private Duration requestTimeout;
                 private ResponseType responseType;
                 private Duration timeout;
                 private boolean disableAuthorization;
@@ -889,6 +913,7 @@ public interface Context {
                         Objects.equals(disableAuthorization, that.disableAuthorization) &&
                         Objects.equals(filename, that.filename) &&
                         Objects.equals(proxy, that.proxy) &&
+                        Objects.equals(requestTimeout, that.requestTimeout) &&
                         Objects.equals(responseType, that.responseType) &&
                         Objects.equals(timeout, that.timeout);
                 }
@@ -896,8 +921,8 @@ public interface Context {
                 @Override
                 public int hashCode() {
                     return Objects.hash(
-                        allowUnauthorizedCerts, filename, followAllRedirects, followRedirect, proxy, responseType,
-                        timeout, disableAuthorization);
+                        allowUnauthorizedCerts, filename, followAllRedirects, followRedirect, proxy, requestTimeout,
+                        responseType, timeout, disableAuthorization);
                 }
 
                 public ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
@@ -930,6 +955,11 @@ public interface Context {
                     return this;
                 }
 
+                public ConfigurationBuilder requestTimeout(Duration requestTimeout) {
+                    this.requestTimeout = requestTimeout;
+                    return this;
+                }
+
                 public ConfigurationBuilder timeout(Duration timeout) {
                     this.timeout = timeout;
                     return this;
@@ -945,6 +975,7 @@ public interface Context {
 
                     configuration.proxy = this.proxy;
                     configuration.followRedirect = this.followRedirect;
+                    configuration.requestTimeout = this.requestTimeout;
                     configuration.timeout = this.timeout;
                     configuration.responseType = this.responseType;
                     configuration.followAllRedirects = this.followAllRedirects;

@@ -215,14 +215,9 @@ class HttpClientExecutor {
     }
 
     Duration resolveRequestTimeout(Configuration configuration) {
-        Duration defaultRequestTimeout = defaultRequestTimeout();
-        Duration timeout = configuration.getTimeout();
+        Duration requestTimeout = configuration.getRequestTimeout();
 
-        if (timeout == null || timeout.compareTo(defaultRequestTimeout) < 0) {
-            return defaultRequestTimeout;
-        }
-
-        return timeout;
+        return requestTimeout == null ? defaultRequestTimeout() : requestTimeout;
     }
 
     HttpRequest createHttpRequest(
