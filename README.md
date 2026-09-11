@@ -152,15 +152,17 @@ docker run --name bytechef -it -p 8080:8080 \
 
 Open <http://localhost:8080/login> → **Create Account** → sign in.
 
-### Build your first agent in 60 seconds
+### Then build your first agent
 
-1. **New Project → New Workflow**,
-2. Add a trigger
+An agent needs a model. Connect any of the 12 LLM providers with an API key, or run [Ollama](https://ollama.com) locally and connect it with no key at all.
+
+1. **New Project → New Workflow**
+2. Keep the **Manual** trigger, or pick another
 3. Add the **AI Agent** component
-4. Pick a **model**, attach **tools** from 250+ connectors, optionally add a **knowledge base** and **guardrails**
-5. Fill the necessary credentials
-6. Configure each component's parameters in the properties panel
-7. Test your workflow
+4. Pick a **model** and its connection
+5. Attach **tools** from 250+ connectors; optionally add a **knowledge base** and **guardrails**
+6. Write the instructions and configure each tool's parameters in the properties panel
+7. Click **Test** and read the agent's tool calls in the execution log
 8. Deploy
 
 ---
