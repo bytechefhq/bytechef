@@ -17,7 +17,8 @@ export default function AiAgentTool({configuredConnectionKeys, tool}: AiAgentToo
         !!tool.componentName
     );
 
-    const isConnectionMissing = !!toolComponentDefinition?.connection && !configuredConnectionKeys.has(tool.name);
+    const isConnectionMissing =
+        !!toolComponentDefinition?.connectionRequired && !configuredConnectionKeys.has(tool.name);
 
     return (
         <div
