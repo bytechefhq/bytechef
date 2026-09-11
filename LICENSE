@@ -2,7 +2,7 @@ Copyright (c) 2025 ByteChef
 
 Portions of this software are licensed as follows:
 
-* All content that resides under the "ee/" directories of this repository, if those directories exist, is licensed under the license as defined in "ee/LICENSE".
+* All content that resides under the "server/ee/" and "client/src/ee/" directories of this repository is licensed under the ByteChef Enterprise License as defined in "server/ee/LICENSE".
 * All third party components incorporated into the ByteChef Software are licensed under the original license provided by the owner of the applicable component.
 * Content outside of the above mentioned directories or restrictions above is available under the "Apache Version 2.0" license as defined below.
 
