@@ -174,6 +174,38 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         }
         """;
 
+    private static final String BRANCH_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [],
+            "tasks": [
+                {
+                    "label": "Branch",
+                    "name": "branch_1",
+                    "type": "branch/v1",
+                    "parameters": {
+                        "expression": "A",
+                        "cases": [
+                            {
+                                "key": "A",
+                                "tasks": [
+                                    {
+                                        "label": "Affinity",
+                                        "name": "affinity_1",
+                                        "type": "affinity/v1/createOpportunity",
+                                        "parameters": {}
+                                    }
+                                ]
+                            }
+                        ],
+                        "default": []
+                    }
+                }
+            ]
+        }
+        """;
+
     private static final OutputResponse SUBFLOW_OUTPUT = new OutputResponse(
         new ObjectProperty(object("subflow_1").properties(string("message"))), null);
 
@@ -262,6 +294,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
         when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
             .thenReturn(httpClientActionDefinition);
+        stubStoredType(workflowNodeTestOutput, "get");
         when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(
             Property.toProperty(ComponentDsl.object("httpClient_1")
                 .properties(ComponentDsl.string("quote"), ComponentDsl.string("author"))),
@@ -282,6 +315,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
         when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
             .thenReturn(httpClientActionDefinition);
+        stubStoredType(workflowNodeTestOutput, "get");
         when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(
             Property.toProperty(ComponentDsl.object("httpClient_1")
                 .properties(ComponentDsl.string("author"))),
@@ -312,6 +346,7 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
 
         WorkflowTestConfigurationConnection connection = mock(WorkflowTestConfigurationConnection.class);
 
+        when(connection.getWorkflowConnectionKey()).thenReturn("affinity");
         when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", "affinity_1", 3L))
             .thenReturn(List.of(connection));
 
@@ -353,6 +388,82 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(AGENT_WORKFLOW, "wf-1", 3L);
 
         assertEquals(List.of("[openAi_1] Missing required connection: OpenAI"), result.errors());
+    }
+
+    @Test
+    void aNodeInsideABranchCaseMissingItsConnectionIsReported() {
+        stubComponent("affinity", "Affinity", true);
+        when(taskDispatcherDefinitionService.getTaskDispatcherDefinition("branch", 1))
+            .thenReturn(new TaskDispatcherDefinition("branch"));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(BRANCH_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[affinity_1] Missing required connection: Affinity"), result.errors());
+    }
+
+    @Test
+    void aClusterElementConnectionDoesNotSatisfyTheRootNode() {
+        stubComponent("aiAgent", "AI Agent", true);
+        stubComponent("openAi", "OpenAI", true);
+        stubComponent("httpClient", "HTTP Client", false);
+
+        WorkflowTestConfigurationConnection modelConnection = mock(WorkflowTestConfigurationConnection.class);
+
+        when(modelConnection.getWorkflowConnectionKey()).thenReturn("openAi_1");
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", "aiAgent_1", 3L))
+            .thenReturn(List.of(modelConnection));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(AGENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[aiAgent_1] Missing required connection: AI Agent"), result.errors());
+    }
+
+    @Test
+    void aRootConnectionKeyedByTheComponentNameSatisfiesTheRootNode() {
+        stubComponent("aiAgent", "AI Agent", true);
+        stubComponent("openAi", "OpenAI", true);
+        stubComponent("httpClient", "HTTP Client", false);
+
+        WorkflowTestConfigurationConnection rootConnection = mock(WorkflowTestConfigurationConnection.class);
+        WorkflowTestConfigurationConnection modelConnection = mock(WorkflowTestConfigurationConnection.class);
+
+        when(rootConnection.getWorkflowConnectionKey()).thenReturn("aiAgent");
+        when(modelConnection.getWorkflowConnectionKey()).thenReturn("openAi_1");
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", "aiAgent_1", 3L))
+            .thenReturn(List.of(rootConnection, modelConnection));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(AGENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void aTestOutputRecordedForAnotherOperationIsIgnored() {
+        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
+            .thenReturn(httpClientActionDefinition);
+        stubStoredType(workflowNodeTestOutput, "post");
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(
+            Property.toProperty(ComponentDsl.object("httpClient_1")
+                .properties(ComponentDsl.string("quote"))),
+            null));
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput("wf-1", "httpClient_1", 3L))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(HTTP_CLIENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+        assertEquals(
+            List.of("[logger_1] Property 'httpClient_1.quote' might not exist in the output of 'httpClient/v1/get'"),
+            result.warnings());
+    }
+
+    private static void stubStoredType(WorkflowNodeTestOutput workflowNodeTestOutput, String operationName) {
+        when(workflowNodeTestOutput.getTypeName()).thenReturn("httpClient");
+        when(workflowNodeTestOutput.getTypeVersion()).thenReturn(1);
+        when(workflowNodeTestOutput.getTypeOperationName()).thenReturn(operationName);
     }
 
     private void stubComponent(String name, String title, boolean connectionRequired) {

@@ -37,6 +37,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -50,9 +51,11 @@ import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -344,22 +347,51 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
         String componentTitle = getTitleOfComponentRequiringConnection(type);
 
-        if (componentTitle != null && connections.isEmpty()) {
+        if (componentTitle != null && !isConnected(connections, getNodeConnectionKeys(nodeJsonNode, type))) {
             StringUtils.appendWithNewline(
                 "[" + name + "] " + ValidationErrorUtils.missingConnection(componentTitle), errors);
         }
 
         appendMissingClusterElementConnections(nodeJsonNode.get("clusterElements"), connections, errors);
 
-        JsonNode parametersJsonNode = nodeJsonNode.get("parameters");
+        WorkflowValidator.forEachNestedTask(
+            nodeJsonNode.get("parameters"),
+            nestedTaskJsonNode -> appendMissingNodeConnection(nestedTaskJsonNode, workflowId, environmentId, errors));
+    }
 
-        if (parametersJsonNode == null || !parametersJsonNode.isObject()) {
-            return;
+    private static Set<String> getNodeConnectionKeys(JsonNode nodeJsonNode, String type) {
+        Set<String> connectionKeys = new HashSet<>();
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        connectionKeys.add(workflowNodeType.name());
+
+        JsonNode connectionsJsonNode = nodeJsonNode.get("connections");
+
+        if (connectionsJsonNode == null) {
+            return connectionKeys;
         }
 
-        for (String propertyName : WorkflowValidator.NESTED_TASK_PROPERTIES) {
-            appendMissingNodeConnections(parametersJsonNode.get(propertyName), workflowId, environmentId, errors);
+        if (connectionsJsonNode.isObject()) {
+            connectionKeys.addAll(connectionsJsonNode.propertyNames());
+        } else if (connectionsJsonNode.isArray()) {
+            for (JsonNode connectionJsonNode : connectionsJsonNode) {
+                JsonNode keyJsonNode = connectionJsonNode.get("key");
+
+                if (keyJsonNode != null && keyJsonNode.isString()) {
+                    connectionKeys.add(keyJsonNode.asString());
+                }
+            }
         }
+
+        return connectionKeys;
+    }
+
+    private static boolean isConnected(
+        List<WorkflowTestConfigurationConnection> connections, Set<String> connectionKeys) {
+
+        return connections.stream()
+            .anyMatch(connection -> connectionKeys.contains(connection.getWorkflowConnectionKey()));
     }
 
     private void appendMissingClusterElementConnections(
@@ -394,10 +426,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             elementJsonNode.get("type")
                 .asString());
 
-        boolean connected = connections.stream()
-            .anyMatch(connection -> Objects.equals(connection.getWorkflowConnectionKey(), elementName));
-
-        if (componentTitle != null && !connected) {
+        if (componentTitle != null && !isConnected(connections, Set.of(elementName))) {
             StringUtils.appendWithNewline(
                 "[" + elementName + "] " + ValidationErrorUtils.missingConnection(componentTitle), errors);
         }
@@ -519,19 +548,10 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             return;
         }
 
-        for (String propertyName : WorkflowValidator.NESTED_TASK_PROPERTIES) {
-            JsonNode nestedJsonNode = parametersJsonNode.get(propertyName);
-
-            if (nestedJsonNode == null) {
-                continue;
-            }
-
-            if (nestedJsonNode.isArray()) {
-                addNodeOutputs(nestedJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap);
-            } else {
-                addNodeOutput(nestedJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap);
-            }
-        }
+        WorkflowValidator.forEachNestedTask(
+            parametersJsonNode,
+            nestedTaskJsonNode -> addNodeOutput(
+                nestedTaskJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap));
     }
 
     private @Nullable PropertyInfo resolveTestOutput(
@@ -548,6 +568,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 ? com.bytechef.platform.workflow.task.dispatcher.domain.Property.class : Property.class;
 
             return workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, name, environmentId)
+                .filter(workflowNodeTestOutput -> isOfType(workflowNodeTestOutput, workflowNodeType))
                 .map(workflowNodeTestOutput -> toOutputPropertyInfo(workflowNodeTestOutput.getOutput(typeClass)))
                 .orElse(null);
         } catch (Exception e) {
@@ -555,6 +576,12 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         }
 
         return null;
+    }
+
+    private static boolean isOfType(WorkflowNodeTestOutput workflowNodeTestOutput, WorkflowNodeType workflowNodeType) {
+        return Objects.equals(workflowNodeTestOutput.getTypeName(), workflowNodeType.name()) &&
+            workflowNodeTestOutput.getTypeVersion() == workflowNodeType.version() &&
+            Objects.equals(workflowNodeTestOutput.getTypeOperationName(), workflowNodeType.operation());
     }
 
     private @Nullable PropertyInfo resolveDynamicOutput(
