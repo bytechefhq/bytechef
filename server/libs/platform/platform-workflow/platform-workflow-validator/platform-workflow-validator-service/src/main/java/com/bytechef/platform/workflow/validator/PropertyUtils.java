@@ -79,6 +79,24 @@ class PropertyUtils {
     /**
      * Checks if a property exists in the given PropertyInfo structure.
      */
+    public static boolean isNestedTaskProperty(PropertyInfo propertyInfo) {
+        if ("TASK".equalsIgnoreCase(propertyInfo.type())) {
+            return true;
+        }
+
+        List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
+
+        if (!"ARRAY".equalsIgnoreCase(propertyInfo.type()) || nestedPropertyInfos == null ||
+            nestedPropertyInfos.size() != 1) {
+
+            return false;
+        }
+
+        PropertyInfo nestedPropertyInfo = nestedPropertyInfos.getFirst();
+
+        return "TASK".equalsIgnoreCase(nestedPropertyInfo.type());
+    }
+
     public static boolean checkPropertyExists(PropertyInfo outputInfo, String propertyName) {
         return checkPropertyExistsRecursive(outputInfo, propertyName.split("\\."));
     }
