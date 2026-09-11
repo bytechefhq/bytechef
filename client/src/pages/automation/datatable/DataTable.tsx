@@ -63,7 +63,7 @@ const DataTable = () => {
             leftSidebarWidth="64"
         >
             <PageLoader errors={[tablesError, rowsError]} loading={tablesLoading || rowsLoading}>
-                <div className="grid px-4">
+                <div className="grid p-4 pt-2">
                     <DataGrid
                         aria-description="Data Table"
                         bottomSummaryRows={[{}]}
