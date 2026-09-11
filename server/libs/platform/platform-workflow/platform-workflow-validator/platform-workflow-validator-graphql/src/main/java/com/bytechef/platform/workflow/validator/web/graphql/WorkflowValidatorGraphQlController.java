@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.validator.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
@@ -40,7 +41,12 @@ public class WorkflowValidatorGraphQlController {
 
     @QueryMapping
     public WorkflowValidatorFacade.WorkflowValidationResult validateWorkflow(
-        @Argument String workflow, @Argument @Nullable Long environmentId) {
+        @Argument String workflow, @Argument @Nullable String workflowId, @Argument @Nullable Long environmentId) {
+
+        if (workflowId != null) {
+            return workflowValidatorFacade.validateWorkflow(
+                workflow, workflowId, environmentId == null ? Environment.DEVELOPMENT.ordinal() : environmentId);
+        }
 
         if (environmentId == null) {
             return workflowValidatorFacade.validateWorkflow(workflow);
