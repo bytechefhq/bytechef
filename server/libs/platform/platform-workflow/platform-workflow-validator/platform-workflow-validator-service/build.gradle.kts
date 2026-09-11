@@ -14,5 +14,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
+    testImplementation("org.mockito:mockito-core")
     testImplementation(project(":server:libs:test:test-support"))
 }
