@@ -1,6 +1,7 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
 import {
     useSaveClusterElementTestConfigurationConnectionMutation,
     useSaveWorkflowTestConfigurationConnectionMutation,
@@ -92,6 +93,8 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                         queryClient.invalidateQueries({
                             queryKey: ConnectionKeys.connections,
                         });
+
+                        invalidateWorkflowValidation(queryClient);
                     },
                 }
             );
@@ -113,6 +116,8 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                         queryClient.invalidateQueries({
                             queryKey: ConnectionKeys.connections,
                         });
+
+                        invalidateWorkflowValidation(queryClient);
                     },
                 }
             );

@@ -4,6 +4,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Label} from '@/components/ui/label';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
@@ -98,6 +99,8 @@ const ConnectionTabConnectionSelect = ({
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
             });
+
+            invalidateWorkflowValidation(queryClient);
         },
     });
 
@@ -106,6 +109,8 @@ const ConnectionTabConnectionSelect = ({
             queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
             });
+
+            invalidateWorkflowValidation(queryClient);
         },
     });
 
