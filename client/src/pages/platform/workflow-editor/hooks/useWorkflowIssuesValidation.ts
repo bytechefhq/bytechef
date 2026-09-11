@@ -17,7 +17,7 @@ export default function useWorkflowIssuesValidation(): void {
     );
 
     const {data} = useValidateWorkflowQuery(
-        {environmentId: currentEnvironmentId, workflowDefinition: workflow.definition!},
+        {environmentId: currentEnvironmentId, workflowDefinition: workflow.definition!, workflowId: workflow.id},
         {enabled: !!workflow.definition}
     );
 

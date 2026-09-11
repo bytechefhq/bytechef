@@ -38,7 +38,11 @@ describe('useWorkflowIssuesValidation', () => {
     it('queries with the definition and the selected environment', () => {
         renderHook(() => useWorkflowIssuesValidation());
 
-        expect(hoisted.queryVariables[0]).toEqual({environmentId: 2, workflowDefinition: '{"tasks":[]}'});
+        expect(hoisted.queryVariables[0]).toEqual({
+            environmentId: 2,
+            workflowDefinition: '{"tasks":[]}',
+            workflowId: 'wf-1',
+        });
     });
 
     it('stores node issues from the response as validator issues', () => {
