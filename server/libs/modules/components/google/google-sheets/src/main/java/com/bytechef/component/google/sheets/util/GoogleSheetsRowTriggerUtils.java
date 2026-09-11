@@ -40,9 +40,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 /**
- * Shared logic for the row-hash-tracking Google Sheets triggers (new row, modified row) that poll a sheet and report
- * rows whose position and hash changed between polls.
- *
  * @author Marko Kriskovic
  */
 public class GoogleSheetsRowTriggerUtils {
@@ -69,10 +66,6 @@ public class GoogleSheetsRowTriggerUtils {
         };
     }
 
-    /**
-     * Polls the configured sheet, diffs the current row hashes against the ones known from the previous poll using
-     * {@code changedRowIndexesFunction}, and returns the rows at the resulting indexes.
-     */
     public static List<Map<String, Object>> getChangedRows(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context,
         BiFunction<List<String>, List<String>, List<Integer>> changedRowIndexesFunction) {
