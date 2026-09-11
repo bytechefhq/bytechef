@@ -1,7 +1,9 @@
-import {NodeDataType} from '@/shared/types';
+import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
+import {ClusterElementsType, NodeDataType} from '@/shared/types';
 import {AlertTriangleIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowIssues from '../hooks/useWorkflowIssues';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -14,7 +16,9 @@ interface WorkflowIssuesSidebarProps {
 }
 
 const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
-    const nodes = useWorkflowDataStore((state) => state.nodes);
+    const {nodes, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({nodes: state.nodes, workflow: state.workflow}))
+    );
 
     const issues = useWorkflowIssues();
 
@@ -41,13 +45,21 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
 
     const handleIssueClick = useCallback(
         (nodeName: string) => {
-            const node = nodes.find((currentNode) => (currentNode.data as NodeDataType).name === nodeName);
+            const clusterRootTask = workflow.tasks?.find(
+                (task) =>
+                    !!task.clusterElements &&
+                    !!getClusterElementByName(task.clusterElements as ClusterElementsType, nodeName)
+            );
+
+            const targetNodeName = clusterRootTask?.name ?? nodeName;
+
+            const node = nodes.find((currentNode) => (currentNode.data as NodeDataType).name === targetNodeName);
 
             if (node) {
                 openNodeDetails(node.data as NodeDataType, 'properties');
             }
         },
-        [nodes]
+        [nodes, workflow.tasks]
     );
 
     return (
