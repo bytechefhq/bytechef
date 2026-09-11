@@ -3743,6 +3743,7 @@ export enum WorkflowIssueKind {
   BrokenReference = 'BROKEN_REFERENCE',
   DuplicateNodeName = 'DUPLICATE_NODE_NAME',
   MissingClusterElement = 'MISSING_CLUSTER_ELEMENT',
+  MissingConnection = 'MISSING_CONNECTION',
   MissingRequired = 'MISSING_REQUIRED',
   MissingResource = 'MISSING_RESOURCE',
   Other = 'OTHER',
