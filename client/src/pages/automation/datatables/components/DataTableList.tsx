@@ -15,7 +15,7 @@ const DataTableList = ({allTags, dataTables, tagsByTableData}: DataTableListProp
     const {sortedTables, tagsByTableMap} = useDataTableList({dataTables, tagsByTableData});
 
     return (
-        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">
             {sortedTables.map((table) => {
                 const currentTags = tagsByTableMap.get(table.id) || [];
 

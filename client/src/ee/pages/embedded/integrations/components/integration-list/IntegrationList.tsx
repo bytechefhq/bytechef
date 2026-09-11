@@ -34,7 +34,7 @@ const IntegrationList = ({
     }, [newlyCreatedIntegrationId]);
 
     return (
-        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">
             {integrations.map((integration) => {
                 const integrationTagIds = integration.tags?.map((tag) => tag.id);
 

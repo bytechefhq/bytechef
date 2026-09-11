@@ -117,7 +117,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
 
     return (
         <div className={twMerge('relative h-full min-h-[50vh] w-[450px] bg-surface-main', className)}>
-            <div className={twMerge('flex items-center justify-between px-4 py-3', headerClassName)}>
+            <div className={twMerge('flex items-center justify-between p-4', headerClassName)}>
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>

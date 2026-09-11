@@ -22,7 +22,7 @@ export default function IdentityProvidersPage() {
             }
             leftSidebarOpen={false}
         >
-            <div className="w-full space-y-4 px-4 text-sm 3xl:mx-auto 3xl:w-4/5">
+            <div className="w-full space-y-4 p-4 text-sm 3xl:mx-auto 3xl:w-4/5">
                 <IdentityProvidersTable />
             </div>
 
