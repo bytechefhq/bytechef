@@ -34,14 +34,14 @@ A project is the container that holds your workflows.
 <Steps>
 <Step>
 
-Open the **Projects** page and click **Create Project**. The button reads **New Project** once you already have projects.
+Open the **Projects** page and click **New Project**. On a fresh instance the button reads **Create Project**.
 
 </Step>
 <Step>
 
 Enter a project name, for example `Getting started`. Optionally add a description, choose a category, and add tags. Then click **Save**.
 
-{/* screenshot: the Create Project dialog with the name "Getting started" filled in. Save as build-first-workflow/create-project.png */}
+![The Create Project dialog with the name Getting started filled in](build-first-workflow/create-project.png)
 
 </Step>
 </Steps>
@@ -56,44 +56,44 @@ On your new project's row, click **+ Workflow**.
 </Step>
 <Step>
 
-Enter the label `Learn ByteChef by doing` and click **Save**. ByteChef opens the new workflow in the editor with a **Manual** trigger already in place.
+Enter the label `Learn ByteChef by doing` and click **Save**.
 
-{/* screenshot: the new workflow in the editor, showing the Manual trigger and the + button. Save as build-first-workflow/workflow-editor.png */}
+![The Create Workflow dialog with a label filled in](build-first-workflow/create-workflow.png)
+
+</Step>
+<Step>
+
+ByteChef opens the new workflow in the editor with a **Manual** trigger already in place. The Manual trigger starts the workflow when you click **Test** or **Run**.
+
+![A new workflow in the editor, showing the Manual trigger and the + button](build-first-workflow/workflow-editor.png)
 
 </Step>
 </Steps>
-
-The Manual trigger starts the workflow when you click **Test** or **Run**. The template uses the same trigger. When you want the workflow to run on its own, click the trigger and swap it for a **Schedule** trigger.
 
 ## 3. Fetch a random quote
 
 <Steps>
 <Step>
 
-Click the **+** button below the trigger, search for **HTTP Client**, and select it.
+Click the **+** button below the trigger, search for **HTTP Client**, and select it. Choose the **GET** action.
 
 </Step>
 <Step>
 
-Choose the **GET** action.
-
-</Step>
-<Step>
-
-In the properties panel, set **URI** to:
+The step's panel opens on the right. Open its **Properties** tab and set **URI** to:
 
 ```
 https://dummyjson.com/quotes/random
 ```
 
-Leave **Response Type** on **JSON** and everything else at its default. There is no connection to create: the API is public.
+Leave **Response Format** on **JSON** and everything else at its default. There is no connection to create: the API is public.
 
-{/* screenshot: the HTTP Client properties panel with the GET action selected and the URI filled in. Save as build-first-workflow/http-client.png */}
+![The HTTP Client step with the GET action and the URI filled in on the Properties tab](build-first-workflow/http-client.png)
 
 </Step>
 <Step>
 
-Optionally rename the step by clicking its label at the top of the panel, for example `Get a random quote`. The step's **name**, `httpClient_1`, is what other steps use to reference its output; it does not change when you edit the label.
+Optionally rename the step on the **Description** tab, for example to `Get a random quote`. The step's **name**, `httpClient_1`, is what other steps use to reference its output; it does not change when you edit the title.
 
 </Step>
 </Steps>
@@ -103,25 +103,20 @@ Optionally rename the step by clicking its label at the top of the panel, for ex
 <Steps>
 <Step>
 
-Click the **+** button below the HTTP Client step, search for **Logger**, and select it.
+Click the **+** button below the HTTP Client step, search for **Logger**, and select it. Choose the **Info** action.
 
 </Step>
 <Step>
 
-Choose the **Info** action.
-
-</Step>
-<Step>
-
-In the **Text** field, enter the expression:
+On the **Properties** tab, enter this expression in the **Text** field:
 
 ```
 ${httpClient_1.quote}
 ```
 
-This is a data pill: it pulls the `quote` field out of the JSON the HTTP Client step returned. You can also open the field's data picker and click the `quote` field under `httpClient_1` to insert the same expression.
+This is a data pill: it pulls the `quote` field out of the JSON the HTTP Client step returned. The editor shows it as a chip once you leave the field. You can also open the field's data picker and click the `quote` field under `httpClient_1` to insert the same expression.
 
-{/* screenshot: the Logger properties panel with the Info action and the ${httpClient_1.quote} expression in the Text field. Save as build-first-workflow/logger.png */}
+![The Logger step with the httpClient_1.quote data pill in the Text field](build-first-workflow/logger.png)
 
 </Step>
 </Steps>
@@ -134,17 +129,15 @@ Click **Test** at the top right of the editor. ByteChef runs the workflow once:
 - The HTTP Client step calls the quotes API
 - The Logger step prints the quote
 
-The execution panel opens below the canvas. Click the Logger step to see the quote in its output, and click the HTTP Client step to see the full JSON it received.
+The execution panel opens below the canvas. Click the Logger step and open its **Logs** tab: the quote is there. Click the HTTP Client step to see the full JSON it received on its **Output** tab.
 
-{/* screenshot: the execution panel after a successful test, with the Logger step selected and the quote visible. Save as build-first-workflow/test-execution.png */}
+![The execution panel after a successful test, with the Logger step selected and the quote in its Logs tab](build-first-workflow/test-execution.png)
 
 Run it again and you get a different quote.
 
 ## What you have built
 
-```
-Manual Trigger → HTTP Client (GET) → Logger (Info)
-```
+![The finished workflow on the canvas: Manual trigger, Get a random quote, Log the quote](build-first-workflow/workflow-canvas.png)
 
 This is the shape of every ByteChef workflow:
 
@@ -152,7 +145,7 @@ This is the shape of every ByteChef workflow:
 - **Components**: do the work, such as fetching, creating or sending
 - **Data pills**: pass data between steps with `${stepName.fieldName}`. See [Data Pills & Input Modes](/platform/automation/build/workflows/data-pills)
 
-The same workflow is available as a template. To import it instead of building it, open the [Learn ByteChef by doing](https://www.bytechef.io/workflow-templates/learn-bytechef-by-doing) page, click **Use template**, and then click **Run** in the editor.
+The same workflow is available as a template. To import it instead of building it, open the [Learn ByteChef by doing](https://www.bytechef.io/workflow-templates/learn-bytechef-by-doing) page, click **Use template**, and then click **Test** in the editor.
 
 ## Next steps
 
