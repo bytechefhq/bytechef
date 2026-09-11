@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
@@ -34,8 +35,8 @@ import tools.jackson.databind.JsonNode;
  */
 public class WorkflowValidator {
 
-    static final String[] NESTED_TASK_PROPERTIES = new String[] {
-        "caseTrue", "caseFalse", "iteratee", "tasks"
+    private static final String[] NESTED_TASK_ARRAY_PROPERTIES = new String[] {
+        "caseTrue", "caseFalse", "default", "main-branch", "on-error-branch", "tasks"
     };
 
     static final List<String> VALID_INPUT_TYPES = List.of(
@@ -260,25 +261,11 @@ public class WorkflowValidator {
         TaskOutputProvider taskOutputProvider, ClusterTypesProvider clusterTypesProvider, StringBuilder errors,
         StringBuilder warnings) {
 
-        for (String propertyName : NESTED_TASK_PROPERTIES) {
-            if (!parametersJsonNode.has(propertyName)) {
-                continue;
-            }
-
-            JsonNode jsonNode = parametersJsonNode.get(propertyName);
-
-            if (jsonNode.isArray()) {
-                for (int i = 0; i < jsonNode.size(); i++) {
-                    discoverNestedTask(
-                        jsonNode.get(i), taskDefinitionMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
-                        taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings);
-                }
-            } else {
-                discoverNestedTask(
-                    jsonNode, taskDefinitionMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
-                    taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings);
-            }
-        }
+        forEachNestedTask(
+            parametersJsonNode,
+            nestedTaskJsonNode -> discoverNestedTask(
+                nestedTaskJsonNode, taskDefinitionMap, taskOutputMap, clusterTypesMap, taskJsonNodes,
+                taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, errors, warnings));
     }
 
     private static void discoverNestedTask(
@@ -742,17 +729,21 @@ public class WorkflowValidator {
      */
     private static void collectTaskNames(JsonNode tasksJsonNode, List<String> nodeNames) {
         for (JsonNode taskJsonNode : tasksJsonNode) {
-            if (!taskJsonNode.isObject()) {
-                continue;
-            }
+            collectTaskName(taskJsonNode, nodeNames);
+        }
+    }
 
-            collectNodeName(taskJsonNode, nodeNames);
+    private static void collectTaskName(JsonNode taskJsonNode, List<String> nodeNames) {
+        if (!taskJsonNode.isObject()) {
+            return;
+        }
 
-            JsonNode parametersJsonNode = taskJsonNode.get("parameters");
+        collectNodeName(taskJsonNode, nodeNames);
 
-            if (parametersJsonNode != null && parametersJsonNode.isObject()) {
-                collectNestedTaskNames(parametersJsonNode, nodeNames);
-            }
+        JsonNode parametersJsonNode = taskJsonNode.get("parameters");
+
+        if (parametersJsonNode != null && parametersJsonNode.isObject()) {
+            collectNestedTaskNames(parametersJsonNode, nodeNames);
         }
     }
 
@@ -761,30 +752,30 @@ public class WorkflowValidator {
      * parallel/on-error task arrays, loop/each/map iteratee (array or single object) and fork-join branches.
      */
     private static void collectNestedTaskNames(JsonNode parametersJsonNode, List<String> nodeNames) {
-        for (String key : new String[] {
-            "caseTrue", "caseFalse", "default", "main-branch", "on-error-branch", "tasks"
-        }) {
+        forEachNestedTask(parametersJsonNode, taskJsonNode -> collectTaskName(taskJsonNode, nodeNames));
+    }
 
-            JsonNode nestedTasksJsonNode = parametersJsonNode.get(key);
+    /**
+     * Passes each task nested directly inside the given parameters to the consumer, covering the task-dispatcher
+     * nesting shapes: condition caseTrue/caseFalse, branch default/cases, parallel/on-error task arrays, loop/each/map
+     * iteratee (array or single object) and fork-join branches. Tasks nested deeper are left to the consumer.
+     */
+    static void forEachNestedTask(@Nullable JsonNode parametersJsonNode, Consumer<JsonNode> consumer) {
+        if (parametersJsonNode == null || !parametersJsonNode.isObject()) {
+            return;
+        }
 
-            if (nestedTasksJsonNode != null && nestedTasksJsonNode.isArray()) {
-                collectTaskNames(nestedTasksJsonNode, nodeNames);
-            }
+        for (String key : NESTED_TASK_ARRAY_PROPERTIES) {
+            acceptTasks(parametersJsonNode.get(key), consumer);
         }
 
         JsonNode iterateeJsonNode = parametersJsonNode.get("iteratee");
 
         if (iterateeJsonNode != null) {
             if (iterateeJsonNode.isArray()) {
-                collectTaskNames(iterateeJsonNode, nodeNames);
-            } else if (iterateeJsonNode.isObject() && iterateeJsonNode.has("name")) {
-                collectNodeName(iterateeJsonNode, nodeNames);
-
-                JsonNode iterateeParametersJsonNode = iterateeJsonNode.get("parameters");
-
-                if (iterateeParametersJsonNode != null && iterateeParametersJsonNode.isObject()) {
-                    collectNestedTaskNames(iterateeParametersJsonNode, nodeNames);
-                }
+                acceptTasks(iterateeJsonNode, consumer);
+            } else if (iterateeJsonNode.isObject()) {
+                consumer.accept(iterateeJsonNode);
             }
         }
 
@@ -792,11 +783,7 @@ public class WorkflowValidator {
 
         if (casesJsonNode != null && casesJsonNode.isArray()) {
             for (JsonNode caseJsonNode : casesJsonNode) {
-                JsonNode caseTasksJsonNode = caseJsonNode.get("tasks");
-
-                if (caseTasksJsonNode != null && caseTasksJsonNode.isArray()) {
-                    collectTaskNames(caseTasksJsonNode, nodeNames);
-                }
+                acceptTasks(caseJsonNode.get("tasks"), consumer);
             }
         }
 
@@ -804,9 +791,19 @@ public class WorkflowValidator {
 
         if (branchesJsonNode != null && branchesJsonNode.isArray()) {
             for (JsonNode branchJsonNode : branchesJsonNode) {
-                if (branchJsonNode.isArray()) {
-                    collectTaskNames(branchJsonNode, nodeNames);
-                }
+                acceptTasks(branchJsonNode, consumer);
+            }
+        }
+    }
+
+    private static void acceptTasks(@Nullable JsonNode tasksJsonNode, Consumer<JsonNode> consumer) {
+        if (tasksJsonNode == null || !tasksJsonNode.isArray()) {
+            return;
+        }
+
+        for (JsonNode taskJsonNode : tasksJsonNode) {
+            if (taskJsonNode.isObject()) {
+                consumer.accept(taskJsonNode);
             }
         }
     }

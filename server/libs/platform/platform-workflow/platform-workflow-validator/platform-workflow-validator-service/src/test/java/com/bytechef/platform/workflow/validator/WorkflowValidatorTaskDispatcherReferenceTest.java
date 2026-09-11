@@ -61,6 +61,8 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
             new PropertyInfo("inputs", "OBJECT", null, false, true, null, null)),
         "logger/v1/info", List.of(
             new PropertyInfo("text", "STRING", null, false, true, null, null)),
+        "aiAgent/v1/chat", List.of(
+            new PropertyInfo("userPrompt", "STRING", null, false, true, null, null)),
         "condition/v1", List.of(
             new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
             new PropertyInfo("expression", "STRING", null, false, true, null, null),
@@ -185,6 +187,44 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
         }
         """;
 
+    private static final String AGENT_IN_MAP_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [
+                {"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual"}
+            ],
+            "tasks": [
+                {
+                    "label": "Map",
+                    "name": "map_1",
+                    "type": "map/v1",
+                    "parameters": {
+                        "items": ["ee"],
+                        "iteratee": [
+                            {
+                                "label": "Agent",
+                                "name": "aiAgent_1",
+                                "type": "aiAgent/v1/chat",
+                                "parameters": {"userPrompt": "hi"},
+                                "clusterElements": {
+                                    "tools": [
+                                        {
+                                            "label": "Logger",
+                                            "name": "logger_1",
+                                            "type": "logger/v1/info",
+                                            "parameters": {"text": "${map_1.item}"}
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        """;
+
     private static final String EACH_WORKFLOW = """
         {
             "label": "workflow1",
@@ -285,6 +325,14 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
         Result result = validate(LOGGER_THEN_MAP_WORKFLOW, Map.of(), Map.of("map_1", ITEM_VARIABLE_OUTPUT));
 
         assertEquals("[logger_1] Wrong task order: You can't reference 'map_1.item' in logger_1", result.errors());
+    }
+
+    @Test
+    void aClusterElementOfATaskInsideTheMapCanReferenceTheMapItem() {
+        Result result = validate(AGENT_IN_MAP_WORKFLOW, Map.of(), Map.of("map_1", ITEM_VARIABLE_OUTPUT));
+
+        assertEquals("", result.errors());
+        assertEquals("", result.warnings());
     }
 
     @Test
