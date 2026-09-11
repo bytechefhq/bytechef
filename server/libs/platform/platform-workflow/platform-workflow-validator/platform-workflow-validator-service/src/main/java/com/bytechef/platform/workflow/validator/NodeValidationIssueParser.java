@@ -61,6 +61,8 @@ class NodeValidationIssueParser {
         new MessageTemplate(
             Pattern.compile("^Cluster element '([^']+)' .*$"), WorkflowIssueKind.MISSING_CLUSTER_ELEMENT),
         new MessageTemplate(
+            Pattern.compile("^Missing required connection: .*$"), WorkflowIssueKind.MISSING_CONNECTION),
+        new MessageTemplate(
             Pattern.compile("^Property '([^']+)' is not defined in task definition$"), WorkflowIssueKind.OTHER),
         new MessageTemplate(Pattern.compile("^Field '([^']+)' must .*$"), WorkflowIssueKind.TYPE_MISMATCH),
         new MessageTemplate(
@@ -126,7 +128,9 @@ class NodeValidationIssueParser {
                 .matcher(message);
 
             if (matcher.matches()) {
-                return new NodeValidationIssue(nodeName, matcher.group(1), messageTemplate.kind(), severity, message);
+                String propertyPath = matcher.groupCount() > 0 ? matcher.group(1) : null;
+
+                return new NodeValidationIssue(nodeName, propertyPath, messageTemplate.kind(), severity, message);
             }
         }
 

@@ -31,6 +31,15 @@ import org.junit.jupiter.api.Test;
 class NodeValidationIssueParserTest {
 
     @Test
+    void classifiesAMissingConnectionWithoutAPropertyPath() {
+        List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
+            List.of("[affinity_1] Missing required connection: Affinity"), List.of());
+
+        assertIssue(
+            issues.getFirst(), "affinity_1", null, WorkflowIssueKind.MISSING_CONNECTION, WorkflowIssueSeverity.ERROR);
+    }
+
+    @Test
     void classifiesPrefixedMessagesByTemplate() {
         List<NodeValidationIssue> issues = NodeValidationIssueParser.parse(
             List.of(
