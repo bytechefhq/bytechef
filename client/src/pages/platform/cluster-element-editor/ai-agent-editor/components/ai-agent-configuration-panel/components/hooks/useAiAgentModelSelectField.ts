@@ -104,7 +104,7 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
 
     const isConnectionMissing =
         !!model &&
-        !!modelComponentDefinition?.connection &&
+        !!modelComponentDefinition?.connectionRequired &&
         !testConnections?.some((connection) => connection.workflowConnectionKey === model.name);
 
     const handleConfigureModel = useCallback(
