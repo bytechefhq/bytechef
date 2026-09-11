@@ -1,148 +1,162 @@
 ---
 title: "Build First Workflow"
-description: "This guide walks you through the basics of ByteChef in a few minutes. You'll learn how to build a workflow quickly, so no much configuration needed."
+description: "Build and run your first ByteChef workflow in a few minutes. No connections or credentials needed."
 ---
 
-In this tutorial, you'll learn:
+In this guide you build the same workflow as the [Learn ByteChef by doing](https://www.bytechef.io/workflow-templates/learn-bytechef-by-doing) template: a trigger, an HTTP call to a public API, and a logger that prints the result. It needs no connections, so it runs the moment you finish it.
 
-- How to build a workflow quickly with ByteChef's Workflow Builder
-- How to add and configure a component with data expressions
-- How to execute workflow automations
+You will learn:
 
+- How to create a project and a workflow
+- How to add and configure components
+- How to pass data between steps with an expression
+- How to test a workflow and read its execution log
 
-## Pick Your Platform
+## Before you start
 
-You have two ways to use ByteChef:
+Sign in to [ByteChef Cloud](https://app.bytechef.io/) or run ByteChef yourself. The quickest self-hosted option is one command, with [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed:
 
-- **[ByteChef Cloud](https://app.bytechef.io/)**: We host it. Zero installation. Best for testing and getting familiar with the platform. We'll use this for this guide.
-
-- **Your own infrastructure (Self-Hosted)**: Deploy and run ByteChef yourself. Supported on:
-
-  - [Docker](/platform/use-bytechef/self-hosted/installation/local-docker)
-  - [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes)
-  - [AWS EC2](/platform/use-bytechef/self-hosted/installation/aws-ec2)
-  - [AWS ECS](/platform/use-bytechef/self-hosted/installation/aws-ecs)
-  - [Azure](/platform/use-bytechef/self-hosted/installation/azure)
-  - [Google Cloud](/platform/use-bytechef/self-hosted/installation/google-cloud)
-  - [DigitalOcean](/platform/use-bytechef/self-hosted/installation/digitalocean)
-
-If you're ready to selfhost, you can pick any of the platforms above for detailed setup instructions.
-
-In this quickstart guide, we'll be working with the Cloud instance so you can dive in immediately. You can switch to self-hosted instance anytime after you finish this guide.
-
-## 1. Sign in
-
-- Open ByteChef on the [Cloud](https://app.bytechef.io/) or your self-hosted instance
-- **Register** a new account (or sign in if you already have one). On a fresh self-hosted instance, sign in with the default admin credentials and change the password afterward
-- On first sign-in you land in the **Automation** workspace
-
-{/* TODO screenshot: ByteChef sign-in screen - email/password fields, social sign-in buttons, and the Register link */}
-
-## 2. Create a Project
-
-- Go to the **Projects** page in the Automation workspace on the [Cloud](https://app.bytechef.io/) or your self-hosted instance
-- Click the **Create Project** button (labeled **New Project** once you already have projects)
-- In the **Create Project** dialog, enter a **Name** and, optionally, a **Description**, **Category**, and **Tags**
-- Click **Save**
-
-{/* TODO screenshot: Create Project dialog - Name, Description, Category, and Tags fields with the Save button */}
-
-## 3. Create Your First Workflow
-
-Inside your project:
-
-- Click the <img
-    src="/addworkflow.png"
-    alt="add workflow"
-    width="100"
-    height="20"
-    style={{
-      display: 'inline',
-      verticalAlign: 'middle',
-      margin: '0 4px'
-    }}
-  /> button in the project pane
-- Give it a label (e.g., "Send Welcome Email")
-- Click `Save`.
-
-Now, you now have a blank canvas in your workflow; let's build something.
-
-## 4. Add a Trigger
-
-Every workflow in ByteChef starts with a trigger, it's the event that kicks off your automation.
-
-- Click the **+** button on the canvas
-- Search for and select Manual Trigger (this lets you start the workflow by testing or deploying)
-- Click to confirm
-
-<div style={{ width: '300px' }}>
-  <img src="/manualtrigger.png" alt="manual trigger" style={{ width: '100%', height: 'auto' }} />
-</div>
-
-## 5. Add and Configure Your First Component
-
-Now, let's add a component that does something. Let's use the Spotify component to create a playlist and share with your teammates on Slack.
-
-- Click the + icon after the Manual Trigger
-- Search for Spotify
-- Select **Spotify** and click to add it
-- Select an action from the dropdown (the **Create Playlist** action)
-- Configure the component:
-  - Make a connection with the component by providing your Spotify Client ID and Client Secret
-
-{/* TODO screenshot: node properties panel open for the Spotify Create Playlist action - the action dropdown, the connection selector with "Create Connection" option, and the property fields */}
-  - In the properties panel, provide the playlist name and description
-  - Select if you want the playlist to be public or private
-  - Select if you want the playlist to be collaborative or not
-- Add the **Slack** component and select the **Send Channel Message** action
-- Configure the component:
-  - Make a connection with the component by providing your Slack Bot User OAuth Access Token
-  - In the properties panel, provide the channel ID and message.
-  - In the message section of the Slack properties panel, click on the message tab and enter this expression:
-
-```
-🎵 New playlist created: Slack Shared Songs
-Playlist:${spotify_1.external_urls.spotify}
-Start adding your favorite songs!
+```bash
+docker run --name bytechef -it -p 8080:8080 \
+    --env BYTECHEF_DATABASE=h2 \
+    -v ~/.bytechef:/root/.bytechef \
+    docker.bytechef.io/bytechef/bytechef:latest
 ```
 
-## 6. Test Your Workflow
+Open [http://localhost:8080/login](http://localhost:8080/login) and click **Create account**. This runs on an embedded H2 database and is meant for evaluation. For anything you intend to keep, use PostgreSQL through [Docker Compose](/platform/use-bytechef/self-hosted/installation/local-docker), or see the guides for [Kubernetes](/platform/use-bytechef/self-hosted/installation/kubernetes), [AWS EC2](/platform/use-bytechef/self-hosted/installation/aws-ec2), [AWS ECS](/platform/use-bytechef/self-hosted/installation/aws-ecs), [Azure](/platform/use-bytechef/self-hosted/installation/azure), [Google Cloud](/platform/use-bytechef/self-hosted/installation/google-cloud) and [DigitalOcean](/platform/use-bytechef/self-hosted/installation/digitalocean).
 
-Click the test button at the top right corner of the workflow. ByteChef runs your workflow:
+On first sign-in you land in the **Automation** workspace.
 
-- The Manual Trigger activates the workflow
-- The Spotify component creates a playlist
-- The Slack component sends a message to a channel
+## 1. Create a project
 
-You'll see the execution results below:
+A project is the container that holds your workflows.
 
-![workflow execution](/workflowexecution.png)
+<Steps>
+<Step>
 
-Check your configured Slack channel to see a message in Slack:
+Open the **Projects** page and click **Create Project**. The button reads **New Project** once you already have projects.
 
-<div style={{ width: '400px' }}>
-  <img src="/spotifyslackmessage.png" alt="slack message" style={{ width: '100%', height: 'auto' }} />
-</div>
+</Step>
+<Step>
 
-## What You've Built
+Enter a project name, for example `Getting started`. Optionally add a description, choose a category, and add tags. Then click **Save**.
 
-Your workflow now looks like:
+{/* screenshot: the Create Project dialog with the name "Getting started" filled in. Save as build-first-workflow/create-project.png */}
+
+</Step>
+</Steps>
+
+## 2. Create a workflow
+
+<Steps>
+<Step>
+
+On your new project's row, click **+ Workflow**.
+
+</Step>
+<Step>
+
+Enter the label `Learn ByteChef by doing` and click **Save**. ByteChef opens the new workflow in the editor with a **Manual** trigger already in place.
+
+{/* screenshot: the new workflow in the editor, showing the Manual trigger and the + button. Save as build-first-workflow/workflow-editor.png */}
+
+</Step>
+</Steps>
+
+The Manual trigger starts the workflow when you click **Test** or **Run**. The template uses a daily **Schedule** trigger instead; you can swap the trigger at any time by clicking it and picking another.
+
+## 3. Fetch a random quote
+
+<Steps>
+<Step>
+
+Click the **+** button below the trigger, search for **HTTP Client**, and select it.
+
+</Step>
+<Step>
+
+Choose the **GET** action.
+
+</Step>
+<Step>
+
+In the properties panel, set **URI** to:
 
 ```
-Manual Trigger → Spotify (Create Playlist) → Slack (Send Message)
+https://dummyjson.com/quotes/random
 ```
 
-The demo in this quickstart demonstrates the core concept of automation:
+Leave **Response Type** on **JSON** and everything else at its default. There is no connection to create: the API is public.
 
-- **Trigger**: Something starts the workflow
-- **Components**: Do the actual work (create, fetch, send)
-- **Data pills**: Pull data between components using `${stepName.fieldName}` - see [Data Pills & Input Modes](/platform/automation/build/workflows/data-pills)
+{/* screenshot: the HTTP Client properties panel with the GET action selected and the URI filled in. Save as build-first-workflow/http-client.png */}
 
-## Next Steps
+</Step>
+<Step>
 
-Here are a few things you can explore next:
+Optionally rename the step by clicking its label at the top of the panel, for example `Get a random quote`. The step's **name**, `httpClient_1`, is what other steps use to reference its output; it does not change when you edit the label.
 
-- [Build Workflows](/platform/automation/build/workflows/projects)
-- [Browse 200+ Components](/reference/components)
-- [Deploy your workflow](/platform/automation/deploy/workflows)
-- [Monitor Executions](/platform/automation/monitor/workflow-executions)
+</Step>
+</Steps>
+
+## 4. Log the quote
+
+<Steps>
+<Step>
+
+Click the **+** button below the HTTP Client step, search for **Logger**, and select it.
+
+</Step>
+<Step>
+
+Choose the **Info** action.
+
+</Step>
+<Step>
+
+In the **Text** field, enter the expression:
+
+```
+${httpClient_1.quote}
+```
+
+This is a data pill: it pulls the `quote` field out of the JSON the HTTP Client step returned. You can also open the field's data picker and click the `quote` field under `httpClient_1` to insert the same expression.
+
+{/* screenshot: the Logger properties panel with the Info action and the ${httpClient_1.quote} expression in the Text field. Save as build-first-workflow/logger.png */}
+
+</Step>
+</Steps>
+
+## 5. Test the workflow
+
+Click **Test** at the top right of the editor. ByteChef runs the workflow once:
+
+- The Manual trigger starts it
+- The HTTP Client step calls the quotes API
+- The Logger step prints the quote
+
+The execution panel opens below the canvas. Click the Logger step to see the quote in its output, and click the HTTP Client step to see the full JSON it received.
+
+{/* screenshot: the execution panel after a successful test, with the Logger step selected and the quote visible. Save as build-first-workflow/test-execution.png */}
+
+Run it again and you get a different quote.
+
+## What you have built
+
+```
+Manual Trigger → HTTP Client (GET) → Logger (Info)
+```
+
+This is the shape of every ByteChef workflow:
+
+- **Trigger**: something starts the workflow
+- **Components**: do the work, such as fetching, creating or sending
+- **Data pills**: pass data between steps with `${stepName.fieldName}`. See [Data Pills & Input Modes](/platform/automation/build/workflows/data-pills)
+
+The same workflow is available as a template. To import it instead of building it, open the [Learn ByteChef by doing](https://www.bytechef.io/workflow-templates/learn-bytechef-by-doing) page, click **Use template**, and then click **Test** in the editor.
+
+## Next steps
+
+- [Star Repository on GitHub](/platform/automation/get-started/quick-start/star-repository-on-github): your first workflow with a connection
+- [Configure Workflow Trigger](/platform/automation/get-started/quick-start/configure-workflow-trigger): a real trigger, a deployment and monitoring
+- [Browse 250+ components](/reference/components)
+- [Templates library](https://www.bytechef.io/workflow-templates)
