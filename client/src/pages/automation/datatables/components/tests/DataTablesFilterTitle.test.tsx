@@ -39,19 +39,19 @@ describe('DataTablesFilterTitle', () => {
         it('should render Filter by text', () => {
             render(<DataTablesFilterTitle {...defaultProps} />);
 
-            expect(screen.getByText('Filter by')).toBeInTheDocument();
+            expect(screen.getByText('Filter by:')).toBeInTheDocument();
         });
 
-        it('should render tag label when tagId is present', () => {
+        it('should name the tag facet inside the badge', () => {
             render(<DataTablesFilterTitle {...defaultProps} />);
 
-            expect(screen.getByText('tag:')).toBeInTheDocument();
+            expect(screen.getByText('Tags: Important')).toBeInTheDocument();
         });
 
         it('should render badge with tag name', () => {
             render(<DataTablesFilterTitle {...defaultProps} />);
 
-            expect(screen.getByText('Important')).toBeInTheDocument();
+            expect(screen.getByText('Tags: Important')).toBeInTheDocument();
         });
     });
 
@@ -66,7 +66,7 @@ describe('DataTablesFilterTitle', () => {
         it('should render Filter by text', () => {
             render(<DataTablesFilterTitle {...defaultProps} />);
 
-            expect(screen.getByText('Filter by')).toBeInTheDocument();
+            expect(screen.getByText('Filter by:')).toBeInTheDocument();
         });
 
         it('should render none when no tag is selected', () => {
@@ -78,7 +78,7 @@ describe('DataTablesFilterTitle', () => {
         it('should not render tag label', () => {
             render(<DataTablesFilterTitle {...defaultProps} />);
 
-            expect(screen.queryByText('tag:')).not.toBeInTheDocument();
+            expect(screen.queryByText(/^Tags:/)).not.toBeInTheDocument();
         });
     });
 
@@ -93,7 +93,7 @@ describe('DataTablesFilterTitle', () => {
         it('should render Unknown Tag as fallback', () => {
             render(<DataTablesFilterTitle {...defaultProps} />);
 
-            expect(screen.getByText('Unknown Tag')).toBeInTheDocument();
+            expect(screen.getByText('Tags: Unknown Tag')).toBeInTheDocument();
         });
     });
 });
