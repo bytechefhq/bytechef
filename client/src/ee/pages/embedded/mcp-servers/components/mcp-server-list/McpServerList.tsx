@@ -43,7 +43,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
     const {createHandleRefresh, sortedMcpServers} = useMcpServerList(mcpServers);
 
     return (
-        <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full self-start p-4 3xl:mx-auto 3xl:w-4/5">
             <WorkflowReadOnlyProvider
                 value={{
                     useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,

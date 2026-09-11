@@ -181,13 +181,13 @@ const Billing = () => {
             leftSidebarOpen={false}
         >
             {subscriptionError ? (
-                <div className="w-full p-4 3xl:mx-auto 3xl:w-4/5">
+                <div className="w-full self-start p-4 3xl:mx-auto 3xl:w-4/5">
                     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                         Unable to load subscription. Please refresh the page or contact support if the problem persists.
                     </div>
                 </div>
             ) : (
-                <div className="w-full space-y-4 p-4 3xl:mx-auto 3xl:w-4/5">
+                <div className="w-full space-y-4 self-start p-4 3xl:mx-auto 3xl:w-4/5">
                     {isCheckoutSuccess && (!subscription || isTrialSubscription) && (
                         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
                             {pollAttempts >= MAX_POLL_ATTEMPTS
