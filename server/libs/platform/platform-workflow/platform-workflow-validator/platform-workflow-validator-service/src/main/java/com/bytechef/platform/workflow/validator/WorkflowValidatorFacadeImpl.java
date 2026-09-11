@@ -36,6 +36,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -75,6 +76,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
+    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
 
     private final WorkflowValidator.ClusterTypesProvider clusterTypesProvider =
@@ -100,7 +102,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        WorkflowService workflowService, List<ResourceReferenceResolver> resourceReferenceResolvers) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
+        List<ResourceReferenceResolver> resourceReferenceResolvers) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
@@ -109,6 +112,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
+        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.resourceReferenceResolverMap = resourceReferenceResolvers.stream()
             .collect(Collectors.toMap(ResourceReferenceResolver::getResourceType, Function.identity()));
@@ -124,7 +128,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return validateWorkflow(workflow, null, environmentId);
     }
 
-    private WorkflowValidationResult validateWorkflow(
+    @Override
+    public WorkflowValidationResult validateWorkflow(
         String workflow, @Nullable String workflowId, long environmentId) {
 
         StringBuilder errors = new StringBuilder();
@@ -329,7 +334,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             .asString();
         Map<String, ?> inputParameters = toInputParameters(nodeJsonNode.get("parameters"));
 
-        PropertyInfo outputProperty = resolveDynamicOutput(type, trigger, inputParameters, workflowId, environmentId);
+        PropertyInfo outputProperty = resolveTestOutput(name, type, workflowId, environmentId);
+
+        if (outputProperty == null) {
+            outputProperty = resolveDynamicOutput(type, trigger, inputParameters, workflowId, environmentId);
+        }
 
         if (outputProperty != null) {
             outputMap.put(name, outputProperty);
@@ -369,6 +378,29 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 addNodeOutput(nestedJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap);
             }
         }
+    }
+
+    private @Nullable PropertyInfo resolveTestOutput(
+        String name, String type, @Nullable String workflowId, long environmentId) {
+
+        if (workflowId == null) {
+            return null;
+        }
+
+        try {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+            Class<? extends BaseProperty> typeClass = workflowNodeType.operation() == null
+                ? com.bytechef.platform.workflow.task.dispatcher.domain.Property.class : Property.class;
+
+            return workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, name, environmentId)
+                .map(workflowNodeTestOutput -> toOutputPropertyInfo(workflowNodeTestOutput.getOutput(typeClass)))
+                .orElse(null);
+        } catch (Exception e) {
+            log.debug("Failed to read the test output of node '{}'", name, e);
+        }
+
+        return null;
     }
 
     private @Nullable PropertyInfo resolveDynamicOutput(

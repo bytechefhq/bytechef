@@ -47,6 +47,21 @@ public interface WorkflowValidatorFacade {
 
     WorkflowValidationResult validateWorkflow(String workflow, long environmentId);
 
+    /**
+     * Validates a workflow JSON string that may differ from the stored one, consulting the test outputs recorded for
+     * the workflow's nodes when a workflow id is given.
+     *
+     * @param workflow      the workflow JSON string to validate
+     * @param workflowId    the id of the stored workflow the JSON belongs to, or null when it is not stored yet
+     * @param environmentId the environment the workflow is validated against
+     * @return a {@link WorkflowValidationResult} containing lists of errors and warnings
+     */
+    default WorkflowValidationResult validateWorkflow(
+        String workflow, @Nullable String workflowId, long environmentId) {
+
+        return validateWorkflow(workflow, environmentId);
+    }
+
     WorkflowValidationResult validateWorkflowById(String workflowId, long environmentId);
 
     /**

@@ -20,6 +20,7 @@ import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDisp
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.object;
 import static com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,6 +39,8 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -49,6 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -97,18 +101,42 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         }
         """;
 
+    private static final String HTTP_CLIENT_WORKFLOW = """
+        {
+            "label": "Learn ByteChef by doing",
+            "description": "",
+            "triggers": [],
+            "tasks": [
+                {
+                    "label": "Get a random quote",
+                    "name": "httpClient_1",
+                    "type": "httpClient/v1/get",
+                    "parameters": {"uri": "https://dummyjson.com/quotes/random"}
+                },
+                {
+                    "label": "Log the quote",
+                    "name": "logger_1",
+                    "type": "logger/v1/info",
+                    "parameters": {"text": "${httpClient_1.quote}"}
+                }
+            ]
+        }
+        """;
+
     private static final OutputResponse SUBFLOW_OUTPUT = new OutputResponse(
         new ObjectProperty(object("subflow_1").properties(string("message"))), null);
 
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService =
         mock(TaskDispatcherDefinitionService.class);
+    private final WorkflowNodeTestOutputService workflowNodeTestOutputService =
+        mock(WorkflowNodeTestOutputService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
 
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
         mock(ComponentDefinitionService.class), taskDispatcherDefinitionService, mock(TriggerDefinitionFacade.class),
-        mock(TriggerDefinitionService.class), workflowService, List.of());
+        mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService, List.of());
 
     @BeforeEach
     void beforeEach() {
@@ -170,6 +198,48 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         assertEquals(
             List.of("[logger_1] Property 'subflow_1.message' might not exist in the output of 'subflow/v1'"),
             result.warnings());
+    }
+
+    @Test
+    void theNodeTestOutputSatisfiesTheReferenceWhenTheWorkflowIdIsKnown() {
+        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
+            .thenReturn(httpClientActionDefinition);
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(
+            Property.toProperty(ComponentDsl.object("httpClient_1")
+                .properties(ComponentDsl.string("quote"), ComponentDsl.string("author"))),
+            null));
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput("wf-1", "httpClient_1", 3L))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(HTTP_CLIENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+        assertEquals(List.of(), result.warnings());
+    }
+
+    @Test
+    void aPropertyMissingFromTheNodeTestOutputIsAnError() {
+        ActionDefinition httpClientActionDefinition = actionDefinition(ComponentDsl.string("uri"));
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        when(actionDefinitionService.getActionDefinition("httpClient", 1, "get"))
+            .thenReturn(httpClientActionDefinition);
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(
+            Property.toProperty(ComponentDsl.object("httpClient_1")
+                .properties(ComponentDsl.string("author"))),
+            null));
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput("wf-1", "httpClient_1", 3L))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(HTTP_CLIENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(
+            List.of("[logger_1] Property 'httpClient_1.quote' does not exist in the output of 'httpClient/v1/get'"),
+            result.errors());
+        assertEquals(List.of(), result.warnings());
     }
 
     private static ActionDefinition actionDefinition(ComponentDsl.ModifiableStringProperty... properties) {
