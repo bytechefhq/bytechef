@@ -154,7 +154,7 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 
 ### Then build your first agent
 
-An agent needs a model. Connect any of the 12 LLM providers with an API key, or run [Ollama](https://ollama.com) locally and connect it with no key at all.
+An agent needs a model. Connect any of the 12 LLM providers with an API key, or run [Ollama](https://ollama.com) locally and connect it with no key at all. Or import the [Build your first agent](https://www.bytechef.io/workflow-templates/build-your-first-agent) template, which needs only an OpenAI key.
 
 1. **New Project → New Workflow**
 2. Keep the **Manual** trigger, or pick another

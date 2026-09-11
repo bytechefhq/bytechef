@@ -1,0 +1,164 @@
+---
+title: "Build First Agent"
+description: "Build and run your first AI agent in ByteChef: an OpenAI model with one tool, in a few minutes with a single API key."
+---
+
+In this guide you build the same workflow as the [Build your first agent](https://www.bytechef.io/workflow-templates/build-your-first-agent) template: an **AI Agent** step with an OpenAI model and one tool, followed by a logger. The agent fetches a random quote through the tool and explains it in one sentence. The only thing to set up is an OpenAI connection.
+
+You will learn:
+
+- How to create a connection and reuse it
+- How to add an AI Agent step and pick its model
+- How to give an agent a tool and tell it when to use it
+- How to read an agent's tool calls in the execution log
+
+## Before you start
+
+- Finish [Build First Workflow](/platform/automation/get-started/quick-start/build-first-workflow) if you have not. This guide starts where it ends: signed in, with a project.
+- Have an [OpenAI API key](https://platform.openai.com/api-keys) ready.
+
+## 1. Create a workflow
+
+<Steps>
+<Step>
+
+On your project's row, click **+ Workflow**.
+
+</Step>
+<Step>
+
+Enter the label `Build your first agent` and click **Save**. The editor opens with a **Manual** trigger in place.
+
+</Step>
+</Steps>
+
+## 2. Add the AI Agent
+
+<Steps>
+<Step>
+
+Click the **+** button below the trigger, search for **AI Agent**, and select it. The **Chat** action is selected by default.
+
+{/* screenshot: the AI Agent step on the canvas with its empty cluster slots for Model, Memory, RAG, Guardrails and Tools. Save as build-first-agent/agent-added.png */}
+
+</Step>
+<Step>
+
+In the properties panel, enter the **System Prompt**:
+
+```
+You are a friendly assistant. Always call the Get a random quote tool first. Then reply with the quote, its author, and one sentence explaining what the quote means. Do not invent quotes.
+```
+
+</Step>
+<Step>
+
+Enter the **User Prompt**:
+
+```
+Fetch a random quote and explain it.
+```
+
+{/* screenshot: the AI Agent properties panel with the system prompt and user prompt filled in. Save as build-first-agent/agent-prompts.png */}
+
+</Step>
+</Steps>
+
+## 3. Pick the model
+
+<Steps>
+<Step>
+
+On the agent step, click the **Model** slot, search for **OpenAI**, and select it.
+
+</Step>
+<Step>
+
+The model needs a connection. Click **Create Connection**, give it a name such as `OpenAI`, paste your API key, and click **Save**. The connection is stored once and reused by every step that needs OpenAI.
+
+{/* screenshot: the Create Connection dialog for OpenAI with the name filled in and the API key field masked. Save as build-first-agent/openai-connection.png */}
+
+</Step>
+<Step>
+
+In the model's properties, choose a model, for example **gpt-5-mini**. Leave the rest at its defaults.
+
+</Step>
+</Steps>
+
+## 4. Give the agent a tool
+
+<Steps>
+<Step>
+
+On the agent step, click the **Tools** slot, search for **HTTP Client**, and choose its **GET** action.
+
+</Step>
+<Step>
+
+Set **URI** to:
+
+```
+https://dummyjson.com/quotes/random
+```
+
+Leave **Response Type** on **JSON**. No connection is needed, the API is public.
+
+</Step>
+<Step>
+
+Rename the tool by clicking its label and entering `Get a random quote`. The agent sees tool labels, and the system prompt refers to this one by name.
+
+{/* screenshot: the agent step with the OpenAI model and the Get a random quote tool attached. Save as build-first-agent/agent-with-tool.png */}
+
+</Step>
+</Steps>
+
+## 5. Log the answer
+
+<Steps>
+<Step>
+
+Click the **+** button below the agent step, search for **Logger**, and choose the **Info** action.
+
+</Step>
+<Step>
+
+In the **Text** field, enter:
+
+```
+${aiAgent_1}
+```
+
+This logs the agent's reply.
+
+</Step>
+</Steps>
+
+## 6. Test the agent
+
+Click **Test** at the top right of the editor. The agent reads the prompts, decides to call the tool, receives the quote, and writes its explanation.
+
+Click the agent step in the execution panel. Its output shows the reply, and the tool call the agent made with the inputs it chose and the JSON the tool returned.
+
+{/* screenshot: the execution panel with the AI Agent step selected, showing the reply and the tool call to Get a random quote. Save as build-first-agent/test-execution.png */}
+
+Run it again and the agent explains a different quote.
+
+## What you have built
+
+```
+Manual Trigger → AI Agent (OpenAI model + HTTP Client tool) → Logger
+```
+
+- **Model**: the agent's reasoning. Any of the supported providers plugs into the same slot.
+- **Tools**: every component action can be a tool. The agent decides when to call it and fills in its parameters. See [AI Agent](/platform/automation/build/workflows/ai/agent) for tools whose parameters the model supplies at runtime.
+- **Connection**: created once, reused everywhere, and never part of an exported workflow.
+
+The same workflow is available as a template. To import it instead of building it, open the [Build your first agent](https://www.bytechef.io/workflow-templates/build-your-first-agent) page, click **Use template**, select your OpenAI connection on the model, and click **Run**.
+
+## Next steps
+
+- [Star Repository on GitHub](/platform/automation/get-started/quick-start/star-repository-on-github): a workflow with an OAuth connection
+- [Configure Workflow Trigger](/platform/automation/get-started/quick-start/configure-workflow-trigger): a real trigger, a deployment and monitoring
+- Add **Memory** or **Guardrails** to the agent from the same cluster slots
