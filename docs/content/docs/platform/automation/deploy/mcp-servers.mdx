@@ -22,7 +22,7 @@ For exposing integrations to your product's own customers instead, see [Embedded
 
 ## Create an MCP server
 
-{/* TODO screenshot: MCP Servers page with the Create MCP Server dialog - name field and server type */}
+![Create MCP Server dialog](mcp-servers/mcp-create-server-dialog.png)
 
 1. In the Automation workspace, open **MCP Servers** from the sidebar.
 2. Click **New MCP Server**.
@@ -43,7 +43,7 @@ A server exposes nothing until you add components or workflows to it.
 
 You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has its own **Enabled** toggle, and a disabled tool disappears from the server's tool list - connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. This complements the server-level toggle, which turns the whole server on or off at once.
 
-{/* TODO screenshot: tool properties popover on a component action row - the Tool Name and Tool Description fields above the action's own parameters */}
+![Tool properties panel for a component action, with Tool Name and Tool Description above the action's own parameters](mcp-servers/mcp-component-tool-properties.png)
 
 For each exposed action you decide which parameters you fix yourself (a constant the assistant can't change) and which the assistant fills at call time, using the `fromAi(...)` expression - the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/automation/build/workflows/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
 
@@ -55,7 +55,7 @@ Rename an action when its generated name would not tell the model what it does i
 
 ## Expose workflows
 
-{/* TODO screenshot: workflows-as-tools mapping panel - a workflow's tool name, description, and per-input fromAi value fields */}
+![Workflow tool mapping panel showing Tool Name, Tool Description and one field per trigger input](mcp-servers/mcp-workflow-tool-mapping.png)
 
 1. From the server's row menu, choose **Add Workflows**.
 2. **Select a project** and a **published version**.
