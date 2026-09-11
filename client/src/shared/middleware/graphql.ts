@@ -1703,6 +1703,7 @@ export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string,
 
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
+  workflowId?: string | null | undefined;
   environmentId?: any;
 }>;
 
@@ -8265,8 +8266,12 @@ export const useUpdateMcpToolMutation = <
     )};
 
 export const ValidateWorkflowDocument = new TypedDocumentString(`
-    query ValidateWorkflow($workflowDefinition: String!, $environmentId: Long) {
-  validateWorkflow(workflow: $workflowDefinition, environmentId: $environmentId) {
+    query ValidateWorkflow($workflowDefinition: String!, $workflowId: String, $environmentId: Long) {
+  validateWorkflow(
+    workflow: $workflowDefinition
+    workflowId: $workflowId
+    environmentId: $environmentId
+  ) {
     errors
     warnings
     nodeIssues {
