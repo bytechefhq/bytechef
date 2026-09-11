@@ -56,6 +56,7 @@ class DataPillValidator {
         taskContext.skipTaskOrderValidation = skipTaskOrderValidation;
         taskContext.nodeOutputMap = context.getNodeOutputMap();
         taskContext.nodeVariableOutputMap = context.getNodeVariableOutputMap();
+        taskContext.currentTaskAncestors = context.getTaskAncestors(name);
 
         findDataPillsInNode(
             parametersJsonNode, "", name, context.getTaskOutputs(), context.getTaskNames(),
@@ -499,7 +500,7 @@ class DataPillValidator {
         if (referencedTaskType != null) {
             validatePropertyInOutput(
                 dataPillExpression, referencedTaskType, propertyName, fieldPath, taskOutputMap,
-                context.nodeOutputMap.get(referencedTaskName), context.nodeVariableOutputMap.get(referencedTaskName),
+                context.nodeOutputMap.get(referencedTaskName), getVariableOutputInfo(referencedTaskName, context),
                 errors, warnings, text, referencedTaskName, allTasksMap, taskDefinition, rootParametersJsonNode);
         }
     }
@@ -507,9 +508,18 @@ class DataPillValidator {
     private static boolean isVariablePropertyReference(
         String referencedTaskName, String propertyName, TaskValidationContext context) {
 
-        PropertyInfo variableOutputInfo = context.nodeVariableOutputMap.get(referencedTaskName);
+        PropertyInfo variableOutputInfo = getVariableOutputInfo(referencedTaskName, context);
 
         return variableOutputInfo != null && PropertyUtils.checkPropertyExists(variableOutputInfo, propertyName);
+    }
+
+    @Nullable
+    private static PropertyInfo getVariableOutputInfo(String referencedTaskName, TaskValidationContext context) {
+        if (!context.currentTaskAncestors.contains(referencedTaskName)) {
+            return null;
+        }
+
+        return context.nodeVariableOutputMap.get(referencedTaskName);
     }
 
     private static void validatePropertyInOutput(
@@ -650,5 +660,6 @@ class DataPillValidator {
         boolean skipTaskOrderValidation = false;
         Map<String, PropertyInfo> nodeOutputMap = Map.of();
         Map<String, PropertyInfo> nodeVariableOutputMap = Map.of();
+        Set<String> currentTaskAncestors = Set.of();
     }
 }

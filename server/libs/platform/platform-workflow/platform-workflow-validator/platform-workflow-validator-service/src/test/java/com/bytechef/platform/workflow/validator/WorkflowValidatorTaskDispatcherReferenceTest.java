@@ -60,7 +60,14 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
             new PropertyInfo("workflowUuid", "STRING", null, false, true, null, null),
             new PropertyInfo("inputs", "OBJECT", null, false, true, null, null)),
         "logger/v1/info", List.of(
-            new PropertyInfo("text", "STRING", null, false, true, null, null)));
+            new PropertyInfo("text", "STRING", null, false, true, null, null)),
+        "condition/v1", List.of(
+            new PropertyInfo("rawExpression", "BOOLEAN", null, false, true, null, null),
+            new PropertyInfo("expression", "STRING", null, false, true, null, null),
+            new PropertyInfo("caseTrue", "ARRAY", null, false, false, null, List.of(
+                new PropertyInfo(null, "TASK", null, false, false, null, null))),
+            new PropertyInfo("caseFalse", "ARRAY", null, false, false, null, List.of(
+                new PropertyInfo(null, "TASK", null, false, false, null, null)))));
 
     private static final String MAP_WORKFLOW = """
         {
@@ -85,6 +92,94 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
                             }
                         ]
                     }
+                }
+            ]
+        }
+        """;
+
+    private static final String DEEP_MAP_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [
+                {"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual"}
+            ],
+            "tasks": [
+                {
+                    "label": "Map",
+                    "name": "map_1",
+                    "type": "map/v1",
+                    "parameters": {
+                        "items": ["ee"],
+                        "iteratee": [
+                            {
+                                "label": "Condition",
+                                "name": "condition_1",
+                                "type": "condition/v1",
+                                "parameters": {
+                                    "rawExpression": true,
+                                    "expression": "true",
+                                    "caseTrue": [
+                                        {
+                                            "label": "Var",
+                                            "name": "var_1",
+                                            "type": "var/v1/set",
+                                            "parameters": {"type": "STRING", "value": "${map_1.item}"}
+                                        }
+                                    ],
+                                    "caseFalse": []
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        """;
+
+    private static final String MAP_THEN_LOGGER_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [
+                {"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual"}
+            ],
+            "tasks": [
+                {
+                    "label": "Map",
+                    "name": "map_1",
+                    "type": "map/v1",
+                    "parameters": {"items": ["ee"], "iteratee": []}
+                },
+                {
+                    "label": "Logger",
+                    "name": "logger_1",
+                    "type": "logger/v1/info",
+                    "parameters": {"text": "${map_1.item}"}
+                }
+            ]
+        }
+        """;
+
+    private static final String LOGGER_THEN_MAP_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [
+                {"label": "Manual", "name": "trigger_1", "type": "manual/v1/manual"}
+            ],
+            "tasks": [
+                {
+                    "label": "Logger",
+                    "name": "logger_1",
+                    "type": "logger/v1/info",
+                    "parameters": {"text": "${map_1.item}"}
+                },
+                {
+                    "label": "Map",
+                    "name": "map_1",
+                    "type": "map/v1",
+                    "parameters": {"items": ["ee"], "iteratee": []}
                 }
             ]
         }
@@ -167,6 +262,29 @@ class WorkflowValidatorTaskDispatcherReferenceTest {
         assertEquals(
             "[var_1] Property 'map_1.item' in output of 'map/v1' is of type string, not number", result.errors());
         assertEquals("", result.warnings());
+    }
+
+    @Test
+    void aTaskNestedDeeperInsideTheMapCanReferenceTheMapItem() {
+        Result result = validate(DEEP_MAP_WORKFLOW, Map.of(), Map.of("map_1", ITEM_VARIABLE_OUTPUT));
+
+        assertEquals("", result.errors());
+        assertEquals("", result.warnings());
+    }
+
+    @Test
+    void aTaskAfterTheMapCannotReferenceTheMapItem() {
+        Result result = validate(MAP_THEN_LOGGER_WORKFLOW, Map.of(), Map.of("map_1", ITEM_VARIABLE_OUTPUT));
+
+        assertEquals("", result.errors());
+        assertEquals("[logger_1] Property 'map_1.item' might not exist in the output of 'map/v1'", result.warnings());
+    }
+
+    @Test
+    void aTaskBeforeTheMapCannotReferenceTheMapItem() {
+        Result result = validate(LOGGER_THEN_MAP_WORKFLOW, Map.of(), Map.of("map_1", ITEM_VARIABLE_OUTPUT));
+
+        assertEquals("[logger_1] Wrong task order: You can't reference 'map_1.item' in logger_1", result.errors());
     }
 
     @Test
