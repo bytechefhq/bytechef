@@ -18,7 +18,7 @@ case "${BYTECHEF_DATABASE:-}" in
         if [ -n "$SPRING_PROFILES" ]; then
           SPRING_PROFILES="${SPRING_PROFILES},h2"
         else
-          SPRING_PROFILES="prod,local,h2"
+          SPRING_PROFILES="prod,h2"
         fi
       ;;
     esac

@@ -16,7 +16,7 @@ val libs = rootProject.extensions.getByType<VersionCatalogsExtension>().named("l
 var profiles = ""
 
 if (project.hasProperty("prod")) {
-    profiles = "prod,local"
+    profiles = "prod"
 
     if (project.hasProperty("api-docs")) {
         profiles += ",api-docs"

@@ -1,5 +1,7 @@
 # docker/dockerfile:1
-FROM bytechef/bytechef-server:latest
+ARG BASE_IMAGE=bytechef/bytechef-server:latest
+
+FROM ${BASE_IMAGE}
 
 ARG ARG_APPLICATION_HOME=/opt/bytechef
 
