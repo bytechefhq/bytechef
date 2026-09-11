@@ -219,7 +219,7 @@ const useWorkflowCodeEditorSheet = ({
     );
 
     const {data: validateWorkflowData, refetch: refetchValidateWorkflow} = useValidateWorkflowQuery(
-        {workflowDefinition: definition!},
+        {environmentId: currentEnvironmentId, workflowDefinition: definition!, workflowId: workflow.id},
         {enabled: !!definition}
     );
 
