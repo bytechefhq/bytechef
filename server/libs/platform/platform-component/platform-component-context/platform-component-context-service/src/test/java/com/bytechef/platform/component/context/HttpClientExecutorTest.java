@@ -3850,6 +3850,26 @@ public class HttpClientExecutorTest {
     class RequestTimeoutTests {
 
         @Test
+        @DisplayName("Should fall back to the four-second default connect timeout")
+        void testResolveConnectTimeoutDefault() {
+            Duration connectTimeout = httpClientExecutor.resolveConnectTimeout(
+                Http.Configuration.newConfiguration()
+                    .build());
+
+            assertEquals(Duration.ofSeconds(4), connectTimeout);
+        }
+
+        @Test
+        @DisplayName("Should honour a configured connect timeout verbatim")
+        void testResolveConnectTimeoutHonoursConfiguredValue() {
+            Duration connectTimeout = httpClientExecutor.resolveConnectTimeout(
+                Http.timeout(Duration.ofSeconds(7))
+                    .build());
+
+            assertEquals(Duration.ofSeconds(7), connectTimeout);
+        }
+
+        @Test
         @DisplayName("Should honour a configured request timeout shorter than the default")
         void testResolveRequestTimeoutHonoursShortConfiguredValue() {
             Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
