@@ -3850,8 +3850,28 @@ public class HttpClientExecutorTest {
     class RequestTimeoutTests {
 
         @Test
-        @DisplayName("Should floor a configured timeout shorter than the default")
-        void testResolveRequestTimeoutFloorsShortConfiguredValue() {
+        @DisplayName("Should honour a configured request timeout shorter than the default")
+        void testResolveRequestTimeoutHonoursShortConfiguredValue() {
+            Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
+                Http.requestTimeout(Duration.ofSeconds(7))
+                    .build());
+
+            assertEquals(Duration.ofSeconds(7), requestTimeout);
+        }
+
+        @Test
+        @DisplayName("Should honour a configured request timeout longer than the default")
+        void testResolveRequestTimeoutHonoursLongConfiguredValue() {
+            Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
+                Http.requestTimeout(Duration.ofMinutes(10))
+                    .build());
+
+            assertEquals(Duration.ofMinutes(10), requestTimeout);
+        }
+
+        @Test
+        @DisplayName("Should ignore the connect timeout when resolving the request timeout")
+        void testResolveRequestTimeoutIgnoresConnectTimeout() {
             Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
                 Http.timeout(Duration.ofSeconds(7))
                     .build());
@@ -3860,13 +3880,16 @@ public class HttpClientExecutorTest {
         }
 
         @Test
-        @DisplayName("Should honour a configured timeout longer than the default")
-        void testResolveRequestTimeoutHonoursLongerConfiguredValue() {
-            Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
-                Http.timeout(Duration.ofMinutes(10))
-                    .build());
+        @DisplayName("Should keep the connect timeout independent of the request timeout")
+        void testConnectTimeoutIsUnaffectedByRequestTimeout() {
+            HttpClient httpClient = httpClientExecutor.createHttpClient(
+                new HashMap<>(), new HashMap<>(),
+                Http.requestTimeout(Duration.ofSeconds(7))
+                    .build(),
+                "componentName", 1, "componentOperationName", null, Mockito.mock(Context.class));
 
-            assertEquals(Duration.ofMinutes(10), requestTimeout);
+            assertEquals(Duration.ofMillis(4000), httpClient.connectTimeout()
+                .orElseThrow());
         }
 
         @Test
