@@ -32,6 +32,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -40,7 +41,9 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
@@ -123,20 +126,72 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         }
         """;
 
+    private static final String CONNECTION_WORKFLOW = """
+        {
+            "label": "workflow1",
+            "description": "",
+            "triggers": [],
+            "tasks": [
+                {
+                    "label": "Affinity",
+                    "name": "affinity_1",
+                    "type": "affinity/v1/createOpportunity",
+                    "parameters": {}
+                }
+            ]
+        }
+        """;
+
+    private static final String AGENT_WORKFLOW = """
+        {
+            "label": "Build your first agent",
+            "description": "",
+            "triggers": [],
+            "tasks": [
+                {
+                    "label": "Explain a quote",
+                    "name": "aiAgent_1",
+                    "type": "aiAgent/v1/chat",
+                    "parameters": {"userPrompt": "Fetch a random quote and explain it."},
+                    "clusterElements": {
+                        "model": {
+                            "label": "OpenAI",
+                            "name": "openAi_1",
+                            "type": "openAi/v1/model",
+                            "parameters": {"model": "gpt-5-mini"}
+                        },
+                        "tools": [
+                            {
+                                "label": "Get a random quote",
+                                "name": "httpClient_1",
+                                "type": "httpClient/v1/get",
+                                "parameters": {"uri": "https://dummyjson.com/quotes/random"}
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        """;
+
     private static final OutputResponse SUBFLOW_OUTPUT = new OutputResponse(
         new ObjectProperty(object("subflow_1").properties(string("message"))), null);
 
     private final ActionDefinitionService actionDefinitionService = mock(ActionDefinitionService.class);
+    private final ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService =
         mock(TaskDispatcherDefinitionService.class);
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService =
         mock(WorkflowNodeTestOutputService.class);
     private final WorkflowService workflowService = mock(WorkflowService.class);
+    private final WorkflowTestConfigurationService workflowTestConfigurationService =
+        mock(WorkflowTestConfigurationService.class);
 
     private final WorkflowValidatorFacadeImpl workflowValidatorFacade = new WorkflowValidatorFacadeImpl(
         mock(ActionDefinitionFacade.class), actionDefinitionService, mock(ClusterElementDefinitionService.class),
-        mock(ComponentDefinitionService.class), taskDispatcherDefinitionService, mock(TriggerDefinitionFacade.class),
-        mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService, List.of());
+        componentDefinitionService, taskDispatcherDefinitionService, mock(TriggerDefinitionFacade.class),
+        mock(TriggerDefinitionService.class), workflowNodeTestOutputService, workflowService,
+        workflowTestConfigurationService, List.of());
 
     @BeforeEach
     void beforeEach() {
@@ -240,6 +295,72 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
             List.of("[logger_1] Property 'httpClient_1.quote' does not exist in the output of 'httpClient/v1/get'"),
             result.errors());
         assertEquals(List.of(), result.warnings());
+    }
+
+    @Test
+    void aNodeWhoseComponentRequiresAConnectionButHasNoneIsAnError() {
+        stubComponent("affinity", "Affinity", true);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[affinity_1] Missing required connection: Affinity"), result.errors());
+    }
+
+    @Test
+    void aNodeWithATestConnectionIsNotReported() {
+        stubComponent("affinity", "Affinity", true);
+
+        WorkflowTestConfigurationConnection connection = mock(WorkflowTestConfigurationConnection.class);
+
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", "affinity_1", 3L))
+            .thenReturn(List.of(connection));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void anOptionalConnectionIsNotReported() {
+        stubComponent("affinity", "Affinity", false);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void connectionsAreNotCheckedWithoutAWorkflowId() {
+        stubComponent("affinity", "Affinity", true);
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(CONNECTION_WORKFLOW, 3L);
+
+        assertEquals(List.of(), result.errors());
+    }
+
+    @Test
+    void aClusterElementMissingItsConnectionIsReportedUnderTheElementName() {
+        stubComponent("aiAgent", "AI Agent", false);
+        stubComponent("openAi", "OpenAI", true);
+        stubComponent("httpClient", "HTTP Client", false);
+
+        WorkflowTestConfigurationConnection toolConnection = mock(WorkflowTestConfigurationConnection.class);
+
+        when(toolConnection.getWorkflowConnectionKey()).thenReturn("httpClient_1");
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", "aiAgent_1", 3L))
+            .thenReturn(List.of(toolConnection));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(AGENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[openAi_1] Missing required connection: OpenAI"), result.errors());
+    }
+
+    private void stubComponent(String name, String title, boolean connectionRequired) {
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinition.getTitle()).thenReturn(title);
+        when(componentDefinition.isConnectionRequired()).thenReturn(connectionRequired);
+        when(componentDefinitionService.getComponentDefinition(name, 1)).thenReturn(componentDefinition);
     }
 
     private static ActionDefinition actionDefinition(ComponentDsl.ModifiableStringProperty... properties) {

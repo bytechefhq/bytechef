@@ -54,6 +54,10 @@ class ValidationErrorUtils {
     /**
      * Creates a missing property error message.
      */
+    public static String missingConnection(String componentTitle) {
+        return "Missing required connection: " + componentTitle;
+    }
+
     public static String missingProperty(String propertyPath) {
         return "Missing required property: " + propertyPath;
     }
