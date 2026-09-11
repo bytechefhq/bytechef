@@ -65,6 +65,8 @@ To help resolve your issue as quickly as possible, read the template and provide
 
 ### File a feature/component request
 We welcome all feature requests, whether it's to add new functionality, improve existing connectors or to suggest a brand new connector.
+Want a connector we don't have? [Build it in an afternoon](https://docs.bytechef.io/developer-guide/build-component) with the connector developer guide, or pick one of the [open connector requests](https://github.com/bytechefhq/bytechef/issues?q=is%3Aissue+is%3Aopen+label%3Aworkflow-component).
+
 File your feature request through GitHub Issues using the [Feature Request](https://github.com/bytechefhq/bytechef/issues/new?assignees=&labels=enhancement&template=feature-request.yaml&title=%5Bfeature%5D%3A+) template for improvements or [Connector Request](https://github.com/bytechefhq/bytechef/issues/new?assignees=&labels=enhancement%2Cworkflow-component&template=new-component-request.yaml&title=%5Bcomponent%5D%3A+) for improvements to the existing components or for the new ones.
 
 ### Improve the documentation
