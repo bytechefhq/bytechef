@@ -33,16 +33,30 @@ class WorkflowValidatorGraphQlControllerTest {
 
     @Test
     void passesEnvironmentThroughWhenGiven() {
-        controller.validateWorkflow("{}", 2L);
+        controller.validateWorkflow("{}", null, 2L);
 
         verify(workflowValidatorFacade).validateWorkflow("{}", 2L);
     }
 
     @Test
     void usesFacadeDefaultWhenEnvironmentIsAbsent() {
-        controller.validateWorkflow("{}", null);
+        controller.validateWorkflow("{}", null, null);
 
         verify(workflowValidatorFacade).validateWorkflow("{}");
+    }
+
+    @Test
+    void passesTheWorkflowIdThroughWhenGiven() {
+        controller.validateWorkflow("{}", "wf-1", 2L);
+
+        verify(workflowValidatorFacade).validateWorkflow("{}", "wf-1", 2L);
+    }
+
+    @Test
+    void validatesInDevelopmentWhenOnlyTheWorkflowIdIsGiven() {
+        controller.validateWorkflow("{}", "wf-1", null);
+
+        verify(workflowValidatorFacade).validateWorkflow("{}", "wf-1", 0L);
     }
 
     @Test
