@@ -179,6 +179,7 @@ class ValidationContext {
             nestedAncestors.add(taskName);
 
             collectTaskAncestors(jsonNode.get("parameters"), nestedAncestors);
+            collectTaskAncestors(jsonNode.get("clusterElements"), nestedAncestors);
 
             return;
         }
