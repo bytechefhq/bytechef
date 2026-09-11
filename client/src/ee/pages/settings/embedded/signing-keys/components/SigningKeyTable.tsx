@@ -99,7 +99,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
     const rows = reactTable.getRowModel().rows;
 
     return (
-        <div className="w-full space-y-8 px-4 text-sm 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full space-y-8 p-4 text-sm 3xl:mx-auto 3xl:w-4/5">
             <p>
                 Use your Signing Keys to sign requests made from the ByteChef SDK. <a href="#">Read our docs</a> for
                 more information.

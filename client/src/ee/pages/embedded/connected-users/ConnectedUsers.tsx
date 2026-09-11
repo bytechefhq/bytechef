@@ -206,7 +206,7 @@ const ConnectedUsers = () => {
             }
             leftSidebarBody={
                 <Form {...form}>
-                    <form className="space-y-4 px-4" onSubmit={form.handleSubmit(handleFilterConnectedUsers)}>
+                    <form className="space-y-4 px-2" onSubmit={form.handleSubmit(handleFilterConnectedUsers)}>
                         <FormField
                             control={form.control}
                             name="search"
