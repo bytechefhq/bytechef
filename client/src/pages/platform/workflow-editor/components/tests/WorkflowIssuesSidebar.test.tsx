@@ -28,7 +28,7 @@ const workflowState = {
         tasks: [
             {name: 'dataTable_2', type: 'dataTable/v1/getRecord'},
             {
-                clusterElements: {model: {name: 'openAi_1', type: 'openAi/v1/model'}},
+                clusterElements: {model: {type: 'openAi/v1/model', workflowNodeName: 'openAi_1'}},
                 name: 'aiAgent_1',
                 type: 'aiAgent/v1/chat',
             },

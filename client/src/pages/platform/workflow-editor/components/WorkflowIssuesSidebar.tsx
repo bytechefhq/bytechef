@@ -1,5 +1,4 @@
-import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
-import {ClusterElementsType, NodeDataType} from '@/shared/types';
+import {NodeDataType} from '@/shared/types';
 import {AlertTriangleIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -9,6 +8,7 @@ import useWorkflowIssues from '../hooks/useWorkflowIssues';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {WorkflowIssueI, getWorkflowIssueKey} from '../stores/useWorkflowIssuesStore';
 import describeWorkflowIssueCounts from '../utils/describeWorkflowIssueCounts';
+import findClusterElementRootTaskName from '../utils/findClusterElementRootTaskName';
 import openNodeDetails from '../utils/openNodeDetails';
 
 interface WorkflowIssuesSidebarProps {
@@ -45,13 +45,7 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
 
     const handleIssueClick = useCallback(
         (nodeName: string) => {
-            const clusterRootTask = workflow.tasks?.find(
-                (task) =>
-                    !!task.clusterElements &&
-                    !!getClusterElementByName(task.clusterElements as ClusterElementsType, nodeName)
-            );
-
-            const targetNodeName = clusterRootTask?.name ?? nodeName;
+            const targetNodeName = findClusterElementRootTaskName(workflow.tasks, nodeName) ?? nodeName;
 
             const node = nodes.find((currentNode) => (currentNode.data as NodeDataType).name === targetNodeName);
 
