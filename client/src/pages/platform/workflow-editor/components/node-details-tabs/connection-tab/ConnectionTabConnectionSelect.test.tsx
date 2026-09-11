@@ -45,6 +45,8 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useSaveWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
         mutate: (...args: unknown[]) => {
             mockSaveWorkflowTestConfigurationConnectionMutation(...args);
+
+            onSuccess?.();
         },
         onSuccess,
     }),
@@ -52,7 +54,11 @@ vi.mock('@/shared/middleware/graphql', () => ({
 
 vi.mock('@/shared/mutations/platform/workflowTestConfigurations.mutations', () => ({
     useDeleteWorkflowTestConfigurationConnectionMutation: ({onSuccess}: {onSuccess?: () => void}) => ({
-        mutate: mockDeleteWorkflowTestConfigurationConnectionMutation,
+        mutate: (...args: unknown[]) => {
+            mockDeleteWorkflowTestConfigurationConnectionMutation(...args);
+
+            onSuccess?.();
+        },
         onSuccess,
     }),
 }));
@@ -332,10 +338,11 @@ describe('ConnectionTabConnectionSelect', () => {
             fireEvent.click(createConnectionButton);
 
             await waitFor(() => {
-                expect(callOrder).toEqual(['invalidateQueries', 'saveConnection']);
+                expect(callOrder.slice(0, 2)).toEqual(['invalidateQueries', 'saveConnection']);
                 expect(mockInvalidateQueries).toHaveBeenCalledWith({
                     queryKey: ['connections'],
                 });
+                expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['ValidateWorkflow']});
                 expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith(
                     {
                         connectionId: 123,
@@ -567,6 +574,7 @@ describe('ConnectionTabConnectionSelect', () => {
 
         await waitFor(() => {
             expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['connections']});
+            expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['ValidateWorkflow']});
         });
     });
 
