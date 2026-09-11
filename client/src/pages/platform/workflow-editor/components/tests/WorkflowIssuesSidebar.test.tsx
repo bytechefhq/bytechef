@@ -12,10 +12,32 @@ const hoisted = vi.hoisted(() => ({
 vi.mock('../../utils/openNodeDetails', () => ({default: hoisted.openNodeDetails}));
 
 const nodeData = {componentName: 'dataTable', name: 'dataTable_2', workflowNodeName: 'dataTable_2'} as NodeDataType;
+const agentNodeData = {
+    clusterRoot: true,
+    componentName: 'aiAgent',
+    name: 'aiAgent_1',
+    workflowNodeName: 'aiAgent_1',
+} as NodeDataType;
+
+const workflowState = {
+    nodes: [
+        {data: nodeData, id: 'dataTable_2'},
+        {data: agentNodeData, id: 'aiAgent_1'},
+    ],
+    workflow: {
+        tasks: [
+            {name: 'dataTable_2', type: 'dataTable/v1/getRecord'},
+            {
+                clusterElements: {model: {name: 'openAi_1', type: 'openAi/v1/model'}},
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            },
+        ],
+    },
+};
 
 vi.mock('../../stores/useWorkflowDataStore', () => ({
-    default: (selector: (state: {nodes: Array<{data: NodeDataType; id: string}>}) => unknown) =>
-        selector({nodes: [{data: nodeData, id: 'dataTable_2'}]}),
+    default: (selector: (state: typeof workflowState) => unknown) => selector(workflowState),
 }));
 
 describe('WorkflowIssuesSidebar', () => {
@@ -58,5 +80,23 @@ describe('WorkflowIssuesSidebar', () => {
         fireEvent.click(screen.getByText('Missing required property: id'));
 
         expect(hoisted.openNodeDetails).toHaveBeenCalledWith(nodeData, 'properties');
+    });
+
+    it('opens the cluster root when an issue of one of its cluster elements is clicked', () => {
+        useWorkflowIssuesStore.getState().setValidatorIssues([
+            {
+                kind: 'MISSING_CONNECTION',
+                message: 'Missing required connection: OpenAI',
+                nodeName: 'openAi_1',
+                severity: 'ERROR',
+                source: 'VALIDATOR',
+            },
+        ]);
+
+        render(<WorkflowIssuesSidebar visible />);
+
+        fireEvent.click(screen.getByText('Missing required connection: OpenAI'));
+
+        expect(hoisted.openNodeDetails).toHaveBeenCalledWith(agentNodeData, 'properties');
     });
 });
