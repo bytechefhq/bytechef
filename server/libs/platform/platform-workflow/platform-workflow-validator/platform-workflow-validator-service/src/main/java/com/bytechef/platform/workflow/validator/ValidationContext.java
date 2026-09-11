@@ -19,8 +19,10 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 
@@ -46,6 +48,7 @@ class ValidationContext {
     private final List<String> taskNames = new ArrayList<>();
     private final Map<String, String> taskNameToTypeMap = new HashMap<>();
     private final Map<String, JsonNode> allTasksMap = new HashMap<>();
+    private final Map<String, Set<String>> taskAncestorsMap = new HashMap<>();
 
     private ValidationContext(
         List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
@@ -136,6 +139,53 @@ class ValidationContext {
         for (JsonNode taskJsonNode : taskJsonNodes) {
             addNodeNameAndType(taskJsonNode);
         }
+
+        for (JsonNode taskJsonNode : taskJsonNodes) {
+            if (taskJsonNode.has("name")) {
+                JsonNode nameJsonNode = taskJsonNode.get("name");
+
+                collectTaskAncestors(taskJsonNode.get("parameters"), List.of(nameJsonNode.asText()));
+            }
+        }
+    }
+
+    private void collectTaskAncestors(@Nullable JsonNode jsonNode, List<String> ancestors) {
+        if (jsonNode == null) {
+            return;
+        }
+
+        if (jsonNode.isArray()) {
+            for (JsonNode itemJsonNode : jsonNode) {
+                collectTaskAncestors(itemJsonNode, ancestors);
+            }
+
+            return;
+        }
+
+        if (!jsonNode.isObject()) {
+            return;
+        }
+
+        if (jsonNode.has("name") && jsonNode.has("type")) {
+            JsonNode nameJsonNode = jsonNode.get("name");
+
+            String taskName = nameJsonNode.asText();
+
+            taskAncestorsMap.computeIfAbsent(taskName, key -> new HashSet<>())
+                .addAll(ancestors);
+
+            List<String> nestedAncestors = new ArrayList<>(ancestors);
+
+            nestedAncestors.add(taskName);
+
+            collectTaskAncestors(jsonNode.get("parameters"), nestedAncestors);
+
+            return;
+        }
+
+        for (JsonNode fieldJsonNode : jsonNode.values()) {
+            collectTaskAncestors(fieldJsonNode, ancestors);
+        }
     }
 
     private void addNodeNameAndType(JsonNode nodeJsonNode) {
@@ -193,6 +243,10 @@ class ValidationContext {
 
     public Map<String, JsonNode> getAllTasksMap() {
         return allTasksMap;
+    }
+
+    public Set<String> getTaskAncestors(String taskName) {
+        return taskAncestorsMap.getOrDefault(taskName, Set.of());
     }
 
     public Map<String, List<String>> getClusterTypesProviderMap() {
