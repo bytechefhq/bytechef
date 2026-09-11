@@ -430,6 +430,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             StringUtils.appendWithNewline(
                 "[" + elementName + "] " + ValidationErrorUtils.missingConnection(componentTitle), errors);
         }
+
+        appendMissingClusterElementConnections(elementJsonNode.get("clusterElements"), connections, errors);
     }
 
     private List<WorkflowTestConfigurationConnection> getTestConfigurationConnections(

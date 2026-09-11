@@ -206,6 +206,36 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         }
         """;
 
+    private static final String NESTED_AGENT_WORKFLOW = """
+        {
+            "label": "Nested agents",
+            "description": "",
+            "triggers": [],
+            "tasks": [
+                {
+                    "label": "Outer agent",
+                    "name": "aiAgent_1",
+                    "type": "aiAgent/v1/chat",
+                    "parameters": {"userPrompt": "hi"},
+                    "clusterElements": {
+                        "model": {"name": "openAi_1", "type": "openAi/v1/model", "parameters": {}},
+                        "tools": [
+                            {
+                                "label": "Inner agent",
+                                "name": "aiAgent_2",
+                                "type": "aiAgent/v1/chat",
+                                "parameters": {"userPrompt": "hi"},
+                                "clusterElements": {
+                                    "model": {"name": "openAi_2", "type": "openAi/v1/model", "parameters": {}}
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+        """;
+
     private static final OutputResponse SUBFLOW_OUTPUT = new OutputResponse(
         new ObjectProperty(object("subflow_1").properties(string("message"))), null);
 
@@ -464,6 +494,22 @@ class WorkflowValidatorFacadeTaskDispatcherOutputTest {
         when(workflowNodeTestOutput.getTypeName()).thenReturn("httpClient");
         when(workflowNodeTestOutput.getTypeVersion()).thenReturn(1);
         when(workflowNodeTestOutput.getTypeOperationName()).thenReturn(operationName);
+    }
+
+    @Test
+    void aNestedClusterElementMissingItsConnectionIsReported() {
+        stubComponent("aiAgent", "AI Agent", false);
+        stubComponent("openAi", "OpenAI", true);
+
+        WorkflowTestConfigurationConnection outerModelConnection = mock(WorkflowTestConfigurationConnection.class);
+
+        when(outerModelConnection.getWorkflowConnectionKey()).thenReturn("openAi_1");
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections("wf-1", "aiAgent_1", 3L))
+            .thenReturn(List.of(outerModelConnection));
+
+        WorkflowValidationResult result = workflowValidatorFacade.validateWorkflow(NESTED_AGENT_WORKFLOW, "wf-1", 3L);
+
+        assertEquals(List.of("[openAi_2] Missing required connection: OpenAI"), result.errors());
     }
 
     private void stubComponent(String name, String title, boolean connectionRequired) {
