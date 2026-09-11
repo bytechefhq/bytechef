@@ -40,6 +40,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.map.MapDataSource;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -120,13 +121,22 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
     @Override
     public WorkflowValidationResult validateWorkflow(String workflow, long environmentId) {
+        return validateWorkflow(workflow, null, environmentId);
+    }
+
+    private WorkflowValidationResult validateWorkflow(
+        String workflow, @Nullable String workflowId, long environmentId) {
+
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
+
+        NodeOutputMaps nodeOutputMaps = buildNodeOutputMaps(workflow, workflowId, environmentId);
 
         WorkflowValidator.validateWorkflow(
             workflow, this::getTaskProperties, this::getTaskOutputProperty, clusterTypesProvider,
             createResourceReferenceProvider(resourceReferenceResolverMap, environmentId), new HashMap<>(),
-            new HashMap<>(), buildNodeOutputMap(workflow), new HashMap<>(), errors, warnings);
+            new HashMap<>(), nodeOutputMaps.outputMap(), nodeOutputMaps.variableOutputMap(), new HashMap<>(), errors,
+            warnings);
 
         String errorsString = errors.toString();
 
@@ -153,7 +163,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     public WorkflowValidationResult validateWorkflowById(String workflowId, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        return validateWorkflow(workflow.getDefinition(), environmentId);
+        return validateWorkflow(workflow.getDefinition(), workflowId, environmentId);
     }
 
     static WorkflowValidator.ResourceReferenceProvider createResourceReferenceProvider(
@@ -272,47 +282,98 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         }
     }
 
-    private Map<String, PropertyInfo> buildNodeOutputMap(String workflow) {
+    private NodeOutputMaps buildNodeOutputMaps(String workflow, @Nullable String workflowId, long environmentId) {
         Map<String, PropertyInfo> nodeOutputMap = new HashMap<>();
+        Map<String, PropertyInfo> nodeVariableOutputMap = new HashMap<>();
 
         try {
             JsonNode workflowJsonNode = JsonUtils.readTree(workflow);
 
-            addNodeOutputs(workflowJsonNode.get("triggers"), true, nodeOutputMap);
-            addNodeOutputs(workflowJsonNode.get("tasks"), false, nodeOutputMap);
+            addNodeOutputs(
+                workflowJsonNode.get("triggers"), true, workflowId, environmentId, nodeOutputMap,
+                nodeVariableOutputMap);
+            addNodeOutputs(
+                workflowJsonNode.get("tasks"), false, workflowId, environmentId, nodeOutputMap,
+                nodeVariableOutputMap);
         } catch (Exception e) {
             log.debug("Failed to build config-aware node output map; falling back to static validation", e);
         }
 
-        return nodeOutputMap;
+        return new NodeOutputMaps(nodeOutputMap, nodeVariableOutputMap);
     }
 
-    private void addNodeOutputs(@Nullable JsonNode nodesJsonNode, boolean trigger, Map<String, PropertyInfo> map) {
+    private void addNodeOutputs(
+        @Nullable JsonNode nodesJsonNode, boolean trigger, @Nullable String workflowId, long environmentId,
+        Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {
+
         if (nodesJsonNode == null || !nodesJsonNode.isArray()) {
             return;
         }
 
         for (JsonNode nodeJsonNode : nodesJsonNode) {
-            if (!nodeJsonNode.has("name") || !nodeJsonNode.has("type")) {
+            addNodeOutput(nodeJsonNode, trigger, workflowId, environmentId, outputMap, variableOutputMap);
+        }
+    }
+
+    private void addNodeOutput(
+        JsonNode nodeJsonNode, boolean trigger, @Nullable String workflowId, long environmentId,
+        Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {
+
+        if (!nodeJsonNode.isObject() || !nodeJsonNode.has("name") || !nodeJsonNode.has("type")) {
+            return;
+        }
+
+        String name = nodeJsonNode.get("name")
+            .asString();
+        String type = nodeJsonNode.get("type")
+            .asString();
+        Map<String, ?> inputParameters = toInputParameters(nodeJsonNode.get("parameters"));
+
+        PropertyInfo outputProperty = resolveDynamicOutput(type, trigger, inputParameters, workflowId, environmentId);
+
+        if (outputProperty != null) {
+            outputMap.put(name, outputProperty);
+        }
+
+        PropertyInfo variableOutputProperty = resolveVariableOutput(type, trigger, inputParameters);
+
+        if (variableOutputProperty != null) {
+            variableOutputMap.put(name, variableOutputProperty);
+        }
+
+        if (!trigger) {
+            addNestedNodeOutputs(nodeJsonNode, workflowId, environmentId, outputMap, variableOutputMap);
+        }
+    }
+
+    private void addNestedNodeOutputs(
+        JsonNode nodeJsonNode, @Nullable String workflowId, long environmentId, Map<String, PropertyInfo> outputMap,
+        Map<String, PropertyInfo> variableOutputMap) {
+
+        JsonNode parametersJsonNode = nodeJsonNode.get("parameters");
+
+        if (parametersJsonNode == null || !parametersJsonNode.isObject()) {
+            return;
+        }
+
+        for (String propertyName : WorkflowValidator.NESTED_TASK_PROPERTIES) {
+            JsonNode nestedJsonNode = parametersJsonNode.get(propertyName);
+
+            if (nestedJsonNode == null) {
                 continue;
             }
 
-            PropertyInfo outputProperty = resolveDynamicOutput(
-                nodeJsonNode.get("type")
-                    .asString(),
-                trigger, toInputParameters(nodeJsonNode.get("parameters")));
-
-            if (outputProperty != null) {
-                map.put(
-                    nodeJsonNode.get("name")
-                        .asString(),
-                    outputProperty);
+            if (nestedJsonNode.isArray()) {
+                addNodeOutputs(nestedJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap);
+            } else {
+                addNodeOutput(nestedJsonNode, false, workflowId, environmentId, outputMap, variableOutputMap);
             }
         }
     }
 
     private @Nullable PropertyInfo resolveDynamicOutput(
-        String type, boolean trigger, Map<String, ?> inputParameters) {
+        String type, boolean trigger, Map<String, ?> inputParameters, @Nullable String workflowId,
+        long environmentId) {
 
         try {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
@@ -328,18 +389,64 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                     workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
                     Map.of());
             } else {
-                return null;
+                Map<String, Object> outputInputParameters = new HashMap<>(inputParameters);
+
+                outputInputParameters.put(MapDataSource.ENVIRONMENT_ID, environmentId);
+
+                if (workflowId != null) {
+                    outputInputParameters.put(MapDataSource.WORKFLOW_ID, workflowId);
+                }
+
+                outputResponse = taskDispatcherDefinitionService.executeOutput(
+                    workflowNodeType.name(), workflowNodeType.version(), outputInputParameters);
             }
 
-            if (outputResponse != null && outputResponse.outputSchema() != null) {
-                return toPropertyInfo(outputResponse.outputSchema());
-            }
+            return toOutputPropertyInfo(outputResponse);
         } catch (Exception e) {
             // Best-effort: connection-needed or otherwise unresolvable dynamic output → fall back to the static path.
             log.debug("Failed to resolve dynamic output for node type '{}'; falling back to the static path", type, e);
         }
 
         return null;
+    }
+
+    private @Nullable PropertyInfo resolveVariableOutput(String type, boolean trigger, Map<String, ?> inputParameters) {
+        if (trigger) {
+            return null;
+        }
+
+        try {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+            if (workflowNodeType.operation() != null) {
+                return null;
+            }
+
+            OutputResponse outputResponse = taskDispatcherDefinitionService.executeVariableProperties(
+                workflowNodeType.name(), workflowNodeType.version(), inputParameters);
+
+            return toOutputPropertyInfo(outputResponse);
+        } catch (Exception e) {
+            log.debug("Failed to resolve variable output for node type '{}'", type, e);
+        }
+
+        return null;
+    }
+
+    private static @Nullable PropertyInfo toOutputPropertyInfo(@Nullable OutputResponse outputResponse) {
+        if (outputResponse == null || outputResponse.outputSchema() == null) {
+            return null;
+        }
+
+        PropertyInfo propertyInfo = toPropertyInfo(outputResponse.outputSchema());
+
+        List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
+
+        if ("OBJECT".equals(propertyInfo.type()) && (nestedPropertyInfos == null || nestedPropertyInfos.isEmpty())) {
+            return null;
+        }
+
+        return propertyInfo;
     }
 
     private static Map<String, ?> toInputParameters(@Nullable JsonNode parametersJsonNode) {
@@ -422,18 +529,6 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                     resourceType = propertyResourceType.name();
                 }
             }
-            case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty -> {
-                type = "OBJECT";
-                List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> properties =
-                    objectProperty
-                        .getProperties();
-
-                if (properties != null && !properties.isEmpty()) {
-                    nestedPropertyInfos = properties.stream()
-                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
-                        .toList();
-                }
-            }
             case com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty -> {
                 type = "ARRAY";
                 List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> items = arrayProperty
@@ -456,6 +551,17 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                         .toList();
                 }
             }
+            case com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty -> {
+                type = "OBJECT";
+                List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> properties =
+                    objectProperty.getProperties();
+
+                if (properties != null && !properties.isEmpty()) {
+                    nestedPropertyInfos = properties.stream()
+                        .map(WorkflowValidatorFacadeImpl::toPropertyInfo)
+                        .toList();
+                }
+            }
             case com.bytechef.platform.workflow.task.dispatcher.domain.Property property -> {
                 com.bytechef.platform.workflow.task.dispatcher.definition.Property.Type propertyType =
                     property.getType();
@@ -469,5 +575,8 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             baseProperty.getName(), type, baseProperty.getDescription(), baseProperty.getRequired(),
             baseProperty.getExpressionEnabled(), baseProperty.getDisplayCondition(), null, nestedPropertyInfos,
             resourceType);
+    }
+
+    private record NodeOutputMaps(Map<String, PropertyInfo> outputMap, Map<String, PropertyInfo> variableOutputMap) {
     }
 }
