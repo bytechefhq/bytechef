@@ -211,15 +211,10 @@ class HttpClientExecutor {
         return DEFAULT_REQUEST_TIMEOUT;
     }
 
-    /**
-     * Bounds establishing the connection only — DNS, TCP and TLS. Distinct from
-     * {@link #resolveRequestTimeout(Configuration)}, which bounds the whole response; the two clocks both start at
-     * {@code send()}, so this one bounds a sub-phase of that window rather than adding to it.
-     */
     Duration resolveConnectTimeout(Configuration configuration) {
-        Duration timeout = configuration.getTimeout();
+        Duration connectTimeout = configuration.getConnectTimeout();
 
-        return timeout == null ? DEFAULT_CONNECT_TIMEOUT : timeout;
+        return connectTimeout == null ? DEFAULT_CONNECT_TIMEOUT : connectTimeout;
     }
 
     Duration resolveRequestTimeout(Configuration configuration) {

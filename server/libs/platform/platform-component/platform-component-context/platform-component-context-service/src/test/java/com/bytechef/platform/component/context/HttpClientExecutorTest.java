@@ -573,7 +573,7 @@ public class HttpClientExecutorTest {
         void testWithCustomTimeout() {
             HttpClient httpClient = httpClientExecutor.createHttpClient(
                 new HashMap<>(), new HashMap<>(),
-                Http.timeout(Duration.ofMillis(5000))
+                Http.connectTimeout(Duration.ofMillis(5000))
                     .build(),
                 "componentName", 1, "componentOperationName", null, Mockito.mock(Context.class));
 
@@ -3863,7 +3863,7 @@ public class HttpClientExecutorTest {
         @DisplayName("Should honour a configured connect timeout verbatim")
         void testResolveConnectTimeoutHonoursConfiguredValue() {
             Duration connectTimeout = httpClientExecutor.resolveConnectTimeout(
-                Http.timeout(Duration.ofSeconds(7))
+                Http.connectTimeout(Duration.ofSeconds(7))
                     .build());
 
             assertEquals(Duration.ofSeconds(7), connectTimeout);
@@ -3893,7 +3893,7 @@ public class HttpClientExecutorTest {
         @DisplayName("Should ignore the connect timeout when resolving the request timeout")
         void testResolveRequestTimeoutIgnoresConnectTimeout() {
             Duration requestTimeout = httpClientExecutor.resolveRequestTimeout(
-                Http.timeout(Duration.ofSeconds(7))
+                Http.connectTimeout(Duration.ofSeconds(7))
                     .build());
 
             assertEquals(Duration.ofMinutes(5), requestTimeout);

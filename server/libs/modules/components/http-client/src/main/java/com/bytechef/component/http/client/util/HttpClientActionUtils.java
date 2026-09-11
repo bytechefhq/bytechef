@@ -174,7 +174,7 @@ public class HttpClientActionUtils {
                 integer(TIMEOUT)
                     .label("Timeout")
                     .description(
-                        "Time in ms to wait for the server to send a response before aborting the request.")
+                        "Time in ms to wait for the connection to be established before aborting the request.")
                     .defaultValue(1000)
                     .minValue(1)
                     .advancedOption(true)));
@@ -196,7 +196,7 @@ public class HttpClientActionUtils {
                         .followRedirect(inputParameters.getBoolean(FOLLOW_REDIRECT, false))
                         .proxy(inputParameters.getString(PROXY))
                         .responseType(getResponseType(inputParameters))
-                        .timeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
+                        .connectTimeout(Duration.ofMillis(inputParameters.getInteger(TIMEOUT, 10000))))
                 .headers((Map) inputParameters.getMap(HEADERS, List.class, Collections.emptyMap()))
                 .queryParameters((Map) inputParameters.getMap(QUERY_PARAMETERS, List.class, Collections.emptyMap()))
                 .body(getBody(inputParameters, getBodyContentType(inputParameters)))
