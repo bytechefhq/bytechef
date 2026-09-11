@@ -85,6 +85,7 @@ import tools.jackson.core.type.TypeReference;
  */
 class HttpClientExecutor {
 
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(4);
     private static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(5);
 
     private final ApplicationContext applicationContext;
@@ -201,17 +202,24 @@ class HttpClientExecutor {
                 ProxySelector.of(new InetSocketAddress(hostPortArray[0], Integer.parseInt(hostPortArray[1]))));
         }
 
-        if (configuration.getTimeout() == null) {
-            builder.connectTimeout(Duration.ofMillis(4000));
-        } else {
-            builder.connectTimeout(configuration.getTimeout());
-        }
+        builder.connectTimeout(resolveConnectTimeout(configuration));
 
         return builder.build();
     }
 
     Duration defaultRequestTimeout() {
         return DEFAULT_REQUEST_TIMEOUT;
+    }
+
+    /**
+     * Bounds establishing the connection only — DNS, TCP and TLS. Distinct from
+     * {@link #resolveRequestTimeout(Configuration)}, which bounds the whole response; the two clocks both start at
+     * {@code send()}, so this one bounds a sub-phase of that window rather than adding to it.
+     */
+    Duration resolveConnectTimeout(Configuration configuration) {
+        Duration timeout = configuration.getTimeout();
+
+        return timeout == null ? DEFAULT_CONNECT_TIMEOUT : timeout;
     }
 
     Duration resolveRequestTimeout(Configuration configuration) {
