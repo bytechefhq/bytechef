@@ -189,7 +189,7 @@ const ProjectDeployments = () => {
                 loading={projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading}
             >
                 {projectDeployments && projectDeployments?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 p-4 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,

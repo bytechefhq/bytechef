@@ -10,7 +10,7 @@ import {useParams} from 'react-router-dom';
 const ChatsSidebarSkeleton = () => (
     <>
         {Array.from({length: 2}).map((_, groupIndex) => (
-            <div className="mb-6 px-4" key={groupIndex}>
+            <div className="mb-6" key={groupIndex}>
                 <Skeleton className="my-1 h-4 w-28" />
 
                 <div className="mt-2 flex flex-col gap-2">
@@ -80,7 +80,7 @@ const ChatsSidebar = () => {
     return (
         <>
             {workflowsByProject.size === 0 ? (
-                <div className="mb-4 px-2">
+                <div className="mb-4">
                     <span className="px-3 text-xs">No chats found</span>
                 </div>
             ) : (

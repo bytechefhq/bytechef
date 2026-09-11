@@ -77,7 +77,7 @@ const LayoutContainer = ({
 
                         <div className="absolute inset-0 mt-5 overflow-auto">
                             <nav className="flex h-full flex-col bg-muted/50">
-                                <div className="space-y-1">{leftSidebarBody}</div>
+                                <div className="space-y-1 px-2 py-4">{leftSidebarBody}</div>
                             </nav>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ const LayoutContainer = ({
                     <nav className="flex h-full flex-col">
                         {leftSidebarHeader}
 
-                        <div className="size-full overflow-y-auto">{leftSidebarBody}</div>
+                        <div className="size-full overflow-y-auto px-2 py-4">{leftSidebarBody}</div>
                     </nav>
                 </aside>
             )}
