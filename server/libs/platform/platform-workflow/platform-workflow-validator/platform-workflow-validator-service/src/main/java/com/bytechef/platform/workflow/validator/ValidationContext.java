@@ -37,6 +37,7 @@ class ValidationContext {
     private final Map<String, List<PropertyInfo>> taskDefinitionMap;
     private final Map<String, PropertyInfo> taskOutputMap;
     private final Map<String, PropertyInfo> nodeOutputMap;
+    private final Map<String, PropertyInfo> nodeVariableOutputMap;
     private final Map<String, List<String>> clusterTypesProviderMap;
     private final WorkflowValidator.@Nullable ClusterTypesProvider clusterTypesProvider;
     private final WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider;
@@ -49,7 +50,8 @@ class ValidationContext {
     private ValidationContext(
         List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
         Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
-        Map<String, PropertyInfo> nodeOutputMap, Map<String, List<String>> clusterTypesProviderMap,
+        Map<String, PropertyInfo> nodeOutputMap, Map<String, PropertyInfo> nodeVariableOutputMap,
+        Map<String, List<String>> clusterTypesProviderMap,
         WorkflowValidator.@Nullable ClusterTypesProvider clusterTypesProvider,
         WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors,
         StringBuilder warnings) {
@@ -59,6 +61,7 @@ class ValidationContext {
         this.taskDefinitionMap = taskDefinitionMap;
         this.taskOutputMap = taskOutputMap;
         this.nodeOutputMap = nodeOutputMap;
+        this.nodeVariableOutputMap = nodeVariableOutputMap;
         this.clusterTypesProviderMap = clusterTypesProviderMap;
         this.clusterTypesProvider = clusterTypesProvider;
         this.resourceReferenceProvider = resourceReferenceProvider;
@@ -106,7 +109,22 @@ class ValidationContext {
         WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors,
         StringBuilder warnings) {
 
-        return new ValidationContext(taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap,
+        return of(
+            taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, Map.of(),
+            clusterTypesProviderMap, clusterTypesProvider, resourceReferenceProvider, errors, warnings);
+    }
+
+    public static ValidationContext of(
+        List<JsonNode> taskJsonNodes, List<JsonNode> inputJsonNodes,
+        Map<String, List<PropertyInfo>> taskDefinitionMap, Map<String, PropertyInfo> taskOutputMap,
+        Map<String, PropertyInfo> nodeOutputMap, Map<String, PropertyInfo> nodeVariableOutputMap,
+        Map<String, List<String>> clusterTypesProviderMap,
+        WorkflowValidator.@Nullable ClusterTypesProvider clusterTypesProvider,
+        WorkflowValidator.ResourceReferenceProvider resourceReferenceProvider, StringBuilder errors,
+        StringBuilder warnings) {
+
+        return new ValidationContext(
+            taskJsonNodes, inputJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, nodeVariableOutputMap,
             clusterTypesProviderMap, clusterTypesProvider, resourceReferenceProvider, errors, warnings);
     }
 
@@ -151,6 +169,10 @@ class ValidationContext {
 
     public Map<String, PropertyInfo> getNodeOutputMap() {
         return nodeOutputMap;
+    }
+
+    public Map<String, PropertyInfo> getNodeVariableOutputMap() {
+        return nodeVariableOutputMap;
     }
 
     public StringBuilder getErrors() {
