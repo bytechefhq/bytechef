@@ -79,12 +79,6 @@ public class GoogleSheetsRowDiffUtils {
         return diff(knownRowHashes, currentRowHashes).insertedRowIndexes();
     }
 
-    /**
-     * Returns the indexes of rows whose content changed while their relative position among the surrounding unchanged
-     * rows stayed the same, i.e. rows that align with a known row but hash differently. This is computed from the same
-     * alignment as {@link #getInsertedRowIndexes}, so a row insertion/removal elsewhere in the sheet shifting later
-     * rows does not cause those unrelated rows to be reported as modified.
-     */
     public static List<Integer> getModifiedRowIndexes(List<String> knownRowHashes, List<String> currentRowHashes) {
         return diff(knownRowHashes, currentRowHashes).modifiedRowIndexes();
     }
@@ -176,11 +170,6 @@ public class GoogleSheetsRowDiffUtils {
         return new RowDiffResult(insertedRowIndexes, modifiedRowIndexes);
     }
 
-    /**
-     * Splits a run of unaligned current-side rows against the known rows removed in the same run: the first
-     * {@code removedRowCount} of them line up with a removed row each and are reported as modified, and any surplus
-     * beyond that is reported as inserted.
-     */
     private static void addSurplusRowIndexes(
         List<Integer> insertedRowIndexes, List<Integer> modifiedRowIndexes, List<Integer> unalignedRowIndexes,
         int removedRowCount) {
