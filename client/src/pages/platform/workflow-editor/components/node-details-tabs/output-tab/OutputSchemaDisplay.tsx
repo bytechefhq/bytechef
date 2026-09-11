@@ -175,25 +175,23 @@ const OutputSchemaDisplay = ({
                 </>
             )}
 
-            {variablePropertiesDefined && (
+            {variablePropertiesDefined && variableOutputSchema && (
                 <>
                     <div className="my-3 flex items-center justify-between">
                         <h3 className="text-sm text-content-neutral-secondary">Item Schema</h3>
                     </div>
 
-                    {variableOutputSchema && (
-                        <PropertyField
-                            copiedValue={copiedValue}
-                            copyToClipboard={copyToClipboard}
-                            label={currentNode.name}
-                            property={variableOutputSchema}
-                            sampleOutput={variableSampleOutput}
-                            valueToCopy={`$\{${currentNode.name}}`}
-                            workflowNodeName={currentNode.name}
-                        />
-                    )}
+                    <PropertyField
+                        copiedValue={copiedValue}
+                        copyToClipboard={copyToClipboard}
+                        label={currentNode.name}
+                        property={variableOutputSchema}
+                        sampleOutput={variableSampleOutput}
+                        valueToCopy={`$\{${currentNode.name}}`}
+                        workflowNodeName={currentNode.name}
+                    />
 
-                    {variableOutputSchema && variableSampleOutput && (
+                    {variableSampleOutput && (
                         <SchemaProperties
                             copiedValue={copiedValue}
                             copyToClipboard={copyToClipboard}
