@@ -1,20 +1,23 @@
 <div align="center">
 
 [![License: Apache 2.0 + EE](https://img.shields.io/static/v1?label=license&message=Apache%202.0%20%2B%20EE&color=brightgreen)](https://github.com/bytechefhq/bytechef/blob/master/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/bytechefhq/bytechef?style=flat&logo=github&label=stars)](https://github.com/bytechefhq/bytechef/stargazers)
 [![Docker Pulls](https://img.shields.io/docker/pulls/bytechef/bytechef)](https://hub.docker.com/r/bytechef/bytechef)
 [![Build Status](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml/badge.svg)](https://github.com/bytechefhq/bytechef/actions/workflows/build_push.yml)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-7389D8?logo=discord&logoColor=white)](https://discord.gg/VKvNxHjpYx)
 
 [![ByteChef](https://raw.githubusercontent.com/bytechefhq/bytechef/master/static/bytechef_logo.png)](https://www.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme)
 
-# **The open-source platform that unifies AI agent orchestration and workflow automation**
-### Autonomy and precision — in one platform.
+# **Open-source AI agents and workflow automation**
+### Autonomy and precision in one platform. Self-host it, or embed it in your SaaS.
 
-[Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Live Demo](https://www.youtube.com/watch?v=vFpobtcdWSc) · [Discord](https://discord.gg/VKvNxHjpYx) · [Connect on X](https://x.com/bytechefhq) · [Roadmap](https://github.com/orgs/bytechefhq/projects/3)
+[Documentation](https://docs.bytechef.io?utm_source=github&utm_medium=organic&utm_campaign=readme) · [Templates](https://www.bytechef.io/workflow-templates) · [Connector Developer Guide](https://docs.bytechef.io/developer-guide/build-component) · [Discord](https://discord.gg/VKvNxHjpYx) · [LinkedIn](https://www.linkedin.com/company/bytechefhq) · [X](https://x.com/bytechefhq) · [Roadmap](https://github.com/orgs/bytechefhq/projects/3)
+
+[![Watch the ByteChef demo](https://img.youtube.com/vi/vFpobtcdWSc/maxresdefault.jpg)](https://www.youtube.com/watch?v=vFpobtcdWSc)
 
 </div>
 
-> <!-- VISUAL 1 — Workflow editor. Capture: full canvas with multiple steps, branches, and a trigger. Save as static/workflow-editor.png -->
+> <!-- VISUAL 1: Workflow editor. Capture: full canvas with multiple steps, branches, and a trigger. Save as static/workflow-editor.png -->
 > ![ByteChef workflow editor](static/workflow-editor.png)
 
 [//]: # (---)
@@ -33,12 +36,12 @@
 [//]: # ()
 [//]: # (---)
 
-### AI Agents — built in, not bolted on
+### AI agents as first-class workflow steps
 
-> <!-- VISUAL 2 — Agent editor (cluster element editor). Capture: the AI agent component opened with its cluster of sub-elements visible — model, tools list, memory, guardrails, knowledge base. Save as static/agent-editor.png -->
-> ![ByteChef agent editor — cluster element view](static/agent-editor.png)
+> <!-- VISUAL 2: Agent editor (cluster element editor). Capture: the AI agent component opened with its cluster of sub-elements visible: model, tools list, memory, guardrails, knowledge base. Save as static/agent-editor.png -->
+> ![ByteChef agent editor: cluster element view](static/agent-editor.png)
 
-A drag-and-drop **AI Agent** component runs the full agent loop — model → tool selection → execution → observation → next step — with streaming and structured output.
+A drag-and-drop **AI Agent** component runs the full agent loop: model, tool selection, execution, observation, next step, with streaming and structured output. The agent is one step in a durable workflow, so a run that fails or pauses for a human resumes from that step instead of starting over. The core is Apache 2.0, and the same agents ship inside your own product through the embedded edition.
 
 [//]: # (| Capability | What ships |)
 
@@ -56,13 +59,13 @@ A drag-and-drop **AI Agent** component runs the full agent loop — model → to
 
 [//]: # (| **Agent Skills** 🚧 | _In development._ Versioned, downloadable bundles of prompt + tools + memory + guardrails + knowledge bindings. [Track on roadmap]&#40;https://github.com/orgs/bytechefhq/projects/3&#41;. |)
 
-[//]: # (| **MCP** &#40;in & out&#41; | Consume any MCP server as a tool source. Expose any workflow as an MCP tool to Claude Desktop, Cursor, Windsurf — with API-key auth. |)
+[//]: # (| **MCP** &#40;in & out&#41; | Consume any MCP server as a tool source. Expose any workflow as an MCP tool to Claude Desktop, Cursor, Windsurf, with API-key auth. |)
 
 [//]: # (| **Evaluations** 🚧 | _In development._ Scenarios, runs, judges &#40;StringEquals, Regex, Contains, JsonSchema, ResponseLength, Similarity, LlmRule, ToolUsage&#41;, tool simulation, user simulator. [Track on roadmap]&#40;https://github.com/orgs/bytechefhq/projects/3&#41;. |)
 
 ### Build Workflows with Ease using Copilot
 
-> <!-- COPILOT SCREENSHOT — capture: Copilot side panel with a natural-language prompt on the left, generating a workflow with a configured AI agent component on the canvas. Save as static/copilot.png -->
+> <!-- COPILOT SCREENSHOT: capture: Copilot side panel with a natural-language prompt on the left, generating a workflow with a configured AI agent component on the canvas. Save as static/copilot.png -->
 > ![ByteChef AI Copilot generating an agent workflow](static/copilot.png)
 
 Build AI agents and workflows by talking to ByteChef. The Copilot generates workflows from a sentence, drops in configured agent steps, explains failed runs and suggests fixes.
@@ -115,17 +118,21 @@ docker run --name bytechef -it -p 8080:8080 \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
-    --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
+    --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=<random-secret> \
     -v ~/.bytechef:/root/.bytechef \
     --network bytechef_network \
     docker.bytechef.io/bytechef/bytechef:latest
 ```
+
+`BYTECHEF_SECURITY_REMEMBER_ME_KEY` signs the remember-me cookie. Generate your own value, for example with `openssl rand -hex 20`, and keep it stable across restarts.
 
 **Note:** Use `-d` flag instead of `-it` to run in detached mode.
 
 Open <http://localhost:8080/login> → **Create Account** → sign in.
 
 ### Build your first agent in 60 seconds
+
+Prefer a head start? Import a ready-made workflow from the [template library](https://www.bytechef.io/workflow-templates) and adapt it.
 
 1. **New Project → New Workflow**,
 2. Add a trigger
@@ -141,32 +148,32 @@ Open <http://localhost:8080/login> → **Create Account** → sign in.
 ## Workflow Automation
 
 - **Visual editor** with JSON underneath, Git-friendly
-- **Flow controls** — `condition` · `branch` · `loop` · `each` · `map` · `parallel` · `fork-join` · `subflow` · `on-error` · `terminate` · `waitForApproval`
-- **Triggers** — static & dynamic webhooks · polling · hybrid · app-event listeners · callable, plus schedule and form components
-- **Polyglot code** — JavaScript · Python · Ruby on GraalVM
-- **Durable execution** on the Atlas runtime, Postgres-backed, queue-mode for horizontal scale (memory · Redis · RabbitMQ · Kafka · JMS · AMQP · SQS)
-- **Workflows-as-APIs** — workflows can be an authenticated HTTP endpoint
-- **Git-native** — push from the UI, environments backed by branches
+- **Flow controls:** `condition` · `branch` · `loop` · `each` · `map` · `parallel` · `fork-join` · `subflow` · `on-error` · `terminate` · `waitForApproval`
+- **Triggers:** static & dynamic webhooks · polling · hybrid · app-event listeners · callable, plus schedule and form components
+- **Polyglot code:** JavaScript · Python · Ruby on GraalVM
+- **Durable execution and orchestration** on the Atlas runtime: every task execution is persisted in Postgres, so a stopped, failed or approval-paused run resumes from the task it reached. Queue mode for horizontal scale (memory · Redis · RabbitMQ · Kafka · JMS · AMQP · SQS)
+- **Workflows-as-APIs** (EE): workflows can be an authenticated HTTP endpoint
+- **Git-native** (EE): push from the UI, environments backed by branches
 
 ---
 
 ## The Unification
 
-- **Agents inside workflows** — an agent is a step; downstream branches react to its decisions
-- **Workflows as agent tools** — a "refund order" workflow with retries and approvals becomes one tool
-- **Sub-agents** — coordinator agents call specialist agents
-- **Human-in-the-loop** — pause on approval, route to Slack/email, resume on response
-- **One audit log** — agent decisions, tool calls, workflow runs, human approvals, all in one trail
+- **Agents inside workflows:** an agent is a step; downstream branches react to its decisions
+- **Workflows as agent tools:** a "refund order" workflow with retries and approvals becomes one tool
+- **Sub-agents:** coordinator agents call specialist agents
+- **Human-in-the-loop:** pause on approval, route to Slack/email, resume on response
+- **One audit log:** agent decisions, tool calls, workflow runs, human approvals, all in one trail
 
 ---
 
 ## 250+ connectors
 
-CRM · marketing · communication · e-commerce · cloud storage · databases · AI/ML · helpdesk · finance. Every connector is **also an agent tool, also an MCP tool**. Browse the [full catalog](https://docs.bytechef.io/reference/components).
+CRM · marketing · communication · e-commerce · cloud storage · databases · AI/ML · helpdesk · finance. Every connector is **also an agent tool, also an MCP tool**. Browse the [integrations catalog](https://www.bytechef.io/integrations) or the [component reference](https://docs.bytechef.io/reference/components).
 
 ---
 
-## Open core — Apache 2.0 + EE
+## Open core: Apache 2.0 + EE
 
 | Capability                                                                | CE (Apache 2.0) | EE |
 |---------------------------------------------------------------------------| --- | --- |
@@ -175,15 +182,15 @@ CRM · marketing · communication · e-commerce · cloud storage · databases ·
 | Knowledge bases, vector stores, guardrails, MCP server                    | ✅ | ✅ |
 | Agent skills, agent evaluations                                           | 🚧 in development | 🚧 in development |
 | Self-host (Docker / Kubernetes / Helm)                                    | ✅ | ✅ |
-| **Workflows-as-APIs**                                                     | — | ✅ |
-| **Git-native**                                                            | — | ✅ |
-| **Microservices deployment**                                              | — |  🚧 in development |
-| **AI Copilot**                                                            | — | ✅ |
-| **SSO / SAML / OIDC**, SCIM, advanced RBAC                                | — |  🚧 in development |
-| **Connection scope sharing** (Workspace / Project / Organization)         | — |  🚧 in development  |
-| Multi-environment promotion, audit log with correlation IDs               | — | ✅ |
-| **AI Gateway** - model routing, quotas, cost controls                     | — |  🚧 in development  |
-| Embedded iPaaS - ship integrations and AI agents inside your SaaS product | — | ✅ |
+| **Workflows-as-APIs**                                                     | ✗ | ✅ |
+| **Git-native**                                                            | ✗ | ✅ |
+| **Microservices deployment**                                              | ✗ |  🚧 in development |
+| **AI Copilot**                                                            | ✗ | ✅ |
+| **SSO / SAML / OIDC**, SCIM, advanced RBAC                                | ✗ |  🚧 in development |
+| **Connection scope sharing** (Private / Workspace / Organization)         | ✗ |  🚧 in development  |
+| Multi-environment promotion, audit log with correlation IDs               | ✗ | ✅ |
+| **AI Gateway:** model routing, quotas, cost controls                     | ✗ |  🚧 in development  |
+| Embedded iPaaS: ship integrations and AI agents inside your SaaS product | ✗ | ✅ |
 
 ---
 
@@ -191,19 +198,27 @@ CRM · marketing · communication · e-commerce · cloud storage · databases ·
 
 ### How is this different from n8n, Zapier or Make?
 
-Those are automation tools where AI is a node you call and get an answer back. In ByteChef an agent is a step that owns a loop — it selects tools, executes them, observes the result and decides what to do next — and any workflow can be published as an MCP tool for agents to call. You get deterministic branching, retries and approvals in the same graph as the non-deterministic part, under one audit trail.
+Three things.
+
+- **License.** The ByteChef core is Apache 2.0. n8n ships under its Sustainable Use License, and Zapier and Make are closed SaaS. You can self-host ByteChef, modify it and use it commercially, with no fair-use clause.
+- **Mid-run resume.** Every task execution is persisted on the Atlas runtime. A run that fails, is stopped, or waits for a human approval resumes from that task with its state intact, instead of re-running from the trigger.
+- **Embedded.** ByteChef also ships as an embedded iPaaS (EE), so your SaaS product can offer integrations and AI agents to its own users, under your UI and your tenancy.
+
+On top of that, an agent in ByteChef is a step that owns a loop: it selects tools, executes them, observes the result and decides what to do next. Any workflow can be published as an MCP tool for agents to call. Deterministic branching, retries and approvals live in the same graph as the model, under one audit trail.
+
+Feature-by-feature comparisons: [n8n](https://www.bytechef.io/compare/bytechef-vs-n8n) · [Zapier](https://www.bytechef.io/compare/bytechef-vs-zapier) · [Make](https://www.bytechef.io/compare/bytechef-vs-make) · [Activepieces](https://www.bytechef.io/compare/bytechef-vs-activepieces) · [all comparisons](https://www.bytechef.io/compare)
 
 ### How is this different from LangChain, LangGraph or CrewAI?
 
-Those are libraries you build an application around: you own deployment, persistence, retries, credential storage and the UI. ByteChef is the running system — durable execution, a visual editor, managed connections, and 250+ connectors that are already agent tools. You can still drop into code where it earns its place; it just isn't the only way in.
+Those are libraries you build an application around: you own deployment, persistence, retries, credential storage and the UI. ByteChef is the running system: durable execution, a visual editor, managed connections, and 250+ connectors that are already agent tools. You can still drop into code where it earns its place; it just isn't the only way in.
 
 ### Which LLM providers ship out of the box?
 
-Twelve direct providers — OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Gemini, Mistral, Groq, DeepSeek, Nvidia, Perplexity, Stability and Ollama — plus three aggregator components (OpenRouter, LiteLLM, NanoGPT) if you would rather route through a gateway.
+Twelve direct providers (OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Gemini, Mistral, Groq, DeepSeek, Nvidia, Perplexity, Stability and Ollama) plus three aggregator components (OpenRouter, LiteLLM, NanoGPT) if you would rather route through a gateway.
 
 ### How does an agent get its tools?
 
-Every connector is already a tool, and workflows you expose through the MCP server become tools too. To let the model supply a value at runtime, put the expression `=fromAi('order_id', 'STRING', {'description': 'The order to refund'})` in the field instead of a literal — that property then becomes part of the tool schema the model sees. It is the same properties panel you would otherwise type into; there is no separate tool definition to write.
+Every connector is already a tool, and workflows you expose through the MCP server become tools too. To let the model supply a value at runtime, put the expression `=fromAi('order_id', 'STRING', {'description': 'The order to refund'})` in the field instead of a literal: that property then becomes part of the tool schema the model sees. It is the same properties panel you would otherwise type into; there is no separate tool definition to write.
 
 ### What is available for memory and RAG?
 
@@ -219,27 +234,35 @@ In both directions. It consumes external MCP servers as a tool source, so remote
 
 ### Do I need the Enterprise Edition?
 
-Only for the rows marked EE in the table above. Everything outside `/ee/` is Apache 2.0 — free to self-host and use commercially, including modified. Code under `/ee/` is covered by the ByteChef Enterprise License and is not; see [License](#license).
+Only for the rows marked EE in the table above. Everything outside `server/ee/` and `client/src/ee/` is Apache 2.0: free to self-host and use commercially, including modified. Code under those two directories is covered by the ByteChef Enterprise License and is not; see [License](#license).
 
 ### Where do I get help?
 
-- **Docs** — [docs.bytechef.io](https://docs.bytechef.io)
-- **Discord** — [discord.gg/VKvNxHjpYx](https://discord.gg/VKvNxHjpYx)
-- **Issues** — [GitHub Issues](https://github.com/bytechefhq/bytechef/issues), with templates for bugs, features and connector requests
-- **Roadmap** — [project board](https://github.com/orgs/bytechefhq/projects/3)
-- **Email** — [support@bytechef.io](mailto:support@bytechef.io)
+- **Docs:** [docs.bytechef.io](https://docs.bytechef.io)
+- **Discord:** [discord.gg/VKvNxHjpYx](https://discord.gg/VKvNxHjpYx), the main community channel
+- **Issues:** [GitHub Issues](https://github.com/bytechefhq/bytechef/issues), with templates for bugs, features and connector requests
+- **Roadmap:** [project board](https://github.com/orgs/bytechefhq/projects/3)
+- **Email:** [support@bytechef.io](mailto:support@bytechef.io)
 
 ---
 
 ## Contributing
 
-If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started.
+If you would like to contribute to the software, read the [contributing guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to get started. Adding a connector is the most common first contribution; the [connector developer guide](https://docs.bytechef.io/developer-guide/build-component) walks through setup, the component definition, actions, triggers, connections and tests.
 
 ---
 
 ## License
 
-This project is licenced under **Apache 2.0** for the core (everything outside `/ee/`) and the **ByteChef Enterprise License** for code under `/ee/` (microservices, embedded, AI Copilot, SSO/SCIM, advanced RBAC)
+This project is licensed under **Apache 2.0** for the core (everything outside `server/ee/` and `client/src/ee/`) and the [**ByteChef Enterprise License**](server/ee/LICENSE) for code under `server/ee/` and `client/src/ee/` (microservices, embedded, AI Copilot, SSO/SCIM, advanced RBAC).
+
+---
+
+## Star ByteChef
+
+If ByteChef is useful to you, [star the repository](https://github.com/bytechefhq/bytechef/stargazers). Stars are how other people find the project, and they tell us which direction to keep building in.
+
+[![GitHub Stars](https://img.shields.io/github/stars/bytechefhq/bytechef?style=social)](https://github.com/bytechefhq/bytechef/stargazers)
 
 ---
 
