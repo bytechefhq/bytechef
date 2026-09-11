@@ -55,6 +55,7 @@ class DataPillValidator {
 
         taskContext.skipTaskOrderValidation = skipTaskOrderValidation;
         taskContext.nodeOutputMap = context.getNodeOutputMap();
+        taskContext.nodeVariableOutputMap = context.getNodeVariableOutputMap();
 
         findDataPillsInNode(
             parametersJsonNode, "", name, context.getTaskOutputs(), context.getTaskNames(),
@@ -68,6 +69,10 @@ class DataPillValidator {
         List<String> taskNames, Map<String, String> taskNameToTypeMap, StringBuilder errors,
         StringBuilder warnings, TaskValidationContext context, Map<String, JsonNode> allTasksMap,
         List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
+
+        if (isNestedTaskProperty(currentPath, taskDefinition)) {
+            return;
+        }
 
         if (jsonNode.isObject()) {
             Set<Map.Entry<String, JsonNode>> fields = jsonNode.properties();
@@ -87,10 +92,6 @@ class DataPillValidator {
                     context, allTasksMap, taskDefinition, rootParametersJsonNode);
             }
         } else if (jsonNode.isArray()) {
-            if (isTaskTypeArray(currentPath, taskDefinition)) {
-                return;
-            }
-
             for (int i = 0; i < jsonNode.size(); i++) {
                 if (context.stopProcessing) {
                     break;
@@ -195,7 +196,9 @@ class DataPillValidator {
         return false;
     }
 
-    private static boolean isTaskTypeArray(@Nullable String currentPath, @Nullable List<PropertyInfo> taskDefinition) {
+    private static boolean isNestedTaskProperty(
+        @Nullable String currentPath, @Nullable List<PropertyInfo> taskDefinition) {
+
         if (taskDefinition == null || currentPath == null || currentPath.isEmpty()) {
             return false;
         }
@@ -220,16 +223,11 @@ class DataPillValidator {
                 return false;
             }
 
-            List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
-            if ("ARRAY".equalsIgnoreCase(propertyInfo.type()) && propertyInfos != null &&
-                propertyInfos.size() == 1) {
-
-                PropertyInfo firstPropertyInfo = propertyInfos.getFirst();
-
-                if ("TASK".equalsIgnoreCase(firstPropertyInfo.type())) {
-                    return true;
-                }
+            if (PropertyUtils.isNestedTaskProperty(propertyInfo)) {
+                return true;
             }
+
+            List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
 
             if (propertyInfos != null) {
                 currentProperties = propertyInfos;
@@ -485,7 +483,9 @@ class DataPillValidator {
             boolean isLoopItemReference = (propertyName.equals("item") || propertyName.startsWith("item.")) &&
                 isLoopTask(referencedTaskName, taskNameToTypeMap);
 
-            if (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference) {
+            if (referencedTaskIndex >= currentTaskIndex && !isLoopItemReference &&
+                !isVariablePropertyReference(referencedTaskName, propertyName, context)) {
+
                 StringUtils.appendWithNewline(
                     "Wrong task order: You can't reference '" + dataPillExpression + "' in " + currentTaskName, errors);
                 context.stopProcessing = true;
@@ -499,16 +499,25 @@ class DataPillValidator {
         if (referencedTaskType != null) {
             validatePropertyInOutput(
                 dataPillExpression, referencedTaskType, propertyName, fieldPath, taskOutputMap,
-                context.nodeOutputMap.get(referencedTaskName), errors, warnings, text, referencedTaskName, allTasksMap,
-                taskDefinition, rootParametersJsonNode);
+                context.nodeOutputMap.get(referencedTaskName), context.nodeVariableOutputMap.get(referencedTaskName),
+                errors, warnings, text, referencedTaskName, allTasksMap, taskDefinition, rootParametersJsonNode);
         }
+    }
+
+    private static boolean isVariablePropertyReference(
+        String referencedTaskName, String propertyName, TaskValidationContext context) {
+
+        PropertyInfo variableOutputInfo = context.nodeVariableOutputMap.get(referencedTaskName);
+
+        return variableOutputInfo != null && PropertyUtils.checkPropertyExists(variableOutputInfo, propertyName);
     }
 
     private static void validatePropertyInOutput(
         String dataPillExpression, String referencedTaskType, String propertyName, String fieldPath,
-        Map<String, PropertyInfo> taskOutput, @Nullable PropertyInfo nodeOutputInfo, StringBuilder errors,
-        StringBuilder warnings, String text, String referencedTaskName, Map<String, JsonNode> allTasksMap,
-        List<PropertyInfo> taskDefinition, JsonNode rootParametersJsonNode) {
+        Map<String, PropertyInfo> taskOutput, @Nullable PropertyInfo nodeOutputInfo,
+        @Nullable PropertyInfo variableOutputInfo, StringBuilder errors, StringBuilder warnings, String text,
+        String referencedTaskName, Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition,
+        JsonNode rootParametersJsonNode) {
 
         // Special handling for loop tasks - they auto-generate 'item' output based on the 'items' parameter
         if (referencedTaskType.startsWith("loop/") && propertyName.startsWith("item")) {
@@ -517,6 +526,14 @@ class DataPillValidator {
 
             validateLoopItemTypes(
                 dataPillExpression, referencedTaskName, expectedType, allTasksMap, errors, text, taskOutput);
+
+            return;
+        }
+
+        if (variableOutputInfo != null && PropertyUtils.checkPropertyExists(variableOutputInfo, propertyName)) {
+            validateTypeCompatibility(
+                dataPillExpression, referencedTaskType, propertyName, fieldPath, variableOutputInfo, errors, text,
+                taskDefinition, rootParametersJsonNode);
 
             return;
         }
@@ -632,5 +649,6 @@ class DataPillValidator {
         boolean stopProcessing = false;
         boolean skipTaskOrderValidation = false;
         Map<String, PropertyInfo> nodeOutputMap = Map.of();
+        Map<String, PropertyInfo> nodeVariableOutputMap = Map.of();
     }
 }

@@ -498,21 +498,6 @@ class TaskValidator {
     }
 
     /**
-     * Strategy to identify TASK type arrays.
-     */
-    private static boolean isTaskTypeArray(PropertyInfo propertyInfo) {
-        List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
-
-        if (!"ARRAY".equalsIgnoreCase(propertyInfo.type()) || propertyInfos == null || propertyInfos.size() != 1) {
-            return false;
-        }
-
-        PropertyInfo propertyInfosFirst = propertyInfos.getFirst();
-
-        return "TASK".equalsIgnoreCase(propertyInfosFirst.type());
-    }
-
-    /**
      * Processes a single nested task. Template method defining the nested task validation steps.
      */
     private static void processIndividualNestedTask(JsonNode nestedTask, ValidationContext context) {
@@ -528,22 +513,26 @@ class TaskValidator {
      */
     private static void processNestedTaskArray(JsonNode taskArrayJsonNode, ValidationContext context) {
         for (int i = 0; i < taskArrayJsonNode.size(); i++) {
-            JsonNode nestedTaskJsonNode = taskArrayJsonNode.get(i);
-
-            if (nestedTaskJsonNode.has("type")) {
-                String nestedTaskName = nestedTaskJsonNode.has("name") ? nestedTaskJsonNode.get("name")
-                    .asString() : "";
-                boolean isInMainLoop = context.getAllTasksMap()
-                    .containsKey(nestedTaskName);
-
-                if (isInMainLoop) {
-                    continue;
-                }
-
-                processIndividualNestedTask(nestedTaskJsonNode, context);
-                validateClusterElements(nestedTaskJsonNode, nestedTaskName, context);
-            }
+            processNestedTask(taskArrayJsonNode.get(i), context);
         }
+    }
+
+    private static void processNestedTask(JsonNode nestedTaskJsonNode, ValidationContext context) {
+        if (!nestedTaskJsonNode.has("type")) {
+            return;
+        }
+
+        String nestedTaskName = nestedTaskJsonNode.has("name") ? nestedTaskJsonNode.get("name")
+            .asString() : "";
+        boolean isInMainLoop = context.getAllTasksMap()
+            .containsKey(nestedTaskName);
+
+        if (isInMainLoop) {
+            return;
+        }
+
+        processIndividualNestedTask(nestedTaskJsonNode, context);
+        validateClusterElements(nestedTaskJsonNode, nestedTaskName, context);
     }
 
     /**
@@ -579,13 +568,21 @@ class TaskValidator {
 
         JsonNode jsonNode = parametersJsonNode.get(propertyName);
 
-        if (jsonNode == null || !jsonNode.isArray()) {
+        if (jsonNode == null) {
             return;
         }
 
-        if (isTaskTypeArray(propertyInfo)) {
-            processNestedTaskArray(jsonNode, context);
+        if (PropertyUtils.isNestedTaskProperty(propertyInfo)) {
+            if (jsonNode.isArray()) {
+                processNestedTaskArray(jsonNode, context);
+            } else if (jsonNode.isObject()) {
+                processNestedTask(jsonNode, context);
+            }
 
+            return;
+        }
+
+        if (!jsonNode.isArray()) {
             return;
         }
 
