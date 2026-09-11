@@ -545,20 +545,29 @@ public interface Context {
 
         /**
          *
-         * @param timeout
+         * @param connectTimeout
          * @return
          */
-        static ConfigurationBuilder timeout(Duration timeout) {
+        static ConfigurationBuilder connectTimeout(Duration connectTimeout) {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 
-            configurationBuilder.timeout = timeout;
+            configurationBuilder.connectTimeout = connectTimeout;
 
             return configurationBuilder;
         }
 
         /**
-         * Maximum duration to wait for the whole response, as distinct from {@link #timeout(Duration)}, which bounds
-         * only establishing the connection. Defaults to five minutes when unset.
+         *
+         * @param timeout
+         * @return
+         * @deprecated use {@link #connectTimeout(Duration)}
+         */
+        @Deprecated
+        static ConfigurationBuilder timeout(Duration timeout) {
+            return connectTimeout(timeout);
+        }
+
+        /**
          *
          * @param requestTimeout
          * @return
@@ -809,7 +818,7 @@ public interface Context {
             private String proxy;
             private Duration requestTimeout;
             private ResponseType responseType;
-            private Duration timeout;
+            private Duration connectTimeout;
             private boolean disableAuthorization;
 
             public Configuration() {
@@ -871,8 +880,17 @@ public interface Context {
             /**
              * @return
              */
+            public Duration getConnectTimeout() {
+                return connectTimeout;
+            }
+
+            /**
+             * @return
+             * @deprecated use {@link #getConnectTimeout()}
+             */
+            @Deprecated
             public Duration getTimeout() {
-                return timeout;
+                return getConnectTimeout();
             }
 
             /**
@@ -891,7 +909,7 @@ public interface Context {
                 private String proxy;
                 private Duration requestTimeout;
                 private ResponseType responseType;
-                private Duration timeout;
+                private Duration connectTimeout;
                 private boolean disableAuthorization;
 
                 private ConfigurationBuilder() {
@@ -915,14 +933,14 @@ public interface Context {
                         Objects.equals(proxy, that.proxy) &&
                         Objects.equals(requestTimeout, that.requestTimeout) &&
                         Objects.equals(responseType, that.responseType) &&
-                        Objects.equals(timeout, that.timeout);
+                        Objects.equals(connectTimeout, that.connectTimeout);
                 }
 
                 @Override
                 public int hashCode() {
                     return Objects.hash(
-                        allowUnauthorizedCerts, filename, followAllRedirects, followRedirect, proxy, requestTimeout,
-                        responseType, timeout, disableAuthorization);
+                        allowUnauthorizedCerts, connectTimeout, filename, followAllRedirects, followRedirect,
+                        proxy, requestTimeout, responseType, disableAuthorization);
                 }
 
                 public ConfigurationBuilder allowUnauthorizedCerts(boolean allowUnauthorizedCerts) {
@@ -960,9 +978,17 @@ public interface Context {
                     return this;
                 }
 
-                public ConfigurationBuilder timeout(Duration timeout) {
-                    this.timeout = timeout;
+                public ConfigurationBuilder connectTimeout(Duration connectTimeout) {
+                    this.connectTimeout = connectTimeout;
                     return this;
+                }
+
+                /**
+                 * @deprecated use {@link #connectTimeout(Duration)}
+                 */
+                @Deprecated
+                public ConfigurationBuilder timeout(Duration timeout) {
+                    return connectTimeout(timeout);
                 }
 
                 public ConfigurationBuilder disableAuthorization(boolean disableAuthorization) {
@@ -976,7 +1002,7 @@ public interface Context {
                     configuration.proxy = this.proxy;
                     configuration.followRedirect = this.followRedirect;
                     configuration.requestTimeout = this.requestTimeout;
-                    configuration.timeout = this.timeout;
+                    configuration.connectTimeout = this.connectTimeout;
                     configuration.responseType = this.responseType;
                     configuration.followAllRedirects = this.followAllRedirects;
                     configuration.allowUnauthorizedCerts = this.allowUnauthorizedCerts;
