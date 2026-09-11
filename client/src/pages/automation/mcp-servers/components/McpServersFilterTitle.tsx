@@ -47,27 +47,23 @@ const McpServersFilterTitle = ({
     let filterLabel: string | undefined;
 
     if (searchParams.get('componentName')) {
-        filterLabel = 'component';
+        filterLabel = 'Components';
     } else if (searchParams.get('projectId')) {
-        filterLabel = 'project';
+        filterLabel = 'Projects';
     } else if (searchParams.get('tagId')) {
-        filterLabel = 'tag';
+        filterLabel = 'Tags';
     }
 
     return (
         <div className="space-x-1">
-            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by </span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             {filterLabel ? (
-                <>
-                    <span className="text-sm text-muted-foreground uppercase">{filterLabel}:</span>
-
-                    <Badge
-                        label={typeof pageTitle === 'string' ? pageTitle : 'Unknown'}
-                        styleType="secondary-filled"
-                        weight="semibold"
-                    />
-                </>
+                <Badge
+                    label={`${filterLabel}: ${typeof pageTitle === 'string' ? pageTitle : 'Unknown'}`}
+                    styleType="primary-outline"
+                    weight="semibold"
+                />
             ) : (
                 <span className="text-sm text-muted-foreground uppercase">none</span>
             )}
