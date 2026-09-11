@@ -75,7 +75,9 @@ cd ..
 
 for tag in $tags; do
     echo "Building docker image with tag \`$tag\`"
-    docker build --progress=plain --platform linux/amd64 --no-cache -t $dckr_img_registry_bytechef:$tag .
+    docker build --progress=plain --platform linux/amd64 --no-cache \
+        --build-arg BASE_IMAGE="$dckr_img_registry_bytechef_server:$tag" \
+        -t $dckr_img_registry_bytechef:$tag .
 done
 
 if [ "$push_images" = "false" ]; then
