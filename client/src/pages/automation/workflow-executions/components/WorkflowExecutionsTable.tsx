@@ -240,7 +240,7 @@ const WorkflowExecutionsTable = ({workflowExecutions}: WorkflowExecutionsTablePr
     const {expandedJobIds, handleRowClick, handleToggleExpand} = useWorkflowExecutionsTable();
 
     return (
-        <div className="w-full p-4 3xl:mx-auto 3xl:w-full">
+        <div className="w-full self-start p-4 3xl:mx-auto 3xl:w-full">
             <Table>
                 <ExecutionTableHeader />
 

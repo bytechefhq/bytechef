@@ -33,7 +33,7 @@ const ProjectList = ({
     }, [newlyCreatedProjectId]);
 
     return (
-        <div className="w-full divide-y divide-border/50 p-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full divide-y divide-border/50 self-start p-4 3xl:mx-auto 3xl:w-4/5">
             {projects.map((project) => {
                 const projectTagIds = project.tags?.map((tag) => tag.id);
 
