@@ -45,7 +45,7 @@ describe('KnowledgeBasesFilterTitle', () => {
     it('renders filter by text', () => {
         render(<KnowledgeBasesFilterTitle allTags={mockAllTags} tagsByKnowledgeBaseData={mockTagsByKnowledgeBase} />);
 
-        expect(screen.getByText('Filter by')).toBeInTheDocument();
+        expect(screen.getByText('Filter by:')).toBeInTheDocument();
     });
 
     it('shows none when no tag filter', () => {
@@ -54,7 +54,7 @@ describe('KnowledgeBasesFilterTitle', () => {
         expect(screen.getByText('none')).toBeInTheDocument();
     });
 
-    it('shows tag label when tag filter is active', () => {
+    it('names the tag facet inside the badge', () => {
         hoisted.mockUseKnowledgeBasesFilterTitle.mockReturnValue({
             pageTitle: 'Tag 1',
             tagId: '1',
@@ -62,7 +62,7 @@ describe('KnowledgeBasesFilterTitle', () => {
 
         render(<KnowledgeBasesFilterTitle allTags={mockAllTags} tagsByKnowledgeBaseData={mockTagsByKnowledgeBase} />);
 
-        expect(screen.getByText('tag:')).toBeInTheDocument();
+        expect(screen.getByTestId('badge')).toHaveTextContent('Tags: Tag 1');
     });
 
     it('renders badge with tag name', () => {

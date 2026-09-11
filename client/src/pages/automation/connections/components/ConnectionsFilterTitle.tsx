@@ -28,15 +28,11 @@ const ConnectionsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by </span>
-
-            <span className="text-sm text-muted-foreground uppercase">
-                {searchParams.get('tagId') ? 'tag' : 'component'}:
-            </span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             <Badge
-                label={typeof pageTitle === 'string' ? pageTitle : 'All Components'}
-                styleType="secondary-filled"
+                label={`${searchParams.get('tagId') ? 'Tags' : 'Components'}: ${typeof pageTitle === 'string' ? pageTitle : 'All Components'}`}
+                styleType="primary-outline"
                 weight="semibold"
             />
         </div>

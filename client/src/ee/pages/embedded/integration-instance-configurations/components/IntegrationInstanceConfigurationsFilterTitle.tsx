@@ -25,14 +25,10 @@ const IntegrationInstanceConfigurationsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by </span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
-            <span className="text-sm text-muted-foreground uppercase">
-                {searchParams.get('tagId') ? 'tag' : 'integration'}:
-            </span>
-
-            <Badge styleType="secondary-filled" weight="semibold">
-                <span className="text-sm">{pageTitle ?? 'All Integrations'}</span>
+            <Badge styleType="primary-outline" weight="semibold">
+                <span className="text-sm">{`${searchParams.get('tagId') ? 'Tags' : 'Integrations'}: ${pageTitle ?? 'All Integrations'}`}</span>
             </Badge>
         </div>
     );
