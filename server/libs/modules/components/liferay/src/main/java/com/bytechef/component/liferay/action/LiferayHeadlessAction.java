@@ -121,7 +121,7 @@ public class LiferayHeadlessAction {
             .queryParameters(
                 getParameterValueMap((List<?>) hiddenProperties.get(QUERY), properties))
             .configuration(
-                Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
+                Http.connectTimeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .configuration(
                 responseType(ResponseType.JSON))
             .body(
