@@ -1,10 +1,10 @@
 # docker/dockerfile:1
-FROM bytechef/bytechef-server:latest
+ARG BASE_IMAGE=bytechef/bytechef-server:latest
 
-ARG ARG_APPLICATION_HOME=/opt/bytechef
+FROM ${BASE_IMAGE}
 
-RUN mkdir ${ARG_APPLICATION_HOME}/client
-RUN mkdir ${ARG_APPLICATION_HOME}/client/assets
+RUN mkdir client
+RUN mkdir client/assets
 
 COPY client/dist/index.html client/
 COPY client/dist/oauth.html client/
