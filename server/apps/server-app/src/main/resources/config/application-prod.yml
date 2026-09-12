@@ -1,10 +1,12 @@
 logging:
+  file:
+    name: /opt/bytechef/server/logs/bytechef.log
   level:
     ROOT: INFO
     com.bytechef: INFO
   structured:
     format:
-      console: ecs
+      file: ecs
 
 server:
   port: 8080
