@@ -29,11 +29,11 @@ public class JobRunner {
         this.jobFacade = jobFacade;
     }
 
-    public void run(String workflowName, Map<String, ?> jobParameters) {
+    public long run(String workflowName, Map<String, ?> jobParameters) {
         String substring = workflowName.substring(workflowName.lastIndexOf("/") + 1, workflowName.lastIndexOf('.'));
 
         String id = EncodingUtils.base64EncodeToString(substring);
 
-        jobFacade.createJob(new JobParametersDTO(id, jobParameters));
+        return jobFacade.createJob(new JobParametersDTO(id, jobParameters));
     }
 }
