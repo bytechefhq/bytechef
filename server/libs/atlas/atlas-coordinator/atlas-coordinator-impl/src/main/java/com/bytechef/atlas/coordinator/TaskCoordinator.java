@@ -246,6 +246,8 @@ public class TaskCoordinator {
     private void handleJobExecutionException(Job job, Exception exception) {
         long jobId = Validate.notNull(job.getId(), "id");
 
+        log.error("Job id={} execution failed", jobId, exception);
+
         String errorMessage = resolveErrorMessage(exception);
 
         Optional<TaskExecution> taskExecutionOptional = taskExecutionService.fetchLastJobTaskExecution(jobId);
