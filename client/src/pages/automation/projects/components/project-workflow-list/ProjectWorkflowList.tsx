@@ -10,6 +10,7 @@ import handleImportWorkflow from '@/pages/automation/project/utils/handleImportW
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
 import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
@@ -37,6 +38,7 @@ const ProjectWorkflowList = ({
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
+    const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
     const navigate = useNavigate();
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
@@ -164,7 +166,7 @@ const ProjectWorkflowList = ({
                                 createWorkflowMutation={createProjectWorkflowMutation}
                                 parentId={project.id}
                                 triggerNode={
-                                    <ButtonGroup className="mx-auto">
+                                    <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
                                         <Button
                                             onClick={(event) => {
                                                 event.stopPropagation();
@@ -175,7 +177,7 @@ const ProjectWorkflowList = ({
                                             Create Workflow
                                         </Button>
 
-                                        <DropdownMenu>
+                                        <DropdownMenu onOpenChange={handleOpenChange}>
                                             <DropdownMenuTrigger asChild>
                                                 <Button
                                                     icon={
@@ -185,10 +187,15 @@ const ProjectWorkflowList = ({
                                                             <ChevronDownIcon />
                                                         )
                                                     }
+                                                    ref={dropdownMenuTriggerRef}
                                                 ></Button>
                                             </DropdownMenuTrigger>
 
-                                            <DropdownMenuContent align="end" className="p-0">
+                                            <DropdownMenuContent
+                                                align="start"
+                                                alignOffset={alignOffset}
+                                                className="p-0"
+                                            >
                                                 <DropdownMenuItem
                                                     className="dropdown-menu-item"
                                                     onClick={(event) => {
