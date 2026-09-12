@@ -20,7 +20,7 @@
     </SpringProfile>
 
     <SpringProfile name="prod">
-        <include resource="org/springframework/boot/logging/logback/structured-console-appender.xml"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     </SpringProfile>
 
     <SpringProfile name="!dev &amp; !prod">
@@ -73,6 +73,10 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="OpenTelemetry"/>
     </root>
+
+    <SpringProfile name="prod">
+        <include optional="true" resource="logback-file-appender.xml"/>
+    </SpringProfile>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>

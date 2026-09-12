@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <include resource="org/springframework/boot/logging/logback/structured-file-appender.xml"/>
+
+    <root>
+        <appender-ref ref="FILE"/>
+    </root>
+</included>
