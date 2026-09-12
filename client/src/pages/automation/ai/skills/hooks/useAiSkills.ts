@@ -1,60 +1,82 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
-import {useAiSkillsQuery} from '@/shared/middleware/graphql';
-import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {toast} from 'sonner';
+import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
+import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useQueryClient} from '@tanstack/react-query';
+import {useCallback, useEffect} from 'react';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
-interface UseAiSkillsOptionsI {
-    enabled?: boolean;
-}
+type AiSkillsRouteType = 'detail' | 'list';
 
-export default function useAiSkills(options?: UseAiSkillsOptionsI) {
-    const enabled = options?.enabled ?? true;
+const determineRoute = (skillId: string | undefined): AiSkillsRouteType => {
+    return skillId ? 'detail' : 'list';
+};
 
-    const {setSkillsPanelOpen, setSkillsView, skillsView} = useAiSkillsStore();
+export default function useAiSkills() {
+    const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
+    const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
+    const selectedSkillId = useAiSkillsStore((state) => state.selectedSkillId);
+    const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
+    const skillsView = useAiSkillsStore((state) => state.skillsView);
 
-    const {data: aiSkillsData, isError, isLoading} = useAiSkillsQuery(undefined, {enabled});
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
 
-    const skills = useMemo(() => aiSkillsData?.aiSkills ?? [], [aiSkillsData]);
+    const {skillId} = useParams<{skillId?: string}>();
 
-    const previousSkillsLengthRef = useRef(skills.length);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const handleClose = useCallback(() => {
-        if (skillsView === 'detail') {
-            setSkillsView('list');
-        } else {
-            setSkillsPanelOpen(false);
-        }
-    }, [setSkillsPanelOpen, setSkillsView, skillsView]);
+    const queryClient = useQueryClient();
 
-    // Sync the store view when the skill list becomes empty or non-empty
+    const route = determineRoute(skillId);
+
+    const isDetailView = route === 'detail';
+
+    const headerTitle = isDetailView ? (skillsHeaderInfo.title ?? 'Skill') : 'AI Skills';
+
+    const showToolbar = route === 'list';
+    const showSearchAndCreate = skillsView !== 'empty';
+
+    const skillsBasePath = getAiSkillsBasePath(location.pathname);
+
+    const handleBack = useCallback(() => navigate(skillsBasePath), [navigate, skillsBasePath]);
+
     useEffect(() => {
-        const wasEmpty = previousSkillsLengthRef.current === 0;
-        const isEmpty = skills.length === 0;
-
-        previousSkillsLengthRef.current = skills.length;
-
-        if (wasEmpty && !isEmpty && skillsView === 'empty') {
-            setSkillsView('list');
-        } else if (!wasEmpty && isEmpty && skillsView === 'list') {
-            setSkillsView('empty');
-        } else if (skillsView === 'empty' && skills.length > 0) {
-            setSkillsView('list');
-        } else if (skillsView === 'list' && skills.length === 0) {
-            setSkillsView('empty');
-        }
-    }, [skills.length, setSkillsView, skillsView]);
+        return registerPostTurn(Source.SKILLS, () => {
+            invalidateSkillQueries(queryClient);
+        });
+    }, [queryClient, registerPostTurn]);
 
     useEffect(() => {
-        if (isError) {
-            toast.error('Failed to load skills', {id: 'skills-load-error'});
+        return useCopilotStateContributorRegistry.getState().register(() => {
+            const {selectedSkillId: activeSkillId, skillsHeaderInfo: activeHeaderInfo} = useAiSkillsStore.getState();
+
+            if (activeSkillId == null) {
+                return {};
+            }
+
+            return {
+                currentSelectedSkillId: activeSkillId,
+                currentSelectedSkillName: activeHeaderInfo.title,
+            };
+        });
+    }, []);
+
+    useEffect(() => {
+        if (route === 'detail' && skillId && selectedSkillId !== skillId) {
+            openSkillDetail(skillId, '');
+        } else if (route === 'list' && skillsView === 'detail') {
+            closeSkillDetail();
         }
-    }, [isError]);
+    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, skillId, skillsView]);
 
     return {
-        handleClose,
-        isError,
-        isLoading,
-        skills,
-        skillsView,
+        handleBack,
+        headerTitle,
+        isDetailView,
+        showSearchAndCreate,
+        showToolbar,
     };
 }
