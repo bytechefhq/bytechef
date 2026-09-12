@@ -19,7 +19,7 @@ const KnowledgeBase = () => {
         >
             <PageLoader errors={[error]} loading={isLoading}>
                 {knowledgeBase && (
-                    <div className="mx-auto flex h-full w-full max-w-(--breakpoint-lg) flex-col p-4 pt-2">
+                    <div className="mx-auto flex h-full w-full max-w-(--breakpoint-lg) flex-col p-4 pt-0">
                         <KnowledgeBaseInfoCard knowledgeBase={knowledgeBase} />
 
                         <KnowledgeBaseTabs documents={documents} knowledgeBaseId={knowledgeBaseId} />

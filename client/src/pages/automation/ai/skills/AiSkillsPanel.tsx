@@ -1,11 +1,11 @@
 import AiSkillDetail from '@/pages/automation/ai/skills/components/AiSkillDetail';
 import AiSkillsEmptyState from '@/pages/automation/ai/skills/components/AiSkillsEmptyState';
 import AiSkillsList from '@/pages/automation/ai/skills/components/AiSkillsList';
-import useAiSkills from '@/pages/automation/ai/skills/hooks/useAiSkills';
+import useAiSkillsPanel from '@/pages/automation/ai/skills/hooks/useAiSkillsPanel';
 import {AlertTriangleIcon, Loader2Icon} from 'lucide-react';
 
 const AiSkillsPanel = () => {
-    const {isError, isLoading, skills, skillsView: currentView} = useAiSkills();
+    const {isError, isLoading, skills, skillsView: currentView} = useAiSkillsPanel();
 
     if (isLoading) {
         return (

@@ -96,7 +96,7 @@ const LayoutContainer = ({
                     <nav className="flex h-full flex-col">
                         {leftSidebarHeader}
 
-                        <div className="size-full overflow-y-auto px-2 pt-2 pb-4">{leftSidebarBody}</div>
+                        <div className="size-full overflow-y-auto px-2 pb-4">{leftSidebarBody}</div>
                     </nav>
                 </aside>
             )}

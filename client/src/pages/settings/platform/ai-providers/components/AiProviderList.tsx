@@ -74,7 +74,7 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
     }, [aiProviders]);
 
     return (
-        <div className="w-full self-start p-4 pt-2">
+        <div className="w-full self-start p-4 pt-0">
             <Accordion
                 className="w-full rounded-md border"
                 collapsible
