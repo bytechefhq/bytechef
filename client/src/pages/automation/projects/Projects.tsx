@@ -8,6 +8,7 @@ import {useGetWorkspaceProjectGitConfigurationsQuery} from '@/ee/shared/mutation
 import handleImportProject from '@/pages/automation/project/utils/handleImportProject';
 import ProjectsFilterTitle from '@/pages/automation/projects/components/ProjectsFilterTitle';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -42,6 +43,8 @@ const Projects = () => {
     const [searchParams] = useSearchParams();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+
+    const {alignOffset, buttonGroupRef, dropdownMenuTriggerRef, handleOpenChange} = useButtonGroupDropdownAlign();
 
     const queryClient = useQueryClient();
 
@@ -188,21 +191,21 @@ const Projects = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <ButtonGroup className="mx-auto">
+                            <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
                                 <ProjectDialog
                                     onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
                                     project={undefined}
                                     triggerNode={<Button aria-label="Create Project" label="Create Project" />}
                                 />
 
-                                <DropdownMenu>
+                                <DropdownMenu onOpenChange={handleOpenChange}>
                                     <DropdownMenuTrigger asChild>
-                                        <Button>
+                                        <Button ref={dropdownMenuTriggerRef}>
                                             <ChevronDownIcon />
                                         </Button>
                                     </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="end">
+                                    <DropdownMenuContent align="start" alignOffset={alignOffset}>
                                         <DropdownMenuItem onClick={() => navigate(`templates`)}>
                                             <LayoutTemplateIcon className="mr-2 size-4" />
                                             From Template
