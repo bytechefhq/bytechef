@@ -15,7 +15,7 @@ const GitConfiguration = () => {
             header={<Header centerTitle={true} position="main" title="Git Configuration" />}
             leftSidebarOpen={false}
         >
-            <div className="w-full self-start p-4 pt-2 3xl:mx-auto 3xl:w-4/5">
+            <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                 <div className="max-w-xl divide-y divide-muted">
                     <GitConfigurationForm gitConfiguration={gitConfiguration} />
                 </div>

@@ -111,7 +111,7 @@ const ApiCollections = () => {
                 loading={apiCollectionsIsLoading || projectsIsLoading || tagsIsLoading}
             >
                 {apiCollections && apiCollections?.length > 0 ? (
-                    <div className="w-full divide-y divide-border/50 self-start p-4 pt-2 3xl:mx-auto 3xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,

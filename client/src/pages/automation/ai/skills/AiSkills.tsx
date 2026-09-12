@@ -10,21 +10,17 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
+import useAiSkills from '@/pages/automation/ai/skills/hooks/useAiSkills';
 import useAiSkillsTagFilterGroups from '@/pages/automation/ai/skills/hooks/useAiSkillsTagFilterGroups';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
-import getAiSkillsBasePath from '@/pages/automation/ai/skills/utils/getAiSkillsBasePath';
-import invalidateSkillQueries from '@/pages/automation/ai/skills/utils/invalidateSkillQueries';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
-import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
-import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import FilterBadges from '@/shared/components/filters/FilterBadges';
 import FilterMenu, {hasActiveFilters} from '@/shared/components/filters/FilterMenu';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useQueryClient} from '@tanstack/react-query';
 import {
     ArrowLeftIcon,
     CodeIcon,
@@ -36,31 +32,11 @@ import {
     SparklesIcon,
     Trash2Icon,
 } from 'lucide-react';
-import {useEffect} from 'react';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-type AiSkillsRouteType = 'detail' | 'list';
-
-const determineRoute = (skillId: string | undefined): AiSkillsRouteType => {
-    return skillId ? 'detail' : 'list';
-};
-
 const AiSkills = () => {
-    const {skillId} = useParams<{skillId?: string}>();
-
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const tagFilterGroups = useAiSkillsTagFilterGroups();
-
-    const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
-    const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
     const searchQuery = useAiSkillsStore((state) => state.searchQuery);
-    const selectedSkillId = useAiSkillsStore((state) => state.selectedSkillId);
     const setSearchQuery = useAiSkillsStore((state) => state.setSearchQuery);
-    const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
-    const skillsView = useAiSkillsStore((state) => state.skillsView);
 
     const {canSave, canToggleView, handlers, isSaving, viewMode} = useAiSkillDetailToolbarStore(
         useShallow((state) => ({
@@ -74,47 +50,11 @@ const AiSkills = () => {
 
     const setViewMode = useAiSkillDetailToolbarStore((state) => state.setViewMode);
 
+    const {handleBack, headerTitle, isDetailView, showSearchAndCreate, showToolbar} = useAiSkills();
+
+    const tagFilterGroups = useAiSkillsTagFilterGroups();
+
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
-
-    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
-
-    const queryClient = useQueryClient();
-
-    useEffect(() => {
-        return registerPostTurn(Source.SKILLS, () => {
-            invalidateSkillQueries(queryClient);
-        });
-    }, [queryClient, registerPostTurn]);
-
-    useEffect(() => {
-        return useCopilotStateContributorRegistry.getState().register(() => {
-            const {selectedSkillId: activeSkillId, skillsHeaderInfo: activeHeaderInfo} = useAiSkillsStore.getState();
-
-            if (activeSkillId == null) {
-                return {};
-            }
-
-            return {
-                currentSelectedSkillId: activeSkillId,
-                currentSelectedSkillName: activeHeaderInfo.title,
-            };
-        });
-    }, []);
-
-    const route = determineRoute(skillId);
-
-    useEffect(() => {
-        if (route === 'detail' && skillId && selectedSkillId !== skillId) {
-            openSkillDetail(skillId, '');
-        } else if (route === 'list' && skillsView === 'detail') {
-            closeSkillDetail();
-        }
-    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, skillId, skillsView]);
-
-    const headerTitle = route === 'detail' ? (skillsHeaderInfo.title ?? 'Skill') : 'AI Skills';
-
-    const showToolbar = route === 'list';
-    const showSearchAndCreate = skillsView !== 'empty';
 
     let toolbarRight: React.ReactNode = undefined;
 
@@ -141,7 +81,7 @@ const AiSkills = () => {
                 {showSearchAndCreate && <AiSkillsCreateDropdown />}
             </div>
         );
-    } else if (route === 'detail' && handlers) {
+    } else if (isDetailView && handlers) {
         const inSourceMode = viewMode === 'source';
 
         toolbarRight = (
@@ -218,10 +158,6 @@ const AiSkills = () => {
         );
     }
 
-    const isDetailView = route === 'detail';
-
-    const skillsBasePath = getAiSkillsBasePath(location.pathname);
-
     // The detail view used to keep a skills-list sidebar for switching between skills. Inside Settings the
     // only sidebar on screen is the settings nav, so the way back to the list is an explicit control instead
     // — the CustomComponentDetail idiom, which solves the same problem one settings entry over.
@@ -230,7 +166,7 @@ const AiSkills = () => {
             <Button
                 aria-label="Back to skills"
                 icon={<ArrowLeftIcon className="size-5" />}
-                onClick={() => navigate(skillsBasePath)}
+                onClick={handleBack}
                 size="icon"
                 variant="ghost"
             />
@@ -253,7 +189,7 @@ const AiSkills = () => {
             }
             leftSidebarOpen={false}
         >
-            <div className="flex min-h-0 w-full flex-col p-4 pt-2 3xl:mx-auto 3xl:w-4/5">
+            <div className="flex min-h-0 w-full flex-col p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                 {showToolbar && showSearchAndCreate && hasActiveFilters(tagFilterGroups) && (
                     <div className="flex flex-wrap items-center gap-2 pt-0 pb-4">
                         <FilterBadges groups={tagFilterGroups} />
