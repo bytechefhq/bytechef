@@ -1,16 +1,14 @@
 # docker/dockerfile:1
 FROM ghcr.io/graalvm/graalvm-community:25.0.2  AS bytechef-server-base
 
-ARG ARG_APPLICATION_HOME=/opt/bytechef
-
-RUN mkdir ${ARG_APPLICATION_HOME}
-RUN mkdir ${ARG_APPLICATION_HOME}/server
-RUN mkdir ${ARG_APPLICATION_HOME}/server/tmp
-RUN mkdir ${ARG_APPLICATION_HOME}/server/logs
-RUN mkdir ${ARG_APPLICATION_HOME}/external_jars
-RUN mkdir ${ARG_APPLICATION_HOME}/tls
-RUN mkdir ${ARG_APPLICATION_HOME}/tls/bytechef
-RUN mkdir ${ARG_APPLICATION_HOME}/tls/trusted
+RUN mkdir /opt/bytechef
+RUN mkdir /opt/bytechef/server
+RUN mkdir /opt/bytechef/server/tmp
+RUN mkdir /opt/bytechef/server/logs
+RUN mkdir /opt/bytechef/external_jars
+RUN mkdir /opt/bytechef/tls
+RUN mkdir /opt/bytechef/tls/bytechef
+RUN mkdir /opt/bytechef/tls/trusted
 
 WORKDIR /opt/bytechef
 
