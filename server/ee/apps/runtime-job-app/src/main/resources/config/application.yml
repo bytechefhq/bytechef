@@ -21,6 +21,29 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${bytechef.observability.tracing.endpoint}
+    logging:
+      export:
+        otlp:
+          endpoint: ${bytechef.observability.logging.endpoint}
+  logging:
+    export:
+      enabled: ${bytechef.observability.logging.enabled}
+  tracing:
+    export:
+      enabled: ${bytechef.observability.tracing.enabled}
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        enabled: ${bytechef.observability.metrics.enabled}
+        step: 10s
+        url: ${bytechef.observability.metrics.endpoint}
   # Prometheus is the default metrics backend
   prometheus:
     metrics:
@@ -29,6 +52,8 @@ management:
         step: 60
 
 spring:
+  config:
+    import: classpath:config/application-bytechef.yml
   application:
     name: runtime-job-app
   cache:
@@ -61,56 +86,3 @@ spring:
   threads:
     virtual:
       enabled: true
-
-#####
-
-bytechef:
-  async:
-    # Upper bound on concurrent @Async tasks on the default executor. There is no queue: a submitter waits for a
-    # permit. Workflow task and trigger execution are bounded separately by bytechef.worker.task.*.
-    concurrency-limit: 200
-  cache:
-    # Cache provider (redis | caffeine) default: caffeine
-    provider: caffeine
-  data-storage:
-    # Data storage provider
-    provider: filesystem
-  # Edition (CE - Community Edition | EE - Enterprise Edition) default: EE
-  edition: EE
-  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
-  encryption:
-    provider: filesystem
-  file-storage:
-    # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
-    provider: filesystem
-    filesystem:
-      basedir: ${user.home}/bytechef/data/file-storage
-  mail:
-    base-url: ${bytechef.public-url}
-    from: noreply@app.bytechef.io
-    host:
-    port: 25
-  message-broker:
-    # Messaging provider between Coordinator and Workers (memory) default: memory
-    provider: memory
-  # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
-  # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
-  # property on any given task.
-  # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
-  # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
-  # bootstraps.
-  worker:
-    task:
-      subscriptions:
-        default: 10
-  workflow:
-    output-storage:
-      # Output storage provider for workflow output data
-      provider: filesystem
-    repository:
-      filesystem:
-        enabled: true
-        location-pattern: ${user.home}/bytechef/data/workflows/*.{json|yml|yaml}
-      classpath:
-        enabled: true
-        location-pattern: workflows/*.{json|yml|yaml}

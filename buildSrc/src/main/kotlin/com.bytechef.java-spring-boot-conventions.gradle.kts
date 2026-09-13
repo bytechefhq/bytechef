@@ -6,7 +6,6 @@ plugins {
     // Apply the common convention plugin for shared build configuration between library and application projects.
     id("com.bytechef.java-application-conventions")
 
-    id("com.google.cloud.tools.jib")
     id("com.gorylenko.gradle-git-properties")
     id("org.springframework.boot")
 }
@@ -122,13 +121,4 @@ defaultTasks("bootRun")
 configure<com.gorylenko.GitPropertiesPluginExtension> {
     failOnNoGitDirectory = false
     setKeys(listOf("git.branch", "git.build.version", "git.commit.id", "git.commit.id.abbrev", "git.commit.id.describe"))
-}
-
-configure<com.google.cloud.tools.jib.gradle.JibExtension> {
-    from {
-        image = "ghcr.io/graalvm/graalvm-community:25.0.0"
-    }
-    to {
-        image = "bytechef/bytechef-" + project.name + ":latest"
-    }
 }
