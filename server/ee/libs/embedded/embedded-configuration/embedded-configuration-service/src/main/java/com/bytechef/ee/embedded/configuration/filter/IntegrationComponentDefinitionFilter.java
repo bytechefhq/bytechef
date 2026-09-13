@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class IntegrationComponentDefinitionFilter implements ComponentDefinitionFilter {
 
-    private static final List<String> COMPONENT_NAMES = List.of("apiPlatform", "codeWorkflow", "webhook");
+    private static final List<String> COMPONENT_NAMES = List.of(
+        "apiPlatform", "codeWorkflow", "dataTable", "knowledgeBase", "webhook");
 
     @Override
     public boolean filter(ComponentDefinition componentDefinition) {
