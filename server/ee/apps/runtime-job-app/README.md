@@ -308,11 +308,11 @@ docker run --rm \
 docker build -t bytechef/bytechef-runtime-job server/ee/apps/runtime-job-app/
 ```
 
-The release script at the repository root builds and pushes this image alongside the
-server images:
+The release script at the repository root builds and pushes this image when given the
+`--runtime-job` flag (without it, the script builds the `bytechef/bytechef` image instead):
 
 ```bash
-./docker-build.sh 20260909
+./docker-build.sh --runtime-job 20260909
 ```
 
 **Note**: To add JVM options, set `JAVA_TOOL_OPTIONS` on the container, for example
