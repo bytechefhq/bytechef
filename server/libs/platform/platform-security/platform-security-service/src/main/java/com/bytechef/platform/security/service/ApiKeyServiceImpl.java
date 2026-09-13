@@ -54,6 +54,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     @Override
     public void delete(long id) {
         apiKeyRepository.deleteById(id);
+
     }
 
     @Override

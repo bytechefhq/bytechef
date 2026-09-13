@@ -220,7 +220,6 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         List<Connection> inactiveConnections = connectionService.getInactiveConnections(connectionIds);
 
         if (!inactiveConnections.isEmpty()) {
-
             connectionService.validateConnectionsActive(connectionIds);
         }
 

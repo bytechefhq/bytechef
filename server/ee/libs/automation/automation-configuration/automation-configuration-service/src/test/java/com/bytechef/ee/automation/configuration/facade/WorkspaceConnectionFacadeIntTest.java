@@ -183,6 +183,26 @@ class WorkspaceConnectionFacadeIntTest {
 
     @ParameterizedTest
     @MethodSource("gatedMethods")
+    void testGateAllowsAWorkspaceAdminWhenTheUserLookupIsUnsupported(String methodName) {
+        when(userService.fetchUserByLogin(OWNER_LOGIN)).thenThrow(new UnsupportedOperationException());
+
+        authenticate(ADMIN_LOGIN, AuthorityConstants.USER);
+
+        assertBodyReached(() -> invokeGatedMethod(methodName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("gatedMethods")
+    void testGateDeniesTheOwnerWhenTheUserLookupIsUnsupported(String methodName) {
+        when(userService.fetchUserByLogin(OWNER_LOGIN)).thenThrow(new UnsupportedOperationException());
+
+        authenticate(OWNER_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> invokeGatedMethod(methodName)).isInstanceOf(AccessDeniedException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("gatedMethods")
     void testGateDeniesAnOrdinaryWorkspaceMember(String methodName) {
         authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
 

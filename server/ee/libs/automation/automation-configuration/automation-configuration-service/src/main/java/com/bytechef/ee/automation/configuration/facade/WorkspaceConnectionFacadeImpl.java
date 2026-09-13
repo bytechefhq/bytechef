@@ -39,6 +39,15 @@ import org.springframework.transaction.annotation.Transactional;
  * EE implementation of the workspace connection visibility and sharing operations. Extends the CE CRUD impl so the EE
  * bean satisfies both the CE base interface (REST/GraphQL CRUD consumers) and the EE sub-interface.
  *
+ * <p>
+ * Every sharing mutation here is owner-or-admin, and "admin" means a <em>workspace-wide</em> ADMIN role:
+ * {@code hasResourceRole} resolves the owning workspace and then asks
+ * {@link com.bytechef.automation.configuration.service.PermissionService#hasWorkspaceRole(long, String)}, which reads
+ * only the member's implicit row. A member in explicit mode is therefore refused here even when they hold ADMIN in
+ * every environment, and owning the connection is their remaining way in. That is deliberate — who a connection is
+ * shared with is not an environment-scoped fact, so a role held per environment should not decide it — but it is a real
+ * denial and {@code PermissionServiceTest} pins it.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -83,8 +92,8 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
-    @PreAuthorize("@permissionService.isResourceOwner('Connection', #connectionId) || " +
-        "@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN')")
+    @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
+        "@permissionService.isResourceOwner('Connection', #connectionId)")
     public void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility) {
         if (!resourceVisibilityPolicyRegistry.supports(CONNECTION, visibility)) {
             throw new ConfigurationException(
@@ -109,8 +118,8 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
-    @PreAuthorize("@permissionService.isResourceOwner('Connection', #connectionId) || " +
-        "@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN')")
+    @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
+        "@permissionService.isResourceOwner('Connection', #connectionId)")
     public void grantConnectionAccess(long workspaceId, long connectionId, long userId) {
         validateConnectionBelongsToWorkspace(workspaceId, connectionId);
         validateGranteeIsWorkspaceMember(workspaceId, userId);
@@ -119,8 +128,8 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
-    @PreAuthorize("@permissionService.isResourceOwner('Connection', #connectionId) || " +
-        "@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN')")
+    @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
+        "@permissionService.isResourceOwner('Connection', #connectionId)")
     public void revokeConnectionAccess(long workspaceId, long connectionId, long userId) {
         validateConnectionBelongsToWorkspace(workspaceId, connectionId);
 
@@ -131,8 +140,8 @@ public class WorkspaceConnectionFacadeImpl
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("@permissionService.isResourceOwner('Connection', #connectionId) || " +
-        "@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN')")
+    @PreAuthorize("@permissionService.hasResourceRole(#connectionId, 'Connection', 'ADMIN') || " +
+        "@permissionService.isResourceOwner('Connection', #connectionId)")
     public List<Long> getConnectionGrants(long workspaceId, long connectionId) {
         validateConnectionBelongsToWorkspace(workspaceId, connectionId);
 

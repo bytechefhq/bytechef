@@ -114,6 +114,28 @@ class ConnectionOwnershipResolverTest {
             .isEqualTo(ResourceOwner.of(OptionalLong.of(WORKSPACE_ID), OptionalLong.empty()));
     }
 
+    /**
+     * The Enterprise microservices deployment. {@code server/ee/apps/configuration-app} hosts the real EE
+     * {@code PermissionServiceImpl} and the sharing controller, but injects {@code RemoteUserServiceClient}, whose
+     * {@code fetchUserByLogin} is a stub that throws {@code UnsupportedOperationException}. Letting that escape would
+     * turn an authorization check into a 500 — and would take the workspace-ADMIN branch down with it, because
+     * {@code hasResourceRole} reads its workspace coordinate off the same {@code resolveOwner} call that computes the
+     * owner. "Owner unknown" is the answer the SPI's fail-closed contract already asks for.
+     */
+    @Test
+    void testResolveOwnerFailsClosedWhenTheUserLookupIsUnsupported() {
+        givenWorkspaceConnection();
+        givenConnectionCreatedBy(OWNER_LOGIN);
+
+        when(userService.fetchUserByLogin(OWNER_LOGIN)).thenThrow(new UnsupportedOperationException());
+
+        assertThat(resolver.resolveOwner(CONNECTION_ID))
+            .as(
+                "a login lookup this deployment does not implement leaves the owner unknown and the workspace "
+                    + "coordinate intact, rather than propagating out of the authorization check")
+            .isEqualTo(ResourceOwner.of(OptionalLong.of(WORKSPACE_ID), OptionalLong.empty()));
+    }
+
     @Test
     void testResolveOwnerFailsClosedForANonNumericId() {
         assertThat(resolver.resolveOwner("not-a-number")).isEqualTo(ResourceOwner.unknown());

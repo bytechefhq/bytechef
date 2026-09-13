@@ -159,9 +159,9 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // Resource families that have not opted into visibility keep CE owner-isolation unchanged, but only if they
-        // also have a registered ResourceOwnershipResolver. API keys are not actually among the families this
-        // protects: no resolver claims their "ApiKey" token, so this branch is never reached for them. See the
-        // API_KEY_* entry in PermissionScopeGateCoverageTest for the gap this leaves open.
+        // also have a registered ResourceOwnershipResolver. API keys are still not among them -- no resolver claims
+        // their "ApiKey" token -- but they no longer need one: ApiKeyFacadeImpl enforces owner-or-tenant-admin
+        // itself, in plain Java, so that it holds in deployments carrying no PermissionService bean at all.
         OptionalLong ownerUserId = resourceOwner.ownerUserId();
 
         if (ownerUserId.isPresent()) {

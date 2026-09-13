@@ -8,13 +8,16 @@
 package com.bytechef.ee.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.automation.configuration.facade.OrganizationConnectionFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -52,12 +55,29 @@ public class OrganizationConnectionGraphQlController {
 
     @MutationMapping
     public long createOrganizationConnection(@Argument CreateOrganizationConnectionInput input) {
+        List<TagInput> inputTags = input.tags();
+
+        List<TagInput> tagInputs = inputTags == null ? List.of() : inputTags;
+
+        List<Tag> tags = tagInputs.stream()
+            .map(tagInput -> {
+                Tag tag = new Tag();
+
+                tag.setId(tagInput.id());
+                tag.setName(tagInput.name());
+
+                return tag;
+            })
+            .toList();
+
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .name(input.name())
+            .authorizationType(input.authorizationType())
             .componentName(input.componentName())
             .connectionVersion(input.connectionVersion())
             .environmentId(input.environmentId())
             .parameters(input.parameters())
+            .tags(tags)
             .visibility(ResourceVisibility.ORGANIZATION)
             .build();
 
@@ -96,9 +116,15 @@ public class OrganizationConnectionGraphQlController {
                 .toString() : null);
     }
 
+    @SuppressFBWarnings({
+        "EI_EXPOSE_REP", "EI_EXPOSE_REP2"
+    })
     public record CreateOrganizationConnectionInput(
-        String name, String componentName, int connectionVersion, int environmentId,
-        Map<String, Object> parameters) {
+        String name, @Nullable AuthorizationType authorizationType, String componentName, int connectionVersion,
+        int environmentId, Map<String, Object> parameters, @Nullable List<TagInput> tags) {
+    }
+
+    public record TagInput(@Nullable Long id, String name) {
     }
 
     public record OrganizationConnectionResponse(

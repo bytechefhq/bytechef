@@ -38,6 +38,7 @@ import dev.samstevens.totp.code.DefaultCodeVerifier;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -79,6 +80,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public UserServiceImpl(
         AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository,
