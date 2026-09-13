@@ -27,8 +27,10 @@ type OrganizationConnection {
 """Input for creating a new organization connection."""
 input CreateOrganizationConnectionInput {
     name: String!
+    authorizationType: AuthorizationType
     componentName: String!
     connectionVersion: Int!
     environmentId: Int!
     parameters: Map!
+    tags: [TagInput!]
 }

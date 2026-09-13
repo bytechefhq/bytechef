@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
  * of those mutations was a tenant-admin-only lockout — including for the connection's own owner, whom the first
  * disjunct exists specifically to admit.
  * <p>
- * Populates <em>both</em> coordinates, because the two disjuncts ask different questions:
+ * Populates <em>both</em> coordinates, because the two disjuncts of those gates ask different questions:
  * <ul>
  * <li>{@code workspaceId} comes from the {@code workspace_connection} join row, since a connection carries no workspace
  * column of its own. It is what {@code hasResourceRole} resolves before asking for the caller's workspace-wide ADMIN

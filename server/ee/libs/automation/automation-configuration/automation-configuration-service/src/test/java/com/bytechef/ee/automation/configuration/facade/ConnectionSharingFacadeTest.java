@@ -92,8 +92,7 @@ class ConnectionSharingFacadeTest {
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
             .thenReturn(List.of(workspaceConnection));
 
-        when(workspaceUserService.isWorkspaceMember(GRANTEE_ID, WORKSPACE_ID))
-            .thenReturn(true);
+        when(workspaceUserService.isWorkspaceMember(GRANTEE_ID, WORKSPACE_ID)).thenReturn(true);
 
         workspaceConnectionFacade = new WorkspaceConnectionFacadeImpl(
             mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), connectionService,

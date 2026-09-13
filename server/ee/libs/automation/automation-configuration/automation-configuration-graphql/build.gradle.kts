@@ -21,4 +21,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:test:test-int-support"))
 }
