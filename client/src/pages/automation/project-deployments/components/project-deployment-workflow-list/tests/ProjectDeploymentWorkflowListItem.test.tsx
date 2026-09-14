@@ -13,7 +13,15 @@ vi.mock('@/shared/mutations/automation/projectDeploymentWorkflows.mutations', ()
     useEnableProjectDeploymentWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
-vi.mock('@/shared/components/WorkflowComponentsList', () => ({default: () => null}));
+const {rowPropsMock} = vi.hoisted(() => ({rowPropsMock: vi.fn()}));
+
+vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
+    default: (props: object) => {
+        rowPropsMock(props);
+
+        return null;
+    },
+}));
 
 vi.mock(
     '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu',
@@ -74,6 +82,21 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(state.projectName).toBe('Subflow');
         expect(state.projectVersion).toBe(2);
         expect(state.workflow).toBe(workflow);
+    });
+
+    it('shows the trigger and components like the projects page', () => {
+        rowPropsMock.mockClear();
+
+        renderListItem('Subflow');
+
+        expect(rowPropsMock).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+                className: 'hidden sm:flex',
+                workflow,
+                workflowComponentDefinitions: {},
+                workflowTaskDispatcherDefinitions: {},
+            })
+        );
     });
 
     it('does not open the executions sheet when the enable switch is toggled', async () => {

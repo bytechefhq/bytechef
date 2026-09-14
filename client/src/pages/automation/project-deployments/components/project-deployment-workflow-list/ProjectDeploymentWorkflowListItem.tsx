@@ -6,7 +6,7 @@ import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-depl
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
-import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
@@ -173,13 +173,13 @@ const ProjectDeploymentWorkflowListItem = ({
                 </div>
 
                 <div className="ml-6 flex items-center gap-1">
-                    <div className="hidden sm:flex">
-                        <WorkflowComponentsList
-                            filteredComponentNames={filteredComponentNames || []}
-                            workflowComponentDefinitions={workflowComponentDefinitions}
-                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                        />
-                    </div>
+                    <WorkflowTriggerAndComponentsRow
+                        className="hidden sm:flex"
+                        filteredComponentNames={filteredComponentNames}
+                        workflow={workflow}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
                 </div>
             </div>
 

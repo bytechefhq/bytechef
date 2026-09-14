@@ -1,5 +1,4 @@
 import Badge from '@/components/Badge/Badge';
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -10,6 +9,7 @@ import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/ee/sh
 import {IntegrationInstanceConfigurationKeys} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -97,31 +97,14 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                     {isMcpWorkflow && <Badge label="MCP" styleType="secondary-outline" />}
                 </div>
 
-                <div className="ml-6 flex space-x-1">
-                    {filteredComponentNames?.map((name) => {
-                        const componentDefinition = workflowComponentDefinitions[name];
-                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
-
-                        return (
-                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <LazyLoadSVG
-                                            className="size-5 flex-none"
-                                            key={name}
-                                            src={
-                                                componentDefinition?.icon
-                                                    ? componentDefinition?.icon
-                                                    : (taskDispatcherDefinition?.icon ?? '')
-                                            }
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
-                                </Tooltip>
-                            </div>
-                        );
-                    })}
+                <div className="ml-6 flex items-center gap-1">
+                    <WorkflowTriggerAndComponentsRow
+                        className="hidden sm:flex"
+                        filteredComponentNames={filteredComponentNames}
+                        workflow={workflow}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
                 </div>
             </div>
 
