@@ -129,9 +129,8 @@ public class DataTableGraphQlController {
         Long environmentId = input.environmentId();
 
         Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
 
-        dataTableService.duplicateTable(baseName, input.newBaseName(), environment.ordinal());
+        workspaceDataTableFacade.duplicateTable(input.tableId(), input.newBaseName(), environment.ordinal());
 
         return true;
     }

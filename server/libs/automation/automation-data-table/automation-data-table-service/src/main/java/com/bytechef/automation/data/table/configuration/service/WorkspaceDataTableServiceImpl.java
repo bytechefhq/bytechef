@@ -49,6 +49,12 @@ public class WorkspaceDataTableServiceImpl implements WorkspaceDataTableService 
 
     @Override
     @Transactional(readOnly = true)
+    public List<WorkspaceDataTable> getDataTableWorkspaceDataTables(Long dataTableId) {
+        return workspaceDataTableRepository.findByDataTableId(dataTableId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<WorkspaceDataTable> getWorkspaceDataTables(Long workspaceId) {
         return workspaceDataTableRepository.findAllByWorkspaceId(workspaceId);
     }
