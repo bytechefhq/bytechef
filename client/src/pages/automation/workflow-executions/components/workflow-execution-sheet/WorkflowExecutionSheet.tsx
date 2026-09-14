@@ -7,6 +7,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SparklesIcon, WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 
+import {getProjectVersion} from '../../utils/workflowExecutionsTable';
 import WorkflowExecutionDetail from './WorkflowExecutionDetail';
 import useWorkflowExecutionSheet from './hooks/useWorkflowExecutionSheet';
 
@@ -24,6 +25,8 @@ const WorkflowExecutionSheet = () => {
     } = useWorkflowExecutionSheet();
 
     const ff_4077 = useFeatureFlagsStore()('ff-4077');
+
+    const projectVersion = workflowExecution ? getProjectVersion(workflowExecution) : undefined;
 
     return (
         <Sheet onOpenChange={handleOpenChange} open={workflowExecutionSheetOpen}>
@@ -50,6 +53,8 @@ const WorkflowExecutionSheet = () => {
                                     <strong className="text-content-neutral-primary">
                                         {workflowExecution?.workflow?.label}
                                     </strong>
+
+                                    {projectVersion != null && <span>{`/ V${projectVersion}`}</span>}
                                 </span>
                             )}
                         </div>

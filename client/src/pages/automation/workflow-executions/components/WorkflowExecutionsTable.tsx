@@ -10,6 +10,7 @@ import {useWorkflowExecutionsTable} from '../hooks/useWorkflowExecutionsTable';
 import {
     MAX_SUBFLOW_DEPTH,
     formatDateTime,
+    getProjectVersion,
     getSubflowChildJobs,
     hasExpandedSubflow,
     wrapChildJob,
@@ -20,6 +21,7 @@ interface ExecutionColumnI {
     cell: (execution: WorkflowExecution) => ReactNode;
     cellClassName?: string;
     header: (depth: number) => string;
+    headerClassName?: string;
     id: string;
 }
 
@@ -50,8 +52,7 @@ const columns: ExecutionColumnI[] = [
     },
     {
         cell: (execution) => {
-            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-            const projectVersion = (execution.job?.metadata as {[key: string]: any} | undefined)?.projectVersion;
+            const projectVersion = getProjectVersion(execution);
 
             return projectVersion != null ? `V${projectVersion}` : '';
         },
@@ -90,7 +91,9 @@ const columns: ExecutionColumnI[] = [
     },
     {
         cell: (execution) => <WorkflowExecutionsDropdownMenu execution={execution} />,
+        cellClassName: 'text-center',
         header: () => 'Actions',
+        headerClassName: 'text-center',
         id: 'actions',
     },
 ];
@@ -106,7 +109,10 @@ const ExecutionTableHeader = ({className, depth = 0}: {className?: string; depth
             <TableHead className="w-9" />
 
             {columns.map((column) => (
-                <TableHead className="w-4 text-sm font-medium text-inherit" key={column.id}>
+                <TableHead
+                    className={twMerge('w-4 text-sm font-medium text-inherit', column.headerClassName)}
+                    key={column.id}
+                >
                     {column.header(depth)}
                 </TableHead>
             ))}
@@ -233,14 +239,18 @@ const ExecutionRows = ({
 );
 
 interface WorkflowExecutionsTableProps {
+    className?: string;
     workflowExecutions: WorkflowExecution[];
 }
 
-const WorkflowExecutionsTable = ({workflowExecutions}: WorkflowExecutionsTableProps) => {
+const WorkflowExecutionsTable = ({className, workflowExecutions}: WorkflowExecutionsTableProps) => {
     const {expandedJobIds, handleRowClick, handleToggleExpand} = useWorkflowExecutionsTable();
 
     return (
-        <div className="w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-full">
+        <div
+            className={twMerge('w-full self-start p-4 pt-0 3xl:mx-auto 3xl:w-full', className)}
+            data-testid="workflow-executions-table"
+        >
             <Table>
                 <ExecutionTableHeader />
 

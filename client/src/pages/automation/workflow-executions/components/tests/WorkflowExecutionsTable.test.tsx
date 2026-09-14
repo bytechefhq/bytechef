@@ -68,4 +68,57 @@ describe('WorkflowExecutionsTable', () => {
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(5);
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
     });
+
+    it('shows the project version the job ran with', () => {
+        const row = {
+            ...jobRow,
+            job: {...jobRow.job, metadata: {projectVersion: 2}},
+            projectDeployment: {name: 'Production', projectVersion: 3},
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render(<WorkflowExecutionsTable workflowExecutions={[row as any]} />);
+
+        expect(screen.getByText('V2')).toBeInTheDocument();
+        expect(screen.queryByText('V3')).not.toBeInTheDocument();
+    });
+
+    it('falls back to the deployment version when the job has no project version metadata', () => {
+        const row = {...jobRow, projectDeployment: {name: 'Production', projectVersion: 3}};
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render(<WorkflowExecutionsTable workflowExecutions={[row as any]} />);
+
+        expect(screen.getByText('V3')).toBeInTheDocument();
+    });
+
+    it('pads the table by default and lets callers override the padding', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const {rerender} = render(<WorkflowExecutionsTable workflowExecutions={[jobRow as any]} />);
+
+        expect(screen.getByTestId('workflow-executions-table')).toHaveClass('p-4', 'pt-0');
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        rerender(<WorkflowExecutionsTable className="p-0" workflowExecutions={[jobRow as any]} />);
+
+        expect(screen.getByTestId('workflow-executions-table')).toHaveClass('p-0');
+        expect(screen.getByTestId('workflow-executions-table')).not.toHaveClass('p-4');
+        expect(screen.getByTestId('workflow-executions-table')).not.toHaveClass('pt-0');
+    });
+
+    it('centers the actions menu under the Actions header', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render(<WorkflowExecutionsTable workflowExecutions={[jobRow as any]} />);
+
+        expect(screen.getByRole('columnheader', {name: 'Actions'})).toHaveClass('text-center');
+        expect(screen.getByTestId('dropdown').closest('td')).toHaveClass('text-center');
+        expect(screen.getByRole('columnheader', {name: 'Status'})).not.toHaveClass('text-center');
+    });
+
+    it('leaves the version empty when no version is known', () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render(<WorkflowExecutionsTable workflowExecutions={[jobRow as any]} />);
+
+        expect(screen.queryByText(/^V\d+$/)).not.toBeInTheDocument();
+    });
 });

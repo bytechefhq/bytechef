@@ -48,6 +48,8 @@ const WorkflowExecutionSheet = () => {
         POLLING_INTERVAL_MS
     );
 
+    const integrationVersion = workflowExecution?.integrationInstanceConfiguration?.integrationVersion;
+
     const handleOpenChange = useCallback(() => {
         setWorkflowExecutionSheetOpen(!workflowExecutionSheetOpen);
     }, [workflowExecutionSheetOpen, setWorkflowExecutionSheetOpen]);
@@ -76,6 +78,8 @@ const WorkflowExecutionSheet = () => {
                                 <strong className="text-content-neutral-primary">
                                     {workflowExecution?.workflow?.label}
                                 </strong>
+
+                                {integrationVersion != null && <span>{`/ V${integrationVersion}`}</span>}
                             </span>
                         )}
                     </div>
