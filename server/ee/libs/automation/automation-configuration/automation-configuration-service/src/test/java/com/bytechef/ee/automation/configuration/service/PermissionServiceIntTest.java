@@ -70,6 +70,7 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -1529,6 +1530,24 @@ class PermissionServiceIntTest {
             resolver("ApiKey", ResourceOwner.ofUser(USER_ID + 1)));
 
         assertThat(resourcePermissionService.isResourceOwner("ApiKey", 1L)).isFalse();
+    }
+
+    @Test
+    void testIsResourceOwnerAllowsAnOwnerWhoIsStillAWorkspaceMember() {
+        addMember(WorkspaceRole.EDITOR);
+
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.of(OptionalLong.of(workspaceId), OptionalLong.of(USER_ID))));
+
+        assertThat(resourcePermissionService.isResourceOwner("Connection", 1L)).isTrue();
+    }
+
+    @Test
+    void testIsResourceOwnerDeniesAnOwnerRemovedFromTheWorkspace() {
+        PermissionService resourcePermissionService = createPermissionService(
+            resolver("Connection", ResourceOwner.of(OptionalLong.of(workspaceId), OptionalLong.of(USER_ID))));
+
+        assertThat(resourcePermissionService.isResourceOwner("Connection", 1L)).isFalse();
     }
 
     @Test

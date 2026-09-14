@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionSharingFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -22,8 +22,8 @@ import org.springframework.stereotype.Controller;
  * GraphQL controller for connection visibility and sharing.
  *
  * <p>
- * Authorization (owner-or-admin) and every validation are enforced on {@link WorkspaceConnectionFacade}, not here, so
- * they protect every caller of the facade rather than this entry point alone. This class only maps arguments.
+ * Authorization (owner-or-admin) and every validation are enforced on {@link WorkspaceConnectionSharingFacade}, not
+ * here, so they protect every caller of the facade rather than this entry point alone. This class only maps arguments.
  *
  * @version ee
  *
@@ -34,23 +34,23 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class ConnectionSharingGraphQlController {
 
-    private final WorkspaceConnectionFacade workspaceConnectionFacade;
+    private final WorkspaceConnectionSharingFacade workspaceConnectionSharingFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectionSharingGraphQlController(WorkspaceConnectionFacade workspaceConnectionFacade) {
-        this.workspaceConnectionFacade = workspaceConnectionFacade;
+    public ConnectionSharingGraphQlController(WorkspaceConnectionSharingFacade workspaceConnectionSharingFacade) {
+        this.workspaceConnectionSharingFacade = workspaceConnectionSharingFacade;
     }
 
     @QueryMapping
     public List<Long> connectionGrants(@Argument long workspaceId, @Argument long connectionId) {
-        return workspaceConnectionFacade.getConnectionGrants(workspaceId, connectionId);
+        return workspaceConnectionSharingFacade.getConnectionGrants(workspaceId, connectionId);
     }
 
     @MutationMapping
     public boolean setConnectionVisibility(
         @Argument long workspaceId, @Argument long connectionId, @Argument ResourceVisibility visibility) {
 
-        workspaceConnectionFacade.setConnectionVisibility(workspaceId, connectionId, visibility);
+        workspaceConnectionSharingFacade.setConnectionVisibility(workspaceId, connectionId, visibility);
 
         return true;
     }
@@ -59,7 +59,7 @@ public class ConnectionSharingGraphQlController {
     public boolean grantConnectionAccess(
         @Argument long workspaceId, @Argument long connectionId, @Argument long userId) {
 
-        workspaceConnectionFacade.grantConnectionAccess(workspaceId, connectionId, userId);
+        workspaceConnectionSharingFacade.grantConnectionAccess(workspaceId, connectionId, userId);
 
         return true;
     }
@@ -68,7 +68,7 @@ public class ConnectionSharingGraphQlController {
     public boolean revokeConnectionAccess(
         @Argument long workspaceId, @Argument long connectionId, @Argument long userId) {
 
-        workspaceConnectionFacade.revokeConnectionAccess(workspaceId, connectionId, userId);
+        workspaceConnectionSharingFacade.revokeConnectionAccess(workspaceId, connectionId, userId);
 
         return true;
     }
