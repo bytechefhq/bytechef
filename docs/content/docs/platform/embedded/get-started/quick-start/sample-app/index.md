@@ -62,7 +62,8 @@ Together these cover the most common embedded integration patterns: the connect 
 │  X-Environment: DEVELOPMENT              │
 └──────────────┬───────────────────────────┘
                ▼
-        ByteChef Embedded API (:5173/9555)
+        ByteChef Embedded API
+        (app.bytechef.io or self-hosted :8080)
 ```
 
 The back-end never proxies ByteChef traffic - it only mints JWTs. The browser (or the Next.js API routes acting on its behalf) calls ByteChef directly with that JWT.
@@ -73,8 +74,10 @@ The back-end never proxies ByteChef traffic - it only mints JWTs. The browser (o
 
 ### 1. Prerequisites
 
-- A ByteChef EE instance running locally (default: `http://localhost:5173`).
-- A **Signing Key** created in **Embedded → Settings → Signing Keys**. Copy the **private key** (shown once) and the **Key Id** (`kid`).
+- A ByteChef instance with Embedded enabled, either:
+  - **ByteChef Cloud** at `https://app.bytechef.io`, or
+  - **self-hosted** ByteChef EE, by default at `http://localhost:8080`.
+- A **Signing Key** created in **Embedded → Settings → Signing Keys** on that same instance. Copy the **private key** (shown once) and the **Key Id** (`kid`). A key created on Cloud does not verify on a self-hosted instance, and vice versa.
 - Node.js 18+ and npm.
 
 ### 2. Configure the back-end
@@ -87,13 +90,18 @@ npm install
 Create `.env` in `back-end/`:
 
 ```bash
-PORT=3001
-TOKEN_EXPIRY=1h
 BYTECHEF_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----
 ...your private key from Signing Keys...
 -----END PRIVATE KEY-----"
 BYTECHEF_KID=<your-key-id>
 ```
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `BYTECHEF_PRIVATE_KEY` | yes | - | PEM private key of your Signing Key. The back-end signs the connected-user JWT with it (RS256). Keep the double quotes around the multi-line value. |
+| `BYTECHEF_KID` | yes | - | **Key Id** of the same Signing Key, written to the JWT `kid` header so ByteChef picks the matching public key. |
+| `PORT` | no | `3001` | Port the back-end listens on. If you change it, update `NEXT_PUBLIC_BACKEND_APP_BASE_URL` in the front-end. |
+| `TOKEN_EXPIRY` | no | `1h` | Lifetime of each issued JWT (`30m`, `1h`, `7d`, ...). |
 
 Run it:
 
@@ -109,16 +117,25 @@ cd ../front-end
 npm install
 ```
 
-Create `.env.local` if you need non-default URLs:
+Create `.env.local` in `front-end/` for any value whose default doesn't fit. Against **ByteChef Cloud**, the one line you need is:
 
 ```bash
-NEXT_PUBLIC_BACKEND_APP_BASE_URL=http://localhost:3001
-NEXT_PUBLIC_BYTECHEF_APP_BASE_URL=http://localhost:5173
-NEXT_PUBLIC_BYTECHEF_ENVIRONMENT=DEVELOPMENT
-NEXT_PUBLIC_BYTECHEF_EXTERNAL_USER_ID=1234567890
-# Only needed for the Chat MCP page:
-NEXT_PUBLIC_BYTECHEF_MCP_SERVER_URL=http://localhost:5173/<your-mcp-server-path>
+NEXT_PUBLIC_BYTECHEF_APP_BASE_URL=https://app.bytechef.io
 ```
+
+Against a **self-hosted** instance on the default `http://localhost:8080`, you can skip the file entirely.
+
+| Variable | Default | Description |
+|---|---|---|
+| `NEXT_PUBLIC_BYTECHEF_APP_BASE_URL` | `http://localhost:8080` | Your ByteChef instance: `https://app.bytechef.io` for Cloud, or your self-hosted URL. |
+| `NEXT_PUBLIC_BACKEND_APP_BASE_URL` | `http://localhost:3001` | The sample back-end that signs JWTs (`POST /api/token`). |
+| `NEXT_PUBLIC_BYTECHEF_ENVIRONMENT` | `DEVELOPMENT` | Environment every call targets - `DEVELOPMENT`, `STAGING` or `PRODUCTION` - sent as the `X-ENVIRONMENT` header. Integrations, connections and workflows are separate per environment. |
+| `NEXT_PUBLIC_BYTECHEF_EXTERNAL_USER_ID` | `1234567890` | Your app's id for the demo end user; it becomes the JWT `sub`, so ByteChef scopes that user's connections and workflows to it. Change it to act as a different user. |
+| `NEXT_PUBLIC_BYTECHEF_MCP_SERVER_URL` | *(empty)* | URL of a ByteChef MCP Server. Only needed for the **Chat MCP** page. |
+| `NEXT_PUBLIC_SHARED_CONNECTION_IDS` | *(empty)* | Comma-separated connection ids (e.g. `12,34`) the embedded workflow builder and Automation Hub offer in addition to the user's own connections. |
+| `OPENAI_API_KEY` | *(none)* | OpenAI key for the **Chat MCP** and **Chat Component Kit** pages. |
+
+`NEXT_PUBLIC_*` values are inlined when Next.js compiles, so restart `npm run dev` after changing them.
 
 Run it:
 
