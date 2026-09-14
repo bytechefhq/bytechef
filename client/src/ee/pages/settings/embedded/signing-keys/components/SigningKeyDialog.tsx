@@ -136,7 +136,12 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
                                 </p>
 
                                 <div className="flex flex-col space-y-1">
-                                    <Textarea className="text-nowrap" readOnly={true} rows={6} value={privateKey} />
+                                    <Textarea
+                                        className="field-sizing-fixed resize-none font-mono text-xs text-nowrap md:text-xs"
+                                        readOnly={true}
+                                        rows={12}
+                                        value={privateKey}
+                                    />
 
                                     <div className="flex justify-end">
                                         <Button
@@ -145,6 +150,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
 
                                                 toast('The Signing Key is copied.');
                                             }}
+                                            type="button"
                                         >
                                             <ClipboardIcon className="h-4" /> Copy
                                         </Button>
