@@ -81,6 +81,18 @@ class MicrosoftExcelRowDiffUtilsTest {
     }
 
     @Test
+    void testGetInsertedRowIndexesDoesNotTriggerWhenTwoExistingRowsAreSwapped() {
+        assertEquals(List.of(),
+            MicrosoftExcelRowDiffUtils.getInsertedRowIndexes(List.of("a", "b", "c"), List.of("a", "c", "b")));
+    }
+
+    @Test
+    void testGetInsertedRowIndexesStillDetectsInsertAfterSwap() {
+        assertEquals(List.of(3),
+            MicrosoftExcelRowDiffUtils.getInsertedRowIndexes(List.of("a", "b", "c"), List.of("a", "c", "b", "x")));
+    }
+
+    @Test
     void testGetInsertedRowIndexesReportsOnlySurplusWhenRowIsEditedAndInserted() {
         List<Integer> result = MicrosoftExcelRowDiffUtils.getInsertedRowIndexes(
             List.of("a", "b", "c"), List.of("a", "x", "y", "c"));
