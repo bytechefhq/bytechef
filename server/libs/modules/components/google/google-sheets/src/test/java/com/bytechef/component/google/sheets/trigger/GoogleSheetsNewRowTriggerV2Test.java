@@ -121,6 +121,15 @@ class GoogleSheetsNewRowTriggerV2Test {
     }
 
     @Test
+    void testWebhookRequestDoesNotTriggerWhenTwoExistingRowsAreSwapped() {
+        List<Map<String, Object>> result = executeWebhookRequest(
+            List.of(ROW_1, ROW_3, ROW_2), Optional.of(hashesOf(ROW_1, ROW_2, ROW_3)), List.of());
+
+        assertEquals(List.of(), result);
+        assertEquals(hashesOf(ROW_1, ROW_3, ROW_2), capturedRowHashes());
+    }
+
+    @Test
     void testWebhookRequestSkipsHeaderRow() {
         Parameters parameters = MockParametersFactory.create(
             Map.of(SPREADSHEET_ID, "123", SHEET_NAME, "abc", IS_THE_FIRST_ROW_HEADER, true));
