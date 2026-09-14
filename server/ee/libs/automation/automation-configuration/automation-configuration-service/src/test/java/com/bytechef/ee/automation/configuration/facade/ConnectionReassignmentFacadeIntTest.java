@@ -42,9 +42,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
- * Runs the admin-only guards of {@link ConnectionReassignmentFacadeImpl} through the method-security proxy. The
- * internal {@code markConnectionsPendingReassignment} variant is invoked by {@code WorkspaceUserRemovalListener} on the
- * non-admin user-removal path, so it must stay reachable without the admin authority.
+ * Runs the admin-only guards of {@link ConnectionReassignmentFacadeImpl} through the method-security proxy.
  *
  * @version ee
  *
@@ -66,12 +64,15 @@ class ConnectionReassignmentFacadeIntTest {
     private static final long WORKSPACE_ID = 1L;
 
     private static final String[] ADMIN_GUARDED_METHODS = {
-        "getAffectedWorkflows", "getUnresolvedConnections", "markConnectionsPendingReassignmentAsAdmin",
-        "reassignAllConnections", "reassignConnection"
+        "getAffectedWorkflows", "getUnresolvedConnections", "markConnectionsPendingReassignment",
+        "markSingleConnectionPendingReassignment", "reassignAllConnections", "reassignConnection"
     };
 
     @Autowired
     private ConnectionReassignmentFacade connectionReassignmentFacade;
+
+    @Autowired
+    private ConnectionService connectionService;
 
     @Autowired
     private UserService userService;
@@ -84,6 +85,7 @@ class ConnectionReassignmentFacadeIntTest {
         when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(new User()));
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
             .thenThrow(new IllegalStateException(BODY_REACHED));
+        when(connectionService.getConnection(CONNECTION_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
     }
 
     @AfterEach
@@ -108,14 +110,6 @@ class ConnectionReassignmentFacadeIntTest {
     }
 
     @Test
-    void testMarkConnectionsPendingReassignmentIsAllowedToANonAdmin() {
-        authenticate(AuthorityConstants.USER);
-
-        assertBodyReached(
-            () -> connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN));
-    }
-
-    @Test
     void testEveryAdminGuardedMethodIsEvaluated() {
         List<String> annotatedMethods = Arrays.stream(ConnectionReassignmentFacadeImpl.class.getDeclaredMethods())
             .filter(method -> !method.isSynthetic())
@@ -137,8 +131,10 @@ class ConnectionReassignmentFacadeIntTest {
             case "getAffectedWorkflows" -> connectionReassignmentFacade.getAffectedWorkflows(WORKSPACE_ID, USER_LOGIN);
             case "getUnresolvedConnections" ->
                 connectionReassignmentFacade.getUnresolvedConnections(WORKSPACE_ID, USER_LOGIN);
-            case "markConnectionsPendingReassignmentAsAdmin" ->
-                connectionReassignmentFacade.markConnectionsPendingReassignmentAsAdmin(WORKSPACE_ID, USER_LOGIN);
+            case "markConnectionsPendingReassignment" ->
+                connectionReassignmentFacade.markConnectionsPendingReassignment(WORKSPACE_ID, USER_LOGIN);
+            case "markSingleConnectionPendingReassignment" ->
+                connectionReassignmentFacade.markSingleConnectionPendingReassignment(CONNECTION_ID);
             case "reassignAllConnections" ->
                 connectionReassignmentFacade.reassignAllConnections(WORKSPACE_ID, USER_LOGIN, NEW_OWNER_LOGIN);
             case "reassignConnection" ->

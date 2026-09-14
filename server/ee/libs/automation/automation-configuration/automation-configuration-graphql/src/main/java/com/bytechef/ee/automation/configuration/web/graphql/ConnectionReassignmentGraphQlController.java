@@ -53,9 +53,7 @@ public class ConnectionReassignmentGraphQlController {
     public BulkReassignResultDTO markConnectionsPendingReassignment(
         @Argument long workspaceId, @Argument String userLogin) {
 
-        // Routes to the ADMIN-guarded facade variant. The unguarded markConnectionsPendingReassignment is reserved
-        // for WorkspaceUserRemovalListener's non-admin system path.
-        return connectionReassignmentFacade.markConnectionsPendingReassignmentAsAdmin(workspaceId, userLogin);
+        return connectionReassignmentFacade.markConnectionsPendingReassignment(workspaceId, userLogin);
     }
 
     @MutationMapping(name = "reassignConnection")

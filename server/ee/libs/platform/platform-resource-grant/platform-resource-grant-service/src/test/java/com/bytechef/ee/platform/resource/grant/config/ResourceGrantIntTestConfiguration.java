@@ -8,8 +8,14 @@
 package com.bytechef.ee.platform.resource.grant.config;
 
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicy;
+import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import java.util.List;
+import java.util.Set;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -30,6 +36,27 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class ResourceGrantIntTestConfiguration {
+
+    @Bean
+    ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry() {
+        return new ResourceVisibilityPolicyRegistry(List.of(new ResourceVisibilityPolicy() {
+
+            @Override
+            public String resourceType() {
+                return "Connection";
+            }
+
+            @Override
+            public ResourceVisibility defaultVisibility() {
+                return ResourceVisibility.WORKSPACE;
+            }
+
+            @Override
+            public Set<ResourceVisibility> supportedVisibilities() {
+                return Set.of(ResourceVisibility.PRIVATE, ResourceVisibility.WORKSPACE);
+            }
+        }));
+    }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class ResourceGrantIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {

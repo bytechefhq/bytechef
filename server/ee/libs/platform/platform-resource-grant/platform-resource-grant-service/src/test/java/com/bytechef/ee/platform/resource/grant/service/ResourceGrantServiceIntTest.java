@@ -9,17 +9,22 @@ package com.bytechef.ee.platform.resource.grant.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.ee.platform.resource.grant.config.ResourceGrantIntTestConfiguration;
 import com.bytechef.ee.platform.resource.grant.repository.ResourceGrantRepository;
+import com.bytechef.test.config.h2.H2DataSourceConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.NestedTestConfiguration;
 
 /**
  * @version ee
@@ -49,6 +54,14 @@ public class ResourceGrantServiceIntTest {
         resourceGrantService.grant(CONNECTION, 10L, 7L);
 
         assertThat(resourceGrantService.getGrantedUserIds(CONNECTION, 10L)).containsExactly(7L);
+    }
+
+    @Test
+    public void testGrantRejectsAResourceTypeThatCannotBeWithheld() {
+        assertThatThrownBy(() -> resourceGrantService.grant("connection", 10L, 7L))
+            .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(resourceGrantService.getGrantedUserIds("connection", 10L)).isEmpty();
     }
 
     @Test
@@ -107,6 +120,30 @@ public class ResourceGrantServiceIntTest {
     }
 
     @Test
+    public void testRevokeUserGrantsRemovesOnlyThatUsersGrantsOnTheGivenResources() {
+        resourceGrantService.grant(CONNECTION, 70L, 7L);
+        resourceGrantService.grant(CONNECTION, 71L, 7L);
+        resourceGrantService.grant(CONNECTION, 72L, 7L);
+        resourceGrantService.grant(CONNECTION, 70L, 8L);
+
+        resourceGrantService.revokeUserGrants(CONNECTION, 7L, List.of(70L, 71L));
+
+        assertThat(resourceGrantService.getGrantedUserIds(CONNECTION, 70L)).containsExactly(8L);
+        assertThat(resourceGrantService.getGrantedUserIds(CONNECTION, 71L)).isEmpty();
+        assertThat(resourceGrantService.getGrantedUserIds(CONNECTION, 72L)).containsExactly(7L);
+    }
+
+    @Test
+    public void testRevokeUserGrantsWithEmptyResourcesIsSilent() {
+        resourceGrantService.grant(CONNECTION, 80L, 7L);
+
+        assertThatCode(() -> resourceGrantService.revokeUserGrants(CONNECTION, 7L, List.of()))
+            .doesNotThrowAnyException();
+
+        assertThat(resourceGrantService.getGrantedUserIds(CONNECTION, 80L)).containsExactly(7L);
+    }
+
+    @Test
     public void testCreatedByAndCreatedDateArePopulated() {
         resourceGrantService.grant(CONNECTION, 60L, 7L);
 
@@ -118,5 +155,20 @@ public class ResourceGrantServiceIntTest {
                 assertThat(resourceGrant.getResourceId()).isEqualTo(60L);
                 assertThat(resourceGrant.getUserId()).isEqualTo(7L);
             });
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @SpringBootTest(classes = ResourceGrantIntTestConfiguration.class, properties = "bytechef.edition=ee")
+    @Import(H2DataSourceConfiguration.class)
+    class H2 {
+
+        @Test
+        public void testGrantIsIdempotent() {
+            resourceGrantService.grant(CONNECTION, 10L, 7L);
+            resourceGrantService.grant(CONNECTION, 10L, 7L);
+
+            assertThat(resourceGrantService.getGrantedUserIds(CONNECTION, 10L)).containsExactly(7L);
+        }
     }
 }
