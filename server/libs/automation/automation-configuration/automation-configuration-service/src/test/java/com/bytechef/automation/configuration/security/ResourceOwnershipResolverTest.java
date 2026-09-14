@@ -70,9 +70,9 @@ class ResourceOwnershipResolverTest {
      * awaiting its own fix, not an exemption.
      *
      * {@code Connection} and {@code McpServer} were both pinned here, each claimed by an environment resolver while no
-     * ownership resolver answered for it, until {@code ConnectionOwnershipResolver} and {@code McpServerOwnershipResolver}
-     * were added. Before that, the four connection sharing guards in {@code WorkspaceConnectionFacadeImpl} denied even
-     * the owner they name.
+     * ownership resolver answered for it, until {@code ConnectionOwnershipResolver} and
+     * {@code McpServerOwnershipResolver} were added. Before that, the four connection sharing guards in
+     * {@code WorkspaceConnectionFacadeImpl} denied even the owner they name.
      *
      * <p>
      * Each entry records the grounds it is pinned on, and both directions of rot are checked, so the map cannot become
@@ -115,6 +115,21 @@ class ResourceOwnershipResolverTest {
     private static Map<String, Set<String>> unreadableGuardArgumentsByFile;
     private static Map<String, String> ownershipResolverTypes;
     private static Map<String, String> environmentResolverTypes;
+    /**
+     * Owner-populating resolvers whose type has no visibility provider on purpose. Owner-isolation is the intended
+     * answer for these, not the lockout the assertion below guards against.
+     * <ul>
+     * <li>{@code ApiKey} — a key authenticates as the user who owns it. CE {@code hasResourceScope} answering
+     * {@code isCurrentUser(ownerUserId)} is exactly the rule that keeps a colleague's key out of reach, and
+     * {@code ApiKeyFacadeImpl} restricts every read and write to the owner for the same reason. A visibility provider
+     * that relaxed it would hand every member someone else's credential.</li>
+     * <li>{@code ApprovalTask} — a task is addressed to its assignee, whom the resolver records as the owner. CE
+     * {@code hasResourceScope} answering {@code isCurrentUser(ownerUserId)} keeps an approval with the person asked to
+     * give it; the approval list applies the same owner-or-scope rule through {@code isResourceOwner}.</li>
+     * </ul>
+     */
+    private static final Set<String> OWNER_ISOLATED_BY_DESIGN = Set.of("ApiKey", "ApprovalTask");
+
     private static Map<String, String> ownerPopulatingResolverTypes;
     private static Map<String, String> visibilityProviderTypes;
 
@@ -268,7 +283,9 @@ class ResourceOwnershipResolverTest {
         Set<String> ownerPopulatingTypesWithoutProvider = new TreeSet<>();
 
         for (Map.Entry<String, String> entry : ownerPopulatingResolverTypes.entrySet()) {
-            if (visibilityProviderTypes.containsKey(entry.getKey())) {
+            if (visibilityProviderTypes.containsKey(entry.getKey()) ||
+                OWNER_ISOLATED_BY_DESIGN.contains(entry.getKey())) {
+
                 continue;
             }
 
