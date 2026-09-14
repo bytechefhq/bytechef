@@ -3,11 +3,11 @@
 Snapshot of Playwright coverage for the workflow-editor Property feature, cross-referenced with
 [bytechefhq/bytechef#3932](https://github.com/bytechefhq/bytechef/issues/3932) and its sub-issues.
 
-Date: 2026-07-29
+Date: 2026-09-14
 
 ## Existing specs
 
-All live in `client/test/playwright/tests/properties/` (~2950 lines, 106 tests total).
+All live in `client/test/playwright/tests/properties/` (116 tests total).
 
 | Spec                                | Node exercised         | Tests | Sub-issue            |
 | ----------------------------------- | ---------------------- | ----- | -------------------- |
@@ -18,6 +18,7 @@ All live in `client/test/playwright/tests/properties/` (~2950 lines, 106 tests t
 | `propertyDisplayConditions.spec.ts` | `propertyTesting_1`    | 8     | #3937 / #4151 closed |
 | `propertyDynamicProperties.spec.ts` | `propertyTesting_1`    | 9     | #4152                |
 | `propertyOptions.spec.ts`           | `propertyTesting_1`    | 22    | untracked            |
+| `dataPillArrayIndex.spec.ts`        | `propertyTesting_1`    | 10    | #1629                |
 
 Open sub-issues:
 
@@ -73,7 +74,13 @@ input-type switch. Only Vitest slice tests exist for its pieces. This is the lar
 
 - static-options `PropertySelect` (`Property.tsx:795`) — only the BOOLEAN variant is exercised, via the
   `bool` property in `propertyDisplayConditions.spec.ts`
-- `PropertyMentionsInput` (`Property.tsx:211`) — data pills, `=` expression mode, formula mode
+- `PropertyMentionsInput` (`Property.tsx:211`) — `=` expression mode and formula mode are still uncovered.
+  Data pill insertion and the array index picker are covered by `dataPillArrayIndex.spec.ts`, which imports
+  `selectableIndexWorkflow.json` for arrays large enough to exercise the picker. Its one unreachable branch is
+  the disabled picker (`PropertyMentionArrayIndexPopover`, plain `[N]` text): it needs either a mention node
+  carrying a `label` attribute, which nothing inserts, or a non-editable editor, which only AI agent
+  `fromAi` mode produces - and that mode replaces the input with the "Automatically defined by the model"
+  overlay instead of rendering pills.
 - input-type-switch button, TIME clear button, description tooltip, `RequiredMark`
 - `CODE_EDITOR`, `JSON_SCHEMA_BUILDER`, `TEXT_AREA`, `NULL` control types
 - `FILE_ENTRY` — a single render assertion in `objectProperty.spec.ts`, no edit or persist coverage
