@@ -108,6 +108,10 @@ export class WorkflowPage {
         return this.arrayProperty.getByLabel(`Array property item at index ${index}`);
     }
 
+    arrayPropertyItemDeleteButtonAt(index: number): Locator {
+        return this.arrayPropertyItemAt(index).getByRole('button', {name: /^Delete /});
+    }
+
     arrayPropertyItemTextboxAt(index: number): Locator {
         return this.arrayPropertyItemAt(index).getByRole('textbox');
     }
