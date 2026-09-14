@@ -6,13 +6,15 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {Background, BackgroundVariant, ReactFlow, useNodesInitialized, useReactFlow} from '@xyflow/react';
+import {Background, BackgroundVariant, ReactFlow, useNodesInitialized, useReactFlow, useStore} from '@xyflow/react';
 import {useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
 import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnlyContext';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import {getAxisCenteredViewport} from '../utils/axisCenteredViewportUtils';
 import NodeActionsHint from './NodeActionsHint';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
 import WorkflowIssuesNote from './WorkflowIssuesNote';
@@ -41,6 +43,10 @@ type WorkflowEditorPropsType = {
 
 const CANVAS_DEFAULT_VIEWPORT = {x: 0, y: CANVAS_TOP_OFFSET, zoom: 1};
 
+const FIT_VIEW_OPTIONS = {maxZoom: 1, minZoom: 0.1, padding: 0.15};
+
+const TRIGGER_NODE_HALF_WIDTH = 72 / 2;
+
 const WorkflowEditor = ({
     className,
     componentDefinitions,
@@ -55,8 +61,11 @@ const WorkflowEditor = ({
 }: WorkflowEditorPropsType & ConditionalWorkflowEditorPropsType) => {
     const fitsViewOnLoad = fitViewOnLoad || preview;
 
-    const {fitView} = useReactFlow();
+    const {fitView, getNodesBounds, setViewport} = useReactFlow();
     const nodesInitialized = useNodesInitialized();
+    const flowHeight = useStore((state) => state.height);
+    const flowWidth = useStore((state) => state.width);
+    const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const {edges, nodes, onEdgesChange} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
@@ -76,14 +85,40 @@ const WorkflowEditor = ({
         });
 
     useEffect(() => {
-        if (!fitsViewOnLoad || !nodesInitialized) {
+        if (!fitsViewOnLoad || !nodesInitialized || !flowWidth || !flowHeight) {
             return;
         }
 
-        fitView({duration: 0, maxZoom: 1, minZoom: 0.1, padding: 0.15});
+        const triggerNode = nodes[0];
+
+        if (layoutDirection === 'TB' && triggerNode) {
+            setViewport(
+                getAxisCenteredViewport({
+                    ...FIT_VIEW_OPTIONS,
+                    axisX: triggerNode.position.x + TRIGGER_NODE_HALF_WIDTH,
+                    bounds: getNodesBounds(nodes),
+                    flowHeight,
+                    flowWidth,
+                }),
+                {duration: 0}
+            );
+        } else {
+            fitView({...FIT_VIEW_OPTIONS, duration: 0});
+        }
 
         onFitView?.();
-    }, [fitsViewOnLoad, fitView, nodes, nodesInitialized, onFitView]);
+    }, [
+        fitsViewOnLoad,
+        fitView,
+        flowHeight,
+        flowWidth,
+        getNodesBounds,
+        layoutDirection,
+        nodes,
+        nodesInitialized,
+        onFitView,
+        setViewport,
+    ]);
 
     return (
         <WorkflowEditorReadOnlyContext.Provider value={!!readOnlyWorkflow}>
