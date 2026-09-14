@@ -17,14 +17,12 @@ describe('useProjectDeploymentWorkflowSheetStore', () => {
     it('opens the sheet for a deployment, project and workflow in one update', () => {
         const workflow = {id: 'workflow1', label: 'workflow1'} as Workflow;
 
-        useProjectDeploymentWorkflowSheetStore
-            .getState()
-            .openProjectDeploymentWorkflowSheet({
-                projectDeploymentId: 3,
-                projectName: 'Subflow',
-                projectVersion: 2,
-                workflow,
-            });
+        useProjectDeploymentWorkflowSheetStore.getState().openProjectDeploymentWorkflowSheet({
+            projectDeploymentId: 3,
+            projectName: 'Subflow',
+            projectVersion: 2,
+            workflow,
+        });
 
         const state = useProjectDeploymentWorkflowSheetStore.getState();
 
