@@ -463,20 +463,11 @@
     .dark
         .react-flow__node
         svg
-        :is(
-            [style*='fill:#000000' i],
-            [style*='fill: #000000' i],
-            [style*='fill:#181818' i],
-            [style*='fill: #181818' i],
-            [style*='fill:#282a36' i],
-            [style*='fill: #282a36' i],
-            [style*='fill:rgb(0%,0%,0%)'],
-            [style*='fill: rgb(0%,0%,0%)']
-        ) {
+        :is([style*='fill: rgb(0, 0, 0)'], [style*='fill: rgb(24, 24, 24)'], [style*='fill: rgb(40, 42, 54)']) {
         fill: hsl(var(--content-neutral-primary)) !important;
     }
 
-    .dark .react-flow__node svg :is([style*='stroke:#000' i], [style*='stroke: #000' i]) {
+    .dark .react-flow__node svg [style*='stroke: rgb(0, 0, 0)'] {
         stroke: hsl(var(--content-neutral-primary)) !important;
     }
 
