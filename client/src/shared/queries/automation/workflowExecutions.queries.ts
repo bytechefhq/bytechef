@@ -35,7 +35,10 @@ export const WorkflowExecutionKeys = {
     workflowExecutions: ['automation_workflowExecutions'] as const,
 };
 
-export const useGetWorkspaceProjectWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
+export const useGetWorkspaceProjectWorkflowExecutionsQuery = (
+    request: GetWorkflowExecutionsPageRequest,
+    enabled?: boolean
+) =>
     useQuery<Page, Error>({
         queryKey: WorkflowExecutionKeys.filteredWorkflowExecutions(request),
         queryFn: () =>
@@ -43,6 +46,7 @@ export const useGetWorkspaceProjectWorkflowExecutionsQuery = (request: GetWorkfl
                 ...request,
                 embedded: false,
             }),
+        enabled: enabled === undefined ? true : enabled,
     });
 
 export const useGetProjectWorkflowExecutionQuery = (

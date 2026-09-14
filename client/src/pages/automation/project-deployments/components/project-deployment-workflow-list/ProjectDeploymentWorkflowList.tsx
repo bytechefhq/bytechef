@@ -13,6 +13,7 @@ const ProjectDeploymentWorkflowList = ({
     projectDeploymentId,
     projectDeploymentWorkflows,
     projectId,
+    projectName,
     projectVersion,
     taskDispatcherDefinitions,
 }: {
@@ -22,6 +23,7 @@ const ProjectDeploymentWorkflowList = ({
     projectDeploymentId: number;
     projectDeploymentWorkflows: Array<ProjectDeploymentWorkflow>;
     projectId: number;
+    projectName?: string;
     projectVersion: number;
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
@@ -140,6 +142,8 @@ const ProjectDeploymentWorkflowList = ({
                                 projectDeploymentEnabled={projectDeploymentEnabled}
                                 projectDeploymentId={projectDeploymentId}
                                 projectDeploymentWorkflow={projectDeploymentWorkflow}
+                                projectName={projectName}
+                                projectVersion={projectVersion}
                                 workflow={workflow}
                                 workflowComponentDefinitions={workflowComponentDefinitions}
                                 workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
@@ -177,6 +181,8 @@ const ProjectDeploymentWorkflowList = ({
                                         projectDeploymentEnabled={projectDeploymentEnabled}
                                         projectDeploymentId={projectDeploymentId}
                                         projectDeploymentWorkflow={projectDeploymentWorkflow}
+                                        projectName={projectName}
+                                        projectVersion={projectVersion}
                                         workflow={workflow}
                                         workflowComponentDefinitions={workflowComponentDefinitions}
                                         workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}

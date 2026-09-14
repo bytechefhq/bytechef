@@ -5,8 +5,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
+import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
-import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
@@ -27,6 +27,8 @@ interface ProjectDeploymentWorkflowListItemProps {
     projectDeploymentEnabled: boolean;
     projectDeploymentId: number;
     projectDeploymentWorkflow: ProjectDeploymentWorkflow;
+    projectName?: string;
+    projectVersion?: number;
     workflow: Workflow;
     workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
@@ -42,12 +44,17 @@ const ProjectDeploymentWorkflowListItem = ({
     projectDeploymentEnabled,
     projectDeploymentId,
     projectDeploymentWorkflow,
+    projectName,
+    projectVersion,
     workflow,
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: ProjectDeploymentWorkflowListItemProps) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-    const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
+
+    const openProjectDeploymentWorkflowSheet = useProjectDeploymentWorkflowSheetStore(
+        (state) => state.openProjectDeploymentWorkflowSheet
+    );
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -78,7 +85,7 @@ const ProjectDeploymentWorkflowListItem = ({
 
     const handleWorkflowClick = () => {
         if (workflow) {
-            openReadOnlyWorkflowSheet(workflow);
+            openProjectDeploymentWorkflowSheet({projectDeploymentId, projectName, projectVersion, workflow});
         }
     };
 
