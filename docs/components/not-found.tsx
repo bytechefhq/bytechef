@@ -2,6 +2,7 @@ import Link from 'fumadocs-core/link';
 import { type ReactNode, Suspense } from 'react';
 import { cn } from '@/lib/cn';
 import { buttonVariants } from 'fumadocs-ui/components/ui/button';
+import { RECOVERY_LINKS } from '@/lib/agent/site';
 
 export interface Suggestion {
   id: string;
@@ -27,6 +28,20 @@ export function NotFound(props: NotFoundProps) {
         >
           <Alternative {...props} />
         </Suspense>
+      </div>
+      <div className="max-w-[400px] w-full text-start">
+        <p className="text-sm text-fd-muted-foreground mb-2">
+          The link may be out of date. Where to look next:
+        </p>
+        <ul className="flex flex-col gap-1 text-sm">
+          {RECOVERY_LINKS.map(({ href, label }) => (
+            <li key={href}>
+              <Link href={href} className="text-fd-primary underline-offset-4 hover:underline">
+                {label}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

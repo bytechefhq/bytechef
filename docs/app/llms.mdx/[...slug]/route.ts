@@ -1,7 +1,8 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { getLLMText } from '@/lib/get-llm-text';
 import { source } from '@/lib/source';
-import { notFound } from 'next/navigation';
+import { markdownResponse } from '@/lib/agent/content-negotiation';
+import { buildNotFoundMarkdown } from '@/lib/agent/site';
 
 export const revalidate = false;
 
@@ -11,13 +12,11 @@ export async function GET(
 ) {
   const slug = (await params).slug;
   const page = source.getPage(slug);
-  if (!page) notFound();
+  // Still a real 404, but with a markdown body an agent can act on instead of an empty one.
+  if (!page) return markdownResponse(buildNotFoundMarkdown(`/${slug.join('/')}`), 404);
 
-  return new NextResponse(await getLLMText(page), {
-    headers: {
-      'Content-Type': 'text/markdown',
-    },
-  });
+  // Vary: Accept because proxy.ts picked this variant from the Accept header of a page URL.
+  return markdownResponse(await getLLMText(page));
 }
 
 export function generateStaticParams() {

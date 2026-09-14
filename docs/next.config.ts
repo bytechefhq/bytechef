@@ -41,6 +41,19 @@ const config: NextConfig = {
       },
     ],
   },
+  async headers() {
+    const agentLinks = [
+      '</llms.txt>; rel="llms-txt"',
+      '</.well-known/api-catalog>; rel="api-catalog"',
+      '</openapi.json>; rel="service-desc"; type="application/openapi+json"',
+      '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+    ].join(', ');
+
+    return [
+      { source: '/', headers: [{ key: 'Link', value: agentLinks }] },
+      { source: '/platform', headers: [{ key: 'Link', value: agentLinks }] },
+    ];
+  },
   async rewrites() {
     return [
       {

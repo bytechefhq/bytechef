@@ -11,6 +11,10 @@ import {Blocks, Cloud, LayoutTemplate, Server, Terminal, Workflow} from "lucide-
 
 ByteChef is an open-source platform for building and running workflow automations and AI agents across the applications, APIs, and databases you already use.
 
+The core is licensed under Apache 2.0 and runs anywhere Docker runs, or as a managed service on ByteChef Cloud. You build workflows in a visual editor, from a library of more than 270 connectors and flow controls, and add code steps in JavaScript, Python or Java where a connector is not enough. AI agents are first-class workflow steps: give an agent a model, tools drawn from the same connectors, memory and guardrails, and let it act inside a workflow that you can pause for a human approval and resume. The same engine can be embedded in your own product, so your customers connect their accounts and run integrations without leaving your app.
+
+These docs are organized by what you want to do. **Platform** explains how to use ByteChef, from your first workflow to enterprise settings. The [Reference](/reference) documents every component, its actions and triggers, and the [expression syntax](/reference/expressions) used to pass data between steps. The [Developer Guide](/developer-guide) covers running ByteChef from source and building your own connectors, and the [API reference](/openapi) describes the public REST APIs for automation, embedded integrations and custom components. Agents can read any page as markdown by requesting it with `Accept: text/markdown`, and start from [llms.txt](/llms.txt).
+
 ## Choose how to use ByteChef
 
 <Cards>

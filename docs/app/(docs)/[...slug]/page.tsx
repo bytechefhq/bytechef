@@ -26,9 +26,9 @@ import { Banner } from 'fumadocs-ui/components/banner';
 import { Installation } from '@/components/preview/installation';
 import { Customisation } from '@/components/preview/customisation';
 import { DocsPage, PageLastUpdate } from 'fumadocs-ui/layouts/docs/page';
-import { NotFound } from '@/components/not-found';
 // import { getSuggestions } from '@/app/(docs)/[...slug]/suggestions';
 import { PathUtils } from 'fumadocs-core/source';
+import { notFound } from 'next/navigation';
 
 function PreviewRenderer({ preview }: { preview: string }): ReactNode {
   if (preview && preview in Preview) {
@@ -41,15 +41,18 @@ function PreviewRenderer({ preview }: { preview: string }): ReactNode {
 
 export const revalidate = false;
 
+// Every page comes from generateStaticParams, so an unknown slug is a 404 served from the
+// prerendered not-found page. Rendering unknown slugs on demand would answer them with a
+// client-rendered shell whose HTML body is empty, which agents cannot read.
+export const dynamicParams = false;
+
 export default async function Page(props: PageProps<'/[...slug]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
 
-  if (!page)
-    return (
-      // <NotFound getSuggestions={() => getSuggestions(params.slug.join(' '))} />
-      <NotFound getSuggestions={() => Promise.resolve([])} />
-    );
+  // A real HTTP 404, rendered by app/(docs)/not-found.tsx inside the docs layout. Returning the
+  // NotFound component from here would answer 200 and make agents believe every path exists.
+  if (!page) notFound();
 
   const { body: Mdx, toc, lastModified } = await page.data.load();
 
