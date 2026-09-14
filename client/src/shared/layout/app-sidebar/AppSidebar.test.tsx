@@ -1,7 +1,8 @@
 import {SidebarProvider} from '@/components/ui/sidebar';
 import {render, screen} from '@/shared/util/test-utils';
+import {fireEvent} from '@testing-library/react';
 import {FolderIcon, MessagesSquareIcon} from 'lucide-react';
-import {MemoryRouter} from 'react-router-dom';
+import {MemoryRouter, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {AppSidebar} from './AppSidebar';
@@ -14,7 +15,19 @@ vi.mock('./AppSidebarFooter', () => ({
 }));
 
 vi.mock('@/shared/components/EnvironmentSelect', () => ({
-    default: ({variant}: {variant?: string}) => <div data-testid="environment-select">{variant}</div>,
+    default: ({onChange, variant}: {onChange?: (environmentId: number) => void; variant?: string}) => (
+        <div data-testid="environment-select">
+            {variant}
+
+            <button onClick={() => onChange?.(0)} type="button">
+                Switch to development
+            </button>
+
+            <button onClick={() => onChange?.(2)} type="button">
+                Switch to production
+            </button>
+        </div>
+    ),
 }));
 
 vi.mock('@/shared/stores/useEnvironmentStore', () => ({
@@ -27,12 +40,20 @@ const navigation = [
     {href: '/automation/projects', icon: FolderIcon, name: 'Projects'},
 ];
 
-const renderSidebar = (open = true) =>
+const LocationDisplay = () => {
+    const {pathname} = useLocation();
+
+    return <div data-testid="location">{pathname}</div>;
+};
+
+const renderSidebar = (open = true, pathname = '/automation/projects') =>
     render(
-        <MemoryRouter initialEntries={['/automation/projects']}>
+        <MemoryRouter initialEntries={[pathname]}>
             <SidebarProvider defaultOpen={open}>
                 <AppSidebar navigation={navigation} />
             </SidebarProvider>
+
+            <LocationDisplay />
         </MemoryRouter>
     );
 
@@ -95,6 +116,38 @@ describe('AppSidebar', () => {
             unmount();
 
             expect(document.documentElement).not.toHaveAttribute('data-environment');
+        });
+
+        it('redirects the workflow editor to deployments when switching away from development', () => {
+            renderSidebar(true, '/automation/projects/1/project-workflows/2');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
+
+            expect(screen.getByTestId('location')).toHaveTextContent('/automation/deployments');
+        });
+
+        it('redirects the integration editor to configurations when switching away from development', () => {
+            renderSidebar(true, '/embedded/integrations/1/integration-workflows/2');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
+
+            expect(screen.getByTestId('location')).toHaveTextContent('/embedded/configurations');
+        });
+
+        it('stays on environment-aware pages when switching environments', () => {
+            renderSidebar(true, '/automation/connections');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Switch to production'}));
+
+            expect(screen.getByTestId('location')).toHaveTextContent('/automation/connections');
+        });
+
+        it('stays in the workflow editor when switching to development', () => {
+            renderSidebar(true, '/automation/projects/1/project-workflows/2');
+
+            fireEvent.click(screen.getByRole('button', {name: 'Switch to development'}));
+
+            expect(screen.getByTestId('location')).toHaveTextContent('/automation/projects/1/project-workflows/2');
         });
     });
 });
