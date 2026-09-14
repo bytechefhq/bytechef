@@ -59,3 +59,18 @@ Open your Stripe dashboard and on the left bar your will find Subscriptions. Ope
 The Subscription ID can also be found in the output of the following actions:
 * **Create Subscription**
 * **Update Subscription**
+
+### How to find Payment Intent ID
+
+- **Method 1: Via API**
+
+Use the `GET /payment_intents` endpoint to retrieve a list of all payment intents and their IDs. Payment intent IDs start with `pi_`.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar you will find Transactions. Open the payment you want and you can find the Payment Intent ID under Details on the right.
+
+The Payment Intent ID can also be found in the output of the following actions:
+* **Get Payment Intent**
+* **List Refunds**
+* **Create Refund**
