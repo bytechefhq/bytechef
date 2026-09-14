@@ -252,7 +252,7 @@
         --content-brand-primary-hover: 217 62% 82%;
         --content-brand-primary-active: 217 61% 90%;
         --content-brand-secondary: 217 91% 40%;
-        --content-canvas_dot: 240 4% 30%;
+        --content-canvas_dot: 240 4% 26%;
         --content-destructive: 0 84% 60%;
         --content-destructive-primary: 0 84% 60%;
         --content-destructive-primary-hover: 0 84% 67%;
@@ -414,14 +414,17 @@
         --sidebar-border: 217 38% 28%;
     }
 
-    .dark .react-flow__node svg[fill='black' i],
+    .dark .react-flow__node svg:not([fill]),
     .dark .react-flow__node svg [fill='black' i],
-    .dark .react-flow__node svg[fill='#000' i],
     .dark .react-flow__node svg [fill='#000' i],
-    .dark .react-flow__node svg[fill='#000000' i],
     .dark .react-flow__node svg [fill='#000000' i],
-    .dark .react-flow__node svg[fill='#212121' i],
-    .dark .react-flow__node svg [fill='#212121' i] {
+    .dark .react-flow__node svg [fill='#212121' i],
+    .dark .react-flow__node svg [fill='#333' i],
+    .dark .react-flow__node svg [fill='#333333' i],
+    .dark .react-flow__node svg [fill='#374151' i],
+    .dark .react-flow__node svg[fill='black' i],
+    .dark .react-flow__node svg[fill='#000' i],
+    .dark .react-flow__node svg[fill='#000000' i] {
         fill: hsl(var(--content-neutral-primary));
     }
 
@@ -432,7 +435,9 @@
     .dark .react-flow__node svg[stroke='#000000' i],
     .dark .react-flow__node svg [stroke='#000000' i],
     .dark .react-flow__node svg[stroke='#212121' i],
-    .dark .react-flow__node svg [stroke='#212121' i] {
+    .dark .react-flow__node svg [stroke='#212121' i],
+    .dark .react-flow__node svg[stroke='#374151' i],
+    .dark .react-flow__node svg [stroke='#374151' i] {
         stroke: hsl(var(--content-neutral-primary));
     }
 
