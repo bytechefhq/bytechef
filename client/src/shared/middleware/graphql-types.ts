@@ -1105,11 +1105,13 @@ export type CreateMcpProjectInput = {
 
 /** Input for creating a new organization connection. */
 export type CreateOrganizationConnectionInput = {
+  authorizationType?: InputMaybe<AuthorizationType>;
   componentName: Scalars['String']['input'];
   connectionVersion: Scalars['Int']['input'];
   environmentId: Scalars['Int']['input'];
   name: Scalars['String']['input'];
   parameters: Scalars['Map']['input'];
+  tags?: InputMaybe<Array<TagInput>>;
 };
 
 export type CreateWorkspaceMcpServerInput = {
