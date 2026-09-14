@@ -373,7 +373,7 @@ const ConnectionDialog = ({
     const handleComponentDefinitionChange = useCallback(
         (componentDefinition?: ComponentDefinitionBasic) => {
             if (componentDefinition) {
-                setValue('componentName', componentDefinition.name);
+                setValue('componentName', componentDefinition.name, {shouldValidate: true});
                 setAuthorizationType(undefined);
                 setSelectedComponentDefinition(componentDefinition);
 
