@@ -1,5 +1,11 @@
 import Button from '@/components/Button/Button';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Download, MoreVertical, Pencil, Trash2, Upload} from 'lucide-react';
 
 interface DataTableActionsMenuProps {
@@ -39,12 +45,16 @@ const DataTableActionsMenu = ({
                 )}
 
                 {tableId && (
-                    <DropdownMenuItem
-                        className="text-content-destructive focus:text-content-destructive-primary"
-                        onClick={onDeleteTable}
-                    >
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete Table
-                    </DropdownMenuItem>
+                    <>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                            className="text-content-destructive focus:text-content-destructive-primary"
+                            onClick={onDeleteTable}
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete Table
+                        </DropdownMenuItem>
+                    </>
                 )}
             </DropdownMenuContent>
         </DropdownMenu>

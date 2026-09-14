@@ -49,20 +49,15 @@ interface ColumnDefinitionI {
 
 interface BuildUserColumnParamsI {
     column: ColumnDefinitionI;
-    isFetchingNextPage: boolean;
     isFirstNonFrozenColumn: boolean;
     onBooleanToggle: (rowId: string, columnName: string, value: boolean) => void;
     onDeleteColumn: (columnId: string, columnName: string) => void;
     onRenameColumn: (columnId: string, columnName: string) => void;
-    rowCount: number;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
     totalColumns: number;
 }
 
 interface BuildTrailingColumnParamsI {
-    hasColumns: boolean;
-    isFetchingNextPage: boolean;
-    rowCount: number;
     setAddColumnDialogOpen: (open: boolean) => void;
 }
 
@@ -85,12 +80,10 @@ interface BuildGridColumnsParamsI {
 
 function buildUserColumn({
     column,
-    isFetchingNextPage,
     isFirstNonFrozenColumn,
     onBooleanToggle,
     onDeleteColumn,
     onRenameColumn,
-    rowCount,
     setLocalRows,
     totalColumns,
 }: BuildUserColumnParamsI): Column<GridRowType, SummaryRowType> {
@@ -122,7 +115,6 @@ function buildUserColumn({
 
                   return undefined;
               },
-              renderSummaryCell: () => <BottomLoader isFetchingNextPage={isFetchingNextPage} rowCount={rowCount} />,
               summaryCellClass: 'datatable-summary-row',
           }
         : {
@@ -177,9 +169,6 @@ function buildUserColumn({
 }
 
 function buildTrailingColumn({
-    hasColumns,
-    isFetchingNextPage,
-    rowCount,
     setAddColumnDialogOpen,
 }: BuildTrailingColumnParamsI): Column<GridRowType, SummaryRowType> {
     return {
@@ -196,9 +185,6 @@ function buildTrailingColumn({
                 ></Button>
             </div>
         ),
-        renderSummaryCell: !hasColumns
-            ? () => <BottomLoader isFetchingNextPage={isFetchingNextPage} rowCount={rowCount} />
-            : undefined,
         resizable: false,
         width: 40,
     };
@@ -248,6 +234,8 @@ function buildGridColumns({
                 someSelected={isSomeSelected}
             />
         ),
+        renderSummaryCell: () => <BottomLoader isFetchingNextPage={isFetchingNextPage} rowCount={localRowCount} />,
+        summaryCellClass: 'datatable-summary-total',
         width: 80,
     });
 
@@ -258,12 +246,10 @@ function buildGridColumns({
 
         const columnDefinition = buildUserColumn({
             column,
-            isFetchingNextPage,
             isFirstNonFrozenColumn: !isSummaryRowAssigned,
             onBooleanToggle,
             onDeleteColumn: setColumnToDelete,
             onRenameColumn: setColumnToRename,
-            rowCount: localRowCount,
             setLocalRows,
             totalColumns: totalColumnCount,
         });
@@ -276,14 +262,7 @@ function buildGridColumns({
     });
 
     // Trailing column with + in the header to add a column
-    columns.push(
-        buildTrailingColumn({
-            hasColumns: (dataTable?.columns?.length ?? 0) > 0,
-            isFetchingNextPage,
-            rowCount: localRowCount,
-            setAddColumnDialogOpen,
-        })
-    );
+    columns.push(buildTrailingColumn({setAddColumnDialogOpen}));
 
     return columns;
 }
