@@ -23,7 +23,7 @@ export const ConnectDefinitionKeys = {
 
 export const useGetConnectionDefinitionQuery = (request: GetComponentConnectionDefinitionRequest, enabled?: boolean) =>
     useQuery<ConnectionDefinition, Error>({
-        enabled: enabled === undefined ? true : enabled,
+        enabled: (enabled === undefined ? true : enabled) && !!request.componentName,
         queryKey: ConnectDefinitionKeys.connectionDefinition(request),
         queryFn: () => new ConnectionDefinitionApi().getComponentConnectionDefinition(request),
         staleTime: DEFINITION_STALE_TIME,
