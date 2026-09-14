@@ -125,21 +125,43 @@ describe('ConnectionVisibilityPicker', () => {
         expect(screen.getByLabelText(/add person/i)).toBeInTheDocument();
     });
 
-    it('hides the Organization option for non-admins', () => {
-        renderPicker({isAdmin: false, showOrganizationOption: true});
+    it('never offers the Organization option', () => {
+        renderPicker();
 
         expect(screen.queryByRole('radio', {name: /organization/i})).not.toBeInTheDocument();
     });
 
-    it('hides the Organization option for admins where it is unsupported', () => {
-        renderPicker({isAdmin: true, showOrganizationOption: false});
+    it('revokes every grant when Private is chosen from Specific people', async () => {
+        const user = userEvent.setup();
 
-        expect(screen.queryByRole('radio', {name: /organization/i})).not.toBeInTheDocument();
+        const {onGrantedUserIdsChange, onVisibilityChange} = renderPicker({
+            grantedUserIds: [8, 9],
+            visibility: 'PRIVATE',
+        });
+
+        await user.click(screen.getByRole('radio', {name: /^private$/i}));
+
+        expect(onGrantedUserIdsChange).toHaveBeenCalledWith([]);
+        expect(onVisibilityChange).not.toHaveBeenCalled();
     });
 
-    it('offers the Organization option to an admin where it is supported', () => {
-        renderPicker({isAdmin: true, showOrganizationOption: true});
+    it('revokes leftover grants when a shared connection is made Private', async () => {
+        const user = userEvent.setup();
 
-        expect(screen.getByRole('radio', {name: /organization/i})).toBeInTheDocument();
+        const {onGrantedUserIdsChange, onVisibilityChange} = renderPicker({
+            grantedUserIds: [8],
+            visibility: 'WORKSPACE',
+        });
+
+        await user.click(screen.getByRole('radio', {name: /^private$/i}));
+
+        expect(onGrantedUserIdsChange).toHaveBeenCalledWith([]);
+        expect(onVisibilityChange).toHaveBeenCalledWith('PRIVATE');
+    });
+
+    it('hides Specific people when the caller cannot write grants', () => {
+        renderPicker({showSpecificPeopleOption: false});
+
+        expect(screen.queryByRole('radio', {name: /specific people/i})).not.toBeInTheDocument();
     });
 });
