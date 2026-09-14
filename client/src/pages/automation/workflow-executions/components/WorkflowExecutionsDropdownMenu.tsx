@@ -53,7 +53,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
                 />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="center" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem className="dropdown-menu-item" onClick={handleViewClick}>
                     <ViewIcon /> View
                 </DropdownMenuItem>

@@ -65,4 +65,14 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionId).toBe(5);
         expect(useWorkflowExecutionSheetStore.getState().workflowExecutionKind).toBe('JOB');
     });
+
+    it('aligns the menu to the end of the actions button', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(jobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menu')).toHaveAttribute('data-align', 'end');
+    });
 });
