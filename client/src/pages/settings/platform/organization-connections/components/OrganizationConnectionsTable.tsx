@@ -67,7 +67,7 @@ const OrganizationConnectionsTable = ({connections, onDeleteClick}: Organization
                                     defined it, and showing nothing would read as a broken row. */}
 
                                     <span>
-                                        {componentsByName.get(connection.componentName)?.title ??
+                                        {componentsByName.get(connection.componentName)?.title ||
                                             connection.componentName}
                                     </span>
                                 </div>
@@ -75,9 +75,9 @@ const OrganizationConnectionsTable = ({connections, onDeleteClick}: Organization
 
                             <TableCell>{connection.environmentId}</TableCell>
 
-                            <TableCell>{connection.createdBy ?? '—'}</TableCell>
+                            <TableCell>{connection.createdBy || '—'}</TableCell>
 
-                            <TableCell className="whitespace-nowrap">{connection.lastModifiedDate ?? '—'}</TableCell>
+                            <TableCell className="whitespace-nowrap">{connection.lastModifiedDate || '—'}</TableCell>
 
                             <TableCell className="text-right">
                                 <Button

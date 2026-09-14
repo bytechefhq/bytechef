@@ -1,5 +1,7 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
@@ -56,16 +58,18 @@ const COMPONENT_DEFINITIONS = [
 const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = {}) =>
     render(
         <MemoryRouter>
-            <ConnectionDialog
-                componentDefinitions={COMPONENT_DEFINITIONS as never}
-                connectionTagsQueryKey={['connectionTags']}
-                connectionsQueryKey={['connections']}
-                useCreateConnectionMutation={
-                    (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
-                }
-                useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
-                {...props}
-            />
+            <TooltipProvider>
+                <ConnectionDialog
+                    componentDefinitions={COMPONENT_DEFINITIONS as never}
+                    connectionTagsQueryKey={['connectionTags']}
+                    connectionsQueryKey={['connections']}
+                    useCreateConnectionMutation={
+                        (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
+                    }
+                    useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
+                    {...props}
+                />
+            </TooltipProvider>
         </MemoryRouter>
     );
 
@@ -178,5 +182,22 @@ describe('ConnectionDialog', () => {
         expect(screen.getByText('Component', {selector: 'label'})).toBeInTheDocument();
         expect(screen.queryByText('Tags', {selector: 'label'})).not.toBeInTheDocument();
         expect(screen.queryByText('Response returned an error code')).not.toBeInTheDocument();
+    });
+
+    it('offers the visibility picker on an ordinary create in EE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}} as never);
+
+        renderDialog();
+
+        expect(screen.getByRole('radio', {name: /shared with workspace/i})).toBeInTheDocument();
+    });
+
+    it('shows a fixed Organization visibility instead of the picker for an organization connection', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}} as never);
+
+        renderDialog({fixedVisibility: 'ORGANIZATION'});
+
+        expect(screen.queryByRole('radio', {name: /shared with workspace/i})).not.toBeInTheDocument();
+        expect(screen.getByText('Organization')).toBeInTheDocument();
     });
 });

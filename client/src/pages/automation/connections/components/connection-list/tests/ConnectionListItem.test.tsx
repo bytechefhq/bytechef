@@ -1,6 +1,8 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {QueryClient} from '@tanstack/react-query';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectionListItem from '../ConnectionListItem';
@@ -8,6 +10,51 @@ import ConnectionListItem from '../ConnectionListItem';
 const ALL_SCOPES = ['CONNECTION_EDIT', 'CONNECTION_DELETE'];
 
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
+
+type MutationOptionsType = {onSuccess?: () => void};
+
+const hoistedSharing = vi.hoisted(() => ({
+    connectionGrantsEnabled: [] as boolean[],
+    grantOptions: undefined as MutationOptionsType | undefined,
+    revokeOptions: undefined as MutationOptionsType | undefined,
+    visibilityEnabled: false,
+    visibilityOptions: undefined as MutationOptionsType | undefined,
+}));
+
+vi.mock('@/pages/automation/connections/hooks/useVisibilityFeatureEnabled', () => ({
+    useVisibilityFeatureEnabled: () =>
+        hoistedSharing.visibilityEnabled
+            ? {enabled: true, isAdmin: false, workspaceId: 1}
+            : {enabled: false, isAdmin: false, workspaceId: undefined},
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useAffectedWorkflowsQuery: () => ({data: undefined}),
+    useConnectionGrantsQuery: (_variables: unknown, options: {enabled: boolean}) => {
+        hoistedSharing.connectionGrantsEnabled.push(options.enabled);
+
+        return {data: undefined};
+    },
+    useGrantConnectionAccessMutation: (options: MutationOptionsType) => {
+        hoistedSharing.grantOptions = options;
+
+        return {mutate: vi.fn()};
+    },
+    useReassignAllConnectionsMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useRevokeConnectionAccessMutation: (options: MutationOptionsType) => {
+        hoistedSharing.revokeOptions = options;
+
+        return {mutate: vi.fn()};
+    },
+    useSetConnectionVisibilityMutation: (options: MutationOptionsType) => {
+        hoistedSharing.visibilityOptions = options;
+
+        return {mutate: vi.fn()};
+    },
+    useUnresolvedConnectionsQuery: () => ({data: undefined, isLoading: false}),
+    useUsersQuery: () => ({data: undefined}),
+    useWorkspaceUsersQuery: () => ({data: undefined}),
+}));
 
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
@@ -43,20 +90,22 @@ vi.mock('@/shared/components/TagList', () => ({
 
 const renderConnectionListItem = (connectionOverrides: Partial<Connection> = {}) =>
     render(
-        <ConnectionListItem
-            componentDefinitions={[]}
-            connection={
-                {
-                    active: false,
-                    componentName: 'slack',
-                    credentialStatus: 'VALID',
-                    id: 1,
-                    name: 'Slack connection',
-                    tags: [],
-                    ...connectionOverrides,
-                } as Connection
-            }
-        />
+        <TooltipProvider>
+            <ConnectionListItem
+                componentDefinitions={[]}
+                connection={
+                    {
+                        active: false,
+                        componentName: 'slack',
+                        credentialStatus: 'VALID',
+                        id: 1,
+                        name: 'Slack connection',
+                        tags: [],
+                        ...connectionOverrides,
+                    } as Connection
+                }
+            />
+        </TooltipProvider>
     );
 
 const setTenantAdmin = (tenantAdmin: boolean) => {
@@ -68,6 +117,9 @@ const setTenantAdmin = (tenantAdmin: boolean) => {
 
 beforeEach(() => {
     hoistedScope.grantedScopes = [...ALL_SCOPES];
+
+    hoistedSharing.connectionGrantsEnabled = [];
+    hoistedSharing.visibilityEnabled = false;
 
     setTenantAdmin(true);
 
@@ -142,5 +194,107 @@ describe('ConnectionListItem', () => {
         renderConnectionListItem({active: true});
 
         expect(screen.queryByRole('button', {name: 'Connection actions'})).not.toBeInTheDocument();
+    });
+});
+
+describe('ConnectionListItem sharing', () => {
+    const setOwner = () => {
+        authenticationStore.setState({
+            account: {authorities: ['ROLE_USER'], login: 'owner@example.com'} as never,
+            authenticated: true,
+        });
+    };
+
+    it('should refresh the grants list after granting or revoking access', () => {
+        hoistedSharing.visibilityEnabled = true;
+
+        setOwner();
+
+        const invalidateQueriesSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+
+        renderConnectionListItem({createdBy: 'owner@example.com', visibility: 'PRIVATE'});
+
+        hoistedSharing.grantOptions?.onSuccess?.();
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['ConnectionGrants']});
+
+        invalidateQueriesSpy.mockClear();
+
+        hoistedSharing.revokeOptions?.onSuccess?.();
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['ConnectionGrants']});
+
+        invalidateQueriesSpy.mockClear();
+
+        hoistedSharing.visibilityOptions?.onSuccess?.();
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['ConnectionGrants']});
+
+        invalidateQueriesSpy.mockRestore();
+    });
+
+    it('should not fetch grants or offer the visibility picker to a member who neither owns the connection nor holds CONNECTION_EDIT', () => {
+        hoistedScope.grantedScopes = [];
+        hoistedSharing.visibilityEnabled = true;
+
+        setOwner();
+
+        renderConnectionListItem({createdBy: 'someone-else@example.com', visibility: 'PRIVATE'});
+
+        expect(hoistedSharing.connectionGrantsEnabled).not.toContain(true);
+        expect(screen.queryByRole('button', {name: 'Change visibility'})).not.toBeInTheDocument();
+    });
+
+    it('should fetch grants and offer the visibility picker to the owner', () => {
+        hoistedScope.grantedScopes = [];
+        hoistedSharing.visibilityEnabled = true;
+
+        setOwner();
+
+        renderConnectionListItem({createdBy: 'owner@example.com', visibility: 'PRIVATE'});
+
+        expect(hoistedSharing.connectionGrantsEnabled).toContain(true);
+        expect(screen.getByRole('button', {name: 'Change visibility'})).toBeInTheDocument();
+    });
+
+    it('should load grants for a shared connection once the sharing menu is opened', async () => {
+        hoistedScope.grantedScopes = [];
+        hoistedSharing.visibilityEnabled = true;
+
+        setOwner();
+
+        const user = userEvent.setup();
+
+        renderConnectionListItem({createdBy: 'owner@example.com', visibility: 'WORKSPACE'});
+
+        expect(hoistedSharing.connectionGrantsEnabled).not.toContain(true);
+
+        await user.click(screen.getByRole('button', {name: 'Change visibility'}));
+
+        expect(hoistedSharing.connectionGrantsEnabled).toContain(true);
+    });
+
+    it('should offer Reassign owner to a tenant admin for a connection pending reassignment', async () => {
+        hoistedSharing.visibilityEnabled = true;
+
+        const user = userEvent.setup();
+
+        renderConnectionListItem({createdBy: 'removed@example.com', status: 'PENDING_REASSIGNMENT'});
+
+        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Reassign owner'})).toBeInTheDocument();
+    });
+
+    it('should not offer Reassign owner for an active connection', async () => {
+        hoistedSharing.visibilityEnabled = true;
+
+        const user = userEvent.setup();
+
+        renderConnectionListItem({createdBy: 'owner@example.com', status: 'ACTIVE'});
+
+        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Reassign owner'})).not.toBeInTheDocument();
     });
 });

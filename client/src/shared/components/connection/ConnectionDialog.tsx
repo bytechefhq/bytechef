@@ -72,13 +72,8 @@ interface ConnectionDialogProps {
     connectionTagsQueryKey: QueryKey;
     connectionsQueryKey: QueryKey;
     onClose?: () => void;
+    fixedVisibility?: 'ORGANIZATION';
     onConnectionCreate?: (connectionId: number) => void;
-    /**
-     * Offers the Organization rung in the visibility picker. Opt-in because ORGANIZATION is not reachable through the
-     * ordinary create path -- setConnectionVisibility rejects it outright -- so only a surface whose create mutation
-     * writes an organization connection may show it.
-     */
-    showOrganizationOption?: boolean;
     triggerNode?: ReactNode;
     useCreateConnectionMutation?: (mutationProps: {
         onSuccess?: (result: number, variables: ConnectionI) => void;
@@ -101,9 +96,9 @@ const ConnectionDialog = ({
     connection,
     connectionTagsQueryKey,
     connectionsQueryKey,
+    fixedVisibility,
     onClose,
     onConnectionCreate,
-    showOrganizationOption,
     triggerNode,
     useCreateConnectionMutation,
     useGetConnectionTagsQuery,
@@ -122,8 +117,6 @@ const ConnectionDialog = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
-    // No admin check here any more: WORKSPACE is the default every connection is created with, so gating it would
-    // fail every ordinary create. ORGANIZATION, which does require admin, is not offered at creation at all.
     // Compose the shared EE-edition primitive with this dialog's platform-type scope. Keeping the
     // edition check in one hook means a future migration away from EditionType.EE updates the
     // list-page gate (useVisibilityFeatureEnabled) and this dialog simultaneously.
@@ -580,7 +573,17 @@ const ConnectionDialog = ({
                                         )}
                                     />
 
-                                    {!connection?.id && visibilityFeatureEnabled && (
+                                    {!connection?.id && fixedVisibility && (
+                                        <FormItem className="space-x-2">
+                                            <FormLabel>Visibility</FormLabel>
+
+                                            <FormControl>
+                                                <ConnectionScopeBadge visibility={fixedVisibility} />
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+
+                                    {!connection?.id && !fixedVisibility && visibilityFeatureEnabled && (
                                         <FormField
                                             control={control}
                                             name="visibility"
@@ -597,7 +600,7 @@ const ConnectionDialog = ({
                                                             grantedUserIds={[]}
                                                             onGrantedUserIdsChange={() => undefined}
                                                             onVisibilityChange={field.onChange}
-                                                            showOrganizationOption={showOrganizationOption}
+                                                            showSpecificPeopleOption={false}
                                                             visibility={field.value}
                                                         />
                                                     </FormControl>
