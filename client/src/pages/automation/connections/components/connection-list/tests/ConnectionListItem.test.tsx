@@ -14,6 +14,23 @@ vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: () => true,
 }));
 
+vi.mock('@/pages/automation/connections/hooks/useVisibilityFeatureEnabled', () => ({
+    useVisibilityFeatureEnabled: () => ({enabled: false, isAdmin: false, workspaceId: undefined}),
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
+    useAffectedWorkflowsQuery: () => ({data: undefined}),
+    useConnectionGrantsQuery: () => ({data: undefined}),
+    useGrantConnectionAccessMutation: () => ({mutate: vi.fn()}),
+    useReassignAllConnectionsMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useRevokeConnectionAccessMutation: () => ({mutate: vi.fn()}),
+    useSetConnectionVisibilityMutation: () => ({mutate: vi.fn()}),
+    useUnresolvedConnectionsQuery: () => ({data: undefined, isLoading: false}),
+    useUsersQuery: () => ({data: undefined}),
+    useWorkspaceUsersQuery: () => ({data: undefined}),
+}));
+
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
     default: ({onClose}: {onClose: () => void}) => (
         <div data-testid="connection-dialog">

@@ -9,6 +9,7 @@ import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
+    AuthorizationType,
     OrganizationConnection,
     useCreateOrganizationConnectionMutation,
     useDeleteOrganizationConnectionMutation,
@@ -27,10 +28,10 @@ const OrganizationConnections = () => {
     // render-tree decision below; the gate is defense-in-depth on top of the server-side guard in
     // OrganizationConnectionFacadeImpl, so if CE users somehow reach this route the server
     // rejects anything they could submit.
-    const edition = useApplicationInfoStore((state) => state.application?.edition);
-
     const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
     const [connectionToDelete, setConnectionToDelete] = useState<OrganizationConnection | undefined>(undefined);
+
+    const edition = useApplicationInfoStore((state) => state.application?.edition);
 
     const {
         data,
@@ -44,8 +45,7 @@ const OrganizationConnections = () => {
     /**
      * Adapts the organization create mutation to the shape ConnectionDialog injects. The dialog hands over a flat
      * connection and expects a numeric id back; createOrganizationConnection takes an input wrapper and returns the id
-     * as a string. Going through the shared dialog is what gets this surface a component picker, the component's real
-     * connection properties, and OAuth2 — none of which the bespoke dialog had.
+     * as a string.
      */
     const useCreateOrganizationConnectionAdapter = (mutationProps: {
         onError?: (error: Error, variables: ConnectionI) => void;
@@ -71,11 +71,16 @@ const OrganizationConnections = () => {
             mutate: (connection: ConnectionI) =>
                 mutation.mutate({
                     input: {
+                        authorizationType: (connection.authorizationType || undefined) as AuthorizationType | undefined,
                         componentName: connection.componentName ?? '',
                         connectionVersion: connection.connectionVersion ?? 1,
                         environmentId: Number(connection.environmentId ?? 0),
                         name: connection.name ?? '',
                         parameters: (connection.parameters ?? {}) as Record<string, unknown>,
+                        tags: (connection.tags ?? []).map((tag) => ({
+                            id: tag.id == null ? undefined : String(tag.id),
+                            name: tag.name,
+                        })),
                     },
                 }),
         } as unknown as UseMutationResult<number, Error, ConnectionI, unknown>;
@@ -162,8 +167,8 @@ const OrganizationConnections = () => {
                     componentDefinitions={componentDefinitions ?? []}
                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
+                    fixedVisibility="ORGANIZATION"
                     onClose={() => setIsCreateDialogOpen(false)}
-                    showOrganizationOption
                     useCreateConnectionMutation={useCreateOrganizationConnectionAdapter}
                     useGetConnectionTagsQuery={() => connectionTagsQueryResult}
                 />

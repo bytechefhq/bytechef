@@ -27,6 +27,8 @@ export type WorkspaceScopeType =
     | 'PROJECT_PUBLISH'
     | 'PROJECT_PUSH'
     | 'PROJECT_PULL'
+    | 'CONNECTION_EDIT'
+    | 'CONNECTION_DELETE'
     | 'DEPLOYMENT_CREATE'
     | 'DEPLOYMENT_EDIT'
     | 'DEPLOYMENT_DELETE'
