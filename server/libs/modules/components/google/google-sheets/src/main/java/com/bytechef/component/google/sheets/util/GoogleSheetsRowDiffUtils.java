@@ -21,8 +21,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Anshul Goel
@@ -108,7 +113,85 @@ public class GoogleSheetsRowDiffUtils {
             modifiedRowIndexes.add(index + prefixLength);
         }
 
-        return new RowDiffResult(insertedRowIndexes, modifiedRowIndexes);
+        return new RowDiffResult(
+            excludeReorderedExistingRows(knownRowHashes, currentRowHashes, insertedRowIndexes),
+            modifiedRowIndexes);
+    }
+
+    /**
+     * Filters candidate insert indexes so swapped or reordered existing rows are not reported as new.
+     *
+     * A candidate is kept only when its fingerprint has more copies in the current snapshot than in the previous one.
+     * If the sheet also grew but those extra copies were not in the candidate list, they are taken from the bottom of
+     * the sheet so a genuine new row after a swap is still reported.
+     *
+     * @param knownRowHashes     fingerprints from the previous poll
+     * @param currentRowHashes   fingerprints from the current sheet
+     * @param insertedRowIndexes candidate indexes from aligning the two fingerprint sequences
+     * @return indexes of rows that did not exist in the previous snapshot
+     */
+    private static List<Integer> excludeReorderedExistingRows(
+        List<String> knownRowHashes, List<String> currentRowHashes, List<Integer> insertedRowIndexes) {
+
+        Map<String, Integer> surplusCounts = new HashMap<>();
+
+        for (String hash : currentRowHashes) {
+            surplusCounts.merge(hash, 1, Integer::sum);
+        }
+
+        for (String hash : knownRowHashes) {
+            surplusCounts.merge(hash, -1, Integer::sum);
+        }
+
+        List<Integer> newRowIndexes = new ArrayList<>();
+        Set<Integer> includedIndexes = new HashSet<>();
+        Map<String, Integer> remainingSurplus = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entry : surplusCounts.entrySet()) {
+            if (entry.getValue() > 0) {
+                remainingSurplus.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        for (int index : insertedRowIndexes) {
+            String hash = currentRowHashes.get(index);
+            int remaining = remainingSurplus.getOrDefault(hash, 0);
+
+            if (remaining <= 0) {
+                continue;
+            }
+
+            newRowIndexes.add(index);
+            includedIndexes.add(index);
+            remainingSurplus.put(hash, remaining - 1);
+        }
+
+        int leftoverSlots = Math.max(0, currentRowHashes.size() - knownRowHashes.size() - newRowIndexes.size());
+
+        // Alignment can pair a true append with a delete from a swap (a,b,c → a,c,b,x). If the sheet
+        // grew but those new rows were not kept above, assign leftover extra fingerprints from the
+        // bottom.
+        for (int index = currentRowHashes.size() - 1; index >= 0 && leftoverSlots > 0; index--) {
+            if (includedIndexes.contains(index)) {
+                continue;
+            }
+
+            String hash = currentRowHashes.get(index);
+            int remaining = remainingSurplus.getOrDefault(hash, 0);
+
+            if (remaining <= 0) {
+                continue;
+            }
+
+            newRowIndexes.add(index);
+            includedIndexes.add(index);
+            remainingSurplus.put(hash, remaining - 1);
+            leftoverSlots--;
+        }
+
+        Collections.sort(newRowIndexes);
+
+        return newRowIndexes;
     }
 
     private static RowDiffResult diffMiddle(List<String> knownRowHashes, List<String> currentRowHashes) {

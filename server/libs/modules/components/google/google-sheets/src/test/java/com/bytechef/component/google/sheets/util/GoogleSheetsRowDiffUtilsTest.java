@@ -81,6 +81,24 @@ class GoogleSheetsRowDiffUtilsTest {
     }
 
     @Test
+    void testGetInsertedRowIndexesDoesNotTriggerWhenTwoExistingRowsAreSwapped() {
+        assertEquals(List.of(),
+            GoogleSheetsRowDiffUtils.getInsertedRowIndexes(List.of("a", "b", "c"), List.of("a", "c", "b")));
+    }
+
+    @Test
+    void testGetModifiedRowIndexesDoesNotTriggerWhenTwoExistingRowsAreSwapped() {
+        assertEquals(List.of(),
+            GoogleSheetsRowDiffUtils.getModifiedRowIndexes(List.of("a", "b", "c"), List.of("a", "c", "b")));
+    }
+
+    @Test
+    void testGetInsertedRowIndexesStillDetectsInsertAfterSwap() {
+        assertEquals(List.of(3),
+            GoogleSheetsRowDiffUtils.getInsertedRowIndexes(List.of("a", "b", "c"), List.of("a", "c", "b", "x")));
+    }
+
+    @Test
     void testGetInsertedRowIndexesReportsOnlySurplusWhenRowIsEditedAndInserted() {
         List<Integer> result = GoogleSheetsRowDiffUtils.getInsertedRowIndexes(
             List.of("a", "b", "c"), List.of("a", "x", "y", "c"));
