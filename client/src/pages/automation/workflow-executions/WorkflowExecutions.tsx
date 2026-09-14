@@ -6,14 +6,16 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
+import {getWorkflowExecutionsFilters} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
+import FilterTitle from '@/shared/components/filters/FilterTitle';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {GetWorkflowExecutionsPageJobStatusEnum} from '@/shared/middleware/automation/workflow/execution';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
+import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowExecutionsTable from './components/WorkflowExecutionsTable';
@@ -57,7 +59,6 @@ const ProjectLabel = ({project}: {project: Project}) => (
 
 export const WorkflowExecutions = () => {
     const {
-        currentEnvironmentId,
         emptyListMessage,
         filterEndDate,
         filterPageNumber,
@@ -84,6 +85,32 @@ export const WorkflowExecutions = () => {
         workflowExecutionsIsLoading,
         workflows,
     } = useWorkflowExecutions();
+
+    const activeFilters = useMemo(
+        () =>
+            getWorkflowExecutionsFilters({
+                endDate: filterEndDate,
+                projectDeploymentId: filterProjectDeploymentId,
+                projectDeployments,
+                projectId: filterProjectId,
+                projects,
+                startDate: filterStartDate,
+                status: filterStatus,
+                workflowId: filterWorkflowId,
+                workflows,
+            }),
+        [
+            filterEndDate,
+            filterProjectDeploymentId,
+            filterProjectId,
+            filterStartDate,
+            filterStatus,
+            filterWorkflowId,
+            projectDeployments,
+            projects,
+            workflows,
+        ]
+    );
 
     return (
         <LayoutContainer
@@ -130,9 +157,7 @@ export const WorkflowExecutions = () => {
                     }
                     title={
                         workflowExecutionPage?.content && workflowExecutionPage.content.length > 0 ? (
-                            <WorkflowExecutionsFilterTitle
-                                filterData={{environment: currentEnvironmentId, status: filterStatus}}
-                            />
+                            <FilterTitle filters={activeFilters} />
                         ) : (
                             ''
                         )

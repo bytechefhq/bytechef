@@ -8,8 +8,8 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowExecutionsTable from '@/ee/pages/embedded/workflow-executions/components/AutomationWorkflowExecutionsTable';
-import WorkflowExecutionsFilterTitle from '@/ee/pages/embedded/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/ee/pages/embedded/workflow-executions/hooks/useWorkflowExecutions';
+import {getWorkflowExecutionsFilters} from '@/ee/pages/embedded/workflow-executions/utils/workflowExecutionsFilters';
 import {Integration} from '@/ee/shared/middleware/embedded/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
@@ -24,6 +24,7 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {useGetIntegrationsQuery} from '@/ee/shared/queries/embedded/integrations.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import AutomationWorkflowExecutionSheet from '@/pages/automation/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheet';
+import FilterTitle from '@/shared/components/filters/FilterTitle';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -35,7 +36,7 @@ import {
 import {ConnectedUserProjectsQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ActivityIcon, RefreshCwIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -186,6 +187,40 @@ export const WorkflowExecutions = () => {
         filterAutomations
             ? AutomationWorkflowExecutionFromJSON(workflowExecution)
             : EmbeddedWorkflowExecutionFromJSON(workflowExecution)
+    );
+
+    const activeFilters = useMemo(
+        () =>
+            getWorkflowExecutionsFilters({
+                automations: filterAutomations,
+                connectedUserProjects,
+                endDate: filterEndDate,
+                integrationId: filterIntegrationId,
+                integrationInstanceConfiguration,
+                integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
+                integrationInstanceConfigurations,
+                integrations,
+                projectId: filterProjectId,
+                startDate: filterStartDate,
+                status: filterStatus,
+                workflowId: filterWorkflowId,
+                workflows,
+            }),
+        [
+            connectedUserProjects,
+            filterAutomations,
+            filterEndDate,
+            filterIntegrationId,
+            filterIntegrationInstanceConfigurationId,
+            filterProjectId,
+            filterStartDate,
+            filterStatus,
+            filterWorkflowId,
+            integrationInstanceConfiguration,
+            integrationInstanceConfigurations,
+            integrations,
+            workflows,
+        ]
     );
 
     function filter(
@@ -454,9 +489,7 @@ export const WorkflowExecutions = () => {
                     }
                     title={
                         workflowExecutions && workflowExecutions.length > 0 ? (
-                            <WorkflowExecutionsFilterTitle
-                                filterData={{environment: currentEnvironmentId, status: filterStatus}}
-                            />
+                            <FilterTitle filters={activeFilters} />
                         ) : (
                             ''
                         )
