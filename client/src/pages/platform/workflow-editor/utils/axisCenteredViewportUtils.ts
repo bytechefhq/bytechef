@@ -25,7 +25,7 @@ export const getAxisCenteredViewport = ({
     padding,
 }: GetAxisCenteredViewportProps): Viewport => {
     const halfWidth = Math.max(axisX - bounds.x, bounds.x + bounds.width - axisX, 1);
-    const paddingFactor = 1 + padding * 2;
+    const paddingFactor = 1 + padding;
 
     const fittingZoom = Math.min(
         flowWidth / (halfWidth * 2 * paddingFactor),
