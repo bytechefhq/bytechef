@@ -3,17 +3,25 @@ import {renderHook, waitFor} from '@testing-library/react';
 import {type ReactNode, createElement} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {WorkflowExecutionKeys, useGetProjectWorkflowExecutionQuery} from '../workflowExecutions.queries';
+import {
+    WorkflowExecutionKeys,
+    useGetProjectWorkflowExecutionQuery,
+    useGetWorkspaceProjectWorkflowExecutionsQuery,
+} from '../workflowExecutions.queries';
 
-const {getTriggerExecutionWorkflowExecutionMock, getWorkflowExecutionMock} = vi.hoisted(() => ({
-    getTriggerExecutionWorkflowExecutionMock: vi.fn(),
-    getWorkflowExecutionMock: vi.fn(),
-}));
+const {getTriggerExecutionWorkflowExecutionMock, getWorkflowExecutionMock, getWorkflowExecutionsPageMock} = vi.hoisted(
+    () => ({
+        getTriggerExecutionWorkflowExecutionMock: vi.fn(),
+        getWorkflowExecutionMock: vi.fn(),
+        getWorkflowExecutionsPageMock: vi.fn(),
+    })
+);
 
 vi.mock('@/shared/middleware/automation/workflow/execution', () => ({
     WorkflowExecutionApi: class {
         getTriggerExecutionWorkflowExecution = getTriggerExecutionWorkflowExecutionMock;
         getWorkflowExecution = getWorkflowExecutionMock;
+        getWorkflowExecutionsPage = getWorkflowExecutionsPageMock;
     },
 }));
 
@@ -115,6 +123,49 @@ describe('workflowExecutions.queries', () => {
 
             expect(getWorkflowExecutionMock).toHaveBeenCalledWith({id: 5});
             expect(getTriggerExecutionWorkflowExecutionMock).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('useGetWorkspaceProjectWorkflowExecutionsQuery', () => {
+        const request = {id: 1, pageNumber: 0, projectDeploymentId: 3, workflowId: 'workflow1'};
+
+        beforeEach(() => {
+            getWorkflowExecutionsPageMock.mockReset();
+            getWorkflowExecutionsPageMock.mockResolvedValue({content: [], totalPages: 0});
+        });
+
+        it('fetches automation executions when enabled is not given', async () => {
+            const {result} = renderHook(() => useGetWorkspaceProjectWorkflowExecutionsQuery(request), {wrapper});
+
+            await waitFor(() => expect(result.current.data).toEqual({content: [], totalPages: 0}));
+
+            expect(getWorkflowExecutionsPageMock).toHaveBeenCalledWith({...request, embedded: false});
+        });
+
+        it('does not fetch while disabled', async () => {
+            const {result} = renderHook(() => useGetWorkspaceProjectWorkflowExecutionsQuery(request, false), {
+                wrapper,
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(result.current.fetchStatus).toBe('idle');
+            expect(getWorkflowExecutionsPageMock).not.toHaveBeenCalled();
+        });
+
+        it('fetches once enabled', async () => {
+            const {rerender, result} = renderHook(
+                ({enabled}: {enabled: boolean}) => useGetWorkspaceProjectWorkflowExecutionsQuery(request, enabled),
+                {initialProps: {enabled: false}, wrapper}
+            );
+
+            expect(getWorkflowExecutionsPageMock).not.toHaveBeenCalled();
+
+            rerender({enabled: true});
+
+            await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+            expect(getWorkflowExecutionsPageMock).toHaveBeenCalledTimes(1);
         });
     });
 });

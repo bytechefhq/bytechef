@@ -82,6 +82,7 @@ const ProjectDeploymentList = ({
                                     projectDeploymentId={projectDeployment.id!}
                                     projectDeploymentWorkflows={projectDeployment.projectDeploymentWorkflows}
                                     projectId={project.id}
+                                    projectName={project.name}
                                     projectVersion={projectDeployment.projectVersion!}
                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
                                 />
