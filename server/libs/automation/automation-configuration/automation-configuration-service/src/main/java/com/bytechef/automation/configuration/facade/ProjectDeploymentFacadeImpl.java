@@ -96,6 +96,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
+    private static final String CONNECTION_RESOURCE_TYPE = "Connection";
+
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -165,11 +167,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     // checked is the one held in the environment being deployed into.
     @PreAuthorize("hasPermission(#projectDeploymentDTO, 'DEPLOYMENT_CREATE')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = CollectionUtils.map(
+            projectDeploymentDTO.projectDeploymentWorkflows(),
+            ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow);
+
+        validateConnectionsAccessible(projectDeploymentWorkflows, Set.of());
+
         return createProjectDeployment(
-            projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectDeploymentDTO.tags());
+            projectDeploymentDTO.toProjectDeployment(), projectDeploymentWorkflows, projectDeploymentDTO.tags());
     }
 
     @Override
@@ -529,12 +534,17 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     })
     @PreAuthorize("hasPermission(#projectDeploymentDTO.id, 'ProjectDeployment', 'DEPLOYMENT_CREATE')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = CollectionUtils.map(
+            projectDeploymentDTO.projectDeploymentWorkflows(),
+            ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow);
+
+        validateConnectionsAccessible(
+            projectDeploymentWorkflows,
+            getConnectionIds(
+                projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentDTO.id())));
+
         updateProjectDeployment(
-            projectDeploymentDTO.toProjectDeployment(),
-            CollectionUtils.map(
-                projectDeploymentDTO.projectDeploymentWorkflows(),
-                ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
-            projectDeploymentDTO.tags());
+            projectDeploymentDTO.toProjectDeployment(), projectDeploymentWorkflows, projectDeploymentDTO.tags());
     }
 
     @Override
@@ -647,6 +657,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         checkProjectDeploymentWorkflowConnectionUsage(
             projectDeploymentWorkflow.getConnections(), oldProjectDeploymentWorkflow.getWorkflowId(),
             projectDeployment.getEnvironment());
+
+        validateConnectionsAccessible(
+            List.of(projectDeploymentWorkflow), getConnectionIds(List.of(storedProjectDeploymentWorkflow)));
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
@@ -1126,6 +1139,29 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             if (!permissionService.canUseConnectionInWorkflow(connectionId, workflowId, environment)) {
                 throw new AccessDeniedException(
                     "Connection id=%s cannot be used by workflow id=%s".formatted(connectionId, workflowId));
+            }
+        }
+    }
+
+    private static Set<Long> getConnectionIds(List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+        return projectDeploymentWorkflows.stream()
+            .flatMap(projectDeploymentWorkflow -> projectDeploymentWorkflow.getConnections()
+                .stream())
+            .map(ProjectDeploymentWorkflowConnection::getConnectionId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    }
+
+    private void validateConnectionsAccessible(
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows, Set<Long> attachedConnectionIds) {
+
+        for (Long connectionId : getConnectionIds(projectDeploymentWorkflows)) {
+            if (attachedConnectionIds.contains(connectionId)) {
+                continue;
+            }
+
+            if (!permissionService.hasResourceScope(connectionId, CONNECTION_RESOURCE_TYPE, "CONNECTION_VIEW")) {
+                throw new AccessDeniedException("Connection id=%s is not accessible".formatted(connectionId));
             }
         }
     }
