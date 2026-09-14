@@ -23,9 +23,11 @@ import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
 import com.bytechef.platform.tag.service.TagService;
@@ -62,7 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SuppressFBWarnings("NM")
 public class WorkspaceConnectionFacadeImpl
     extends com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl
-    implements WorkspaceConnectionFacade {
+    implements WorkspaceConnectionSharingFacade {
 
     private static final String CONNECTION = "Connection";
 
@@ -154,12 +156,21 @@ public class WorkspaceConnectionFacadeImpl
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') || " +
+        "isResourceOwner(#connectionId, 'Connection')")
     public void delete(long connectionId) {
         // Grants first: resource_grant.resource_id is polymorphic and carries no foreign key, so a grant left
         // behind would attach to whatever later recycles this id.
         resourceGrantService.deleteGrants(CONNECTION, connectionId);
 
         super.delete(connectionId);
+    }
+
+    @Override
+    protected List<Long> getSharedConnectionIds() {
+        return CollectionUtils.map(
+            connectionService.getConnectionsByVisibility(ResourceVisibility.ORGANIZATION, PlatformType.AUTOMATION),
+            Connection::getId);
     }
 
     private void validateConnectionBelongsToWorkspace(long workspaceId, long connectionId) {
@@ -176,7 +187,7 @@ public class WorkspaceConnectionFacadeImpl
     private void validateConnectionNotUsedByDeployments(long connectionId) {
         if (projectDeploymentWorkflowService.isConnectionUsed(connectionId)) {
             throw new ConfigurationException(
-                "Connection id=%s is used by active deployments".formatted(connectionId),
+                "Connection id=%s is used by a deployment".formatted(connectionId),
                 ConnectionErrorType.CONNECTION_IS_USED);
         }
     }

@@ -42,7 +42,7 @@ import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
@@ -440,8 +440,8 @@ class WorkspaceUserServiceIntTest {
         // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — a denial fires the
         // @PreAuthorize check before any of them is touched, and the positive controls only need Mockito's defaults.
         @Bean
-        UserInvitationService userInvitationService() {
-            return mock(UserInvitationService.class);
+        UserInvitationFacade userInvitationFacade() {
+            return mock(UserInvitationFacade.class);
         }
 
         @Bean
@@ -489,7 +489,7 @@ class WorkspaceUserServiceIntTest {
         private PermissionService permissionService;
 
         @Autowired
-        private UserInvitationService userInvitationService;
+        private UserInvitationFacade userInvitationFacade;
 
         @Autowired
         private UserService userService;
@@ -507,7 +507,7 @@ class WorkspaceUserServiceIntTest {
         void beforeEach() {
             reset(
                 auditEventService, customRoleRepository, permissionScopeRegistry, permissionService,
-                userInvitationService, userService, workspaceUserRepository);
+                userInvitationFacade, userService, workspaceUserRepository);
 
             SecurityContextHolder.getContext()
                 .setAuthentication(
@@ -573,7 +573,7 @@ class WorkspaceUserServiceIntTest {
 
             when(invitedUser.getId()).thenReturn(9L);
             when(userService.fetchUserByEmail("someone@example.com")).thenReturn(Optional.empty());
-            when(userInvitationService.inviteUser(anyString(), anyString())).thenReturn(invitedUser);
+            when(userInvitationFacade.inviteUser(anyString(), anyString())).thenReturn(invitedUser);
 
             workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "someone@example.com", WorkspaceRole.VIEWER);
 
@@ -594,6 +594,12 @@ class WorkspaceUserServiceIntTest {
 
             when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
                 .thenReturn(List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR)));
+
+            User removedUser = new User();
+
+            removedUser.setLogin("bob");
+
+            when(userService.getUser(USER_ID)).thenReturn(removedUser);
 
             workspaceUserFacade.removeWorkspaceUser(USER_ID, WORKSPACE_ID);
 
@@ -711,8 +717,8 @@ class WorkspaceUserServiceIntTest {
             }
 
             @Bean
-            UserInvitationService userInvitationService() {
-                return mock(UserInvitationService.class);
+            UserInvitationFacade userInvitationFacade() {
+                return mock(UserInvitationFacade.class);
             }
 
             @Bean

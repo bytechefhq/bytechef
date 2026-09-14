@@ -49,7 +49,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
@@ -462,8 +462,8 @@ class PreAuthorizeProxyEnforcementIntTest {
         }
 
         @Bean
-        UserInvitationService userInvitationService() {
-            return mock(UserInvitationService.class);
+        UserInvitationFacade userInvitationFacade() {
+            return mock(UserInvitationFacade.class);
         }
 
         @Bean

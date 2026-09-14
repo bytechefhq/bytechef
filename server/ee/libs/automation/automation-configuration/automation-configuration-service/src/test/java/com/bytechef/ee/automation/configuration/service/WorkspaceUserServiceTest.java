@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -35,7 +36,7 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -66,10 +68,11 @@ class WorkspaceUserServiceTest {
     private static final long WORKSPACE_ID = 7L;
     private static final long USER_ID = 42L;
 
+    private ApplicationEventPublisher applicationEventPublisher;
     private CustomRoleRepository customRoleRepository;
     private PermissionScopeRegistry permissionScopeRegistry;
     private PermissionService permissionService;
-    private UserInvitationService userInvitationService;
+    private UserInvitationFacade userInvitationFacade;
     private UserService userService;
     private WorkspaceService workspaceService;
     private WorkspaceUserRepository workspaceUserRepository;
@@ -77,10 +80,11 @@ class WorkspaceUserServiceTest {
 
     @BeforeEach
     void setUp() {
+        applicationEventPublisher = mock(ApplicationEventPublisher.class);
         customRoleRepository = mock(CustomRoleRepository.class);
         permissionScopeRegistry = mock(PermissionScopeRegistry.class);
         permissionService = mock(PermissionService.class);
-        userInvitationService = mock(UserInvitationService.class);
+        userInvitationFacade = mock(UserInvitationFacade.class);
         userService = mock(UserService.class);
         workspaceService = mock(WorkspaceService.class);
         workspaceUserRepository = mock(WorkspaceUserRepository.class);
@@ -97,8 +101,16 @@ class WorkspaceUserServiceTest {
         lenient().when(permissionService.hasWorkspaceScopeInEveryEnvironment(anyLong(), anyString()))
             .thenReturn(true);
 
+        User removedUser = new User();
+
+        removedUser.setLogin("removed@example.com");
+
+        lenient().when(userService.getUser(USER_ID))
+            .thenReturn(removedUser);
+
         workspaceUserService = new WorkspaceUserServiceImpl(
-            customRoleRepository, permissionScopeRegistry, permissionService, userInvitationService, userService,
+            applicationEventPublisher, customRoleRepository, permissionScopeRegistry, permissionService,
+            userInvitationFacade, userService,
             workspaceService, workspaceUserRepository);
     }
 
@@ -182,7 +194,7 @@ class WorkspaceUserServiceTest {
         User invitedUser = createUser(USER_ID);
 
         when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
-        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(userInvitationFacade.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
         when(customRoleRepository.findById(900L))
             .thenReturn(Optional.of(new CustomRole("Deployer", Set.of("WORKFLOW_VIEW"))));
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(false);
@@ -239,6 +251,27 @@ class WorkspaceUserServiceTest {
 
         verify(workspaceUserRepository, times(1)).deleteByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
         verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testRemoveWorkspaceUserPublishesWorkspaceUserRemovedEvent() {
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
+
+        workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID);
+
+        verify(applicationEventPublisher)
+            .publishEvent(new WorkspaceUserRemovedEvent(WORKSPACE_ID, USER_ID, "removed@example.com"));
+    }
+
+    @Test
+    void testRemoveWorkspaceUserDoesNotPublishWhenNotMember() {
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+            .isInstanceOf(RuntimeException.class);
+
+        verify(applicationEventPublisher, never()).publishEvent(any(Object.class));
     }
 
     @Test
@@ -389,7 +422,7 @@ class WorkspaceUserServiceTest {
         User invitedUser = createUser(USER_ID);
 
         when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
-        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(userInvitationFacade.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(false);
         when(workspaceUserRepository.save(any(WorkspaceUser.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -420,7 +453,7 @@ class WorkspaceUserServiceTest {
 
         // Reusing rather than rejecting: a workspace admin should not have to know whether a colleague already signed
         // up. The provisioning call is skipped entirely, because one address has at most one account.
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, times(1)).save(any(WorkspaceUser.class));
     }
 
@@ -438,7 +471,7 @@ class WorkspaceUserServiceTest {
 
         // Without this the existing account holder is added silently and discovers the workspace by chance. They
         // must not get the claim link -- they already have a password.
-        verify(userInvitationService).notifyAddedToWorkspace(existingUser, "Engineering");
+        verify(userInvitationFacade).notifyAddedToWorkspace(existingUser, "Engineering");
     }
 
     @Test
@@ -446,7 +479,7 @@ class WorkspaceUserServiceTest {
         User invitedUser = createUser(USER_ID);
 
         when(userService.fetchUserByEmail("newcomer@example.com")).thenReturn(Optional.empty());
-        when(userInvitationService.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
+        when(userInvitationFacade.inviteUser("newcomer@example.com", "ROLE_USER")).thenReturn(invitedUser);
         when(workspaceUserRepository.existsByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(false);
         when(workspaceUserRepository.save(any(WorkspaceUser.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -454,7 +487,7 @@ class WorkspaceUserServiceTest {
         workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "newcomer@example.com", WorkspaceRole.EDITOR);
 
         // A new account already learned about this through the claim link; a second mail would be noise.
-        verify(userInvitationService, never()).notifyAddedToWorkspace(any(), any());
+        verify(userInvitationFacade, never()).notifyAddedToWorkspace(any(), any());
     }
 
     @Test
@@ -470,7 +503,7 @@ class WorkspaceUserServiceTest {
                     .isInstanceOf(ConfigurationException.class);
 
         // Announcing access nobody has would be worse than announcing nothing.
-        verify(userInvitationService, never()).notifyAddedToWorkspace(any(), any());
+        verify(userInvitationFacade, never()).notifyAddedToWorkspace(any(), any());
     }
 
     @Test
@@ -500,7 +533,7 @@ class WorkspaceUserServiceTest {
         // Provisioning first and validating afterwards mailed a claim link and then rolled the account, and its
         // activation_key, out from under it. Nothing is even looked up here.
         verify(userService, never()).fetchUserByEmail(any());
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
     }
 
     @Test
@@ -510,7 +543,7 @@ class WorkspaceUserServiceTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("Exactly one");
 
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
     }
 
     @Test
@@ -527,7 +560,7 @@ class WorkspaceUserServiceTest {
                 .isEqualTo(WorkspaceErrorType.WORKSPACE_NOT_FOUND.getErrorKey());
 
         verify(userService, never()).fetchUserByEmail(any());
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
@@ -540,7 +573,7 @@ class WorkspaceUserServiceTest {
                 .isInstanceOf(ConfigurationException.class)
                 .hasMessageContaining("does not exist");
 
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
@@ -713,7 +746,7 @@ class WorkspaceUserServiceTest {
             () -> workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "alt@example.com", WorkspaceRole.ADMIN))
                 .isInstanceOf(AccessDeniedException.class);
 
-        verify(userInvitationService, never()).inviteUser(any(), any());
+        verify(userInvitationFacade, never()).inviteUser(any(), any());
         verify(workspaceUserRepository, never()).save(any(WorkspaceUser.class));
     }
 
@@ -924,7 +957,7 @@ class WorkspaceUserServiceTest {
 
         workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "colleague@example.com", WorkspaceRole.VIEWER);
 
-        verify(userInvitationService).notifyAddedToWorkspace(existingUser, "Engineering");
+        verify(userInvitationFacade).notifyAddedToWorkspace(existingUser, "Engineering");
         verify(workspaceService, never()).getWorkspace(WORKSPACE_ID);
     }
 
@@ -1159,6 +1192,9 @@ class WorkspaceUserServiceTest {
         private static final long WORKSPACE_ID = 2L;
 
         @Mock
+        private ApplicationEventPublisher applicationEventPublisher;
+
+        @Mock
         private CustomRoleRepository customRoleRepository;
 
         @Mock
@@ -1166,6 +1202,9 @@ class WorkspaceUserServiceTest {
 
         @Mock
         private PermissionService permissionService;
+
+        @Mock
+        private UserService userService;
 
         @Mock
         private WorkspaceService workspaceService;
@@ -1178,6 +1217,12 @@ class WorkspaceUserServiceTest {
 
         @BeforeEach
         void setUp() {
+            User user = new User();
+
+            user.setLogin("user@example.com");
+
+            lenient().when(userService.getUser(anyLong()))
+                .thenReturn(user);
             lenient().when(workspaceService.workspaceExists(WORKSPACE_ID))
                 .thenReturn(true);
             lenient().when(permissionService.isTenantAdmin())

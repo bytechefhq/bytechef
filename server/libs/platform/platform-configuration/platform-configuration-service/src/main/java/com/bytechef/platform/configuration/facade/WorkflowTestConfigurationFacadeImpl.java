@@ -145,7 +145,8 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId) && " +
+        "hasResourceScopeIfProjectWorkflow(#workflowId, #connectionId, 'Connection', 'CONNECTION_VIEW')")
     public void saveClusterElementTestConfigurationConnection(
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId,
@@ -171,7 +172,8 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId) && " +
+        "hasResourceScopeIfProjectWorkflow(#workflowId, #connectionId, 'Connection', 'CONNECTION_VIEW')")
     public void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {

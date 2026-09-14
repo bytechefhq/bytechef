@@ -123,6 +123,13 @@ public class RemotePermissionServiceClient implements PermissionService {
     }
 
     @Override
+    public boolean hasResourceScopeIfProjectWorkflow(
+        String workflowId, Serializable id, String resourceType, String scope) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
         throw new UnsupportedOperationException();
     }

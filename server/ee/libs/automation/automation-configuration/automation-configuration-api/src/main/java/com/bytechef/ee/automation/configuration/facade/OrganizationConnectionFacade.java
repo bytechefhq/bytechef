@@ -19,7 +19,7 @@ import java.util.List;
  *
  * <p>
  * <b>Terminal visibility.</b> {@code create} always persists with
- * {@link com.bytechef.platform.connection.domain.ResourceVisibility#ORGANIZATION}. Admins cannot demote an organization
+ * {@link com.bytechef.platform.security.domain.ResourceVisibility#ORGANIZATION}. Admins cannot demote an organization
  * connection to a narrower visibility — they must delete and recreate. This keeps organization-level credentials from
  * silently being narrowed to workspace-only by a routine share-list edit.
  *

@@ -8,17 +8,16 @@
 package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.platform.security.domain.ResourceVisibility;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
- * EE-only workspace connection visibility and sharing. Extends the CE base contract so the EE impl is the active bean
- * for both interfaces in EE and transparently satisfies CE consumers (CE REST/GraphQL).
+ * EE-only workspace connection visibility and sharing. The CRUD operations stay on
+ * {@link com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade}, which serves both editions.
  *
  * <p>
- * <b>Authorization model:</b> every mutation here is owner-or-admin, expressed in SpEL on the implementation. Unlike
- * the promote/demote surface this replaces, none of them needs the annotation deliberately <em>absent</em>: an admin
- * always satisfies the second disjunct, so there is no orphan-recovery hole to keep open by checking programmatically.
+ * <b>Authorization model:</b> every mutation here is owner-or-workspace-ADMIN, expressed in SpEL on the implementation.
+ * A tenant admin short-circuits inside {@code PermissionService}; a member in explicit mode is not a workspace ADMIN
+ * here and gets in only as the owner.
  *
  * <p>
  * <b>Non-disclosure:</b> a caller who may not manage a connection must not be able to tell "does not exist" from "not
@@ -30,17 +29,15 @@ import java.util.List;
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NM")
-public interface WorkspaceConnectionFacade
-    extends com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade {
+public interface WorkspaceConnectionSharingFacade {
 
     /**
      * Sets the connection's reach. Rejects a rung the connection type does not support, and rejects
      * {@code ORGANIZATION}, which is reached through {@code OrganizationConnectionFacade} rather than here.
      *
      * <p>
-     * Narrowing to {@code PRIVATE} is blocked while an active deployment uses the connection: withdrawing it would
-     * break a running deployment. Widening carries no such risk and does not pay for the check.
+     * Narrowing to {@code PRIVATE} is refused while any deployment references the connection. Widening does not pay for
+     * the check.
      */
     void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility);
 

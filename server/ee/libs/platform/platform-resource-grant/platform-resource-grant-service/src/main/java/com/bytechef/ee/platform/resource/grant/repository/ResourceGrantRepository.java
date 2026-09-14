@@ -67,5 +67,31 @@ public interface ResourceGrantRepository extends ListCrudRepository<ResourceGran
         @Param("userId") long userId, @Param("createdBy") String createdBy,
         @Param("createdDate") Instant createdDate);
 
+    @Modifying
+    @Query("""
+        INSERT INTO resource_grant (resource_type, resource_id, user_id, created_by, created_date)
+        SELECT :resourceType, :resourceId, :userId, :createdBy, :createdDate
+         WHERE NOT EXISTS (
+               SELECT 1 FROM resource_grant
+                WHERE resource_type = :resourceType
+                  AND resource_id = :resourceId
+                  AND user_id = :userId)
+        """)
+    void insertIfAbsentWithoutOnConflict(
+        @Param("resourceType") String resourceType, @Param("resourceId") long resourceId,
+        @Param("userId") long userId, @Param("createdBy") String createdBy,
+        @Param("createdDate") Instant createdDate);
+
     void deleteAllByResourceTypeAndResourceId(String resourceType, long resourceId);
+
+    @Modifying
+    @Query("""
+        DELETE FROM resource_grant
+         WHERE resource_type = :resourceType
+           AND user_id = :userId
+           AND resource_id IN (:resourceIds)
+        """)
+    void deleteUserGrants(
+        @Param("resourceType") String resourceType, @Param("userId") long userId,
+        @Param("resourceIds") Collection<Long> resourceIds);
 }

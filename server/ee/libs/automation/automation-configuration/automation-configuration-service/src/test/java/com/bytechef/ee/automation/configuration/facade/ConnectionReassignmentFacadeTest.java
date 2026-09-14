@@ -251,7 +251,7 @@ class ConnectionReassignmentFacadeTest {
     }
 
     @Test
-    void testReassignConnectionResetsStatusFromPendingToActive() {
+    void testReassignConnectionHandsTheConnectionToTheNewOwner() {
         WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
 
         when(workspaceConnection.getConnectionId()).thenReturn(10L);
@@ -265,35 +265,11 @@ class ConnectionReassignmentFacadeTest {
 
         when(connection.getStatus()).thenReturn(ConnectionStatus.PENDING_REASSIGNMENT);
         when(connectionService.getConnection(10L)).thenReturn(connection);
-        when(connectionService.updateCreatedBy(10L, NEW_OWNER_LOGIN)).thenReturn(connection);
 
         connectionReassignmentFacade.reassignConnection(WORKSPACE_ID, 10L, NEW_OWNER_LOGIN);
 
-        verify(connectionService).updateCreatedBy(10L, NEW_OWNER_LOGIN);
-        verify(connectionService).updateConnectionStatus(10L, ConnectionStatus.ACTIVE);
-    }
-
-    @Test
-    void testReassignConnectionDoesNotResetStatusWhenActive() {
-        WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
-
-        when(workspaceConnection.getConnectionId()).thenReturn(10L);
-
-        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
-            .thenReturn(List.of(workspaceConnection));
-
-        when(userService.fetchUserByLogin(NEW_OWNER_LOGIN)).thenReturn(Optional.of(mock(User.class)));
-
-        Connection connection = mock(Connection.class);
-
-        when(connection.getStatus()).thenReturn(ConnectionStatus.ACTIVE);
-        when(connectionService.getConnection(10L)).thenReturn(connection);
-        when(connectionService.updateCreatedBy(10L, NEW_OWNER_LOGIN)).thenReturn(connection);
-
-        connectionReassignmentFacade.reassignConnection(WORKSPACE_ID, 10L, NEW_OWNER_LOGIN);
-
-        verify(connectionService).updateCreatedBy(10L, NEW_OWNER_LOGIN);
-        verify(connectionService, never()).updateConnectionStatus(anyLong(), eq(ConnectionStatus.ACTIVE));
+        verify(connectionService).reassignOwner(10L, NEW_OWNER_LOGIN);
+        verify(connectionService, never()).updateConnectionStatus(anyLong(), any());
     }
 
     @Test
@@ -316,7 +292,7 @@ class ConnectionReassignmentFacadeTest {
             () -> connectionReassignmentFacade.reassignConnection(WORKSPACE_ID, 10L, NEW_OWNER_LOGIN))
                 .isInstanceOf(ConfigurationException.class);
 
-        verify(connectionService, never()).updateCreatedBy(anyLong(), any());
+        verify(connectionService, never()).reassignOwner(anyLong(), any());
     }
 
     @Test
@@ -410,7 +386,7 @@ class ConnectionReassignmentFacadeTest {
             () -> connectionReassignmentFacade.reassignConnection(WORKSPACE_ID, 10L, NEW_OWNER_LOGIN))
                 .isInstanceOf(ConfigurationException.class);
 
-        verify(connectionService, never()).updateCreatedBy(anyLong(), any());
+        verify(connectionService, never()).reassignOwner(anyLong(), any());
     }
 
     @Test
@@ -421,7 +397,7 @@ class ConnectionReassignmentFacadeTest {
             () -> connectionReassignmentFacade.reassignConnection(WORKSPACE_ID, 999L, NEW_OWNER_LOGIN))
                 .isInstanceOf(ConfigurationException.class);
 
-        verify(connectionService, never()).updateCreatedBy(anyLong(), any());
+        verify(connectionService, never()).reassignOwner(anyLong(), any());
     }
 
     @Test
