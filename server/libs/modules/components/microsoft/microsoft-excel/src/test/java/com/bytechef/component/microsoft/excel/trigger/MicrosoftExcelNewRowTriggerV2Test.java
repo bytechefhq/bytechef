@@ -88,6 +88,15 @@ class MicrosoftExcelNewRowTriggerV2Test {
     }
 
     @Test
+    void testPollDoesNotTriggerWhenTwoExistingRowsAreSwapped() {
+        PollOutput result = executePoll(
+            List.of(ROW_1, ROW_3, ROW_2), hashesOf(ROW_1, ROW_2, ROW_3), List.of());
+
+        assertEquals(List.of(), result.records());
+        assertEquals(Map.of("knownRowHashes", hashesOf(ROW_1, ROW_3, ROW_2)), result.closureParameters());
+    }
+
+    @Test
     void testPollSkipsRowsPaddedWithBlankCells() {
         List<Object> blankRow = Arrays.asList("", null);
 
