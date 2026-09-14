@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import OrganizationConnectionDeleteDialog from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionDeleteDialog';
 import OrganizationConnectionsTable from '@/pages/settings/platform/organization-connections/components/OrganizationConnectionsTable';
@@ -99,11 +98,7 @@ const OrganizationConnections = () => {
     const componentDefinitionsQueryResult = useGetComponentDefinitionsQuery({connectionDefinitions: true});
     const componentDefinitions = componentDefinitionsQueryResult.data;
 
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-
-    const workspaceId = currentWorkspaceId ?? 0;
-
-    const connectionTagsQueryResult = useGetConnectionTagsQuery(workspaceId);
+    const connectionTagsQueryResult = useGetConnectionTagsQuery();
 
     const handleDeleteConfirm = (connectionId: string) => {
         deleteMutation.mutate({connectionId});
@@ -165,7 +160,7 @@ const OrganizationConnections = () => {
             {isCreateDialogOpen && (
                 <ConnectionDialog
                     componentDefinitions={componentDefinitions ?? []}
-                    connectionTagsQueryKey={ConnectionKeys.connectionTags(workspaceId)}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setIsCreateDialogOpen(false)}
                     showOrganizationOption
