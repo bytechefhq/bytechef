@@ -129,7 +129,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public Connection updateCreatedBy(long id, String newCreatedBy) {
+    public Connection reassignOwner(long id, String newOwnerLogin) {
         throw new UnsupportedOperationException();
     }
 

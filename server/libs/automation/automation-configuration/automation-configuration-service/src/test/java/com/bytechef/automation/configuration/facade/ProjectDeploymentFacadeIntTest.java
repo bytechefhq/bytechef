@@ -1458,6 +1458,49 @@ public class ProjectDeploymentFacadeIntTest {
         }
 
         @Test
+        void testUpdateProjectDeploymentWorkflowRejectsANewConnectionTheCallerCannotSee() {
+            grant(PROJECT_DEPLOYMENT_WORKFLOW_ID, "ProjectDeploymentWorkflow", "DEPLOYMENT_EDIT");
+            allowConnectionUsageInWorkflow();
+
+            doReturn(storedProjectDeploymentWorkflow(10L)).when(projectDeploymentWorkflowService)
+                .getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_WORKFLOW_ID);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setConnections(
+                List.of(new ProjectDeploymentWorkflowConnection(42L, "connection", "node_1")));
+
+            assertThatThrownBy(
+                () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(42L, "Connection", "CONNECTION_VIEW");
+            verify(projectDeploymentWorkflowService, never()).update(any(ProjectDeploymentWorkflow.class));
+        }
+
+        @Test
+        void testUpdateProjectDeploymentWorkflowDoesNotRecheckAnAlreadyAttachedConnection() {
+            grant(PROJECT_DEPLOYMENT_WORKFLOW_ID, "ProjectDeploymentWorkflow", "DEPLOYMENT_EDIT");
+            allowConnectionUsageInWorkflow();
+
+            doReturn(storedProjectDeploymentWorkflow(10L)).when(projectDeploymentWorkflowService)
+                .getProjectDeploymentWorkflow(PROJECT_DEPLOYMENT_WORKFLOW_ID);
+
+            ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflow();
+
+            projectDeploymentWorkflow.setConnections(
+                List.of(new ProjectDeploymentWorkflowConnection(10L, "connection", "node_1")));
+
+            doReturn(projectDeploymentWorkflow).when(projectDeploymentWorkflowService)
+                .update(projectDeploymentWorkflow);
+
+            projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+            verify(permissionService, never()).hasResourceScope(eq(10L), eq("Connection"), anyString());
+            verify(projectDeploymentWorkflowService).update(projectDeploymentWorkflow);
+        }
+
+        @Test
         void testEnableProjectDeploymentIsDeniedWithoutTheDeploymentScope() {
             assertThatThrownBy(() -> projectDeploymentFacade.enableProjectDeployment(PROJECT_DEPLOYMENT_ID, true))
                 .isInstanceOf(AccessDeniedException.class);
@@ -1539,6 +1582,29 @@ public class ProjectDeploymentFacadeIntTest {
             assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(BODY_REACHED);
+        }
+
+        private void allowConnectionUsageInWorkflow() {
+            ProjectDeployment projectDeployment = new ProjectDeployment();
+
+            projectDeployment.setEnvironment(Environment.PRODUCTION);
+
+            doReturn(projectDeployment).when(projectDeploymentService)
+                .getProjectDeployment(PROJECT_DEPLOYMENT_ID);
+
+            when(permissionService.canUseConnectionInWorkflow(anyLong(), eq(WORKFLOW_ID), eq(Environment.PRODUCTION)))
+                .thenReturn(true);
+        }
+
+        private static ProjectDeploymentWorkflow storedProjectDeploymentWorkflow(long connectionId) {
+            ProjectDeploymentWorkflow storedProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+            storedProjectDeploymentWorkflow.setConnections(
+                List.of(new ProjectDeploymentWorkflowConnection(connectionId, "connection", "node_1")));
+            storedProjectDeploymentWorkflow.setProjectDeploymentId(PROJECT_DEPLOYMENT_ID);
+            storedProjectDeploymentWorkflow.setWorkflowId(WORKFLOW_ID);
+
+            return storedProjectDeploymentWorkflow;
         }
 
         private void grant(String scope) {
