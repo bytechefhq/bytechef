@@ -1,5 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
@@ -82,6 +83,23 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         expect(state.projectName).toBe('Subflow');
         expect(state.projectVersion).toBe(2);
         expect(state.workflow).toBe(workflow);
+    });
+
+    it('closes an execution detail left open elsewhere so the sheet starts on the executions list', async () => {
+        const user = userEvent.setup();
+
+        useWorkflowExecutionSheetStore.setState({
+            workflowExecutionId: 9,
+            workflowExecutionKind: 'JOB',
+            workflowExecutionSheetOpen: true,
+        });
+
+        renderListItem('Subflow');
+
+        await user.click(screen.getByText('workflow1'));
+
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
+        expect(useProjectDeploymentWorkflowSheetStore.getState().projectDeploymentWorkflowSheetOpen).toBe(true);
     });
 
     it('shows the trigger and components like the projects page', () => {
