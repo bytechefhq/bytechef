@@ -232,11 +232,15 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection updateCreatedBy(long id, String newCreatedBy) {
+    public Connection reassignOwner(long id, String newOwnerLogin) {
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
 
-        connection.setCreatedBy(newCreatedBy);
+        try {
+            connection.reassignOwner(newOwnerLogin);
+        } catch (IllegalStateException exception) {
+            throw new ConfigurationException(exception.getMessage(), ConnectionErrorType.INVALID_CONNECTION);
+        }
 
         return connectionRepository.save(connection);
     }

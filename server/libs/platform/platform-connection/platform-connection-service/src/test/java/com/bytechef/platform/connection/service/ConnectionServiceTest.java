@@ -24,11 +24,13 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -100,31 +102,88 @@ class ConnectionServiceTest {
     }
 
     @Test
-    void testUpdateCreatedBy() {
+    void testUpdateConnectionParametersWithoutAuthentication() {
+        SecurityContextHolder.clearContext();
+
         Connection connection = new Connection();
+
+        connection.setCreatedBy("owner@example.com");
+        connection.setParameters(Map.of("access_token", "old"));
 
         when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
         when(connectionRepository.save(any(Connection.class))).thenReturn(connection);
 
-        String newOwner = "new-owner@example.com";
+        connectionService.updateConnectionParameters(CONNECTION_ID, Map.of("access_token", "new"));
 
-        Connection result = connectionService.updateCreatedBy(CONNECTION_ID, newOwner);
+        ArgumentCaptor<Connection> captor = ArgumentCaptor.forClass(Connection.class);
 
-        assertThat(result).isNotNull();
+        verify(connectionRepository).save(captor.capture());
+
+        Map<String, ?> savedParameters = captor.getValue()
+            .getParameters();
+
+        assertThat(savedParameters.get("access_token")).isEqualTo("new");
+    }
+
+    @Test
+    void testUpdateConnectionCredentialStatusWithoutAuthentication() {
+        SecurityContextHolder.clearContext();
+
+        Connection connection = new Connection();
+
+        connection.setCreatedBy("owner@example.com");
+
+        when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+        when(connectionRepository.save(any(Connection.class))).thenReturn(connection);
+
+        connectionService.updateConnectionCredentialStatus(CONNECTION_ID, CredentialStatus.INVALID);
 
         ArgumentCaptor<Connection> captor = ArgumentCaptor.forClass(Connection.class);
 
         verify(connectionRepository).save(captor.capture());
 
         assertThat(captor.getValue()
-            .getCreatedBy()).isEqualTo(newOwner);
+            .getCredentialStatus()).isEqualTo(CredentialStatus.INVALID);
     }
 
     @Test
-    void testUpdateCreatedByNotFound() {
+    void testReassignOwnerReactivatesAPendingConnectionInOneSave() {
+        Connection connection = new Connection();
+
+        connection.setStatus(ConnectionStatus.PENDING_REASSIGNMENT);
+
+        when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+        when(connectionRepository.save(any(Connection.class))).thenReturn(connection);
+
+        connectionService.reassignOwner(CONNECTION_ID, "new-owner@example.com");
+
+        ArgumentCaptor<Connection> captor = ArgumentCaptor.forClass(Connection.class);
+
+        verify(connectionRepository).save(captor.capture());
+
+        Connection savedConnection = captor.getValue();
+
+        assertThat(savedConnection.getCreatedBy()).isEqualTo("new-owner@example.com");
+        assertThat(savedConnection.getStatus()).isEqualTo(ConnectionStatus.ACTIVE);
+    }
+
+    @Test
+    void testReassignOwnerRefusesARevokedConnection() {
+        Connection connection = new Connection();
+
+        connection.setStatus(ConnectionStatus.REVOKED);
+
+        when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+        assertThatThrownBy(() -> connectionService.reassignOwner(CONNECTION_ID, "new-owner@example.com"))
+            .isInstanceOf(ConfigurationException.class);
+    }
+
+    @Test
+    void testReassignOwnerNotFound() {
         when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> connectionService.updateCreatedBy(CONNECTION_ID, "new-owner@example.com"))
+        assertThatThrownBy(() -> connectionService.reassignOwner(CONNECTION_ID, "new-owner@example.com"))
             .isInstanceOf(NoSuchElementException.class)
             .hasMessageContaining(String.valueOf(CONNECTION_ID));
     }
