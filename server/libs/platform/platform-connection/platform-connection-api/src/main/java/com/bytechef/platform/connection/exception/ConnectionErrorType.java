@@ -26,16 +26,13 @@ import com.bytechef.platform.connection.domain.Connection;
  * <p>
  * Classification guidance:
  * <ul>
- * <li>{@code CONNECTION_ALREADY_AT_TARGET_VISIBILITY} — benign concurrent race: the row was promoted by another admin
- * between a bulk operation's pre-filter read and the per-row call. Bulk promote classifies this as {@code skipped}, NOT
- * {@code failed}, so "N promoted, M skipped" reads as a success. Do not broaden the catch to include other error keys —
- * doing so hides real authorization failures as benign skips.</li>
- * <li>{@code CONNECTION_IS_USED} — a destructive operation was attempted while the connection is still wired to an
- * active deployment workflow or test configuration. The caller must disconnect or unshare first.</li>
+ * <li>{@code CONNECTION_ALREADY_AT_TARGET_VISIBILITY} — reserved; no current operation raises it.</li>
+ * <li>{@code CONNECTION_IS_USED} — the connection is still referenced by a deployment workflow (and, for delete, a test
+ * configuration). The caller must disconnect it first.</li>
  * <li>{@code CONNECTION_NOT_ACTIVE} — the row's {@code ConnectionStatus} is not ACTIVE (PENDING_REASSIGNMENT or
  * REVOKED). Emitted by operations that refuse to run against non-active credentials.</li>
- * <li>{@code INVALID_CONNECTION} — either the id does not exist in this workspace, or the caller lacks authorization.
- * Deliberately ambiguous to avoid a connection-id enumeration oracle for non-admin callers.</li>
+ * <li>{@code INVALID_CONNECTION} — the request names a connection, grantee, owner, visibility or status transition that
+ * is not valid for it. Authorization failures are not reported here; they raise {@code AccessDeniedException}.</li>
  * <li>{@code INVALID_CONNECTION_COMPONENT_NAME} — componentName does not match a known component definition.</li>
  * </ul>
  *

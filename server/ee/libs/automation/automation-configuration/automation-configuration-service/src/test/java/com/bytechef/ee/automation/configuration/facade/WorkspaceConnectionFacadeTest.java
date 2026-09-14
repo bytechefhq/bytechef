@@ -26,9 +26,11 @@ import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicy;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
@@ -47,8 +49,9 @@ import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
- * Behavioural tests for connection visibility and sharing. The authorization expressions themselves are pinned by
- * {@link ConnectionSharingFacadeAuthorizationTest}; these exercise the validation that runs after them.
+ * Behavioural tests for connection visibility and sharing. The authorization gates themselves are enforced through the
+ * method-security proxy in {@link WorkspaceConnectionFacadeIntTest}; these exercise the validation that runs after
+ * them.
  *
  * @version ee
  *
@@ -56,11 +59,14 @@ import org.springframework.beans.factory.ObjectProvider;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class ConnectionSharingFacadeTest {
+class WorkspaceConnectionFacadeTest {
 
     private static final long CONNECTION_ID = 10L;
     private static final long GRANTEE_ID = 8L;
     private static final long WORKSPACE_ID = 1L;
+
+    @Mock
+    private ConnectionFacade connectionFacade;
 
     @Mock
     private ConnectionService connectionService;
@@ -95,12 +101,27 @@ class ConnectionSharingFacadeTest {
         when(workspaceUserService.isWorkspaceMember(GRANTEE_ID, WORKSPACE_ID)).thenReturn(true);
 
         workspaceConnectionFacade = new WorkspaceConnectionFacadeImpl(
-            mock(ConnectionFacade.class), mock(ConnectionLifecycleFacade.class), connectionService,
+            connectionFacade, mock(ConnectionLifecycleFacade.class), connectionService,
             meterRegistryProvider, mock(PermissionService.class), projectDeploymentWorkflowService,
             mock(ProjectService.class), resourceGrantService,
             connectionPolicyRegistry(), mock(ResourceVisibilityResolver.class), mock(UserService.class),
             mock(WorkflowTestConfigurationService.class), workspaceConnectionService, mock(WorkspaceFacade.class),
             workspaceUserService);
+    }
+
+    @Test
+    void testGetConnectionsListsOrganizationConnectionsInEveryWorkspace() {
+        Connection organizationConnection = new Connection();
+
+        organizationConnection.setId(20L);
+
+        when(connectionService.getConnectionsByVisibility(ResourceVisibility.ORGANIZATION, PlatformType.AUTOMATION))
+            .thenReturn(List.of(organizationConnection));
+
+        workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
+
+        verify(connectionFacade).getConnections(
+            null, null, List.of(CONNECTION_ID, 20L), null, null, PlatformType.AUTOMATION);
     }
 
     @Test
@@ -111,7 +132,7 @@ class ConnectionSharingFacadeTest {
             () -> workspaceConnectionFacade.setConnectionVisibility(
                 WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.PRIVATE))
                     .isInstanceOf(ConfigurationException.class)
-                    .hasMessageContaining("used by active deployments");
+                    .hasMessageContaining("used by a deployment");
 
         verify(connectionService, never()).updateVisibility(anyLong(), org.mockito.ArgumentMatchers.any());
     }

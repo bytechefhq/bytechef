@@ -16,15 +16,9 @@ import java.util.List;
  * per-row moves that return a removed user's credentials to an active owner without losing audit continuity.
  *
  * <p>
- * <b>Authorization.</b> Queries and mutations are {@code @PreAuthorize(ROLE_ADMIN)} on the facade implementation. The
- * GraphQL admin entry uses {@link #markConnectionsPendingReassignmentAsAdmin(long, String)} (guarded);
- * {@link #markConnectionsPendingReassignment(long, String)} is the unguarded internal variant invoked by the non-admin
- * user-removal path ({@code WorkspaceUserRemovalListener}), so the listener is not blocked by an ADMIN check.
- *
- * <p>
- * <b>Audit emission.</b> {@code reassignAllConnections} batches per-row work under a single transaction and emits audit
- * events imperatively after the outer commit, so claims of "successfully reassigned" cannot survive a rollback.
- * Single-row {@code reassignConnection} emits nothing until the declarative emitter lands.
+ * <b>Authorization.</b> Every method is {@code @PreAuthorize(ROLE_ADMIN)} on the facade implementation. The
+ * user-removal path ({@code WorkspaceUserRemovalListener}) acts for whoever removed the member, who need not be a
+ * tenant admin, so it calls {@link #markConnectionsPendingReassignment(long, String)} as the system principal.
  *
  * <p>
  * <b>Partial-failure surfacing.</b> {@code markConnectionsPendingReassignment} returns a
@@ -50,22 +44,16 @@ public interface ConnectionReassignmentFacade {
     BulkReassignResultDTO markConnectionsPendingReassignment(long workspaceId, String userLogin);
 
     /**
-     * Admin-gated GraphQL entry point for the bulk mark. Carries {@code @PreAuthorize(ROLE_ADMIN)} and delegates to
-     * {@link #markConnectionsPendingReassignment(long, String)} (the unguarded internal variant the user-removal
-     * listener calls). Split so the listener's non-admin system path is not blocked by the admin check.
-     */
-    BulkReassignResultDTO markConnectionsPendingReassignmentAsAdmin(long workspaceId, String userLogin);
-
-    /**
      * Per-row worker invoked through the AOP proxy by {@link #markConnectionsPendingReassignment} so each row commits
      * or rolls back in its own {@code REQUIRES_NEW} transaction. Returns {@link MarkPendingOutcome#UPDATED} when the
      * row's status successfully transitioned to {@code PENDING_REASSIGNMENT}, or {@link MarkPendingOutcome#SKIPPED}
      * when the row was in a terminal state (e.g. {@code REVOKED}) at read time and could not legally transition.
      *
      * <p>
-     * Exposed on the interface because Spring-generated proxies only advise interface methods, and the per-row tx
-     * boundary is load-bearing — without it, a single failing row would flip the outer transaction to rollback-only and
-     * discard every previously-updated row in the same batch.
+     * Exposed on the interface because {@code self} is injected as this interface, so the method must be visible
+     * through it for the {@code REQUIRES_NEW} advice to apply, and the per-row tx boundary is load-bearing — without
+     * it, a single failing row would flip the outer transaction to rollback-only and discard every previously-updated
+     * row in the same batch.
      */
     MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId);
 

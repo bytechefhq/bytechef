@@ -52,4 +52,9 @@ public interface ResourceGrantService {
      * target and later collide with a recycled id.
      */
     void deleteGrants(String resourceType, long resourceId);
+
+    /**
+     * Removes the grants {@code userId} holds on any of {@code resourceIds}.
+     */
+    void revokeUserGrants(String resourceType, long userId, Collection<Long> resourceIds);
 }

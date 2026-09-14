@@ -22,9 +22,8 @@ import java.util.Objects;
  * How far a resource reaches. Ordered: PRIVATE &lt; WORKSPACE &lt; ORGANIZATION.
  *
  * <p>
- * This enum is only the vocabulary. Which rungs a given resource type may actually hold, and which one it is created
- * with, are declared per module through {@link ResourceVisibilityPolicy} — connections support all three, while a
- * workspace-bound resource such as a project supports only the first two.
+ * This enum is only the vocabulary. Which rungs a given resource type may be set to is declared per module through
+ * {@link ResourceVisibilityPolicy}; connections, the only resource with a policy so far, support all three.
  *
  * <p>
  * Persisted as an INT ordinal by Spring Data JDBC. Appending a value is safe; reordering existing values would
@@ -35,7 +34,7 @@ import java.util.Objects;
 public enum ResourceVisibility {
 
     PRIVATE, // the owner, plus any users named in a resource grant
-    WORKSPACE, // every member of the owning workspace — the default for every resource type
+    WORKSPACE, // every member of the owning workspace
     ORGANIZATION; // every member of every workspace in the organization
 
     /**
