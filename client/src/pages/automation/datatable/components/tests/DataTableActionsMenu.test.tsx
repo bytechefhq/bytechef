@@ -51,6 +51,16 @@ describe('DataTableActionsMenu', () => {
             expect(screen.getByText('Rename Table')).toBeInTheDocument();
             expect(screen.getByText('Delete Table')).toBeInTheDocument();
         });
+
+        it('should separate Delete Table from the other actions', async () => {
+            const user = userEvent.setup();
+
+            render(<DataTableActionsMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'More actions'}));
+
+            expect(screen.getByRole('separator')).toBeInTheDocument();
+        });
     });
 
     describe('menu items when tableId is not provided', () => {
@@ -67,6 +77,7 @@ describe('DataTableActionsMenu', () => {
             expect(screen.getByText('Export CSV')).toBeInTheDocument();
             expect(screen.queryByText('Rename Table')).not.toBeInTheDocument();
             expect(screen.queryByText('Delete Table')).not.toBeInTheDocument();
+            expect(screen.queryByRole('separator')).not.toBeInTheDocument();
         });
     });
 

@@ -1,5 +1,17 @@
 @reference '../../../styles/index.css';
 
+.rdg {
+    --rdg-background-color: hsl(var(--background));
+    --rdg-border-color: hsl(var(--border));
+    --rdg-color: hsl(var(--foreground));
+    --rdg-header-background-color: hsl(var(--muted));
+    --rdg-header-draggable-background-color: hsl(var(--accent));
+    --rdg-row-hover-background-color: hsl(var(--accent));
+    --rdg-row-selected-background-color: hsl(var(--surface-brand-secondary));
+    --rdg-row-selected-hover-background-color: hsl(var(--surface-brand-secondary));
+    --rdg-summary-border-color: hsl(var(--border));
+}
+
 .datatable-cell {
     @apply border-t;
     @apply border-r;
@@ -8,4 +20,12 @@
 .datatable-summary-row {
     @apply border-t;
     @apply border-r;
+}
+
+.datatable-summary-total {
+    @apply border-t whitespace-nowrap;
+
+    border-inline-end: none;
+    box-shadow: none;
+    overflow: visible;
 }
