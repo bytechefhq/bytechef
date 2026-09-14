@@ -415,30 +415,69 @@
     }
 
     .dark .react-flow__node svg:not([fill]),
-    .dark .react-flow__node svg [fill='black' i],
-    .dark .react-flow__node svg [fill='#000' i],
-    .dark .react-flow__node svg [fill='#000000' i],
-    .dark .react-flow__node svg [fill='#212121' i],
-    .dark .react-flow__node svg [fill='#333' i],
-    .dark .react-flow__node svg [fill='#333333' i],
-    .dark .react-flow__node svg [fill='#374151' i],
-    .dark .react-flow__node svg[fill='black' i],
-    .dark .react-flow__node svg[fill='#000' i],
-    .dark .react-flow__node svg[fill='#000000' i] {
+    .dark
+        .react-flow__node
+        :is(svg, svg *):is(
+            [fill='black' i],
+            [fill='#000' i],
+            [fill='#000000' i],
+            [fill='#020202' i],
+            [fill='#040202' i],
+            [fill='#181818' i],
+            [fill='#1b1f23' i],
+            [fill='#1d1919' i],
+            [fill='#1e232d' i],
+            [fill='#201d1e' i],
+            [fill='#212121' i],
+            [fill='#212322' i],
+            [fill='#231f20' i],
+            [fill='#282a36' i],
+            [fill='#292929' i],
+            [fill='#292d32' i],
+            [fill='#333' i],
+            [fill='#333333' i],
+            [fill='#343434' i],
+            [fill='#353333' i],
+            [fill='#374151' i],
+            [fill='#383434' i],
+            [fill='#464342' i],
+            [fill='#474747' i],
+            [fill='#4c4c4c' i]
+        ) {
         fill: hsl(var(--content-neutral-primary));
     }
 
-    .dark .react-flow__node svg[stroke='black' i],
-    .dark .react-flow__node svg [stroke='black' i],
-    .dark .react-flow__node svg[stroke='#000' i],
-    .dark .react-flow__node svg [stroke='#000' i],
-    .dark .react-flow__node svg[stroke='#000000' i],
-    .dark .react-flow__node svg [stroke='#000000' i],
-    .dark .react-flow__node svg[stroke='#212121' i],
-    .dark .react-flow__node svg [stroke='#212121' i],
-    .dark .react-flow__node svg[stroke='#374151' i],
-    .dark .react-flow__node svg [stroke='#374151' i] {
+    .dark
+        .react-flow__node
+        :is(svg, svg *):is(
+            [stroke='black' i],
+            [stroke='#000' i],
+            [stroke='#000000' i],
+            [stroke='#212121' i],
+            [stroke='#33363f' i],
+            [stroke='#374151' i]
+        ) {
         stroke: hsl(var(--content-neutral-primary));
+    }
+
+    .dark
+        .react-flow__node
+        svg
+        :is(
+            [style*='fill:#000000' i],
+            [style*='fill: #000000' i],
+            [style*='fill:#181818' i],
+            [style*='fill: #181818' i],
+            [style*='fill:#282a36' i],
+            [style*='fill: #282a36' i],
+            [style*='fill:rgb(0%,0%,0%)'],
+            [style*='fill: rgb(0%,0%,0%)']
+        ) {
+        fill: hsl(var(--content-neutral-primary)) !important;
+    }
+
+    .dark .react-flow__node svg :is([style*='stroke:#000' i], [style*='stroke: #000' i]) {
+        stroke: hsl(var(--content-neutral-primary)) !important;
     }
 
     * {
