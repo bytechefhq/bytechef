@@ -432,7 +432,7 @@ class ConnectionFacadeIntTest {
 
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
-        connectionService.updateCreatedBy(connectionId, "external-user-id");
+        connectionService.reassignOwner(connectionId, "external-user-id");
 
         Assertions.assertThat(connectionRepository.findById(connectionId))
             .hasValueSatisfying(connection -> Assertions.assertThat(connection.getCreatedBy())
