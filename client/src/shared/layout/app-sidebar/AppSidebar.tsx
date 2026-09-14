@@ -13,11 +13,12 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon} from 'lucide-react';
 import {useEffect} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 
 import {AppSidebarFooter} from './AppSidebarFooter';
 
@@ -34,6 +35,8 @@ interface AppSidebarProps {
 export function AppSidebar({navigation}: AppSidebarProps) {
     const {pathname} = useLocation();
 
+    const navigate = useNavigate();
+
     const {isMobile, state} = useSidebar();
 
     const currentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.currentEnvironmentId);
@@ -41,6 +44,20 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const collapsed = state === 'collapsed' && !isMobile;
 
     const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
+    // Projects and integrations (and their workflow editors) only exist in development, so leaving
+    // development moves the user to the environment-scoped deployments/configurations page instead.
+    const handleEnvironmentChange = (environmentId: number) => {
+        if (environmentId === DEVELOPMENT_ENVIRONMENT) {
+            return;
+        }
+
+        if (isActive('/automation/projects')) {
+            navigate('/automation/deployments');
+        } else if (isActive('/embedded/integrations')) {
+            navigate('/embedded/configurations');
+        }
+    };
 
     useEffect(() => {
         const {documentElement} = document;
@@ -69,7 +86,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                         <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
                     </Link>
 
-                    <EnvironmentSelect variant={collapsed ? 'icon' : 'compact'} />
+                    <EnvironmentSelect onChange={handleEnvironmentChange} variant={collapsed ? 'icon' : 'compact'} />
                 </div>
             </SidebarHeader>
 
