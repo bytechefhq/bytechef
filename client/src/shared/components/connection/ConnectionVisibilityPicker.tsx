@@ -15,10 +15,9 @@ export interface WorkspaceMemberI {
 
 interface ConnectionVisibilityPickerPropsI {
     grantedUserIds: number[];
-    isAdmin?: boolean;
     onGrantedUserIdsChange: (userIds: number[]) => void;
     onVisibilityChange: (visibility: 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE') => void;
-    showOrganizationOption?: boolean;
+    showSpecificPeopleOption?: boolean;
     visibility: 'ORGANIZATION' | 'PRIVATE' | 'WORKSPACE';
     workspaceMembers?: WorkspaceMemberI[];
 }
@@ -41,10 +40,9 @@ export const deriveVisibilityState = (
 
 const ConnectionVisibilityPicker = ({
     grantedUserIds,
-    isAdmin = false,
     onGrantedUserIdsChange,
     onVisibilityChange,
-    showOrganizationOption = false,
+    showSpecificPeopleOption = true,
     visibility,
     workspaceMembers = [],
 }: ConnectionVisibilityPickerPropsI) => {
@@ -70,6 +68,14 @@ const ConnectionVisibilityPicker = ({
         }
 
         setSpecificPeopleIntent(false);
+
+        if (nextState === 'PRIVATE' && grantedUserIds.length > 0) {
+            onGrantedUserIdsChange([]);
+        }
+
+        if (nextState === visibility) {
+            return;
+        }
 
         // Leaving PRIVATE makes any grants inert rather than deleting them, so demoting again restores the same
         // audience. The server keeps the rows for the same reason.
@@ -100,20 +106,12 @@ const ConnectionVisibilityPicker = ({
                     </Label>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                    <RadioGroupItem id="visibility-specific-people" value="SPECIFIC_PEOPLE" />
-
-                    <Label className="font-normal" htmlFor="visibility-specific-people">
-                        Specific people
-                    </Label>
-                </div>
-
-                {showOrganizationOption && isAdmin && (
+                {showSpecificPeopleOption && (
                     <div className="flex items-center space-x-2">
-                        <RadioGroupItem id="visibility-organization" value="ORGANIZATION" />
+                        <RadioGroupItem id="visibility-specific-people" value="SPECIFIC_PEOPLE" />
 
-                        <Label className="font-normal" htmlFor="visibility-organization">
-                            Organization
+                        <Label className="font-normal" htmlFor="visibility-specific-people">
+                            Specific people
                         </Label>
                     </div>
                 )}
