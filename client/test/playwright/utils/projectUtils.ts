@@ -2,7 +2,6 @@ import {Page, expect} from '@playwright/test';
 
 import {ProjectsPage} from '../pages/projectsPage';
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
-import {SAMPLE_WORKFLOW_NAME} from './constants';
 import getRandomString from './getRandomString';
 
 export interface TestProjectI {
@@ -77,9 +76,15 @@ interface ImportWorkflowProps {
     page: Page;
     projectId: string;
     workflowFilePath: string;
+    workflowName: string;
 }
 
-export async function importWorkflow({page, projectId, workflowFilePath}: ImportWorkflowProps): Promise<TestWorkflowI> {
+export async function importWorkflow({
+    page,
+    projectId,
+    workflowFilePath,
+    workflowName,
+}: ImportWorkflowProps): Promise<TestWorkflowI> {
     const projectsPage = new ProjectsPage(page);
 
     await page.goto('/automation/projects');
@@ -109,7 +114,7 @@ export async function importWorkflow({page, projectId, workflowFilePath}: Import
 
     await fileInput.setInputFiles(workflowFilePath);
 
-    const workflowLink = page.getByLabel(`Link to workflow ${SAMPLE_WORKFLOW_NAME}`);
+    const workflowLink = page.getByLabel(`Link to workflow ${workflowName}`);
 
     await expect(workflowLink).toBeVisible({timeout: 10000});
 
@@ -123,5 +128,5 @@ export async function importWorkflow({page, projectId, workflowFilePath}: Import
 
     const workflowId = workflowIdMatch ? workflowIdMatch[1] : 'unknown';
 
-    return {projectId, workflowId, workflowName: SAMPLE_WORKFLOW_NAME};
+    return {projectId, workflowId, workflowName};
 }

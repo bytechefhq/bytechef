@@ -55,6 +55,19 @@ import {workflowTest} from '../fixtures';
 // Requires: page and project (use with loginTest() and projectTest via mergeTests)
 ```
 
+### Selectable Index Workflow Fixture
+
+Imports `selectableIndexWorkflow.json` instead of `sampleWorkflow.json`. Its `var_1` node holds a three
+item array, an array of objects with a nested array, and an array longer than the fifty rows the data
+pill array index picker lists:
+
+```typescript
+import {importSelectableIndexWorkflowTest} from '../fixtures';
+
+// importSelectableIndexWorkflowTest provides: workflow fixture
+// Requires: page and project (use with loginTest() and projectTest via mergeTests)
+```
+
 ## Usage Pattern
 
 The key pattern is to use `mergeTests` at the top of your test file to combine independent fixtures:
