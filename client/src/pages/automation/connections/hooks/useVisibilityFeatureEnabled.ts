@@ -24,7 +24,7 @@ export const useIsVisibilityEditionEnabled = (): boolean =>
  * Gate for the connection-visibility UI on workspace-scoped pages (connection list, list-item
  * menus, scope badges). Returns:
  * - enabled: the visibility UI should render (EE edition + a concrete workspace context)
- * - isAdmin: current user has ROLE_ADMIN (controls promote/demote/share menu items)
+ * - isAdmin: current user has ROLE_ADMIN
  * - workspaceId: the workspace mutations should be scoped to
  *
  * Shared dialogs that render in both Automation and Embedded platforms (e.g.

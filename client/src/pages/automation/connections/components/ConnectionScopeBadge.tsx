@@ -48,8 +48,7 @@ const ConnectionScopeBadge = ({grantedUserCount = 0, visibility}: ConnectionScop
     const isSpecificPeople = visibility === 'PRIVATE' && grantedUserCount > 0;
 
     // Defensive fallback: server may add a new visibility value before the client is deployed. Falling back to
-    // PRIVATE keeps the list renderable instead of undefined destructuring. The || operator (not ??) is correct
-    // because VISIBILITY_CONFIG[k] is never legitimately falsy.
+    // PRIVATE keeps the list renderable instead of undefined destructuring.
     const {
         className,
         icon: IconComponent,

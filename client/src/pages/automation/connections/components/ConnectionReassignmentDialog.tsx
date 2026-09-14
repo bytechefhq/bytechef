@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {
     useAffectedWorkflowsQuery,
@@ -17,6 +16,8 @@ import {
     useUnresolvedConnectionsQuery,
     useUsersQuery,
 } from '@/shared/middleware/graphql';
+import {ConnectionKeys} from '@/shared/queries/automation/connections.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {AlertTriangleIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -33,6 +34,8 @@ interface ConnectionReassignmentDialogProps {
 const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: ConnectionReassignmentDialogProps) => {
     const [newOwnerLogin, setNewOwnerLogin] = useState('');
     const [reassignmentError, setReassignmentError] = useState<string | null>(null);
+
+    const queryClient = useQueryClient();
 
     const {data: unresolvedConnectionsData, isLoading: isLoadingConnections} = useUnresolvedConnectionsQuery(
         {userLogin, workspaceId: String(workspaceId)},
@@ -53,6 +56,10 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
             setReassignmentError(error.message || 'Failed to reassign connections. Please try again.');
         },
         onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['unresolvedConnections']});
+            queryClient.invalidateQueries({queryKey: ['affectedWorkflows']});
+            queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
+
             onClose();
         },
     });
@@ -99,138 +106,135 @@ const ConnectionReassignmentDialog = ({onClose, open, userLogin, workspaceId}: C
 
     return (
         <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
-            <DialogContent className="max-w-2xl">
-                <div className="flex flex-col gap-4">
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                        <div className="flex flex-col space-y-1">
-                            <DialogTitle>Reassign Connections</DialogTitle>
+            <DialogContent size="md">
+                <DialogMain>
+                    <DialogHeader
+                        description={`The user ${userLogin} owns ${connections.length} connection${connections.length !== 1 ? 's' : ''} that must be reassigned before removal.`}
+                        title="Reassign Connections"
+                    />
 
-                            <DialogDescription>
-                                {`The user ${userLogin} owns ${connections.length} connection${connections.length !== 1 ? 's' : ''} that must be reassigned before removal.`}
-                            </DialogDescription>
-                        </div>
+                    <DialogBody className="flex flex-col gap-4">
+                        {reassignmentError && (
+                            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                                <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" />
 
-                        <DialogCloseButton />
-                    </DialogHeader>
+                                <span>{reassignmentError}</span>
+                            </div>
+                        )}
 
-                    {reassignmentError && (
-                        <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                            <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" />
+                        {affectedWorkflowCount > 0 && (
+                            <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                                <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" />
 
-                            <span>{reassignmentError}</span>
-                        </div>
-                    )}
+                                <span>
+                                    {affectedWorkflowCount} workflow{affectedWorkflowCount !== 1 ? 's' : ''} will be
+                                    affected by this reassignment.
+                                </span>
+                            </div>
+                        )}
 
-                    {affectedWorkflowCount > 0 && (
-                        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-                            <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" />
+                        <div className="max-h-72 overflow-auto rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="border-b-border/50">
+                                        <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                            Connection
+                                        </TableHead>
 
-                            <span>
-                                {affectedWorkflowCount} workflow{affectedWorkflowCount !== 1 ? 's' : ''} will be
-                                affected by this reassignment.
-                            </span>
-                        </div>
-                    )}
+                                        <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                            Scope
+                                        </TableHead>
 
-                    <div className="max-h-72 overflow-auto rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="border-b-border/50">
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
-                                        Connection
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                            Environment
+                                        </TableHead>
 
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
-                                        Scope
-                                    </TableHead>
-
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-left text-xs font-medium tracking-wide text-gray-500 uppercase">
-                                        Environment
-                                    </TableHead>
-
-                                    <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-right text-xs font-medium tracking-wide text-gray-500 uppercase">
-                                        Workflows
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-
-                            <TableBody>
-                                {isLoadingConnections ? (
-                                    <TableRow>
-                                        <TableCell className="px-3 py-4 text-center text-muted-foreground" colSpan={4}>
-                                            Loading connections...
-                                        </TableCell>
+                                        <TableHead className="sticky top-0 z-10 bg-white px-3 py-2 text-right text-xs font-medium tracking-wide text-gray-500 uppercase">
+                                            Workflows
+                                        </TableHead>
                                     </TableRow>
-                                ) : connections.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell className="px-3 py-4 text-center text-muted-foreground" colSpan={4}>
-                                            No connections require reassignment.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    connections.map((connection) => (
-                                        <TableRow className="border-b-border/50" key={connection.connectionId}>
-                                            <TableCell className="px-3 py-2 text-sm font-medium">
-                                                {connection.connectionName}
-                                            </TableCell>
+                                </TableHeader>
 
-                                            <TableCell className="px-3 py-2">
-                                                <ConnectionScopeBadge visibility={connection.visibility} />
-                                            </TableCell>
-
-                                            <TableCell className="px-3 py-2 text-sm text-muted-foreground">
-                                                {connection.environmentId}
-                                            </TableCell>
-
+                                <TableBody>
+                                    {isLoadingConnections ? (
+                                        <TableRow>
                                             <TableCell
-                                                className={twMerge(
-                                                    'px-3 py-2 text-right text-sm',
-                                                    connection.dependentWorkflowCount > 0
-                                                        ? 'font-medium text-amber-600'
-                                                        : 'text-muted-foreground'
-                                                )}
+                                                className="px-3 py-4 text-center text-muted-foreground"
+                                                colSpan={4}
                                             >
-                                                {connection.dependentWorkflowCount}
+                                                Loading connections...
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                    ) : connections.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell
+                                                className="px-3 py-4 text-center text-muted-foreground"
+                                                colSpan={4}
+                                            >
+                                                No connections require reassignment.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        connections.map((connection) => (
+                                            <TableRow className="border-b-border/50" key={connection.connectionId}>
+                                                <TableCell className="px-3 py-2 text-sm font-medium">
+                                                    {connection.connectionName}
+                                                </TableCell>
 
-                    <div className="flex items-center gap-3">
-                        <span className="shrink-0 text-sm font-medium">Reassign all to</span>
+                                                <TableCell className="px-3 py-2">
+                                                    <ConnectionScopeBadge visibility={connection.visibility} />
+                                                </TableCell>
 
-                        <Select onValueChange={setNewOwnerLogin} value={newOwnerLogin}>
-                            <SelectTrigger className="flex-1">
-                                <SelectValue placeholder="Select new owner..." />
-                            </SelectTrigger>
+                                                <TableCell className="px-3 py-2 text-sm text-muted-foreground">
+                                                    {connection.environmentId}
+                                                </TableCell>
 
-                            <SelectContent>
-                                {availableUsers.map((user) => (
-                                    <SelectItem key={user.login} value={user.login}>
-                                        {[user.firstName, user.lastName].filter(Boolean).join(' ') || user.login}
+                                                <TableCell
+                                                    className={twMerge(
+                                                        'px-3 py-2 text-right text-sm',
+                                                        connection.dependentWorkflowCount > 0
+                                                            ? 'font-medium text-amber-600'
+                                                            : 'text-muted-foreground'
+                                                    )}
+                                                >
+                                                    {connection.dependentWorkflowCount}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
 
-                                        {user.email ? ` (${user.email})` : ''}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                        <div className="flex items-center gap-3">
+                            <span className="shrink-0 text-sm font-medium">Reassign all to</span>
+
+                            <Select onValueChange={setNewOwnerLogin} value={newOwnerLogin}>
+                                <SelectTrigger className="flex-1">
+                                    <SelectValue placeholder="Select new owner..." />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    {availableUsers.map((user) => (
+                                        <SelectItem key={user.login} value={user.login}>
+                                            {[user.firstName, user.lastName].filter(Boolean).join(' ') || user.login}
+
+                                            {user.email ? ` (${user.email})` : ''}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </DialogBody>
 
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button onClick={onClose} variant="outline">
-                                Cancel
-                            </Button>
-                        </DialogClose>
+                        <DialogCancelButton />
 
                         <Button disabled={isReassignDisabled} onClick={handleReassignAll}>
                             {isReassigning ? 'Reassigning...' : 'Reassign All'}
                         </Button>
                     </DialogFooter>
-                </div>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

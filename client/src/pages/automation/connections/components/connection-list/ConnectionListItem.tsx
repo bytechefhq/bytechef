@@ -39,10 +39,11 @@ import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automa
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {Link2OffIcon, Trash2Icon} from 'lucide-react';
+import {Link2OffIcon, Trash2Icon, UserCogIcon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
+import ConnectionReassignmentDialog from '../ConnectionReassignmentDialog';
 import ConnectionScopeBadge from '../ConnectionScopeBadge';
 
 const CONNECTION_WORKFLOWS_QUERY_KEY = ['ConnectionWorkflows'];
@@ -59,13 +60,22 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
     const [connectionWorkflowToDisconnect, setConnectionWorkflowToDisconnect] = useState<ConnectionWorkflowI>();
     const [workflowsOpen, setWorkflowsOpen] = useState(false);
+    const [showReassignmentDialog, setShowReassignmentDialog] = useState(false);
+    const [showVisibilityMenu, setShowVisibilityMenu] = useState(false);
+
+    const account = useAuthenticationStore((state) => state.account);
 
     const {enabled: visibilityFeatureEnabled, workspaceId: currentWorkspaceId} = useVisibilityFeatureEnabled();
-    const currentUserLogin = useAuthenticationStore((state) => state.account?.login);
 
-    const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
-    const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_DELETE');
+    const hasConnectionEditScope = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
+    const hasConnectionDeleteScope = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_DELETE');
     const isTenantAdmin = useIsTenantAdmin();
+
+    const isConnectionOwner = account?.login != null && account.login === connection.createdBy;
+
+    const canEdit = hasConnectionEditScope || isConnectionOwner;
+    const canDelete = hasConnectionDeleteScope || isConnectionOwner;
+    const canManageSharing = visibilityFeatureEnabled && (isConnectionOwner || isTenantAdmin || hasConnectionEditScope);
 
     const queryClient = useQueryClient();
     const {openProjectWorkflow} = useOpenInProject();
@@ -80,18 +90,23 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         queryClient.invalidateQueries({queryKey: ComponentDefinitionKeys.componentDefinitions});
     };
 
+    const invalidateConnectionGrants = () => {
+        queryClient.invalidateQueries({queryKey: ['ConnectionGrants']});
+    };
+
     const setConnectionVisibilityMutation = useSetConnectionVisibilityMutation({
         onSuccess: () => {
             invalidateConnections();
+            invalidateConnectionGrants();
         },
     });
 
     const grantConnectionAccessMutation = useGrantConnectionAccessMutation({
-        onSuccess: () => invalidateConnections(),
+        onSuccess: () => invalidateConnectionGrants(),
     });
 
     const revokeConnectionAccessMutation = useRevokeConnectionAccessMutation({
-        onSuccess: () => invalidateConnections(),
+        onSuccess: () => invalidateConnectionGrants(),
     });
 
     const deleteConnectionMutation = useDeleteConnectionMutation({
@@ -165,6 +180,20 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         },
     });
 
+    // Only a withheld connection can have a meaningful audience, so the two lookups the picker needs are skipped for
+    // the workspace-visible majority until the sharing menu is opened.
+    const isWithheld = connection.visibility === 'PRIVATE';
+
+    const connectionGrantsQuery = useConnectionGrantsQuery(
+        {connectionId: String(connection.id), workspaceId: String(currentWorkspaceId)},
+        {enabled: canManageSharing && (isWithheld || showVisibilityMenu) && !!connection.id && !!currentWorkspaceId}
+    );
+
+    const workspaceUsersQuery = useWorkspaceUsersQuery(
+        {workspaceId: String(currentWorkspaceId)},
+        {enabled: canManageSharing && (isWithheld || showVisibilityMenu) && !!currentWorkspaceId}
+    );
+
     const componentDefinition = useMemo(() => {
         const matchingComponentDefinitions = componentDefinitions.filter(
             (definition) => definition.name === connection.componentName
@@ -199,12 +228,16 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         [connectionWorkflowsData, openProjectWorkflow]
     );
 
-    const canReplaceCredentials =
-        isTenantAdmin || (!!connection.createdBy && connection.createdBy === currentUserLogin);
+    const canReplaceCredentials = isTenantAdmin || (!!connection.createdBy && connection.createdBy === account?.login);
 
     const canDisconnect = isTenantAdmin && connection.active === true;
+    const canReassign =
+        visibilityFeatureEnabled &&
+        isTenantAdmin &&
+        connection.status === 'PENDING_REASSIGNMENT' &&
+        !!connection.createdBy;
 
-    const hasSecondaryActions = canDisconnect || canDelete;
+    const hasSecondaryActions = canDisconnect || canDelete || canReassign;
 
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
@@ -231,20 +264,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         }
     };
 
-    // Only a withheld connection can have a meaningful audience, so the two lookups the picker needs are skipped
-    // entirely for the workspace-visible majority.
-    const isWithheld = connection.visibility === 'PRIVATE';
-
-    const connectionGrantsQuery = useConnectionGrantsQuery(
-        {connectionId: String(connection.id), workspaceId: String(currentWorkspaceId)},
-        {enabled: visibilityFeatureEnabled && isWithheld && !!connection.id && !!currentWorkspaceId}
-    );
-
-    const workspaceUsersQuery = useWorkspaceUsersQuery(
-        {workspaceId: String(currentWorkspaceId)},
-        {enabled: visibilityFeatureEnabled && isWithheld && !!currentWorkspaceId}
-    );
-
     const grantedUserIds = (connectionGrantsQuery.data?.connectionGrants ?? []).map(Number);
 
     const workspaceMembers = (workspaceUsersQuery.data?.workspaceUsers ?? []).map((workspaceUser) => ({
@@ -253,7 +272,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     }));
 
     const renderVisibilityPicker = () => {
-        if (!visibilityFeatureEnabled || !connection.id || !currentWorkspaceId) {
+        if (!canManageSharing || !connection.id || !currentWorkspaceId) {
             return null;
         }
 
@@ -309,8 +328,8 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             active={connection.active}
             badges={
                 visibilityFeatureEnabled &&
-                (connection.id && currentWorkspaceId ? (
-                    <DropdownMenu>
+                (canManageSharing && connection.id && currentWorkspaceId ? (
+                    <DropdownMenu onOpenChange={setShowVisibilityMenu}>
                         <DropdownMenuTrigger asChild>
                             <button
                                 aria-label="Change visibility"
@@ -347,6 +366,14 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             menuItems={
                 hasSecondaryActions && (
                     <>
+                        {canReassign && (
+                            <DropdownMenuItem
+                                icon={<UserCogIcon />}
+                                label="Reassign owner"
+                                onClick={() => setShowReassignmentDialog(true)}
+                            />
+                        )}
+
                         {canDisconnect && (
                             <DropdownMenuItem
                                 icon={<Link2OffIcon />}
@@ -430,6 +457,15 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                 open={!!connectionWorkflowToDisconnect}
                 title={`Disconnect ${connection.name} from ${connectionWorkflowToDisconnect?.workflowName}?`}
             />
+
+            {canReassign && connection.createdBy && currentWorkspaceId && (
+                <ConnectionReassignmentDialog
+                    onClose={() => setShowReassignmentDialog(false)}
+                    open={showReassignmentDialog}
+                    userLogin={connection.createdBy}
+                    workspaceId={currentWorkspaceId}
+                />
+            )}
 
             {showEditDialog && componentDefinitions && (
                 <ConnectionDialog
