@@ -30,7 +30,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDe
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.stripe.action.StripeCreateRefundAction;
 import com.bytechef.component.stripe.action.StripeCreateSubscriptionAction;
+import com.bytechef.component.stripe.action.StripeGetPaymentIntentAction;
+import com.bytechef.component.stripe.action.StripeListRefundsAction;
 import com.bytechef.component.stripe.action.StripeUpdateSubscriptionAction;
 import com.bytechef.component.stripe.trigger.StripeNewCustomerTrigger;
 import com.bytechef.component.stripe.trigger.StripeNewInvoiceTrigger;
@@ -48,13 +51,18 @@ public class StripeComponentHandler extends AbstractStripeComponentHandler {
     @Override
     public List<ModifiableActionDefinition> getCustomActions() {
         return List.of(
-            StripeCreateSubscriptionAction.ACTION_DEFINITION, StripeUpdateSubscriptionAction.ACTION_DEFINITION);
+            StripeCreateRefundAction.ACTION_DEFINITION, StripeCreateSubscriptionAction.ACTION_DEFINITION,
+            StripeGetPaymentIntentAction.ACTION_DEFINITION, StripeListRefundsAction.ACTION_DEFINITION,
+            StripeUpdateSubscriptionAction.ACTION_DEFINITION);
     }
 
     @Override
     public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of(
+            tool(StripeCreateRefundAction.ACTION_DEFINITION),
             tool(StripeCreateSubscriptionAction.ACTION_DEFINITION),
+            tool(StripeGetPaymentIntentAction.ACTION_DEFINITION),
+            tool(StripeListRefundsAction.ACTION_DEFINITION),
             tool(StripeUpdateSubscriptionAction.ACTION_DEFINITION));
     }
 
