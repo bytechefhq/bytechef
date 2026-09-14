@@ -34,6 +34,23 @@ describe('getAxisCenteredViewport', () => {
         expect(viewport.x + 400 * viewport.zoom).toBeLessThanOrEqual(300);
     });
 
+    it('applies padding the way fitView does when the axis is the middle of the bounds', () => {
+        const padding = 0.15;
+
+        const viewport = getAxisCenteredViewport({
+            axisX: 200,
+            bounds: {height: 100, width: 400, x: 0, y: 0},
+            flowHeight: 1000,
+            flowWidth: 1000,
+            maxZoom: 10,
+            minZoom: 0.1,
+            padding,
+        });
+
+        expect(viewport.zoom).toBeCloseTo(1000 / (400 * (1 + padding)));
+        expect(viewport.x + 200 * viewport.zoom).toBeCloseTo(500);
+    });
+
     it('clamps the zoom to the given limits', () => {
         const viewport = getAxisCenteredViewport({
             axisX: 0,
