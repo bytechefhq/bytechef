@@ -38,7 +38,7 @@ import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
 import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -348,8 +348,8 @@ class CustomRoleServiceIntTest {
         // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — a denial fires the
         // @PreAuthorize check before any of them is touched, and the positive controls only need Mockito's defaults.
         @Bean
-        UserInvitationService userInvitationService() {
-            return mock(UserInvitationService.class);
+        UserInvitationFacade userInvitationFacade() {
+            return mock(UserInvitationFacade.class);
         }
 
         @Bean
@@ -394,7 +394,7 @@ class CustomRoleServiceIntTest {
         private PermissionService permissionService;
 
         @Autowired
-        private UserInvitationService userInvitationService;
+        private UserInvitationFacade userInvitationFacade;
 
         @Autowired
         private UserService userService;
@@ -409,7 +409,7 @@ class CustomRoleServiceIntTest {
         void beforeEach() {
             reset(
                 auditEventService, customRoleRepository, permissionScopeRegistry, permissionService,
-                userInvitationService, userService, workspaceUserRepository);
+                userInvitationFacade, userService, workspaceUserRepository);
 
             SecurityContextHolder.getContext()
                 .setAuthentication(
@@ -498,8 +498,8 @@ class CustomRoleServiceIntTest {
             }
 
             @Bean
-            UserInvitationService userInvitationService() {
-                return mock(UserInvitationService.class);
+            UserInvitationFacade userInvitationFacade() {
+                return mock(UserInvitationFacade.class);
             }
 
             @Bean

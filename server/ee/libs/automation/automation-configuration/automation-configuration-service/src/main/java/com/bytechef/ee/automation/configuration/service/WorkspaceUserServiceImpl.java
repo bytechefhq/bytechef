@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
+import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvents;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
@@ -24,7 +25,7 @@ import com.bytechef.platform.audit.Audited;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.UserInvitationService;
+import com.bytechef.platform.user.facade.UserInvitationFacade;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.EnumSet;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,24 +53,27 @@ import org.springframework.util.Assert;
 })
 public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final CustomRoleRepository customRoleRepository;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final PermissionService permissionService;
-    private final UserInvitationService userInvitationService;
+    private final UserInvitationFacade userInvitationFacade;
     private final WorkspaceService workspaceService;
     private final UserService userService;
     private final WorkspaceUserRepository workspaceUserRepository;
 
     @SuppressFBWarnings("EI")
     public WorkspaceUserServiceImpl(
-        CustomRoleRepository customRoleRepository, PermissionScopeRegistry permissionScopeRegistry,
-        PermissionService permissionService, UserInvitationService userInvitationService, UserService userService,
+        ApplicationEventPublisher applicationEventPublisher, CustomRoleRepository customRoleRepository,
+        PermissionScopeRegistry permissionScopeRegistry,
+        PermissionService permissionService, UserInvitationFacade userInvitationFacade, UserService userService,
         WorkspaceService workspaceService, WorkspaceUserRepository workspaceUserRepository) {
 
+        this.applicationEventPublisher = applicationEventPublisher;
         this.customRoleRepository = customRoleRepository;
         this.permissionScopeRegistry = permissionScopeRegistry;
         this.permissionService = permissionService;
-        this.userInvitationService = userInvitationService;
+        this.userInvitationFacade = userInvitationFacade;
         this.userService = userService;
         this.workspaceService = workspaceService;
         this.workspaceUserRepository = workspaceUserRepository;
@@ -90,14 +95,14 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         Optional<User> existingUser = userService.fetchUserByEmail(email);
 
-        User user = existingUser.orElseGet(() -> userInvitationService.inviteUser(email, AuthorityConstants.USER));
+        User user = existingUser.orElseGet(() -> userInvitationFacade.inviteUser(email, AuthorityConstants.USER));
 
         WorkspaceUser workspaceUser = addWorkspaceUser(user.getId(), workspaceId, workspaceRole, customRoleId);
 
         if (existingUser.isPresent()) {
             String workspaceName = workspaceService.getWorkspaceName(workspaceId);
 
-            userInvitationService.notifyAddedToWorkspace(user, workspaceName);
+            userInvitationFacade.notifyAddedToWorkspace(user, workspaceName);
         }
 
         return workspaceUser;
@@ -418,6 +423,10 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
         workspaceUserRepository.deleteByUserIdAndWorkspaceId(userId, workspaceId);
 
         permissionService.evictWorkspaceScopeCache(userId, workspaceId);
+
+        User user = userService.getUser(userId);
+
+        applicationEventPublisher.publishEvent(new WorkspaceUserRemovedEvent(workspaceId, userId, user.getLogin()));
 
         return true;
     }
