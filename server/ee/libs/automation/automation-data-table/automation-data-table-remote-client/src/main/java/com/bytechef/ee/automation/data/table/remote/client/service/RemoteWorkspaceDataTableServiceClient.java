@@ -28,6 +28,11 @@ public class RemoteWorkspaceDataTableServiceClient implements WorkspaceDataTable
     }
 
     @Override
+    public List<WorkspaceDataTable> getDataTableWorkspaceDataTables(Long dataTableId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<WorkspaceDataTable> getWorkspaceDataTables(Long workspaceId) {
         throw new UnsupportedOperationException();
     }

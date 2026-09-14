@@ -29,6 +29,8 @@ public interface WorkspaceDataTableService {
 
     void assignDataTableToWorkspace(Long dataTableId, Long workspaceId);
 
+    List<WorkspaceDataTable> getDataTableWorkspaceDataTables(Long dataTableId);
+
     List<WorkspaceDataTable> getWorkspaceDataTables(Long workspaceId);
 
     void removeDataTableFromWorkspace(Long dataTableId);

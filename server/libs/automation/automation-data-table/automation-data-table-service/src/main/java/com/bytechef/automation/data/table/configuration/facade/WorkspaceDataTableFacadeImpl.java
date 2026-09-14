@@ -59,6 +59,23 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    public void duplicateTable(long tableId, String newBaseName, long environmentId) {
+        String baseName = dataTableService.getBaseNameById(tableId);
+
+        dataTableService.duplicateTable(baseName, newBaseName, environmentId);
+
+        long duplicatedDataTableId = dataTableService.getIdByBaseName(newBaseName);
+
+        List<WorkspaceDataTable> sourceWorkspaceDataTables =
+            workspaceDataTableService.getDataTableWorkspaceDataTables(tableId);
+
+        for (WorkspaceDataTable workspaceDataTable : sourceWorkspaceDataTables) {
+            workspaceDataTableService.assignDataTableToWorkspace(
+                duplicatedDataTableId, workspaceDataTable.getWorkspaceId());
+        }
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
         List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
