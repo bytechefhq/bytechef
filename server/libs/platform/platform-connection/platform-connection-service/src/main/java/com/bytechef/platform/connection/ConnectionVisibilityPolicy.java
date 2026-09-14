@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
  * workspace has no representation outside it.
  *
  * <p>
- * Created WORKSPACE. Sharing a connection conveys use and existence, not the secret: the REST boundary obfuscates
- * authorization parameters and no facade mutates them after creation.
+ * Sharing a connection conveys use and existence, not the secret: the REST boundary obfuscates authorization parameters
+ * and no caller-facing method accepts new credentials after creation.
  *
  * @author Ivica Cardic
  */

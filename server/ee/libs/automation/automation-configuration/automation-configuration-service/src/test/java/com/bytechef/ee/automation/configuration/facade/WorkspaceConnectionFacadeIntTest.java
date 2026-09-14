@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
@@ -120,13 +121,19 @@ class WorkspaceConnectionFacadeIntTest {
     private UserService userService;
 
     @Autowired
-    private WorkspaceConnectionFacade workspaceConnectionFacade;
+    private ResourceGrantService resourceGrantService;
 
     @Autowired
     private WorkspaceConnectionRepository workspaceConnectionRepository;
 
     @Autowired
     private WorkspaceConnectionService workspaceConnectionService;
+
+    @Autowired
+    private WorkspaceConnectionSharingFacade workspaceConnectionSharingFacade;
+
+    @Autowired
+    private WorkspaceScopeCacheService workspaceScopeCacheService;
 
     @Autowired
     private WorkspaceUserRepository workspaceUserRepository;
@@ -153,11 +160,15 @@ class WorkspaceConnectionFacadeIntTest {
         when(workspaceConnectionService.getWorkspaceConnections(anyLong()))
             .thenThrow(new IllegalStateException(BODY_REACHED));
 
+        doThrow(new IllegalStateException(BODY_REACHED)).when(resourceGrantService)
+            .deleteGrants(CONNECTION_TYPE, CONNECTION_ID);
+
         when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(ADMIN_USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(ADMIN_USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal())));
         when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(MEMBER_USER_ID, WORKSPACE_ID))
             .thenReturn(
                 Optional.of(new WorkspaceUser(MEMBER_USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceId(OWNER_USER_ID, WORKSPACE_ID)).thenReturn(true);
     }
 
     @AfterEach
@@ -221,6 +232,8 @@ class WorkspaceConnectionFacadeIntTest {
     void testEveryGatedMethodIsEvaluated() {
         List<String> annotatedMethods = Arrays.stream(WorkspaceConnectionFacadeImpl.class.getDeclaredMethods())
             .filter(method -> method.getAnnotation(PreAuthorize.class) != null)
+            .filter(method -> !method.getName()
+                .equals("delete"))
             .map(Method::getName)
             .distinct()
             .sorted()
@@ -229,6 +242,34 @@ class WorkspaceConnectionFacadeIntTest {
         assertThat(annotatedMethods)
             .as("a gate added to the facade must be added to GATED_METHODS, or it goes unevaluated")
             .containsExactlyInAnyOrder(GATED_METHODS);
+    }
+
+    @Test
+    void testDeleteAllowsTheConnectionOwner() {
+        authenticate(OWNER_LOGIN, AuthorityConstants.USER);
+
+        assertBodyReached(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID));
+    }
+
+    @Test
+    void testDeleteAllowsAMemberHoldingTheDeleteScope() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+            .thenReturn(Set.of("CONNECTION_DELETE"));
+
+        authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
+
+        assertBodyReached(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID));
+    }
+
+    @Test
+    void testDeleteDeniesAMemberWithoutTheDeleteScope() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(MEMBER_USER_ID, WORKSPACE_ID))
+            .thenReturn(Set.of("CONNECTION_EDIT", "CONNECTION_VIEW"));
+
+        authenticate(MEMBER_LOGIN, AuthorityConstants.USER);
+
+        assertThatThrownBy(() -> workspaceConnectionSharingFacade.delete(CONNECTION_ID))
+            .isInstanceOf(AccessDeniedException.class);
     }
 
     @Nested
@@ -270,13 +311,14 @@ class WorkspaceConnectionFacadeIntTest {
 
     private void invokeGatedMethod(String methodName) {
         switch (methodName) {
-            case "setConnectionVisibility" -> workspaceConnectionFacade.setConnectionVisibility(
+            case "setConnectionVisibility" -> workspaceConnectionSharingFacade.setConnectionVisibility(
                 WORKSPACE_ID, CONNECTION_ID, ResourceVisibility.WORKSPACE);
-            case "grantConnectionAccess" -> workspaceConnectionFacade.grantConnectionAccess(
+            case "grantConnectionAccess" -> workspaceConnectionSharingFacade.grantConnectionAccess(
                 WORKSPACE_ID, CONNECTION_ID, MEMBER_USER_ID);
-            case "revokeConnectionAccess" -> workspaceConnectionFacade.revokeConnectionAccess(
+            case "revokeConnectionAccess" -> workspaceConnectionSharingFacade.revokeConnectionAccess(
                 WORKSPACE_ID, CONNECTION_ID, MEMBER_USER_ID);
-            case "getConnectionGrants" -> workspaceConnectionFacade.getConnectionGrants(WORKSPACE_ID, CONNECTION_ID);
+            case "getConnectionGrants" ->
+                workspaceConnectionSharingFacade.getConnectionGrants(WORKSPACE_ID, CONNECTION_ID);
             default -> throw new IllegalArgumentException("No invocation for gated method " + methodName);
         }
     }

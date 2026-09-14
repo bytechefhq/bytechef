@@ -256,6 +256,16 @@ public final class AutomationMethodSecurityExpressionRoot
      * reason given on {@link #hasWorkspaceScopeInEnvironmentId}. A {@code null} ordinal is the Development environment
      * projects are edited in, and an ordinal outside the enum is denied outside skip mode.
      */
+    public boolean hasResourceScopeIfProjectWorkflow(
+        String workflowId, Serializable id, String resourceType, String scope) {
+
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
+
+        return permissionService.hasResourceScopeIfProjectWorkflow(workflowId, id, resourceType, scope);
+    }
+
     public boolean hasWorkflowScopeIfProjectWorkflowInEnvironmentId(
         String workflowId, String scope, @Nullable Long environmentId) {
 

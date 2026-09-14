@@ -24,6 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -48,6 +49,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -65,6 +67,7 @@ class WorkspaceUserServiceTest {
     private static final long WORKSPACE_ID = 7L;
     private static final long USER_ID = 42L;
 
+    private ApplicationEventPublisher applicationEventPublisher;
     private CustomRoleRepository customRoleRepository;
     private PermissionScopeRegistry permissionScopeRegistry;
     private PermissionService permissionService;
@@ -76,6 +79,7 @@ class WorkspaceUserServiceTest {
 
     @BeforeEach
     void setUp() {
+        applicationEventPublisher = mock(ApplicationEventPublisher.class);
         customRoleRepository = mock(CustomRoleRepository.class);
         permissionScopeRegistry = mock(PermissionScopeRegistry.class);
         permissionService = mock(PermissionService.class);
@@ -96,8 +100,16 @@ class WorkspaceUserServiceTest {
         lenient().when(permissionService.hasWorkspaceScopeInEveryEnvironment(anyLong(), anyString()))
             .thenReturn(true);
 
+        User removedUser = new User();
+
+        removedUser.setLogin("removed@example.com");
+
+        lenient().when(userService.getUser(USER_ID))
+            .thenReturn(removedUser);
+
         workspaceUserService = new WorkspaceUserServiceImpl(
-            customRoleRepository, permissionScopeRegistry, permissionService, userInvitationService, userService,
+            applicationEventPublisher, customRoleRepository, permissionScopeRegistry, permissionService,
+            userInvitationService, userService,
             workspaceService, workspaceUserRepository);
     }
 
@@ -238,6 +250,27 @@ class WorkspaceUserServiceTest {
 
         verify(workspaceUserRepository, times(1)).deleteByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
         verify(permissionService, times(1)).evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testRemoveWorkspaceUserPublishesWorkspaceUserRemovedEvent() {
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
+
+        workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID);
+
+        verify(applicationEventPublisher)
+            .publishEvent(new WorkspaceUserRemovedEvent(WORKSPACE_ID, USER_ID, "removed@example.com"));
+    }
+
+    @Test
+    void testRemoveWorkspaceUserDoesNotPublishWhenNotMember() {
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+            .isInstanceOf(RuntimeException.class);
+
+        verify(applicationEventPublisher, never()).publishEvent(any(Object.class));
     }
 
     @Test
@@ -1118,6 +1151,9 @@ class WorkspaceUserServiceTest {
         private static final long WORKSPACE_ID = 2L;
 
         @Mock
+        private ApplicationEventPublisher applicationEventPublisher;
+
+        @Mock
         private CustomRoleRepository customRoleRepository;
 
         @Mock
@@ -1125,6 +1161,9 @@ class WorkspaceUserServiceTest {
 
         @Mock
         private PermissionService permissionService;
+
+        @Mock
+        private UserService userService;
 
         @Mock
         private WorkspaceService workspaceService;
@@ -1137,6 +1176,12 @@ class WorkspaceUserServiceTest {
 
         @BeforeEach
         void setUp() {
+            User user = new User();
+
+            user.setLogin("user@example.com");
+
+            lenient().when(userService.getUser(anyLong()))
+                .thenReturn(user);
             lenient().when(workspaceService.workspaceExists(WORKSPACE_ID))
                 .thenReturn(true);
             lenient().when(permissionService.isTenantAdmin())

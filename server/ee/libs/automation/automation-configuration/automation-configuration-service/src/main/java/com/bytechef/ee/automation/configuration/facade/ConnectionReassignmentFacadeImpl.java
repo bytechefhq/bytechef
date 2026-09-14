@@ -63,7 +63,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
 
     // Self-reference via the interface so AOP advice (@Transactional propagation for the per-row
     // REQUIRES_NEW worker) fires on internal re-entry (bulk mark-pending → markSingleConnectionPendingReassignment).
-    // @Lazy breaks the circular dependency Spring would otherwise refuse. Tests inject via setSelf().
+    // @Lazy breaks the circular dependency Spring would otherwise refuse.
     @Lazy
     @Autowired
     private ConnectionReassignmentFacade self;
@@ -227,10 +227,9 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId) {
-        // Re-read current status inside the REQUIRES_NEW tx so we close the TOCTOU window with
-        // getUnresolvedConnections: another admin may have revoked the row between the enumeration
-        // and our per-row call. Rehydrated from a primitive INT ordinal by Connection.getStatus, so
-        // no null-guard.
+        // Re-read current status inside the REQUIRES_NEW tx so a row whose status changed between the enumeration
+        // and this per-row call is classified on what it is now. Rehydrated from a primitive INT code by
+        // Connection.getStatus, so no null-guard.
         ConnectionStatus currentStatus = connectionService.getConnection(connectionId)
             .getStatus();
 
@@ -272,9 +271,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
 
     private void applyReassignment(long connectionId, String newOwnerLogin) {
         // REVOKED is terminal by design (see ConnectionStatus#REVOKED): a credential that should not have been
-        // transferable must not change hands. Read-before-write gives us a TOCTOU-tight enough guard — any
-        // concurrent revoker will observe the new owner but will still revoke (REVOKED remains terminal after
-        // reassignment), which is the correct outcome.
+        // transferable must not change hands.
         ConnectionStatus currentStatus = connectionService.getConnection(connectionId)
             .getStatus();
 
@@ -284,11 +281,7 @@ public class ConnectionReassignmentFacadeImpl implements ConnectionReassignmentF
                 ConnectionErrorType.INVALID_CONNECTION);
         }
 
-        Connection connection = connectionService.updateCreatedBy(connectionId, newOwnerLogin);
-
-        if (connection.getStatus() == ConnectionStatus.PENDING_REASSIGNMENT) {
-            connectionService.updateConnectionStatus(connectionId, ConnectionStatus.ACTIVE);
-        }
+        connectionService.reassignOwner(connectionId, newOwnerLogin);
     }
 
     private void validateConnectionBelongsToWorkspace(long workspaceId, long connectionId) {

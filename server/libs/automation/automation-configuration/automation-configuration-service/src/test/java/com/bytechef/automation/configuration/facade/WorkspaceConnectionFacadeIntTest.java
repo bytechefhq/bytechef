@@ -71,6 +71,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -83,9 +84,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @ProjectIntTestConfigurationSharedMocks
-@org.springframework.security.test.context.support.WithMockUser(
-    username = "admin@localhost.com",
-    authorities = com.bytechef.platform.security.constant.AuthorityConstants.ADMIN)
+@WithMockUser(username = "admin@localhost.com", authorities = AuthorityConstants.ADMIN)
 public class WorkspaceConnectionFacadeIntTest {
 
     @Autowired
@@ -368,15 +367,29 @@ public class WorkspaceConnectionFacadeIntTest {
         }
 
         @Test
-        void testDeleteDeniesWhenTheConnectionDeleteScopeIsRefused() {
-            assertResourceGuard(
-                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", false);
+        void testDeleteDeniesWhenTheConnectionDeleteScopeIsRefusedAndTheCallerIsNotTheOwner() {
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", false, false);
         }
 
         @Test
         void testDeleteAllowsWhenTheConnectionDeleteScopeIsGranted() {
-            assertResourceGuard(
-                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", true);
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", true, false);
+        }
+
+        @Test
+        void testDeleteAllowsTheOwnerWithoutTheConnectionDeleteScope() {
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", false, true);
+        }
+
+        @Test
+        void testDeleteDeniesWithOnlyTheConnectionEditScope() {
+            when(permissionService.hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, "CONNECTION_EDIT"))
+                .thenReturn(true);
+
+            assertInvocationOutcome(() -> workspaceConnectionFacade.delete(CONNECTION_ID), false);
         }
 
         @Test
@@ -392,27 +405,50 @@ public class WorkspaceConnectionFacadeIntTest {
         }
 
         @Test
-        void testUpdateDeniesWhenTheConnectionEditScopeIsRefused() {
+        void testGetConnectionDeniesTheOwnerWithoutTheConnectionViewScope() {
+            when(permissionService.isResourceOwner(CONNECTION_TYPE, CONNECTION_ID)).thenReturn(true);
+
             assertResourceGuard(
-                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", false);
+                () -> workspaceConnectionFacade.getConnection(CONNECTION_ID), "CONNECTION_VIEW", false);
+        }
+
+        @Test
+        void testUpdateDeniesWhenTheConnectionEditScopeIsRefusedAndTheCallerIsNotTheOwner() {
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", false,
+                false);
         }
 
         @Test
         void testUpdateAllowsWhenTheConnectionEditScopeIsGranted() {
-            assertResourceGuard(
-                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", true);
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", true,
+                false);
         }
 
         @Test
-        void testUpdateTagsDeniesWhenTheConnectionEditScopeIsRefused() {
-            assertResourceGuard(
-                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", false);
+        void testUpdateAllowsTheOwnerWithoutTheConnectionEditScope() {
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", false,
+                true);
+        }
+
+        @Test
+        void testUpdateTagsDeniesWhenTheConnectionEditScopeIsRefusedAndTheCallerIsNotTheOwner() {
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", false, false);
         }
 
         @Test
         void testUpdateTagsAllowsWhenTheConnectionEditScopeIsGranted() {
-            assertResourceGuard(
-                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", true);
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", true, false);
+        }
+
+        @Test
+        void testUpdateTagsAllowsTheOwnerWithoutTheConnectionEditScope() {
+            assertScopeOrOwnerGuard(
+                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", false, true);
         }
 
         @Test
@@ -443,6 +479,10 @@ public class WorkspaceConnectionFacadeIntTest {
 
         @Test
         void testDisconnectConnectionDeniesANonAdmin() {
+            when(permissionService.hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, "CONNECTION_DELETE"))
+                .thenReturn(true);
+            when(permissionService.isResourceOwner(CONNECTION_TYPE, CONNECTION_ID)).thenReturn(true);
+
             assertThatThrownBy(() -> workspaceConnectionFacade.disconnectConnection(CONNECTION_ID))
                 .isInstanceOf(AccessDeniedException.class);
 
@@ -467,6 +507,24 @@ public class WorkspaceConnectionFacadeIntTest {
             assertInvocationOutcome(invocation, granted);
 
             verify(permissionService).hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, expectedScope);
+            verifyNoMoreInteractions(permissionService);
+        }
+
+        private void assertScopeOrOwnerGuard(
+            ThrowingCallable invocation, String expectedScope, boolean scopeGranted, boolean owner) {
+
+            when(permissionService.hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, expectedScope))
+                .thenReturn(scopeGranted);
+            when(permissionService.isResourceOwner(CONNECTION_TYPE, CONNECTION_ID)).thenReturn(owner);
+
+            assertInvocationOutcome(invocation, scopeGranted || owner);
+
+            verify(permissionService).hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, expectedScope);
+
+            if (!scopeGranted) {
+                verify(permissionService).isResourceOwner(CONNECTION_TYPE, CONNECTION_ID);
+            }
+
             verifyNoMoreInteractions(permissionService);
         }
 

@@ -113,8 +113,8 @@ public final class Connection {
 
     public Connection() {
         this.parameters = new EncryptedMapWrapper(Collections.emptyMap());
-        this.status = ConnectionStatus.ACTIVE.ordinal();
-        this.visibility = ResourceVisibility.PRIVATE.ordinal();
+        this.status = ConnectionStatus.ACTIVE.getCode();
+        this.visibility = ResourceVisibility.WORKSPACE.ordinal();
     }
 
     public static Builder builder() {
@@ -228,15 +228,12 @@ public final class Connection {
     }
 
     public ConnectionStatus getStatus() {
-        ConnectionStatus[] values = ConnectionStatus.values();
-
-        if (status < 0 || status >= values.length) {
+        try {
+            return ConnectionStatus.fromCode(status);
+        } catch (IllegalArgumentException exception) {
             throw new IllegalStateException(
-                "Connection id=%s has invalid status ordinal %d (valid range: 0-%d)".formatted(
-                    id, status, values.length - 1));
+                "Connection id=%s has invalid status code %d".formatted(id, status), exception);
         }
-
-        return values[status];
     }
 
     public List<Long> getTagIds() {
@@ -278,14 +275,24 @@ public final class Connection {
     }
 
     /**
-     * Overrides the auditing-populated creator login. Only the reassignment flow should call this directly; Spring Data
-     * auditing populates {@code createdBy} automatically for normal creates. Callers must also transition the
-     * connection's status (e.g. via {@code ConnectionService#updateConnectionStatus}) so that provenance and status
-     * stay in sync — otherwise a successful reassignment leaves {@code PENDING_REASSIGNMENT} in place and an operator
-     * cannot tell the flow completed.
+     * Overrides the auditing-populated creator login. Reassignment goes through {@link #reassignOwner(String)}.
      */
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public void reassignOwner(String newOwnerLogin) {
+        Objects.requireNonNull(newOwnerLogin, "newOwnerLogin");
+
+        if (getStatus() == ConnectionStatus.REVOKED) {
+            throw new IllegalStateException("Cannot reassign a revoked connection");
+        }
+
+        this.createdBy = newOwnerLogin;
+
+        if (getStatus() == ConnectionStatus.PENDING_REASSIGNMENT) {
+            setStatus(ConnectionStatus.ACTIVE);
+        }
     }
 
     public void setConnectionVersion(int connectionVersion) {
@@ -308,7 +315,7 @@ public final class Connection {
                 "Cannot transition connection status from %s to %s".formatted(currentStatus, status));
         }
 
-        this.status = status.ordinal();
+        this.status = status.getCode();
     }
 
     public void setEnvironmentId(int environmentId) {
@@ -364,14 +371,8 @@ public final class Connection {
     }
 
     /**
-     * Assign visibility. A plain field assignment: the entity no longer polices which rung may follow which.
-     *
-     * <p>
-     * The previous transition state machine encoded a one-way promote-from-private model (PRIVATE &rarr; WORKSPACE,
-     * ORGANIZATION terminal) that no longer exists — an owner may move a resource freely between the rungs its resource
-     * type supports. Which rungs those are is declared per resource by {@code ResourceVisibilityPolicy} and enforced
-     * centrally at the facade, so the rule lives in one place rather than being split between an entity setter and its
-     * callers.
+     * Assign visibility. A plain field assignment: which rungs a connection may be set to is declared by
+     * {@code ResourceVisibilityPolicy} and enforced at the facade.
      */
     public void setVisibility(ResourceVisibility visibility) {
         Objects.requireNonNull(visibility, "visibility");

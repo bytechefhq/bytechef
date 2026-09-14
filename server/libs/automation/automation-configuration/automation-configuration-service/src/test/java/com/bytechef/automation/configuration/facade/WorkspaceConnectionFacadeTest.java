@@ -37,7 +37,6 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -138,6 +137,37 @@ class WorkspaceConnectionFacadeTest {
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
         assertThat(result).isEqualTo(allConnections);
+    }
+
+    @Test
+    void testGetConnectionsHidesConnectionsTheResolverWithholds() {
+        WorkspaceConnection visibleWorkspaceConnection = mock(WorkspaceConnection.class);
+        WorkspaceConnection hiddenWorkspaceConnection = mock(WorkspaceConnection.class);
+
+        when(visibleWorkspaceConnection.getConnectionId()).thenReturn(10L);
+        when(hiddenWorkspaceConnection.getConnectionId()).thenReturn(11L);
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
+            .thenReturn(List.of(visibleWorkspaceConnection, hiddenWorkspaceConnection));
+
+        ConnectionDTO visibleConnection = ConnectionDTO.builder()
+            .id(10L)
+            .visibility(ResourceVisibility.WORKSPACE)
+            .createdBy("someone@example.com")
+            .build();
+        ConnectionDTO hiddenConnection = ConnectionDTO.builder()
+            .id(11L)
+            .visibility(ResourceVisibility.PRIVATE)
+            .createdBy("someone@example.com")
+            .build();
+
+        when(connectionFacade.getConnections(null, null, List.of(10L, 11L), null, null, PlatformType.AUTOMATION))
+            .thenReturn(List.of(visibleConnection, hiddenConnection));
+        when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
+            .thenReturn(Set.of(10L));
+
+        List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
+
+        assertThat(result).containsExactly(visibleConnection);
     }
 
     @Test
@@ -318,38 +348,17 @@ class WorkspaceConnectionFacadeTest {
     }
 
     @Test
-    void testDeleteRethrowsOriginalExceptionAndDoesNotDeleteConnection() {
-        ConfigurationException scheduledRefreshFailure = new ConfigurationException(
-            "scheduler down", ConnectionErrorType.INVALID_CONNECTION);
-
-        org.mockito.Mockito.doThrow(scheduledRefreshFailure)
-            .when(connectionLifecycleFacade)
-            .deleteScheduledConnectionRefresh(eq(10L), any());
-
-        assertThatThrownBy(() -> workspaceConnectionFacade.delete(10L))
-            .isSameAs(scheduledRefreshFailure);
-
-        verify(workspaceConnectionService, never()).deleteWorkspaceConnection(10L);
-        verify(connectionFacade, never()).delete(10L);
-    }
-
-    @Test
-    void testDeleteCancelsScheduledRefreshBeforeDeletingConnection() {
-        // Pin the call ordering: scheduled-refresh cancellation MUST happen BEFORE the workspace-connection /
-        // connection-facade deletes. A refactor that reorders these would leave a scheduler firing for a
-        // deleted connection id indefinitely (the failure path is already pinned by
-        // testDeleteRethrowsOriginalExceptionAndDoesNotDeleteConnection; this test pins the success path).
-        org.mockito.InOrder inOrder = org.mockito.Mockito.inOrder(
-            connectionLifecycleFacade, workspaceConnectionService, connectionFacade);
+    void testDeleteLeavesRefreshCancellationToTheBeforeDeleteListener() {
+        org.mockito.InOrder inOrder = org.mockito.Mockito.inOrder(workspaceConnectionService, connectionFacade);
 
         workspaceConnectionFacade.delete(10L);
 
-        inOrder.verify(connectionLifecycleFacade)
-            .deleteScheduledConnectionRefresh(eq(10L), any());
         inOrder.verify(workspaceConnectionService)
             .deleteWorkspaceConnection(10L);
         inOrder.verify(connectionFacade)
             .delete(10L);
+
+        verify(connectionLifecycleFacade, never()).deleteScheduledConnectionRefresh(any(), any());
     }
 
     /**
@@ -416,7 +425,7 @@ class WorkspaceConnectionFacadeTest {
             ConnectionDTO requestDto = ConnectionDTO.builder()
                 .componentName("dummy")
                 .name("my-conn")
-                .visibility(ResourceVisibility.WORKSPACE)
+                .visibility(ResourceVisibility.PRIVATE)
                 .build();
 
             assertThatThrownBy(() -> workspaceFacadeWithRealChain.create(WORKSPACE_ID, requestDto))

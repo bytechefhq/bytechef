@@ -239,6 +239,20 @@ public interface PermissionService {
     boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment);
 
     /**
+     * Returns whether the current user has {@code scope} for the resource, or the workflow belongs to no automation
+     * project. For the platform workflow-editor endpoints shared with embedded that attach a resource to a workflow: a
+     * project workflow must not be handed a resource its editor cannot see.
+     *
+     * @param workflowId   the workflow the resource is being attached to
+     * @param id           the resource identifier
+     * @param resourceType the resource type key used to select the ownership resolver
+     * @param scope        the scope name the user must hold for the resource
+     * @return {@code true} if the workflow belongs to no project, or the current user holds {@code scope} for the
+     *         resource
+     */
+    boolean hasResourceScopeIfProjectWorkflow(String workflowId, Serializable id, String resourceType, String scope);
+
+    /**
      * Returns the scope names the current user holds in the workspace (all registered scopes for a tenant admin).
      *
      * @param workspaceId the workspace whose scope grants are returned

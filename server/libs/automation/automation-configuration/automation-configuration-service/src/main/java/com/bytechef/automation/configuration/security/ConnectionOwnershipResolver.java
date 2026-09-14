@@ -30,11 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Owning coordinates of a connection for the {@code 'Connection'} token, which the four connection-sharing mutations on
- * the EE {@code WorkspaceConnectionFacadeImpl} name through {@code isResourceOwner} and {@code hasResourceRole}. Both
- * of those deny unconditionally when the resolver registry has no entry for the type, so without this class every one
- * of those mutations was a tenant-admin-only lockout — including for the connection's own owner, whom the first
- * disjunct exists specifically to admit.
+ * Owning coordinates of a connection for the {@code 'Connection'} token, which the connection-sharing gates on the EE
+ * {@code WorkspaceConnectionFacadeImpl} and the CE/EE {@code delete}, {@code update} and {@code updateTags} gates name
+ * through {@code isResourceOwner} and {@code hasResourceRole}, and which {@code hasPermission(..., 'Connection', ...)}
+ * reaches through {@code hasResourceScope}. Both deny unconditionally when the resolver registry has no entry for the
+ * type, so without this class every one of those gates was a tenant-admin-only lockout — including for the connection's
+ * own owner, whom the owner disjunct exists specifically to admit.
  * <p>
  * Populates <em>both</em> coordinates, because the two disjuncts of those gates ask different questions:
  * <ul>

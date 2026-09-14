@@ -1767,7 +1767,7 @@ export type Mutation = {
   saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
   saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
   saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  /** Set a connection's reach. PRIVATE withholds it from the workspace; WORKSPACE shares it. ORGANIZATION is set through createOrganizationConnection instead and is rejected here. Narrowing to PRIVATE fails while an active deployment uses the connection. (owner or admin, EE only) */
+  /** Set a connection's reach. PRIVATE withholds it from the workspace; WORKSPACE shares it. ORGANIZATION is set through createOrganizationConnection instead and is rejected here. Narrowing to PRIVATE fails while any deployment references the connection. (owner or admin, EE only) */
   setConnectionVisibility: Scalars['Boolean']['output'];
   /**
    * Give a member a role in one environment. The first such call switches the member from a

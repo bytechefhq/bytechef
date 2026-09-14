@@ -70,7 +70,7 @@ public interface ConnectionService {
 
     Connection updateConnectionStatus(long connectionId, ConnectionStatus status);
 
-    Connection updateCreatedBy(long id, String newCreatedBy);
+    Connection reassignOwner(long id, String newOwnerLogin);
 
     Connection updateConnectionParameters(long connectionId, Map<String, ?> parameters);
 

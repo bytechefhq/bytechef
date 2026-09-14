@@ -22,11 +22,6 @@ import java.util.List;
  * user-removal path ({@code WorkspaceUserRemovalListener}), so the listener is not blocked by an ADMIN check.
  *
  * <p>
- * <b>Audit emission.</b> {@code reassignAllConnections} batches per-row work under a single transaction and emits audit
- * events imperatively after the outer commit, so claims of "successfully reassigned" cannot survive a rollback.
- * Single-row {@code reassignConnection} emits nothing until the declarative emitter lands.
- *
- * <p>
  * <b>Partial-failure surfacing.</b> {@code markConnectionsPendingReassignment} returns a
  * {@link com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO} with separate {@code updated} /
  * {@code skipped} / {@code failed} counts plus per-row {@code failures}. Benign terminal states (e.g. REVOKED) are
@@ -63,9 +58,10 @@ public interface ConnectionReassignmentFacade {
      * when the row was in a terminal state (e.g. {@code REVOKED}) at read time and could not legally transition.
      *
      * <p>
-     * Exposed on the interface because Spring-generated proxies only advise interface methods, and the per-row tx
-     * boundary is load-bearing — without it, a single failing row would flip the outer transaction to rollback-only and
-     * discard every previously-updated row in the same batch.
+     * Exposed on the interface because {@code self} is injected as this interface, so the method must be visible
+     * through it for the {@code REQUIRES_NEW} advice to apply, and the per-row tx boundary is load-bearing — without
+     * it, a single failing row would flip the outer transaction to rollback-only and discard every previously-updated
+     * row in the same batch.
      */
     MarkPendingOutcome markSingleConnectionPendingReassignment(long connectionId);
 

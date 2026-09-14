@@ -18,15 +18,23 @@ package com.bytechef.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver.VisibilityRecord;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -140,6 +148,148 @@ class PermissionServiceTest {
     @Test
     void testEvictAllWorkspaceScopeCacheIsNoOp() {
         permissionService.evictAllWorkspaceScopeCache();
+    }
+
+    /**
+     * Pins the CE behavior of {@code hasResourceScope}: owner-isolation for owner-carrying resources (PRIVATE),
+     * permissive for workspace-mapped resources (shared within the single CE workspace), fail-closed when nothing is
+     * resolvable. Also pins {@code isResourceOwner} (permissive — EE-only enforcement for now).
+     */
+    @Nested
+    class Resource {
+
+        private final UserService userService = mock(UserService.class);
+
+        private PermissionService createService(ResourceOwnershipResolver... resolvers) {
+            return new PermissionServiceImpl(userService, List.of(resolvers), List.of(), permissiveResolver());
+        }
+
+        private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
+            return new ResourceOwnershipResolver() {
+                @Override
+                public String resourceType() {
+                    return type;
+                }
+
+                @Override
+                public ResourceOwner resolveOwner(long id) {
+                    return owner;
+                }
+            };
+        }
+
+        @Test
+        void testHasResourceScopeOwnerMatchAllowsInCe() {
+            User user = new User();
+
+            user.setId(7L);
+
+            when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+            PermissionService service = createService(resolver("Connection", ResourceOwner.ofUser(7L)));
+
+            assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();
+        }
+
+        @Test
+        void testHasResourceScopeOwnerMismatchDeniesInCe() {
+            User user = new User();
+
+            user.setId(99L);
+
+            when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+            PermissionService service = createService(resolver("Connection", ResourceOwner.ofUser(7L)));
+
+            assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isFalse();
+        }
+
+        @Test
+        void testVisibilityBearingResourceDropsOwnerIsolationInCe() {
+            // CE creates every connection WORKSPACE-visible, so a colleague who can see it in the list must also be
+            // able to act on it by id. Owner-isolation is replaced by visibility for types that registered a
+            // provider — and only for those, which the preceding test pins for everything else.
+            User user = new User();
+
+            user.setId(99L);
+
+            when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+            PermissionService service = new PermissionServiceImpl(
+                userService, List.of(resolver("Connection", ResourceOwner.ofUser(7L))),
+                List.of(visibilityProvider("Connection")), permissiveResolver());
+
+            assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isTrue();
+        }
+
+        private static ResourceVisibilityProvider visibilityProvider(String resourceType) {
+            return new ResourceVisibilityProvider() {
+
+                @Override
+                public String resourceType() {
+                    return resourceType;
+                }
+
+                @Override
+                public Optional<VisibilityRecord> fetchVisibility(long id) {
+                    return Optional.of(
+                        new VisibilityRecord(id, ResourceVisibility.WORKSPACE, "someone-else"));
+                }
+            };
+        }
+
+        @Test
+        void testHasResourceScopeNoOwnerFailsClosedInCe() {
+            PermissionService service = createService(resolver("Connection", ResourceOwner.unknown()));
+
+            assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isFalse();
+        }
+
+        @Test
+        void testHasResourceScopeWorkspaceMappedIsPermissiveInCe() {
+            // A workspace-mapped resource with no owner user (knowledge bases, data tables, workspaces, projects,
+            // workflows, ...) is shared within the single CE workspace, so CE is permissive.
+            PermissionService service = createService(resolver("KnowledgeBase", ResourceOwner.ofWorkspace(42L)));
+
+            assertThat(service.hasResourceScope(1L, "KnowledgeBase", "KNOWLEDGE_BASE_EDIT")).isTrue();
+        }
+
+        @Test
+        void testHasResourceScopeUnregisteredTypeFailsClosed() {
+            PermissionService service = createService();
+
+            assertThat(service.hasResourceScope(1L, "Nope", "X")).isFalse();
+        }
+
+        @Test
+        void testIsResourceOwnerPermissiveInCe() {
+            PermissionService service = createService(resolver("ApiKey", ResourceOwner.ofUser(7L)));
+
+            assertThat(service.isResourceOwner("ApiKey", 1L)).isTrue();
+        }
+
+        @Test
+        void testHasResourceRolePermissiveInCe() {
+            PermissionService service = createService(resolver("KnowledgeBase", ResourceOwner.ofWorkspace(42L)));
+
+            assertThat(service.hasResourceRole(1L, "KnowledgeBase", "EDITOR")).isTrue();
+        }
+
+        @Test
+        void testHasWorkflowScopePermissiveInCe() {
+            PermissionService service = createService();
+
+            assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+        }
+
+        @Test
+        void testHasResourceScopeDeniesUnauthenticatedCaller() {
+            SecurityContextHolder.clearContext();
+
+            PermissionService service = createService(resolver("Connection", ResourceOwner.ofUser(7L)));
+
+            assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isFalse();
+        }
     }
 
     /**

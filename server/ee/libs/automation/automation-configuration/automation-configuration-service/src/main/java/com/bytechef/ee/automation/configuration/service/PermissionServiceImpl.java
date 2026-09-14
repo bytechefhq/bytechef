@@ -14,6 +14,7 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.automation.configuration.security.ResourceVisibilityProvider;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
@@ -23,6 +24,7 @@ import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
@@ -322,7 +324,7 @@ public class PermissionServiceImpl implements PermissionService {
             .workspaceId();
 
         if (workspaceId.isEmpty()) {
-            return false;
+            return scope.endsWith("_VIEW") && isOrganizationVisible(id, resourceType);
         }
 
         // A resource that lives in an environment is checked against the role the caller holds THERE. Without this,
@@ -404,6 +406,18 @@ public class PermissionServiceImpl implements PermissionService {
      * the two cannot drift. A resource type with no registered provider has not opted into visibility and is
      * unrestricted by it; a registered type whose resource does not exist fails closed.
      */
+    private boolean isOrganizationVisible(Serializable id, String resourceType) {
+        ResourceVisibilityProvider resourceVisibilityProvider = resourceVisibilityProviders.get(resourceType);
+
+        if (resourceVisibilityProvider == null || !(id instanceof Number number)) {
+            return false;
+        }
+
+        return resourceVisibilityProvider.fetchVisibility(number.longValue())
+            .map(visibilityRecord -> visibilityRecord.visibility() == ResourceVisibility.ORGANIZATION)
+            .orElse(false);
+    }
+
     private boolean isResourceVisible(Serializable id, String resourceType) {
         ResourceVisibilityProvider resourceVisibilityProvider = resourceVisibilityProviders.get(resourceType);
 
@@ -444,10 +458,18 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
-        OptionalLong ownerUserId = resourceOwnershipResolver.resolveOwner(id)
-            .ownerUserId();
+        ResourceOwner resourceOwner = resourceOwnershipResolver.resolveOwner(id);
 
-        return ownerUserId.isPresent() && isCurrentUser(ownerUserId.getAsLong());
+        OptionalLong ownerUserId = resourceOwner.ownerUserId();
+
+        if (ownerUserId.isEmpty() || !isCurrentUser(ownerUserId.getAsLong())) {
+            return false;
+        }
+
+        OptionalLong workspaceId = resourceOwner.workspaceId();
+
+        return workspaceId.isEmpty() ||
+            workspaceUserRepository.existsByUserIdAndWorkspaceId(ownerUserId.getAsLong(), workspaceId.getAsLong());
     }
 
     @Override
@@ -634,6 +656,27 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         return checkWorkspaceScope(workspaceId, CONNECTION_VIEW, environment);
+    }
+
+    @Override
+    public boolean hasResourceScopeIfProjectWorkflow(
+        String workflowId, Serializable id, String resourceType, String scope) {
+
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
+        if (projectRepository.findByWorkflowId(workflowId)
+            .isEmpty()) {
+
+            return true;
+        }
+
+        return hasResourceScope(id, resourceType, scope);
     }
 
     @Override

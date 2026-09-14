@@ -24,11 +24,15 @@ package com.bytechef.automation.configuration.event;
  *
  * @author Ivica Cardic
  */
-public record WorkspaceUserRemovedEvent(long workspaceId, String userLogin) {
+public record WorkspaceUserRemovedEvent(long workspaceId, long userId, String userLogin) {
 
     public WorkspaceUserRemovedEvent {
         if (workspaceId <= 0) {
             throw new IllegalArgumentException("workspaceId must be positive; got " + workspaceId);
+        }
+
+        if (userId <= 0) {
+            throw new IllegalArgumentException("userId must be positive; got " + userId);
         }
 
         if (userLogin == null || userLogin.isBlank()) {

@@ -40,7 +40,6 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
-import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -127,17 +126,14 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
                 ConnectionErrorType.INVALID_CONNECTION);
         }
 
-        // No admin gate on WORKSPACE: it is now the default every connection is created with, so requiring
-        // ROLE_ADMIN for it would fail every ordinary create. The gate existed when WORKSPACE was a
-        // promotion out of a private default — a meaning it no longer has.
         validateCurrentUserIsWorkspaceMember(workspaceId);
 
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
         workspaceConnectionService.create(connectionId, workspaceId);
 
-        // Read the persisted visibility (ConnectionFacadeImpl may have forced PRIVATE in CE/embedded)
-        // so the metric tag matches what was actually stored, not the unsanitized request body.
+        // Read the persisted visibility (ConnectionFacadeImpl forces WORKSPACE in CE) so the metric tag matches
+        // what was actually stored, not the unsanitized request body.
         ConnectionDTO connection = connectionFacade.getConnection(connectionId);
 
         incrementCreateCounter(connection.visibility());
@@ -146,14 +142,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE') || @permissionService.isResourceOwner('Connection', #connectionId)")
     public void delete(long connectionId) {
-        // Cancel any pending OAuth refresh job before deleting any rows. If this fails, abort: a leftover
-        // scheduled refresh that fires against a deleted connection wakes up the scheduler with no row to
-        // refresh, which the production listener (ConnectionAfterSaveEventListener#onBeforeDelete) cannot
-        // recover from once we've already torn down the workspace mapping.
-        connectionLifecycleFacade.deleteScheduledConnectionRefresh(connectionId, TenantContext.getCurrentTenantId());
-
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
         connectionFacade.delete(connectionId);
@@ -182,8 +172,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
-        List<Long> connectionIds = CollectionUtils.map(
-            workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
+        List<Long> connectionIds = CollectionUtils.concatDistinct(
+            CollectionUtils.map(
+                workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId),
+            getSharedConnectionIds());
 
         if (connectionIds.isEmpty()) {
             return List.of();
@@ -193,6 +185,10 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
             connectionFacade.getConnections(
                 componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION),
             workspaceId);
+    }
+
+    protected List<Long> getSharedConnectionIds() {
+        return List.of();
     }
 
     /**
@@ -214,9 +210,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     /**
      * Reject a create request whose {@code workspaceId} the caller is not a member of. In CE this is a permissive no-op
      * because {@link WorkspaceFacade#getUserWorkspaces(long)} returns every workspace (CE has no membership table). In
-     * EE it delegates to the real {@code WorkspaceUserService} and blocks cross-workspace attaches. Visible to the EE
-     * subclass ({@code com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacadeImpl}) which reuses it
-     * from its bulk-promote path.
+     * EE it delegates to the real {@code WorkspaceUserService} and blocks cross-workspace attaches.
      */
     protected void validateCurrentUserIsWorkspaceMember(long workspaceId) {
         String currentUserLogin = SecurityUtils.getCurrentUserLogin();
@@ -261,13 +255,13 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || @permissionService.isResourceOwner('Connection', #connectionId)")
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         connectionFacade.update(connectionId, name, tags, version);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT') || @permissionService.isResourceOwner('Connection', #connectionId)")
     public void updateTags(long connectionId, List<Tag> tags) {
         connectionFacade.update(connectionId, tags);
     }

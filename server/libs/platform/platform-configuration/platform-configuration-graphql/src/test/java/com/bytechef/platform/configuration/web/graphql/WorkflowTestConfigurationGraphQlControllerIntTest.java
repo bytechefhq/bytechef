@@ -122,10 +122,25 @@ class WorkflowTestConfigurationGraphQlControllerIntTest {
     void testGuardAllowsWhenTheWorkflowEditScopeInTheRequestedEnvironmentIsGranted(GuardedOperation guardedOperation) {
         when(permissionService.hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
             .thenReturn(true);
+        when(permissionService.hasResourceScopeIfProjectWorkflow(
+            WORKFLOW_ID, CONNECTION_ID, "Connection", "CONNECTION_VIEW")).thenReturn(true);
 
         assertThatThrownBy(() -> guardedOperation.invoke(workflowTestConfigurationGraphQlController))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage(BODY_REACHED);
+    }
+
+    @ParameterizedTest
+    @MethodSource("guardedOperations")
+    void testGuardDeniesAConnectionTheEditorCannotSee(GuardedOperation guardedOperation) {
+        when(permissionService.hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION))
+            .thenReturn(true);
+
+        assertThatThrownBy(() -> guardedOperation.invoke(workflowTestConfigurationGraphQlController))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasResourceScopeIfProjectWorkflow(
+            WORKFLOW_ID, CONNECTION_ID, "Connection", "CONNECTION_VIEW");
     }
 
     @Test

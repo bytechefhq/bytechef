@@ -365,48 +365,54 @@ resource wired to it so far.
 - **EE**: the picker offers Shared with workspace / Private / Specific people. No `ROLE_ADMIN` gate on
   `WORKSPACE` — it is the default, so gating it would fail every ordinary create. `ORGANIZATION` is
   **not** offered here: it is reached through `createOrganizationConnection`, and
-  `setConnectionVisibility` rejects it. (`ConnectionVisibilityPicker` can render an Organization
-  option behind `showOrganizationOption`, but no caller passes it today.)
+  `setConnectionVisibility` rejects it. Organization connections are listed in every workspace, and any
+  member passes `*_VIEW` scopes on them by id; everything else goes through the admin-only
+  `OrganizationConnectionFacade`.
 - **Embedded**: force-written `PRIVATE`, unchanged. An embedded connection belongs to a connected user,
   not a workspace member, so workspace reach would be wrong in a way that crosses customers.
 
 **What sharing exposes.** `WORKSPACE` grants *use plus existence*, not *read plus write*: both REST
-controllers obfuscate `authorizationParameters` and null `parameters`, and no `ConnectionFacade` method
-mutates authorization parameters after creation. A member can run a workflow against a colleague's
-account; they cannot extract or repoint the credential.
+controllers obfuscate `authorizationParameters` and null `parameters`, and no caller-facing method accepts
+new credentials after creation (only token refresh rewrites them). A member can run a workflow against a
+colleague's account; they cannot extract or repoint the credential. Attaching a connection to a project
+workflow's test configuration or to a deployment requires `CONNECTION_VIEW` on it, so a PRIVATE
+connection cannot be bound by id.
 
 **"Specific people"** is not a fourth stored value — it is `PRIVATE` plus rows in `resource_grant`
 (EE, `platform-resource-grant`). A grant conveys visibility only; what the recipient may then do is
 decided by the usual `PermissionScope`/`WorkspaceRole` machinery. Grants survive promotion so demoting
 restores the previous audience, and are deleted with the connection because `resource_id` is
-polymorphic and has no foreign key.
+polymorphic and has no foreign key. Removing a member publishes `WorkspaceUserRemovedEvent`: their grants
+on that workspace's connections are revoked in the same transaction, and after commit the connections
+they own move to `PENDING_REASSIGNMENT` for a tenant admin to reassign. A creator who has left the
+workspace no longer counts as the owner.
 
 **Visibility is a precondition of `hasResourceScope`**, in both editions — not a filter running beside
 it. Without that, a member holding `CONNECTION_EDIT` would pass the by-id check for a connection the
 list correctly hides. In CE this replaces owner-isolation *only* for resource types that registered a
 `ResourceVisibilityProvider`; a type with a `ResourceOwnershipResolver` but no visibility provider
-keeps it. API keys are **not** such a type — no main-source `ResourceOwnershipResolver` claims the
-`"ApiKey"` token, so that owner-isolation branch is never entered for them and nothing there isolates
-one user's keys from another's. Treat API keys as unprotected until someone decides whether they are
-user-owned or workspace-owned; the `API_KEY_*` entry in `PermissionScopeGateCoverageTest` records what
-was actually checked. `PermissionServiceVisibilityTest` is the regression guard for the visibility
+keeps it. API keys are such a type: `ApiKeyOwnershipResolver` claims the `"ApiKey"` token and fills the
+owner, and no visibility provider exists for it, so CE `hasResourceScope` answers
+`isCurrentUser(owner)`. `ApiKeyFacadeImpl` enforces the same owner-or-tenant-admin rule in plain Java,
+and `ResourceTokenResolverCoverageTest.OWNER_ISOLATED_BY_DESIGN` pins the exemption.
+The `VisibilityPrecondition` nest of the EE `PermissionServiceTest` is the regression guard for the visibility
 precondition.
 
 **GraphQL mutations** (owner-or-admin, annotated on the facade so they protect every caller):
 - `setConnectionVisibility(workspaceId, connectionId, visibility)` — rejects `ORGANIZATION` (set
-  through `createOrganizationConnection`) and refuses to narrow to `PRIVATE` while an active
-  deployment uses the connection.
+  through `createOrganizationConnection`) and refuses to narrow to `PRIVATE` while any deployment
+  references the connection.
 - `grantConnectionAccess` / `revokeConnectionAccess(workspaceId, connectionId, userId)` — grantee must
-  be a member of the owning workspace; rejection reuses the unknown-connection error so user ids
-  cannot be enumerated. Grant is idempotent via `ON CONFLICT DO NOTHING`, not a caught
-  `DuplicateKeyException` — PostgreSQL aborts the transaction on a constraint violation, so catching it
-  still fails at commit.
+  be a member of the owning workspace; a non-member and a non-existent user fail the same membership
+  check, so user ids cannot be enumerated. Grant is idempotent via `ON CONFLICT DO NOTHING` on
+  PostgreSQL, not a caught `DuplicateKeyException` — PostgreSQL aborts the transaction on a constraint
+  violation, so catching it still fails at commit. Other dialects (H2) use `INSERT ... WHERE NOT EXISTS`.
 - `connectionGrants(workspaceId, connectionId)` — owner-or-admin; a plain viewer must not learn who
   else a connection was handed to.
 
-**Metrics**: `bytechef_connection_create` (Counter), tagged
-`visibility=PRIVATE|WORKSPACE|ORGANIZATION`, wired via `ObjectProvider<MeterRegistry>` so lightweight
-app variants without actuator start cleanly.
+**Metrics**: `bytechef_connection_create` (Counter), tagged `visibility=PRIVATE|WORKSPACE` (organization
+connections are created through their own facade and not counted), wired via
+`ObjectProvider<MeterRegistry>` so lightweight app variants without actuator start cleanly.
 
 
 ### Spring Boot Project Conventions

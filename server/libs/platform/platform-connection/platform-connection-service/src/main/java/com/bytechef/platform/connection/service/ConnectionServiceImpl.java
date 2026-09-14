@@ -27,9 +27,7 @@ import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
-import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +38,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -102,8 +99,6 @@ public class ConnectionServiceImpl implements ConnectionService {
     public void delete(long id) {
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
-
-        validateOwnerOrAdmin(connection);
 
         connectionRepository.delete(connection);
     }
@@ -187,8 +182,6 @@ public class ConnectionServiceImpl implements ConnectionService {
     public Connection update(long id, List<Long> tagIds) {
         Connection connection = getConnection(id);
 
-        validateOwnerOrAdmin(connection);
-
         connection.setTagIds(tagIds);
 
         return connectionRepository.save(connection);
@@ -197,8 +190,6 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Connection update(long id, String name, List<Long> tagIds, int version) {
         Connection curConnection = getConnection(id);
-
-        validateOwnerOrAdmin(curConnection);
 
         if (name != null) {
             curConnection.setName(name);
@@ -219,8 +210,6 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         Connection connection = getConnection(connectionId);
 
-        validateOwnerOrAdmin(connection);
-
         connection.setCredentialStatus(status);
 
         Connection updatedConnection = connectionRepository.save(connection);
@@ -232,12 +221,9 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public Connection updateConnectionStatus(long connectionId, ConnectionStatus status) {
-        // No @PreAuthorize here by design. Authorization lives at the public entry points:
-        // ConnectionReassignmentGraphQlController marks every reassignment mutation admin-only, and
-        // WorkspaceUserRemovalListener is a trusted system listener that runs after-commit with a
-        // cleared SecurityContext — a service-level ADMIN guard would throw AccessDeniedException
-        // for the listener path and leave orphaned connections stuck in ACTIVE. Mirrors the
-        // convention already applied to updateVisibility.
+        // No @PreAuthorize here by design. ConnectionReassignmentFacadeImpl carries the admin guard on every
+        // reassignment entry point, and WorkspaceUserRemovalListener marks a removed member's connections as a
+        // system step on behalf of whoever removed them, who need not be a tenant admin.
         Assert.notNull(status, "'status' must not be null");
 
         Connection connection = connectionRepository.findById(connectionId)
@@ -253,22 +239,24 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection updateCreatedBy(long id, String newCreatedBy) {
-        // No @PreAuthorize here by design — see updateConnectionStatus for the rationale. The
-        // listener-driven reassignment path needs to run without an authenticated principal.
+    public Connection reassignOwner(long id, String newOwnerLogin) {
+        // No @PreAuthorize here by design; ConnectionReassignmentFacadeImpl carries the admin guard.
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
 
-        connection.setCreatedBy(newCreatedBy);
+        try {
+            connection.reassignOwner(newOwnerLogin);
+        } catch (IllegalStateException exception) {
+            throw new ConfigurationException(exception.getMessage(), ConnectionErrorType.INVALID_CONNECTION);
+        }
 
         return connectionRepository.save(connection);
     }
 
     @Override
     public Connection updateVisibility(long id, ResourceVisibility visibility) {
-        // No @PreAuthorize here by design. The caller (WorkspaceConnectionFacadeImpl) performs the
-        // admin-OR-creator check so the orphan-recovery demote path works when no admins remain.
-        // A service-level ADMIN guard would block that flow even though the facade authorised it.
+        // No @PreAuthorize here by design. The callers authorize: the EE setConnectionVisibility is
+        // owner-or-workspace-ADMIN and OrganizationConnectionFacadeImpl.create is tenant-admin.
         Connection connection = connectionRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("Connection not found: " + id));
 
@@ -282,8 +270,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         Assert.notNull(parameters, "'parameters' must not be null");
 
         Connection connection = getConnection(connectionId);
-
-        validateOwnerOrAdmin(connection);
 
         if (log.isTraceEnabled()) {
             log.trace("New....: {}", FormatUtils.toString(parameters));
@@ -343,19 +329,4 @@ public class ConnectionServiceImpl implements ConnectionService {
             ConnectionErrorType.CONNECTION_NOT_ACTIVE);
     }
 
-    private void validateOwnerOrAdmin(Connection connection) {
-        if (!SecurityUtils.isAuthenticated()) {
-            throw new AccessDeniedException(
-                "Authentication required to modify connection " + connection.getId());
-        }
-
-        String currentUserLogin = SecurityUtils.getCurrentUserLogin();
-
-        if (!currentUserLogin.equals(connection.getCreatedBy()) &&
-            !SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
-
-            throw new AccessDeniedException(
-                "Only the connection creator or an admin can modify connection " + connection.getId());
-        }
-    }
 }

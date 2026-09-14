@@ -37,7 +37,7 @@ class WorkflowTestConfigurationGraphQlController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId) && hasResourceScopeIfProjectWorkflow(#workflowId, #connectionId, 'Connection', 'CONNECTION_VIEW')")
     public boolean saveClusterElementTestConfigurationConnection(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
         @Argument String clusterElementWorkflowNodeName, @Argument String workflowConnectionKey,
@@ -51,7 +51,7 @@ class WorkflowTestConfigurationGraphQlController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId) && hasResourceScopeIfProjectWorkflow(#workflowId, #connectionId, 'Connection', 'CONNECTION_VIEW')")
     public boolean saveWorkflowTestConfigurationConnection(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String workflowConnectionKey,
         @Argument long connectionId, @Argument long environmentId) {

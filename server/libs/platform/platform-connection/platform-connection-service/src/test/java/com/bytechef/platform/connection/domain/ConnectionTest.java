@@ -87,6 +87,6 @@ class ConnectionTest {
     void testGetVisibilityWithDefaultConstructor() {
         Connection connection = new Connection();
 
-        assertThat(connection.getVisibility()).isEqualTo(ResourceVisibility.PRIVATE);
+        assertThat(connection.getVisibility()).isEqualTo(ResourceVisibility.WORKSPACE);
     }
 }

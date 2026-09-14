@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.facade;
 
-import com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.ee.automation.configuration.facade.WorkspaceConnectionSharingFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectionFacade {
+public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectionSharingFacade {
 
     @Override
     public long create(long workspaceId, com.bytechef.platform.connection.dto.ConnectionDTO connectionDTO) {

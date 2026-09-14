@@ -31,9 +31,8 @@ import java.util.Set;
  * operators cannot accidentally reintroduce a withdrawn credential.
  *
  * <p>
- * <b>Ordinal stability:</b> values are persisted as INT ordinals (see Liquibase migrations). Do not reorder or insert
- * existing values — append only. Use {@link #getCode()} / {@link #fromCode(int)} when wiring a future Spring Data JDBC
- * {@code Converter} pair so the persistence mapping becomes code-based rather than ordinal-based.
+ * <b>Code stability:</b> {@code Connection} persists {@link #getCode()} and reads back through {@link #fromCode(int)},
+ * so the stored INT is independent of declaration order. Never change an existing code.
  *
  * @author Ivica Cardic
  */
@@ -54,9 +53,7 @@ public enum ConnectionStatus {
     }
 
     /**
-     * Returns the stable integer code for JDBC persistence. Semantically identical to {@link #ordinal()} today but
-     * decouples the wire representation from the enum declaration order — a future reorder under code-based persistence
-     * would not corrupt persisted rows.
+     * Returns the stable integer code {@code Connection} persists.
      */
     public int getCode() {
         return code;

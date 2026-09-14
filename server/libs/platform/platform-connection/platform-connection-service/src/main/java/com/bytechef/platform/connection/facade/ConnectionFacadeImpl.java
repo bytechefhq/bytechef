@@ -373,8 +373,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
                     // parameter). Spring security failures (AccessDeniedException) and data-access
                     // failures (DataAccessException) propagate so they are not silently hidden as
                     // "broken row" — those indicate systemic issues that deserve to surface to the
-                    // caller rather than be metered-away. The full throwable is logged (dropping the
-                    // stack trace via log.error(message) would have been forbidden), and the
+                    // caller rather than be metered-away. The stack trace is logged at DEBUG, and the
                     // bytechef_connection_list_dto_failed counter lets operators alert on a rising
                     // skip rate rather than chasing individual log lines.
                     if (log.isDebugEnabled()) {

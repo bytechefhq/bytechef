@@ -43,7 +43,7 @@ public record ConnectionDTO(
     public ConnectionDTO {
         // status and visibility are load-bearing for authorization and audit; null here would cascade
         // into silent defaults downstream (e.g. ConnectionFacadeImpl persists whatever visibility the
-        // DTO carries). The Builder supplies safe defaults (ACTIVE / PRIVATE); direct canonical-ctor
+        // DTO carries). The Builder supplies defaults (ACTIVE / WORKSPACE); direct canonical-ctor
         // callers must explicitly pick a value.
         Objects.requireNonNull(status, "status");
         Objects.requireNonNull(visibility, "visibility");
@@ -131,7 +131,7 @@ public record ConnectionDTO(
         private ConnectionStatus status = ConnectionStatus.ACTIVE;
         private List<Tag> tags;
         private int version;
-        private ResourceVisibility visibility = ResourceVisibility.PRIVATE;
+        private ResourceVisibility visibility = ResourceVisibility.WORKSPACE;
 
         private Builder() {
         }

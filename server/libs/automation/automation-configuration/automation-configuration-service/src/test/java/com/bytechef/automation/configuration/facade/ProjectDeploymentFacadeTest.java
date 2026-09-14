@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -221,6 +222,48 @@ class ProjectDeploymentFacadeTest {
         return projectDeploymentWorkflow;
     }
 
+    @Test
+    void testUpdateProjectDeploymentWorkflowRejectsANewConnectionTheCallerCannotSee() {
+        allowConnectionUsageInWorkflow();
+
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(5L))
+            .thenReturn(projectDeploymentWorkflow(5L, 10L));
+        when(permissionService.hasResourceScope(42L, "Connection", "CONNECTION_VIEW")).thenReturn(false);
+
+        assertThatThrownBy(
+            () -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow(5L, 42L)))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(projectDeploymentWorkflowService, never()).update(any(ProjectDeploymentWorkflow.class));
+    }
+
+    @Test
+    void testUpdateProjectDeploymentWorkflowDoesNotRecheckAnAlreadyAttachedConnection() {
+        allowConnectionUsageInWorkflow();
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = projectDeploymentWorkflow(5L, 10L);
+
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(5L))
+            .thenReturn(projectDeploymentWorkflow(5L, 10L));
+
+        projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow);
+
+        verify(permissionService, never()).hasResourceScope(eq(10L), anyString(), anyString());
+        verify(projectDeploymentWorkflowService).update(projectDeploymentWorkflow);
+    }
+
+    private static ProjectDeploymentWorkflow projectDeploymentWorkflow(long id, long connectionId) {
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setId(id);
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(connectionId, "connection", "node_1")));
+        projectDeploymentWorkflow.setProjectDeploymentId(3L);
+        projectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+        return projectDeploymentWorkflow;
+    }
+
     private static ProjectDeploymentDTO projectDeploymentDTO() {
         return new ProjectDeploymentDTO(
             null, null, null, true, Environment.PRODUCTION, PROJECT_DEPLOYMENT_ID, "deployment", null, null, null, null,
@@ -231,6 +274,17 @@ class ProjectDeploymentFacadeTest {
         return new ProjectDeploymentDTO(
             null, null, null, true, environment, 1L, "deployment", null, null, null, null, projectId, 1, List.of(),
             List.of(), 0);
+    }
+
+    private void allowConnectionUsageInWorkflow() {
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
+
+        when(projectDeploymentService.getProjectDeployment(3L))
+            .thenReturn(projectDeployment);
+        when(permissionService.canUseConnectionInWorkflow(anyLong(), eq("workflow-1"), eq(Environment.PRODUCTION)))
+            .thenReturn(true);
     }
 
     @Nested
