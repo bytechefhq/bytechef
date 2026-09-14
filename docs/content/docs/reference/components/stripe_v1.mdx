@@ -274,6 +274,79 @@ Type: OBJECT
 
 
 
+### Create Refund
+Name: createRefund
+
+`Refunds a payment intent, in full or in part.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| payment_intent | Payment Intent ID | STRING | ID of the payment intent to refund. | true |
+| amount | Amount | INTEGER | Amount to refund, in the smallest currency unit (for example 100 cents to refund $1.00). Defaults to the entire amount that has not been refunded yet. | false |
+| reason | Reason | STRING <details> <summary> Options </summary> <span>duplicate</span>, <span>fraudulent</span>, <span>requested_by_customer</span> </details> | Reason for the refund. | false |
+| metadata | Metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs that you can attach to the refund. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Refund",
+  "name" : "createRefund",
+  "parameters" : {
+    "payment_intent" : "",
+    "amount" : 1,
+    "reason" : "",
+    "metadata" : { }
+  },
+  "type" : "stripe/v1/createRefund"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique identifier for the object. |
+| object | STRING | String representing the object's type. |
+| amount | INTEGER | Amount refunded, in the smallest currency unit. |
+| charge | STRING | ID of the charge that was refunded. |
+| created | INTEGER | Time at which the object was created, in seconds since the Unix epoch. |
+| currency | STRING | Three-letter ISO currency code in lowercase. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs attached to the object. |
+| payment_intent | STRING | ID of the payment intent that was refunded. |
+| reason | STRING | Reason for the refund, one of `duplicate`, `fraudulent` or `requested_by_customer`. |
+| status | STRING | Status of the refund, one of `pending`, `requires_action`, `succeeded`, `failed` or `canceled`. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "object" : "",
+  "amount" : 1,
+  "charge" : "",
+  "created" : 1,
+  "currency" : "",
+  "metadata" : { },
+  "payment_intent" : "",
+  "reason" : "",
+  "status" : ""
+}
+```
+
+
+
+
 ### Create Subscription
 Name: createSubscription
 
@@ -386,6 +459,149 @@ To find the Coupon ID, click [here](/reference/components/stripe_v1#how-to-find-
 #### Find Default Payment Method
 
 To find the Default Payment Method, click [here](/reference/components/stripe_v1#how-to-find-default-payment-method).
+
+
+
+### Get Payment Intent
+Name: getPaymentIntent
+
+`Retrieves a payment intent, including its amount, currency, status and customer.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| payment_intent | Payment Intent ID | STRING | ID of the payment intent to retrieve, for example pi_3MtwBwLkdIwHu7ix28a3tqPa. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Payment Intent",
+  "name" : "getPaymentIntent",
+  "parameters" : {
+    "payment_intent" : ""
+  },
+  "type" : "stripe/v1/getPaymentIntent"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique identifier for the object. |
+| object | STRING | String representing the object's type. |
+| amount | INTEGER | Amount intended to be collected, in the smallest currency unit. |
+| amount_received | INTEGER | Amount that this payment intent collected, in the smallest currency unit. |
+| created | INTEGER | Time at which the object was created, in seconds since the Unix epoch. |
+| currency | STRING | Three-letter ISO currency code in lowercase. |
+| customer | STRING | ID of the customer this payment intent belongs to, if one exists. |
+| description | STRING | An arbitrary string attached to the object. |
+| latest_charge | STRING | ID of the latest charge created by this payment intent. |
+| livemode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the object exists in live mode, the value is `true`. If the object exists in test mode, the value is `false`. |
+| metadata | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Set of key-value pairs attached to the object. |
+| payment_method | STRING | ID of the payment method used in this payment intent. |
+| receipt_email | STRING | Email address that the receipt for the resulting payment will be sent to. |
+| status | STRING | Status of this payment intent, one of `requires_payment_method`, `requires_confirmation`, `requires_action`, `processing`, `requires_capture`, `canceled` or `succeeded`. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "object" : "",
+  "amount" : 1,
+  "amount_received" : 1,
+  "created" : 1,
+  "currency" : "",
+  "customer" : "",
+  "description" : "",
+  "latest_charge" : "",
+  "livemode" : false,
+  "metadata" : { },
+  "payment_method" : "",
+  "receipt_email" : "",
+  "status" : ""
+}
+```
+
+
+
+
+### List Refunds
+Name: listRefunds
+
+`Lists refunds, most recent first, optionally only those for one payment intent.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| payment_intent | Payment Intent ID | STRING | Only return refunds for the payment intent with this ID. | false |
+| limit | Limit | INTEGER | Maximum number of refunds to return, between 1 and 100. Defaults to 10. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Refunds",
+  "name" : "listRefunds",
+  "parameters" : {
+    "payment_intent" : "",
+    "limit" : 1
+  },
+  "type" : "stripe/v1/listRefunds"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| object | STRING | String representing the object's type, always `list`. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(object), INTEGER\(amount), STRING\(charge), INTEGER\(created), STRING\(currency), &#123;&#125;\(metadata), STRING\(payment_intent), STRING\(reason), STRING\(status)&#125;] </details> | The refunds, most recent first. |
+| has_more | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | True if there are more refunds after this page. |
+| url | STRING | The URL where this list can be accessed. |
+
+
+
+
+#### Output Example
+```json
+{
+  "object" : "",
+  "data" : [ {
+    "id" : "",
+    "object" : "",
+    "amount" : 1,
+    "charge" : "",
+    "created" : 1,
+    "currency" : "",
+    "metadata" : { },
+    "payment_intent" : "",
+    "reason" : "",
+    "status" : ""
+  } ],
+  "has_more" : false,
+  "url" : ""
+}
+```
+
 
 
 
@@ -668,3 +884,18 @@ Open your Stripe dashboard and on the left bar your will find Subscriptions. Ope
 The Subscription ID can also be found in the output of the following actions:
 * **Create Subscription**
 * **Update Subscription**
+
+#### How to find Payment Intent ID
+
+- **Method 1: Via API**
+
+Use the `GET /payment_intents` endpoint to retrieve a list of all payment intents and their IDs. Payment intent IDs start with `pi_`.
+
+- **Method 2: Via UI**
+
+Open your Stripe dashboard and on the left bar you will find Transactions. Open the payment you want and you can find the Payment Intent ID under Details on the right.
+
+The Payment Intent ID can also be found in the output of the following actions:
+* **Get Payment Intent**
+* **List Refunds**
+* **Create Refund**
