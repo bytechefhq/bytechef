@@ -31,6 +31,11 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
+    public void duplicateTable(long tableId, String newBaseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
         throw new UnsupportedOperationException();
     }

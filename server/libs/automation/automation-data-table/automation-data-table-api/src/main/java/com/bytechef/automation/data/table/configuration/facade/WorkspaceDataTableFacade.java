@@ -31,5 +31,7 @@ public interface WorkspaceDataTableFacade {
     void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
 
+    void duplicateTable(long tableId, String newBaseName, long environmentId);
+
     List<DataTableInfo> listTables(long workspaceId, long environmentId);
 }
