@@ -6,6 +6,7 @@ import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-depl
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -55,6 +56,9 @@ const ProjectDeploymentWorkflowListItem = ({
     const openProjectDeploymentWorkflowSheet = useProjectDeploymentWorkflowSheetStore(
         (state) => state.openProjectDeploymentWorkflowSheet
     );
+    const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
+        (state) => state.setWorkflowExecutionSheetOpen
+    );
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -85,6 +89,8 @@ const ProjectDeploymentWorkflowListItem = ({
 
     const handleWorkflowClick = () => {
         if (workflow) {
+            setWorkflowExecutionSheetOpen(false);
+
             openProjectDeploymentWorkflowSheet({projectDeploymentId, projectName, projectVersion, workflow});
         }
     };
