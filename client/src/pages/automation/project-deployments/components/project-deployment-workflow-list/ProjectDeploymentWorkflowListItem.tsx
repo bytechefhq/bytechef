@@ -141,7 +141,9 @@ const ProjectDeploymentWorkflowListItem = ({
                             </span>
                         </TooltipTrigger>
 
-                        <TooltipContent className="max-w-md break-all">{workflow.label}</TooltipContent>
+                        <TooltipContent align="start" className="max-w-md break-all">
+                            {workflow.label}
+                        </TooltipContent>
                     </Tooltip>
 
                     <div className="flex gap-x-6 xl:hidden">

@@ -2,7 +2,7 @@ import {TooltipProvider} from '@/components/ui/tooltip';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -96,6 +96,18 @@ describe('ProjectDeploymentWorkflowListItem', () => {
                 workflowComponentDefinitions: {},
                 workflowTaskDispatcherDefinitions: {},
             })
+        );
+    });
+
+    it('aligns the workflow name tooltip to the start of the name', async () => {
+        const user = userEvent.setup();
+
+        renderListItem('Subflow');
+
+        await user.hover(screen.getByText('workflow1'));
+
+        await waitFor(() =>
+            expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveAttribute('data-align', 'start')
         );
     });
 
