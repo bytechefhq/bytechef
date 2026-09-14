@@ -179,9 +179,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Verify delete button is present on the added item', async () => {
-                const addedItem = workflowPage.arrayPropertyItemAt(0);
-
-                const deleteButton = addedItem.getByRole('button');
+                const deleteButton = workflowPage.arrayPropertyItemDeleteButtonAt(0);
 
                 await expect(deleteButton).toBeVisible();
             });
@@ -199,9 +197,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Delete the first item', async () => {
-                const firstItem = workflowPage.arrayPropertyItemAt(0);
-
-                const deleteButton = firstItem.getByRole('button');
+                const deleteButton = workflowPage.arrayPropertyItemDeleteButtonAt(0);
 
                 await deleteButton.click();
             });
@@ -222,9 +218,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
                 await authenticatedPage.waitForTimeout(WorkflowPage.SHORT_DEBOUNCE_MS);
 
-                const addedItem = workflowPage.arrayPropertyItemAt(1);
-
-                await addedItem.getByRole('button').click();
+                await workflowPage.arrayPropertyItemDeleteButtonAt(1).click();
 
                 await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
             });
@@ -260,9 +254,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Delete the first row (the row that held the value)', async () => {
-                const firstRow = workflowPage.arrayPropertyItemAt(0);
-
-                await firstRow.getByRole('button').click();
+                await workflowPage.arrayPropertyItemDeleteButtonAt(0).click();
             });
 
             await test.step('The remaining row must stay empty (value must not jump from the deleted row)', async () => {
@@ -304,9 +296,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Delete the middle row', async () => {
-                const middleRow = workflowPage.arrayPropertyItemAt(1);
-
-                await middleRow.getByRole('button').click();
+                await workflowPage.arrayPropertyItemDeleteButtonAt(1).click();
             });
 
             await test.step('Neither remaining row should display the deleted middle value', async () => {
@@ -375,9 +365,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Delete the middle row (the one with no value)', async () => {
-                const middleRow = workflowPage.arrayPropertyItemAt(1);
-
-                await middleRow.getByRole('button').click();
+                await workflowPage.arrayPropertyItemDeleteButtonAt(1).click();
             });
 
             await test.step('UI shows foo then bar on the two remaining rows', async () => {
@@ -431,9 +419,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Delete the INTEGER row that holds the value', async () => {
-                const integerRowWithValue = workflowPage.arrayPropertyItemAt(1);
-
-                await integerRowWithValue.getByRole('button').last().click();
+                await workflowPage.arrayPropertyItemDeleteButtonAt(1).click();
             });
 
             await test.step('The INTEGER row that was empty after it must stay empty', async () => {
