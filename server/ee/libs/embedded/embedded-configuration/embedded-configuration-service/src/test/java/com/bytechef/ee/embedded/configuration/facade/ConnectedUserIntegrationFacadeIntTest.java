@@ -1163,7 +1163,7 @@ class ConnectedUserIntegrationFacadeIntTest {
 
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
 
-            verify(connectionService).updateCreatedBy(CONNECTION_ID, connectedUser.getExternalId());
+            verify(connectionService).reassignOwner(CONNECTION_ID, connectedUser.getExternalId());
         }
 
         @Test

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
+import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvents;
 import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,7 @@ import org.springframework.util.Assert;
 })
 public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final CustomRoleRepository customRoleRepository;
     private final PermissionScopeRegistry permissionScopeRegistry;
     private final PermissionService permissionService;
@@ -61,10 +64,12 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
     @SuppressFBWarnings("EI")
     public WorkspaceUserServiceImpl(
-        CustomRoleRepository customRoleRepository, PermissionScopeRegistry permissionScopeRegistry,
+        ApplicationEventPublisher applicationEventPublisher, CustomRoleRepository customRoleRepository,
+        PermissionScopeRegistry permissionScopeRegistry,
         PermissionService permissionService, UserInvitationService userInvitationService, UserService userService,
         WorkspaceService workspaceService, WorkspaceUserRepository workspaceUserRepository) {
 
+        this.applicationEventPublisher = applicationEventPublisher;
         this.customRoleRepository = customRoleRepository;
         this.permissionScopeRegistry = permissionScopeRegistry;
         this.permissionService = permissionService;
@@ -418,6 +423,10 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
         workspaceUserRepository.deleteByUserIdAndWorkspaceId(userId, workspaceId);
 
         permissionService.evictWorkspaceScopeCache(userId, workspaceId);
+
+        User user = userService.getUser(userId);
+
+        applicationEventPublisher.publishEvent(new WorkspaceUserRemovedEvent(workspaceId, userId, user.getLogin()));
 
         return true;
     }

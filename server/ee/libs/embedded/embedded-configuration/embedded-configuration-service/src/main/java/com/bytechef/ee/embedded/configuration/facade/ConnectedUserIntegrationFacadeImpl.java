@@ -420,7 +420,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         List<String> enableAttemptedWorkflowIds = new ArrayList<>();
 
         try {
-            connectionService.updateCreatedBy(connectionId, connectedUser.getExternalId());
+            connectionService.reassignOwner(connectionId, connectedUser.getExternalId());
 
             integrationInstance = integrationInstanceService.create(
                 connectedUser.getId(), connectionId, integrationInstanceConfiguration.getId());

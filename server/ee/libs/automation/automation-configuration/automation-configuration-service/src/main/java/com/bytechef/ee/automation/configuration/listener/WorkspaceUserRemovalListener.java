@@ -7,16 +7,22 @@
 
 package com.bytechef.ee.automation.configuration.listener;
 
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.event.WorkspaceUserRemovedEvent;
+import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO;
 import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade;
+import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -42,20 +48,38 @@ public class WorkspaceUserRemovalListener {
 
     private static final Logger log = LoggerFactory.getLogger(WorkspaceUserRemovalListener.class);
 
+    private static final String CONNECTION_RESOURCE_TYPE = "Connection";
     private static final String METRIC_NAME = "bytechef_connection_reassignment_listener";
     private static final String METRIC_DESCRIPTION =
         "Outcome of the workspace-user-removal listener that flips owned connections to PENDING_REASSIGNMENT";
 
     private final ConnectionReassignmentFacade connectionReassignmentFacade;
     private final MeterRegistry meterRegistry;
+    private final ResourceGrantService resourceGrantService;
+    private final WorkspaceConnectionService workspaceConnectionService;
 
-    @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
+    @SuppressFBWarnings({
+        "CT_CONSTRUCTOR_THROW", "EI"
+    })
     public WorkspaceUserRemovalListener(
         ConnectionReassignmentFacade connectionReassignmentFacade,
-        ObjectProvider<MeterRegistry> meterRegistryProvider) {
+        ObjectProvider<MeterRegistry> meterRegistryProvider, ResourceGrantService resourceGrantService,
+        WorkspaceConnectionService workspaceConnectionService) {
 
         this.connectionReassignmentFacade = connectionReassignmentFacade;
         this.meterRegistry = meterRegistryProvider.getIfAvailable();
+        this.resourceGrantService = resourceGrantService;
+        this.workspaceConnectionService = workspaceConnectionService;
+    }
+
+    @EventListener
+    public void revokeConnectionGrants(WorkspaceUserRemovedEvent event) {
+        List<Long> connectionIds = workspaceConnectionService.getWorkspaceConnections(event.workspaceId())
+            .stream()
+            .map(WorkspaceConnection::getConnectionId)
+            .toList();
+
+        resourceGrantService.revokeUserGrants(CONNECTION_RESOURCE_TYPE, event.userId(), connectionIds);
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -67,8 +91,11 @@ public class WorkspaceUserRemovalListener {
         }
 
         try {
-            BulkReassignResultDTO result = connectionReassignmentFacade.markConnectionsPendingReassignment(
-                event.workspaceId(), event.userLogin());
+            // Marking connections is tenant-admin work, but whoever removed the member need not be a tenant admin; the
+            // removal they were allowed to make is what authorizes this step.
+            BulkReassignResultDTO result = SecurityUtils.runAsSystem(
+                () -> connectionReassignmentFacade.markConnectionsPendingReassignment(
+                    event.workspaceId(), event.userLogin()));
 
             if (result.failed() > 0) {
                 // Partial failure: facade has already logged per-row errors. Surface a single WARN so
