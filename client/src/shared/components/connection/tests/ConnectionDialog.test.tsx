@@ -1,10 +1,12 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
 import {
     useGetOAuth2AuthorizationParametersQuery,
     useGetOAuth2PropertiesQuery,
 } from '@/shared/queries/platform/oauth2.queries';
+import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {act, render, screen, waitFor} from '@testing-library/react';
@@ -717,5 +719,22 @@ describe('ConnectionDialog', () => {
 
         expect(screen.getByText('Component', {selector: 'label'})).toHaveTextContent(/^Component\*$/);
         expect(screen.getByText('Name', {selector: 'label'})).toHaveTextContent(/^Name\*$/);
+    });
+
+    it('offers the visibility picker on an ordinary create in EE', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}} as never);
+
+        renderDialog({platformType: PlatformType.AUTOMATION});
+
+        expect(screen.getByRole('radio', {name: /shared with workspace/i})).toBeInTheDocument();
+    });
+
+    it('shows a fixed Organization visibility instead of the picker for an organization connection', () => {
+        applicationInfoStore.setState({application: {edition: EditionType.EE}} as never);
+
+        renderDialog({fixedVisibility: 'ORGANIZATION'});
+
+        expect(screen.queryByRole('radio', {name: /shared with workspace/i})).not.toBeInTheDocument();
+        expect(screen.getByText('Organization')).toBeInTheDocument();
     });
 });
