@@ -105,7 +105,7 @@
     "tsconfig": "^7.0.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.67.0",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.11"
   },
   "browserslist": [
     "extends browserslist-config-baseline/2024"
