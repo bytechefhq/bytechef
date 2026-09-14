@@ -12,7 +12,7 @@ const AppEventsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm text-muted-foreground uppercase">Filter by:</span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
 
             <Badge label={`Workflows: ${label ?? 'All Workflows'}`} styleType="primary-outline" weight="semibold" />
         </div>

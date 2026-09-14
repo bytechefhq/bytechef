@@ -1,5 +1,6 @@
-import Badge from '@/components/Badge/Badge';
 import {Type} from '@/pages/automation/mcp-servers/McpServers';
+import FilterTitle from '@/shared/components/filters/FilterTitle';
+import {getMcpServersFilter} from '@/shared/components/mcp-server/mcpServersFilter';
 import {Tag} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ReactNode} from 'react';
@@ -44,31 +45,14 @@ const McpServersFilterTitle = ({
         pageTitle = matchedTag?.name;
     }
 
-    let filterLabel: string | undefined;
+    const filter = getMcpServersFilter({
+        groupLabel: 'Projects',
+        groupSearchParamName: 'projectId',
+        pageTitle,
+        searchParams,
+    });
 
-    if (searchParams.get('componentName')) {
-        filterLabel = 'Components';
-    } else if (searchParams.get('projectId')) {
-        filterLabel = 'Projects';
-    } else if (searchParams.get('tagId')) {
-        filterLabel = 'Tags';
-    }
-
-    return (
-        <div className="space-x-1">
-            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by:</span>
-
-            {filterLabel ? (
-                <Badge
-                    label={`${filterLabel}: ${typeof pageTitle === 'string' ? pageTitle : 'Unknown'}`}
-                    styleType="primary-outline"
-                    weight="semibold"
-                />
-            ) : (
-                <span className="text-sm text-muted-foreground uppercase">none</span>
-            )}
-        </div>
-    );
+    return <FilterTitle filters={[filter]} />;
 };
 
 export default McpServersFilterTitle;
