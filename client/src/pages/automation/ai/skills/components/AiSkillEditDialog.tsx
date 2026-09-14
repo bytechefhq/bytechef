@@ -1,13 +1,13 @@
+import Button from '@/components/Button/Button';
 import {Input} from '@/components/Input/Input';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useState} from 'react';
@@ -30,7 +30,7 @@ const AiSkillEditDialog = ({currentDescription, currentName, onClose, onSave}: A
     const isValid = trimmedName.length > 0;
 
     return (
-        <AlertDialog
+        <Dialog
             onOpenChange={(open) => {
                 if (!open) {
                     onClose();
@@ -38,10 +38,12 @@ const AiSkillEditDialog = ({currentDescription, currentName, onClose, onSave}: A
             }}
             open
         >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Edit Skill</AlertDialogTitle>
-                </AlertDialogHeader>
+            <DialogContent>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <DialogTitle>Edit Skill</DialogTitle>
+
+                    <DialogCloseButton />
+                </DialogHeader>
 
                 <div className="flex flex-col gap-4 py-2">
                     <div>
@@ -70,18 +72,20 @@ const AiSkillEditDialog = ({currentDescription, currentName, onClose, onSave}: A
                     </div>
                 </div>
 
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
+                <DialogFooter>
+                    <Button onClick={onClose} variant="outline">
+                        Cancel
+                    </Button>
 
-                    <AlertDialogAction
+                    <Button
                         disabled={!isValid || !hasChanges}
                         onClick={() => onSave(trimmedName, trimmedDescription || null)}
                     >
                         Save
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
