@@ -23,12 +23,19 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class IntegrationComponentDefinitionFilter implements ComponentDefinitionFilter {
 
-    private static final List<String> COMPONENT_NAMES = List.of(
+    private static final List<String> EXCLUDED_COMPONENT_NAMES = List.of(
         "apiPlatform", "codeWorkflow", "dataTable", "knowledgeBase", "webhook");
 
+    /**
+     * Returns information if componentDefinition should be retained or skipped within the context of how the enterprise
+     * subscription is integrated within the customer's software ecosystem.
+     *
+     * @param componentDefinition the component definition
+     * @return true if component definition is allowed in this type of platform usage, otherwise false
+     */
     @Override
     public boolean filter(ComponentDefinition componentDefinition) {
-        return !COMPONENT_NAMES.contains(componentDefinition.getName());
+        return !EXCLUDED_COMPONENT_NAMES.contains(componentDefinition.getName());
     }
 
     @Override
