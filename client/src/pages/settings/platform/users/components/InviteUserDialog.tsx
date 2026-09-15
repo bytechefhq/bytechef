@@ -10,8 +10,15 @@ import {
 } from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Checkbox} from '@/components/ui/checkbox';
+import {WorkspaceRole} from '@/shared/middleware/graphql';
+import {getRoleLabel} from '@/shared/util/role-utils';
 
 import useInviteUserDialog from './hooks/useInviteUserDialog';
+
+// Derive from the generated GraphQL enum so a new server-side role appears here without a client change, and a removed
+// one stops being offered. The values are the wire names the mutation takes.
+const WORKSPACE_ROLES = Object.values(WorkspaceRole);
 
 const InviteUserDialog = () => {
     const {
@@ -21,11 +28,15 @@ const InviteUserDialog = () => {
         handleInvite,
         handleOpenChange,
         handleRoleChange,
+        handleWorkspaceRoleChange,
+        handleWorkspaceToggle,
         inviteDisabled,
         inviteEmail,
         inviteRole,
+        inviteWorkspaces,
         open,
         roleSelectVisible,
+        workspaces,
     } = useInviteUserDialog();
 
     return (
@@ -33,7 +44,7 @@ const InviteUserDialog = () => {
             <DialogContent>
                 <DialogMain>
                     <DialogHeader
-                        description="The invitee receives an email with a link on which they set their own password. The link expires after 3 days."
+                        description="The invitee receives an email with a link on which they set their own password. The link expires after 3 days. Optionally add them to workspaces now; you can also do that later from each workspace."
                         title="Invite User"
                     />
 
@@ -65,13 +76,61 @@ const InviteUserDialog = () => {
                                         <SelectContent>
                                             {authorities.map((authority) => (
                                                 <SelectItem key={authority} value={authority}>
-                                                    {authority}
+                                                    {getRoleLabel(authority)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                             )}
+
+                            <fieldset className="flex flex-col gap-2 border-0 p-0">
+                                <legend className="text-sm font-medium">Workspaces</legend>
+
+                                {workspaces.length === 0 && (
+                                    <p className="text-xs text-muted-foreground">No workspaces available.</p>
+                                )}
+
+                                {workspaces.map((workspace) => {
+                                    const assignment = inviteWorkspaces.find(
+                                        (inviteWorkspace) => inviteWorkspace.workspaceId === workspace.id
+                                    );
+
+                                    return (
+                                        <div className="flex items-center justify-between gap-2" key={workspace.id}>
+                                            <label className="flex items-center gap-2 text-sm">
+                                                <Checkbox
+                                                    checked={assignment !== undefined}
+                                                    onCheckedChange={() => handleWorkspaceToggle(workspace.id)}
+                                                />
+
+                                                {workspace.name}
+                                            </label>
+
+                                            {assignment && (
+                                                <Select
+                                                    onValueChange={(value) =>
+                                                        handleWorkspaceRoleChange(workspace.id, value)
+                                                    }
+                                                    value={assignment.roleName}
+                                                >
+                                                    <SelectTrigger className="w-32">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+
+                                                    <SelectContent>
+                                                        {WORKSPACE_ROLES.map((workspaceRole) => (
+                                                            <SelectItem key={workspaceRole} value={workspaceRole}>
+                                                                {getRoleLabel(workspaceRole)}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </fieldset>
                         </div>
                     </DialogBody>
 
