@@ -6,6 +6,7 @@ import {AlertTriangleIcon, BlocksIcon, CableIcon, Code2Icon, SlidersIcon, Sparkl
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import {WorkflowIssueSeverityType} from '../stores/useWorkflowIssuesStore';
 
 export interface WorkflowRightSidebarProps {
@@ -42,6 +43,8 @@ const WorkflowRightSidebar = ({
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
     const ff_1840 = useFeatureFlagsStore()('ff-1840');
+
+    const readOnly = useWorkflowEditorReadOnly();
 
     const copilotEnabled = ai.copilot.enabled && ff_1570;
 
@@ -114,6 +117,10 @@ const WorkflowRightSidebar = ({
                     return ff_1840;
                 }
 
+                if (item.name === 'Components & Flow Controls') {
+                    return !readOnly;
+                }
+
                 return true;
             }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,6 +131,7 @@ const WorkflowRightSidebar = ({
             issueCount,
             issueSeverity,
             issuesSidebarOpen,
+            readOnly,
             rightSidebarOpen,
             showCopilot,
         ]
