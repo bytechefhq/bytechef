@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {
     getCompletionContext,
     unregisterCompletionContext,
@@ -128,18 +129,20 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     },
 }));
 
-const renderSheet = (workflow: Partial<Workflow>) =>
+const renderSheet = (workflow: Partial<Workflow>, readOnly = false) =>
     render(
-        <TooltipProvider>
-            <WorkflowCodeEditorSheet
-                invalidateWorkflowQueries={vi.fn()}
-                onSheetOpenClose={vi.fn()}
-                runDisabled={false}
-                sheetOpen
-                testConfigurationDisabled={false}
-                workflow={{definition: '{}', id: 'workflow-1', ...workflow} as Workflow}
-            />
-        </TooltipProvider>
+        <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+            <TooltipProvider>
+                <WorkflowCodeEditorSheet
+                    invalidateWorkflowQueries={vi.fn()}
+                    onSheetOpenClose={vi.fn()}
+                    runDisabled={false}
+                    sheetOpen
+                    testConfigurationDisabled={false}
+                    workflow={{definition: '{}', id: 'workflow-1', ...workflow} as Workflow}
+                />
+            </TooltipProvider>
+        </WorkflowEditorReadOnlyContext.Provider>
     );
 
 describe('WorkflowCodeEditorSheet', () => {
@@ -147,6 +150,8 @@ describe('WorkflowCodeEditorSheet', () => {
         windowResizeObserver();
         hoisted.editorState.includeComponents = undefined;
         hoisted.editorState.platformType = 'AUTOMATION';
+        hoisted.sheetState.dirty = false;
+        hoisted.sheetState.workflowIsRunning = false;
     });
 
     afterEach(() => {
@@ -225,5 +230,39 @@ describe('WorkflowCodeEditorSheet', () => {
         fireEvent.click(await screen.findByTestId('mount-btn'));
 
         expect(hoisted.editorFocus).toHaveBeenCalled();
+    });
+
+    it('offers Save, Test and an editable definition when the editor is editable', async () => {
+        hoisted.sheetState.dirty = true;
+
+        renderSheet({});
+
+        await screen.findByTestId('mount-btn');
+
+        expect(hoisted.editorOptions.current?.readOnly).toBe(false);
+        expect(screen.getByRole('button', {name: 'Save current workflow'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test Configuration'})).toBeEnabled();
+    });
+
+    it('shows a read-only definition without Save or Test in read-only mode', async () => {
+        hoisted.sheetState.dirty = true;
+
+        renderSheet({}, true);
+
+        await screen.findByTestId('mount-btn');
+
+        expect(hoisted.editorOptions.current?.readOnly).toBe(true);
+        expect(screen.queryByRole('button', {name: 'Save current workflow'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Test'})).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Test Configuration'})).toBeDisabled();
+    });
+
+    it('still offers Stop for a running test in read-only mode', async () => {
+        hoisted.sheetState.workflowIsRunning = true;
+
+        renderSheet({}, true);
+
+        expect(await screen.findByRole('button', {name: 'Stop'})).toBeInTheDocument();
     });
 });
