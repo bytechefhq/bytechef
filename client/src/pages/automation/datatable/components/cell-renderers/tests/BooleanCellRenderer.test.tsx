@@ -16,10 +16,11 @@ describe('BooleanCellRenderer', () => {
     const mockOnToggle = vi.fn();
     const mockSetLocalRows = vi.fn();
 
-    const createRenderer = (columnName: string = 'isActive') => {
+    const createRenderer = (columnName: string = 'isActive', readOnly: boolean = false) => {
         return createBooleanCellRenderer({
             columnName,
             onToggle: mockOnToggle,
+            readOnly,
             setLocalRows: mockSetLocalRows,
         });
     };
@@ -107,6 +108,21 @@ describe('BooleanCellRenderer', () => {
             await user.click(checkbox);
 
             expect(mockOnToggle).toHaveBeenCalledWith('1', 'isActive', true);
+        });
+
+        it('should disable the checkbox and not toggle when readOnly is true', async () => {
+            const user = userEvent.setup();
+            const BooleanRenderer = createRenderer('isActive', true);
+
+            render(<BooleanRenderer row={{id: '1', isActive: false}} />);
+
+            const checkbox = screen.getByRole('checkbox', {name: 'Toggle isActive'});
+
+            expect(checkbox).toBeDisabled();
+
+            await user.click(checkbox);
+
+            expect(mockOnToggle).not.toHaveBeenCalled();
         });
 
         it('should toggle from true to false', async () => {
