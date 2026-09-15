@@ -3,6 +3,7 @@ import {createRoot} from 'react-dom/client';
 import './styles/index.css';
 
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {shouldRetryQuery} from '@/config/queryRetry';
 import I18n from '@/i18n';
 import {buildLoginPath} from '@/shared/auth/login-redirect-utils';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';
@@ -39,7 +40,7 @@ const publicRoutes = [
 async function renderApp() {
     const container = document.getElementById('root') as HTMLDivElement;
     const root = createRoot(container);
-    const queryClient = new QueryClient();
+    const queryClient = new QueryClient({defaultOptions: {queries: {retry: shouldRetryQuery}}});
 
     const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
 
