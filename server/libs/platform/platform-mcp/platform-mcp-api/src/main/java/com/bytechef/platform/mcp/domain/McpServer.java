@@ -31,6 +31,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -85,6 +86,9 @@ public final class McpServer {
 
     @Version
     private int version;
+
+    @Transient
+    private Boolean storedEnabled;
 
     public McpServer() {
     }
@@ -169,6 +173,10 @@ public final class McpServer {
         return secretKey;
     }
 
+    public Boolean getStoredEnabled() {
+        return storedEnabled;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -204,6 +212,10 @@ public final class McpServer {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public void setStoredEnabled(Boolean storedEnabled) {
+        this.storedEnabled = storedEnabled;
     }
 
     public void setVersion(int version) {

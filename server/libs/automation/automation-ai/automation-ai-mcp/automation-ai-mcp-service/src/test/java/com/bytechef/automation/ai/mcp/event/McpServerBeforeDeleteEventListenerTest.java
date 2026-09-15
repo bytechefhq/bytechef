@@ -16,8 +16,14 @@
 
 package com.bytechef.automation.ai.mcp.event;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,6 +41,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
 
@@ -44,6 +51,10 @@ import org.springframework.data.relational.core.mapping.event.Identifier;
  * @author Ivica Cardic
  */
 public class McpServerBeforeDeleteEventListenerTest {
+
+    private static final long MCP_SERVER_ID = 1L;
+    private static final long PROJECT_DEPLOYMENT_A_ID = 100L;
+    private static final long PROJECT_DEPLOYMENT_B_ID = 200L;
 
     private final McpProjectService mcpProjectService = mock(McpProjectService.class);
     private final McpProjectWorkflowService mcpProjectWorkflowService = mock(McpProjectWorkflowService.class);
@@ -282,5 +293,67 @@ public class McpServerBeforeDeleteEventListenerTest {
         verify(projectDeploymentService).delete(eq(300L));
         verify(projectDeploymentService).delete(eq(400L));
         verify(projectDeploymentService).delete(eq(500L));
+    }
+
+    @Test
+    public void testDeletingAServerDisablesNoDeploymentWhenTheCheckOfALaterOneFails() {
+        stubTwoMcpProjects();
+
+        doThrow(new IllegalStateException("check failed")).when(projectDeploymentFacade)
+            .checkEnableProjectDeployment(PROJECT_DEPLOYMENT_B_ID, false);
+
+        assertThatThrownBy(() -> createListener().onBeforeDelete(beforeDeleteEvent()))
+            .isInstanceOf(IllegalStateException.class);
+
+        verify(projectDeploymentFacade, never()).enableProjectDeployment(anyLong(), anyBoolean());
+        verify(mcpProjectService, never()).delete(anyLong());
+        verify(projectDeploymentService, never()).delete(anyLong());
+    }
+
+    @Test
+    public void testDeletingAServerChecksEveryDeploymentBeforeDisablingAny() {
+        stubTwoMcpProjects();
+
+        createListener().onBeforeDelete(beforeDeleteEvent());
+
+        InOrder inOrder = inOrder(projectDeploymentFacade);
+
+        inOrder.verify(projectDeploymentFacade)
+            .checkEnableProjectDeployment(PROJECT_DEPLOYMENT_A_ID, false);
+        inOrder.verify(projectDeploymentFacade)
+            .checkEnableProjectDeployment(PROJECT_DEPLOYMENT_B_ID, false);
+        inOrder.verify(projectDeploymentFacade)
+            .enableProjectDeployment(PROJECT_DEPLOYMENT_A_ID, false);
+        inOrder.verify(projectDeploymentFacade)
+            .enableProjectDeployment(PROJECT_DEPLOYMENT_B_ID, false);
+    }
+
+    private void stubTwoMcpProjects() {
+        McpProject mcpProjectA = new McpProject(PROJECT_DEPLOYMENT_A_ID, MCP_SERVER_ID);
+
+        mcpProjectA.setId(10L);
+
+        McpProject mcpProjectB = new McpProject(PROJECT_DEPLOYMENT_B_ID, MCP_SERVER_ID);
+
+        mcpProjectB.setId(20L);
+
+        when(mcpProjectService.getMcpServerMcpProjects(MCP_SERVER_ID)).thenReturn(List.of(mcpProjectA, mcpProjectB));
+    }
+
+    private McpServerBeforeDeleteEventListener createListener() {
+        return new McpServerBeforeDeleteEventListener(
+            mcpProjectService, mcpProjectWorkflowService, projectDeploymentWorkflowService, projectDeploymentService,
+            projectDeploymentFacade);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static BeforeDeleteEvent<McpServer> beforeDeleteEvent() {
+        BeforeDeleteEvent<McpServer> beforeDeleteEvent = mock(BeforeDeleteEvent.class);
+        Identifier identifier = mock(Identifier.class);
+
+        when(beforeDeleteEvent.getId()).thenReturn(identifier);
+        when(identifier.getValue()).thenReturn(MCP_SERVER_ID);
+
+        return beforeDeleteEvent;
     }
 }

@@ -60,6 +60,7 @@ import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -246,19 +247,33 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    public void checkEnableProjectDeployment(long projectDeploymentId, boolean enable) {
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
+            .getProjectDeploymentWorkflows(projectDeploymentId);
+
+        if (enable) {
+            validateEnabledProjectDeploymentWorkflowInputs(projectDeploymentWorkflows);
+        } else {
+            resolveEnabledTriggerDisables(projectDeploymentWorkflows);
+        }
+    }
+
+    @Override
     public void enableProjectDeployment(long projectDeploymentId, boolean enable) {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
             .getProjectDeploymentWorkflows(projectDeploymentId);
 
-        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
-            if (!projectDeploymentWorkflow.isEnabled()) {
-                continue;
-            }
+        if (enable) {
+            validateEnabledProjectDeploymentWorkflowInputs(projectDeploymentWorkflows);
 
-            if (enable) {
-                enableWorkflowTriggers(projectDeploymentWorkflow);
-            } else {
-                disableWorkflowTriggers(projectDeploymentWorkflow);
+            for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+                if (projectDeploymentWorkflow.isEnabled()) {
+                    enableWorkflowTriggers(projectDeploymentWorkflow);
+                }
+            }
+        } else {
+            for (TriggerDisable triggerDisable : resolveEnabledTriggerDisables(projectDeploymentWorkflows)) {
+                executeTriggerDisable(triggerDisable);
             }
         }
 
@@ -594,21 +609,53 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private void disableWorkflowTriggers(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
+        for (TriggerDisable triggerDisable : resolveTriggerDisables(projectDeploymentWorkflow)) {
+            executeTriggerDisable(triggerDisable);
+        }
+    }
+
+    private void executeTriggerDisable(TriggerDisable triggerDisable) {
+        triggerLifecycleFacade.executeTriggerDisable(
+            triggerDisable.workflowId(), triggerDisable.workflowExecutionId(), triggerDisable.workflowNodeType(),
+            triggerDisable.triggerParameters(), triggerDisable.connectionId());
+    }
+
+    private List<TriggerDisable> resolveEnabledTriggerDisables(
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+
+        List<TriggerDisable> triggerDisables = new ArrayList<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            if (projectDeploymentWorkflow.isEnabled()) {
+                triggerDisables.addAll(resolveTriggerDisables(projectDeploymentWorkflow));
+            }
+        }
+
+        return triggerDisables;
+    }
+
+    private List<TriggerDisable> resolveTriggerDisables(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
+
+        List<TriggerDisable> triggerDisables = new ArrayList<>();
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 PlatformType.AUTOMATION, projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectWorkflow.getUuidAsString(), workflowTrigger.getName());
 
-            triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
-                getConnectionId(projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger));
+            triggerDisables.add(
+                new TriggerDisable(
+                    workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
+                    workflowTrigger.evaluateParameters(projectDeploymentWorkflow.getInputs(), evaluator),
+                    getConnectionId(
+                        projectDeploymentWorkflow.getProjectDeploymentId(), workflow.getId(), workflowTrigger)));
         }
+
+        return triggerDisables;
     }
 
     private ProjectDeploymentWorkflow doEnableProjectDeploymentWorkflow(
@@ -915,6 +962,18 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         }
     }
 
+    private void validateEnabledProjectDeploymentWorkflowInputs(
+        List<ProjectDeploymentWorkflow> projectDeploymentWorkflows) {
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : projectDeploymentWorkflows) {
+            if (projectDeploymentWorkflow.isEnabled()) {
+                Workflow workflow = workflowService.getWorkflow(projectDeploymentWorkflow.getWorkflowId());
+
+                validateProjectDeploymentWorkflowInputs(projectDeploymentWorkflow.getInputs(), workflow);
+            }
+        }
+    }
+
     static void validateProjectDeploymentWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
@@ -927,5 +986,10 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
         }
+    }
+
+    private record TriggerDisable(
+        String workflowId, WorkflowExecutionId workflowExecutionId, WorkflowNodeType workflowNodeType,
+        Map<String, ?> triggerParameters, Long connectionId) {
     }
 }

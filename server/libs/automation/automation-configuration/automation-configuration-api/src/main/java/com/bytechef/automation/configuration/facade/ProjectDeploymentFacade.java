@@ -42,6 +42,8 @@ public interface ProjectDeploymentFacade {
 
     void deleteProjectDeployment(long id);
 
+    void checkEnableProjectDeployment(long id, boolean enable);
+
     void enableProjectDeployment(long id, boolean enable);
 
     void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable);
