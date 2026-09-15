@@ -1,0 +1,14 @@
+mutation inviteWorkspaceUser(
+    $workspaceId: ID!
+    $email: String!
+    $role: WorkspaceRole
+    $customRoleId: ID
+) {
+    inviteWorkspaceUser(workspaceId: $workspaceId, email: $email, role: $role, customRoleId: $customRoleId) {
+        id
+        userId
+        workspaceId
+        workspaceRole
+        customRoleId
+    }
+}

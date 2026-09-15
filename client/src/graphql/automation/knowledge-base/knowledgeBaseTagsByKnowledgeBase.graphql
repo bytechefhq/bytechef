@@ -1,5 +1,5 @@
-query knowledgeBaseTagsByKnowledgeBase {
-    knowledgeBaseTagsByKnowledgeBase {
+query knowledgeBaseTagsByKnowledgeBase($environmentId: ID!, $workspaceId: ID!) {
+    knowledgeBaseTagsByKnowledgeBase(environmentId: $environmentId, workspaceId: $workspaceId) {
         knowledgeBaseId
         tags {
             id
