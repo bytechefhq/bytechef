@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -59,6 +60,9 @@ class AiAgentEvalRunFacadeImpl implements AiAgentEvalRunFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalTest', #agentEvalTestId), "
+        + "'WORKFLOW_EDIT', #environmentId)")
     public AiAgentEvalRun startEvalRun(
         long agentEvalTestId, String name, long environmentId,
         List<Long> scenarioIds, List<Long> aiAgentJudgeIds) {
@@ -110,6 +114,9 @@ class AiAgentEvalRunFacadeImpl implements AiAgentEvalRunFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalRun', #id), 'WORKFLOW_EDIT', "
+        + "@aiAgentEvalWorkflowResolver.getEnvironmentId('AiAgentEvalRun', #id))")
     public AiAgentEvalRun cancelEvalRun(long id) {
         AiAgentEvalRun aiAgentEvalRun = agentEvalRunService.getAgentEvalRun(id);
 

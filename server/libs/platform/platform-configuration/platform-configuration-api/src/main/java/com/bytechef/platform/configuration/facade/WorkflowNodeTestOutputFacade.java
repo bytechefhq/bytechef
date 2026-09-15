@@ -26,6 +26,8 @@ import java.util.Map;
  */
 public interface WorkflowNodeTestOutputFacade {
 
+    void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId);
+
     WorkflowNodeTestOutput saveClusterElementTestOutput(
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, long environmentId);

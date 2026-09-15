@@ -57,6 +57,7 @@ import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
+import com.bytechef.platform.workflow.test.service.TestJobRegistry;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -77,6 +78,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -96,6 +98,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
+    private final TestJobRegistry testJobRegistry;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -105,8 +108,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
         JobService jobService, JobSyncExecutor jobSyncExecutor,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, TestJobRegistry testJobRegistry,
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.componentDefinitionService = componentDefinitionService;
@@ -117,12 +120,14 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
+        this.testJobRegistry = testJobRegistry;
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public void executeAsync(
         String workflowId, Map<String, Object> inputs, long environmentId, Consumer<String> afterStartCallback,
         Function<String, SseStreamBridge> sseStreamBridgeFactory,
@@ -132,6 +137,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
 
         long jobId = jobSyncExecutor.startJob(workflowTestParameters.jobParametersDTO());
+
+        testJobRegistry.register(jobId, workflowId, environmentId);
 
         String key = TenantCacheKeyUtils.getKey(jobId);
 
@@ -177,14 +184,17 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowTestExecutionDTO executeSync(String workflowId, Map<String, Object> inputs, long environmentId) {
         WorkflowTestParameters workflowTestParameters = getWorkflowTestParameters(workflowId, inputs, environmentId);
 
         return new WorkflowTestExecutionDTO(
-            execute(workflowTestParameters.jobParametersDTO()), workflowTestParameters.triggerExecutionDTO());
+            execute(workflowTestParameters.jobParametersDTO(), workflowId, environmentId),
+            workflowTestParameters.triggerExecutionDTO());
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     public void stop(long jobId) {
         jobSyncExecutor.stopJob(jobId);
     }
@@ -253,8 +263,10 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             getJobTaskExecutions(Validate.notNull(job.getId(), "id")));
     }
 
-    private JobDTO execute(JobParametersDTO jobParametersDTO) {
+    private JobDTO execute(JobParametersDTO jobParametersDTO, String workflowId, long environmentId) {
         long jobId = jobSyncExecutor.startJob(jobParametersDTO);
+
+        testJobRegistry.register(jobId, workflowId, environmentId);
 
         return await(jobId);
     }

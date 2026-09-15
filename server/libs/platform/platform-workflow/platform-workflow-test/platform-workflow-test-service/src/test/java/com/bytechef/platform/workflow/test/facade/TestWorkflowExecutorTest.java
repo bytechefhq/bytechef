@@ -97,8 +97,9 @@ public class TestWorkflowExecutorTest {
             jobSyncExecutor,
             mock(com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService.class),
             mock(com.bytechef.atlas.execution.service.TaskExecutionService.class),
-            mock(com.bytechef.atlas.file.storage.TaskFileStorage.class), workflowService, workflowNodeOutputFacade,
-            workflowTestConfigurationService);
+            mock(com.bytechef.atlas.file.storage.TaskFileStorage.class),
+            mock(com.bytechef.platform.workflow.test.service.TestJobRegistry.class), workflowService,
+            workflowNodeOutputFacade, workflowTestConfigurationService);
     }
 
     @Test
