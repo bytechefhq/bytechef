@@ -16,7 +16,9 @@ import static org.mockito.Mockito.when;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
@@ -56,7 +58,7 @@ class WorkspaceScopeCacheKeyConsistencyTest {
 
         WorkspaceUser workspaceUser = WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
 
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(workspaceUser));
         when(permissionScopeRegistry.getScopeNames(WorkspaceRole.EDITOR))
             .thenReturn(Set.of("WORKFLOW_VIEW"));
@@ -73,7 +75,7 @@ class WorkspaceScopeCacheKeyConsistencyTest {
         workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
         workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
 
-        verify(workspaceUserRepository, times(1)).findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+        verify(workspaceUserRepository, times(1)).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID);
 
         // No active transaction, so eviction runs immediately.
         workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
@@ -82,21 +84,100 @@ class WorkspaceScopeCacheKeyConsistencyTest {
         // did not match, this read would still be served from cache and the repository would stay at a single hit.
         workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
 
-        verify(workspaceUserRepository, times(2)).findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+        verify(workspaceUserRepository, times(2)).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID);
     }
 
     @Test
     void testEvictAllWorkspaceScopeCacheClearsTheCachedEntry() {
         workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
 
-        verify(workspaceUserRepository, times(1)).findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+        verify(workspaceUserRepository, times(1)).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID);
 
         workspaceScopeCacheService.evictAllWorkspaceScopeCache();
 
         Set<String> scopes = workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID);
 
         assertThat(scopes).containsExactly("WORKFLOW_VIEW");
-        verify(workspaceUserRepository, times(2)).findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+        verify(workspaceUserRepository, times(2)).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testTwoEnvironmentsDoNotShareACacheEntry() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal()))
+                .thenReturn(
+                    Optional.of(
+                        WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT)));
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal()))
+                .thenReturn(
+                    Optional.of(
+                        WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.PRODUCTION)));
+
+        PermissionScopeRegistry permissionScopeRegistry = applicationContext.getBean(PermissionScopeRegistry.class);
+
+        // A different scope set from EDITOR's, so the assertion below distinguishes the two entries rather
+        // than passing because both roles happen to resolve alike.
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).thenReturn(Set.of("PROJECT_VIEW"));
+
+        Set<String> developmentScopes =
+            workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT);
+        Set<String> productionScopes =
+            workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+
+        // Without the environment in the key the second call would be served the first's entry, and a member who is
+        // viewer in Production would be answered with their Development scopes -- silent privilege escalation that a
+        // single-environment test cannot catch.
+        assertThat(developmentScopes).isNotEqualTo(productionScopes);
+
+        verify(workspaceUserRepository).findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT.ordinal());
+        verify(workspaceUserRepository).findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testEvictionClearsEveryEnvironmentEntry() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal()))
+                .thenReturn(
+                    Optional.of(
+                        WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.PRODUCTION)));
+
+        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+
+        verify(workspaceUserRepository, times(1)).findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal());
+
+        workspaceScopeCacheService.evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
+
+        // A single eviction must clear the entry for every environment, not just the arity-2 one. If the loop or the
+        // key shape were wrong this read would still be served from cache.
+        workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION);
+
+        verify(workspaceUserRepository, times(2)).findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testEnvironmentUnawareReadUnionsTheEnvironmentRoles() {
+        // An explicit-mode member has no implicit row. Without the union they would hold nothing under any guard that
+        // names no environment, which is most of them.
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(
+                List.of(
+                    WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT),
+                    WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER, Environment.PRODUCTION)));
+
+        PermissionScopeRegistry permissionScopeRegistry = applicationContext.getBean(PermissionScopeRegistry.class);
+
+        when(permissionScopeRegistry.getScopeNames(WorkspaceRole.VIEWER)).thenReturn(Set.of("WORKFLOW_VIEW"));
+
+        assertThat(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+            .containsExactlyInAnyOrder("WORKFLOW_VIEW");
     }
 
     @EnableCaching
