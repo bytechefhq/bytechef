@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import useDataStreamMapping from '@/pages/platform/cluster-element-editor/data-stream-editor/hooks/useDataStreamMapping';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {SparklesIcon} from 'lucide-react';
 
 export default function DataStreamMappingStep() {
@@ -15,6 +16,7 @@ export default function DataStreamMappingStep() {
         propertiesKey,
         sourceLabel,
     } = useDataStreamMapping();
+    const readOnly = useWorkflowEditorReadOnly();
 
     return (
         <div className="space-y-6 py-4">
@@ -26,7 +28,7 @@ export default function DataStreamMappingStep() {
                 </p>
             </div>
 
-            {processor && hasSourceAndDestination && (
+            {processor && hasSourceAndDestination && !readOnly && (
                 <Button
                     className="w-fit"
                     disabled={autoMapping}
