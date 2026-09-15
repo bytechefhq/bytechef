@@ -1,0 +1,3 @@
+mutation RemoveWorkspaceUserEnvironmentRole($workspaceId: ID!, $userId: ID!, $environment: EnvironmentEnum!) {
+    removeWorkspaceUserEnvironmentRole(workspaceId: $workspaceId, userId: $userId, environment: $environment)
+}
