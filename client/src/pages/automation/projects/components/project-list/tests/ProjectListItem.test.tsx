@@ -22,6 +22,10 @@ const ALL_SCOPES = [
 
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
 
+const hoistedQueries = vi.hoisted(() => ({
+    useGetWorkspaceProjectDeploymentsQuery: vi.fn(() => ({data: [], isFetching: false, refetch: vi.fn()})),
+}));
+
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
     useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
         hoistedScope.grantedScopes.includes(scope),
@@ -106,7 +110,12 @@ vi.mock('@/shared/queries/automation/projectCategories.queries', () => ({
 }));
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
-    useGetWorkspaceProjectDeploymentsQuery: () => ({data: [], isFetching: false, refetch: vi.fn()}),
+    useGetWorkspaceProjectDeploymentsQuery: hoistedQueries.useGetWorkspaceProjectDeploymentsQuery,
+}));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: (selector: (state: {currentEnvironmentId: number}) => unknown) =>
+        selector({currentEnvironmentId: 2}),
 }));
 
 vi.mock('@/shared/queries/automation/projectTags.queries', () => ({
@@ -172,6 +181,15 @@ afterEach(() => {
 });
 
 describe('ProjectListItem', () => {
+    it('looks up the project deployments of the current environment', () => {
+        renderProjectListItem();
+
+        expect(hoistedQueries.useGetWorkspaceProjectDeploymentsQuery).toHaveBeenCalledWith(
+            {environmentId: 2, id: 1, projectId: 1},
+            false
+        );
+    });
+
     it('shows every gated control when all scopes are granted', async () => {
         renderProjectListItem();
 

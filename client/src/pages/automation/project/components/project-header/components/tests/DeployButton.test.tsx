@@ -1,19 +1,24 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import DeployButton from '@/pages/automation/project/components/project-header/components/DeployButton';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import {WorkspaceScopeType} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {EditionType, applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {permissionStore} from '@/shared/stores/usePermissionStore';
 import {render, screen} from '@/shared/util/test-utils';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+const hoistedQueries = vi.hoisted(() => ({
+    useGetWorkspaceProjectDeploymentsQuery: vi.fn(() => ({data: [], isFetching: false, refetch: vi.fn()})),
+}));
+
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
-    useGetWorkspaceProjectDeploymentsQuery: () => ({data: [], isFetching: false, refetch: vi.fn()}),
+    useGetWorkspaceProjectDeploymentsQuery: hoistedQueries.useGetWorkspaceProjectDeploymentsQuery,
 }));
 
 const WORKSPACE_ID = 1049;
@@ -57,9 +62,22 @@ const renderDeployButton = (project = publishedProject) => {
 
 describe('DeployButton', () => {
     beforeEach(() => {
+        environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
+        hoistedQueries.useGetWorkspaceProjectDeploymentsQuery.mockClear();
         useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
 
         setEnterpriseMemberScopes(DEPLOY_SCOPES);
+    });
+
+    it('looks up the project deployments of the current environment', () => {
+        environmentStore.setState({currentEnvironmentId: PRODUCTION_ENVIRONMENT});
+
+        renderDeployButton();
+
+        expect(hoistedQueries.useGetWorkspaceProjectDeploymentsQuery).toHaveBeenCalledWith(
+            {environmentId: PRODUCTION_ENVIRONMENT, id: WORKSPACE_ID, projectId: 1},
+            false
+        );
     });
 
     it('enables Deploy for a published project when the member holds both deploy scopes', () => {
