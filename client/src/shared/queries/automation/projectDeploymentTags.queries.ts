@@ -1,13 +1,21 @@
 /* eslint-disable sort-keys */
-import {ProjectDeploymentTagApi, Tag} from '@/shared/middleware/automation/configuration';
+import {
+    GetProjectDeploymentTagsRequest,
+    ProjectDeploymentTagApi,
+    Tag,
+} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectDeploymentTagKeys = {
     projectDeploymentTags: ['projectDeploymentTags'] as const,
+    workspaceProjectDeploymentTags: (request: GetProjectDeploymentTagsRequest) => [
+        ...ProjectDeploymentTagKeys.projectDeploymentTags,
+        request,
+    ],
 };
 
-export const useGetProjectDeploymentTagsQuery = () =>
+export const useGetProjectDeploymentTagsQuery = (request: GetProjectDeploymentTagsRequest) =>
     useQuery<Tag[], Error>({
-        queryKey: ProjectDeploymentTagKeys.projectDeploymentTags,
-        queryFn: () => new ProjectDeploymentTagApi().getProjectDeploymentTags(),
+        queryKey: ProjectDeploymentTagKeys.workspaceProjectDeploymentTags(request),
+        queryFn: () => new ProjectDeploymentTagApi().getProjectDeploymentTags(request),
     });
