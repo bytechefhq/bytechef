@@ -52,7 +52,11 @@ import org.springframework.web.context.request.RequestContextHolder;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspacePermissionIntTestConfiguration.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = WorkspacePermissionIntTestConfiguration.class,
+    properties = {
+        "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
+    })
 class PermissionServiceIntTest {
 
     private static final String LOGIN = "user";

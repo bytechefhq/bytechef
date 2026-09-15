@@ -25,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Runs {@link WorkspaceUserAuditMapper} over real {@code workspace_user} rows, so the previous role it captures is read
@@ -34,10 +35,17 @@ import org.springframework.boot.test.context.SpringBootTest;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspacePermissionIntTestConfiguration.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = WorkspacePermissionIntTestConfiguration.class,
+    properties = {
+        "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
+    })
 class WorkspaceUserAuditMapperIntTest {
 
     private static final long USER_ID = 2L;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private WorkspaceRepository workspaceRepository;
@@ -119,6 +127,8 @@ class WorkspaceUserAuditMapperIntTest {
 
     @Test
     void testCustomRolePreviousRoleIsDescribedByItsId() {
+        createCustomRole(5L);
+
         workspaceUserRepository.save(WorkspaceUser.forCustomRole(USER_ID, workspaceId, 5L));
 
         Map<String, Object> arguments = arguments(
@@ -170,6 +180,14 @@ class WorkspaceUserAuditMapperIntTest {
         assertThatThrownBy(() -> workspaceUserAuditMapper.capture(auditInvocation))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("userId");
+    }
+
+    private void createCustomRole(long customRoleId) {
+        jdbcTemplate.update(
+            "INSERT INTO custom_role (id, name, created_date, created_by, last_modified_date, last_modified_by, " +
+                "version) VALUES (?, ?, CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0) " +
+                "ON CONFLICT (id) DO NOTHING",
+            customRoleId, "Custom Role " + customRoleId);
     }
 
     private static AuditInvocation invocation(

@@ -47,7 +47,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = CurrentUserResolverIntTest.Config.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = CurrentUserResolverIntTest.Config.class,
+    properties = {
+        "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
+    })
 @Import(PostgreSQLContainerConfiguration.class)
 class CurrentUserResolverIntTest {
 
