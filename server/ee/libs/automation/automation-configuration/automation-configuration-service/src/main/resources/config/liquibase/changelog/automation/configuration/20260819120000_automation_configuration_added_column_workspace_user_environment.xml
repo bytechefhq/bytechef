@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+      Give workspace_user an environment dimension. A NULL environment means "every environment" and is what every
+      existing row has, so there is no data migration and no behaviour change on upgrade.
+
+      Per (workspace_id, user_id) the membership is either implicit (a single NULL row) or explicit (one row per
+      environment, an absent row meaning denial). That one-mode-at-a-time rule is a service-layer invariant; the
+      schema below enforces only the weaker part of it, because a partial index cannot express "not both modes".
+
+      H2 supports neither DELETE ... USING nor partial indexes, so it gets its own changesets: a correlated DELETE, and
+      one unique index over a generated column that maps a NULL environment to -1.
+    -->
+
+    <changeSet id="20260819120000" author="Ivica Cardic">
+        <comment>Add the nullable environment ordinal to workspace_user. NULL means every environment.</comment>
+
+        <addColumn tableName="workspace_user">
+            <column name="environment" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260819120001" author="Ivica Cardic" dbms="postgresql">
+        <comment>
+            Remove duplicate (workspace_id, user_id) rows so uk_workspace_user_implicit can be created. Keeps the most
+            privileged built-in role (0=ADMIN), ranks a custom-role row (NULL role) below every built-in one, and
+            breaks ties by the lowest id.
+        </comment>
+
+        <sql>
+            DELETE FROM workspace_user wu
+            USING workspace_user wu2
+            WHERE wu.workspace_id = wu2.workspace_id
+              AND wu.user_id = wu2.user_id
+              AND (
+                    COALESCE(wu.workspace_role, 2147483647) &gt; COALESCE(wu2.workspace_role, 2147483647)
+                 OR (COALESCE(wu.workspace_role, 2147483647) = COALESCE(wu2.workspace_role, 2147483647)
+                     AND wu.id &gt; wu2.id)
+              )
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260819120001-h2" author="Ivica Cardic" dbms="h2">
+        <comment>The H2 form of 20260819120001, with the same keep rule.</comment>
+
+        <sql>
+            DELETE FROM workspace_user wu
+            WHERE EXISTS (
+                SELECT 1 FROM workspace_user wu2
+                WHERE wu2.workspace_id = wu.workspace_id
+                  AND wu2.user_id = wu.user_id
+                  AND (
+                        COALESCE(wu.workspace_role, 2147483647) &gt; COALESCE(wu2.workspace_role, 2147483647)
+                     OR (COALESCE(wu.workspace_role, 2147483647) = COALESCE(wu2.workspace_role, 2147483647)
+                         AND wu.id &gt; wu2.id)
+                  )
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260819120002" author="Ivica Cardic" dbms="postgresql">
+        <comment>
+            At most one implicit row per member. Written as raw SQL because Liquibase's createIndex has no WHERE
+            clause, and a plain three-column unique constraint would not do: PostgreSQL treats NULLs as distinct and
+            would admit unlimited NULL rows for one member.
+        </comment>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_workspace_user_implicit
+                ON workspace_user (workspace_id, user_id) WHERE environment IS NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_workspace_user_implicit;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260819120003" author="Ivica Cardic" dbms="postgresql">
+        <comment>At most one explicit row per member per environment.</comment>
+
+        <sql>
+            CREATE UNIQUE INDEX uk_workspace_user_explicit
+                ON workspace_user (workspace_id, user_id, environment) WHERE environment IS NOT NULL;
+        </sql>
+
+        <rollback>
+            <sql>DROP INDEX IF EXISTS uk_workspace_user_explicit;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260819120002-h2" author="Ivica Cardic" dbms="h2">
+        <comment>
+            The H2 form of 20260819120002 and 20260819120003: one unique index covering the implicit row (environment
+            -1) and each explicit row.
+        </comment>
+
+        <sql>
+            ALTER TABLE workspace_user ADD COLUMN environment_key INT GENERATED ALWAYS AS (COALESCE(environment, -1));
+            CREATE UNIQUE INDEX uk_workspace_user_environment
+                ON workspace_user (workspace_id, user_id, environment_key);
+        </sql>
+
+        <rollback>
+            <sql>
+                DROP INDEX IF EXISTS uk_workspace_user_environment;
+                ALTER TABLE workspace_user DROP COLUMN environment_key;
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
