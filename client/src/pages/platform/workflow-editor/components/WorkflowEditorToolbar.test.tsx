@@ -1,11 +1,12 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useUserGuidingStore} from '@/shared/stores/useUserGuidingStore';
-import {render, screen, userEvent} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactFlowProvider} from '@xyflow/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {WorkflowEditorProvider, WorkflowEditorStateI, WorkflowMockProvider} from '../providers/workflowEditorProvider';
+import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnlyContext';
 import useClusterElementsViewModeStore from '../stores/useClusterElementsViewModeStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useLayoutEngineStore from '../stores/useLayoutEngineStore';
@@ -13,6 +14,10 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import {clearAllWorkflowMutations} from '../utils/workflowMutationGuard';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
+
+vi.mock('../hooks/useWorkflowUndoRedo', () => ({
+    default: () => ({canRedo: true, canUndo: true, handleRedo: vi.fn(), handleUndo: vi.fn()}),
+}));
 
 const renderToolbar = (readOnly = false) =>
     render(
@@ -291,5 +296,52 @@ describe('WorkflowEditorToolbar - hide guide button', () => {
 
         window.userGuiding = undefined;
         applicationInfoStore.setState({userGuiding: {containerId: undefined, enabled: false}});
+    });
+});
+
+describe('WorkflowEditorToolbar - button set', () => {
+    const EDITABLE_TOOLBAR_BUTTON_COUNT = 11;
+
+    const READ_ONLY_TOOLBAR_BUTTON_COUNT = 8;
+
+    const renderToolbarWithReadOnlyContext = ({
+        contextReadOnly = false,
+        readOnly = false,
+    }: {
+        contextReadOnly?: boolean;
+        readOnly?: boolean;
+    }) =>
+        render(
+            <WorkflowEditorReadOnlyContext.Provider value={contextReadOnly}>
+                <ReactFlowProvider>
+                    <WorkflowMockProvider>
+                        <TooltipProvider>
+                            <WorkflowEditorToolbar enableUndoRedo readOnly={readOnly} />
+                        </TooltipProvider>
+                    </WorkflowMockProvider>
+                </ReactFlowProvider>
+            </WorkflowEditorReadOnlyContext.Provider>
+        );
+
+    afterEach(() => {
+        resetAll();
+    });
+
+    it('offers layout engine, zoom, layout, reset layout, cluster elements view mode, node lock, undo and redo when editable', () => {
+        renderToolbarWithReadOnlyContext({});
+
+        expect(screen.getAllByRole('button')).toHaveLength(EDITABLE_TOOLBAR_BUTTON_COUNT);
+    });
+
+    it('keeps disabling reset layout and hiding node lock, undo and redo for the existing read-only workflow sheets', () => {
+        renderToolbarWithReadOnlyContext({readOnly: true});
+
+        expect(screen.getAllByRole('button')).toHaveLength(READ_ONLY_TOOLBAR_BUTTON_COUNT);
+    });
+
+    it('is unaffected by the viewer context alone when the editor passes no read-only flag', () => {
+        renderToolbarWithReadOnlyContext({contextReadOnly: true});
+
+        expect(screen.getAllByRole('button')).toHaveLength(EDITABLE_TOOLBAR_BUTTON_COUNT);
     });
 });
