@@ -54,8 +54,9 @@ import org.springframework.stereotype.Component;
  * </ul>
  *
  * <p>
- * For {@code AbstractException} subclasses, {@code entityClass}/{@code errorKey}/{@code errorCode} are forwarded to the
- * GraphQL error {@code extensions} map so clients can discriminate variants without string-matching message text.
+ * For {@code AbstractException} subclasses, the structured {@code entityClass}, {@code errorKey}, and {@code errorCode}
+ * fields are forwarded to the GraphQL error {@code extensions} map so clients can discriminate between error variants
+ * (e.g., {@code ALREADY_MEMBER} vs {@code LAST_ADMIN_PROTECTED}) without string-matching on message text.
  *
  * @author Ivica Cardic
  */

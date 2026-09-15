@@ -24,9 +24,12 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.RandomUtils;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
 import java.time.Instant;
@@ -66,6 +69,9 @@ class UserServiceIntTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthorityRepository authorityRepository;
 
     @Autowired
     private PersistentTokenRepository persistentTokenRepository;
@@ -459,6 +465,54 @@ class UserServiceIntTest {
         User savedUser = userRepository.save(user);
 
         return Objects.requireNonNull(savedUser.getId());
+    }
+
+    /**
+     * {@code UserRepository.findAllByAuthorityName} is hand-written SQL over three tables, and it runs on every load of
+     * the workspace members page to project tenant admins as inherited workspace admins. Both of its consumers mock the
+     * repository, so before this test the statement had never executed against a database at all — a wrong join, a
+     * mistyped column or a missing {@code activated} predicate would have surfaced only in production.
+     */
+    @Test
+    @Transactional
+    void testGetUsersByAuthorityNameReturnsOnlyActivatedAdmins() {
+        long adminAuthorityId = authorityId(AuthorityConstants.ADMIN);
+        long userAuthorityId = authorityId(AuthorityConstants.USER);
+
+        User activatedAdmin = saveUser("activatedadmin", true, adminAuthorityId);
+        User deactivatedAdmin = saveUser("deactivatedadmin", false, adminAuthorityId);
+        User activatedMember = saveUser("activatedmember", true, userAuthorityId);
+
+        List<User> admins = userService.getUsersByAuthorityName(AuthorityConstants.ADMIN);
+
+        // The deactivated admin is the case the SQL's `u.activated = true` exists for: showing them as an inherited
+        // workspace admin would advertise access nobody has. The ROLE_USER row proves the authority join filters at
+        // all.
+        assertThat(admins).extracting(User::getId)
+            .contains(activatedAdmin.getId())
+            .doesNotContain(deactivatedAdmin.getId(), activatedMember.getId());
+    }
+
+    private long authorityId(String authorityName) {
+        Authority authority = authorityRepository.findByName(authorityName)
+            .orElseThrow();
+
+        return authority.getId();
+    }
+
+    private User saveUser(String login, boolean activated, long authorityId) {
+        User newUser = new User();
+
+        newUser.setActivated(activated);
+        newUser.setAuthorityIds(List.of(authorityId));
+        newUser.setEmail(login + "@localhost");
+        newUser.setFirstName(DEFAULT_FIRSTNAME);
+        newUser.setLangKey(DEFAULT_LANGKEY);
+        newUser.setLastName(DEFAULT_LASTNAME);
+        newUser.setLogin(login);
+        newUser.setPassword(RandomStringUtils.randomAlphanumeric(60));
+
+        return userRepository.save(newUser);
     }
 
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")

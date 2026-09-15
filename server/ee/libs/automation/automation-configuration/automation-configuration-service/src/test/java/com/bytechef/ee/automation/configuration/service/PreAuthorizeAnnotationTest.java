@@ -57,6 +57,54 @@ class PreAuthorizeAnnotationTest {
     }
 
     @Test
+    void testWorkspaceUserFacadeMembershipChangesAreProtected() throws Exception {
+        // Workspace-wide changes grant or revoke a role in every environment at once, so they need the scope in every
+        // environment; the per-environment writes need it only where they apply. Left unguarded, any member could
+        // grant themselves ADMIN.
+        Class<?> clazz = Class.forName("com.bytechef.ee.automation.configuration.facade.WorkspaceUserFacadeImpl");
+        Class<?> workspaceRoleClass = Class.forName(
+            "com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole");
+        Class<?> environmentClass = Class.forName("com.bytechef.platform.configuration.domain.Environment");
+
+        String memberManage = "hasWorkspaceScopeInEveryEnvironment(#workspaceId, 'WORKSPACE_MEMBER_MANAGE')";
+        String environmentMemberManage =
+            "hasWorkspaceScopeInEnvironment(#workspaceId, 'WORKSPACE_MEMBER_MANAGE', #environment)";
+
+        assertOverloadPreAuthorize(
+            clazz, "addWorkspaceUser", new Class<?>[] {
+                long.class, long.class, workspaceRoleClass, Long.class
+            }, memberManage);
+        assertOverloadPreAuthorize(
+            clazz, "assignCustomRole", new Class<?>[] {
+                long.class, long.class, long.class
+            }, memberManage);
+        assertOverloadPreAuthorize(
+            clazz, "inviteWorkspaceUser", new Class<?>[] {
+                long.class, String.class, workspaceRoleClass, Long.class
+            }, memberManage);
+        assertOverloadPreAuthorize(
+            clazz, "removeWorkspaceUser", new Class<?>[] {
+                long.class, long.class
+            }, memberManage);
+        assertOverloadPreAuthorize(
+            clazz, "updateWorkspaceUserRole", new Class<?>[] {
+                long.class, long.class, workspaceRoleClass
+            }, memberManage);
+        assertOverloadPreAuthorize(
+            clazz, "setEnvironmentRole", new Class<?>[] {
+                long.class, long.class, environmentClass, workspaceRoleClass, Long.class
+            }, environmentMemberManage);
+        assertOverloadPreAuthorize(
+            clazz, "removeEnvironmentRole", new Class<?>[] {
+                long.class, long.class, environmentClass
+            }, environmentMemberManage);
+        assertOverloadPreAuthorize(
+            clazz, "getWorkspaceWorkspaceUsers", new Class<?>[] {
+                long.class
+            }, "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_VIEW')");
+    }
+
+    @Test
     void testCeProjectFacadeCreateMutationsAreProtected() throws Exception {
         Class<?> clazz = Class.forName(
             "com.bytechef.automation.configuration.facade.ProjectFacadeImpl");
