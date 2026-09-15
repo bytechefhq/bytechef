@@ -17,6 +17,15 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 vi.mock('../../hooks/useDataTableHeader', () => ({
     default: () => ({
         handleOpenDeleteRowsDialog: hoisted.mockHandleOpenDeleteRowsDialog,
@@ -76,6 +85,8 @@ vi.mock('../DataTableActionsMenu', () => ({
 }));
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     windowResizeObserver();
     hoisted.storeState.selectedRowsCount = 0;
     hoisted.storeState.dataTable = {baseName: 'TestTable', id: 'table-123'};
@@ -124,6 +135,15 @@ describe('DataTableHeader', () => {
             render(<DataTableHeader />);
 
             expect(screen.getByRole('button', {name: /Delete \(5\)/i})).toBeInTheDocument();
+        });
+
+        it('should hide delete rows button without DATA_TABLE_EDIT', () => {
+            hoistedScope.grantedScopes = [];
+            hoisted.storeState.selectedRowsCount = 5;
+
+            render(<DataTableHeader />);
+
+            expect(screen.queryByRole('button', {name: /Delete \(5\)/i})).not.toBeInTheDocument();
         });
 
         it('should show correct count in delete button', () => {
