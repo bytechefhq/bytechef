@@ -1,0 +1,6 @@
+query BuiltInRoles {
+    builtInRoles {
+        name
+        scopes
+    }
+}
