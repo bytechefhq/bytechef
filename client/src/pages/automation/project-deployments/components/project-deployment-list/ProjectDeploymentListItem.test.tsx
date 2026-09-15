@@ -28,6 +28,10 @@ vi.mock('@/shared/mutations/automation/projectDeploymentTags.mutations', () => (
     useUpdateProjectDeploymentTagsMutation: () => ({mutate: vi.fn()}),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/shared/hooks/useAnalytics', () => ({
     useAnalytics: () => ({captureProjectDeploymentEnabled: vi.fn()}),
 }));
