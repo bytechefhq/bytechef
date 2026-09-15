@@ -17,7 +17,13 @@
 package com.bytechef.ai.mcp.server.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
@@ -29,6 +35,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.repository.PropertyRepository;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.configuration.service.PropertyServiceImpl;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,12 +43,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -49,7 +61,15 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockReset;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -197,6 +217,79 @@ class ManagementMcpServerServiceIntTest {
                 return Arrays.asList(
                     new EncryptedMapWrapperToStringConverter(encryption, objectMapper),
                     new EncryptedStringToMapWrapperConverter(encryption, objectMapper));
+            }
+        }
+    }
+
+    @Nested
+    @ContextConfiguration(classes = MethodSecurityEnforcement.MethodSecurityConfiguration.class)
+    class MethodSecurityEnforcement {
+
+        @Autowired
+        private PermissionService permissionService;
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @ParameterizedTest
+        @MethodSource("managementMcpServerOperations")
+        void testManagementMcpServerDeniesACallerWhoIsNotTheTenantAdmin(GuardedOperation guardedOperation) {
+            authenticate(AuthorityConstants.USER);
+
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+
+            assertThatThrownBy(() -> guardedOperation.invoke(managementMcpServerService))
+                .isInstanceOf(AccessDeniedException.class);
+
+            assertThat(propertyRepository.findAll()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @MethodSource("managementMcpServerOperations")
+        void testManagementMcpServerAllowsTheTenantAdmin(GuardedOperation guardedOperation) {
+            authenticate(AuthorityConstants.ADMIN);
+
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertThatCode(() -> guardedOperation.invoke(managementMcpServerService))
+                .doesNotThrowAnyException();
+        }
+
+        static Stream<Named<GuardedOperation>> managementMcpServerOperations() {
+            return Stream.of(
+                Named.of(
+                    "getManagementMcpServerUrl",
+                    (GuardedOperation) ManagementMcpServerService::getManagementMcpServerUrl),
+                Named.of(
+                    "updateManagementMcpServerUrl",
+                    (GuardedOperation) ManagementMcpServerService::updateManagementMcpServerUrl));
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "alice", "credentials", List.of(new SimpleGrantedAuthority(authority))));
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        @FunctionalInterface
+        interface GuardedOperation {
+
+            void invoke(ManagementMcpServerService managementMcpServerService);
+        }
+
+        @EnableMethodSecurity
+        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            PermissionService permissionService() {
+                return mock(PermissionService.class, MockReset.withSettings(MockReset.AFTER));
             }
         }
     }

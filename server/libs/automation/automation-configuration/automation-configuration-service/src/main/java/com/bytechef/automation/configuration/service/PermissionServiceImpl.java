@@ -186,6 +186,11 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment) {
+        return hasResourceScope(connectionId, "Connection", "CONNECTION_VIEW");
+    }
+
+    @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
         return Collections.emptySet();
     }

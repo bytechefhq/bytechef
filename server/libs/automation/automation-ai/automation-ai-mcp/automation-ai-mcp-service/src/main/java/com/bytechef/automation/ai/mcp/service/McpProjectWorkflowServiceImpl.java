@@ -20,6 +20,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
@@ -46,15 +47,18 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
 
     private final McpProjectRepository mcpProjectRepository;
     private final McpProjectWorkflowRepository mcpProjectWorkflowRepository;
+    private final McpProjectWorkspaceGuard mcpProjectWorkspaceGuard;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpProjectWorkflowServiceImpl(
         McpProjectRepository mcpProjectRepository, McpProjectWorkflowRepository mcpProjectWorkflowRepository,
+        McpProjectWorkspaceGuard mcpProjectWorkspaceGuard,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
         this.mcpProjectRepository = mcpProjectRepository;
         this.mcpProjectWorkflowRepository = mcpProjectWorkflowRepository;
+        this.mcpProjectWorkspaceGuard = mcpProjectWorkspaceGuard;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
@@ -187,5 +191,7 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
         if (!owned) {
             throw new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
         }
+
+        mcpProjectWorkspaceGuard.requireDeploymentInServerWorkspace(mcpProject.getMcpServerId(), projectDeploymentId);
     }
 }
