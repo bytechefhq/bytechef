@@ -31,6 +31,8 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -181,11 +183,18 @@ class McpProjectWorkflowFacadeIntTest {
         private ProjectRepository projectRepository;
 
         @Autowired
+        private WorkspaceMcpServerRepository workspaceMcpServerRepository;
+
+        @Autowired
+        private WorkspaceMcpServerService workspaceMcpServerService;
+
+        @Autowired
         private WorkspaceRepository workspaceRepository;
 
         private ProjectDeploymentWorkflow foreignProjectDeploymentWorkflow;
         private McpProject mcpProject;
         private ProjectDeploymentWorkflow projectDeploymentWorkflow;
+        private Workspace workspace;
 
         @BeforeEach
         void beforeEach() {
@@ -193,7 +202,7 @@ class McpProjectWorkflowFacadeIntTest {
                 new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
             Category category = categoryRepository.save(new Category("test-category"));
-            Workspace workspace = workspaceRepository.save(new Workspace("test-workspace"));
+            workspace = workspaceRepository.save(new Workspace("test-workspace"));
 
             Project project = Project.builder()
                 .categoryId(category.getId())
@@ -203,6 +212,8 @@ class McpProjectWorkflowFacadeIntTest {
                 .build();
 
             project = projectRepository.save(project);
+
+            workspaceMcpServerService.assignMcpServerToWorkspace(mcpServer.getId(), workspace.getId());
 
             ProjectDeployment projectDeployment = saveProjectDeployment(
                 "test-deployment", project.getId(), Environment.DEVELOPMENT);
@@ -222,6 +233,7 @@ class McpProjectWorkflowFacadeIntTest {
         void afterEach() {
             mcpProjectWorkflowRepository.deleteAll();
             mcpProjectRepository.deleteAll();
+            workspaceMcpServerRepository.deleteAll();
             projectDeploymentWorkflowRepository.deleteAll();
             projectDeploymentRepository.deleteAll();
             projectRepository.deleteAll();
@@ -293,6 +305,8 @@ class McpProjectWorkflowFacadeIntTest {
         void testUpdateKeepsTheStoredProjectDeploymentWorkflowWhenOnlyTheMcpProjectChanges() {
             McpServer otherMcpServer = mcpServerRepository.save(
                 new McpServer("test-server-2", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
+
+            workspaceMcpServerService.assignMcpServerToWorkspace(otherMcpServer.getId(), workspace.getId());
 
             McpProject otherMcpProject = mcpProjectRepository.save(
                 new McpProject(mcpProject.getProjectDeploymentId(), otherMcpServer.getId()));

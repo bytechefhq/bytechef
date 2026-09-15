@@ -170,8 +170,7 @@ public interface PermissionService {
      * <p>
      * Resolves the owning workspace and then defers to {@link #hasWorkspaceRole(long, String)}, so it inherits that
      * method's workspace-wide reading: a member in explicit mode is denied here too, however much they hold per
-     * environment. Every {@code @PreAuthorize} using this therefore denies such a member — see the four connection
-     * sharing mutations in {@code WorkspaceConnectionFacadeImpl}, where owning the connection is the remaining way in.
+     * environment.
      *
      * @param id           the resource identifier
      * @param resourceType the resource type key used to select the ownership resolver
@@ -225,6 +224,18 @@ public interface PermissionService {
      * @return {@code true} if the binding is allowed
      */
     boolean canUseConnectionInWorkflow(long connectionId, String workflowId, Environment environment);
+
+    /**
+     * Returns whether the current user may bind the connection to a resource of the workspace in the environment: the
+     * connection must belong to that workspace and live in that environment, and the user must hold
+     * {@code CONNECTION_VIEW} there. A tenant administrator is not subject to the check.
+     *
+     * @param connectionId the connection being bound
+     * @param workspaceId  the workspace of the resource the connection is bound to
+     * @param environment  the environment the binding applies to
+     * @return {@code true} if the binding is allowed
+     */
+    boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment);
 
     /**
      * Returns the scope names the current user holds in the workspace (all registered scopes for a tenant admin).
