@@ -7,6 +7,7 @@ import {
     ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import WorkflowNodeDeleteAlertDialog from '@/pages/platform/workflow-editor/components/WorkflowNodeDeleteAlertDialog';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getWorkflowNodeMenuItems} from '@/pages/platform/workflow-editor/utils/getWorkflowNodeMenuItems';
 import {NodeDataType} from '@/shared/types';
@@ -66,6 +67,8 @@ const WorkflowNodeContextMenu = ({
 
     const copiedNode = useWorkflowEditorStore(useShallow((state) => state.copiedNode));
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     const handleDeleteClick = useCallback(() => setDeleteDialogOpen(true), []);
 
     const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
@@ -80,38 +83,15 @@ const WorkflowNodeContextMenu = ({
         }
     };
 
-    const menuItems = useMemo(
-        () =>
-            getWorkflowNodeMenuItems({
-                canPaste,
-                copiedNode,
-                data,
-                hasSavedPosition,
-                onCopy,
-                onCut,
-                onDelete: handleDeleteClick,
-                onInfo,
-                onPaste,
-                onRename,
-                onResetPosition,
-                onSwitch,
-                onToggleDisabled,
-                showCopyAction,
-                showCutAction,
-                showDeleteAction,
-                showDisableAction,
-                showInfoAction,
-                showRenameAction,
-                showReplaceAction,
-            }),
-        [
+    const menuItems = useMemo(() => {
+        const workflowNodeMenuItems = getWorkflowNodeMenuItems({
             canPaste,
             copiedNode,
             data,
-            handleDeleteClick,
             hasSavedPosition,
             onCopy,
             onCut,
+            onDelete: handleDeleteClick,
             onInfo,
             onPaste,
             onRename,
@@ -125,8 +105,34 @@ const WorkflowNodeContextMenu = ({
             showInfoAction,
             showRenameAction,
             showReplaceAction,
-        ]
-    );
+        });
+
+        return readOnly
+            ? workflowNodeMenuItems.filter((workflowNodeMenuItem) => workflowNodeMenuItem.key === 'info')
+            : workflowNodeMenuItems;
+    }, [
+        canPaste,
+        copiedNode,
+        data,
+        handleDeleteClick,
+        hasSavedPosition,
+        onCopy,
+        onCut,
+        onInfo,
+        onPaste,
+        onRename,
+        onResetPosition,
+        onSwitch,
+        onToggleDisabled,
+        readOnly,
+        showCopyAction,
+        showCutAction,
+        showDeleteAction,
+        showDisableAction,
+        showInfoAction,
+        showRenameAction,
+        showReplaceAction,
+    ]);
 
     useEffect(() => {
         const menuReadyTimeout = menuReadyTimeoutRef.current;
@@ -172,7 +178,7 @@ const WorkflowNodeContextMenu = ({
                 </ContextMenuContent>
             </ContextMenu>
 
-            {showDeleteAction && (
+            {!readOnly && showDeleteAction && (
                 <WorkflowNodeDeleteAlertDialog
                     nodeLabel={data.label}
                     onCancel={handleDeleteCancel}
