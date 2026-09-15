@@ -8,6 +8,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/workflow-test-configuration/WorkflowTestConfigurationDialog';
 import useWorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/hooks/useWorkflowCodeEditorSheet';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
@@ -85,6 +86,8 @@ const WorkflowCodeEditorSheet = ({
     const ff_4076 = useFeatureFlagsStore()('ff-4076');
     const showBottomPanel = useWorkflowEditorStore((state) => state.showBottomPanel);
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <Sheet onOpenChange={handleOpenChange} open={sheetOpen}>
             <VisuallyHidden.Root>
@@ -115,7 +118,7 @@ const WorkflowCodeEditorSheet = ({
                                 <TooltipTrigger asChild>
                                     <span tabIndex={0}>
                                         <Button
-                                            disabled={testConfigurationDisabled}
+                                            disabled={readOnly || testConfigurationDisabled}
                                             icon={<Settings2Icon />}
                                             label="Test Configuration"
                                             onClick={() => handleWorkflowTestConfigurationDialog(true)}
@@ -132,28 +135,33 @@ const WorkflowCodeEditorSheet = ({
                             </Tooltip>
 
                             <ButtonGroup>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div>
-                                            <Button
-                                                className="rounded-r-none"
-                                                disabled={!dirty || hasErrors}
-                                                icon={<SaveIcon />}
-                                                onClick={() => handleSaveClick(workflow, definition)}
-                                                size="icon"
-                                                type="submit"
-                                            />
-                                        </div>
-                                    </TooltipTrigger>
+                                {!readOnly && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div>
+                                                <Button
+                                                    aria-label="Save current workflow"
+                                                    className="rounded-r-none"
+                                                    disabled={!dirty || hasErrors}
+                                                    icon={<SaveIcon />}
+                                                    onClick={() => handleSaveClick(workflow, definition)}
+                                                    size="icon"
+                                                    type="submit"
+                                                />
+                                            </div>
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>
-                                        {hasErrors ? 'Saving is disabled due to code errors.' : 'Save current workflow'}
-                                    </TooltipContent>
-                                </Tooltip>
+                                        <TooltipContent>
+                                            {hasErrors
+                                                ? 'Saving is disabled due to code errors.'
+                                                : 'Save current workflow'}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
 
-                                <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
+                                {!readOnly && <ButtonGroupSeparator className="bg-stroke-brand-secondary" />}
 
-                                {!workflowIsRunning && (
+                                {!readOnly && !workflowIsRunning && (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <span tabIndex={0}>
@@ -218,6 +226,7 @@ const WorkflowCodeEditorSheet = ({
                                         options={{
                                             folding: true,
                                             foldingStrategy: 'indentation',
+                                            readOnly,
                                         }}
                                         value={definition}
                                     />
