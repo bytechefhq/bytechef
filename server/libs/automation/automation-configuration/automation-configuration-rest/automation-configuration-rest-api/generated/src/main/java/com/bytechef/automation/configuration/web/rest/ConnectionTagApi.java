@@ -5,6 +5,7 @@
  */
 package com.bytechef.automation.configuration.web.rest;
 
+import org.springframework.lang.Nullable;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -43,17 +44,19 @@ public interface ConnectionTagApi {
         return Optional.empty();
     }
 
-    String PATH_GET_CONNECTION_TAGS = "/connections/tags";
+    String PATH_GET_CONNECTION_TAGS = "/workspaces/{id}/connection-tags";
     /**
-     * GET /connections/tags : Get connection tags
-     * Get connection tags.
+     * GET /workspaces/{id}/connection-tags : Get connection tags
+     * Get connection tags for a workspace.
      *
+     * @param id The id of a workspace. (required)
+     * @param environmentId The id of an environment. (optional)
      * @return The list of connection tags. (status code 200)
      */
     @Operation(
         operationId = "getConnectionTags",
         summary = "Get connection tags",
-        description = "Get connection tags.",
+        description = "Get connection tags for a workspace.",
         tags = { "connection-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of connection tags.", content = {
@@ -67,7 +70,8 @@ public interface ConnectionTagApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getConnectionTags(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "environmentId", description = "The id of an environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = false) @Nullable Long environmentId
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

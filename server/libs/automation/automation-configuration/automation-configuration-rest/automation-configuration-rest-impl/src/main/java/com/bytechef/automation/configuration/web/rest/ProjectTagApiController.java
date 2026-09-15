@@ -46,9 +46,9 @@ public class ProjectTagApiController implements ProjectTagApi {
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getProjectTags() {
+    public ResponseEntity<List<TagModel>> getProjectTags(Long id) {
         return ResponseEntity.ok(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(id)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());

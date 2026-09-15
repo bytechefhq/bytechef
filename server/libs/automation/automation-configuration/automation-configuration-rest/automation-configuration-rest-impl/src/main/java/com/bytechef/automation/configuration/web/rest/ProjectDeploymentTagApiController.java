@@ -48,9 +48,9 @@ public class ProjectDeploymentTagApiController implements ProjectDeploymentTagAp
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getProjectDeploymentTags() {
+    public ResponseEntity<List<TagModel>> getProjectDeploymentTags(Long id, Long environmentId) {
         return ResponseEntity.ok(
-            projectDeploymentFacade.getProjectDeploymentTags()
+            projectDeploymentFacade.getProjectDeploymentTags(id, environmentId)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
