@@ -7,6 +7,7 @@ import {
 import {registerPendingSave} from '@/pages/platform/workflow-editor/components/properties/pendingPropertySaves';
 import {isSingleDataPill} from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {transformValueForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
@@ -510,6 +511,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             },
             [isFormulaMode, restrictsToOnePill]
         );
+        const readOnly = useWorkflowEditorReadOnly();
 
         const handleDrop = useCallback(
             (view: EditorView, event: DragEvent, _slice: unknown, moved: boolean): boolean => {
@@ -583,6 +585,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     blockSeparator: '\n',
                 },
             },
+            editable: !readOnly,
             editorProps: {
                 attributes: {
                     ...(labelId ? {'aria-labelledby': labelId} : {}),
@@ -845,9 +848,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             }
 
             if (editor && isFromAi !== undefined) {
-                editor.setEditable(!isFromAi);
+                editor.setEditable(!isFromAi && !readOnly);
             }
-        }, [currentNode?.metadata?.ui?.fromAi, editor, isFromAi, path]);
+        }, [currentNode?.metadata?.ui?.fromAi, editor, isFromAi, path, readOnly]);
+
+        useEffect(() => {
+            if (editor && readOnly) {
+                editor.setEditable(false);
+            }
+        }, [editor, readOnly]);
 
         useEffect(() => {
             if (previousFormulaModeRef.current === isFormulaMode) {
