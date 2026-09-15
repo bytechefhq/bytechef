@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="202604061200070" author="Ivica Cardic">
+        <!--
+            PostgreSQL indexes the referenced side of a foreign key, never the referencing side, so
+            fk_workspace_user_custom_role left custom_role_id unindexed. Two things scan it: the ON DELETE RESTRICT
+            check PostgreSQL runs on every custom_role delete, and WorkspaceUserRepository.countByCustomRoleId, which
+            CustomRoleServiceImpl calls before a delete and the custom-roles page calls per row. All three are
+            sequential scans of workspace_user without this.
+        -->
+        <createIndex tableName="workspace_user" indexName="idx_workspace_user_custom_role_id">
+            <column name="custom_role_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
