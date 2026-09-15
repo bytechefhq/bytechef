@@ -12,9 +12,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -29,6 +32,8 @@ class ApiPlatformApiKeyAuthenticationProviderTest {
     @Test
     void testAuthenticatedTokenCarriesTheApiKeyId() {
         ApiKey apiKey = mock(ApiKey.class);
+
+        when(apiKey.getType()).thenReturn(PlatformType.AUTOMATION);
 
         when(apiKey.getId()).thenReturn(7L);
         when(apiKey.getName()).thenReturn("orders");
@@ -81,5 +86,63 @@ class ApiPlatformApiKeyAuthenticationProviderTest {
         assertThatThrownBy(
             () -> apiPlatformApiKeyAuthenticationProvider.authenticate(apiPlatformApiKeyAuthenticationToken))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Nested
+    class PlatformTypeEnforcement {
+
+        private static final long ENVIRONMENT_ID = 1L;
+        private static final String SECRET_KEY = "secret-key";
+
+        private ApiKeyService apiKeyService;
+        private ApiPlatformApiKeyAuthenticationProvider apiPlatformApiKeyAuthenticationProvider;
+
+        @BeforeEach
+        void setUp() {
+            apiKeyService = mock(ApiKeyService.class);
+
+            apiPlatformApiKeyAuthenticationProvider = new ApiPlatformApiKeyAuthenticationProvider(apiKeyService);
+        }
+
+        @Test
+        void testRejectsAPlatformKey() {
+            when(apiKeyService.fetchApiKey(SECRET_KEY, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(createApiKey(null)));
+
+            assertThatThrownBy(() -> apiPlatformApiKeyAuthenticationProvider.authenticate(
+                new ApiPlatformApiKeyAuthenticationToken(ENVIRONMENT_ID, SECRET_KEY, "tenant")))
+                    .isInstanceOf(BadCredentialsException.class);
+        }
+
+        @Test
+        void testRejectsAnEmbeddedKey() {
+            when(apiKeyService.fetchApiKey(SECRET_KEY, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(createApiKey(PlatformType.EMBEDDED)));
+
+            assertThatThrownBy(() -> apiPlatformApiKeyAuthenticationProvider.authenticate(
+                new ApiPlatformApiKeyAuthenticationToken(ENVIRONMENT_ID, SECRET_KEY, "tenant")))
+                    .isInstanceOf(BadCredentialsException.class);
+        }
+
+        @Test
+        void testAcceptsAnAutomationKey() {
+            when(apiKeyService.fetchApiKey(SECRET_KEY, ENVIRONMENT_ID))
+                .thenReturn(Optional.of(createApiKey(PlatformType.AUTOMATION)));
+
+            Authentication authentication = apiPlatformApiKeyAuthenticationProvider.authenticate(
+                new ApiPlatformApiKeyAuthenticationToken(ENVIRONMENT_ID, SECRET_KEY, "tenant"));
+
+            assertThat(authentication.getName()).isEqualTo("key");
+        }
+
+        private static ApiKey createApiKey(PlatformType type) {
+            ApiKey apiKey = new ApiKey();
+
+            apiKey.setName("key");
+            apiKey.setSecretKey(SECRET_KEY);
+            apiKey.setType(type);
+
+            return apiKey;
+        }
     }
 }
