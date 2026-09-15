@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.configuration.security.scope;
 import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 
 /**
+ * The project-lifecycle permission scopes.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -18,5 +20,8 @@ public enum ProjectPermissionScope implements PermissionScopeType {
 
     PROJECT_CREATE,
     PROJECT_SETTINGS,
-    PROJECT_DELETE
+    PROJECT_DELETE,
+    PROJECT_PUBLISH,
+    PROJECT_PUSH,
+    PROJECT_PULL
 }
