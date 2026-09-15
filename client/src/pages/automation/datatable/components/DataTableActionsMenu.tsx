@@ -6,6 +6,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {DownloadIcon, MoreVerticalIcon, PencilIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 interface DataTableActionsMenuProps {
@@ -23,6 +25,13 @@ const DataTableActionsMenu = ({
     onRenameTable,
     tableId,
 }: DataTableActionsMenuProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    // Dropping a table is ADMIN-tier on the server (DataTableGraphQlController.dropDataTable), so offering it to a member
+    // without DATA_TABLE_DELETE means a confirm dialog that ends in a 403.
+    const canDeleteDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_DELETE');
+    const canEditDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_EDIT');
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -30,13 +39,17 @@ const DataTableActionsMenu = ({
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem icon={<UploadIcon />} label="Import CSV" onClick={onImportCsv} />
+                {canEditDataTable && (
+                    <DropdownMenuItem icon={<UploadIcon />} label="Import CSV" onClick={onImportCsv} />
+                )}
 
                 <DropdownMenuItem icon={<DownloadIcon />} label="Export CSV" onClick={onExportCsv} />
 
-                {tableId && <DropdownMenuItem icon={<PencilIcon />} label="Rename Table" onClick={onRenameTable} />}
+                {tableId && canEditDataTable && (
+                    <DropdownMenuItem icon={<PencilIcon />} label="Rename Table" onClick={onRenameTable} />
+                )}
 
-                {tableId && (
+                {tableId && canDeleteDataTable && (
                     <>
                         <DropdownMenuSeparator />
 

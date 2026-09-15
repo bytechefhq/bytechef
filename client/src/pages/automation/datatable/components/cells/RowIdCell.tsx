@@ -10,6 +10,7 @@ interface RowIdCellProps {
     hoveredRowId: string | null;
     onAddRow: () => void;
     onSelectedRowsChange: (rows: ReadonlySet<string>) => void;
+    readOnly?: boolean;
     row: GridRowType;
     rowIdx: number;
     selectedRows: ReadonlySet<string>;
@@ -20,6 +21,7 @@ const RowIdCell = ({
     hoveredRowId,
     onAddRow,
     onSelectedRowsChange,
+    readOnly = false,
     row,
     rowIdx,
     selectedRows,
@@ -44,9 +46,14 @@ const RowIdCell = ({
 
     // Synthetic last row: show the "+ Add row" button
     if (rowId === '-1') {
+        if (readOnly) {
+            return null;
+        }
+
         return (
             <div className="flex h-full w-full items-center justify-center">
                 <Button
+                    aria-label="Add row"
                     icon={<Plus className="mr-1 size-4" />}
                     onClick={onAddRow}
                     size="icon"
