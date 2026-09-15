@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
@@ -38,9 +39,12 @@ const PropertyCodeEditorDialogRightPanelConnectionsSelect = ({
         workflowTestConfigurationConnection,
     });
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <>
             <Select
+                disabled={readOnly}
                 onValueChange={(value) => handleValueChange(+value, componentConnection.key)}
                 required={componentConnection.required}
                 value={connectionId ? connectionId.toString() : undefined}
@@ -50,14 +54,16 @@ const PropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                         <SelectValue placeholder="Choose Connection..." />
                     </SelectTrigger>
 
-                    <Button
-                        className="mt-auto"
-                        icon={<PlusIcon />}
-                        onClick={() => setShowNewConnectionDialog(true)}
-                        size="icon"
-                        title="Create a new connection"
-                        variant="outline"
-                    />
+                    {!readOnly && (
+                        <Button
+                            className="mt-auto"
+                            icon={<PlusIcon />}
+                            onClick={() => setShowNewConnectionDialog(true)}
+                            size="icon"
+                            title="Create a new connection"
+                            variant="outline"
+                        />
+                    )}
                 </div>
 
                 <SelectContent>

@@ -3,6 +3,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import ClusterElementTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/ClusterElementTestButton';
 import OutputTabTestBlockedNotice from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabTestBlockedNotice';
 import OutputTabTestButton from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabTestButton';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 
 interface OutputSchemaCreationControlsProps {
@@ -45,6 +46,8 @@ const OutputSchemaCreationControls = ({
     trigger = false,
     uploadSampleOutputRequestMutationPending,
 }: OutputSchemaCreationControlsProps) => {
+    const readOnly = useWorkflowEditorReadOnly();
+
     const operationLabel = clusterElementType === 'tools' ? 'Tool' : trigger ? 'Trigger' : 'Action';
 
     const title =
@@ -72,65 +75,67 @@ const OutputSchemaCreationControls = ({
                     <p className="text-sm text-muted-foreground">{description}</p>
                 </div>
 
-                <div className="flex w-full flex-col gap-4">
-                    {testable && (
-                        <div className="flex w-full flex-col gap-3">
-                            {showClusterElementTestButton &&
-                            currentNode &&
-                            currentOperationProperties &&
-                            handleClusterElementTestSubmit ? (
-                                <ClusterElementTestButton
-                                    clusterElementType={clusterElementType}
-                                    connectionMissing={!!connectionMissing}
-                                    currentNode={currentNode}
-                                    onSubmit={handleClusterElementTestSubmit}
-                                    properties={currentOperationProperties}
-                                    saving={!!saveClusterElementTestOutputMutationPending}
-                                />
-                            ) : (
-                                <>
-                                    <OutputTabTestBlockedNotice
-                                        className="mb-5"
+                {!readOnly && (
+                    <div className="flex w-full flex-col gap-4">
+                        {testable && (
+                            <div className="flex w-full flex-col gap-3">
+                                {showClusterElementTestButton &&
+                                currentNode &&
+                                currentOperationProperties &&
+                                handleClusterElementTestSubmit ? (
+                                    <ClusterElementTestButton
+                                        clusterElementType={clusterElementType}
                                         connectionMissing={!!connectionMissing}
-                                        missingRequiredProperties={missingRequiredProperties}
-                                        onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
-                                        operationLabel={operationLabel}
+                                        currentNode={currentNode}
+                                        onSubmit={handleClusterElementTestSubmit}
+                                        properties={currentOperationProperties}
+                                        saving={!!saveClusterElementTestOutputMutationPending}
                                     />
+                                ) : (
+                                    <>
+                                        <OutputTabTestBlockedNotice
+                                            className="mb-5"
+                                            connectionMissing={!!connectionMissing}
+                                            missingRequiredProperties={missingRequiredProperties}
+                                            onMissingRequiredPropertiesClick={onMissingRequiredPropertiesClick}
+                                            operationLabel={operationLabel}
+                                        />
 
-                                    <OutputTabTestButton
-                                        connectionMissing={!!connectionMissing}
-                                        label={`Test ${operationLabel}`}
-                                        missingRequiredProperties={missingRequiredProperties}
-                                        onClick={handleTestOperationClick}
-                                        pending={saveWorkflowNodeTestOutputMutationPending}
-                                    />
-                                </>
-                            )}
+                                        <OutputTabTestButton
+                                            connectionMissing={!!connectionMissing}
+                                            label={`Test ${operationLabel}`}
+                                            missingRequiredProperties={missingRequiredProperties}
+                                            onClick={handleTestOperationClick}
+                                            pending={saveWorkflowNodeTestOutputMutationPending}
+                                        />
+                                    </>
+                                )}
 
-                            {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
-                                <span className="text-center">or</span>
-                            )}
-                        </div>
-                    )}
+                                {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
+                                    <span className="text-center">or</span>
+                                )}
+                            </div>
+                        )}
 
-                    {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
-                        <Button
-                            disabled={uploadSampleOutputRequestMutationPending}
-                            onClick={() => setShowUploadDialog(true)}
-                            type="button"
-                        >
-                            {uploadSampleOutputRequestMutationPending && (
-                                <>
-                                    <LoadingIcon />
+                        {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
+                            <Button
+                                disabled={uploadSampleOutputRequestMutationPending}
+                                onClick={() => setShowUploadDialog(true)}
+                                type="button"
+                            >
+                                {uploadSampleOutputRequestMutationPending && (
+                                    <>
+                                        <LoadingIcon />
 
-                                    <span>Uploading...</span>
-                                </>
-                            )}
+                                        <span>Uploading...</span>
+                                    </>
+                                )}
 
-                            {!uploadSampleOutputRequestMutationPending && <span>Upload Sample Output Data</span>}
-                        </Button>
-                    )}
-                </div>
+                                {!uploadSampleOutputRequestMutationPending && <span>Upload Sample Output Data</span>}
+                            </Button>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
