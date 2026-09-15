@@ -1,6 +1,8 @@
-import {render, screen} from '@/shared/util/test-utils';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {render, resetAll, screen} from '@/shared/util/test-utils';
+import {MemoryRouter} from 'react-router-dom';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnlyContext';
 import ClusterElementsCanvasDialog from './ClusterElementsCanvasDialog';
 
 // The cluster canvas renders a ReactFlow inside this dialog. ReactFlow measures handle positions
@@ -9,6 +11,11 @@ import ClusterElementsCanvasDialog from './ClusterElementsCanvasDialog';
 // DialogContent hardcodes zoom-in-95/zoom-out-95 and twMerge does not dedupe the tw-animate-css zoom
 // utilities, so the dialog pins the enter/exit scale to 1 via inline style (inline beats the utility
 // classes deterministically). These tests guard that the scale animation stays removed.
+
+const hoisted = vi.hoisted(() => ({
+    isAiAgentClusterRoot: false,
+    testingPanelOpen: false,
+}));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
@@ -26,7 +33,7 @@ vi.mock('./hooks/useClusterElementsCanvasDialog', () => ({
         handlePointerDownOutside: vi.fn(),
         handleTestClick: vi.fn(),
         handleToggleEditor: vi.fn(),
-        isAiAgentClusterRoot: false,
+        isAiAgentClusterRoot: hoisted.isAiAgentClusterRoot,
         isDataStreamClusterRoot: false,
         isDataStreamSimpleModeAvailable: false,
     }),
@@ -38,7 +45,7 @@ vi.mock('./stores/useClusterElementsCanvasDialogStore', () => ({
             copilotPanelOpen: false,
             showAiAgentEditor: false,
             showDataStreamEditor: false,
-            testingPanelOpen: false,
+            testingPanelOpen: hoisted.testingPanelOpen,
         }),
 }));
 
@@ -79,14 +86,14 @@ vi.mock('@/pages/platform/cluster-element-editor/components/ClusterElementsWorkf
 }));
 
 vi.mock('@/pages/platform/cluster-element-editor/components/ClusterElementsWorkflowEditorHeader', () => ({
-    default: () => null,
+    default: ({showTestButton}: {showTestButton: boolean}) => (showTestButton ? <button>Test agent</button> : null),
 }));
 
 vi.mock('@/pages/platform/cluster-element-editor/ai-agent-editor/AiAgentEditor', () => ({default: () => null}));
 
 vi.mock(
     '@/pages/platform/cluster-element-editor/ai-agent-editor/components/ai-agent-testing-panel/AiAgentTestingPanel',
-    () => ({default: () => null})
+    () => ({default: () => <div>Agent Playbook</div>})
 );
 
 vi.mock('@/pages/platform/cluster-element-editor/ai-agent-evals/AiAgentEvals', () => ({default: () => null}));
@@ -151,5 +158,70 @@ describe('ClusterElementsCanvasDialog - no scale animation', () => {
         const dialog = screen.getByRole('dialog') as HTMLElement;
 
         expect(dialog.style.getPropertyValue('--tw-exit-scale')).toBe('1');
+    });
+});
+
+describe('ClusterElementsCanvasDialog - read-only mode', () => {
+    const renderReadOnlyAwareDialog = (readOnly: boolean) =>
+        render(
+            <MemoryRouter>
+                <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+                    <ClusterElementsCanvasDialog
+                        onOpenChange={vi.fn()}
+                        open
+                        previousComponentDefinitions={[]}
+                        updateWorkflowMutation={{} as never}
+                        workflowNodeOutputs={[]}
+                    />
+                </WorkflowEditorReadOnlyContext.Provider>
+            </MemoryRouter>
+        );
+
+    beforeEach(() => {
+        hoisted.isAiAgentClusterRoot = true;
+        hoisted.testingPanelOpen = false;
+    });
+
+    afterEach(() => {
+        hoisted.isAiAgentClusterRoot = false;
+        hoisted.testingPanelOpen = false;
+
+        resetAll();
+    });
+
+    it('offers Test agent on an AI Agent cluster root when the workflow is editable', () => {
+        renderReadOnlyAwareDialog(false);
+
+        expect(screen.getByRole('button', {name: 'Test agent'})).toBeInTheDocument();
+    });
+
+    it('hides Test agent from a viewer who cannot edit the workflow', () => {
+        renderReadOnlyAwareDialog(true);
+
+        expect(screen.queryByRole('button', {name: 'Test agent'})).not.toBeInTheDocument();
+    });
+
+    it('does not offer Test agent on a cluster root that is not an AI Agent', () => {
+        hoisted.isAiAgentClusterRoot = false;
+
+        renderReadOnlyAwareDialog(false);
+
+        expect(screen.queryByRole('button', {name: 'Test agent'})).not.toBeInTheDocument();
+    });
+
+    it('shows an open testing panel when the workflow is editable', () => {
+        hoisted.testingPanelOpen = true;
+
+        renderReadOnlyAwareDialog(false);
+
+        expect(screen.getByText('Agent Playbook')).toBeInTheDocument();
+    });
+
+    it('hides an open testing panel from a viewer who cannot edit the workflow', () => {
+        hoisted.testingPanelOpen = true;
+
+        renderReadOnlyAwareDialog(true);
+
+        expect(screen.queryByText('Agent Playbook')).not.toBeInTheDocument();
     });
 });
