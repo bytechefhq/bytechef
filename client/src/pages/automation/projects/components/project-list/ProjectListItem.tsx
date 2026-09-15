@@ -39,6 +39,7 @@ import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -101,6 +102,19 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const [searchParams] = useSearchParams();
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canConfigureProjectGit = useHasWorkspaceScope(currentWorkspaceId, 'WORKSPACE_MANAGE');
+    const canCreateDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_CREATE');
+    const canCreateProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
+    const canCreateWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_CREATE');
+    const canDeleteProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_DELETE');
+    const canEditProject = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT');
+    const canManageProjectSettings = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_SETTINGS');
+    const canPublish = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_PUBLISH');
+    const canPullProjectFromGit = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_PULL');
+
+    const canDeployProject = canCreateDeployment && canEditProject;
+    const canPublishProject = canPublish && canEditProject;
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
@@ -317,93 +331,95 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <ChevronDownIcon className="size-4 duration-300 group-data-[state=open]:rotate-180" />
                                 </CollapsibleTrigger>
 
-                                <ButtonGroup aria-label="Workflow Creation Actions">
-                                    <Button
-                                        aria-label="Create Workflow"
-                                        onClick={(event) => {
-                                            event.stopPropagation();
+                                {canCreateWorkflow && (
+                                    <ButtonGroup aria-label="Workflow Creation Actions">
+                                        <Button
+                                            aria-label="Create Workflow"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
 
-                                            setShowWorkflowDialog(true);
-                                        }}
-                                        size="xs"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon />
-                                        Workflow
-                                    </Button>
+                                                setShowWorkflowDialog(true);
+                                            }}
+                                            size="xs"
+                                            variant="outline"
+                                        >
+                                            <PlusIcon />
+                                            Workflow
+                                        </Button>
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                aria-label="More Workflow Creation Actions"
-                                                icon={
-                                                    isImportingN8nWorkflow ? (
-                                                        <LoaderCircleIcon className="animate-spin text-primary" />
-                                                    ) : (
-                                                        <ChevronDownIcon />
-                                                    )
-                                                }
-                                                size="xs"
-                                                variant="outline"
-                                            >
-                                                <> </>
-                                            </Button>
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end" className="p-0">
-                                            <DropdownMenuItem
-                                                aria-label="Create Workflow from Template"
-                                                className="dropdown-menu-item"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    navigate(`./${project.id}/templates`);
-                                                }}
-                                            >
-                                                <LayoutTemplateIcon /> From Template
-                                            </DropdownMenuItem>
-
-                                            <DropdownMenuItem
-                                                aria-label="Import Workflow"
-                                                className="dropdown-menu-item"
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
-
-                                                    if (hiddenFileInputRef.current) {
-                                                        hiddenFileInputRef.current.click();
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    aria-label="More Workflow Creation Actions"
+                                                    icon={
+                                                        isImportingN8nWorkflow ? (
+                                                            <LoaderCircleIcon className="animate-spin text-primary" />
+                                                        ) : (
+                                                            <ChevronDownIcon />
+                                                        )
                                                     }
-                                                }}
-                                            >
-                                                <UploadIcon /> Import Workflow
-                                            </DropdownMenuItem>
+                                                    size="xs"
+                                                    variant="outline"
+                                                >
+                                                    <> </>
+                                                </Button>
+                                            </DropdownMenuTrigger>
 
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <span className="block">
-                                                        <DropdownMenuItem
-                                                            aria-label="Import n8n Workflow"
-                                                            className="dropdown-menu-item"
-                                                            disabled={importN8nWorkflowDisabled}
-                                                            onClick={() => {
-                                                                if (converterHiddenFileInputRef.current) {
-                                                                    converterHiddenFileInputRef.current.click();
-                                                                }
-                                                            }}
-                                                        >
-                                                            <UploadIcon /> Import n8n Workflow
-                                                        </DropdownMenuItem>
-                                                    </span>
-                                                </TooltipTrigger>
+                                            <DropdownMenuContent align="end" className="p-0">
+                                                <DropdownMenuItem
+                                                    aria-label="Create Workflow from Template"
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
 
-                                                {importN8nWorkflowDisabled && (
-                                                    <TooltipContent>
-                                                        Enable an AI provider to import n8n workflows.
-                                                    </TooltipContent>
-                                                )}
-                                            </Tooltip>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
+                                                        navigate(`./${project.id}/templates`);
+                                                    }}
+                                                >
+                                                    <LayoutTemplateIcon /> From Template
+                                                </DropdownMenuItem>
+
+                                                <DropdownMenuItem
+                                                    aria-label="Import Workflow"
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        if (hiddenFileInputRef.current) {
+                                                            hiddenFileInputRef.current.click();
+                                                        }
+                                                    }}
+                                                >
+                                                    <UploadIcon /> Import Workflow
+                                                </DropdownMenuItem>
+
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <span className="block">
+                                                            <DropdownMenuItem
+                                                                aria-label="Import n8n Workflow"
+                                                                className="dropdown-menu-item"
+                                                                disabled={importN8nWorkflowDisabled}
+                                                                onClick={() => {
+                                                                    if (converterHiddenFileInputRef.current) {
+                                                                        converterHiddenFileInputRef.current.click();
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <UploadIcon /> Import n8n Workflow
+                                                            </DropdownMenuItem>
+                                                        </span>
+                                                    </TooltipTrigger>
+
+                                                    {importN8nWorkflowDisabled && (
+                                                        <TooltipContent>
+                                                            Enable an AI provider to import n8n workflows.
+                                                        </TooltipContent>
+                                                    )}
+                                                </Tooltip>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
+                                )}
 
                                 <div onClick={(event) => event.stopPropagation()}>
                                     {project.tags && (
@@ -415,6 +431,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                                 },
                                             })}
                                             id={project.id!}
+                                            readOnly={!canEditProject}
                                             remainingTags={remainingTags}
                                             tags={project.tags}
                                             updateTagsMutation={updateProjectTagsMutation}
@@ -436,27 +453,29 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             <span>PUBLISHED</span>
                                         </Badge>
 
-                                        <ProjectDeploymentDialog
-                                            environmentEditable={true}
-                                            onOpenChange={setIsProjectDeploymentDialogOpen}
-                                            projectDeployment={{
-                                                name: project.name,
-                                                projectId: project.id,
-                                            }}
-                                            projectDeployments={projectDeploymentsQuery.data}
-                                            projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
-                                            showTabs
-                                            triggerNode={
-                                                <Button
-                                                    className="hover:bg-surface-neutral-primary-hover"
-                                                    onClick={handleProjectDeploymentDialogOpen}
-                                                    size="sm"
-                                                    variant="outline"
-                                                >
-                                                    <RocketIcon /> Deploy
-                                                </Button>
-                                            }
-                                        />
+                                        {canDeployProject && (
+                                            <ProjectDeploymentDialog
+                                                environmentEditable={true}
+                                                onOpenChange={setIsProjectDeploymentDialogOpen}
+                                                projectDeployment={{
+                                                    name: project.name,
+                                                    projectId: project.id,
+                                                }}
+                                                projectDeployments={projectDeploymentsQuery.data}
+                                                projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                                                showTabs
+                                                triggerNode={
+                                                    <Button
+                                                        className="hover:bg-surface-neutral-primary-hover"
+                                                        onClick={handleProjectDeploymentDialogOpen}
+                                                        size="sm"
+                                                        variant="outline"
+                                                    >
+                                                        <RocketIcon /> Deploy
+                                                    </Button>
+                                                }
+                                            />
+                                        )}
                                     </>
                                 ) : (
                                     <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
@@ -496,31 +515,39 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="p-0">
-                                <DropdownMenuItem
-                                    aria-label="Publish Project"
-                                    className="dropdown-menu-item"
-                                    onClick={() => setShowPublishProjectDialog(true)}
-                                >
-                                    <SendIcon /> Publish
-                                </DropdownMenuItem>
+                                {canPublishProject && (
+                                    <>
+                                        <DropdownMenuItem
+                                            aria-label="Publish Project"
+                                            className="dropdown-menu-item"
+                                            onClick={() => setShowPublishProjectDialog(true)}
+                                        >
+                                            <SendIcon /> Publish
+                                        </DropdownMenuItem>
 
-                                <DropdownMenuSeparator className="m-0" />
+                                        <DropdownMenuSeparator className="m-0" />
+                                    </>
+                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Edit Project"
-                                    className="dropdown-menu-item"
-                                    onClick={() => setShowEditDialog(true)}
-                                >
-                                    <EditIcon /> Edit
-                                </DropdownMenuItem>
+                                {canEditProject && (
+                                    <DropdownMenuItem
+                                        aria-label="Edit Project"
+                                        className="dropdown-menu-item"
+                                        onClick={() => setShowEditDialog(true)}
+                                    >
+                                        <EditIcon /> Edit
+                                    </DropdownMenuItem>
+                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Duplicate Project"
-                                    className="dropdown-menu-item"
-                                    onClick={() => duplicateProjectMutation.mutate(project.id!)}
-                                >
-                                    <CopyIcon /> Duplicate
-                                </DropdownMenuItem>
+                                {canCreateProject && (
+                                    <DropdownMenuItem
+                                        aria-label="Duplicate Project"
+                                        className="dropdown-menu-item"
+                                        onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                    >
+                                        <CopyIcon /> Duplicate
+                                    </DropdownMenuItem>
+                                )}
 
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
                                     <DropdownMenuItem
@@ -536,13 +563,15 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     </DropdownMenuItem>
                                 )}
 
-                                <DropdownMenuItem
-                                    aria-label="Share Project"
-                                    className="dropdown-menu-item"
-                                    onClick={() => setShowProjectShareDialog(true)}
-                                >
-                                    <Share2Icon /> Share
-                                </DropdownMenuItem>
+                                {canManageProjectSettings && (
+                                    <DropdownMenuItem
+                                        aria-label="Share Project"
+                                        className="dropdown-menu-item"
+                                        onClick={() => setShowProjectShareDialog(true)}
+                                    >
+                                        <Share2Icon /> Share
+                                    </DropdownMenuItem>
+                                )}
 
                                 {templatesSubmissionForm && (
                                     <DropdownMenuItem
@@ -564,43 +593,51 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <DownloadIcon /> Export
                                 </DropdownMenuItem>
 
-                                <DropdownMenuSeparator className="m-0" />
-
-                                {ff_1039 && (
+                                {ff_1039 && (canPullProjectFromGit || canConfigureProjectGit) && (
                                     <EEVersion hidden={true}>
-                                        <DropdownMenuItem
-                                            aria-label="Pull Project from Git"
-                                            className="dropdown-menu-item"
-                                            disabled={!projectGitConfiguration?.enabled}
-                                            onClick={handlePullProjectFromGitClick}
-                                        >
-                                            <GitPullRequestArrowIcon /> Pull Project from Git
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem
-                                            aria-label="Git Configuration"
-                                            className="dropdown-menu-item"
-                                            onClick={() => setShowProjectGitConfigurationDialog(true)}
-                                        >
-                                            <GitBranchIcon /> Git Configuration
-                                        </DropdownMenuItem>
-
                                         <DropdownMenuSeparator className="m-0" />
+
+                                        {canPullProjectFromGit && (
+                                            <DropdownMenuItem
+                                                aria-label="Pull Project from Git"
+                                                className="dropdown-menu-item"
+                                                disabled={!projectGitConfiguration?.enabled}
+                                                onClick={handlePullProjectFromGitClick}
+                                            >
+                                                <GitPullRequestArrowIcon /> Pull Project from Git
+                                            </DropdownMenuItem>
+                                        )}
+
+                                        {canConfigureProjectGit && (
+                                            <DropdownMenuItem
+                                                aria-label="Git Configuration"
+                                                className="dropdown-menu-item"
+                                                onClick={() => setShowProjectGitConfigurationDialog(true)}
+                                            >
+                                                <GitBranchIcon /> Git Configuration
+                                            </DropdownMenuItem>
+                                        )}
                                     </EEVersion>
                                 )}
 
-                                <DropdownMenuItem
-                                    aria-label="Delete Project"
-                                    className="dropdown-menu-item-destructive"
-                                    onClick={(event: MouseEvent) => {
-                                        setShowDeleteDialog(true);
+                                {canDeleteProject && (
+                                    <>
+                                        <DropdownMenuSeparator className="m-0" />
 
-                                        event.stopPropagation();
-                                    }}
-                                    variant="destructive"
-                                >
-                                    <Trash2Icon /> Delete
-                                </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            aria-label="Delete Project"
+                                            className="dropdown-menu-item-destructive"
+                                            onClick={(event: MouseEvent) => {
+                                                setShowDeleteDialog(true);
+
+                                                event.stopPropagation();
+                                            }}
+                                            variant="destructive"
+                                        >
+                                            <Trash2Icon /> Delete
+                                        </DropdownMenuItem>
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>

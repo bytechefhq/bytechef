@@ -1,6 +1,8 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {Separator} from '@/components/ui/separator';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {CopyIcon, DownloadIcon, EditIcon, Share2Icon, Trash2Icon} from 'lucide-react';
 import {MouseEvent} from 'react';
@@ -20,7 +22,17 @@ const WorkflowTabButtons = ({
     onShowDeleteWorkflowAlertDialog: () => void;
     workflowId: string;
 }) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
+
+    // Duplicate adds a workflow to the project, so the server gate it hits is the create one, not an edit one:
+    //   Duplicate -> ProjectWorkflowFacadeImpl.duplicateWorkflow -> ProjectWorkflowServiceImpl.addWorkflow
+    //                @PreAuthorize hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')
+    //   Delete    -> ProjectWorkflowFacadeImpl.deleteWorkflow -> ProjectWorkflowServiceImpl.delete
+    //                @PreAuthorize hasPermission(#projectId, 'Project', 'WORKFLOW_DELETE')
+    const canCreateWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_CREATE');
+    const canDeleteWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_DELETE');
+    const canEditWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT');
 
     const handleButtonClick = (event: MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
@@ -30,29 +42,35 @@ const WorkflowTabButtons = ({
 
     return (
         <div className="flex flex-col" onClick={handleButtonClick}>
-            <Button
-                className="dropdown-menu-item"
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={onShowEditWorkflowDialog}
-                variant="ghost"
-            />
+            {canEditWorkflow && (
+                <Button
+                    className="dropdown-menu-item"
+                    icon={<EditIcon />}
+                    label="Edit"
+                    onClick={onShowEditWorkflowDialog}
+                    variant="ghost"
+                />
+            )}
 
-            <Button
-                className="dropdown-menu-item"
-                icon={<CopyIcon />}
-                label="Duplicate"
-                onClick={onDuplicateWorkflow}
-                variant="ghost"
-            />
+            {canCreateWorkflow && (
+                <Button
+                    className="dropdown-menu-item"
+                    icon={<CopyIcon />}
+                    label="Duplicate"
+                    onClick={onDuplicateWorkflow}
+                    variant="ghost"
+                />
+            )}
 
-            <Button
-                className="dropdown-menu-item"
-                icon={<Share2Icon />}
-                label="Share"
-                onClick={onShareWorkflow}
-                variant="ghost"
-            />
+            {canEditWorkflow && (
+                <Button
+                    className="dropdown-menu-item"
+                    icon={<Share2Icon />}
+                    label="Share"
+                    onClick={onShareWorkflow}
+                    variant="ghost"
+                />
+            )}
 
             {templatesSubmissionForm && (
                 <Button
@@ -72,15 +90,19 @@ const WorkflowTabButtons = ({
                 variant="ghost"
             />
 
-            <Separator />
+            {canDeleteWorkflow && (
+                <>
+                    <Separator />
 
-            <Button
-                className="dropdown-menu-item-destructive"
-                icon={<Trash2Icon />}
-                label="Delete"
-                onClick={() => onShowDeleteWorkflowAlertDialog()}
-                variant="ghost"
-            />
+                    <Button
+                        className="dropdown-menu-item-destructive"
+                        icon={<Trash2Icon />}
+                        label="Delete"
+                        onClick={() => onShowDeleteWorkflowAlertDialog()}
+                        variant="ghost"
+                    />
+                </>
+            )}
         </div>
     );
 };

@@ -2,9 +2,12 @@ import WorkflowsListItemDropdownMenu from '@/pages/automation/project/components
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
+const ALL_WORKFLOW_SCOPES = ['WORKFLOW_CREATE', 'WORKFLOW_DELETE', 'WORKFLOW_EDIT'];
+
 const hoisted = vi.hoisted(() => ({
     deleteMutate: vi.fn(),
     duplicateMutate: vi.fn(),
+    grantedScopes: [] as string[],
     navigate: vi.fn(),
     templatesSubmissionForm: 'https://templates.example.com' as string | undefined,
     toast: vi.fn(),
@@ -18,6 +21,10 @@ vi.mock('react-router-dom', () => ({
 
 vi.mock('sonner', () => ({
     toast: hoisted.toast,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) => hoisted.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
@@ -125,6 +132,7 @@ const deleteWorkflow = async () => {
 
 beforeEach(() => {
     windowResizeObserver();
+    hoisted.grantedScopes = [...ALL_WORKFLOW_SCOPES];
     hoisted.templatesSubmissionForm = 'https://templates.example.com';
 });
 
@@ -143,6 +151,49 @@ describe('WorkflowsListItemDropdownMenu', () => {
             'Edit',
             'Duplicate',
             'Share',
+            'Share with Community',
+            'Export',
+            'Delete',
+        ]);
+    });
+
+    it('offers only Share with Community and Export to a member without workflow scopes', async () => {
+        hoisted.grantedScopes = [];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Share with Community',
+            'Export',
+        ]);
+    });
+
+    it('offers Edit and Share only with WORKFLOW_EDIT', async () => {
+        hoisted.grantedScopes = ['WORKFLOW_EDIT'];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Edit',
+            'Share',
+            'Share with Community',
+            'Export',
+        ]);
+    });
+
+    it('offers Duplicate only with WORKFLOW_CREATE and Delete only with WORKFLOW_DELETE', async () => {
+        hoisted.grantedScopes = ['WORKFLOW_CREATE', 'WORKFLOW_DELETE'];
+
+        renderMenu();
+
+        await openMenu();
+
+        expect(screen.getAllByRole('menuitem').map((menuItem) => menuItem.textContent?.trim())).toEqual([
+            'Duplicate',
             'Share with Community',
             'Export',
             'Delete',
