@@ -78,6 +78,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -90,6 +91,8 @@ import tools.jackson.core.type.TypeReference;
 public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowFacadeImpl.class);
+
+    private static final String DEVELOPMENT = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
 
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final EnvironmentService environmentService;
@@ -139,6 +142,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'WORKFLOW_CREATE', " + DEVELOPMENT + ")")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
 
@@ -150,6 +154,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_DELETE', " + DEVELOPMENT + ")")
     public void deleteSharedWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
@@ -163,6 +168,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_DELETE', " + DEVELOPMENT + ")")
     public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
@@ -201,6 +207,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'WORKFLOW_CREATE', " + DEVELOPMENT + ") and "
+        + "hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_VIEW', " + DEVELOPMENT + ")")
     public String duplicateWorkflow(long projectId, String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
@@ -220,6 +228,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
     public void exportSharedWorkflow(String workflowId, String description) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
@@ -308,6 +317,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectWorkflowId, 'ProjectWorkflow', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(projectWorkflowId);
@@ -318,6 +328,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public ProjectWorkflowDTO getProjectWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
@@ -328,6 +339,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     @Transactional(readOnly = true)
     public List<ProjectWorkflowDTO> getProjectWorkflows() {
         return projectWorkflowService.getProjectWorkflows()
@@ -341,6 +353,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public List<ProjectWorkflowDTO> getProjectWorkflows(long projectId) {
         Project project = projectService.getProject(projectId);
@@ -365,6 +378,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public List<ProjectWorkflowDTO> getProjectVersionWorkflows(
         long projectId, int projectVersion, boolean includeAllFields) {
@@ -458,6 +472,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasResourceScopeInEnvironment(#projectId, 'Project', 'WORKFLOW_CREATE', " + DEVELOPMENT + ")")
     public long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow) {
         if (!sharedWorkflow) {
             WorkflowTemplate workflowTemplate = preBuiltTemplateService.getWorkflowTemplate(id);
@@ -487,6 +502,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowFacade.update(workflowId, definition, version);
 

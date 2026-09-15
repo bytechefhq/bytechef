@@ -7,7 +7,10 @@ import WorkflowsListItem from '@/pages/automation/project/components/projects-si
 import WorkflowsListSkeleton from '@/pages/automation/project/components/projects-sidebar/components/WorkflowsListSkeleton';
 import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {
+    useGetProjectWorkflowsQuery,
+    useGetWorkspaceWorkflowsQuery,
+} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useEffect, useMemo, useRef, useState} from 'react';
 
@@ -25,18 +28,19 @@ const ProjectsLeftSidebar = ({currentWorkflowId, onProjectClick, projectId}: Pro
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {data: eachProjectWorkflows, isLoading: projectWorkflowsLoading} = useGetProjectWorkflowsQuery(
         selectedProjectId,
         selectedProjectId !== 0
     );
-    const {data: allProjectsWorkflows, isLoading: allProjectsWorkflowsLoading} = useGetWorkflowsQuery(
-        selectedProjectId === 0
+    const {data: allProjectsWorkflows, isLoading: allProjectsWorkflowsLoading} = useGetWorkspaceWorkflowsQuery(
+        currentWorkspaceId!,
+        selectedProjectId === 0 && !!currentWorkspaceId
     );
     const workflows = eachProjectWorkflows || allProjectsWorkflows;
 
     const {calculateTimeDifference, getFilteredWorkflows, getWorkflowsProjectId} = useProjectsLeftSidebar();
-
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {
         data: projects,

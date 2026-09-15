@@ -55,6 +55,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchProject(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<Project> fetchProject(String name) {
         throw new UnsupportedOperationException();
     }
@@ -114,6 +119,11 @@ public class RemoteProjectServiceClient implements ProjectService {
         Boolean apiCollections, Long categoryId, Boolean projectDeployments, Long tagId,
         Status status, Long workspaceId) {
 
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<Project> fetchWorkflowProject(String workflowId) {
         throw new UnsupportedOperationException();
     }
 

@@ -74,6 +74,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Project> fetchProject(long id) {
+        return projectRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<Project> fetchProject(String name) {
         return projectRepository.findByNameIgnoreCase(name);
     }
@@ -139,6 +145,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Project> fetchWorkflowProject(String workflowId) {
+        return projectRepository.findByWorkflowId(workflowId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Project getWorkflowProject(String workflowId) {
         return OptionalUtils.get(projectRepository.findByWorkflowId(workflowId));
     }
@@ -149,7 +161,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_PUBLISH')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = getProject(id);
 

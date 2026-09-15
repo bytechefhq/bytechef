@@ -35,9 +35,24 @@ public interface ProjectService {
 
     void delete(long id);
 
+    /**
+     * The fail-soft counterpart of {@link #getProject(long)}, for callers to whom an absent project is an ordinary
+     * answer rather than an error — the ownership resolvers above all, which must fail closed and would otherwise have
+     * to catch a throw that crosses this service's {@code @Transactional} proxy and marks their own participating
+     * transaction rollback-only.
+     */
+    Optional<Project> fetchProject(long id);
+
     Optional<Project> fetchProject(String name);
 
     Optional<Project> fetchProject(String name, long workspaceId);
+
+    /**
+     * The fail-soft counterpart of {@link #getWorkflowProject(String)}. "This workflow belongs to no project" is an
+     * ordinary answer for a platform or embedded workflow; see {@link #fetchProject(long)} for why the resolvers cannot
+     * simply catch the throwing variant.
+     */
+    Optional<Project> fetchWorkflowProject(String workflowId);
 
     Project getProjectDeploymentProject(long projectDeploymentId);
 
