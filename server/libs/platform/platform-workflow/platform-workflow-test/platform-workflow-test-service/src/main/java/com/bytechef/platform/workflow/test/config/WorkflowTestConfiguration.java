@@ -65,6 +65,8 @@ import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacadeImpl;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutorImpl;
+import com.bytechef.platform.workflow.test.service.TestJobRegistry;
+import com.bytechef.platform.workflow.test.service.TestJobRegistryImpl;
 import com.bytechef.task.dispatcher.approval.WaitForApprovalTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
@@ -114,13 +116,19 @@ public class WorkflowTestConfiguration {
     }
 
     @Bean
+    TestJobRegistry testJobRegistry() {
+        return new TestJobRegistryImpl();
+    }
+
+    @Bean
     TestWorkflowExecutor testWorkflowExecutor(
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
         ObjectMapper objectMapper, SubflowResolver subflowResolver,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor,
-        TaskHandlerRegistry taskHandlerRegistry, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        TaskHandlerRegistry taskHandlerRegistry, TestJobRegistry testJobRegistry,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
@@ -152,7 +160,7 @@ public class WorkflowTestConfiguration {
                     contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
                     subflowResolver, taskExecutionService, taskFileStorage, workflowService),
                 taskExecutionService, syncWorkerExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
-            taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
+            taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, testJobRegistry, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
     }
 

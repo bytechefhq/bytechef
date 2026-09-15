@@ -54,6 +54,7 @@ dependencies {
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.security:spring-security-core")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
@@ -72,7 +73,10 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
 
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

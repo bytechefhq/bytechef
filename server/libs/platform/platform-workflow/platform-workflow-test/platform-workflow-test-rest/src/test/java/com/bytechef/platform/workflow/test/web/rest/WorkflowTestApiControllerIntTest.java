@@ -19,10 +19,13 @@ package com.bytechef.platform.workflow.test.web.rest;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.COMPLETED;
 import static com.bytechef.platform.workflow.test.dto.TaskStatusEventDTO.Status.STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -36,7 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
@@ -47,10 +53,11 @@ import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.facade.TestWorkflowExecutor;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import com.github.benmanes.caffeine.cache.Cache;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,15 +70,30 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockReset;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -401,8 +423,8 @@ class WorkflowTestApiControllerIntTest {
             });
 
             future.whenComplete((result, throwable) -> whenCompleteCallback.accept(key));
-            afterFutureCallback.accept(key, future);
             actualBridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
+            afterFutureCallback.accept(key, future);
 
             return null;
         }).when(testWorkflowExecutor)
@@ -427,7 +449,7 @@ class WorkflowTestApiControllerIntTest {
 
         Thread.sleep(duration.toMillis());
 
-        String key = waitForRunKey();
+        String key = waitForRunKey(String.valueOf(jobId));
 
         Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
@@ -519,8 +541,8 @@ class WorkflowTestApiControllerIntTest {
             });
 
             future.whenComplete((result, throwable) -> whenCompleteCallback.accept(key));
-            afterFutureCallback.accept(key, future);
             bridge.onEvent(Map.of("event", "start", "jobId", String.valueOf(jobId)));
+            afterFutureCallback.accept(key, future);
 
             return null;
         }).when(testWorkflowExecutor)
@@ -543,7 +565,7 @@ class WorkflowTestApiControllerIntTest {
         Thread.sleep(Duration.ofMillis(75)
             .toMillis());
 
-        String key = waitForRunKey();
+        String key = waitForRunKey("test-key-" + jobId);
 
         Object emitter = ReflectionTestUtils.getField(controller, "emitter");
 
@@ -751,43 +773,151 @@ class WorkflowTestApiControllerIntTest {
         assertThat(future.isCancelled()).isTrue();
     }
 
-    private String waitForRunKey() throws InterruptedException {
+    private String waitForRunKey(String expectedKey) throws InterruptedException {
         long deadline = System.currentTimeMillis() + 1000;
 
         while (System.currentTimeMillis() < deadline) {
-            Object runs = ReflectionTestUtils.getField(controller, "workflowExecutions");
+            @SuppressWarnings("unchecked")
+            Cache<String, CompletableFuture<WorkflowTestExecutionModel>> workflowExecutions =
+                (Cache<String, CompletableFuture<WorkflowTestExecutionModel>>) ReflectionTestUtils.getField(
+                    controller, "workflowExecutions");
 
-            if (runs instanceof Cache<?, ?> cache) {
-                @SuppressWarnings("unchecked")
-                Cache<String, CompletableFuture<WorkflowTestExecutionModel>> r =
-                    (Cache<String, CompletableFuture<WorkflowTestExecutionModel>>) cache;
-
-                ConcurrentMap<String, CompletableFuture<WorkflowTestExecutionModel>> map = r.asMap();
-
-                if (!map.isEmpty()) {
-                    Set<String> keySet = map.keySet();
-
-                    Iterator<String> iterator = keySet.iterator();
-
-                    return iterator.next();
-                }
-            } else if (runs instanceof ConcurrentMap<?, ?>) {
-                @SuppressWarnings("unchecked")
-                ConcurrentMap<String, CompletableFuture<WorkflowTestExecutionModel>> r =
-                    (ConcurrentMap<String, CompletableFuture<WorkflowTestExecutionModel>>) runs;
-
-                if (!r.isEmpty()) {
-                    Set<String> keySet = r.keySet();
-
-                    Iterator<String> iterator = keySet.iterator();
-
-                    return iterator.next();
-                }
+            if (workflowExecutions != null && workflowExecutions.getIfPresent(expectedKey) != null) {
+                return expectedKey;
             }
 
             Thread.sleep(10);
         }
 
         throw new AssertionError("Run key not available in time");
+    }
+
+    @ContextConfiguration(classes = {
+        WorkflowTestApiControllerTestConfiguration.class, MethodSecurityEnforcement.MethodSecurityConfiguration.class
+    })
+    @Nested
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final long JOB_ID = 7L;
+        private static final long PRODUCTION_ENVIRONMENT_ID = 2L;
+        private static final String WORKFLOW_ID = "workflow-1";
+
+        @Autowired
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            IllegalStateException bodyReachedException = new IllegalStateException(BODY_REACHED);
+
+            doThrow(bodyReachedException).when(testWorkflowExecutor)
+                .stop(anyLong());
+            doThrow(bodyReachedException).when(workflowService)
+                .getWorkflow(anyString());
+
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken("alice", "credentials", List.of()));
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testStartWorkflowTestDeniesWhenTheWorkflowEditScopeInTheRequestedEnvironmentIsRefused() {
+            assertThatThrownBy(() -> controller.startWorkflowTest(WORKFLOW_ID, PRODUCTION_ENVIRONMENT_ID, null))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasWorkflowScopeIfProjectWorkflow(
+                WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION);
+        }
+
+        @Test
+        void testStartWorkflowTestAllowsWhenTheWorkflowEditScopeInTheRequestedEnvironmentIsGranted() {
+            when(permissionService.hasWorkflowScopeIfProjectWorkflow(
+                WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION)).thenReturn(true);
+
+            assertBodyReached(() -> controller.startWorkflowTest(WORKFLOW_ID, PRODUCTION_ENVIRONMENT_ID, null));
+        }
+
+        @Test
+        void testAttachWorkflowTestDeniesWhenTheTestJobEditScopeIsRefused() {
+            assertThatThrownBy(() -> controller.attachWorkflowTest(JOB_ID))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT");
+        }
+
+        @Test
+        void testAttachWorkflowTestAllowsWhenTheTestJobEditScopeIsGranted() {
+            when(permissionService.hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT")).thenReturn(true);
+
+            assertThat(controller.attachWorkflowTest(JOB_ID)).isNotNull();
+        }
+
+        @Test
+        void testStopWorkflowTestDeniesWhenTheTestJobEditScopeIsRefused() {
+            assertThatThrownBy(() -> controller.stopWorkflowTest(String.valueOf(JOB_ID)))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT");
+        }
+
+        @Test
+        void testStopWorkflowTestAllowsWhenTheTestJobEditScopeIsGranted() {
+            when(permissionService.hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT")).thenReturn(true);
+
+            assertBodyReached(() -> controller.stopWorkflowTest(String.valueOf(JOB_ID)));
+        }
+
+        @Test
+        void testStopWorkflowTestChecksAMalformedJobIdAsTheFallbackIdAndDeniesWhenRefused() {
+            assertThatThrownBy(() -> controller.stopWorkflowTest("not-a-number"))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(-1L, "TestJob", "WORKFLOW_EDIT");
+        }
+
+        @Test
+        void testStopWorkflowTestChecksAMalformedJobIdAsTheFallbackIdAndAllowsWhenGranted() {
+            when(permissionService.hasResourceScope(-1L, "TestJob", "WORKFLOW_EDIT")).thenReturn(true);
+
+            ResponseEntity<Void> responseEntity = controller.stopWorkflowTest("not-a-number");
+
+            assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+        @Test
+        void testEveryGuardedMethodHasAnEvaluatedCase() {
+            Set<String> guardedMethodNames = Arrays.stream(WorkflowTestApiController.class.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(PreAuthorize.class))
+                .map(Method::getName)
+                .collect(Collectors.toSet());
+
+            Set<String> coveredMethodNames = Set.of("attachWorkflowTest", "startWorkflowTest", "stopWorkflowTest");
+
+            assertThat(coveredMethodNames).isEqualTo(guardedMethodNames);
+        }
+
+        private static void assertBodyReached(ThrowingCallable throwingCallable) {
+            assertThatThrownBy(throwingCallable)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @EnableMethodSecurity(proxyTargetClass = true)
+        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            PermissionService permissionService() {
+                return mock(PermissionService.class, MockReset.withSettings(MockReset.AFTER));
+            }
+        }
     }
 }

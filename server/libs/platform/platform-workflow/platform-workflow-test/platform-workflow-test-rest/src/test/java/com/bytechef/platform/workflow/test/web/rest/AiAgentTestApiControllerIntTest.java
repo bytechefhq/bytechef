@@ -17,35 +17,56 @@
 package com.bytechef.platform.workflow.test.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
+import com.bytechef.platform.workflow.test.web.rest.AiAgentTestApiController.AiAgentTestRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockReset;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -285,6 +306,90 @@ class AiAgentTestApiControllerIntTest {
         @Bean
         AiAgentTestApiController aiAgentTestApiController(AiAgentTestFacade aiAgentTestFacade) {
             return new AiAgentTestApiController(aiAgentTestFacade, Runnable::run);
+        }
+    }
+
+    @ContextConfiguration(classes = {
+        AiAgentTestApiControllerTestConfiguration.class, MethodSecurityEnforcement.MethodSecurityConfiguration.class
+    })
+    @Nested
+    class MethodSecurityEnforcement {
+
+        private static final String WORKFLOW_ID = "workflow-1";
+
+        @Autowired
+        private AiAgentTestApiController aiAgentTestApiController;
+
+        @Autowired
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken("alice", "credentials", List.of()));
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testTestAiAgentDeniesWhenTheWorkflowEditScopeInTheRequestedEnvironmentIsRefused() {
+            AiAgentTestRequest aiAgentTestRequest = createRequest(Environment.PRODUCTION.ordinal());
+
+            assertThatThrownBy(() -> aiAgentTestApiController.testAiAgent(aiAgentTestRequest))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasWorkflowScopeIfProjectWorkflow(
+                WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION);
+            verifyNoInteractions(aiAgentTestFacade);
+        }
+
+        @Test
+        void testTestAiAgentAllowsWhenTheWorkflowEditScopeInTheRequestedEnvironmentIsGranted() {
+            when(permissionService.hasWorkflowScopeIfProjectWorkflow(
+                WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION)).thenReturn(true);
+
+            SseEmitter sseEmitter = aiAgentTestApiController.testAiAgent(
+                createRequest(Environment.PRODUCTION.ordinal()));
+
+            assertThat(sseEmitter).isNotNull();
+
+            verify(aiAgentTestFacade, timeout(5000)).executeAiAgentAction(
+                WORKFLOW_ID, "aiAgent_1", Environment.PRODUCTION.ordinal(), "conversation-1", "hello", List.of());
+        }
+
+        @Test
+        void testTestAiAgentDeniesAnEnvironmentOutsideTheEnum() {
+            when(permissionService.hasWorkflowScopeIfProjectWorkflow(anyString(), anyString(), any()))
+                .thenReturn(true);
+
+            AiAgentTestRequest aiAgentTestRequest = createRequest(Environment.values().length);
+
+            assertThatThrownBy(() -> aiAgentTestApiController.testAiAgent(aiAgentTestRequest))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService, never()).hasWorkflowScopeIfProjectWorkflow(anyString(), anyString(), any());
+            verifyNoInteractions(aiAgentTestFacade);
+        }
+
+        private static AiAgentTestRequest createRequest(long environmentId) {
+            return new AiAgentTestRequest(WORKFLOW_ID, "aiAgent_1", environmentId, "conversation-1", "hello", null);
+        }
+
+        @EnableMethodSecurity
+        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            PermissionService permissionService() {
+                return mock(PermissionService.class, MockReset.withSettings(MockReset.AFTER));
+            }
         }
     }
 }
