@@ -37,6 +37,10 @@ public class CustomComponentApiController implements CustomComponentApi {
         this.customComponentFacade = customComponentFacade;
     }
 
+    /**
+     * Authorization note: the {@code ROLE_ADMIN} guard was moved off this controller onto
+     * {@code CustomComponentFacadeImpl#save} so it protects every caller of the facade, not only this REST entry point.
+     */
     @Override
     public ResponseEntity<Void> deployCustomComponent(MultipartFile componentFile) {
         try {
