@@ -2,6 +2,7 @@ import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore, {
     setWorkflowWithoutHistory,
     useWorkflowTemporalStore,
@@ -29,6 +30,7 @@ export default function useWorkflowUndoRedo(): UseWorkflowUndoRedoReturnI {
     const canRedo = useWorkflowTemporalStore((state) => state.futureStates.length > 0);
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const isMutating = updateWorkflowMutation?.isPending ?? false;
 
@@ -83,7 +85,7 @@ export default function useWorkflowUndoRedo(): UseWorkflowUndoRedoReturnI {
     const handleUndo = useCallback(() => {
         const {workflow} = useWorkflowDataStore.getState();
 
-        if (isWorkflowMutating(workflow.id)) {
+        if (readOnly || isWorkflowMutating(workflow.id)) {
             return;
         }
 
@@ -94,12 +96,12 @@ export default function useWorkflowUndoRedo(): UseWorkflowUndoRedoReturnI {
         reset();
 
         persistTimeTravel(previousVersion);
-    }, [persistTimeTravel, reset]);
+    }, [persistTimeTravel, readOnly, reset]);
 
     const handleRedo = useCallback(() => {
         const {workflow} = useWorkflowDataStore.getState();
 
-        if (isWorkflowMutating(workflow.id)) {
+        if (readOnly || isWorkflowMutating(workflow.id)) {
             return;
         }
 
@@ -110,11 +112,11 @@ export default function useWorkflowUndoRedo(): UseWorkflowUndoRedoReturnI {
         reset();
 
         persistTimeTravel(previousVersion);
-    }, [persistTimeTravel, reset]);
+    }, [persistTimeTravel, readOnly, reset]);
 
     return {
-        canRedo: canRedo && !isMutating,
-        canUndo: canUndo && !isMutating,
+        canRedo: !readOnly && canRedo && !isMutating,
+        canUndo: !readOnly && canUndo && !isMutating,
         handleRedo,
         handleUndo,
     };
