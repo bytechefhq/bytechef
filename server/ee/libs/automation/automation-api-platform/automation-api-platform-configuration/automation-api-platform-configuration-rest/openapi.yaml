@@ -138,13 +138,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiCollection"
-  /api-collections/tags:
+  /workspaces/{id}/api-collection-tags:
     get:
-      description: "Get API collection tags."
+      description: "Get API collection tags for a workspace."
       summary: "Get API collection tags"
       tags:
         - "api-collection-tag"
       operationId: "getApiCollectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of API collection tags."

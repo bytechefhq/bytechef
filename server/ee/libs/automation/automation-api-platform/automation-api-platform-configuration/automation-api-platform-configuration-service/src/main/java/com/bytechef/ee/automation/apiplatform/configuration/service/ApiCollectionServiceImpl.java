@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiCollectionRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -49,6 +50,11 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApiCollection> fetchApiCollection(long id) {
+        return apiCollectionRepository.findById(id);
+    }
+
+    @Override
     public ApiCollection getApiCollection(long id) {
         return OptionalUtils.get(apiCollectionRepository.findById(id));
     }
