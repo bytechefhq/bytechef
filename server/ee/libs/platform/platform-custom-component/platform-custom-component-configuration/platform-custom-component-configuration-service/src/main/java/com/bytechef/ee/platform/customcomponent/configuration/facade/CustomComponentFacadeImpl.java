@@ -137,6 +137,12 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
         customComponentFileStorage.deleteCustomComponentFile(customComponent.getComponent());
     }
 
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void enableCustomComponent(long id, boolean enable) {
+        customComponentService.enableCustomComponent(id, enable);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public CustomComponentDefinitionRecord getCustomComponentDefinition(Long id) {
