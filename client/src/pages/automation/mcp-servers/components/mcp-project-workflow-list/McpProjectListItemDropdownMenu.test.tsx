@@ -4,6 +4,10 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import McpProjectListItemDropdownMenu from './McpProjectListItemDropdownMenu';
 import {McpProjectItemType} from './hooks/useMcpProjectList';
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 const hoisted = vi.hoisted(() => ({
     handleConfirmDelete: vi.fn(),
     isDeletePending: false,

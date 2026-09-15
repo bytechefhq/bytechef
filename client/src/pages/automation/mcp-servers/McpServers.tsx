@@ -2,9 +2,11 @@ import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
@@ -26,6 +28,10 @@ export enum Type {
 
 const McpServers = () => {
     const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canCreateMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_CREATE');
 
     const {
         allComponentNames,
@@ -64,7 +70,7 @@ const McpServers = () => {
                             <div className="flex items-center gap-1">
                                 <CopilotButton source={Source.MCP_SERVER} />
 
-                                {validMcpServers.length > 0 && (
+                                {canCreateMcpServer && validMcpServers.length > 0 && (
                                     <McpServerDialog
                                         mcpServer={undefined}
                                         triggerNode={<Button label="New MCP Server" />}
@@ -111,7 +117,12 @@ const McpServers = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
+                            canCreateMcpServer && (
+                                <McpServerDialog
+                                    mcpServer={undefined}
+                                    triggerNode={<Button label="Create MCP Server" />}
+                                />
+                            )
                         }
                         icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new MCP server."
