@@ -69,6 +69,7 @@ import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -120,9 +121,16 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName, long environmentId) {
+        workflowNodeTestOutputService.deleteWorkflowNodeTestOutput(workflowId, workflowNodeName, environmentId);
+    }
+
+    @Override
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowNodeTestOutput saveClusterElementTestOutput(
         @WorkflowIdParam String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, @EnvironmentIdParam long environmentId) {
@@ -160,6 +168,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowNodeTestOutput saveClusterElementTestOutput(
         @WorkflowIdParam String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, Map<String, Object> inputParameters,
@@ -190,6 +199,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowNodeTestOutput saveWorkflowNodeSampleFile(
         @WorkflowIdParam String workflowId, String workflowNodeName, String filename, InputStream inputStream,
         @EnvironmentIdParam long environmentId) {
@@ -210,6 +220,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowNodeTestOutput saveWorkflowNodeSampleOutput(
         @WorkflowIdParam String workflowId, String workflowNodeName, Object sampleOutput,
         @EnvironmentIdParam long environmentId) {
@@ -239,6 +250,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
         @WorkflowIdParam String workflowId, String workflowNodeName, @EnvironmentIdParam long environmentId) {
 
@@ -272,6 +284,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
     @SuppressWarnings("unchecked")
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
     public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
         @WorkflowIdParam String workflowId, String workflowNodeName, Map<String, Object> inputParameters,
         @EnvironmentIdParam long environmentId) {

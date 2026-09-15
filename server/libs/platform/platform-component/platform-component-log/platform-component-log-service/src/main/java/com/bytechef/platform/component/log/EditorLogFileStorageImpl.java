@@ -24,6 +24,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 /**
  * Carries its own guards rather than inheriting the delegate's: the {@link LogFileStorageImpl} it builds below is
  * constructed with {@code new}, so Spring never proxies it and the annotations on it do not run here.
+ * <p>
+ * The job ids here are editor test jobs, which never reach the persistent job store, so the guards name the
+ * {@code TestJob} resource and the scope that starting a test run requires.
  *
  * @author Ivica Cardic
  */
@@ -48,25 +51,25 @@ public class EditorLogFileStorageImpl implements EditorLogFileStorage {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_DELETE')")
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     public void deleteLogEntries(long jobId) {
         logFileStorage.deleteLogEntries(jobId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     public boolean logsExist(long jobId) {
         return logFileStorage.logsExist(jobId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         return logFileStorage.readLogEntries(jobId, taskExecutionId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         return logFileStorage.readLogEntriesByJobId(jobId);
     }

@@ -8,6 +8,7 @@ dependencies {
     implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
@@ -21,7 +22,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
 
-    testImplementation("org.springframework.security:spring-security-core")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
