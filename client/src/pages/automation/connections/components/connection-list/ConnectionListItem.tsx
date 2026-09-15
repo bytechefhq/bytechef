@@ -1,10 +1,12 @@
 import AlertDialog from '@/components/AlertDialog';
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import ConnectionListItemLayout from '@/shared/components/connection/ConnectionListItemLayout';
 import ConnectionWorkflowList, {type ConnectionWorkflowI} from '@/shared/components/connection/ConnectionWorkflowList';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {
@@ -43,9 +45,13 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [connectionWorkflowToDisconnect, setConnectionWorkflowToDisconnect] = useState<ConnectionWorkflowI>();
     const [workflowsOpen, setWorkflowsOpen] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentUserLogin = useAuthenticationStore((state) => state.account?.login);
 
+    const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
+    const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_DELETE');
     const isTenantAdmin = useIsTenantAdmin();
+
     const queryClient = useQueryClient();
     const {openProjectWorkflow} = useOpenInProject();
 
@@ -162,6 +168,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const canReplaceCredentials =
         isTenantAdmin || (!!connection.createdBy && connection.createdBy === currentUserLogin);
 
+    const canDisconnect = isTenantAdmin && connection.active === true;
+
+    const hasSecondaryActions = canDisconnect || canDelete;
+
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
             deleteConnectionMutation.mutate(connection.id);
@@ -203,34 +213,38 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
             icon={componentDefinition?.icon}
             id={connection.id}
             menuItems={
-                <>
-                    {connection.active === true && (
-                        <DropdownMenuItem
-                            icon={<Link2OffIcon />}
-                            label="Disconnect from all"
-                            onClick={() => setShowDisconnectDialog(true)}
-                        />
-                    )}
+                hasSecondaryActions && (
+                    <>
+                        {canDisconnect && (
+                            <DropdownMenuItem
+                                icon={<Link2OffIcon />}
+                                label="Disconnect from all"
+                                onClick={() => setShowDisconnectDialog(true)}
+                            />
+                        )}
 
-                    <div
-                        title={
-                            connection.active === true
-                                ? 'Disconnect from all workflows first to enable deletion'
-                                : 'Delete the connection'
-                        }
-                    >
-                        <DropdownMenuItem
-                            disabled={connection.active}
-                            icon={<Trash2Icon />}
-                            label="Delete"
-                            onClick={() => setShowDeleteDialog(true)}
-                            variant="destructive"
-                        />
-                    </div>
-                </>
+                        {canDelete && (
+                            <div
+                                title={
+                                    connection.active === true
+                                        ? 'Disconnect from all workflows first to enable deletion'
+                                        : 'Delete the connection'
+                                }
+                            >
+                                <DropdownMenuItem
+                                    disabled={connection.active}
+                                    icon={<Trash2Icon />}
+                                    label="Delete"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
+                                />
+                            </div>
+                        )}
+                    </>
+                )
             }
             name={connection.name}
-            onEditClick={() => setShowEditDialog(true)}
+            onEditClick={canEdit ? () => setShowEditDialog(true) : undefined}
             onOpenChange={setWorkflowsOpen}
             open={workflowsOpen}
             tagList={
@@ -243,6 +257,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                             },
                         })}
                         id={connection.id!}
+                        readOnly={!canEdit}
                         remainingTags={remainingTags}
                         tags={connection.tags}
                         updateTagsMutation={updateConnectionTagsMutation}

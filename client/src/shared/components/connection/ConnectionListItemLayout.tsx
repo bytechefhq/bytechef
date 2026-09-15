@@ -144,7 +144,7 @@ const ConnectionListItemLayout = ({
                             )}
                         </div>
 
-                        {onEditClick ? (
+                        {onEditClick || menuItems ? (
                             <ConnectionListItemDropdownMenu onEditClick={onEditClick}>
                                 {menuItems}
                             </ConnectionListItemDropdownMenu>
