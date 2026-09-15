@@ -112,7 +112,7 @@ class WorkspaceApiKeyFacadeIntTest {
         assertThat(apiKeyRepository.findAll()).isEmpty();
         assertThat(workspaceApiKeyRepository.findAllByWorkspaceId(workspaceId)).isEmpty();
 
-        verify(permissionService).hasResourceScope(workspaceId, "Workspace", "API_KEY_CREATE");
+        verify(permissionService).hasWorkspaceScope(workspaceId, "API_KEY_CREATE", Environment.DEVELOPMENT);
     }
 
     @Test
@@ -131,7 +131,7 @@ class WorkspaceApiKeyFacadeIntTest {
                 .hasValue(workspaceId);
         });
 
-        verify(permissionService).hasResourceScope(workspaceId, "Workspace", "API_KEY_CREATE");
+        verify(permissionService).hasWorkspaceScope(workspaceId, "API_KEY_CREATE", Environment.DEVELOPMENT);
     }
 
     @Test
@@ -145,7 +145,7 @@ class WorkspaceApiKeyFacadeIntTest {
         assertThatThrownBy(() -> workspaceApiKeyFacade.getApiKeys(workspaceId, ENVIRONMENT_ID))
             .isInstanceOf(AccessDeniedException.class);
 
-        verify(permissionService).hasResourceScope(workspaceId, "Workspace", "API_KEY_VIEW");
+        verify(permissionService).hasWorkspaceScope(workspaceId, "API_KEY_VIEW", Environment.DEVELOPMENT);
     }
 
     @Test
@@ -164,7 +164,7 @@ class WorkspaceApiKeyFacadeIntTest {
             .extracting(ApiKey::getId)
             .containsExactly(ownerBoundApiKey.getId());
 
-        verify(permissionService).hasResourceScope(workspaceId, "Workspace", "API_KEY_VIEW");
+        verify(permissionService).hasWorkspaceScope(workspaceId, "API_KEY_VIEW", Environment.DEVELOPMENT);
     }
 
     @Test

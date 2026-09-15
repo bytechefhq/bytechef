@@ -21,6 +21,5 @@ public enum DeploymentPermissionScope implements PermissionScopeType {
     DEPLOYMENT_VIEW,
     DEPLOYMENT_CREATE,
     DEPLOYMENT_EDIT,
-    DEPLOYMENT_DELETE,
-    DEPLOYMENT_PUSH
+    DEPLOYMENT_DELETE
 }

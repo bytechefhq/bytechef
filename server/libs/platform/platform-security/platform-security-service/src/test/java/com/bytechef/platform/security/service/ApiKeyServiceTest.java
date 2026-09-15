@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 
@@ -55,5 +56,20 @@ class ApiKeyServiceTest {
         apiKeyService.delete(7L);
 
         verify(apiKeyRepository).deleteById(7L);
+    }
+
+    @Test
+    void testExistsMatchesOnlyAKeyOfTheRequestedType() {
+        ApiKey automationApiKey = new ApiKey();
+
+        automationApiKey.setType(PlatformType.AUTOMATION);
+
+        when(apiKeyRepository.findBySecretKeyAndEnvironment("secret-key", 1))
+            .thenReturn(Optional.of(automationApiKey));
+        when(apiKeyRepository.existsBySecretKeyAndEnvironmentAndType(
+            "secret-key", 1, PlatformType.AUTOMATION.ordinal())).thenReturn(true);
+
+        assertThat(apiKeyService.exists("secret-key", 1L, PlatformType.EMBEDDED)).isFalse();
+        assertThat(apiKeyService.exists("secret-key", 1L, PlatformType.AUTOMATION)).isTrue();
     }
 }
