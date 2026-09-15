@@ -40,6 +40,15 @@ icon.
 
 Development is the default for a new session.
 
+<Callout type="warn" title="Coming soon">
+    With role-based access control, a member can hold a different role in each environment. What they
+    can do then follows the selected environment: a member who is Viewer in Development and Admin in
+    Production sees admin controls only while Production is selected. Editing workflows is the exception:
+    it always follows the member's Development role. This is on the upcoming release
+    track and is not yet available in the latest released version of ByteChef. See
+    [Per-environment roles](/platform/settings/users#per-environment-roles).
+</Callout>
+
 ![The open selector, listing Development, Staging and Production with a description for each and a check against the current one](environments/environment-selector-menu.png)
 
 ---
