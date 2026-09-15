@@ -21,24 +21,46 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.stripe.model.Subscription;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.lang.reflect.Method;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
  * @author Matija Petanjek
@@ -196,5 +218,75 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
         return subscription;
+    }
+
+    static Stream<Arguments> subscriptionWrites() {
+        return Stream.of("cancelSubscription", "createCheckoutSession", "reactivateSubscription", "updateSubscription")
+            .flatMap(methodName -> Stream.of(Arguments.of(methodName, false), Arguments.of(methodName, true)));
+    }
+
+    // Evaluates the real @PreAuthorize expressions on the subscription writes through the real
+    // AutomationMethodSecurityExpressionHandler and AutomationPermissionEvaluator. Each write changes the tenant's
+    // subscription, so it must decide on the caller's ROLE_ADMIN authority alone.
+    @ParameterizedTest(name = "{0} admin={1}")
+    @MethodSource("subscriptionWrites")
+    void testSubscriptionWriteRequiresTheAdminAuthority(String methodName, boolean admin) {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        assertThat(evaluateGuard(permissionService, findMethod(methodName), admin))
+            .as("%s must %s a caller %s ROLE_ADMIN", methodName, admin ? "allow" : "deny",
+                admin ? "holding" : "without")
+            .isEqualTo(admin);
+
+        verifyNoInteractions(permissionService);
+    }
+
+    // The expression parsed here is read straight off our own @PreAuthorize annotation in this repository's compiled
+    // bytecode, not attacker-influenced input.
+    @SuppressFBWarnings(
+        value = "SPEL_INJECTION",
+        justification = "The expression is this repository's own @PreAuthorize value, not untrusted input.")
+    private static boolean evaluateGuard(PermissionService permissionService, Method method, boolean admin) {
+        PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+
+        assertThat(preAuthorize)
+            .as("%s must carry a @PreAuthorize guard", method.getName())
+            .isNotNull();
+
+        AutomationMethodSecurityExpressionHandler expressionHandler =
+            new AutomationMethodSecurityExpressionHandler(permissionService);
+
+        expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+        List<GrantedAuthority> authorities = admin
+            ? List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))
+            : List.of(new SimpleGrantedAuthority(AuthorityConstants.USER));
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken("alice", "credentials", authorities);
+
+        Object[] arguments = new Object[method.getParameterCount()];
+
+        SimpleMethodInvocation methodInvocation = new SimpleMethodInvocation(new Object(), method, arguments);
+
+        EvaluationContext evaluationContext =
+            expressionHandler.createEvaluationContext(() -> authentication, methodInvocation);
+
+        Expression expression = expressionHandler.getExpressionParser()
+            .parseExpression(preAuthorize.value());
+
+        return Boolean.TRUE.equals(expression.getValue(evaluationContext, Boolean.class));
+    }
+
+    private static Method findMethod(String methodName) {
+        List<Method> matches = Arrays.stream(BillingSubscriptionFacadeImpl.class.getDeclaredMethods())
+            .filter(method -> !method.isSynthetic())
+            .filter(method -> methodName.equals(method.getName()))
+            .toList();
+
+        assertThat(matches)
+            .as("Expected exactly one non-synthetic '%s' method on BillingSubscriptionFacadeImpl", methodName)
+            .hasSize(1);
+
+        return matches.getFirst();
     }
 }

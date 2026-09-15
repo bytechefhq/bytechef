@@ -28,6 +28,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +71,12 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         this.workspaceService = workspaceService;
     }
 
+    // Overwrites the project's workflows from the remote branch, so it needs the pull scope in its own right. The
+    // workflow writes and the publishProject call further down carry their own guards, but they run only after the pull
+    // has started, and not at all when the branch is empty, so they cannot stand in for one here. The publish requires
+    // WORKFLOW_EDIT and PROJECT_PUBLISH on the project.
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'PROJECT_PULL')")
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     public void pullProjectFromGit(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
@@ -105,27 +111,35 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
                 projectWorkflowFacade.updateWorkflow(
                     Objects.requireNonNull(oldWorkflow.getId()), workflow.getDefinition(), oldWorkflow.getVersion());
             }
-
-            GitInfo gitInfo = gitWorkflows.gitInfo();
-            GitConfigurationDTO gitConfigurationDTO = gitConfigurationFacade.getGitConfiguration(workspace.getId());
-
-            projectFacade.publishProject(
-                projectId,
-                """
-                    %s
-
-                    Project pulled from git repository:
-                    Repository: %s
-                    Branch: %s
-                    Commit hash: %s
-                    """.formatted(
-                    gitInfo.message(), gitConfigurationDTO.url(), projectGitConfiguration.getBranch(),
-                    gitInfo.commitHash()),
-                false);
         }
+
+        if (gitWorkflows.workflows()
+            .isEmpty()) {
+
+            return;
+        }
+
+        GitInfo gitInfo = gitWorkflows.gitInfo();
+
+        // One version for the whole pull, after every workflow is written.
+        projectFacade.publishProject(
+            projectId,
+            """
+                %s
+
+                Project pulled from git repository:
+                Repository: %s
+                Branch: %s
+                Commit hash: %s
+                """.formatted(
+                gitInfo.message(), gitConfiguration.url(), projectGitConfiguration.getBranch(), gitInfo.commitHash()),
+            false);
     }
 
+    // Contacts the remote with the workspace's stored credentials so the Git Configuration dialog can offer a branch.
+    // Gated with that dialog's submit, ProjectGitConfigurationServiceImpl.save, so the two cannot disagree.
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'WORKSPACE_MANAGE')")
     public List<String> getRemoteBranches(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 
@@ -135,7 +149,13 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
             gitConfiguration.url(), gitConfiguration.username(), gitConfiguration.password());
     }
 
+    // PROJECT_PUSH, not the PROJECT_PUBLISH that ProjectServiceImpl.publishProject requires of the publish this is
+    // normally reached from. Publishing a project whose Git configuration is enabled needs both, since
+    // ProjectGitSyncEventListenerImpl reaches this only for such a project. Both sit at EDITOR rank, so only a custom
+    // role can hold one without the other. Push stays with editors because it writes to a branch of a repository an
+    // administrator configured and changes nothing inside ByteChef; pull, which overwrites the project, is ADMIN.
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'PROJECT_PUSH')")
     public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
 
