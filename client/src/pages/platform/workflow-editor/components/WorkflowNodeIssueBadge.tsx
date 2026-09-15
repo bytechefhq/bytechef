@@ -5,13 +5,13 @@ import useNodeIssues from '../hooks/useNodeIssues';
 import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 
 interface WorkflowNodeIssueBadgeProps {
-    clusterElement?: boolean;
+    includeClusterElementIssues?: boolean;
     nodeName: string;
 }
 
-const WorkflowNodeIssueBadge = ({clusterElement, nodeName}: WorkflowNodeIssueBadgeProps) => {
+const WorkflowNodeIssueBadge = ({includeClusterElementIssues, nodeName}: WorkflowNodeIssueBadgeProps) => {
     const readOnly = useWorkflowEditorReadOnly();
-    const {count, severity, title} = useNodeIssues(nodeName, clusterElement);
+    const {count, severity, title} = useNodeIssues(nodeName, includeClusterElementIssues);
 
     if (readOnly || count === 0) {
         return null;

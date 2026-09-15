@@ -266,13 +266,17 @@ const WorkflowNodeDetailsPanel = ({
                                                     {errors.map((error, index) => (
                                                         <li
                                                             className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
-                                                            key={`${error}_${index}`}
+                                                            key={`${error.kind}_${error.name}_${index}`}
                                                         >
-                                                            <span className="font-light">
-                                                                Missing required property:
-                                                            </span>
+                                                            {error.kind !== 'ISSUE' && (
+                                                                <span className="font-light">
+                                                                    {error.kind === 'CONNECTION'
+                                                                        ? 'Missing required connection:'
+                                                                        : 'Missing required property:'}
+                                                                </span>
+                                                            )}
 
-                                                            <span>{error}</span>
+                                                            <span>{error.name}</span>
                                                         </li>
                                                     ))}
                                                 </ul>

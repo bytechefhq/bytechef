@@ -164,7 +164,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             )}
 
             <div className="relative w-fit">
-                <WorkflowNodeIssueBadge clusterElement={!!isClusterElement} nodeName={data.name} />
+                <WorkflowNodeIssueBadge nodeName={data.name} />
 
                 <Popover
                     onOpenChange={(open) => {
