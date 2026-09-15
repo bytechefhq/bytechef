@@ -22,9 +22,11 @@ import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.handler.SubscriptionModelHandlerRegistry;
 import com.bytechef.platform.billing.handler.prepaid.PrepaidSubscriptionModelHandler;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,6 +55,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void cancelSubscription() {
         BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
@@ -62,12 +65,14 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public String createCheckoutSession(String planName) {
         return subscriptionModelHandlerRegistry.getSubscriptionModelHandler(SubscriptionModel.PREPAID)
             .createCheckoutSession(planName);
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public String createJobExecutionsPackageCheckoutSession(int quantity) {
         if (quantity < MIN_PACKAGE_QUANTITY || quantity > MAX_PACKAGE_QUANTITY) {
             throw new IllegalArgumentException(
@@ -90,6 +95,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void reactivateSubscription() {
         BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
@@ -99,6 +105,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void updateSubscription(String newPlanName) {
         BillingSubscription currentSubscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));

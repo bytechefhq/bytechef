@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
+import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
 import java.util.List;
 
 /**
@@ -21,4 +22,6 @@ public interface ProjectGitFacade {
     void pullProjectFromGit(long projectId);
 
     String pushProjectToGit(long projectId, String commitMessage);
+
+    void saveProjectGitConfiguration(ProjectGitConfiguration projectGitConfiguration);
 }

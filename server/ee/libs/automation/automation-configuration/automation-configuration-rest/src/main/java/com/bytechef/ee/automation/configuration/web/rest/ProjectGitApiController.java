@@ -83,7 +83,7 @@ public class ProjectGitApiController implements ProjectGitApi {
         ProjectGitConfiguration projectGitConfiguration = conversionService.convert(
             projectGitConfigurationModel.projectId(id), ProjectGitConfiguration.class);
 
-        projectGitConfigurationService.save(projectGitConfiguration);
+        projectGitFacade.saveProjectGitConfiguration(projectGitConfiguration);
 
         return noContent();
     }

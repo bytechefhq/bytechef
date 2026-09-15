@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -6,4 +7,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
 
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
+
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 }
