@@ -20,8 +20,10 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.Comparator;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public McpServer getMcpServer(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
             .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
@@ -82,6 +85,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(readOnly = true)
     public List<McpServer> getMcpServers(PlatformType type, McpServerOrderBy orderBy) {
         List<McpServer> servers = mcpServerRepository.findAll()
@@ -115,6 +119,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServer.id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(McpServer mcpServer) {
         McpServer currentMcpServer = getMcpServer(mcpServer.getId());
 
@@ -128,6 +133,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public McpServer update(long id, String name, Boolean enabled) {
         McpServer existingMcpServer = getMcpServer(id);
 

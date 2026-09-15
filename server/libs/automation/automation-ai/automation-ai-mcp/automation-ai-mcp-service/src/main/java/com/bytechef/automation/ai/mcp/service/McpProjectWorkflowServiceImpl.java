@@ -16,12 +16,21 @@
 
 package com.bytechef.automation.ai.mcp.service;
 
+import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,18 +43,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService {
 
+    private final McpProjectRepository mcpProjectRepository;
     private final McpProjectWorkflowRepository mcpProjectWorkflowRepository;
+    private final McpProjectWorkspaceGuard mcpProjectWorkspaceGuard;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
-    public McpProjectWorkflowServiceImpl(McpProjectWorkflowRepository mcpProjectWorkflowRepository) {
+    @SuppressFBWarnings("EI")
+    public McpProjectWorkflowServiceImpl(
+        McpProjectRepository mcpProjectRepository, McpProjectWorkflowRepository mcpProjectWorkflowRepository,
+        McpProjectWorkspaceGuard mcpProjectWorkspaceGuard,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+
+        this.mcpProjectRepository = mcpProjectRepository;
         this.mcpProjectWorkflowRepository = mcpProjectWorkflowRepository;
+        this.mcpProjectWorkspaceGuard = mcpProjectWorkspaceGuard;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflow.mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow create(McpProjectWorkflow mcpProjectWorkflow) {
+        requireDeploymentWorkflowOfMcpProject(
+            mcpProjectWorkflow.getMcpProjectId(), mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+
         return mcpProjectWorkflowRepository.save(mcpProjectWorkflow);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow create(Long mcpProjectId, Long projectDeploymentWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = new McpProjectWorkflow(mcpProjectId, projectDeploymentWorkflowId);
 
@@ -53,12 +78,14 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')")
     public void delete(long mcpProjectWorkflowId) {
         mcpProjectWorkflowRepository.deleteById(mcpProjectWorkflowId);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_VIEW')")
     public Optional<McpProjectWorkflow> fetchMcpProjectWorkflow(long mcpProjectWorkflowId) {
         return mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId);
     }
@@ -82,9 +109,14 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflow.id, 'McpProjectWorkflow', 'MCP_EDIT') and " +
+        "hasPermission(#mcpProjectWorkflow.mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow update(McpProjectWorkflow mcpProjectWorkflow) {
         McpProjectWorkflow currentMcpProjectWorkflow =
             OptionalUtils.get(mcpProjectWorkflowRepository.findById(mcpProjectWorkflow.getId()));
+
+        requireDeploymentWorkflowOfMcpProject(
+            mcpProjectWorkflow.getMcpProjectId(), mcpProjectWorkflow.getProjectDeploymentWorkflowId());
 
         currentMcpProjectWorkflow.setMcpProjectId(mcpProjectWorkflow.getMcpProjectId());
         currentMcpProjectWorkflow.setProjectDeploymentWorkflowId(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
@@ -94,6 +126,8 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT') and " +
+        "(#mcpProjectId == null or hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT'))")
     public McpProjectWorkflow update(long id, Long mcpProjectId, Long projectDeploymentWorkflowId) {
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
@@ -110,6 +144,7 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')")
     public McpProjectWorkflow updateParameters(long id, Map<String, ?> parameters) {
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
@@ -117,5 +152,23 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
         existingMcpProjectWorkflow.setParameters(parameters);
 
         return mcpProjectWorkflowRepository.save(existingMcpProjectWorkflow);
+    }
+
+    private void requireDeploymentWorkflowOfMcpProject(Long mcpProjectId, Long projectDeploymentWorkflowId) {
+        McpProject mcpProject = mcpProjectRepository.findById(Objects.requireNonNull(mcpProjectId, "mcpProjectId"))
+            .orElseThrow(() -> new AccessDeniedException("MCP project id=%s does not exist".formatted(mcpProjectId)));
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                Objects.requireNonNull(projectDeploymentWorkflowId, "projectDeploymentWorkflowId"));
+
+        if (!Objects.equals(projectDeploymentWorkflow.getProjectDeploymentId(), mcpProject.getProjectDeploymentId())) {
+            throw new AccessDeniedException(
+                "Project deployment workflow id=%s is not part of MCP project id=%s".formatted(
+                    projectDeploymentWorkflowId, mcpProjectId));
+        }
+
+        mcpProjectWorkspaceGuard.requireDeploymentInServerWorkspace(
+            mcpProject.getMcpServerId(), mcpProject.getProjectDeploymentId());
     }
 }

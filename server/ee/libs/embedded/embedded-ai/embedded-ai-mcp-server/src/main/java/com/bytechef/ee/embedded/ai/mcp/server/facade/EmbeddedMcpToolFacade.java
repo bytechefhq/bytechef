@@ -13,6 +13,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -299,7 +300,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Map<String, ?> parameters, long mcpServerId, Environment environment, String tenantId) {
 
         return request -> {
-            McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+            McpServer mcpServer = getMcpServer(mcpServerId);
 
             if (!mcpServer.isEnabled()) {
                 throw new IllegalStateException("MCP server is disabled");
@@ -330,6 +331,16 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         };
     }
 
+    private McpServer getMcpServer(long mcpServerId) {
+        try {
+            return AutomationAuthorizationContext.callSkippingChecks(() -> mcpServerService.getMcpServer(mcpServerId));
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
+    }
+
     private long getIntegrationId(String componentName) {
         return integrationService.getIntegrations()
             .stream()
@@ -345,7 +356,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
 
         return inputParameters -> {
-            McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+            McpServer mcpServer = getMcpServer(mcpServerId);
 
             if (!mcpServer.isEnabled()) {
                 throw new IllegalStateException("MCP server is disabled");
