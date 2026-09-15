@@ -12,6 +12,7 @@ import {
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {CableIcon, EditIcon, Trash2Icon} from 'lucide-react';
@@ -29,6 +30,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
     const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
 
     const {updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     function handleDelete(input: WorkflowInput) {
         saveWorkflowDefinitionUpdate({
@@ -79,25 +81,29 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                                     </TableCell>
 
                                     <TableCell className="flex justify-end">
-                                        <Button
-                                            icon={<EditIcon />}
-                                            onClick={() => {
-                                                setCurrentInputIndex(index);
-                                                setShowEditDialog(true);
-                                            }}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
+                                        {!readOnly && (
+                                            <>
+                                                <Button
+                                                    icon={<EditIcon />}
+                                                    onClick={() => {
+                                                        setCurrentInputIndex(index);
+                                                        setShowEditDialog(true);
+                                                    }}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
 
-                                        <Button
-                                            icon={<Trash2Icon className="text-destructive" />}
-                                            onClick={() => {
-                                                setCurrentInputIndex(index);
-                                                setShowDeleteDialog(true);
-                                            }}
-                                            size="icon"
-                                            variant="ghost"
-                                        />
+                                                <Button
+                                                    icon={<Trash2Icon className="text-destructive" />}
+                                                    onClick={() => {
+                                                        setCurrentInputIndex(index);
+                                                        setShowDeleteDialog(true);
+                                                    }}
+                                                    size="icon"
+                                                    variant="ghost"
+                                                />
+                                            </>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -114,12 +120,14 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                             Get started by creating a new input.
                         </p>
 
-                        <div className="mt-6">
-                            <WorkflowOutputsSheetDialog
-                                triggerNode={<Button label="New Output" size="sm" />}
-                                workflow={workflow}
-                            />
-                        </div>
+                        {!readOnly && (
+                            <div className="mt-6">
+                                <WorkflowOutputsSheetDialog
+                                    triggerNode={<Button label="New Output" size="sm" />}
+                                    workflow={workflow}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
