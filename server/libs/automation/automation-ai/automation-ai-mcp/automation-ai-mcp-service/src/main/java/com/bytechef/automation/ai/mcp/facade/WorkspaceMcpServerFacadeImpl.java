@@ -119,7 +119,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_CREATE')")
+    @PreAuthorize("hasWorkspaceScopeInEnvironment(#workspaceId, 'MCP_CREATE', #environment)")
     public McpServer createWorkspaceMcpServer(
         String name, PlatformType type, Environment environment, Boolean enabled, Boolean authenticationRequired,
         Long workspaceId) {
@@ -162,7 +162,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteWorkspaceMcpServer(Long mcpServerId) {
         for (McpProject mcpProject : mcpProjectService.getMcpServerMcpProjects(mcpServerId)) {
             mcpProjectFacade.deleteMcpProject(mcpProject.getId());
