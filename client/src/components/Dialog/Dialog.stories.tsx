@@ -1,7 +1,9 @@
 import Button from '@/components/Button/Button';
 import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
+import {RocketIcon} from 'lucide-react';
 
 import {Dialog, DialogClose, DialogContent, DialogTrigger} from './Dialog';
+import {DialogSidebar} from './DialogSidebar';
 import {type DialogStepI, type DialogStepStatusI, DialogStepsProvider} from './DialogStepsProvider';
 import {useDialogSteps} from './hooks/useDialogSteps';
 
@@ -45,22 +47,24 @@ export const Default: Story = {
     ),
 };
 
-export const WithSidebarSlot: Story = {
+export const WithSidebar: Story = {
     render: () => (
         <Dialog defaultOpen>
             <DialogTrigger asChild>
                 <Button label="Open dialog" />
             </DialogTrigger>
 
-            <DialogContent aria-describedby={undefined}>
-                <div className="hidden w-80 flex-col p-6 lg:flex" data-slot="dialog-sidebar">
-                    <ShadcnDialogTitle>Sidebar slot</ShadcnDialogTitle>
-                </div>
-
-                <div className="flex flex-1 flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6">
+            <DialogContent>
+                <DialogSidebar description="Deploy a project version" icon={<RocketIcon />} title="New Deployment">
                     <p className="text-sm text-content-neutral-secondary">
-                        From 1024 px, a child with data-slot=&quot;dialog-sidebar&quot; switches DialogContent to the
-                        860 × 648 grey sidebar layout.
+                        Sidebar children render here. DialogSteps and DialogStepIndicator go here later.
+                    </p>
+                </DialogSidebar>
+
+                <div className="flex w-[512px] max-w-full flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6 lg:w-auto lg:flex-1">
+                    <p className="text-sm text-content-neutral-secondary">
+                        From 1024 px the sidebar shows and DialogContent switches to the 860 × 648 layout. Narrower, the
+                        sidebar hides, but its title and description stay in the DOM for screen readers.
                     </p>
 
                     <DialogClose asChild>
