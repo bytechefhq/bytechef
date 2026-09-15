@@ -38,7 +38,7 @@ public interface WorkspaceMembershipAssigner {
 
     /**
      * Rejects anything {@link #assign(long, List)} would reject, without writing. Lets the invite fail before it
-     * provisions an account and mails a claim link the rollback would invalidate.
+     * provisions an account.
      *
      * @param assignments the workspaces and role names the caller asked for
      */

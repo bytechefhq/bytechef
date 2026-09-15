@@ -27,9 +27,7 @@ public class CustomRoleErrorType extends AbstractErrorType {
     public static final CustomRoleErrorType SCOPES_REQUIRED = new CustomRoleErrorType(102);
 
     /**
-     * No custom role with that id exists. Raised by the delete and the update, which used to succeed silently and throw
-     * a bare {@code NoSuchElementException} respectively — the first publishing a {@code CUSTOM_ROLE_DELETED} audit
-     * event for a role nobody deleted, the second surfacing as {@code INTERNAL_ERROR}.
+     * No custom role with that id exists. Raised by the delete and the update.
      */
     public static final CustomRoleErrorType CUSTOM_ROLE_NOT_FOUND = new CustomRoleErrorType(103);
 
