@@ -1244,12 +1244,12 @@ public class ProjectFacadeIntTest {
 
             assertRequiresScope(PROJECT_ID, "Project", "PROJECT_DELETE", () -> projectFacade.deleteProject(PROJECT_ID));
             assertRequiresBothScopes(
-                PROJECT_ID, "Project", "WORKFLOW_EDIT", "DEPLOYMENT_PUSH",
+                PROJECT_ID, "Project", "WORKFLOW_EDIT", "PROJECT_PUBLISH",
                 () -> projectFacade.deleteProjectVersion(PROJECT_ID, 1));
             assertRequiresScope(
                 PROJECT_ID, "Project", "PROJECT_SETTINGS", () -> projectFacade.deleteSharedProject(PROJECT_ID));
             assertRequiresBothScopes(
-                PROJECT_ID, "Project", "WORKFLOW_VIEW", "WORKFLOW_CREATE",
+                PROJECT_ID, "Project", "WORKFLOW_VIEW", "PROJECT_CREATE",
                 () -> projectFacade.duplicateProject(PROJECT_ID));
             assertRequiresScope(PROJECT_ID, "Project", "WORKFLOW_VIEW",
                 () -> projectFacade.exportProject(PROJECT_ID, null));
@@ -1257,7 +1257,7 @@ public class ProjectFacadeIntTest {
                 PROJECT_ID, "Project", "PROJECT_SETTINGS",
                 () -> projectFacade.exportSharedProject(PROJECT_ID, "description"));
             assertRequiresBothScopes(
-                PROJECT_ID, "Project", "WORKFLOW_EDIT", "DEPLOYMENT_PUSH",
+                PROJECT_ID, "Project", "WORKFLOW_EDIT", "PROJECT_PUBLISH",
                 () -> projectFacade.publishProject(PROJECT_ID, "description", false));
             assertRequiresScope(
                 PROJECT_ID, "Project", "WORKFLOW_EDIT", () -> projectFacade.restoreProjectVersion(PROJECT_ID, 1));
