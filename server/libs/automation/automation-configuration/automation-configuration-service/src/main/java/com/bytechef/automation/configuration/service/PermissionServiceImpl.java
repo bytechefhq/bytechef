@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.service.UserService;
@@ -83,8 +84,33 @@ public class PermissionServiceImpl implements PermissionService {
         return SecurityUtils.isAuthenticated();
     }
 
+    /**
+     * Community Edition has no authorization boundary between workspace members, so per-environment roles do not exist
+     * here and this matches the environment-unaware overload exactly.
+     */
+    @Override
+    public boolean hasWorkspaceScope(long workspaceId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     */
+    @Override
+    public boolean hasWorkspaceScopeInEveryEnvironment(long workspaceId, String scope) {
+        return SecurityUtils.isAuthenticated();
+    }
+
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature.
+     */
+    @Override
+    public boolean hasWorkspaceScopeForProject(long projectId, String scope, Environment environment) {
         return SecurityUtils.isAuthenticated();
     }
 
@@ -116,6 +142,19 @@ public class PermissionServiceImpl implements PermissionService {
             .isPresent();
     }
 
+    /**
+     * See {@link #hasWorkspaceScope(long, String, Environment)} — per-environment roles are an Enterprise feature, so
+     * naming an environment cannot change the answer and this matches the environment-unaware overload exactly. It
+     * still delegates rather than returning {@code isAuthenticated()}: owner isolation for user-owned resources is
+     * enforced in CE too, and skipping it here would make the environment-aware guard the weaker of the two.
+     */
+    @Override
+    public boolean hasResourceScopeInEnvironment(
+        Serializable id, String resourceType, String scope, Environment environment) {
+
+        return hasResourceScope(id, resourceType, scope);
+    }
+
     @Override
     public boolean isResourceOwner(String resourceType, long id) {
         return SecurityUtils.isAuthenticated();
@@ -132,7 +171,22 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public boolean hasWorkflowScope(String workflowId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    @Override
+    public boolean hasWorkflowScopeIfProjectWorkflow(String workflowId, String scope, Environment environment) {
+        return SecurityUtils.isAuthenticated();
+    }
+
+    @Override
     public Set<String> getMyWorkspaceScopes(long workspaceId) {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getMyWorkspaceScopes(long workspaceId, Environment environment) {
         return Collections.emptySet();
     }
 

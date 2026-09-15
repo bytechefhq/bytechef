@@ -40,7 +40,7 @@ class PermissionServiceResourceTest {
     private PermissionServiceImpl service(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers));
+            workspaceUserRepository, List.of(resolvers), List.of());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
@@ -107,7 +107,7 @@ class PermissionServiceResourceTest {
 
         when(workspaceUser.getWorkspaceRole())
             .thenReturn(com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole.EDITOR.ordinal());
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(7L, 42L))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(7L, 42L))
             .thenReturn(java.util.Optional.of(workspaceUser));
 
         PermissionServiceImpl service = service(resolver("KnowledgeBase", ResourceOwner.ofWorkspace(42L)));
