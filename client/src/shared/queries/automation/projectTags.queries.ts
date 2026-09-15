@@ -4,10 +4,11 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ProjectTagKeys = {
     projectTags: ['projectTags'] as const,
+    workspaceProjectTags: (workspaceId: number) => [...ProjectTagKeys.projectTags, workspaceId],
 };
 
-export const useGetProjectTagsQuery = () =>
+export const useGetProjectTagsQuery = (workspaceId: number) =>
     useQuery<Tag[], Error>({
-        queryKey: ProjectTagKeys.projectTags,
-        queryFn: () => new ProjectTagApi().getProjectTags(),
+        queryKey: ProjectTagKeys.workspaceProjectTags(workspaceId),
+        queryFn: () => new ProjectTagApi().getProjectTags({id: workspaceId}),
     });
