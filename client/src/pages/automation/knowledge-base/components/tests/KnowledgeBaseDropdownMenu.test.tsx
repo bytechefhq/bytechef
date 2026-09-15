@@ -3,6 +3,15 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseDropdownMenu from '../KnowledgeBaseDropdownMenu';
 
+const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
+
+// The Delete item is gated on the delete scope the server enforces. These tests cover the menu's own behaviour, so the
+// scope check is controlled here rather than through the permission and edition stores.
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 const hoisted = vi.hoisted(() => {
     return {
         handleCloseDeleteDialog: vi.fn(),
@@ -78,6 +87,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['KNOWLEDGE_BASE_DELETE', 'KNOWLEDGE_BASE_EDIT'];
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseDropdownMenu.mockReturnValue({...defaultMockReturn});
 });
@@ -114,6 +125,33 @@ describe('KnowledgeBaseDropdownMenu', () => {
         renderComponent();
 
         expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('hides Delete from a member without KNOWLEDGE_BASE_DELETE', () => {
+        hoistedScope.grantedScopes = ['KNOWLEDGE_BASE_EDIT'];
+
+        render(<KnowledgeBaseDropdownMenu knowledgeBase={mockKnowledgeBase} />);
+
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+        expect(screen.getByText('Edit')).toBeInTheDocument();
+    });
+
+    it('hides Edit from a member without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.grantedScopes = ['KNOWLEDGE_BASE_DELETE'];
+
+        renderComponent();
+
+        expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+        expect(screen.getByText('Delete')).toBeInTheDocument();
+        expect(screen.queryByTestId('dropdown-separator')).not.toBeInTheDocument();
+    });
+
+    it('hides the trigger when the member has neither edit nor delete scope', () => {
+        hoistedScope.grantedScopes = [];
+
+        renderComponent();
+
+        expect(screen.queryByLabelText('More Knowledge Base Actions')).not.toBeInTheDocument();
     });
 
     it('calls handleShowEditDialog when Edit is clicked', async () => {
