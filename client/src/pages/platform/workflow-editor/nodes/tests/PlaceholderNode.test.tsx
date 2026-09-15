@@ -4,11 +4,12 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactFlowProvider} from '@xyflow/react';
 import {describe, expect, it, vi} from 'vitest';
 
+import {WorkflowEditorReadOnlyContext} from '../../providers/workflowEditorReadOnlyContext';
 import {CANVAS_DRAG_DATA_TYPE, TRIGGER_DRAG_DATA_TYPE} from '../../utils/canvasDragData';
 import PlaceholderNode from '../PlaceholderNode';
 
 vi.mock('../../components/WorkflowNodesPopoverMenu', () => ({
-    default: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
+    default: ({children}: {children: React.ReactNode}) => <div data-testid="add-node-popover">{children}</div>,
 }));
 
 vi.mock('../../providers/workflowEditorProvider', () => ({
@@ -19,6 +20,17 @@ const renderPlaceholder = (id: string) =>
     render(
         <ReactFlowProvider>
             <PlaceholderNode data={{label: '+'} as NodeDataType} id={id} />
+        </ReactFlowProvider>
+    );
+
+const placeholderData = {label: '+', name: 'placeholder_1'} as NodeDataType;
+
+const renderPlaceholderNode = (readOnly: boolean) =>
+    render(
+        <ReactFlowProvider>
+            <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+                <PlaceholderNode data={placeholderData} id="placeholder_1" />
+            </WorkflowEditorReadOnlyContext.Provider>
         </ReactFlowProvider>
     );
 
@@ -62,5 +74,22 @@ describe('PlaceholderNode', () => {
         });
 
         expect(screen.queryByTestId('dropzone-highlight')).not.toBeInTheDocument();
+    });
+
+    describe('read-only mode', () => {
+        it('offers adding a node when the editor is editable', () => {
+            renderPlaceholderNode(false);
+
+            expect(screen.getByTitle('Click to add a node')).toBeInTheDocument();
+            expect(screen.getByTestId('add-node-popover')).toBeInTheDocument();
+        });
+
+        it('offers no add-node affordance in read-only mode', () => {
+            renderPlaceholderNode(true);
+
+            expect(screen.queryByTitle('Click to add a node')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('add-node-popover')).not.toBeInTheDocument();
+            expect(screen.queryByText('+')).not.toBeInTheDocument();
+        });
     });
 });
