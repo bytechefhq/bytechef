@@ -26,6 +26,7 @@ import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentJudge;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentJudgeVerdict;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentScenarioJudge;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentScenarioToolSimulation;
+import com.bytechef.ee.platform.ai.agent.eval.facade.AiAgentEvalFacade;
 import com.bytechef.ee.platform.ai.agent.eval.facade.AiAgentEvalRunFacade;
 import com.bytechef.ee.platform.ai.agent.eval.file.storage.AiAgentEvalFileStorage;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalResultService;
@@ -55,6 +56,7 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiAgentEvalGraphQlController {
 
+    private final AiAgentEvalFacade agentEvalFacade;
     private final AiAgentEvalFileStorage agentEvalFileStorage;
     private final AiAgentEvalResultService agentEvalResultService;
     private final AiAgentEvalRunFacade agentEvalRunFacade;
@@ -67,13 +69,14 @@ class AiAgentEvalGraphQlController {
     private final AiAgentScenarioToolSimulationService agentScenarioToolSimulationService;
 
     AiAgentEvalGraphQlController(
-        AiAgentEvalFileStorage agentEvalFileStorage, AiAgentEvalResultService agentEvalResultService,
-        AiAgentEvalRunFacade agentEvalRunFacade, AiAgentEvalRunService agentEvalRunService,
-        AiAgentEvalScenarioService agentEvalScenarioService, AiAgentEvalTestService agentEvalTestService,
-        AiAgentJudgeService agentJudgeService, AiAgentJudgeVerdictService agentJudgeVerdictService,
-        AiAgentScenarioJudgeService agentScenarioJudgeService,
+        AiAgentEvalFacade agentEvalFacade, AiAgentEvalFileStorage agentEvalFileStorage,
+        AiAgentEvalResultService agentEvalResultService, AiAgentEvalRunFacade agentEvalRunFacade,
+        AiAgentEvalRunService agentEvalRunService, AiAgentEvalScenarioService agentEvalScenarioService,
+        AiAgentEvalTestService agentEvalTestService, AiAgentJudgeService agentJudgeService,
+        AiAgentJudgeVerdictService agentJudgeVerdictService, AiAgentScenarioJudgeService agentScenarioJudgeService,
         AiAgentScenarioToolSimulationService agentScenarioToolSimulationService) {
 
+        this.agentEvalFacade = agentEvalFacade;
         this.agentEvalFileStorage = agentEvalFileStorage;
         this.agentEvalResultService = agentEvalResultService;
         this.agentEvalRunFacade = agentEvalRunFacade;
@@ -162,15 +165,7 @@ class AiAgentEvalGraphQlController {
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String name,
         @Argument AiAgentJudgeType type, @Argument Map<String, Object> configuration) {
 
-        AiAgentJudge agentJudge = new AiAgentJudge();
-
-        agentJudge.setWorkflowId(workflowId);
-        agentJudge.setWorkflowNodeName(workflowNodeName);
-        agentJudge.setName(name);
-        agentJudge.setType(type);
-        agentJudge.setConfiguration(configuration);
-
-        return agentJudgeService.createAiAgentJudge(agentJudge);
+        return agentEvalFacade.createAiAgentJudge(workflowId, workflowNodeName, name, type, configuration);
     }
 
     @MutationMapping
@@ -178,22 +173,12 @@ class AiAgentEvalGraphQlController {
         @Argument Long id, @Argument @Nullable String name,
         @Argument @Nullable Map<String, Object> configuration) {
 
-        AiAgentJudge agentJudge = agentJudgeService.getAgentJudge(id);
-
-        if (name != null) {
-            agentJudge.setName(name);
-        }
-
-        if (configuration != null) {
-            agentJudge.setConfiguration(configuration);
-        }
-
-        return agentJudgeService.updateAiAgentJudge(agentJudge);
+        return agentEvalFacade.updateAiAgentJudge(id, name, configuration);
     }
 
     @MutationMapping
     boolean deleteAiAgentJudge(@Argument Long id) {
-        agentJudgeService.deleteAiAgentJudge(id);
+        agentEvalFacade.deleteAiAgentJudge(id);
 
         return true;
     }
@@ -205,36 +190,19 @@ class AiAgentEvalGraphQlController {
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String name,
         @Argument @Nullable String description) {
 
-        AiAgentEvalTest aiAgentEvalTest = new AiAgentEvalTest();
-
-        aiAgentEvalTest.setWorkflowId(workflowId);
-        aiAgentEvalTest.setWorkflowNodeName(workflowNodeName);
-        aiAgentEvalTest.setName(name);
-        aiAgentEvalTest.setDescription(description);
-
-        return agentEvalTestService.createAiAgentEvalTest(aiAgentEvalTest);
+        return agentEvalFacade.createAiAgentEvalTest(workflowId, workflowNodeName, name, description);
     }
 
     @MutationMapping
     AiAgentEvalTest updateAiAgentEvalTest(
         @Argument Long id, @Argument @Nullable String name, @Argument @Nullable String description) {
 
-        AiAgentEvalTest aiAgentEvalTest = agentEvalTestService.getAgentEvalTest(id);
-
-        if (name != null) {
-            aiAgentEvalTest.setName(name);
-        }
-
-        if (description != null) {
-            aiAgentEvalTest.setDescription(description);
-        }
-
-        return agentEvalTestService.updateAiAgentEvalTest(aiAgentEvalTest);
+        return agentEvalFacade.updateAiAgentEvalTest(id, name, description);
     }
 
     @MutationMapping
     boolean deleteAiAgentEvalTest(@Argument Long id) {
-        agentEvalTestService.deleteAiAgentEvalTest(id);
+        agentEvalFacade.deleteAiAgentEvalTest(id);
 
         return true;
     }
@@ -248,24 +216,8 @@ class AiAgentEvalGraphQlController {
         @Argument @Nullable String personaPrompt, @Argument @Nullable Integer maxTurns,
         @Argument @Nullable Integer numberOfRuns) {
 
-        AiAgentEvalScenario aiAgentEvalScenario = new AiAgentEvalScenario();
-
-        aiAgentEvalScenario.setAgentEvalTestId(agentEvalTestId);
-        aiAgentEvalScenario.setName(name);
-        aiAgentEvalScenario.setType(type);
-        aiAgentEvalScenario.setUserMessage(userMessage);
-        aiAgentEvalScenario.setExpectedOutput(expectedOutput);
-        aiAgentEvalScenario.setPersonaPrompt(personaPrompt);
-
-        if (maxTurns != null) {
-            aiAgentEvalScenario.setMaxTurns(maxTurns);
-        }
-
-        if (numberOfRuns != null) {
-            aiAgentEvalScenario.setNumberOfRuns(numberOfRuns);
-        }
-
-        return agentEvalScenarioService.createAiAgentEvalScenario(aiAgentEvalScenario);
+        return agentEvalFacade.createAiAgentEvalScenario(
+            agentEvalTestId, name, type, userMessage, expectedOutput, personaPrompt, maxTurns, numberOfRuns);
     }
 
     @MutationMapping
@@ -274,38 +226,13 @@ class AiAgentEvalGraphQlController {
         @Argument @Nullable String expectedOutput, @Argument @Nullable String personaPrompt,
         @Argument @Nullable Integer maxTurns, @Argument @Nullable Integer numberOfRuns) {
 
-        AiAgentEvalScenario aiAgentEvalScenario = agentEvalScenarioService.getAgentEvalScenario(id);
-
-        if (name != null) {
-            aiAgentEvalScenario.setName(name);
-        }
-
-        if (userMessage != null) {
-            aiAgentEvalScenario.setUserMessage(userMessage);
-        }
-
-        if (expectedOutput != null) {
-            aiAgentEvalScenario.setExpectedOutput(expectedOutput);
-        }
-
-        if (personaPrompt != null) {
-            aiAgentEvalScenario.setPersonaPrompt(personaPrompt);
-        }
-
-        if (maxTurns != null) {
-            aiAgentEvalScenario.setMaxTurns(maxTurns);
-        }
-
-        if (numberOfRuns != null) {
-            aiAgentEvalScenario.setNumberOfRuns(numberOfRuns);
-        }
-
-        return agentEvalScenarioService.updateAiAgentEvalScenario(aiAgentEvalScenario);
+        return agentEvalFacade.updateAiAgentEvalScenario(
+            id, name, userMessage, expectedOutput, personaPrompt, maxTurns, numberOfRuns);
     }
 
     @MutationMapping
     boolean deleteAiAgentEvalScenario(@Argument Long id) {
-        agentEvalScenarioService.deleteAiAgentEvalScenario(id);
+        agentEvalFacade.deleteAiAgentEvalScenario(id);
 
         return true;
     }
@@ -317,14 +244,7 @@ class AiAgentEvalGraphQlController {
         @Argument Long agentEvalScenarioId, @Argument String name, @Argument AiAgentJudgeType type,
         @Argument Map<String, Object> configuration) {
 
-        AiAgentScenarioJudge agentScenarioJudge = new AiAgentScenarioJudge();
-
-        agentScenarioJudge.setAgentEvalScenarioId(agentEvalScenarioId);
-        agentScenarioJudge.setName(name);
-        agentScenarioJudge.setType(type);
-        agentScenarioJudge.setConfiguration(configuration);
-
-        return agentScenarioJudgeService.createAiAgentScenarioJudge(agentScenarioJudge);
+        return agentEvalFacade.createAiAgentScenarioJudge(agentEvalScenarioId, name, type, configuration);
     }
 
     @MutationMapping
@@ -332,22 +252,12 @@ class AiAgentEvalGraphQlController {
         @Argument Long id, @Argument @Nullable String name,
         @Argument @Nullable Map<String, Object> configuration) {
 
-        AiAgentScenarioJudge agentScenarioJudge = agentScenarioJudgeService.getAgentScenarioJudge(id);
-
-        if (name != null) {
-            agentScenarioJudge.setName(name);
-        }
-
-        if (configuration != null) {
-            agentScenarioJudge.setConfiguration(configuration);
-        }
-
-        return agentScenarioJudgeService.updateAiAgentScenarioJudge(agentScenarioJudge);
+        return agentEvalFacade.updateAiAgentScenarioJudge(id, name, configuration);
     }
 
     @MutationMapping
     boolean deleteAiAgentScenarioJudge(@Argument Long id) {
-        agentScenarioJudgeService.deleteAiAgentScenarioJudge(id);
+        agentEvalFacade.deleteAiAgentScenarioJudge(id);
 
         return true;
     }
@@ -359,14 +269,8 @@ class AiAgentEvalGraphQlController {
         @Argument Long agentEvalScenarioId, @Argument String toolName,
         @Argument String responsePrompt, @Argument @Nullable String simulationModel) {
 
-        AiAgentScenarioToolSimulation toolSimulation = new AiAgentScenarioToolSimulation();
-
-        toolSimulation.setAgentEvalScenarioId(agentEvalScenarioId);
-        toolSimulation.setToolName(toolName);
-        toolSimulation.setResponsePrompt(responsePrompt);
-        toolSimulation.setSimulationModel(simulationModel);
-
-        return agentScenarioToolSimulationService.createAiAgentScenarioToolSimulation(toolSimulation);
+        return agentEvalFacade.createAiAgentScenarioToolSimulation(
+            agentEvalScenarioId, toolName, responsePrompt, simulationModel);
     }
 
     @MutationMapping
@@ -374,25 +278,12 @@ class AiAgentEvalGraphQlController {
         @Argument Long id, @Argument @Nullable String toolName,
         @Argument @Nullable String responsePrompt, @Argument @Nullable String simulationModel) {
 
-        AiAgentScenarioToolSimulation toolSimulation =
-            agentScenarioToolSimulationService.getAgentScenarioToolSimulation(id);
-
-        if (toolName != null) {
-            toolSimulation.setToolName(toolName);
-        }
-
-        if (responsePrompt != null) {
-            toolSimulation.setResponsePrompt(responsePrompt);
-        }
-
-        toolSimulation.setSimulationModel(simulationModel);
-
-        return agentScenarioToolSimulationService.updateAiAgentScenarioToolSimulation(toolSimulation);
+        return agentEvalFacade.updateAiAgentScenarioToolSimulation(id, toolName, responsePrompt, simulationModel);
     }
 
     @MutationMapping
     boolean deleteAiAgentScenarioToolSimulation(@Argument Long id) {
-        agentScenarioToolSimulationService.deleteAiAgentScenarioToolSimulation(id);
+        agentEvalFacade.deleteAiAgentScenarioToolSimulation(id);
 
         return true;
     }

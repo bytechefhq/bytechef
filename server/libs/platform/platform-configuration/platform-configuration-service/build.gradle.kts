@@ -8,6 +8,7 @@ dependencies {
     implementation("org.aspectj:aspectjweaver")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:cache-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
