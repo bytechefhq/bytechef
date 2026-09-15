@@ -1,5 +1,6 @@
 import {Dialog} from '@/components/Dialog';
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -7,6 +8,7 @@ import PropertyCodeEditorDialogToolbar from '../PropertyCodeEditorDialogToolbar'
 
 const hoisted = vi.hoisted(() => {
     return {
+        allFeatureFlagsEnabled: false,
         mockHandleCopilotClick: vi.fn(),
         mockHandleRunClick: vi.fn(),
         mockHandleSaveClick: vi.fn(),
@@ -33,6 +35,15 @@ vi.mock('../hooks', () => ({
     }),
 }));
 
+vi.mock('@/shared/stores/useFeatureFlagsStore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/stores/useFeatureFlagsStore')>();
+
+    return {
+        ...actual,
+        useFeatureFlagsStore: () => (hoisted.allFeatureFlagsEnabled ? () => true : actual.useFeatureFlagsStore()),
+    };
+});
+
 // The toolbar only ever renders inside the code editor dialog, and its DialogClose needs that context.
 const renderWithProviders = (ui: React.ReactElement) => {
     return render(
@@ -52,6 +63,7 @@ describe('PropertyCodeEditorDialogToolbar', () => {
 
     beforeEach(() => {
         windowResizeObserver();
+        hoisted.allFeatureFlagsEnabled = false;
         hoisted.storeState.copilotEnabled = true;
         hoisted.storeState.dirty = false;
         hoisted.storeState.saving = false;
@@ -201,6 +213,45 @@ describe('PropertyCodeEditorDialogToolbar', () => {
 
                 expect(hoisted.mockHandleCopilotClick).toHaveBeenCalledTimes(1);
             }
+        });
+    });
+
+    describe('read-only mode', () => {
+        const renderToolbar = (readOnly: boolean) =>
+            render(
+                <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+                    <TooltipProvider>
+                        <Dialog open>
+                            <PropertyCodeEditorDialogToolbar
+                                language="javascript"
+                                onChange={vi.fn()}
+                                workflowId="workflow-1"
+                                workflowNodeName="script_1"
+                            />
+                        </Dialog>
+                    </TooltipProvider>
+                </WorkflowEditorReadOnlyContext.Provider>
+            );
+
+        beforeEach(() => {
+            hoisted.allFeatureFlagsEnabled = true;
+            hoisted.storeState.dirty = true;
+        });
+
+        it('offers Save and Run when the editor is editable', () => {
+            renderToolbar(false);
+
+            expect(screen.getByRole('button', {name: 'Save script'})).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Run script'})).toBeInTheDocument();
+        });
+
+        it('hides Save, Run and the Copilot entry in read-only mode', () => {
+            renderToolbar(true);
+
+            expect(screen.getByText('Edit Script')).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Save script'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Run script'})).not.toBeInTheDocument();
+            expect(screen.getAllByRole('button')).toHaveLength(2);
         });
     });
 });

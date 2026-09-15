@@ -9,6 +9,7 @@ import {
 } from '@/pages/platform/workflow-editor/components/properties/hooks/propertyValueReducer';
 import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -271,6 +272,7 @@ export const useProperty = ({
         updateClusterElementParameterMutation,
         updateWorkflowNodeParameterMutation,
     } = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const rootClusterElementNodeData = useWorkflowEditorStore((state) => state.rootClusterElementNodeData);
 
@@ -1677,6 +1679,7 @@ export const useProperty = ({
     // handle NULL type property saving
     useEffect(() => {
         if (
+            !readOnly &&
             type === 'NULL' &&
             propertyParameterValue === undefined &&
             currentNode &&

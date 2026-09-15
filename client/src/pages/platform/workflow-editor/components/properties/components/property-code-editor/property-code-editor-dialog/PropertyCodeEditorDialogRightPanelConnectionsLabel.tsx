@@ -2,6 +2,7 @@ import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 
 import usePropertyCodeEditorDialogRightPanelConnectionsLabel from './hooks/usePropertyCodeEditorDialogRightPanelConnectionsLabel';
@@ -16,6 +17,7 @@ const PropertyCodeEditorDialogRightPanelConnectionsLabel = ({
     onRemoveClick,
 }: PropertyCodeEditorDialogRightPanelConnectionsLabelProps) => {
     const {componentDefinition} = usePropertyCodeEditorDialogRightPanelConnectionsLabel({componentConnection});
+    const readOnly = useWorkflowEditorReadOnly();
 
     return (
         <div className="flex items-center justify-between">
@@ -37,13 +39,15 @@ const PropertyCodeEditorDialogRightPanelConnectionsLabel = ({
                 </Tooltip>
             </div>
 
-            <Button
-                className="px-0 text-content-destructive-primary hover:text-content-destructive-primary active:text-content-destructive-primary"
-                label="Remove"
-                onClick={onRemoveClick}
-                size="sm"
-                variant="link"
-            />
+            {!readOnly && (
+                <Button
+                    className="px-0 text-content-destructive-primary hover:text-content-destructive-primary active:text-content-destructive-primary"
+                    label="Remove"
+                    onClick={onRemoveClick}
+                    size="sm"
+                    variant="link"
+                />
+            )}
         </div>
     );
 };
