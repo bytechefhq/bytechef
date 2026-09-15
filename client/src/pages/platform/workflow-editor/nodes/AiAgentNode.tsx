@@ -354,7 +354,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 )}
 
                 <div className="relative w-fit">
-                    <WorkflowNodeIssueBadge nodeName={data.name} />
+                    <WorkflowNodeIssueBadge includeClusterElementIssues nodeName={data.name} />
 
                     <Popover
                         onOpenChange={(open) => {
