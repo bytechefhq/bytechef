@@ -18,5 +18,6 @@ public enum DataTablePermissionScope implements PermissionScopeType {
 
     DATA_TABLE_VIEW,
     DATA_TABLE_CREATE,
-    DATA_TABLE_EDIT
+    DATA_TABLE_EDIT,
+    DATA_TABLE_DELETE
 }

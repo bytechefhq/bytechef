@@ -27,6 +27,7 @@ public class DataTablePermissionScopeProvider implements PermissionScopeProvider
         return Set.of(
             new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_VIEW, WorkspaceRole.VIEWER),
             new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_CREATE, WorkspaceRole.EDITOR),
-            new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_EDIT, WorkspaceRole.EDITOR));
+            new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_EDIT, WorkspaceRole.EDITOR),
+            new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_DELETE, WorkspaceRole.ADMIN));
     }
 }
