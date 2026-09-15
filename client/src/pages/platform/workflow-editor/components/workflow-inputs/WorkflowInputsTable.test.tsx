@@ -1,3 +1,4 @@
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {render, resetAll, screen} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 
@@ -44,5 +45,27 @@ describe('WorkflowInputsTable', () => {
         renderTable();
 
         expect(screen.getByTitle(longTestValue)).toBeInTheDocument();
+    });
+
+    it('should offer editing and deleting an input when the editor is editable', () => {
+        renderTable();
+
+        expect(screen.getAllByRole('button')).toHaveLength(2);
+    });
+
+    it('should offer neither editing nor deleting an input in read-only mode', () => {
+        render(
+            <WorkflowEditorReadOnlyContext.Provider value={true}>
+                <WorkflowInputsTable
+                    openDeleteDialog={vi.fn()}
+                    openEditDialog={vi.fn()}
+                    workflowInputs={workflowInputs}
+                    workflowTestConfigurationInputs={{longInput: longTestValue}}
+                />
+            </WorkflowEditorReadOnlyContext.Provider>
+        );
+
+        expect(screen.getByText('longInput')).toBeInTheDocument();
+        expect(screen.queryAllByRole('button')).toHaveLength(0);
     });
 });

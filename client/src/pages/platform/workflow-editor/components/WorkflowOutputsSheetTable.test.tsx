@@ -1,3 +1,4 @@
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {render, resetAll, screen, userEvent, within} from '@/shared/util/test-utils';
@@ -78,6 +79,34 @@ describe('WorkflowOutputsSheetTable', () => {
 
         expect(saveWorkflowDefinitionUpdate).toHaveBeenCalledTimes(1);
         expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
+
+    it('should offer editing and deleting an output when the editor is editable', () => {
+        renderTable();
+
+        expect(screen.getAllByRole('button')).toHaveLength(2);
+    });
+
+    it('should offer neither editing nor deleting an output in read-only mode', () => {
+        render(
+            <WorkflowEditorReadOnlyContext.Provider value={true}>
+                <WorkflowOutputsSheetTable workflow={workflow} />
+            </WorkflowEditorReadOnlyContext.Provider>
+        );
+
+        expect(screen.getByText('longOutput')).toBeInTheDocument();
+        expect(screen.queryAllByRole('button')).toHaveLength(0);
+    });
+
+    it('should not offer creating the first output in read-only mode', () => {
+        render(
+            <WorkflowEditorReadOnlyContext.Provider value={true}>
+                <WorkflowOutputsSheetTable workflow={{outputs: []}} />
+            </WorkflowEditorReadOnlyContext.Provider>
+        );
+
+        expect(screen.getByText('No outputs')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'New Output'})).not.toBeInTheDocument();
     });
 });
 
