@@ -1,6 +1,7 @@
 import {Background, BackgroundVariant, ReactFlow, ReactFlowProvider, type Viewport} from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -25,6 +26,7 @@ const ClusterElementsWorkflowEditor = () => {
 
     const {clusterElementsEdgeTypes, clusterElementsNodeTypes, edges, handleNodesChange, handleResetLayout, nodes} =
         useClusterElementsWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const handleViewportChange = useCallback(
         (viewport: Viewport) => {
@@ -62,7 +64,7 @@ const ClusterElementsWorkflowEditor = () => {
                     nodeTypes={clusterElementsNodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
-                    nodesDraggable={!nodesLocked}
+                    nodesDraggable={!readOnly && !nodesLocked}
                     onEdgesChange={onEdgesChange}
                     onNodesChange={handleNodesChange}
                     onViewportChange={handleViewportChange}
@@ -74,7 +76,7 @@ const ClusterElementsWorkflowEditor = () => {
                 >
                     <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
-                    <ClusterElementsWorkflowEditorToolbar onResetLayout={handleResetLayout} />
+                    <ClusterElementsWorkflowEditorToolbar onResetLayout={handleResetLayout} readOnly={readOnly} />
                 </ReactFlow>
             </ReactFlowProvider>
         </div>
