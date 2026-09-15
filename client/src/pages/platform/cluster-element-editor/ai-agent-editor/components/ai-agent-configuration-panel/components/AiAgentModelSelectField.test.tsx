@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {render, screen} from '@/shared/util/test-utils';
 import {ReactNode} from 'react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -12,16 +13,18 @@ vi.mock('./hooks/useAiAgentModelSelectField', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu', () => ({
-    default: ({children}: {children: ReactNode}) => <div>{children}</div>,
+    default: ({children}: {children: ReactNode}) => <div data-testid="model-popover">{children}</div>,
 }));
 
 import AiAgentModelSelectField from './AiAgentModelSelectField';
 
-const renderField = () =>
+const renderField = (readOnly = false) =>
     render(
-        <TooltipProvider>
-            <AiAgentModelSelectField />
-        </TooltipProvider>
+        <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+            <TooltipProvider>
+                <AiAgentModelSelectField />
+            </TooltipProvider>
+        </WorkflowEditorReadOnlyContext.Provider>
     );
 
 const openAiModel = {
@@ -82,5 +85,22 @@ describe('AiAgentModelSelectField', () => {
         renderField();
 
         expect(screen.getByRole('button', {name: /OpenAI/})).toHaveClass('border-red-500');
+    });
+
+    it('lets the model be changed when the editor is editable', () => {
+        mockHook({model: openAiModel});
+
+        renderField();
+
+        expect(screen.getByTestId('model-popover')).toBeInTheDocument();
+    });
+
+    it('shows the model without the change-model popover in read-only mode', () => {
+        mockHook({model: openAiModel});
+
+        renderField(true);
+
+        expect(screen.getByRole('button', {name: /OpenAI/})).toBeInTheDocument();
+        expect(screen.queryByTestId('model-popover')).not.toBeInTheDocument();
     });
 });
