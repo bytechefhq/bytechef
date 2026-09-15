@@ -1,4 +1,5 @@
 /* eslint-disable sort-keys */
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     Connection,
     ConnectionApi,
@@ -7,6 +8,7 @@ import {
     Tag,
 } from '@/shared/middleware/automation/configuration';
 import {DEFINITION_STALE_TIME} from '@/shared/queries/queryConstants';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
@@ -19,13 +21,24 @@ export const ConnectionKeys = {
         connectionVersion?: number;
         tagId?: number;
     }) => [...ConnectionKeys.connections, filters],
+    workspaceConnectionTags: (workspaceId: number, environmentId?: number) => [
+        ...ConnectionKeys.connectionTags,
+        workspaceId,
+        environmentId,
+    ],
 };
 
-export const useGetConnectionTagsQuery = () =>
-    useQuery<Tag[], Error>({
-        queryKey: ConnectionKeys.connectionTags,
-        queryFn: () => new ConnectionTagApi().getConnectionTags(),
+export const useGetConnectionTagsQuery = () => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    return useQuery<Tag[], Error>({
+        queryKey: ConnectionKeys.workspaceConnectionTags(currentWorkspaceId!, currentEnvironmentId),
+        queryFn: () =>
+            new ConnectionTagApi().getConnectionTags({environmentId: currentEnvironmentId, id: currentWorkspaceId!}),
+        enabled: currentWorkspaceId !== undefined,
     });
+};
 
 export const useGetWorkspaceConnectionsQuery = (request: GetWorkspaceConnectionsRequest, enabled?: boolean) =>
     useQuery<Connection[], Error>({

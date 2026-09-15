@@ -10,8 +10,8 @@ import {EditIcon, EllipsisVerticalIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 
 interface ConnectionListItemDropdownMenuProps {
-    children: ReactNode;
-    onEditClick: () => void;
+    children?: ReactNode;
+    onEditClick?: () => void;
 }
 
 const ConnectionListItemDropdownMenu = ({children, onEditClick}: ConnectionListItemDropdownMenuProps) => (
@@ -21,9 +21,9 @@ const ConnectionListItemDropdownMenu = ({children, onEditClick}: ConnectionListI
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-            <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
+            {onEditClick && <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />}
 
-            <DropdownMenuSeparator />
+            {onEditClick && children && <DropdownMenuSeparator />}
 
             {children}
         </DropdownMenuContent>

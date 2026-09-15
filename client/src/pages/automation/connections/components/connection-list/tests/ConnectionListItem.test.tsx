@@ -1,4 +1,5 @@
 import {Connection} from '@/shared/middleware/automation/configuration';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {render, resetAll, screen, userEvent, windowResizeObserver, within} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -7,6 +8,10 @@ import ConnectionListItem from '../ConnectionListItem';
 const hoisted = vi.hoisted(() => ({
     deleteConnectionMutate: vi.fn(),
     disconnectConnectionMutate: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
 }));
 
 vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
@@ -64,6 +69,8 @@ const openMenu = async () => {
 
 beforeEach(() => {
     windowResizeObserver();
+
+    authenticationStore.setState({account: {authorities: ['ROLE_ADMIN']}, authenticated: true});
 });
 
 afterEach(() => {
