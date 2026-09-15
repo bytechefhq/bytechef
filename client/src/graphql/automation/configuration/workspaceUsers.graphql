@@ -1,0 +1,17 @@
+query WorkspaceUsers($workspaceId: ID!) {
+    workspaceUsers(workspaceId: $workspaceId) {
+        id
+        workspaceId
+        userId
+        workspaceRole
+        customRoleId
+        inherited
+        user {
+            email
+            firstName
+            lastName
+        }
+        createdDate
+        environment
+    }
+}
