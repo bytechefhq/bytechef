@@ -1,7 +1,10 @@
 import {DropdownMenuItem} from '@/components/DropdownMenu/DropdownMenu';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowListItemDropdownMenu from '@/shared/components/workflow/WorkflowListItemDropdownMenu';
+import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {
     useDeleteWorkflowMutation,
@@ -30,11 +33,19 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
     const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
 
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     const queryClient = useQueryClient();
+
+    const canCreateWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_CREATE', DEVELOPMENT_ENVIRONMENT);
+    const canDeleteWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_DELETE', DEVELOPMENT_ENVIRONMENT);
+    const canEditWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT', DEVELOPMENT_ENVIRONMENT);
+    const canViewWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_VIEW', DEVELOPMENT_ENVIRONMENT);
+
+    const canDuplicateWorkflow = canCreateWorkflow && canViewWorkflow;
 
     const projectId = project.id!;
 
@@ -133,20 +144,30 @@ const WorkflowsListItemDropdownMenu = ({currentWorkflowId, project, workflow}: W
             }
             onDelete={() => deleteWorkflowMutation.mutate({id: workflow.id!})}
             onEditClick={() => setShowEditWorkflowDialog(true)}
+            showDeleteAction={canDeleteWorkflow}
+            showEditAction={canEditWorkflow}
             workflowLabel={workflow.label}
         >
-            <DropdownMenuItem
-                icon={<CopyIcon />}
-                label="Duplicate"
-                onClick={() =>
-                    duplicateWorkflowMutation.mutate({
-                        id: projectId,
-                        workflowId: workflow.id!,
-                    })
-                }
-            />
+            {canDuplicateWorkflow && (
+                <DropdownMenuItem
+                    icon={<CopyIcon />}
+                    label="Duplicate"
+                    onClick={() =>
+                        duplicateWorkflowMutation.mutate({
+                            id: projectId,
+                            workflowId: workflow.id!,
+                        })
+                    }
+                />
+            )}
 
-            <DropdownMenuItem icon={<Share2Icon />} label="Share" onClick={() => setShowWorkflowShareDialog(true)} />
+            {canEditWorkflow && (
+                <DropdownMenuItem
+                    icon={<Share2Icon />}
+                    label="Share"
+                    onClick={() => setShowWorkflowShareDialog(true)}
+                />
+            )}
 
             {templatesSubmissionForm && (
                 <DropdownMenuItem

@@ -30,6 +30,7 @@ import EEVersion from '@/shared/edition/EEVersion';
 import {ProjectGitConfigurationI, getProjectGitApi} from '@/shared/edition/project-git/projectGitApi';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -110,6 +111,19 @@ const ProjectListItem = ({
     const [searchParams] = useSearchParams();
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canConfigureProjectGit = useHasWorkspaceScope(currentWorkspaceId, 'WORKSPACE_MANAGE');
+    const canCreateDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_CREATE');
+    const canCreateProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
+    const canCreateWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_CREATE');
+    const canDeleteProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_DELETE');
+    const canEditProject = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT');
+    const canManageProjectSettings = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_SETTINGS');
+    const canPublish = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_PUBLISH');
+    const canPullProjectFromGit = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_PULL');
+
+    const canDeployProject = canCreateDeployment && canEditProject;
+    const canPublishProject = canPublish && canEditProject;
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
@@ -339,6 +353,7 @@ const ProjectListItem = ({
                                                 },
                                             })}
                                             id={project.id!}
+                                            readOnly={!canEditProject}
                                             remainingTags={remainingTags}
                                             tags={project.tags}
                                             updateTagsMutation={updateProjectTagsMutation}
@@ -364,27 +379,29 @@ const ProjectListItem = ({
                                             <span>PUBLISHED</span>
                                         </Badge>
 
-                                        <ButtonGroup>
-                                            <ProjectDeploymentDialog
-                                                environmentEditable={true}
-                                                onOpenChange={setIsProjectDeploymentDialogOpen}
-                                                onSuccess={openSavedProjectDeployment}
-                                                projectDeployment={{
-                                                    name: project.name,
-                                                    projectId: project.id,
-                                                }}
-                                                projectDeployments={projectDeploymentsQuery.data}
-                                                projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
-                                                redirectOnSubmit={false}
-                                                showTabs
-                                                triggerNode={
-                                                    <ProjectListItemDeployButton
-                                                        hasWorkflows={hasWorkflows}
-                                                        onClick={handleProjectDeploymentDialogOpen}
-                                                    />
-                                                }
-                                            />
-                                        </ButtonGroup>
+                                        {canDeployProject && (
+                                            <ButtonGroup>
+                                                <ProjectDeploymentDialog
+                                                    environmentEditable={true}
+                                                    onOpenChange={setIsProjectDeploymentDialogOpen}
+                                                    onSuccess={openSavedProjectDeployment}
+                                                    projectDeployment={{
+                                                        name: project.name,
+                                                        projectId: project.id,
+                                                    }}
+                                                    projectDeployments={projectDeploymentsQuery.data}
+                                                    projectDeploymentsLoading={projectDeploymentsQuery.isFetching}
+                                                    redirectOnSubmit={false}
+                                                    showTabs
+                                                    triggerNode={
+                                                        <ProjectListItemDeployButton
+                                                            hasWorkflows={hasWorkflows}
+                                                            onClick={handleProjectDeploymentDialogOpen}
+                                                        />
+                                                    }
+                                                />
+                                            </ButtonGroup>
+                                        )}
                                     </>
                                 ) : (
                                     <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
@@ -424,26 +441,34 @@ const ProjectListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <ProjectListItemPublishMenuItem
-                                    hasWorkflows={hasWorkflows}
-                                    onClick={() => setShowPublishProjectDialog(true)}
-                                />
+                                {canPublishProject && (
+                                    <>
+                                        <ProjectListItemPublishMenuItem
+                                            hasWorkflows={hasWorkflows}
+                                            onClick={() => setShowPublishProjectDialog(true)}
+                                        />
 
-                                <DropdownMenuSeparator />
+                                        <DropdownMenuSeparator />
+                                    </>
+                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Edit Project"
-                                    icon={<EditIcon />}
-                                    label="Edit"
-                                    onClick={() => setShowEditDialog(true)}
-                                />
+                                {canEditProject && (
+                                    <DropdownMenuItem
+                                        aria-label="Edit Project"
+                                        icon={<EditIcon />}
+                                        label="Edit"
+                                        onClick={() => setShowEditDialog(true)}
+                                    />
+                                )}
 
-                                <DropdownMenuItem
-                                    aria-label="Duplicate Project"
-                                    icon={<CopyIcon />}
-                                    label="Duplicate"
-                                    onClick={() => duplicateProjectMutation.mutate(project.id!)}
-                                />
+                                {canCreateProject && (
+                                    <DropdownMenuItem
+                                        aria-label="Duplicate Project"
+                                        icon={<CopyIcon />}
+                                        label="Duplicate"
+                                        onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                                    />
+                                )}
 
                                 {project.projectWorkflowIds && project.projectWorkflowIds?.length > 0 && (
                                     <DropdownMenuItem
@@ -458,12 +483,14 @@ const ProjectListItem = ({
                                     />
                                 )}
 
-                                <DropdownMenuItem
-                                    aria-label="Share Project"
-                                    icon={<Share2Icon />}
-                                    label="Share"
-                                    onClick={() => setShowProjectShareDialog(true)}
-                                />
+                                {canManageProjectSettings && (
+                                    <DropdownMenuItem
+                                        aria-label="Share Project"
+                                        icon={<Share2Icon />}
+                                        label="Share"
+                                        onClick={() => setShowProjectShareDialog(true)}
+                                    />
+                                )}
 
                                 {templatesSubmissionForm && (
                                     <DropdownMenuItem
@@ -483,40 +510,48 @@ const ProjectListItem = ({
                                     }
                                 />
 
-                                <DropdownMenuSeparator />
-
-                                {ff_1039 && (
+                                {ff_1039 && (canPullProjectFromGit || canConfigureProjectGit) && (
                                     <EEVersion hidden={true}>
-                                        <DropdownMenuItem
-                                            aria-label="Pull Project from Git"
-                                            disabled={!projectGitConfiguration?.enabled}
-                                            icon={<GitPullRequestArrowIcon />}
-                                            label="Pull Project from Git"
-                                            onClick={handlePullProjectFromGitClick}
-                                        />
-
-                                        <DropdownMenuItem
-                                            aria-label="Git Configuration"
-                                            icon={<GitBranchIcon />}
-                                            label="Git Configuration"
-                                            onClick={() => setShowProjectGitConfigurationDialog(true)}
-                                        />
-
                                         <DropdownMenuSeparator />
+
+                                        {canPullProjectFromGit && (
+                                            <DropdownMenuItem
+                                                aria-label="Pull Project from Git"
+                                                disabled={!projectGitConfiguration?.enabled}
+                                                icon={<GitPullRequestArrowIcon />}
+                                                label="Pull Project from Git"
+                                                onClick={handlePullProjectFromGitClick}
+                                            />
+                                        )}
+
+                                        {canConfigureProjectGit && (
+                                            <DropdownMenuItem
+                                                aria-label="Git Configuration"
+                                                icon={<GitBranchIcon />}
+                                                label="Git Configuration"
+                                                onClick={() => setShowProjectGitConfigurationDialog(true)}
+                                            />
+                                        )}
                                     </EEVersion>
                                 )}
 
-                                <DropdownMenuItem
-                                    aria-label="Delete Project"
-                                    icon={<Trash2Icon />}
-                                    label="Delete"
-                                    onClick={(event: MouseEvent) => {
-                                        setShowDeleteDialog(true);
+                                {canDeleteProject && (
+                                    <>
+                                        <DropdownMenuSeparator />
 
-                                        event.stopPropagation();
-                                    }}
-                                    variant="destructive"
-                                />
+                                        <DropdownMenuItem
+                                            aria-label="Delete Project"
+                                            icon={<Trash2Icon />}
+                                            label="Delete"
+                                            onClick={(event: MouseEvent) => {
+                                                setShowDeleteDialog(true);
+
+                                                event.stopPropagation();
+                                            }}
+                                            variant="destructive"
+                                        />
+                                    </>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -526,7 +561,7 @@ const ProjectListItem = ({
             <CollapsibleContent className="mx-3 mt-1 mb-3">
                 <ProjectListItemTabs
                     actions={
-                        activeTab === 'workflows' && hasWorkflows ? (
+                        activeTab === 'workflows' && hasWorkflows && canCreateWorkflow ? (
                             <ButtonGroup aria-label="Workflow Creation Actions">
                                 <Button
                                     aria-label="Create Workflow"
@@ -611,7 +646,7 @@ const ProjectListItem = ({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </ButtonGroup>
-                        ) : activeTab === 'deployments' && isPublished && deploymentCount !== 0 ? (
+                        ) : activeTab === 'deployments' && isPublished && deploymentCount !== 0 && canDeployProject ? (
                             <ProjectDeploymentDialog
                                 onSuccess={(projectDeploymentId) => onTabChange('deployments', projectDeploymentId)}
                                 projectDeployment={{
