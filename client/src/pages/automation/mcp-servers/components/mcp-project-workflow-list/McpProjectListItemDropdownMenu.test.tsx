@@ -11,6 +11,10 @@ const hoisted = vi.hoisted(() => ({
     showDeleteDialog: false,
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('./hooks/useMcpProjectListItemDropdownMenu', () => ({
     default: () => ({
         handleConfirmDelete: hoisted.handleConfirmDelete,
