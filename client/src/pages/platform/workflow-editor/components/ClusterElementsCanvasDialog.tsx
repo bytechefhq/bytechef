@@ -12,6 +12,7 @@ import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import useClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/hooks/useClusterElementsCanvasDialog';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
@@ -83,6 +84,8 @@ const ClusterElementsCanvasDialog = ({
     } = useClusterElementsCanvasDialog({
         onOpenChange,
     });
+
+    const readOnly = useWorkflowEditorReadOnly();
 
     const queryClient = useQueryClient();
     const {projectId, projectWorkflowId} = useParams();
@@ -206,7 +209,7 @@ const ClusterElementsCanvasDialog = ({
                                 onTestClick={handleTestClick}
                                 onToggleEditor={handleToggleEditor}
                                 showSkills={isAiAgentClusterRoot}
-                                showTestButton={isAiAgentClusterRoot}
+                                showTestButton={isAiAgentClusterRoot && !readOnly}
                                 showToggleEditor={
                                     isAiAgentClusterRoot || (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
                                 }
@@ -255,7 +258,7 @@ const ClusterElementsCanvasDialog = ({
                             </Suspense>
                         )}
 
-                        {testingPanelOpen && (
+                        {testingPanelOpen && !readOnly && (
                             <div
                                 className={twMerge(
                                     'absolute inset-y-0 right-0 z-10 w-[800px] overflow-hidden border-r border-l bg-background transition-[right] duration-300 ease-in-out',
