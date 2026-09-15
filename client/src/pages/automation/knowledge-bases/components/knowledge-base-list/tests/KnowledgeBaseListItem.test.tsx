@@ -3,6 +3,13 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseListItem from '../KnowledgeBaseListItem';
 
+const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 const hoisted = vi.hoisted(() => {
     return {
         handleCloseDeleteDialog: vi.fn(),
@@ -110,6 +117,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['KNOWLEDGE_BASE_DELETE', 'KNOWLEDGE_BASE_EDIT'];
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseListItem.mockReturnValue({...defaultMockReturn});
 });
@@ -200,6 +209,35 @@ describe('KnowledgeBaseListItem', () => {
         );
 
         expect(screen.getByTestId('dropdown-menu')).toBeInTheDocument();
+    });
+
+    it('hides Edit without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.grantedScopes = ['KNOWLEDGE_BASE_DELETE'];
+
+        render(
+            <KnowledgeBaseListItem
+                knowledgeBase={mockKnowledgeBase}
+                remainingTags={mockRemainingTags}
+                tags={mockTags}
+            />
+        );
+
+        expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+        expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('hides the dropdown menu without edit or delete scope', () => {
+        hoistedScope.grantedScopes = [];
+
+        render(
+            <KnowledgeBaseListItem
+                knowledgeBase={mockKnowledgeBase}
+                remainingTags={mockRemainingTags}
+                tags={mockTags}
+            />
+        );
+
+        expect(screen.queryByTestId('dropdown-menu')).not.toBeInTheDocument();
     });
 
     it('calls handleKnowledgeBaseClick when item is clicked', async () => {
