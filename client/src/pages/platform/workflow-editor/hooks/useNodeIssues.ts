@@ -1,11 +1,14 @@
 import {useMemo} from 'react';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {WorkflowIssueSeverityType} from '../stores/useWorkflowIssuesStore';
+import getNodeIssues from '../utils/getNodeIssues';
+import {getClusterElementRootNames} from '../utils/getWorkflowIssueOwnerName';
 import useWorkflowIssues from './useWorkflowIssues';
 
 export default function useNodeIssues(
     nodeName: string,
-    clusterElement = false
+    includeClusterElementIssues = false
 ): {
     count: number;
     severity?: WorkflowIssueSeverityType;
@@ -13,19 +16,17 @@ export default function useNodeIssues(
 } {
     const issues = useWorkflowIssues();
 
+    const tasks = useWorkflowDataStore((state) => state.workflow.tasks);
+
+    const clusterElementRootNames = useMemo(() => getClusterElementRootNames(tasks), [tasks]);
+
     return useMemo(() => {
-        const nodeIssues = issues.filter(
-            (issue) =>
-                issue.nodeName === nodeName ||
-                (clusterElement &&
-                    !!issue.propertyPath &&
-                    (issue.propertyPath.startsWith(`${nodeName}.`) || issue.propertyPath.includes(`.${nodeName}.`)))
-        );
+        const nodeIssues = getNodeIssues({clusterElementRootNames, includeClusterElementIssues, issues, nodeName});
 
         return {
             count: nodeIssues.length,
             severity: nodeIssues[0]?.severity,
             title: nodeIssues.map((issue) => issue.message).join('\n') || undefined,
         };
-    }, [clusterElement, issues, nodeName]);
+    }, [clusterElementRootNames, includeClusterElementIssues, issues, nodeName]);
 }

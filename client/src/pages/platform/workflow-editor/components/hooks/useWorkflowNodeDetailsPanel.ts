@@ -72,18 +72,25 @@ import {
     convertNameToSnakeCase,
     extractClusterElementComponentOperations,
 } from '../../../cluster-element-editor/utils/clusterElementsUtils';
+import useWorkflowIssues from '../../hooks/useWorkflowIssues';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 import changeComponentVersion from '../../utils/changeComponentVersion';
 import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
+import getNodeIssues from '../../utils/getNodeIssues';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
 import getParametersWithDefaultValues from '../../utils/getParametersWithDefaultValues';
+import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
 import invalidateOperationQueries from '../../utils/invalidateOperationQueries';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
+import getMissingRequiredConnectionErrors, {
+    WorkflowNodeDetailsErrorI,
+    getWorkflowIssueErrors,
+} from './getMissingRequiredConnectionErrors';
 import isActionDefinitionFresh from './isActionDefinitionFresh';
 import {resolveDisplayConditionsQueryTarget} from './resolveDisplayConditionsQueryTarget';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
@@ -137,6 +144,8 @@ export default function useWorkflowNodeDetailsPanel({
     const lastErrorsDataUpdatedAtRef = useRef(0);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const workflowIssues = useWorkflowIssues();
 
     const {
         activeTab,
@@ -445,10 +454,6 @@ export default function useWorkflowNodeDetailsPanel({
         }
     );
 
-    const errors = currentNode?.clusterElementType
-        ? (clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties ?? [])
-        : (workflowNodeMissingRequiredPropertiesData?.workflowNodeMissingRequiredProperties ?? []);
-
     const errorsDataUpdatedAt = currentNode?.clusterElementType
         ? clusterElementMissingRequiredPropertiesUpdatedAt
         : workflowNodeMissingRequiredPropertiesUpdatedAt;
@@ -694,6 +699,50 @@ export default function useWorkflowNodeDetailsPanel({
         currentNode?.workflowNodeName,
         currentWorkflowTask?.connections,
         currentWorkflowTrigger?.connections,
+    ]);
+
+    const clusterElementRootNames = useMemo(() => getClusterElementRootNames(workflow.tasks), [workflow.tasks]);
+
+    const errors: Array<WorkflowNodeDetailsErrorI> = useMemo(() => {
+        const missingRequiredProperties = currentNode?.clusterElementType
+            ? (clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties ?? [])
+            : (workflowNodeMissingRequiredPropertiesData?.workflowNodeMissingRequiredProperties ?? []);
+
+        const nodeIssues = currentNode?.workflowNodeName
+            ? getNodeIssues({
+                  clusterElementRootNames,
+                  issues: workflowIssues,
+                  nodeName: currentNode.workflowNodeName,
+              })
+            : [];
+
+        return [
+            ...missingRequiredProperties.map(
+                (propertyName): WorkflowNodeDetailsErrorI => ({
+                    kind: 'PROPERTY',
+                    name: propertyName,
+                })
+            ),
+            ...getMissingRequiredConnectionErrors({
+                clusterRoot: !!currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot,
+                componentTitle: currentComponentDefinition?.title,
+                connections: currentWorkflowNodeConnections,
+                workflowTestConfigurationConnections,
+            }),
+            ...getWorkflowIssueErrors(nodeIssues),
+        ];
+    }, [
+        clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties,
+        clusterElementRootNames,
+        currentComponentDefinition?.title,
+        currentNode?.clusterElementType,
+        currentNode?.clusterRoot,
+        currentNode?.isNestedClusterRoot,
+        currentNode?.workflowNodeName,
+        currentWorkflowNodeConnections,
+        workflowIssues,
+        workflowNodeMissingRequiredPropertiesData?.workflowNodeMissingRequiredProperties,
+        workflowTestConfigurationConnections,
     ]);
 
     const nodeTabs = useMemo(
