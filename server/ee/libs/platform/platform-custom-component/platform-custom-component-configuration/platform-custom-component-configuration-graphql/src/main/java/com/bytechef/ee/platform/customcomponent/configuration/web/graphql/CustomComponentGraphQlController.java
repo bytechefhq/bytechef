@@ -65,7 +65,7 @@ class CustomComponentGraphQlController {
 
     @MutationMapping
     boolean enableCustomComponent(@Argument Long id, @Argument boolean enable) {
-        customComponentService.enableCustomComponent(id, enable);
+        customComponentFacade.enableCustomComponent(id, enable);
 
         return true;
     }
