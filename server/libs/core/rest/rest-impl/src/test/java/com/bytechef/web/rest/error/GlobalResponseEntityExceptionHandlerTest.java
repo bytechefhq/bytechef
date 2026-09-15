@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
@@ -92,6 +93,24 @@ class GlobalResponseEntityExceptionHandlerTest {
                 webRequest);
 
         assertNull(secondResponse);
+    }
+
+    @Test
+    void testHandleAccessDeniedExceptionReturnsForbidden() {
+        ResponseEntity<ProblemDetail> responseEntity =
+            exceptionHandler.handleAccessDeniedException(new AccessDeniedException("Access Denied"), newRequest());
+
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+    }
+
+    @Test
+    void testHandleAnyExceptionReturnsForbiddenOnWrappedAccessDenied() {
+        Throwable throwable = new IllegalStateException("gate failed", new AccessDeniedException("Access Denied"));
+
+        ResponseEntity<ProblemDetail> responseEntity = exceptionHandler.handleAnyException(throwable, newRequest());
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
 
     private static WebRequest newRequest() {

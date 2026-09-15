@@ -20,8 +20,11 @@ import com.bytechef.exception.AbstractException;
 import com.bytechef.exception.ConfigurationException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
+import graphql.execution.ResultPath;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -47,9 +50,9 @@ import org.springframework.stereotype.Component;
  * <li>Any other {@link AbstractException} \u2192 {@code INTERNAL_ERROR}. Typically indicates a runtime failure that the
  * caller cannot correct (e.g., {@code ExecutionException}).</li>
  * <li>{@link GraphQlBadRequestException} \u2192 {@code BAD_REQUEST}. Controller-thrown input-shape validation.</li>
- * <li>{@link AccessDeniedException} \u2192 {@code FORBIDDEN}. Raised by Spring Security {@code @PreAuthorize} denials.
- * Returns a generic message (never the exception detail) so error shape alone cannot be used to enumerate resources the
- * caller does not own. The client only needs to know the classification.</li>
+ * <li>{@link AccessDeniedException}, directly or anywhere in the cause chain \u2192 {@code FORBIDDEN}. Raised by Spring
+ * Security {@code @PreAuthorize} denials. Returns a generic message (never the exception detail) so error shape alone
+ * cannot be used to enumerate resources the caller does not own. The client only needs to know the classification.</li>
  * <li>{@link AuthenticationCredentialsNotFoundException} \u2192 {@code UNAUTHORIZED}. Raised when a protected GraphQL
  * mutation is invoked without a SecurityContext. Mapped distinctly from {@code FORBIDDEN} so clients can prompt for
  * re-authentication rather than signalling a permission error.</li>
@@ -119,7 +122,14 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
                 .build();
         }
 
-        if (throwable instanceof AccessDeniedException) {
+        AccessDeniedException accessDeniedException = findAccessDeniedException(throwable);
+
+        if (accessDeniedException != null) {
+            ResultPath resultPath = environment.getExecutionStepInfo()
+                .getPath();
+
+            log.warn("Access denied at {}: {}", resultPath, accessDeniedException.getMessage());
+
             return GraphqlErrorBuilder
                 .newError(environment)
                 .message("Access denied")
@@ -134,6 +144,27 @@ class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAda
                 .getName(),
             throwable.getMessage(),
             throwable);
+
+        return null;
+    }
+
+    /**
+     * Returns the {@link AccessDeniedException} in the cause chain, or {@code null} when there is none. A denial can
+     * reach this resolver wrapped, for example by an asynchronous data fetcher, and must still map to FORBIDDEN rather
+     * than fall through as an unmapped error.
+     */
+    private static @Nullable AccessDeniedException findAccessDeniedException(Throwable throwable) {
+        Set<Throwable> visitedThrowables = Collections.newSetFromMap(new IdentityHashMap<>());
+
+        Throwable currentThrowable = throwable;
+
+        while (currentThrowable != null && visitedThrowables.add(currentThrowable)) {
+            if (currentThrowable instanceof AccessDeniedException accessDeniedException) {
+                return accessDeniedException;
+            }
+
+            currentThrowable = currentThrowable.getCause();
+        }
 
         return null;
     }
