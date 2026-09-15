@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
@@ -26,6 +27,7 @@ import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
@@ -78,7 +80,7 @@ class PermissionServiceTest {
 
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of());
+            workspaceUserRepository, List.of(), List.of());
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -142,12 +144,12 @@ class PermissionServiceTest {
 
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isTrue();
 
-        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID);
     }
 
     @Test
     void testHasWorkspaceRoleAdminUserSatisfiesAllMinimums() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal())));
 
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isTrue();
@@ -157,7 +159,7 @@ class PermissionServiceTest {
 
     @Test
     void testHasWorkspaceRoleViewerCannotEdit() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER.ordinal())));
 
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isTrue();
@@ -167,10 +169,70 @@ class PermissionServiceTest {
 
     @Test
     void testHasWorkspaceRoleFalseForNonMember() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
 
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceRoleDeniesAMemberInExplicitMode() {
+        // A behaviour change worth pinning: this member holds ADMIN in every environment there is, and is still denied,
+        // because a per-environment role is not a workspace-wide one and there is no single role of theirs to compare.
+        // The rows are stubbed to show the denial is not "no membership found" — hasWorkspaceRole deliberately never
+        // looks at them, which the verify below holds in place. Reached from @PreAuthorize through hasResourceRole, so
+        // this denies the connection sharing mutations on WorkspaceConnectionFacadeImpl for such a member.
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(
+                List.of(
+                    WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.DEVELOPMENT),
+                    WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.STAGING),
+                    WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+
+        assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "ADMIN")).isFalse();
+        assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isFalse();
+
+        verify(workspaceUserRepository, never()).findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testHasResourceRoleDeniesAMemberInExplicitMode() {
+        // hasResourceRole resolves the owning workspace and then asks hasWorkspaceRole, so it inherits that denial.
+        // This
+        // is the path by which the explicit-mode denial reaches @PreAuthorize: setConnectionVisibility,
+        // grantConnectionAccess, revokeConnectionAccess and getConnectionGrants all gate on it, and owning the
+        // connection
+        // is the remaining way in for such a member.
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(
+                List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+
+        PermissionServiceImpl service = createService(
+            resolver("Connection", ResourceOwner.ofWorkspace(WORKSPACE_ID)));
+
+        assertThat(service.hasResourceRole(1L, "Connection", "ADMIN")).isFalse();
+
+        verify(workspaceUserRepository, never()).findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+    }
+
+    @Test
+    void testGetMyWorkspaceRoleNullForAMemberInExplicitMode() {
+        // The honest answer, and the other half of the explicit-mode reading: they hold no one role across the
+        // workspace,
+        // so the members view must render the per-environment roles rather than this.
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.empty());
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(
+                List.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN, Environment.PRODUCTION)));
+
+        assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
+
+        verify(workspaceUserRepository, never()).findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
     }
 
     @Test
@@ -180,7 +242,7 @@ class PermissionServiceTest {
         WorkspaceUser corrupted = mock(WorkspaceUser.class);
 
         when(corrupted.getWorkspaceRole()).thenReturn(999);
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(corrupted));
 
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isFalse();
@@ -248,7 +310,7 @@ class PermissionServiceTest {
     @Test
     void testHasWorkspaceRoleFalseOnUnknownRoleName() {
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "NOT_A_ROLE")).isFalse();
-        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceId(anyLong(), anyLong());
+        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(anyLong(), anyLong());
     }
 
     @Test
@@ -257,7 +319,7 @@ class PermissionServiceTest {
             .thenReturn(Optional.empty());
 
         assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isFalse();
-        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceId(anyLong(), anyLong());
+        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(anyLong(), anyLong());
     }
 
     @Test
@@ -320,6 +382,38 @@ class PermissionServiceTest {
 
         assertThat(permissionService.getMyWorkspaceScopes(WORKSPACE_ID))
             .containsExactly("WORKFLOW_VIEW");
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentDelegatesToTheEnvironmentLookup() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.STAGING))
+            .thenReturn(Set.of("WORKFLOW_EDIT"));
+
+        assertThat(permissionService.getMyWorkspaceScopes(WORKSPACE_ID, Environment.STAGING))
+            .containsExactly("WORKFLOW_EDIT");
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong());
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentReturnsAllScopesForTenantAdmin() {
+        securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+            .thenReturn(true);
+        when(permissionScopeRegistry.getAllScopeNames())
+            .thenReturn(Set.of("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(permissionService.getMyWorkspaceScopes(WORKSPACE_ID, Environment.PRODUCTION))
+            .containsExactlyInAnyOrder("WORKFLOW_VIEW", "WORKSPACE_MEMBER_MANAGE");
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testGetMyWorkspaceScopesForAnEnvironmentEmptyWhenSecurityContextEmpty() {
+        securityUtilsMock.when(SecurityUtils::fetchCurrentUserLogin)
+            .thenReturn(Optional.empty());
+
+        assertThat(permissionService.getMyWorkspaceScopes(WORKSPACE_ID, Environment.PRODUCTION)).isEmpty();
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong(), any());
     }
 
     @Test
@@ -328,7 +422,7 @@ class PermissionServiceTest {
             .thenReturn(Optional.empty());
 
         assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
-        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceId(anyLong(), anyLong());
+        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(anyLong(), anyLong());
     }
 
     @Test
@@ -337,12 +431,12 @@ class PermissionServiceTest {
             .thenReturn(true);
 
         assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isEqualTo("ADMIN");
-        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID);
+        verify(workspaceUserRepository, never()).findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID);
     }
 
     @Test
     void testGetMyWorkspaceRoleReturnsMembershipRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
 
         assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isEqualTo("EDITOR");
@@ -350,7 +444,7 @@ class PermissionServiceTest {
 
     @Test
     void testGetMyWorkspaceRoleReturnsNullForNonMember() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
 
         assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
@@ -362,7 +456,7 @@ class PermissionServiceTest {
         WorkspaceUser corrupted = mock(WorkspaceUser.class);
 
         when(corrupted.getWorkspaceRole()).thenReturn(999);
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(corrupted));
 
         assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
@@ -424,7 +518,7 @@ class PermissionServiceTest {
 
     @Test
     void testHasResourceRoleChecksWorkspaceRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR.ordinal())));
 
         PermissionServiceImpl service = createService(
@@ -454,6 +548,64 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testHasWorkflowScopeIfProjectWorkflowGrantsWhenTheWorkflowBelongsToNoProject() {
+        assertThat(permissionService.hasWorkflowScopeIfProjectWorkflow(
+            "integration-workflow", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isTrue();
+
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong());
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowDeniesAProjectWorkflowWithoutTheScope() {
+        Project project = new Project();
+
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("WORKFLOW_VIEW"));
+
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowGrantsAProjectWorkflowWithTheScope() {
+        Project project = new Project();
+
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("WORKFLOW_EDIT"));
+
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isTrue();
+    }
+
+    @Test
+    void testHasWorkflowScopeDeniesAMemberWhoHoldsTheScopeOnlyInProduction() {
+        Project project = new Project();
+
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(projectRepository.findByWorkflowId("wf-uuid")).thenReturn(Optional.of(project));
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+            .thenReturn(Set.of("WORKFLOW_EDIT"));
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("WORKFLOW_VIEW"));
+
+        assertThat(permissionService.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT)).isFalse();
+        assertThat(permissionService.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT", Environment.PRODUCTION)).isTrue();
+        assertThat(
+            permissionService.hasWorkflowScopeIfProjectWorkflow("wf-uuid", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
+    }
+
+    @Test
     void testEvictWorkspaceScopeCacheDelegates() {
         permissionService.evictWorkspaceScopeCache(USER_ID, WORKSPACE_ID);
 
@@ -470,7 +622,7 @@ class PermissionServiceTest {
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers));
+            workspaceUserRepository, List.of(resolvers), List.of());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
