@@ -194,7 +194,7 @@ const AutomationWorkflowEditorLeftSidebar = ({currentWorkflowId}: AutomationWork
                 />
             </div>
 
-            <ScrollArea className="mb-3 min-h-0 w-full flex-1">
+            <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">
                 {projectsIsLoading && (
                     <div className="flex flex-col gap-2">
                         <Skeleton className="h-9 w-full rounded-md" />

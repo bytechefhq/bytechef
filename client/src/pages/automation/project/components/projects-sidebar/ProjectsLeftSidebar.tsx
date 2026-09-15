@@ -294,7 +294,7 @@ const ProjectsLeftSidebar = ({
                 </ButtonGroup>
             </div>
 
-            <ScrollArea className="mb-3 min-h-0 w-full flex-1">
+            <ScrollArea className="mb-3 min-h-0 w-full flex-1 [&_[data-radix-scroll-area-viewport]>div]:block!">
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (
