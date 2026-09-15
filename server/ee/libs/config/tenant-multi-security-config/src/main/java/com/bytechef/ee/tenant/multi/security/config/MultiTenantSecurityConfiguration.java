@@ -37,10 +37,9 @@ public class MultiTenantSecurityConfiguration {
 
     @Bean
     MultiTenantAuthenticationSuccessHandler multiTenantAuthenticationSuccessHandler(
-        TenantService tenantService,
         ObjectProvider<TwoFactorAuthenticationCustomizer> twoFactorAuthenticationCustomizerProvider) {
 
-        return new MultiTenantAuthenticationSuccessHandler(tenantService, twoFactorAuthenticationCustomizerProvider);
+        return new MultiTenantAuthenticationSuccessHandler(twoFactorAuthenticationCustomizerProvider);
     }
 
     @Bean
