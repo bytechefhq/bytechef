@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.configuration.security.scope;
 import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 
 /**
+ * The MCP (Model Context Protocol) permission scopes.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -18,5 +20,6 @@ public enum McpPermissionScope implements PermissionScopeType {
 
     MCP_VIEW,
     MCP_CREATE,
-    MCP_EDIT
+    MCP_EDIT,
+    MCP_DELETE
 }

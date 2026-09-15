@@ -27,6 +27,7 @@ public class KnowledgeBasePermissionScopeProvider implements PermissionScopeProv
         return Set.of(
             new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_VIEW, WorkspaceRole.VIEWER),
             new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_CREATE, WorkspaceRole.EDITOR),
-            new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_EDIT, WorkspaceRole.EDITOR));
+            new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_EDIT, WorkspaceRole.EDITOR),
+            new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_DELETE, WorkspaceRole.ADMIN));
     }
 }

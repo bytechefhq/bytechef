@@ -14,6 +14,8 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
+ * Declares the workflow-domain permission scopes. Read is granted from VIEWER; create/edit/delete from EDITOR.
+ *
  * @version ee
  *
  * @author Ivica Cardic
