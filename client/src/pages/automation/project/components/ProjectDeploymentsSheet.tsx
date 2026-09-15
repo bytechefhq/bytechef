@@ -74,7 +74,10 @@ const ProjectDeploymentsSheet = ({
         sheetOpen
     );
 
-    const {data: tags} = useGetProjectDeploymentTagsQuery();
+    const {data: tags} = useGetProjectDeploymentTagsQuery({
+        environmentId: currentEnvironmentId,
+        id: currentWorkspaceId!,
+    });
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
