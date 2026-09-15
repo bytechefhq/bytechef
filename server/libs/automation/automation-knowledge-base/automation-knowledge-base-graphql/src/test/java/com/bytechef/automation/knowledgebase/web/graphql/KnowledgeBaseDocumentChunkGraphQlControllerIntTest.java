@@ -20,6 +20,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.web.graphql.config.AutomationKnowledgeBaseGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.knowledgebase.web.graphql.config.AutomationKnowledgeBaseGraphQlTestConfiguration;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
@@ -51,6 +52,9 @@ import org.springframework.test.context.ContextConfiguration;
 class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
 
     @Autowired
+    private WorkspaceKnowledgeBaseFacade workspaceKnowledgeBaseFacade;
+
+    @Autowired
     private GraphQlTester graphQlTester;
 
     @Autowired
@@ -63,7 +67,7 @@ class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
 
         KnowledgeBaseDocumentChunk mockChunk = createMockChunk(chunkId, newContent);
 
-        when(knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(newContent)))
+        when(workspaceKnowledgeBaseFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(newContent)))
             .thenReturn(mockChunk);
 
         this.graphQlTester
@@ -86,7 +90,7 @@ class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
             .entity(String.class)
             .isEqualTo("Updated content");
 
-        verify(knowledgeBaseDocumentChunkFacade).updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(newContent));
+        verify(workspaceKnowledgeBaseFacade).updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(newContent));
     }
 
     @Test
@@ -104,7 +108,7 @@ class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(knowledgeBaseDocumentChunkFacade).deleteKnowledgeBaseDocumentChunk(chunkId);
+        verify(workspaceKnowledgeBaseFacade).deleteKnowledgeBaseDocumentChunk(chunkId);
     }
 
     @Test
@@ -114,7 +118,7 @@ class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
 
         KnowledgeBaseDocumentChunk mockChunk = createMockChunk(chunkId, content);
 
-        when(knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(content)))
+        when(workspaceKnowledgeBaseFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(content)))
             .thenReturn(mockChunk);
 
         this.graphQlTester
@@ -144,7 +148,7 @@ class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
 
         mockChunk.setMetadata(Map.of("key1", "value1", "key2", "value2"));
 
-        when(knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(content)))
+        when(workspaceKnowledgeBaseFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(content)))
             .thenReturn(mockChunk);
 
         this.graphQlTester
@@ -174,7 +178,7 @@ class KnowledgeBaseDocumentChunkGraphQlControllerIntTest {
 
         mockChunk.setScore(0.95f);
 
-        when(knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(content)))
+        when(workspaceKnowledgeBaseFacade.updateKnowledgeBaseDocumentChunk(eq(chunkId), eq(content)))
             .thenReturn(mockChunk);
 
         this.graphQlTester
