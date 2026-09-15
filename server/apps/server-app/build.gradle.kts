@@ -266,6 +266,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-rest"))
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-graphql"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
