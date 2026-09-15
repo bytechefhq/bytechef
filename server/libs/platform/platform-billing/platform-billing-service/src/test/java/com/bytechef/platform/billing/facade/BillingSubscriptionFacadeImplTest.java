@@ -21,24 +21,46 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.dto.BillingSubscriptionDTO;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.stripe.model.Subscription;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Matija Petanjek
@@ -196,5 +218,109 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
         return subscription;
+    }
+
+    @Nested
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+
+        private final PermissionService permissionService = mock(PermissionService.class);
+        private final BillingSubscriptionFacade securedBillingSubscriptionFacade = secure(
+            new BillingSubscriptionFacadeImpl(
+                new BillingProperties(
+                    new BillingProperties.Stripe(
+                        "sk_test_abc", null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null,
+                        "whsec_test", null, null)),
+                mock(BillingSubscriptionService.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                }),
+                mock(BillingUsageService.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                }),
+                mock(StripeClient.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                })));
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @ParameterizedTest
+        @MethodSource("subscriptionWrites")
+        void testSubscriptionWriteDeniesACallerWithoutTheAdminAuthority(GuardedOperation guardedOperation) {
+            authenticate(AuthorityConstants.USER);
+
+            assertThatThrownBy(() -> guardedOperation.invoke(securedBillingSubscriptionFacade))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(permissionService);
+        }
+
+        @ParameterizedTest
+        @MethodSource("subscriptionWrites")
+        void testSubscriptionWriteAllowsACallerHoldingTheAdminAuthority(GuardedOperation guardedOperation) {
+            authenticate(AuthorityConstants.ADMIN);
+
+            assertThatThrownBy(() -> guardedOperation.invoke(securedBillingSubscriptionFacade))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+
+            verifyNoInteractions(permissionService);
+        }
+
+        static Stream<Named<GuardedOperation>> subscriptionWrites() {
+            return Stream.of(
+                Named.of("cancelSubscription", (GuardedOperation) BillingSubscriptionFacade::cancelSubscription),
+                Named.of(
+                    "createCheckoutSession",
+                    (GuardedOperation) guardedFacade -> guardedFacade.createCheckoutSession("STARTER")),
+                Named.of(
+                    "reactivateSubscription", (GuardedOperation) BillingSubscriptionFacade::reactivateSubscription),
+                Named.of(
+                    "updateSubscription",
+                    (GuardedOperation) guardedFacade -> guardedFacade.updateSubscription("GROWTH")));
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "alice", "credentials", List.of(new SimpleGrantedAuthority(authority))));
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        private BillingSubscriptionFacade secure(BillingSubscriptionFacade billingSubscriptionFacade) {
+            AutomationMethodSecurityExpressionHandler expressionHandler =
+                new AutomationMethodSecurityExpressionHandler(permissionService);
+
+            expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+            expressionHandler.setRoleHierarchy(
+                RoleHierarchyImpl.withDefaultRolePrefix()
+                    .role("ADMIN")
+                    .implies("USER")
+                    .build());
+
+            PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager =
+                new PreAuthorizeAuthorizationManager();
+
+            preAuthorizeAuthorizationManager.setExpressionHandler(expressionHandler);
+
+            ProxyFactory proxyFactory = new ProxyFactory(billingSubscriptionFacade);
+
+            proxyFactory.addAdvisor(
+                AuthorizationManagerBeforeMethodInterceptor.preAuthorize(preAuthorizeAuthorizationManager));
+
+            return (BillingSubscriptionFacade) proxyFactory.getProxy();
+        }
+
+        @FunctionalInterface
+        interface GuardedOperation {
+
+            void invoke(BillingSubscriptionFacade guardedFacade);
+        }
     }
 }
