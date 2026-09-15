@@ -243,9 +243,38 @@ class PermissionServiceEnvironmentTest {
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
 
-        // A resolver that cannot answer must never turn a working permission into a failure.
+        // A resource with no environment keeps the environment-unaware check.
         assertThat(permissionServiceWithResolvers.hasResourceScope(1L, "ProjectDeployment", "DEPLOYMENT_EDIT"))
             .isTrue();
+    }
+
+    @Test
+    void testByIdCheckDeniesWhenResolvingTheEnvironmentFails() {
+        ResourceEnvironmentResolver failingEnvironmentResolver = new ResourceEnvironmentResolver() {
+
+            @Override
+            public String resourceType() {
+                return "ProjectDeployment";
+            }
+
+            @Override
+            public Optional<Environment> fetchEnvironment(Serializable id) {
+                throw new IllegalStateException("database unavailable");
+            }
+        };
+
+        PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
+            new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
+            workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
+            List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver));
+
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
+            .thenReturn(Set.of("DEPLOYMENT_EDIT"));
+
+        // The member holds DEPLOYMENT_EDIT in some environment. Falling back to that union when the lookup fails would
+        // let them edit a deployment in an environment where they are only a viewer.
+        assertThat(permissionServiceWithResolvers.hasResourceScope(1L, "ProjectDeployment", "DEPLOYMENT_EDIT"))
+            .isFalse();
     }
 
     private static ResourceOwnershipResolver deploymentOwnershipResolver() {
