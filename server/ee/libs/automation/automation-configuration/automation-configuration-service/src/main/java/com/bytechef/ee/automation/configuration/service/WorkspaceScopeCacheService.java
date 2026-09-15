@@ -11,11 +11,14 @@ import com.bytechef.automation.configuration.service.PermissionService.UserWorks
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -121,20 +124,49 @@ public class WorkspaceScopeCacheService {
 
     @Cacheable(value = WORKSPACE_SCOPES_CACHE)
     public Set<String> getWorkspaceScopes(long userId, long workspaceId) {
-        return workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
+        Optional<WorkspaceUser> implicitWorkspaceUser = workspaceUserRepository
+            .findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
+
+        if (implicitWorkspaceUser.isPresent()) {
+            return dispatchScopes(implicitWorkspaceUser.get(), userId, workspaceId);
+        }
+
+        Set<String> unionScopes = new HashSet<>();
+
+        for (WorkspaceUser workspaceUser : workspaceUserRepository.findAllByUserIdAndWorkspaceId(userId, workspaceId)) {
+            unionScopes.addAll(dispatchScopes(workspaceUser, userId, workspaceId));
+        }
+
+        return unionScopes;
+    }
+
+    @Cacheable(value = WORKSPACE_SCOPES_CACHE)
+    public Set<String> getWorkspaceScopes(long userId, long workspaceId, Environment environment) {
+        return fetchWorkspaceUser(userId, workspaceId, environment)
             .map(workspaceUser -> dispatchScopes(workspaceUser, userId, workspaceId))
             .orElse(Collections.emptySet());
+    }
+
+    private Optional<WorkspaceUser> fetchWorkspaceUser(long userId, long workspaceId, Environment environment) {
+        Optional<WorkspaceUser> environmentWorkspaceUser = workspaceUserRepository
+            .findByUserIdAndWorkspaceIdAndEnvironment(userId, workspaceId, environment.ordinal());
+
+        if (environmentWorkspaceUser.isPresent()) {
+            return environmentWorkspaceUser;
+        }
+
+        return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
     }
 
     private void evictSingleEntry(long userId, long workspaceId) {
         Cache cache = cacheManager.getCache(WORKSPACE_SCOPES_CACHE);
 
         if (cache != null) {
-            // Key must mirror the @Cacheable read path. That path declares no explicit key, so it falls through to the
-            // globally-configured TenantKeyGenerator (CacheConfiguration), which stores under the tenant-prefixed
-            // "<tenantId>_<userId>_<workspaceId>". A bare SimpleKey(userId, workspaceId) would never match it, so the
-            // eviction would silently no-op and stale scopes would be served until the TTL expires.
             cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId));
+
+            for (Environment environment : Environment.values()) {
+                cache.evict(TenantCacheKeyUtils.getKey(userId, workspaceId, environment));
+            }
         }
     }
 
