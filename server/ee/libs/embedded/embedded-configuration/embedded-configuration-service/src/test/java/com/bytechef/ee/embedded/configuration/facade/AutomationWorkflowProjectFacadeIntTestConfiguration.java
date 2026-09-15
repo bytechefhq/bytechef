@@ -17,6 +17,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.encryption.EncryptionKey;
@@ -95,6 +96,17 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    PermissionService permissionService() {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        // These tests exercise the reference and catalog flows, not connection authorization: let every deployment
+        // workflow use its connection so the rollouts reach the code under test.
+        when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
+
+        return permissionService;
     }
 
     @Bean
