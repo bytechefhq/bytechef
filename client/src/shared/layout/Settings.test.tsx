@@ -7,6 +7,11 @@ import Settings, {SettingsNavItemI} from './Settings';
 
 const hoisted = vi.hoisted(() => ({
     enabledFeatureFlags: [] as string[],
+    isTenantAdmin: true,
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => hoisted.isTenantAdmin,
 }));
 
 vi.mock('@/shared/layout/Header', () => ({
@@ -43,6 +48,28 @@ const aiNavGroup: SettingsNavItemI = {
 describe('Settings', () => {
     beforeEach(() => {
         hoisted.enabledFeatureFlags = [];
+        hoisted.isTenantAdmin = true;
+    });
+
+    it('shows the MCP Server entry to a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-2197'];
+
+        renderSettings([{href: 'mcp-server', title: 'MCP Server'}]);
+
+        expect(screen.getByText('MCP Server')).toBeInTheDocument();
+    });
+
+    it('hides the MCP Server entry from a user who is not a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-2197'];
+        hoisted.isTenantAdmin = false;
+
+        renderSettings([
+            {href: 'users', title: 'Users'},
+            {href: 'mcp-server', title: 'MCP Server'},
+        ]);
+
+        expect(screen.queryByText('MCP Server')).not.toBeInTheDocument();
+        expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
     it('hides a section heading when every item below it is hidden by a feature flag', () => {

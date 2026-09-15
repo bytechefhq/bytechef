@@ -8,6 +8,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {EditIcon, EllipsisVerticalIcon, RefreshCwIcon, Trash2Icon} from 'lucide-react';
 
 import {McpProjectItemType} from './hooks/useMcpProjectList';
@@ -27,11 +29,25 @@ const McpProjectListItemDropdownMenu = ({
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpProjectListItemDropdownMenu(mcpProject.id.toString());
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
+    if (!canEditMcpServer) {
+        return null;
+    }
+
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button className="relative z-10" icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
+                    <Button
+                        aria-label="MCP Project Actions"
+                        className="relative z-10"
+                        icon={<EllipsisVerticalIcon />}
+                        size="iconSm"
+                        variant="ghost"
+                    />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">

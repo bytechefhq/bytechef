@@ -1,9 +1,11 @@
 import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItem from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerCollapsibleItem from '@/shared/components/mcp-server/McpServerCollapsibleItem';
 import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useMemo} from 'react';
@@ -32,6 +34,10 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
 };
 
 const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
     const {createHandleRefresh, sortedMcpServers} = useMcpServerList(mcpServers);
 
     const workflowReadOnlyValue = useMemo(() => ({useGetComponentDefinitionsQuery}), []);
@@ -44,6 +50,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
 
                     return (
                         <McpServerCollapsibleItem
+                            canEdit={canEditMcpServer}
                             connectContent={
                                 <McpServerConfiguration mcpServerUrl={mcpServer.url} onRefresh={handleRefresh} />
                             }
