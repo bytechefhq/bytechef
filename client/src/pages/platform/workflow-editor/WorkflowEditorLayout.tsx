@@ -5,6 +5,7 @@ import './WorkflowEditorLayout.css';
 import ClusterElementsCanvasDialog from '@/pages/platform/workflow-editor/components/ClusterElementsCanvasDialog';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
+import useCopilotBuildModeReadOnlySync from '@/pages/platform/workflow-editor/hooks/useCopilotBuildModeReadOnlySync';
 import useDelayedUnmount from '@/pages/platform/workflow-editor/hooks/useDelayedUnmount';
 import useWorkflowEditorLayout from '@/pages/platform/workflow-editor/hooks/useWorkflowEditorLayout';
 import useWorkflowIssues from '@/pages/platform/workflow-editor/hooks/useWorkflowIssues';
@@ -12,6 +13,7 @@ import useWorkflowIssuesSweep from '@/pages/platform/workflow-editor/hooks/useWo
 import useWorkflowIssuesValidation from '@/pages/platform/workflow-editor/hooks/useWorkflowIssuesValidation';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowIssuesStore from '@/pages/platform/workflow-editor/stores/useWorkflowIssuesStore';
@@ -119,10 +121,12 @@ const WorkflowEditorLayout = ({
 
     useWorkflowIssuesSweep();
     useWorkflowIssuesValidation();
+    useCopilotBuildModeReadOnlySync();
 
     const issues = useWorkflowIssues();
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
     const queryClient = useQueryClient();
@@ -202,7 +206,7 @@ const WorkflowEditorLayout = ({
                     </Suspense>
                 )}
 
-                {rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (
+                {!readOnly && rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense fallback={<WorkflowNodesSidebarSkeleton />}>
                         <WorkflowNodesSidebar
                             data={{
