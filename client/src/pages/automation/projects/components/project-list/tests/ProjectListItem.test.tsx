@@ -13,6 +13,10 @@ const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,

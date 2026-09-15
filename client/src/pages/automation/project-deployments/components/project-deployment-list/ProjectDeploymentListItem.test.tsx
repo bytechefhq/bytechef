@@ -12,6 +12,10 @@ const hoisted = vi.hoisted(() => ({
     openProjectMock: vi.fn(),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
     default: () => ({
         openProject: hoisted.openProjectMock,

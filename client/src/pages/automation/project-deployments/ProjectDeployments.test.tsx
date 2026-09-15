@@ -21,6 +21,10 @@ const publishedProject: Project = {
     workspaceId: 1,
 };
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
     useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
         selector({currentWorkspaceId: 1}),

@@ -6,6 +6,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useWorkspaceScopeState} from '@/shared/hooks/useHasWorkspaceScope';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {RocketIcon} from 'lucide-react';
 import {MouseEvent} from 'react';
 
@@ -15,10 +16,12 @@ interface DeployButtonProps {
 }
 
 const DeployButton = ({onDeploymentSaved, project}: DeployButtonProps) => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId ?? 0,
             projectId: project.id ?? 0,
         },
