@@ -37,6 +37,7 @@ import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -101,11 +102,13 @@ public class ProjectGraphQlController {
     }
 
     @QueryMapping(name = "project")
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     public Project project(@Argument long id) {
         return projectService.getProject(id);
     }
 
     @QueryMapping(name = "projects")
+    @PreAuthorize("isTenantAdmin()")
     public List<Project> projects() {
         return projectService.getProjects()
             .stream()

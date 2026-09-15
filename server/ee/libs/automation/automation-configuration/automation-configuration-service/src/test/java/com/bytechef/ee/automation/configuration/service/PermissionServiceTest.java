@@ -625,12 +625,24 @@ class PermissionServiceTest {
     }
 
     @Test
-    void testHasWorkflowScopeIfProjectWorkflowGrantsWhenTheWorkflowBelongsToNoProject() {
+    void testHasWorkflowScopeIfProjectWorkflowDeniesANonAdminWhenTheWorkflowBelongsToNoProject() {
+        when(projectRepository.findByWorkflowId("unknown-workflow")).thenReturn(Optional.empty());
+
+        assertThat(permissionService.hasWorkflowScopeIfProjectWorkflow(
+            "unknown-workflow", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
+                .isFalse();
+
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testHasWorkflowScopeIfProjectWorkflowGrantsATenantAdminWhenTheWorkflowBelongsToNoProject() {
+        securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+            .thenReturn(true);
+
         assertThat(permissionService.hasWorkflowScopeIfProjectWorkflow(
             "integration-workflow", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
                 .isTrue();
-
-        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong());
     }
 
     @Test

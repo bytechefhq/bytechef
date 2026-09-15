@@ -197,7 +197,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW') and hasPermission(#id, 'Project', 'WORKFLOW_CREATE')")
+    // Duplicating reads a source project and then creates a project and its workflows, so it needs the authority to do
+    // both: WORKFLOW_VIEW alone let a view-only member bypass PROJECT_CREATE, and PROJECT_CREATE alone would drop the
+    // read requirement. The two are independently composable in a custom role, so neither implies the other. The copy
+    // lands in the source's workspace, which is the workspace the 'Project' token resolves to.
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW') and hasPermission(#id, 'Project', 'PROJECT_CREATE')")
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
 
@@ -423,7 +427,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'PROJECT_PUBLISH')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = projectService.getProject(id);
 

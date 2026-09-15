@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.web.rest.model.CreateProjectWorkflow200ResponseModel;
 import com.bytechef.automation.configuration.web.rest.model.DuplicateWorkflow200ResponseModel;
@@ -31,6 +32,7 @@ import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,16 +48,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowApiController extends AbstractWorkflowApiController implements WorkflowApi {
 
     private final ConversionService conversionService;
+    private final ProjectFacade projectFacade;
     private final ProjectWorkflowFacade projectWorkflowFacade;
 
     @SuppressFBWarnings("EI2")
     public WorkflowApiController(
-        ConversionService conversionService, ProjectWorkflowFacade projectWorkflowFacade,
+        ConversionService conversionService, ProjectFacade projectFacade, ProjectWorkflowFacade projectWorkflowFacade,
         WorkflowService workflowService) {
 
         super(workflowService);
 
         this.conversionService = conversionService;
+        this.projectFacade = projectFacade;
         this.projectWorkflowFacade = projectWorkflowFacade;
     }
 
@@ -85,6 +89,7 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @GetMapping("/workflows/{id}/export")
+    @PreAuthorize("hasWorkflowScope(#id, 'WORKFLOW_VIEW')")
     @ResponseBody
     public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") String id) {
         return doExportWorkflow(id);
@@ -128,6 +133,14 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
         return ResponseEntity.ok(
             CollectionUtils.map(
                 projectWorkflowFacade.getProjectWorkflows(),
+                workflow -> conversionService.convert(workflow, WorkflowModel.class)));
+    }
+
+    @Override
+    public ResponseEntity<List<WorkflowModel>> getWorkspaceWorkflows(Long id) {
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                projectFacade.getWorkspaceProjectWorkflows(id),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 
