@@ -16,26 +16,48 @@
 
 package com.bytechef.platform.mcp.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.web.graphql.McpServerGraphQlController.McpServerInput;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlConfigurationSharedMocks;
 import com.bytechef.platform.mcp.web.graphql.config.McpGraphQlTestConfiguration;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockReset;
 
 /**
  * @author Ivica Cardic
@@ -257,5 +279,72 @@ public class McpServerGraphQlControllerIntTest {
         tag.setName(name);
 
         return tag;
+    }
+
+    @Nested
+    @Import(MethodSecurityEnforcement.MethodSecurityConfiguration.class)
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+
+        @Autowired
+        private McpServerGraphQlController mcpServerGraphQlController;
+
+        @Autowired
+        private PermissionService permissionService;
+
+        private final McpServerInput mcpServerInput = new McpServerInput("server", PlatformType.AUTOMATION, 0L, true);
+
+        @BeforeEach
+        void beforeEach() {
+            when(mcpServerService.create(anyString(), any(), any(), anyBoolean()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testCreateMcpServerDeniesACallerWithoutTheAdminAuthority() {
+            authenticate(AuthorityConstants.USER);
+
+            assertThatThrownBy(() -> mcpServerGraphQlController.createMcpServer(mcpServerInput))
+                .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(permissionService);
+        }
+
+        @Test
+        void testCreateMcpServerAllowsACallerHoldingTheAdminAuthority() {
+            authenticate(AuthorityConstants.ADMIN);
+
+            assertThatThrownBy(() -> mcpServerGraphQlController.createMcpServer(mcpServerInput))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+
+            verifyNoInteractions(permissionService);
+        }
+
+        private static void authenticate(String authority) {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "alice", "credentials", List.of(new SimpleGrantedAuthority(authority))));
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        @EnableMethodSecurity
+        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            PermissionService permissionService() {
+                return mock(PermissionService.class, MockReset.withSettings(MockReset.AFTER));
+            }
+        }
     }
 }

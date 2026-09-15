@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.aspectj:aspectjweaver")
@@ -15,6 +16,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:core:commons:commons-data"))

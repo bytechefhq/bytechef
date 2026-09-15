@@ -39,6 +39,7 @@ import com.bytechef.automation.ai.mcp.server.spi.McpServerWorkspaceToolCallbackC
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
@@ -86,6 +87,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -203,6 +205,18 @@ public class AutomationMcpServerConfiguration {
         ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
+        return callSkippingChecks(
+            () -> collectToolSpecifications(
+                secretKey, mcpComponentService, mcpProjectService, mcpServerService, mcpToolService, mcpToolFacade,
+                workspaceToolProviders, workspaceMcpServerService));
+    }
+
+    private static List<McpServerFeatures.AsyncToolSpecification> collectToolSpecifications(
+        String secretKey, McpComponentService mcpComponentService, McpProjectService mcpProjectService,
+        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
+        ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
+        WorkspaceMcpServerService workspaceMcpServerService) {
+
         McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
 
         List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
@@ -242,6 +256,16 @@ public class AutomationMcpServerConfiguration {
                 return (T) new AutomationMcpServerSecurityConfigurer(mcpServerService);
             }
         };
+    }
+
+    private static <T> T callSkippingChecks(Supplier<T> supplier) {
+        try {
+            return AutomationAuthorizationContext.callSkippingChecks(supplier::get);
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

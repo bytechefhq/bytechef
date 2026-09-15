@@ -27,6 +27,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.server.exception.McpServerErrorType;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
@@ -201,7 +202,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         @Nullable Long connectionId, long mcpServerId) {
 
         return request -> {
-            McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+            McpServer mcpServer = getMcpServer(mcpServerId);
 
             if (!mcpServer.isEnabled()) {
                 throw new ConfigurationException("MCP server is disabled", McpServerErrorType.MCP_SERVER_DISABLED);
@@ -224,7 +225,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
         long mcpServerId) {
 
         return inputParameters -> {
-            McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+            McpServer mcpServer = getMcpServer(mcpServerId);
 
             if (!mcpServer.isEnabled()) {
                 throw new ConfigurationException("MCP server is disabled", McpServerErrorType.MCP_SERVER_DISABLED);
@@ -278,6 +279,16 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                 "Failed to extract callable response output from job {}: {}", job.getId(), exception.getMessage());
 
             return Optional.empty();
+        }
+    }
+
+    private McpServer getMcpServer(long mcpServerId) {
+        try {
+            return AutomationAuthorizationContext.callSkippingChecks(() -> mcpServerService.getMcpServer(mcpServerId));
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
         }
     }
 
