@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.security.constant.PermissionScopeTy
 public enum ConnectionPermissionScope implements PermissionScopeType {
 
     CONNECTION_VIEW,
+    CONNECTION_CREATE,
     CONNECTION_EDIT,
     CONNECTION_DELETE
 }
