@@ -7,12 +7,14 @@
 
 package com.bytechef.ee.atlas.execution.remote.client.facade;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,6 +49,21 @@ public class RemoteJobFacadeClient implements JobFacade {
 
     @Override
     public void resumeApproval(long jobId, String uuid, boolean approved) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Job getJob(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Page<Job> getJobsPage(int pageNumber) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Job getLatestJob() {
         throw new UnsupportedOperationException();
     }
 

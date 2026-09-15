@@ -16,9 +16,11 @@
 
 package com.bytechef.atlas.execution.facade;
 
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Ivica Cardic
@@ -28,6 +30,13 @@ public interface JobFacade {
     long createJob(JobParametersDTO jobParametersDTO);
 
     void deleteJob(long id);
+
+    Job getJob(long id);
+
+    Page<Job> getJobsPage(int pageNumber);
+
+    @Nullable
+    Job getLatestJob();
 
     @Deprecated
     void resumeApproval(long jobId, String uuid, boolean approved);

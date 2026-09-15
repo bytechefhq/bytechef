@@ -20,6 +20,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.annotation.ConditionalOnWebhook;
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry.CallSession;
 import com.bytechef.tenant.TenantContext;
@@ -120,7 +121,12 @@ public class CallStatusHandler {
             log.info("Stopping sub-workflow for terminated call: callSid={}, subJobId={}", callSid, subJobId);
 
             try {
-                jobFacade.stopJob(subJobId);
+                // A hang-up arrives without a user, so the guarded stop runs as the system.
+                SecurityUtils.runAsSystem(() -> {
+                    jobFacade.stopJob(subJobId);
+
+                    return null;
+                });
             } catch (Exception exception) {
                 log.warn("Failed to stop sub-workflow: callSid={}, subJobId={}", callSid, subJobId, exception);
             }
