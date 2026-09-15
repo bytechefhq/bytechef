@@ -47,6 +47,7 @@ import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {
@@ -105,6 +106,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     });
     const [searchParams] = useSearchParams();
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const canConfigureProjectGit = useHasWorkspaceScope(currentWorkspaceId, 'WORKSPACE_MANAGE');
@@ -122,6 +124,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
     const projectDeploymentsQuery = useGetWorkspaceProjectDeploymentsQuery(
         {
+            environmentId: currentEnvironmentId,
             id: currentWorkspaceId ?? 0,
             projectId: project.id ?? 0,
         },
