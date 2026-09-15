@@ -11,32 +11,47 @@ import {McpServer} from '@/shared/middleware/graphql';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface McpServerListItemDropdownMenuProps {
+    canDelete?: boolean;
+    canEdit?: boolean;
     mcpServer: McpServer;
     onDeleteClick: () => void;
     onEditClick: () => void;
 }
 
-const McpServerListItemDropdownMenu = ({onDeleteClick, onEditClick}: McpServerListItemDropdownMenuProps) => {
+const McpServerListItemDropdownMenu = ({
+    canDelete = true,
+    canEdit = true,
+    onDeleteClick,
+    onEditClick,
+}: McpServerListItemDropdownMenuProps) => {
+    if (!canEdit && !canDelete) {
+        return null;
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                <Button aria-label="MCP Server Actions" icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
-                    <EditIcon /> Edit
-                </DropdownMenuItem>
+                {canEdit && (
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
+                        <EditIcon /> Edit
+                    </DropdownMenuItem>
+                )}
 
-                <DropdownMenuSeparator />
+                {canEdit && canDelete && <DropdownMenuSeparator />}
 
-                <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
-                    onClick={onDeleteClick}
-                    variant="destructive"
-                >
-                    <Trash2Icon /> Delete
-                </DropdownMenuItem>
+                {canDelete && (
+                    <DropdownMenuItem
+                        className="dropdown-menu-item-destructive"
+                        onClick={onDeleteClick}
+                        variant="destructive"
+                    >
+                        <Trash2Icon /> Delete
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
