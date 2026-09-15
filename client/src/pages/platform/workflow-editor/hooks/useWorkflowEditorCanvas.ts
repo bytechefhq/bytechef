@@ -37,6 +37,7 @@ import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
 import TriggerPlaceholderNode from '../nodes/TriggerPlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import {handleCanvasDragOver, handleCanvasDrop} from '../utils/canvasDrop';
 import clearAllNodePositions from '../utils/clearAllNodePositions';
@@ -100,7 +101,9 @@ const useWorkflowEditorCanvas = ({
 
     const {invalidateWorkflowQueries: editorInvalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
-    const {handleAddStickyNote} = useStickyNotes({readOnly: !!readOnlyWorkflow});
+    const inheritedReadOnly = useWorkflowEditorReadOnly();
+
+    const {handleAddStickyNote} = useStickyNotes({readOnly: !!readOnlyWorkflow || inheritedReadOnly});
 
     const [
         handleDropOnPlaceholderNode,
