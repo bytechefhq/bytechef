@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     api(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-api"))
 
     implementation("com.github.ben-manes.caffeine:caffeine")
