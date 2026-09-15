@@ -1,0 +1,8 @@
+mutation CreateCustomRole($input: CreateCustomRoleInput!) {
+    createCustomRole(input: $input) {
+        id
+        name
+        description
+        scopes
+    }
+}
