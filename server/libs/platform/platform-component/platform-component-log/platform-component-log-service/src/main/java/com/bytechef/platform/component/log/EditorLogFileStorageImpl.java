@@ -19,8 +19,12 @@ package com.bytechef.platform.component.log;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
+ * Carries its own guards rather than inheriting the delegate's: the {@link LogFileStorageImpl} it builds below is
+ * constructed with {@code new}, so Spring never proxies it and the annotations on it do not run here.
+ *
  * @author Ivica Cardic
  */
 public class EditorLogFileStorageImpl implements EditorLogFileStorage {
@@ -44,21 +48,25 @@ public class EditorLogFileStorageImpl implements EditorLogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_DELETE')")
     public void deleteLogEntries(long jobId) {
         logFileStorage.deleteLogEntries(jobId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public boolean logsExist(long jobId) {
         return logFileStorage.logsExist(jobId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         return logFileStorage.readLogEntries(jobId, taskExecutionId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         return logFileStorage.readLogEntriesByJobId(jobId);
     }
