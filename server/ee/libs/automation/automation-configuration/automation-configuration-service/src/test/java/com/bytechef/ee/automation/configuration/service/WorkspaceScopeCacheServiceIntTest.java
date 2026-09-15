@@ -44,7 +44,11 @@ import org.springframework.transaction.support.TransactionTemplate;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WorkspacePermissionIntTestConfiguration.class, properties = "bytechef.edition=ee")
+@SpringBootTest(
+    classes = WorkspacePermissionIntTestConfiguration.class,
+    properties = {
+        "bytechef.edition=ee", "spring.liquibase.contexts=mono,dev"
+    })
 class WorkspaceScopeCacheServiceIntTest {
 
     private static final long USER_ID = 2L;
@@ -92,6 +96,8 @@ class WorkspaceScopeCacheServiceIntTest {
 
     @Test
     void testGetWorkspaceScopesResolvesCustomRole() {
+        createCustomRole(WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID);
+
         workspaceUserRepository.save(
             WorkspaceUser.forCustomRole(USER_ID, workspaceId, WorkspacePermissionIntTestConfiguration.CUSTOM_ROLE_ID));
 
@@ -266,6 +272,14 @@ class WorkspaceScopeCacheServiceIntTest {
         persistedWorkspaceUser.assignRole(workspaceRole);
 
         workspaceUserRepository.save(persistedWorkspaceUser);
+    }
+
+    private void createCustomRole(long customRoleId) {
+        jdbcTemplate.update(
+            "INSERT INTO custom_role (id, name, created_date, created_by, last_modified_date, last_modified_by, " +
+                "version) VALUES (?, ?, CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0) " +
+                "ON CONFLICT (id) DO NOTHING",
+            customRoleId, "Custom Role " + customRoleId);
     }
 
     @SuppressWarnings("unchecked")

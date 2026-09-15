@@ -54,7 +54,7 @@ import org.springframework.security.core.context.SecurityContextImpl;
         WorkspacePermissionIntTestConfiguration.class, AdminWorkspaceFacadeAuditIntTest.AuditConfiguration.class
     },
     properties = {
-        "bytechef.edition=ee", "bytechef.audit.enabled=true"
+        "bytechef.edition=ee", "bytechef.audit.enabled=true", "spring.liquibase.contexts=mono,dev"
     })
 class AdminWorkspaceFacadeAuditIntTest {
 
