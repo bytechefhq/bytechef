@@ -25,8 +25,6 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityEx
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.workflow.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -41,54 +39,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expressions on the project and deployment GraphQL reads through the real
+ * Evaluates the real {@code @PreAuthorize} expressions on {@link ProjectDeploymentGraphQlController} through the real
  * {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}.
  *
  * @author Ivica Cardic
  */
-class ProjectReadGraphQlControllersAuthorizationTest {
+class ProjectDeploymentGraphQlControllerTest {
 
     private static final long ENVIRONMENT_ID = 2L;
-    private static final long PROJECT_DEPLOYMENT_ID = 7L;
-    private static final long PROJECT_ID = 11L;
     private static final long WORKSPACE_ID = 42L;
 
     @BeforeAll
     static void warmUpGuardEvaluation() throws NoSuchMethodException {
         evaluateGuard(
-            mock(PermissionService.class), ProjectGraphQlController.class.getMethod("projects"), new Object[0]);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {
-        false, true
-    })
-    void testProjectRequiresWorkflowViewOnTheProject(boolean granted) throws NoSuchMethodException {
-        PermissionService permissionService = mock(PermissionService.class);
-
-        when(permissionService.hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW")).thenReturn(granted);
-
-        Method method = ProjectGraphQlController.class.getMethod("project", long.class);
-
-        assertThat(evaluateGuard(permissionService, method, new Object[] {
-            PROJECT_ID
-        })).isEqualTo(granted);
-
-        verify(permissionService).hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW");
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {
-        false, true
-    })
-    void testProjectsRequiresATenantAdmin(boolean granted) throws NoSuchMethodException {
-        PermissionService permissionService = mock(PermissionService.class);
-
-        when(permissionService.isTenantAdmin()).thenReturn(granted);
-
-        Method method = ProjectGraphQlController.class.getMethod("projects");
-
-        assertThat(evaluateGuard(permissionService, method, new Object[0])).isEqualTo(granted);
+            mock(PermissionService.class),
+            ProjectDeploymentGraphQlController.class.getMethod(
+                "workspaceProjectDeployments", Long.class, Long.class, Long.class, Long.class),
+            new Object[] {
+                WORKSPACE_ID, ENVIRONMENT_ID, null, null
+            });
     }
 
     @ParameterizedTest
@@ -111,53 +80,6 @@ class ProjectReadGraphQlControllersAuthorizationTest {
         })).isEqualTo(granted);
 
         verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {
-        false, true
-    })
-    void testWorkspaceChatWorkflowsRequiresDeploymentViewInTheNamedEnvironment(boolean granted)
-        throws NoSuchMethodException {
-
-        PermissionService permissionService = mock(PermissionService.class);
-        Environment environment = Environment.values()[(int) ENVIRONMENT_ID];
-
-        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment)).thenReturn(granted);
-
-        Method method = ProjectDeploymentWorkflowGraphQlController.class.getMethod(
-            "workspaceChatWorkflows", Long.class, Long.class);
-
-        assertThat(evaluateGuard(permissionService, method, new Object[] {
-            WORKSPACE_ID, ENVIRONMENT_ID
-        })).isEqualTo(granted);
-
-        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {
-        false, true
-    })
-    void testProjectDeploymentWorkflowRequiresDeploymentViewOnTheEncodedDeployment(boolean granted)
-        throws NoSuchMethodException {
-
-        PermissionService permissionService = mock(PermissionService.class);
-
-        when(permissionService.hasResourceScope(PROJECT_DEPLOYMENT_ID, "ProjectDeployment", "DEPLOYMENT_VIEW"))
-            .thenReturn(granted);
-
-        WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-            PlatformType.AUTOMATION, PROJECT_DEPLOYMENT_ID, "workflow-uuid", "trigger_1");
-
-        Method method = ProjectDeploymentWorkflowGraphQlController.class.getMethod(
-            "projectDeploymentWorkflow", String.class);
-
-        assertThat(evaluateGuard(permissionService, method, new Object[] {
-            workflowExecutionId.toString()
-        })).isEqualTo(granted);
-
-        verify(permissionService).hasResourceScope(PROJECT_DEPLOYMENT_ID, "ProjectDeployment", "DEPLOYMENT_VIEW");
     }
 
     @SuppressFBWarnings(

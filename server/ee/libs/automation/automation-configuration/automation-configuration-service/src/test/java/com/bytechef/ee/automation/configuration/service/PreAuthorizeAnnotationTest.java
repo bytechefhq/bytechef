@@ -282,7 +282,7 @@ class PreAuthorizeAnnotationTest {
         assertOverloadPreAuthorize(
             clazz, "createProjectDeployment", new Class<?>[] {
                 com.bytechef.automation.configuration.dto.ProjectDeploymentDTO.class
-            }, "hasPermission(#projectDeploymentDTO, 'WORKFLOW_EDIT')");
+            }, "hasPermission(#projectDeploymentDTO, 'DEPLOYMENT_CREATE')");
     }
 
     @Test
