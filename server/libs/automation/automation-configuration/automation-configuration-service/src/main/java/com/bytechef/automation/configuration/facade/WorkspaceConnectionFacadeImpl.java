@@ -25,6 +25,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -60,6 +61,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_CREATE', #connectionDTO.environmentId)")
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.AUTOMATION);
 
@@ -69,6 +71,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
@@ -83,6 +86,14 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_VIEW')")
+    @Transactional(readOnly = true)
+    public ConnectionDTO getConnection(long connectionId) {
+        return connectionFacade.getConnection(connectionId);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
     public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
@@ -95,5 +106,36 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         return connectionFacade.getConnections(
             componentName, connectionVersion, connectionIds, tagId, environmentId, PlatformType.AUTOMATION);
+    }
+
+    @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'CONNECTION_VIEW', #environmentId)")
+    @Transactional(readOnly = true)
+    public List<Tag> getConnectionTags(long workspaceId, Long environmentId) {
+        List<Long> connectionIds = CollectionUtils.map(
+            workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
+
+        if (connectionIds.isEmpty()) {
+            return List.of();
+        }
+
+        return connectionFacade.getConnections(null, null, connectionIds, null, environmentId, PlatformType.AUTOMATION)
+            .stream()
+            .flatMap(connectionDTO -> connectionDTO.tags()
+                .stream())
+            .distinct()
+            .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
+    public void update(long connectionId, String name, List<Tag> tags, int version) {
+        connectionFacade.update(connectionId, name, tags, version);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')")
+    public void updateTags(long connectionId, List<Tag> tags) {
+        connectionFacade.update(connectionId, tags);
     }
 }

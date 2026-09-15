@@ -19,6 +19,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwnerContributor;
 import com.bytechef.automation.configuration.ownership.ProjectOwnerContributor;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipServiceImpl;
 import com.bytechef.config.ApplicationProperties;
@@ -114,6 +115,17 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
                 .toList(),
             projectOwnerContributorProvider.orderedStream()
                 .toList());
+    }
+
+    @Bean
+    PermissionService permissionService() {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        // These tests exercise the reference and catalog flows, not connection authorization: let every deployment
+        // workflow use its connection so the rollouts reach the code under test.
+        when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
+
+        return permissionService;
     }
 
     @Bean

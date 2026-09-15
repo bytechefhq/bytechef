@@ -32,6 +32,7 @@ import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
 import com.bytechef.automation.configuration.exception.ProjectDeploymentErrorType;
 import com.bytechef.automation.configuration.listener.ProjectDeploymentDeleteEventListener;
 import com.bytechef.automation.configuration.ownership.ProjectDeploymentOwner;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
@@ -75,6 +76,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -98,6 +100,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final JobFacade jobFacade;
     private final JobService jobService;
     private final List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners;
+    private final PermissionService permissionService;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectOwnershipService projectOwnershipService;
@@ -121,7 +124,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
-        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService,
+        ComponentConnectionFacade componentConnectionFacade, PermissionService permissionService,
+        WorkflowService workflowService,
         List<ProjectDeploymentDeleteEventListener> projectDeploymentDeleteEventListeners) {
 
         this.connectionService = connectionService;
@@ -132,6 +136,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.projectDeploymentDeleteEventListeners = projectDeploymentDeleteEventListeners;
+        this.permissionService = permissionService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectOwnershipService = projectOwnershipService;
@@ -149,8 +154,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @Override
     // The whole DTO, not its projectId: the evaluator reads the target environment off it so that the role
     // checked is the one held in the environment being deployed into.
-    @PreAuthorize("hasPermission(#projectDeploymentDTO, 'WORKFLOW_EDIT') and "
-        + "hasPermission(#projectDeploymentDTO.projectId(), 'Project', 'DEPLOYMENT_CREATE')")
+    @PreAuthorize("hasPermission(#projectDeploymentDTO, 'DEPLOYMENT_CREATE')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         return createProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
@@ -227,9 +231,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             id, PlatformType.AUTOMATION);
     }
 
-    // Guarded here rather than beneath: ProjectDeploymentServiceImpl.delete carries no guard, and the triggers, jobs
-    // and
-    // deployment workflows are torn down before it is reached.
+    // Guarded here rather than beneath: ProjectDeploymentServiceImpl.delete carries no guard, and the triggers,
+    // jobs and deployment workflows are torn down before it is reached.
     @Override
     @PreAuthorize("hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_DELETE')")
     public void deleteProjectDeployment(long id) {
@@ -551,14 +554,17 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     @Override
     @PreAuthorize("hasPermission(#projectDeploymentWorkflow.id, 'ProjectDeploymentWorkflow', 'DEPLOYMENT_EDIT')")
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
-        validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
-
         ProjectDeploymentWorkflow oldProjectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
                 Validate.notNull(projectDeploymentWorkflow.getId(), "id"));
 
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
             oldProjectDeploymentWorkflow.getProjectDeploymentId());
+
+        checkProjectDeploymentWorkflowConnectionUsage(
+            projectDeploymentWorkflow.getConnections(), oldProjectDeploymentWorkflow.getWorkflowId(),
+            projectDeployment.getEnvironment());
+        validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
         ProjectDeploymentWorkflow updatedProjectDeploymentWorkflow = projectDeploymentWorkflowService.update(
             projectDeploymentWorkflow);
@@ -642,6 +648,9 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 }
             }
 
+            checkProjectDeploymentWorkflowConnectionUsage(
+                projectDeploymentWorkflow.getConnections(), projectDeploymentWorkflow.getWorkflowId(),
+                projectDeployment.getEnvironment());
             validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
             if (oldProjectDeploymentWorkflow == null) {
@@ -1020,6 +1029,20 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 projectDeploymentWorkflow.getProjectDeploymentId(),
                 projectDeploymentWorkflow.getWorkflowId()),
             workflowUuid);
+    }
+
+    private void checkProjectDeploymentWorkflowConnectionUsage(
+        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections, String workflowId,
+        Environment environment) {
+
+        for (ProjectDeploymentWorkflowConnection projectDeploymentWorkflowConnection : projectDeploymentWorkflowConnections) {
+            long connectionId = projectDeploymentWorkflowConnection.getConnectionId();
+
+            if (!permissionService.canUseConnectionInWorkflow(connectionId, workflowId, environment)) {
+                throw new AccessDeniedException(
+                    "Connection id=%s cannot be used by workflow id=%s".formatted(connectionId, workflowId));
+            }
+        }
     }
 
     private void validateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {

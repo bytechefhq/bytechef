@@ -19,13 +19,22 @@ package com.bytechef.automation.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.HashMap;
@@ -36,6 +45,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author Ivica Cardic
@@ -47,13 +57,49 @@ class ProjectDeploymentFacadeTest {
     private ApplicationProperties applicationProperties;
 
     @Mock
+    private PermissionService permissionService;
+
+    @Mock
     private ProjectDeploymentService projectDeploymentService;
+
+    @Mock
+    private ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @Mock
     private TagService tagService;
 
     @InjectMocks
     private ProjectDeploymentFacadeImpl projectDeploymentFacade;
+
+    @Test
+    void testUpdateProjectDeploymentWorkflowRefusesAConnectionTheWorkflowMayNotUse() {
+        ProjectDeploymentWorkflow storedProjectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        storedProjectDeploymentWorkflow.setProjectDeploymentId(3L);
+        storedProjectDeploymentWorkflow.setWorkflowId("workflow-1");
+
+        ProjectDeployment projectDeployment = new ProjectDeployment();
+
+        projectDeployment.setEnvironment(Environment.PRODUCTION);
+
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
+
+        projectDeploymentWorkflow.setConnections(
+            List.of(new ProjectDeploymentWorkflowConnection(9L, "connection", "node_1")));
+        projectDeploymentWorkflow.setId(5L);
+
+        when(projectDeploymentWorkflowService.getProjectDeploymentWorkflow(5L))
+            .thenReturn(storedProjectDeploymentWorkflow);
+        when(projectDeploymentService.getProjectDeployment(3L))
+            .thenReturn(projectDeployment);
+        when(permissionService.canUseConnectionInWorkflow(9L, "workflow-1", Environment.PRODUCTION))
+            .thenReturn(false);
+
+        assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeploymentWorkflow(projectDeploymentWorkflow))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(projectDeploymentWorkflowService, never()).update(any(ProjectDeploymentWorkflow.class));
+    }
 
     @Test
     void testGetProjectDeploymentTags() {
