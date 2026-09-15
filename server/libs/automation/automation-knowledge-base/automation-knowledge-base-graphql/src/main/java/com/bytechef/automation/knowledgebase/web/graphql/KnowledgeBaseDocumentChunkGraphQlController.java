@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -54,7 +55,8 @@ class KnowledgeBaseDocumentChunkGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
+    public KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(
         @Argument Long id,
         @Argument("knowledgeBaseDocumentChunk") KnowledgeBaseDocumentChunkInput knowledgeBaseDocumentChunk) {
 
@@ -63,7 +65,8 @@ class KnowledgeBaseDocumentChunkGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteKnowledgeBaseDocumentChunk(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBaseDocumentChunk', 'KNOWLEDGE_BASE_EDIT')")
+    public boolean deleteKnowledgeBaseDocumentChunk(@Argument Long id) {
         knowledgeBaseDocumentChunkFacade.deleteKnowledgeBaseDocumentChunk(id);
 
         return true;

@@ -42,6 +42,8 @@ import org.springframework.security.core.Authentication;
  * {@code hasWorkspaceScopeInEnvironment}, for listings that carry an environment id.</li>
  * <li>{@code hasResourceScopeInEnvironment(#id, 'Type', 'SCOPE', #environment)} — for a resource that spans
  * environments and an operation that acts on one of them.</li>
+ * <li>{@code hasResourceScopeInEnvironmentId(#id, 'Type', 'SCOPE', #environmentId)} — the raw-ordinal counterpart of
+ * {@code hasResourceScopeInEnvironment}.</li>
  * <li>{@code hasWorkflowScope(#workflowId, 'SCOPE')} — requires it in the workspace owning the workflow's project, for
  * a read not confined to one environment.</li>
  * <li>{@code hasWorkflowScopeInEnvironment(#workflowId, 'SCOPE', #environment)} — requires it in the workspace owning
@@ -176,6 +178,28 @@ public final class AutomationMethodSecurityExpressionRoot
         }
 
         return permissionService.hasResourceScopeInEnvironment(id, resourceType, scope, environment);
+    }
+
+    /**
+     * The raw-ordinal counterpart of {@link #hasResourceScopeInEnvironment}, for an operation on a resource whose data
+     * the caller-supplied environment selects, such as the physical table of a data table. A {@code null} ordinal and
+     * an ordinal outside the enum are denied.
+     */
+    public boolean hasResourceScopeInEnvironmentId(
+        Serializable id, String resourceType, String scope, @Nullable Long environmentId) {
+
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
+
+        Environment[] environments = Environment.values();
+
+        if (environmentId == null || environmentId < 0 || environmentId >= environments.length) {
+            return false;
+        }
+
+        return permissionService.hasResourceScopeInEnvironment(
+            id, resourceType, scope, environments[(int) (long) environmentId]);
     }
 
     /**

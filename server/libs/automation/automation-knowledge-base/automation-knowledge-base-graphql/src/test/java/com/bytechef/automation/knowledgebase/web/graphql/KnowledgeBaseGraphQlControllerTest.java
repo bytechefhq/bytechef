@@ -24,7 +24,10 @@ import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 
-class KnowledgeBaseGraphQlControllerEmbeddingActiveTest {
+/**
+ * @author Ivica Cardic
+ */
+class KnowledgeBaseGraphQlControllerTest {
 
     @Test
     @SuppressWarnings("unchecked")

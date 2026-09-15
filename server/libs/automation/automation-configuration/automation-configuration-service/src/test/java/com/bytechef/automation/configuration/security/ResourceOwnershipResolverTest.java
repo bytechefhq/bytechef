@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.security.MainSourceScan.GuardExpressionScan;
 import com.bytechef.automation.configuration.security.MainSourceScan.ResolvedGuardExpression;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,7 +53,11 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class ResourceTokenResolverCoverageTest {
+@SuppressFBWarnings(
+    value = "REDOS",
+    justification = "The patterns scan this repository's own source files, and their only quantified groups are "
+        + "optional (?), which cannot backtrack catastrophically.")
+class ResourceOwnershipResolverTest {
 
     /**
      * Resource tokens that today have <em>no</em> registered {@code ResourceOwnershipResolver}, pinned so the
@@ -82,7 +87,8 @@ class ResourceTokenResolverCoverageTest {
     // hasPermission(#id, 'Type', 'SCOPE') and the two PermissionService methods callable as @permissionService.x(...):
     // the token is always the second argument.
     private static final Pattern TOKEN_AS_SECOND_ARGUMENT = Pattern.compile(
-        "(?:hasPermission|hasResourceScope|hasResourceRole)\\(\\s*[^,()]+?,\\s*'([A-Za-z][A-Za-z0-9]*)'\\s*,");
+        "(?:hasPermission|hasResourceScope(?:InEnvironment(?:Id)?)?|hasResourceRole)"
+            + "\\(\\s*[^,()]+?,\\s*'([A-Za-z][A-Za-z0-9]*)'\\s*,");
     // isResourceOwner has two shapes: the SpEL root built-in takes (id, 'Type') and the bean method takes ('Type', id).
     private static final Pattern OWNER_TOKEN_AS_SECOND_ARGUMENT =
         Pattern.compile("isResourceOwner\\(\\s*[^,()']+?,\\s*'([A-Za-z][A-Za-z0-9]*)'\\s*\\)");
