@@ -29,6 +29,7 @@ import graphql.schema.DataFetchingEnvironmentImpl;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.graphql.execution.ErrorType;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author Ivica Cardic
@@ -70,6 +71,18 @@ class GlobalDataFetcherExceptionResolverTest {
         assertThat(graphQLError).isNotNull();
         assertThat(graphQLError.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
         assertThat(graphQLError.getExtensions()).containsEntry("code", "ENUM_OUT_OF_RANGE");
+    }
+
+    @Test
+    void testWrappedAccessDeniedResolvesToForbidden() {
+        GraphQLError graphQLError = globalDataFetcherExceptionResolver.resolveToSingleError(
+            new IllegalStateException("fetch failed", new AccessDeniedException("Connection 42 is not accessible")),
+            createDataFetchingEnvironment());
+
+        assertThat(graphQLError).isNotNull();
+        assertThat(graphQLError.getErrorType()).isEqualTo(ErrorType.FORBIDDEN);
+        assertThat(graphQLError.getMessage()).isEqualTo("Access denied");
+        assertThat(graphQLError.getExtensions()).containsEntry("errorCode", "ACCESS_DENIED");
     }
 
     @Test
