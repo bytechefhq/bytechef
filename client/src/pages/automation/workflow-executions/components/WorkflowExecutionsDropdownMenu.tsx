@@ -5,6 +5,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useRestartJobMutation, useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -17,9 +19,11 @@ import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetS
 const RESTARTABLE_JOB_STATUSES = new Set<string>(['FAILED', 'STOPPED']);
 
 const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecution}) => {
-    const queryClient = useQueryClient();
-
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
+
+    const canControlWorkflowExecution = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
+    const queryClient = useQueryClient();
 
     const restartJobMutation = useRestartJobMutation({
         onSuccess: () => {
@@ -83,20 +87,24 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
             <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem icon={<ViewIcon />} label="View" onClick={handleViewClick} />
 
-                <DropdownMenuItem
-                    disabled={restartDisabled}
-                    icon={<RotateCcwIcon />}
-                    label="Restart"
-                    onClick={handleRestartWorkflowExecutionClick}
-                />
+                {canControlWorkflowExecution && (
+                    <>
+                        <DropdownMenuItem
+                            disabled={restartDisabled}
+                            icon={<RotateCcwIcon />}
+                            label="Restart"
+                            onClick={handleRestartWorkflowExecutionClick}
+                        />
 
-                <DropdownMenuItem
-                    disabled={stopDisabled}
-                    icon={<CircleStopIcon />}
-                    label="Stop"
-                    onClick={handleStopWorkflowExecutionClick}
-                    variant="destructive"
-                />
+                        <DropdownMenuItem
+                            disabled={stopDisabled}
+                            icon={<CircleStopIcon />}
+                            label="Stop"
+                            onClick={handleStopWorkflowExecutionClick}
+                            variant="destructive"
+                        />
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

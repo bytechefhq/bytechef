@@ -8,8 +8,10 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ProjectDeployment, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentTagsMutation} from '@/shared/mutations/automation/projectDeploymentTags.mutations';
 import {
@@ -47,10 +49,13 @@ const ProjectDeploymentListItem = ({
     const setProjectDeploymentEnabled = useProjectDeploymentsEnabledStore(
         ({setProjectDeploymentEnabled}) => setProjectDeploymentEnabled
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {captureProjectDeploymentEnabled} = useAnalytics();
 
     const {openProject} = useOpenInProject();
+
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -118,7 +123,9 @@ const ProjectDeploymentListItem = ({
     const enabledWorkflowCount = enabledProjectDeploymentWorkflows.length;
 
     const isDeploymentSwitchDisabled =
-        enableProjectDeploymentMutation.isPending || (enabledWorkflowCount < 1 && !projectDeployment.enabled);
+        !canEditDeployment ||
+        enableProjectDeploymentMutation.isPending ||
+        (enabledWorkflowCount < 1 && !projectDeployment.enabled);
 
     const showOpenProject = !hideOpenInProject && projectDeployment.projectId != null;
 
@@ -207,6 +214,7 @@ const ProjectDeploymentListItem = ({
                                                 updateTagsRequest: {tags: tags || []},
                                             })}
                                             id={projectDeployment.id!}
+                                            readOnly={!canEditDeployment}
                                             remainingTags={remainingTags}
                                             tags={projectDeployment.tags}
                                             updateTagsMutation={updateProjectDeploymentTagsMutation}
@@ -235,6 +243,7 @@ const ProjectDeploymentListItem = ({
                                 {enableProjectDeploymentMutation.isPending && <LoadingIcon />}
 
                                 <Switch
+                                    aria-label="Enable Deployment"
                                     checked={projectDeployment.enabled}
                                     disabled={isDeploymentSwitchDisabled}
                                     onCheckedChange={handleOnCheckedChange}

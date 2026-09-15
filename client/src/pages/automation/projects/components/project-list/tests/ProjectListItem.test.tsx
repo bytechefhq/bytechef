@@ -27,6 +27,10 @@ const hoisted = vi.hoisted(() => ({
 
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
 
+const hoistedQueries = vi.hoisted(() => ({
+    useGetWorkspaceProjectDeploymentsQuery: vi.fn(() => ({data: [], isFetching: false, refetch: vi.fn()})),
+}));
+
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,
@@ -148,7 +152,7 @@ vi.mock('@/shared/queries/automation/projectCategories.queries', () => ({
 }));
 
 vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
-    useGetWorkspaceProjectDeploymentsQuery: () => ({data: [], isFetching: false, refetch: vi.fn()}),
+    useGetWorkspaceProjectDeploymentsQuery: hoistedQueries.useGetWorkspaceProjectDeploymentsQuery,
 }));
 
 vi.mock('@/shared/queries/automation/projectTags.queries', () => ({
@@ -203,6 +207,7 @@ const openProjectActionsMenu = async () => {
 };
 
 beforeEach(() => {
+    environmentStore.setState({currentEnvironmentId: 2});
     hoistedScope.grantedScopes = [...ALL_SCOPES];
 
     windowResizeObserver();
@@ -214,6 +219,15 @@ afterEach(() => {
 });
 
 describe('ProjectListItem', () => {
+    it('looks up the project deployments of the current environment', () => {
+        renderProjectListItem();
+
+        expect(hoistedQueries.useGetWorkspaceProjectDeploymentsQuery).toHaveBeenCalledWith(
+            {environmentId: 2, id: 1, projectId: 1},
+            false
+        );
+    });
+
     it('shows every gated control when all scopes are granted', async () => {
         renderProjectListItem();
 
