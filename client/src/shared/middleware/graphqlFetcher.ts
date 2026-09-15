@@ -2,9 +2,27 @@ import {getCookie} from '@/shared/util/cookie-utils';
 
 import {endpointUrl, fetchParams} from './config';
 
-export class GraphQLResponseError extends Error {
-    constructor(message: string) {
+interface GraphQlRequestErrorDetailsI {
+    classification?: string;
+    status?: number;
+}
+
+export class GraphQlRequestError extends Error {
+    classification?: string;
+    status?: number;
+
+    constructor(message: string, {classification, status}: GraphQlRequestErrorDetailsI = {}) {
         super(message);
+
+        this.classification = classification;
+        this.name = 'GraphQlRequestError';
+        this.status = status;
+    }
+}
+
+export class GraphQLResponseError extends GraphQlRequestError {
+    constructor(message: string, details: GraphQlRequestErrorDetailsI = {}) {
+        super(message, details);
 
         this.name = 'GraphQLResponseError';
     }
@@ -29,19 +47,24 @@ export function fetcher<TData, TVariables>(
             const errorJson = await res.json().catch(() => null);
             const serverMessage = errorJson?.errors?.[0]?.message;
 
+            const errorDetails = {
+                classification: errorJson?.errors?.[0]?.extensions?.classification,
+                status: res.status,
+            };
+
             if (serverMessage) {
-                throw new GraphQLResponseError(serverMessage);
+                throw new GraphQLResponseError(serverMessage, errorDetails);
             }
 
-            throw new Error(`GraphQL request failed with status ${res.status}`);
+            throw new GraphQlRequestError(`GraphQL request failed with status ${res.status}`, errorDetails);
         }
 
         const json = await res.json();
 
         if (json.errors) {
-            const {message} = json.errors[0];
+            const {extensions, message} = json.errors[0];
 
-            throw new GraphQLResponseError(message);
+            throw new GraphQLResponseError(message, {classification: extensions?.classification});
         }
 
         return json.data;

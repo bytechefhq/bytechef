@@ -124,4 +124,17 @@ describe('EnvironmentSelect', () => {
             }
         }
     });
+
+    it('should offer only the visible environments', async () => {
+        render(
+            <MemoryRouter>
+                <EnvironmentSelect variant="compact" visibleEnvironmentIds={[0, 2]} />
+            </MemoryRouter>
+        );
+
+        await userEvent.click(screen.getByRole('button'));
+
+        expect(await screen.findByText('PRODUCTION')).toBeInTheDocument();
+        expect(screen.queryByText('STAGING')).not.toBeInTheDocument();
+    });
 });
