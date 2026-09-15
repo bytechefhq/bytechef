@@ -1,4 +1,5 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {renderHook, waitFor} from '@testing-library/react';
 import {ReactNode} from 'react';
@@ -41,9 +42,11 @@ describe('connections.queries', () => {
 
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-        expect(getConnectionTagsMock).toHaveBeenCalledWith({id: 7});
+        const {currentEnvironmentId} = environmentStore.getState();
+
+        expect(getConnectionTagsMock).toHaveBeenCalledWith({environmentId: currentEnvironmentId, id: 7});
         expect(result.current.data).toEqual([{id: 10, name: 'billing'}]);
-        expect(queryClient.getQueryData(ConnectionKeys.workspaceConnectionTags(7))).toEqual([
+        expect(queryClient.getQueryData(ConnectionKeys.workspaceConnectionTags(7, currentEnvironmentId))).toEqual([
             {id: 10, name: 'billing'},
         ]);
     });
