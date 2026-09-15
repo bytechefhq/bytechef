@@ -18,7 +18,9 @@ import com.bytechef.ee.automation.configuration.repository.WorkspaceUserReposito
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.audit.AuditInvocation;
 import com.bytechef.platform.audit.AuditOutcome;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,30 +46,47 @@ class WorkspaceUserAuditMapperTest {
     }
 
     @Test
-    void testAddedRecordsWorkspaceIdUserIdAndRole() {
+    void testAddedRecordsBuiltInRole() {
         Map<String, String> data = workspaceUserAuditMapper.map(invocation(
             WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED,
-            arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID, "workspaceRole", WorkspaceRole.EDITOR), null,
-            null));
+            arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID, "workspaceRole", WorkspaceRole.EDITOR,
+                "customRoleId", null),
+            null, null));
 
         assertThat(data).containsExactlyInAnyOrderEntriesOf(
             Map.of("workspaceId", "1", "userId", "2", "role", "EDITOR"));
     }
 
     @Test
-    void testAddedCaptureReadsNothing() {
-        Object captured = workspaceUserAuditMapper.capture(invocation(
-            WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED,
-            arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID, "workspaceRole", WorkspaceRole.EDITOR), null,
-            null));
+    void testInviteRecordsUserIdFromTheResultAndNeverTheEmail() {
+        WorkspaceUser workspaceUser = WorkspaceUser.forCustomRole(9L, WORKSPACE_ID, 5L);
 
-        assertThat(captured).isNull();
-        verifyNoInteractions(workspaceUserRepository);
+        Map<String, String> data = workspaceUserAuditMapper.map(invocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED,
+            arguments("workspaceId", WORKSPACE_ID, "email", "someone@example.com", "workspaceRole", null,
+                "customRoleId", 5L),
+            workspaceUser, null));
+
+        assertThat(data).containsExactlyInAnyOrderEntriesOf(
+            Map.of("workspaceId", "1", "userId", "9", "role", "customRole:5", "invited", "true"));
+        assertThat(data.values()).noneMatch(value -> value.contains("@"));
     }
 
     @Test
-    void testRoleUpdatedCapturesThePreviousRoleAndMapsTheNewRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+    void testDeniedInviteRecordsNoUserId() {
+        Map<String, String> data = workspaceUserAuditMapper.map(new AuditInvocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED,
+            arguments("workspaceId", WORKSPACE_ID, "email", "someone@example.com", "workspaceRole",
+                WorkspaceRole.VIEWER),
+            null, null, AuditOutcome.DENIED, null));
+
+        assertThat(data).containsEntry("invited", "true")
+            .doesNotContainKey("userId");
+    }
+
+    @Test
+    void testRoleUpdatedCapturesThePreviousWorkspaceWideRole() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
         Map<String, Object> arguments = arguments(
@@ -84,51 +103,85 @@ class WorkspaceUserAuditMapperTest {
     }
 
     @Test
-    void testRemovedCapturesThePreviousRole() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
-            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR)));
+    void testAssignCustomRoleRecordsTheCustomRole() {
+        Map<String, String> data = workspaceUserAuditMapper.map(invocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED,
+            arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID, "customRoleId", 5L), null, "EDITOR"));
+
+        assertThat(data).containsEntry("role", "customRole:5")
+            .containsEntry("previousRole", "EDITOR");
+    }
+
+    @Test
+    void testRemovedCapturesEveryRow() {
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(
+                WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.DEVELOPMENT),
+                WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 5L, Environment.PRODUCTION)));
 
         Map<String, Object> arguments = arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID);
 
         Object captured = workspaceUserAuditMapper.capture(
             invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED, arguments, null, null));
 
-        Map<String, String> data = workspaceUserAuditMapper.map(
-            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED, arguments, true, captured));
-
-        assertThat(data).containsEntry("previousRole", "EDITOR")
-            .containsEntry("workspaceId", "1")
-            .containsEntry("userId", "2");
+        assertThat(workspaceUserAuditMapper.map(
+            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED, arguments, true, captured)))
+                .containsEntry("previousRole", "DEVELOPMENT:EDITOR,PRODUCTION:customRole:5");
     }
 
     @Test
-    void testCustomRolePreviousRoleIsDescribedByItsId() {
-        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
-            .thenReturn(Optional.of(WorkspaceUser.forCustomRole(USER_ID, WORKSPACE_ID, 5L)));
+    void testEnvironmentRoleUpdatedFallsBackToTheWorkspaceWideRole() {
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.STAGING.ordinal())).thenReturn(Optional.empty());
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
 
         Map<String, Object> arguments = arguments(
-            "userId", USER_ID, "workspaceId", WORKSPACE_ID, "workspaceRole", WorkspaceRole.EDITOR);
+            "userId", USER_ID, "workspaceId", WORKSPACE_ID, "environment", Environment.STAGING, "workspaceRole",
+            WorkspaceRole.EDITOR, "customRoleId", null);
 
         Object captured = workspaceUserAuditMapper.capture(
-            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED, arguments, null, null));
+            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED, arguments, null, null));
 
-        Map<String, String> data = workspaceUserAuditMapper.map(
-            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED, arguments, null, captured));
-
-        assertThat(data).containsEntry("previousRole", "customRole:5");
+        assertThat(workspaceUserAuditMapper.map(invocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ENVIRONMENT_ROLE_UPDATED, arguments, null, captured)))
+                .containsExactlyInAnyOrderEntriesOf(
+                    Map.of(
+                        "workspaceId", "1", "userId", "2", "environment", "STAGING", "previousRole", "VIEWER", "role",
+                        "EDITOR"));
     }
 
     @Test
-    void testDeniedInvocationMapsWithoutErrorAndRecordsNoPreviousRole() {
-        Map<String, String> data = workspaceUserAuditMapper.map(new AuditInvocation(
-            WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED,
-            arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID, "workspaceRole", WorkspaceRole.ADMIN), null,
-            null, AuditOutcome.DENIED, null));
+    void testEnvironmentRoleRemovedRecordsWideningOfTheLastRow() {
+        WorkspaceUser environmentWorkspaceUser = WorkspaceUser.forRole(
+            USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR, Environment.PRODUCTION);
 
-        assertThat(data).containsEntry("workspaceId", "1")
-            .containsEntry("userId", "2")
-            .containsEntry("role", "ADMIN")
-            .doesNotContainKey("previousRole");
+        when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironment(
+            USER_ID, WORKSPACE_ID, Environment.PRODUCTION.ordinal())).thenReturn(Optional.of(environmentWorkspaceUser));
+        when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(List.of(environmentWorkspaceUser));
+
+        Map<String, Object> arguments = arguments(
+            "userId", USER_ID, "workspaceId", WORKSPACE_ID, "environment", Environment.PRODUCTION);
+
+        Object captured = workspaceUserAuditMapper.capture(
+            invocation(WorkspaceUserAuditEvents.WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED, arguments, null, null));
+
+        assertThat(workspaceUserAuditMapper.map(invocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ENVIRONMENT_ROLE_REMOVED, arguments, null, captured)))
+                .containsExactlyInAnyOrderEntriesOf(
+                    Map.of(
+                        "workspaceId", "1", "userId", "2", "environment", "PRODUCTION", "previousRole", "EDITOR",
+                        "widenedToWorkspaceWide", "true"));
+    }
+
+    @Test
+    void testCaptureOfAddedReadsNothing() {
+        assertThat(workspaceUserAuditMapper.capture(invocation(
+            WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED, arguments("userId", USER_ID, "workspaceId", WORKSPACE_ID),
+            null, null))).isNull();
+
+        verifyNoInteractions(workspaceUserRepository);
     }
 
     @Test

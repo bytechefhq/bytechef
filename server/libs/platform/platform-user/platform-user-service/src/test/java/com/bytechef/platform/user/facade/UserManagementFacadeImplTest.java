@@ -18,46 +18,88 @@ package com.bytechef.platform.user.facade;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.service.TenantService;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
  */
 class UserManagementFacadeImplTest {
 
+    private static final long USER_ID = 7L;
+
+    private ApiKeyRevoker apiKeyRevoker;
     private TenantService tenantService;
     private UserInvitationService userInvitationService;
     private UserService userService;
     private UserManagementFacadeImpl userManagementFacade;
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
-        tenantService = Mockito.mock(TenantService.class);
-        userInvitationService = Mockito.mock(UserInvitationService.class);
-        userService = Mockito.mock(UserService.class);
+        apiKeyRevoker = mock(ApiKeyRevoker.class);
+        tenantService = mock(TenantService.class);
+        userInvitationService = mock(UserInvitationService.class);
+        userService = mock(UserService.class);
+
+        ObjectProvider<ApiKeyRevoker> apiKeyRevokerProvider = mock(ObjectProvider.class);
+
+        when(apiKeyRevokerProvider.getIfAvailable()).thenReturn(apiKeyRevoker);
 
         userManagementFacade = new UserManagementFacadeImpl(
-            Mockito.mock(AuthorityService.class), tenantService, userInvitationService, userService);
+            apiKeyRevokerProvider, mock(AuthorityService.class), tenantService, userInvitationService, userService,
+            mock(ObjectProvider.class));
+    }
+
+    @Test
+    void testDeleteUserRevokesTheApiKeysBeforeRemovingTheAccount() {
+        User user = user();
+
+        when(userService.fetchUserByLogin("departing")).thenReturn(Optional.of(user));
+
+        userManagementFacade.deleteUser("departing");
+
+        InOrder inOrder = Mockito.inOrder(apiKeyRevoker, userService);
+
+        inOrder.verify(apiKeyRevoker)
+            .revokeAll(USER_ID);
+        inOrder.verify(userService)
+            .delete("departing");
+    }
+
+    @Test
+    void testDeleteUserOfAnUnknownLoginRevokesNothing() {
+        when(userService.fetchUserByLogin("ghost")).thenReturn(Optional.empty());
+
+        userManagementFacade.deleteUser("ghost");
+
+        verify(apiKeyRevoker, never()).revokeAll(USER_ID);
+        verify(userService).delete("ghost");
     }
 
     @Test
     void testInviteUserDelegatesToTheInvitationService() {
         when(userService.fetchUserByEmail("newuser@example.com")).thenReturn(Optional.empty());
+        when(userInvitationService.inviteUser("newuser@example.com", "ROLE_USER")).thenReturn(user());
 
-        userManagementFacade.inviteUser("newuser@example.com", "ROLE_USER");
+        userManagementFacade.inviteUser("newuser@example.com", "ROLE_USER", List.of());
 
         verify(userInvitationService).inviteUser("newuser@example.com", "ROLE_USER");
     }
@@ -71,7 +113,7 @@ class UserManagementFacadeImplTest {
 
         when(userService.fetchUserByEmail("existing@example.com")).thenReturn(Optional.of(user));
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", "ROLE_USER"))
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("existing@example.com", "ROLE_USER", List.of()))
             .isInstanceOf(EmailAlreadyUsedException.class);
 
         verify(userInvitationService, never()).inviteUser(anyString(), anyString());
@@ -82,9 +124,18 @@ class UserManagementFacadeImplTest {
         when(tenantService.isMultiTenantEnabled()).thenReturn(true);
         when(tenantService.tenantIdsByUserEmailExist("taken@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> userManagementFacade.inviteUser("taken@example.com", "ROLE_USER"))
+        assertThatThrownBy(() -> userManagementFacade.inviteUser("taken@example.com", "ROLE_USER", List.of()))
             .isInstanceOf(EmailAlreadyUsedException.class);
 
         verify(userInvitationService, never()).inviteUser(anyString(), anyString());
+    }
+
+    private static User user() {
+        User user = new User();
+
+        user.setId(USER_ID);
+        user.setLogin("departing");
+
+        return user;
     }
 }
