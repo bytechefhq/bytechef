@@ -55,7 +55,7 @@ public interface ProjectDeploymentFacade {
      */
     ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentId, String workflowUuid);
 
-    List<Tag> getProjectDeploymentTags();
+    List<Tag> getProjectDeploymentTags(long id, Long environmentId);
 
     List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields);

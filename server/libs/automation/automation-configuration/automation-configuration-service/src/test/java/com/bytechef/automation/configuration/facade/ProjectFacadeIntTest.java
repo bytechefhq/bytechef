@@ -20,7 +20,11 @@ import static com.bytechef.automation.configuration.util.ProjectDeploymentFacade
 import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
 import static com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -37,6 +41,9 @@ import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowServiceImpl;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
@@ -50,25 +57,36 @@ import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.Validate;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
@@ -442,7 +460,7 @@ public class ProjectFacadeIntTest {
         projectRepository.save(project);
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(Validate.notNull(workspace.getId(), "id"))
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");
@@ -460,7 +478,7 @@ public class ProjectFacadeIntTest {
         projectRepository.save(project);
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(Validate.notNull(workspace.getId(), "id"))
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
@@ -468,7 +486,7 @@ public class ProjectFacadeIntTest {
         projectRepository.deleteById(Validate.notNull(project.getId(), "id"));
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(Validate.notNull(workspace.getId(), "id"))
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");
@@ -974,5 +992,390 @@ public class ProjectFacadeIntTest {
 
         assertThat(projectDTO.tags()).hasSize(1);
         assertThat(projectDTO.name()).isEqualTo("Updated Name");
+    }
+
+    /**
+     * Calls every guarded {@link ProjectFacadeImpl} method through the real method-security interceptor, backed by the
+     * production {@code AutomationMethodSecurityExpressionHandler} and {@code AutomationPermissionEvaluator}. Each
+     * denial withholds only the scope the guard needs while granting every other one, and each allowed case grants only
+     * that scope and proves the body ran.
+     * <p>
+     * Duplicating is a create: the body calls {@code projectService.create} and
+     * {@code projectWorkflowService.addWorkflow}, and {@code ProjectServiceImpl.create} carries no gate of its own, so
+     * the guard on {@code duplicateProject} is the only barrier. It named {@code WORKFLOW_VIEW} alone — a read scope —
+     * which let a view-only member create a project and its workflows by duplicating any project they could open,
+     * bypassing the {@code PROJECT_CREATE} that {@code createProject}, {@code importProject} and
+     * {@code importProjectTemplate} all demand.
+     * <p>
+     * The guard is a conjunction, so every combination is asserted rather than only the denial. Holding the read alone
+     * must not create; holding the create alone must not reach a project the caller cannot read; holding both must
+     * pass.
+     * <p>
+     * Only the outcome and the scopes actually consulted are asserted, never the order the two halves are evaluated in:
+     * SpEL {@code and} short-circuits, so pinning which half runs first would redden a harmless reordering of an
+     * expression that admits exactly the same principals either way.
+     */
+    @Nested
+    @Import({
+        MethodSecurityEnforcement.Config.class, PostgreSQLContainerConfiguration.class
+    })
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final Set<String> GUARDED_METHOD_NAMES = Set.of(
+            "createProject", "deleteProject", "deleteSharedProject", "duplicateProject", "exportProject",
+            "exportSharedProject", "getProject", "getProjects", "getWorkspaceProjectWorkflows", "getWorkspaceProjects",
+            "importProject", "importProjectTemplate", "publishProject", "updateProject");
+        private static final String PROJECT_CREATE = "PROJECT_CREATE";
+        private static final String PROJECT_DELETE = "PROJECT_DELETE";
+        private static final long PROJECT_ID = 42L;
+        private static final String PROJECT_SETTINGS = "PROJECT_SETTINGS";
+        private static final String PROJECT_TYPE = "Project";
+        private static final String WORKFLOW_EDIT = "WORKFLOW_EDIT";
+        private static final String WORKFLOW_VIEW = "WORKFLOW_VIEW";
+        private static final long WORKSPACE_ID = 7L;
+        private static final String WORKSPACE_TYPE = "Workspace";
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @MockitoBean
+        private ProjectDeploymentService projectDeploymentService;
+
+        @MockitoBean
+        private ProjectService projectService;
+
+        @BeforeEach
+        void authenticateAsNonAdmin() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "member", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            when(projectDeploymentService.getProjectDeployments(anyLong()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.create(any(Project.class))).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getProject(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getProjects(any(), any(), any(), any(), any(), any()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getWorkspaceProjectIds(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.update(any(Project.class))).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(preBuiltTemplateService.getPrebuiltTemplateData(anyString()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+        }
+
+        @AfterEach
+        void clearSecurityContext() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testEveryGuardedMethodHasACase() {
+            Set<String> guardedMethodNames = Arrays.stream(ProjectFacadeImpl.class.getDeclaredMethods())
+                .filter(method -> method.isAnnotationPresent(PreAuthorize.class))
+                .map(Method::getName)
+                .collect(Collectors.toSet());
+
+            assertThat(guardedMethodNames).isEqualTo(GUARDED_METHOD_NAMES);
+
+            for (Method method : ProjectFacade.class.getMethods()) {
+                if (GUARDED_METHOD_NAMES.contains(method.getName())) {
+                    assertThat(getImplementation(method).isAnnotationPresent(PreAuthorize.class))
+                        .as("every public overload of %s must be guarded", method.getName())
+                        .isTrue();
+                }
+            }
+        }
+
+        @Test
+        void testCreateProjectDeniesWithoutTheWorkspaceCreateScope() {
+            denyOnly(WORKSPACE_ID, WORKSPACE_TYPE, PROJECT_CREATE);
+
+            assertDenied(() -> projectFacade.createProject(newProjectDTO(null)));
+        }
+
+        @Test
+        void testCreateProjectAllowsWithTheWorkspaceCreateScope() {
+            grant(WORKSPACE_ID, WORKSPACE_TYPE, PROJECT_CREATE);
+
+            assertBodyReached(() -> projectFacade.createProject(newProjectDTO(null)));
+        }
+
+        @Test
+        void testDeleteProjectDeniesWithoutTheDeleteScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, PROJECT_DELETE);
+
+            assertDenied(() -> projectFacade.deleteProject(PROJECT_ID));
+        }
+
+        @Test
+        void testDeleteProjectAllowsWithTheDeleteScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, PROJECT_DELETE);
+
+            assertBodyReached(() -> projectFacade.deleteProject(PROJECT_ID));
+        }
+
+        @Test
+        void testDeleteSharedProjectDeniesWithoutTheSettingsScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, PROJECT_SETTINGS);
+
+            assertDenied(() -> projectFacade.deleteSharedProject(PROJECT_ID));
+        }
+
+        @Test
+        void testDeleteSharedProjectAllowsWithTheSettingsScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, PROJECT_SETTINGS);
+
+            assertBodyReached(() -> projectFacade.deleteSharedProject(PROJECT_ID));
+        }
+
+        @Test
+        void testDuplicateProjectDeniesWhenTheCallerHoldsOnlyTheViewScope() {
+            when(permissionService.hasResourceScope(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW)).thenReturn(true);
+            when(permissionService.hasResourceScope(PROJECT_ID, PROJECT_TYPE, PROJECT_CREATE)).thenReturn(false);
+
+            assertThatThrownBy(() -> projectFacade.duplicateProject(PROJECT_ID))
+                .as("a member holding WORKFLOW_VIEW but not PROJECT_CREATE must not create a project by duplicating " +
+                    "one")
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(PROJECT_ID, PROJECT_TYPE, PROJECT_CREATE);
+        }
+
+        @Test
+        void testDuplicateProjectAllowsWhenTheCallerHoldsBothScopes() {
+            when(permissionService.hasResourceScope(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW)).thenReturn(true);
+            when(permissionService.hasResourceScope(PROJECT_ID, PROJECT_TYPE, PROJECT_CREATE)).thenReturn(true);
+
+            assertThatThrownBy(() -> projectFacade.duplicateProject(PROJECT_ID))
+                .as("a member holding both WORKFLOW_VIEW and PROJECT_CREATE must be allowed to duplicate a project")
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+
+            verify(permissionService).hasResourceScope(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+            verify(permissionService).hasResourceScope(PROJECT_ID, PROJECT_TYPE, PROJECT_CREATE);
+        }
+
+        @Test
+        void testDuplicateProjectDeniesWhenTheCallerCannotReadTheSourceProject() {
+            when(permissionService.hasResourceScope(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW)).thenReturn(false);
+            when(permissionService.hasResourceScope(PROJECT_ID, PROJECT_TYPE, PROJECT_CREATE)).thenReturn(true);
+
+            assertThatThrownBy(() -> projectFacade.duplicateProject(PROJECT_ID))
+                .as("PROJECT_CREATE must not admit a caller who cannot read the project being copied")
+                .isInstanceOf(AccessDeniedException.class);
+
+            verify(permissionService).hasResourceScope(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+        }
+
+        @Test
+        void testDuplicateProjectDeniesWhenTheCallerHoldsNeitherScope() {
+            assertThatThrownBy(() -> projectFacade.duplicateProject(PROJECT_ID))
+                .as("a caller holding neither scope must be denied")
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testExportProjectDeniesWithoutTheViewScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.exportProject(PROJECT_ID));
+        }
+
+        @Test
+        void testExportProjectAllowsWithTheViewScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(() -> projectFacade.exportProject(PROJECT_ID));
+        }
+
+        @Test
+        void testExportSharedProjectDeniesWithoutTheSettingsScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, PROJECT_SETTINGS);
+
+            assertDenied(() -> projectFacade.exportSharedProject(PROJECT_ID, "description"));
+        }
+
+        @Test
+        void testExportSharedProjectAllowsWithTheSettingsScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, PROJECT_SETTINGS);
+
+            assertBodyReached(() -> projectFacade.exportSharedProject(PROJECT_ID, "description"));
+        }
+
+        @Test
+        void testGetProjectDeniesWithoutTheViewScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.getProject(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectAllowsWithTheViewScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(() -> projectFacade.getProject(PROJECT_ID));
+        }
+
+        @Test
+        void testGetProjectsDeniesANonAdminHoldingEveryResourceScope() {
+            when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(true);
+
+            assertDenied(() -> projectFacade.getProjects(null, null, null, null));
+
+            verify(permissionService).isTenantAdmin();
+        }
+
+        @Test
+        void testGetProjectsAllowsATenantAdmin() {
+            when(permissionService.isTenantAdmin()).thenReturn(true);
+
+            assertBodyReached(() -> projectFacade.getProjects(null, null, null, null));
+        }
+
+        @Test
+        void testGetWorkspaceProjectsDeniesWithoutTheWorkspaceViewScope() {
+            denyOnly(WORKSPACE_ID, WORKSPACE_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.getWorkspaceProjects(null, null, true, null, null, null, WORKSPACE_ID));
+        }
+
+        @Test
+        void testGetWorkspaceProjectsAllowsWithTheWorkspaceViewScope() {
+            grant(WORKSPACE_ID, WORKSPACE_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(
+                () -> projectFacade.getWorkspaceProjects(null, null, true, null, null, null, WORKSPACE_ID));
+        }
+
+        @Test
+        void testGetWorkspaceProjectWorkflowsDeniesWithoutTheWorkspaceViewScope() {
+            denyOnly(WORKSPACE_ID, WORKSPACE_TYPE, WORKFLOW_VIEW);
+
+            assertDenied(() -> projectFacade.getWorkspaceProjectWorkflows(WORKSPACE_ID));
+        }
+
+        @Test
+        void testGetWorkspaceProjectWorkflowsAllowsWithTheWorkspaceViewScope() {
+            grant(WORKSPACE_ID, WORKSPACE_TYPE, WORKFLOW_VIEW);
+
+            assertBodyReached(() -> projectFacade.getWorkspaceProjectWorkflows(WORKSPACE_ID));
+        }
+
+        @Test
+        void testImportProjectDeniesWithoutTheWorkspaceCreateScope() throws Exception {
+            byte[] projectData = createProjectData();
+
+            denyOnly(WORKSPACE_ID, WORKSPACE_TYPE, PROJECT_CREATE);
+
+            assertDenied(() -> projectFacade.importProject(projectData, WORKSPACE_ID));
+        }
+
+        @Test
+        void testImportProjectAllowsWithTheWorkspaceCreateScope() throws Exception {
+            byte[] projectData = createProjectData();
+
+            grant(WORKSPACE_ID, WORKSPACE_TYPE, PROJECT_CREATE);
+
+            assertBodyReached(() -> projectFacade.importProject(projectData, WORKSPACE_ID));
+        }
+
+        @Test
+        void testImportProjectTemplateDeniesWithoutTheWorkspaceCreateScope() {
+            denyOnly(WORKSPACE_ID, WORKSPACE_TYPE, PROJECT_CREATE);
+
+            assertDenied(() -> projectFacade.importProjectTemplate("template", WORKSPACE_ID, false));
+        }
+
+        @Test
+        void testImportProjectTemplateAllowsWithTheWorkspaceCreateScope() {
+            grant(WORKSPACE_ID, WORKSPACE_TYPE, PROJECT_CREATE);
+
+            assertBodyReached(() -> projectFacade.importProjectTemplate("template", WORKSPACE_ID, false));
+        }
+
+        @Test
+        void testPublishProjectDeniesWithoutTheEditScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_EDIT);
+
+            assertDenied(() -> projectFacade.publishProject(PROJECT_ID, "description", false));
+        }
+
+        @Test
+        void testPublishProjectAllowsWithTheEditScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_EDIT);
+
+            assertBodyReached(() -> projectFacade.publishProject(PROJECT_ID, "description", false));
+        }
+
+        @Test
+        void testUpdateProjectDeniesWithoutTheEditScope() {
+            denyOnly(PROJECT_ID, PROJECT_TYPE, WORKFLOW_EDIT);
+
+            assertDenied(() -> projectFacade.updateProject(newProjectDTO(PROJECT_ID)));
+        }
+
+        @Test
+        void testUpdateProjectAllowsWithTheEditScope() {
+            grant(PROJECT_ID, PROJECT_TYPE, WORKFLOW_EDIT);
+
+            assertBodyReached(() -> projectFacade.updateProject(newProjectDTO(PROJECT_ID)));
+        }
+
+        private void assertBodyReached(ThrowingCallable call) {
+            assertThatThrownBy(call)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        private void assertDenied(ThrowingCallable call) {
+            assertThatThrownBy(call).isInstanceOf(AccessDeniedException.class);
+        }
+
+        private byte[] createProjectData() throws Exception {
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                try (ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+                    zipOutputStream.putNextEntry(new ZipEntry("project.json"));
+                    zipOutputStream.write("{\"name\":\"imported\"}".getBytes(StandardCharsets.UTF_8));
+                    zipOutputStream.closeEntry();
+
+                    zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+                    zipOutputStream.write("\"{}\"".getBytes(StandardCharsets.UTF_8));
+                    zipOutputStream.closeEntry();
+                }
+
+                return byteArrayOutputStream.toByteArray();
+            }
+        }
+
+        private void denyOnly(long targetId, String targetType, String scope) {
+            when(permissionService.isTenantAdmin()).thenReturn(false);
+            when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(true);
+            when(permissionService.hasResourceScope(targetId, targetType, scope)).thenReturn(false);
+        }
+
+        private Method getImplementation(Method method) {
+            try {
+                return ProjectFacadeImpl.class.getMethod(method.getName(), method.getParameterTypes());
+            } catch (NoSuchMethodException noSuchMethodException) {
+                throw new IllegalStateException(noSuchMethodException);
+            }
+        }
+
+        private void grant(long targetId, String targetType, String scope) {
+            when(permissionService.hasResourceScope(targetId, targetType, scope)).thenReturn(true);
+        }
+
+        private ProjectDTO newProjectDTO(Long id) {
+            return ProjectDTO.builder()
+                .id(id)
+                .name("project")
+                .workspaceId(WORKSPACE_ID)
+                .build();
+        }
+
+        @EnableMethodSecurity
+        static class Config {
+        }
     }
 }
