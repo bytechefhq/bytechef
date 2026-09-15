@@ -1,19 +1,63 @@
 import {Collapsible} from '@/components/ui/collapsible';
 import {TooltipProvider} from '@/components/ui/tooltip';
-import ProjectListItem from '@/pages/automation/projects/components/project-list/ProjectListItem';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
-import {fireEvent, render, screen} from '@/shared/util/test-utils';
+import {fireEvent, render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
-import {expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+
+import ProjectListItem from '../ProjectListItem';
+
+const ALL_SCOPES = [
+    'DEPLOYMENT_CREATE',
+    'PROJECT_CREATE',
+    'PROJECT_DELETE',
+    'PROJECT_PUBLISH',
+    'PROJECT_PULL',
+    'PROJECT_SETTINGS',
+    'WORKFLOW_CREATE',
+    'WORKFLOW_EDIT',
+    'WORKSPACE_MANAGE',
+];
 
 const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
 }));
 
+const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
+
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
+vi.mock('@tanstack/react-query', async () => {
+    const actual = await vi.importActual('@tanstack/react-query');
+
+    return {
+        ...actual,
+        useQueryClient: () => ({cancelQueries: vi.fn(), invalidateQueries: vi.fn(), removeQueries: vi.fn()}),
+    };
+});
+
+vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
+    useWorkspaceStore: (selector: (state: {currentWorkspaceId: number}) => unknown) =>
+        selector({currentWorkspaceId: 1}),
+}));
+
+vi.mock('@/ee/shared/mutations/automation/projectGit.mutations', () => ({
+    usePullProjectFromGitMutation: () => ({mutate: vi.fn()}),
+    useUpdateProjectGitConfigurationMutation: () => ({mutate: vi.fn()}),
+}));
+
+vi.mock('@/ee/shared/mutations/automation/projectGit.queries', () => ({
+    ProjectGitConfigurationKeys: {projectGitConfigurations: ['projectGitConfigurations']},
 }));
 
 vi.mock('@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog', () => ({
@@ -24,7 +68,7 @@ vi.mock('@/pages/automation/project-deployments/components/project-deployment-di
     }: {
         onSuccess: (deploymentId: number, environmentId?: number) => void;
         redirectOnSubmit?: boolean;
-        triggerNode: React.ReactNode;
+        triggerNode: ReactNode;
     }) => (
         <>
             {triggerNode}
@@ -52,56 +96,221 @@ vi.mock('@/pages/automation/project/components/ProjectDeploymentsSheet', () => (
     ),
 }));
 
-const project = {
-    id: 7,
+vi.mock('@/pages/automation/project/components/ProjectGitConfigurationDialog', () => ({
+    default: () => null,
+}));
+
+vi.mock('@/pages/automation/project/components/ProjectShareDialog', () => ({
+    ProjectShareDialog: () => null,
+}));
+
+vi.mock('@/pages/automation/project/hooks/useConverterN8nToWorkflow', () => ({
+    useConvertN8nToWorkflow: () => ({convertN8nWorkflow: vi.fn()}),
+}));
+
+vi.mock('@/pages/automation/project/utils/handleImportN8nWorkflow', () => ({default: vi.fn()}));
+
+vi.mock('@/pages/automation/project/utils/handleImportWorkflow', () => ({default: vi.fn()}));
+
+vi.mock('@/pages/automation/projects/components/ProjectPublishDialog', () => ({default: () => null}));
+
+vi.mock('@/pages/automation/projects/components/ProjectDialog', () => ({default: () => null}));
+
+vi.mock('@/shared/components/workflow/WorkflowDialog', () => ({default: () => null}));
+
+vi.mock('@/shared/edition/EEVersion', () => ({
+    default: ({children}: {children: ReactNode}) => <>{children}</>,
+}));
+
+vi.mock('@/shared/hooks/useAnalytics', () => ({
+    useAnalytics: () => ({captureProjectWorkflowCreated: vi.fn(), captureProjectWorkflowImported: vi.fn()}),
+}));
+
+vi.mock('@/shared/hooks/useHasEnabledAiProvider', () => ({
+    useHasEnabledAiProvider: () => ({hasEnabledAiProvider: true, isPending: false}),
+}));
+
+vi.mock('@/shared/mutations/automation/projectTags.mutations', () => ({
+    useUpdateProjectTagsMutation: () => ({mutate: vi.fn()}),
+}));
+
+vi.mock('@/shared/mutations/automation/projects.mutations', () => ({
+    useDeleteProjectMutation: () => ({mutate: vi.fn()}),
+    useDuplicateProjectMutation: () => ({mutate: vi.fn()}),
+}));
+
+vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
+    useCreateProjectWorkflowMutation: () => ({mutate: vi.fn()}),
+}));
+
+vi.mock('@/shared/queries/automation/projectCategories.queries', () => ({
+    ProjectCategoryKeys: {projectCategories: (workspaceId: number) => ['projectCategories', workspaceId]},
+}));
+
+vi.mock('@/shared/queries/automation/projectDeployments.queries', () => ({
+    useGetWorkspaceProjectDeploymentsQuery: () => ({data: [], isFetching: false, refetch: vi.fn()}),
+}));
+
+vi.mock('@/shared/queries/automation/projectTags.queries', () => ({
+    ProjectTagKeys: {projectTags: ['projectTags']},
+}));
+
+vi.mock('@/shared/queries/automation/projects.queries', () => ({
+    ProjectKeys: {project: (id: number) => ['projects', id], projects: ['projects']},
+}));
+
+vi.mock('@/shared/queries/automation/workflows.queries', () => ({
+    useGetWorkflowQuery: () => ({data: null}),
+}));
+
+vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
+    useApplicationInfoStore: () => undefined,
+}));
+
+vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
+    useFeatureFlagsStore: () => () => true,
+}));
+
+vi.mock('@/shared/components/TagList', () => ({
+    default: ({readOnly}: {readOnly?: boolean}) => (
+        <div data-read-only={readOnly ? 'true' : 'false'} data-testid="tag-list" />
+    ),
+}));
+
+const project: Project = {
+    id: 1,
     lastProjectVersion: 2,
-    lastPublishedDate: new Date(),
-    name: 'Orders',
-    projectWorkflowIds: [1],
-} as Project;
+    lastPublishedDate: new Date('2024-01-15T10:00:00'),
+    name: 'Test Project',
+    projectWorkflowIds: [],
+    tags: [],
+    workspaceId: 1049,
+};
 
 const renderProjectListItem = () =>
     render(
         <MemoryRouter>
             <TooltipProvider>
                 <Collapsible>
-                    <ProjectListItem project={project} remainingTags={[]} />
+                    <ProjectListItem project={project} />
                 </Collapsible>
             </TooltipProvider>
         </MemoryRouter>
     );
 
-it('opens the project deployments sheet from the deployments button', () => {
-    renderProjectListItem();
+const openProjectActionsMenu = async () => {
+    await userEvent.click(screen.getByRole('button', {name: 'More Project Actions'}));
+};
 
-    fireEvent.click(screen.getByLabelText('Project Deployments'));
+beforeEach(() => {
+    hoistedScope.grantedScopes = [...ALL_SCOPES];
 
-    expect(screen.getByText('Deployments sheet none')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Close sheet'));
-
-    expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+    windowResizeObserver();
 });
 
-it('opens the project deployments sheet on a saved development deployment', () => {
-    renderProjectListItem();
-
-    fireEvent.click(screen.getByText('Save deployment false'));
-
-    expect(screen.getByText('Deployments sheet 42')).toBeInTheDocument();
+afterEach(() => {
+    resetAll();
+    vi.clearAllMocks();
 });
 
-it('opens the deployments page in production after deploying to production', () => {
-    environmentStore.setState({currentEnvironmentId: 0});
-    hoisted.navigate.mockReset();
+describe('ProjectListItem', () => {
+    it('shows every gated control when all scopes are granted', async () => {
+        renderProjectListItem();
 
-    renderProjectListItem();
+        expect(screen.getByRole('button', {name: 'Deploy'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Create Workflow'})).toBeInTheDocument();
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'false');
 
-    fireEvent.click(screen.getByText('Save production deployment false'));
+        await openProjectActionsMenu();
 
-    expect(environmentStore.getState().currentEnvironmentId).toBe(2);
-    expect(hoisted.navigate).toHaveBeenCalledWith('/automation/deployments?projectId=7', {
-        state: {projectDeploymentId: 43},
+        for (const name of [
+            'Publish Project',
+            'Edit Project',
+            'Duplicate Project',
+            'Share Project',
+            'Export Project',
+            'Pull Project from Git',
+            'Git Configuration',
+            'Delete Project',
+        ]) {
+            expect(screen.getByRole('menuitem', {name})).toBeInTheDocument();
+        }
     });
-    expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+
+    it('hides every gated control when no scope is granted, leaving Export', async () => {
+        hoistedScope.grantedScopes = [];
+
+        renderProjectListItem();
+
+        expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Create Workflow'})).not.toBeInTheDocument();
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
+
+        await openProjectActionsMenu();
+
+        expect(screen.getByRole('menuitem', {name: 'Export Project'})).toBeInTheDocument();
+
+        for (const name of [
+            'Publish Project',
+            'Edit Project',
+            'Duplicate Project',
+            'Share Project',
+            'Pull Project from Git',
+            'Git Configuration',
+            'Delete Project',
+        ]) {
+            expect(screen.queryByRole('menuitem', {name})).not.toBeInTheDocument();
+        }
+    });
+
+    it('hides Publish and Deploy when WORKFLOW_EDIT is missing even with PROJECT_PUBLISH and DEPLOYMENT_CREATE', async () => {
+        hoistedScope.grantedScopes = ALL_SCOPES.filter((scope) => scope !== 'WORKFLOW_EDIT');
+
+        renderProjectListItem();
+
+        expect(screen.queryByRole('button', {name: 'Deploy'})).not.toBeInTheDocument();
+
+        await openProjectActionsMenu();
+
+        expect(screen.queryByRole('menuitem', {name: 'Publish Project'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Edit Project'})).not.toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete Project'})).toBeInTheDocument();
+    });
+});
+
+describe('ProjectListItem deployments', () => {
+    it('opens the project deployments sheet from the deployments button', () => {
+        renderProjectListItem();
+
+        fireEvent.click(screen.getByLabelText('Project Deployments'));
+
+        expect(screen.getByText('Deployments sheet none')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Close sheet'));
+
+        expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+    });
+
+    it('opens the project deployments sheet on a saved development deployment', () => {
+        renderProjectListItem();
+
+        fireEvent.click(screen.getByText('Save deployment false'));
+
+        expect(screen.getByText('Deployments sheet 42')).toBeInTheDocument();
+    });
+
+    it('opens the deployments page in production after deploying to production', () => {
+        environmentStore.setState({currentEnvironmentId: 0});
+        hoisted.navigate.mockReset();
+
+        renderProjectListItem();
+
+        fireEvent.click(screen.getByText('Save production deployment false'));
+
+        expect(environmentStore.getState().currentEnvironmentId).toBe(2);
+        expect(hoisted.navigate).toHaveBeenCalledWith('/automation/deployments?projectId=1', {
+            state: {projectDeploymentId: 43},
+        });
+        expect(screen.queryByText(/Deployments sheet/)).not.toBeInTheDocument();
+    });
 });
