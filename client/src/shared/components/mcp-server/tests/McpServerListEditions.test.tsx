@@ -20,6 +20,10 @@ const hoisted = vi.hoisted(() => ({
     useMcpServerList: (mcpServers: unknown[]) => ({createHandleRefresh: () => () => {}, sortedMcpServers: mcpServers}),
 }));
 
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => true,
+}));
+
 vi.mock('@/components/ui/collapsible', () => ({
     Collapsible: hoisted.renderChildren,
     CollapsibleContent: hoisted.renderChildren,
