@@ -25,9 +25,11 @@ import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
@@ -46,12 +48,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class McpComponentServiceImpl implements McpComponentService {
 
     private final McpComponentRepository mcpComponentRepository;
+    private final List<McpComponentConnectionUsageChecker> mcpComponentConnectionUsageCheckers;
     private final McpToolRepository mcpToolRepository;
 
+    @SuppressFBWarnings("EI")
     public McpComponentServiceImpl(
-        McpComponentRepository mcpComponentRepository, McpToolRepository mcpToolRepository) {
+        McpComponentRepository mcpComponentRepository,
+        List<McpComponentConnectionUsageChecker> mcpComponentConnectionUsageCheckers,
+        McpToolRepository mcpToolRepository) {
 
         this.mcpComponentRepository = mcpComponentRepository;
+        this.mcpComponentConnectionUsageCheckers = mcpComponentConnectionUsageCheckers;
         this.mcpToolRepository = mcpToolRepository;
     }
 
@@ -65,6 +72,7 @@ public class McpComponentServiceImpl implements McpComponentService {
     @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent) {
         validateNotOnServer(mcpComponent);
+        checkConnectionUsage(mcpComponent.getMcpServerId(), mcpComponent.getConnectionId());
 
         return saveNew(mcpComponent);
     }
@@ -101,6 +109,8 @@ public class McpComponentServiceImpl implements McpComponentService {
         McpComponent mcpComponent, @Nullable Set<String> requiredAuthorities, List<McpTool> mcpTools) {
 
         McpComponent currentMcpComponent = OptionalUtils.get(mcpComponentRepository.findById(mcpComponent.getId()));
+
+        checkConnectionUsage(currentMcpComponent.getMcpServerId(), mcpComponent.getConnectionId());
 
         currentMcpComponent.setConnectionId(mcpComponent.getConnectionId());
         currentMcpComponent.setVersion(mcpComponent.getVersion());
@@ -169,6 +179,18 @@ public class McpComponentServiceImpl implements McpComponentService {
     @Override
     public List<McpComponent> getMcpServerMcpComponents(long mcpServerId) {
         return mcpComponentRepository.findAllByMcpServerId(mcpServerId);
+    }
+
+    private void checkConnectionUsage(Long mcpServerId, Long connectionId) {
+        if (connectionId == null) {
+            return;
+        }
+
+        for (McpComponentConnectionUsageChecker mcpComponentConnectionUsageChecker : mcpComponentConnectionUsageCheckers) {
+
+            mcpComponentConnectionUsageChecker.checkConnectionUsage(
+                Objects.requireNonNull(mcpServerId, "mcpServerId"), connectionId);
+        }
     }
 
     private static String getAlreadyOnServerMessage(McpComponent mcpComponent) {

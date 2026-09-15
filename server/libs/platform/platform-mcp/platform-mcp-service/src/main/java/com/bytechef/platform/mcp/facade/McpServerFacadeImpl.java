@@ -99,7 +99,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteMcpServer(long mcpServerId) {
         checkMcpServerSharedAdministration(mcpServerId);
 
