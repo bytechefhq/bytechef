@@ -27,8 +27,18 @@ vi.mock('../KnowledgeBaseDocumentListItemDropdownMenu', () => ({
     default: ({documentId}: {documentId: string}) => <div data-testid={`dropdown-${documentId}`}>Dropdown</div>,
 }));
 
+const hoistedScope = vi.hoisted(() => ({canEditKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditKnowledgeBase,
+}));
+
 vi.mock('@/shared/components/TagList', () => ({
-    default: () => <div data-testid="tag-list">Tag List</div>,
+    default: ({readOnly}: {readOnly?: boolean}) => (
+        <div data-read-only={String(Boolean(readOnly))} data-testid="tag-list">
+            Tag List
+        </div>
+    ),
 }));
 
 vi.mock('@/components/ui/collapsible', () => ({
@@ -78,6 +88,8 @@ const defaultTagListMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.canEditKnowledgeBase = true;
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBaseDocumentListItem.mockReturnValue({...defaultListItemMockReturn});
     hoisted.mockUseKnowledgeBaseDocumentListItemTagList.mockReturnValue({...defaultTagListMockReturn});
@@ -144,6 +156,15 @@ describe('KnowledgeBaseDocumentListItem', () => {
         renderComponent();
 
         expect(screen.getByTestId('tag-list')).toBeInTheDocument();
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'false');
+    });
+
+    it('renders a read-only tag list without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.canEditKnowledgeBase = false;
+
+        renderComponent();
+
+        expect(screen.getByTestId('tag-list')).toHaveAttribute('data-read-only', 'true');
     });
 
     it('renders the collapsible trigger', () => {

@@ -7,6 +7,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import useKnowledgeBaseDocumentListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentListItemDropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
 
 interface KnowledgeBaseDocumentListItemDropdownMenuProps {
@@ -14,7 +16,15 @@ interface KnowledgeBaseDocumentListItemDropdownMenuProps {
 }
 
 const KnowledgeBaseDocumentListItemDropdownMenu = ({documentId}: KnowledgeBaseDocumentListItemDropdownMenuProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {handleDelete} = useKnowledgeBaseDocumentListItemDropdownMenu({documentId});
+
+    const canEditKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_EDIT');
+
+    if (!canEditKnowledgeBase) {
+        return null;
+    }
 
     return (
         <DropdownMenu>
