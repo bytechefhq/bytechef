@@ -3,6 +3,7 @@ import {
     initializeClusterElementsObject,
 } from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -63,6 +64,7 @@ export default function useDataStreamMapping() {
     );
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const queryClient = useQueryClient();
 
@@ -316,7 +318,7 @@ export default function useDataStreamMapping() {
     ]);
 
     useEffect(() => {
-        if (processor || !hasSourceAndDestination || processorCreationInProgressRef.current) {
+        if (readOnly || processor || !hasSourceAndDestination || processorCreationInProgressRef.current) {
             return;
         }
 
@@ -441,6 +443,7 @@ export default function useDataStreamMapping() {
         mainClusterRootComponentDefinition,
         processor,
         queryClient,
+        readOnly,
         rootClusterElementNodeData,
         setCurrentNode,
         setRootClusterElementNodeData,
