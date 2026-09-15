@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -21,6 +22,13 @@ public interface ApiCollectionService {
     ApiCollection create(ApiCollection apiCollection);
 
     void delete(long id);
+
+    /**
+     * The fail-soft counterpart of {@link #getApiCollection(long)}, for authorization callers: an ownership resolver
+     * must fail closed on an absent collection rather than throw, and the throw would cross this service's
+     * transactional proxy and mark the caller's own participating transaction rollback-only.
+     */
+    Optional<ApiCollection> fetchApiCollection(long id);
 
     ApiCollection getApiCollection(long id);
 

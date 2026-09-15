@@ -29,6 +29,7 @@ import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -77,5 +78,20 @@ class ApiKeyServiceTest {
 
         verify(apiKeyRepository).deleteById(7L);
         verify(apiKeyAuditPublisher).publish(ApiKeyAuditEvent.API_KEY_DELETED, 7L);
+    }
+
+    @Test
+    void testExistsMatchesOnlyAKeyOfTheRequestedType() {
+        ApiKey automationApiKey = new ApiKey();
+
+        automationApiKey.setType(PlatformType.AUTOMATION);
+
+        when(apiKeyRepository.findBySecretKeyAndEnvironment("secret-key", 1))
+            .thenReturn(Optional.of(automationApiKey));
+        when(apiKeyRepository.existsBySecretKeyAndEnvironmentAndType(
+            "secret-key", 1, PlatformType.AUTOMATION.ordinal())).thenReturn(true);
+
+        assertThat(apiKeyService.exists("secret-key", 1L, PlatformType.EMBEDDED)).isFalse();
+        assertThat(apiKeyService.exists("secret-key", 1L, PlatformType.AUTOMATION)).isTrue();
     }
 }
