@@ -4,6 +4,7 @@ import {UpdateWorkflowMutationType, WorkflowDefinitionType} from '@/shared/types
 
 import useWorkflowDataStore, {WorkflowDataType, setWorkflowWithoutHistory} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface HandleDeleteTriggerProps {
@@ -21,6 +22,10 @@ export default function handleDeleteTrigger({
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTriggerProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     if (!workflow?.definition) {
         return;
     }
