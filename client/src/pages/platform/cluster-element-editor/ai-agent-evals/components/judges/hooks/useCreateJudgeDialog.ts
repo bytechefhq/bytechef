@@ -5,6 +5,7 @@ import {
     useGetClusterElementDefinitionQuery,
     useGetRootComponentClusterElementDefinitions,
 } from '@/shared/queries/platform/clusterElementDefinitions.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useMemo, useState} from 'react';
 
 import type {StringProperty} from '@/shared/middleware/platform/configuration';
@@ -50,6 +51,7 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
     const [toolName, setToolName] = useState(String(editConfig.toolName ?? ''));
     const [toolPosition, setToolPosition] = useState(String(editConfig.position ?? 'ANYWHERE'));
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {data: modelProviders = []} = useGetRootComponentClusterElementDefinitions(
@@ -58,7 +60,7 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
     );
 
     const {data: allConnections = []} = useGetWorkspaceConnectionsQuery(
-        {componentName: provider || undefined, id: currentWorkspaceId!},
+        {componentName: provider || undefined, environmentId: currentEnvironmentId, id: currentWorkspaceId!},
         judgeType === AiAgentJudgeType.LlmRule && currentWorkspaceId != null && !!provider
     );
 
