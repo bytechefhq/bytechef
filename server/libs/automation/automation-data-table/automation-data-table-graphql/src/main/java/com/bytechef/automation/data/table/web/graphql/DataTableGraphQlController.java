@@ -25,7 +25,6 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,15 +45,12 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableGraphQlController {
 
-    private final DataTableService dataTableService;
     private final EnvironmentService environmentService;
     private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     public DataTableGraphQlController(
-        DataTableService dataTableService, EnvironmentService environmentService,
-        WorkspaceDataTableFacade workspaceDataTableFacade) {
+        EnvironmentService environmentService, WorkspaceDataTableFacade workspaceDataTableFacade) {
 
-        this.dataTableService = dataTableService;
         this.environmentService = environmentService;
         this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
@@ -81,11 +77,9 @@ public class DataTableGraphQlController {
         Long environmentId = input.environmentId();
 
         Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
         ColumnInput columnInput = input.column();
 
-        dataTableService.addColumn(baseName, columnInput.toSpec(), environment.ordinal());
+        workspaceDataTableFacade.addColumn(input.tableId(), columnInput.toSpec(), environment.ordinal());
 
         return true;
     }
@@ -117,9 +111,7 @@ public class DataTableGraphQlController {
         Long environmentId = input.environmentId();
 
         Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        dataTableService.dropTable(baseName, environment.ordinal());
+        workspaceDataTableFacade.dropTable(input.tableId(), environment.ordinal());
 
         return true;
     }
@@ -140,10 +132,9 @@ public class DataTableGraphQlController {
         Long environmentId = input.environmentId();
 
         Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
         String columnName = new String(urlDecodeBase64FromString(input.columnId()), UTF_8);
 
-        dataTableService.removeColumn(baseName, columnName, environment.ordinal());
+        workspaceDataTableFacade.removeColumn(input.tableId(), columnName, environment.ordinal());
 
         return true;
     }
@@ -153,10 +144,9 @@ public class DataTableGraphQlController {
         Long environmentId = input.environmentId();
 
         Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
         String fromColumnName = new String(urlDecodeBase64FromString(input.columnId()), UTF_8);
 
-        dataTableService.renameColumn(baseName, fromColumnName, input.newName(), environment.ordinal());
+        workspaceDataTableFacade.renameColumn(input.tableId(), fromColumnName, input.newName(), environment.ordinal());
 
         return true;
     }
@@ -166,9 +156,7 @@ public class DataTableGraphQlController {
         Long environmentId = input.environmentId();
 
         Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        dataTableService.renameTable(baseName, input.newBaseName(), environment.ordinal());
+        workspaceDataTableFacade.renameTable(input.tableId(), input.newBaseName(), environment.ordinal());
 
         return true;
     }
