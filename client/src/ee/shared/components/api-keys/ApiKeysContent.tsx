@@ -11,7 +11,14 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {KeyIcon} from 'lucide-react';
 import {useShallow} from 'zustand/react/shallow';
 
-const ApiKeysContent = ({description, title}: {description: string; title: string}) => {
+interface ApiKeysContentProps {
+    canCreate?: boolean;
+    canDelete?: boolean;
+    description: string;
+    title: string;
+}
+
+const ApiKeysContent = ({canCreate = true, canDelete = true, description, title}: ApiKeysContentProps) => {
     const {setShowEditDialog, showDeleteDialog, showEditDialog} = useApiKeysStore(
         useShallow((state) => ({
             setShowEditDialog: state.setShowEditDialog,
@@ -31,7 +38,9 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                         description={description}
                         position="main"
                         right={
-                            apiKeys && apiKeys.length > 0 && <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />
+                            canCreate &&
+                            apiKeys &&
+                            apiKeys.length > 0 && <ApiKeyDialog triggerNode={<Button>New API Key</Button>} />
                         }
                         title={title}
                     />
@@ -39,10 +48,12 @@ const ApiKeysContent = ({description, title}: {description: string; title: strin
                 leftSidebarOpen={false}
             >
                 {apiKeys && apiKeys.length > 0 ? (
-                    <ApiKeyTable apiKeys={apiKeys} />
+                    <ApiKeyTable apiKeys={apiKeys} canDelete={canDelete} />
                 ) : (
                     <EmptyList
-                        button={<Button onClick={() => setShowEditDialog(true)}>New API Key</Button>}
+                        button={
+                            canCreate ? <Button onClick={() => setShowEditDialog(true)}>New API Key</Button> : undefined
+                        }
                         icon={<KeyIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new API key."
                         title="No API Keys"
