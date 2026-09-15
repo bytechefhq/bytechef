@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
@@ -6,4 +7,6 @@ dependencies {
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
 }

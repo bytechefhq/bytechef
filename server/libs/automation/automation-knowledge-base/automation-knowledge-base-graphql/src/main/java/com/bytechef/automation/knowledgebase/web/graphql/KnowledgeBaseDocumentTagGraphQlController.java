@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -47,11 +48,13 @@ public class KnowledgeBaseDocumentTagGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
     public List<String> knowledgeBaseDocumentTags(@Argument Long knowledgeBaseId) {
         return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseId(knowledgeBaseId);
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
     public List<KnowledgeBaseDocumentTagsEntry> knowledgeBaseDocumentTagsByDocument(@Argument Long knowledgeBaseId) {
         return knowledgeBaseDocumentTagService.getTagNamesByKnowledgeBaseDocumentId(knowledgeBaseId)
             .entrySet()
@@ -61,6 +64,7 @@ public class KnowledgeBaseDocumentTagGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.knowledgeBaseDocumentId, 'KnowledgeBaseDocument', 'KNOWLEDGE_BASE_EDIT')")
     public boolean updateKnowledgeBaseDocumentTags(@Argument UpdateKnowledgeBaseDocumentTagsInput input) {
         List<String> tagNames = input.tags() == null ? List.of() : input.tags();
 

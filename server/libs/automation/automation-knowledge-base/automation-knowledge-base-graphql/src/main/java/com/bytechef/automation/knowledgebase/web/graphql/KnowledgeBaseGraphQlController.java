@@ -33,6 +33,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -75,12 +76,14 @@ class KnowledgeBaseGraphQlController {
     }
 
     @QueryMapping
-    KnowledgeBase knowledgeBase(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
+    public KnowledgeBase knowledgeBase(@Argument Long id) {
         return knowledgeBaseService.getKnowledgeBase(id);
     }
 
     @QueryMapping
-    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
+    public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
         @Argument Long id, @Argument String query, @Argument String metadataFilters) {
 
         return knowledgeBaseFacade.searchKnowledgeBase(id, query, metadataFilters);
@@ -96,7 +99,8 @@ class KnowledgeBaseGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
+    public KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(id, knowledgeBase);
     }
 

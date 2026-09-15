@@ -81,6 +81,7 @@ class PermissionScopeGateCoverageTest {
         "hasAuthority",
         "hasPermission",
         "hasResourceScopeInEnvironment",
+        "hasResourceScopeInEnvironmentId",
         "hasWorkspaceScopeInEnvironment",
         "hasWorkspaceScopeInEnvironmentId",
         "hasWorkflowScope",
@@ -113,7 +114,8 @@ class PermissionScopeGateCoverageTest {
      * own pattern rather than sharing the one above: that pattern ends at a literal {@code (}, which the {@code Id}
      * suffix defeats, so a shared pattern would read no scope at all out of this function and every scope named only
      * here would look uncatalogued.</li>
-     * <li>{@code hasResourceScopeInEnvironment(id, 'Type', 'SCOPE', environment)} — third of four.</li>
+     * <li>{@code hasResourceScopeInEnvironment(id, 'Type', 'SCOPE', environment)} — third of four, and the same for its
+     * {@code InEnvironmentId} sibling, which needs its own pattern for the reason given above.</li>
      * <li>{@code hasWorkflowScope(workflowId, 'SCOPE')} — second of two.</li>
      * <li>{@code hasWorkflowScopeInEnvironment(workflowId, 'SCOPE', environment)} — second of three.</li>
      * <li>{@code hasWorkflowScopeIfProjectWorkflowInEnvironment(workflowId, 'SCOPE', environment)} and its
@@ -136,6 +138,9 @@ class PermissionScopeGateCoverageTest {
         Pattern.compile("hasWorkspaceScopeInEnvironmentId\\(\\s*[^,()]+?,\\s*" + SCOPE_GROUP + "\\s*,"),
         Pattern.compile(
             "hasResourceScopeInEnvironment\\(\\s*[^,()]+?,\\s*'[A-Za-z][A-Za-z0-9]*'\\s*,\\s*" + SCOPE_GROUP
+                + "\\s*,"),
+        Pattern.compile(
+            "hasResourceScopeInEnvironmentId\\(\\s*[^,()]+?,\\s*'[A-Za-z][A-Za-z0-9]*'\\s*,\\s*" + SCOPE_GROUP
                 + "\\s*,"));
 
     private static final Pattern GATE_FUNCTION_CALL = Pattern.compile("(@?[A-Za-z_][A-Za-z0-9_.]*)\\(");
