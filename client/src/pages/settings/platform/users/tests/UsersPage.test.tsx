@@ -89,10 +89,14 @@ beforeEach(() => {
         handleInvite: vi.fn(),
         handleOpen: hoisted.handleInviteDialogOpen,
         handleRoleChange: vi.fn(),
+        handleWorkspaceRoleChange: vi.fn(),
+        handleWorkspaceToggle: vi.fn(),
         inviteDisabled: true,
         inviteEmail: '',
         inviteRole: null,
+        inviteWorkspaces: [],
         open: false,
+        workspaces: [],
     });
 });
 
@@ -180,8 +184,8 @@ describe('UsersPage', () => {
         it('should render user roles', () => {
             render(<UsersPage />);
 
-            expect(screen.getByText('ROLE_ADMIN')).toBeInTheDocument();
-            expect(screen.getByText('ROLE_USER')).toBeInTheDocument();
+            expect(screen.getByText('Admin')).toBeInTheDocument();
+            expect(screen.getByText('User')).toBeInTheDocument();
         });
 
         it('should render user status', () => {
