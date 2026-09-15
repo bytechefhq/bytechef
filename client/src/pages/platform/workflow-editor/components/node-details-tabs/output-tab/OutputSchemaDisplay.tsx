@@ -10,6 +10,7 @@ import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {ButtonGroup} from '@/components/ui/button-group';
 import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {MoreHorizontalIcon, TriangleAlertIcon} from 'lucide-react';
 import {ReactNode} from 'react';
@@ -76,6 +77,8 @@ const OutputSchemaDisplay = ({
     variablePropertiesDefined,
     variableSampleOutput,
 }: OutputSchemaDisplayProps) => {
+    const readOnly = useWorkflowEditorReadOnly();
+
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
     const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
 
@@ -93,70 +96,75 @@ const OutputSchemaDisplay = ({
                     <div className="mb-2 flex items-center justify-between">
                         <h3 className="text-sm text-content-neutral-secondary">Output Schema</h3>
 
-                        <ButtonGroup>
-                            {testable &&
-                                (clusterElementTestButtonShown ? (
-                                    <ClusterElementTestButton
-                                        clusterElementType={clusterElementType}
-                                        connectionMissing={connectionMissing}
-                                        currentNode={currentNode}
-                                        onSubmit={handleClusterElementTestSubmit}
-                                        properties={currentOperationProperties}
-                                        saving={!!saveClusterElementTestOutputMutationPending}
-                                    />
-                                ) : (
-                                    <OutputTabTestButton
-                                        className="rounded-r-none"
-                                        connectionMissing={connectionMissing}
-                                        label={`Test ${operationLabel}`}
-                                        missingRequiredProperties={missingRequiredProperties}
-                                        onClick={handleTestOperationClick}
-                                        pending={saveWorkflowNodeTestOutputMutation.isPending}
-                                        variant="outline"
-                                    />
-                                ))}
+                        {!readOnly && (
+                            <ButtonGroup>
+                                {testable &&
+                                    (clusterElementTestButtonShown ? (
+                                        <ClusterElementTestButton
+                                            clusterElementType={clusterElementType}
+                                            connectionMissing={connectionMissing}
+                                            currentNode={currentNode}
+                                            onSubmit={handleClusterElementTestSubmit}
+                                            properties={currentOperationProperties}
+                                            saving={!!saveClusterElementTestOutputMutationPending}
+                                        />
+                                    ) : (
+                                        <OutputTabTestButton
+                                            className="rounded-r-none"
+                                            connectionMissing={connectionMissing}
+                                            label={`Test ${operationLabel}`}
+                                            missingRequiredProperties={missingRequiredProperties}
+                                            onClick={handleTestOperationClick}
+                                            pending={saveWorkflowNodeTestOutputMutation.isPending}
+                                            variant="outline"
+                                        />
+                                    ))}
 
-                            {!testable && !isClusterElement && (
-                                <Button
-                                    disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                    label="Upload Sample Output"
-                                    onClick={() => setShowUploadDialog(true)}
-                                    variant="outline"
-                                />
-                            )}
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
+                                {!testable && !isClusterElement && (
                                     <Button
-                                        aria-label="More Options"
                                         disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                        icon={<MoreHorizontalIcon />}
-                                        size="icon"
+                                        label="Upload Sample Output"
+                                        onClick={() => setShowUploadDialog(true)}
                                         variant="outline"
                                     />
-                                </DropdownMenuTrigger>
+                                )}
 
-                                <DropdownMenuContent align="end" className="w-52">
-                                    <DropdownMenuGroup>
-                                        {testable && !isClusterElement && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            aria-label="More Options"
+                                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                            icon={<MoreHorizontalIcon />}
+                                            size="icon"
+                                            variant="outline"
+                                        />
+                                    </DropdownMenuTrigger>
+
+                                    <DropdownMenuContent align="end" className="w-52">
+                                        <DropdownMenuGroup>
+                                            {testable && !isClusterElement && (
+                                                <DropdownMenuItem
+                                                    label="Upload Sample Output"
+                                                    onClick={() => setShowUploadDialog(true)}
+                                                />
+                                            )}
+
                                             <DropdownMenuItem
-                                                label="Upload Sample Output"
-                                                onClick={() => setShowUploadDialog(true)}
+                                                label="Reset"
+                                                onClick={handlePredefinedOutputSchemaClick}
                                             />
-                                        )}
-
-                                        <DropdownMenuItem label="Reset" onClick={handlePredefinedOutputSchemaClick} />
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </ButtonGroup>
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
+                        )}
                     </div>
 
                     {testErrorAlert}
 
                     {testNotice}
 
-                    {testable && !clusterElementTestButtonShown && (
+                    {!readOnly && testable && !clusterElementTestButtonShown && (
                         <OutputTabTestBlockedNotice
                             className="mb-3"
                             connectionMissing={connectionMissing}
