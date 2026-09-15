@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -102,6 +103,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      * @return an {@link SseEmitter} instance that streams events such as start, error, and result to the client
      */
     @GetMapping(value = "/workflow-tests/{jobId}/attach", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     @SuppressFBWarnings(
         value = "CRLF_INJECTION_LOGS",
         justification = "jobId is Long (no CRLF), exception messages sanitized with StringUtils.sanitize")
