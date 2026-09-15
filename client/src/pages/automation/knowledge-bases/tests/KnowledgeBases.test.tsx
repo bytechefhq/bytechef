@@ -13,6 +13,12 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({canCreateKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canCreateKnowledgeBase,
+}));
+
 vi.mock('../components/hooks/useKnowledgeBases', () => ({
     default: hoisted.mockUseKnowledgeBases,
 }));
@@ -182,6 +188,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.canCreateKnowledgeBase = true;
+
     windowResizeObserver();
     hoisted.mockUseKnowledgeBases.mockReturnValue({...defaultMockReturn});
     hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
@@ -264,6 +272,14 @@ describe('KnowledgeBases', () => {
         render(<KnowledgeBases />);
 
         expect(screen.getByTestId('create-dialog-1049')).toBeInTheDocument();
+    });
+
+    it('hides create dialog in header without KNOWLEDGE_BASE_CREATE', () => {
+        hoistedScope.canCreateKnowledgeBase = false;
+
+        render(<KnowledgeBases />);
+
+        expect(screen.queryByTestId('create-dialog-1049')).not.toBeInTheDocument();
     });
 
     it('shows the getting-started guide without the sidebar when there are no knowledge bases', () => {

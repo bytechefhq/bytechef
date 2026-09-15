@@ -3,6 +3,12 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import KnowledgeBaseTabs from '../KnowledgeBaseTabs';
 
+const hoistedScope = vi.hoisted(() => ({canEditKnowledgeBase: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: () => hoistedScope.canEditKnowledgeBase,
+}));
+
 vi.mock('@/components/ui/tabs', () => ({
     Tabs: ({children, defaultValue}: {children: React.ReactNode; className?: string; defaultValue: string}) => (
         <div data-default-value={defaultValue} data-testid="tabs">
@@ -42,6 +48,8 @@ const mockDocuments = [
 ];
 
 beforeEach(() => {
+    hoistedScope.canEditKnowledgeBase = true;
+
     windowResizeObserver();
 });
 
@@ -81,6 +89,14 @@ describe('KnowledgeBaseTabs', () => {
         render(<KnowledgeBaseTabs documents={mockDocuments} knowledgeBaseId="kb-1" />);
 
         expect(screen.getByTestId('upload-dialog-kb-1')).toBeInTheDocument();
+    });
+
+    it('hides upload document dialog without KNOWLEDGE_BASE_EDIT', () => {
+        hoistedScope.canEditKnowledgeBase = false;
+
+        render(<KnowledgeBaseTabs documents={mockDocuments} knowledgeBaseId="kb-1" />);
+
+        expect(screen.queryByTestId('upload-dialog-kb-1')).not.toBeInTheDocument();
     });
 
     it('renders document list in documents tab', () => {

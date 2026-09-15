@@ -10,6 +10,7 @@ import {useNavigate} from 'react-router-dom';
 export const AI_PROVIDERS_PATH = '/automation/settings/ai-providers';
 
 interface KnowledgeBasesEmptyStateProps {
+    canCreateKnowledgeBase?: boolean;
     embeddingActive: boolean;
     workspaceId: string;
 }
@@ -18,7 +19,11 @@ interface KnowledgeBasesEmptyStateProps {
  * A knowledge base can only ingest documents once the environment has an embedding model, so a new user is shown both
  * steps: turning on an embedding provider, then creating the first knowledge base.
  */
-const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBasesEmptyStateProps) => {
+const KnowledgeBasesEmptyState = ({
+    canCreateKnowledgeBase = true,
+    embeddingActive,
+    workspaceId,
+}: KnowledgeBasesEmptyStateProps) => {
     const navigate = useNavigate();
 
     const steps: JourneyStepI[] = useMemo(
@@ -35,21 +40,22 @@ const KnowledgeBasesEmptyState = ({embeddingActive, workspaceId}: KnowledgeBases
                 status: embeddingActive ? 'complete' : 'current',
             },
             {
-                ...(embeddingActive && {
-                    action: (
-                        <CreateKnowledgeBaseDialog
-                            trigger={<Button label="Create Knowledge Base" size="sm" />}
-                            workspaceId={workspaceId}
-                        />
-                    ),
-                    description: 'Name it, then upload your documents.',
-                }),
+                ...(embeddingActive &&
+                    canCreateKnowledgeBase && {
+                        action: (
+                            <CreateKnowledgeBaseDialog
+                                trigger={<Button label="Create Knowledge Base" size="sm" />}
+                                workspaceId={workspaceId}
+                            />
+                        ),
+                        description: 'Name it, then upload your documents.',
+                    }),
                 id: 'createKnowledgeBase',
                 label: 'Create a knowledge base',
                 status: embeddingActive ? 'current' : 'upcoming',
             },
         ],
-        [embeddingActive, navigate, workspaceId]
+        [canCreateKnowledgeBase, embeddingActive, navigate, workspaceId]
     );
 
     return (
