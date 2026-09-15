@@ -1,4 +1,5 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
@@ -50,6 +51,7 @@ export default function useWorkflowInputs({
 
     const queryClient = useQueryClient();
     const {updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const {setWorkflow, workflow} = useWorkflowDataStore(
@@ -159,6 +161,10 @@ export default function useWorkflowInputs({
     }
 
     function saveWorkflowInput(formInput: WorkflowInputType) {
+        if (readOnly) {
+            return;
+        }
+
         const {getValues} = form;
 
         const inputFields: WorkflowInputType = {...formInput};
@@ -223,6 +229,10 @@ export default function useWorkflowInputs({
     }
 
     function deleteWorkflowInput(input: WorkflowInput) {
+        if (readOnly) {
+            return;
+        }
+
         const definitionObject: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
         const originalInputs: WorkflowInput[] = definitionObject.inputs ?? [];
