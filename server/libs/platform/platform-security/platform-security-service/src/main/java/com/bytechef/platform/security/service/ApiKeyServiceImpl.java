@@ -21,6 +21,7 @@ import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,8 +57,10 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     }
 
     @Override
-    public boolean exists(String secretKey, long environmentId) {
-        return apiKeyRepository.existsBySecretKeyAndEnvironment(secretKey, (int) environmentId);
+    public boolean exists(String secretKey, long environmentId, PlatformType type) {
+        Validate.notNull(type, "'type' must not be null");
+
+        return apiKeyRepository.existsBySecretKeyAndEnvironmentAndType(secretKey, (int) environmentId, type.ordinal());
     }
 
     @Override
@@ -76,6 +79,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApiKey> fetchApiKey(long id) {
+        return apiKeyRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ApiKey getApiKey(long id) {
         return apiKeyRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Api key not found for id: " + id));
@@ -89,6 +98,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         } else {
             return apiKeyRepository.findAllByEnvironmentAndType((int) environmentId, type.ordinal());
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ApiKey> getUserApiKeys(long userId) {
+        return apiKeyRepository.findAllByUserId(userId);
     }
 
     @Override

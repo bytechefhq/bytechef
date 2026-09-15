@@ -20,12 +20,12 @@ import com.bytechef.automation.configuration.domain.WorkspaceApiKey;
 import com.bytechef.automation.configuration.service.WorkspaceApiKeyService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,8 +50,9 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_CREATE')")
     public String create(long workspaceId, ApiKey apiKey) {
-        apiKey = apiKeyFacade.create(apiKey, PlatformType.AUTOMATION);
+        apiKey = apiKeyFacade.createAutomationApiKey(apiKey);
 
         workspaceApiKeyService.create(apiKey.getId(), workspaceId);
 
@@ -59,12 +60,14 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#apiKeyId, 'ApiKey', 'API_KEY_DELETE')")
     public void delete(long apiKeyId) {
         workspaceApiKeyService.deleteWorkspaceApiKey(apiKeyId);
         apiKeyService.delete(apiKeyId);
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'API_KEY_VIEW', #environmentId)")
     public List<ApiKey> getApiKeys(long workspaceId, long environmentId) {
         List<Long> apiKeyIds = CollectionUtils.map(
             workspaceApiKeyService.getWorkspaceApiKeys(workspaceId), WorkspaceApiKey::getApiKeyId);
