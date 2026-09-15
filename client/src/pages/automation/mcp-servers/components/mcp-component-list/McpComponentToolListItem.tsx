@@ -1,8 +1,10 @@
 import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {McpTool} from '@/shared/middleware/graphql';
 import {BoltIcon, Trash2Icon} from 'lucide-react';
 
@@ -25,6 +27,10 @@ const McpComponentToolListItem = ({
     description,
     mcpTool,
 }: McpComponentToolListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
     const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} = useMcpProjectComponentToolDropdownMenu({
         mcpTool,
     });
@@ -46,31 +52,33 @@ const McpComponentToolListItem = ({
                         {description && <span className="truncate text-xs text-muted-foreground">{description}</span>}
                     </div>
 
-                    <div className="flex shrink-0 items-center gap-0.5">
-                        {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
+                    {canEditMcpServer && (
+                        <div className="flex shrink-0 items-center gap-0.5">
+                            {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
 
-                        <PopoverAnchor asChild>
+                            <PopoverAnchor asChild>
+                                <Button
+                                    aria-label="Configure"
+                                    className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    icon={<BoltIcon className="size-4" />}
+                                    onClick={() => openPopover(popoverId)}
+                                    size="iconSm"
+                                    title="Configure"
+                                    variant="ghost"
+                                />
+                            </PopoverAnchor>
+
                             <Button
-                                aria-label="Configure"
-                                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                icon={<BoltIcon className="size-4" />}
-                                onClick={() => openPopover(popoverId)}
+                                aria-label="Delete"
+                                className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                icon={<Trash2Icon className="size-4" />}
+                                onClick={() => setShowDeleteDialog(true)}
                                 size="iconSm"
-                                title="Configure"
+                                title="Delete"
                                 variant="ghost"
                             />
-                        </PopoverAnchor>
-
-                        <Button
-                            aria-label="Delete"
-                            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                            icon={<Trash2Icon className="size-4" />}
-                            onClick={() => setShowDeleteDialog(true)}
-                            size="iconSm"
-                            title="Delete"
-                            variant="ghost"
-                        />
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 {isPopoverOpen && (

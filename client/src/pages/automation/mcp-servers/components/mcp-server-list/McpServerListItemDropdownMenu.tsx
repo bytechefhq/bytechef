@@ -6,6 +6,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {McpServer} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
@@ -23,26 +25,45 @@ const McpServerListItemDropdownMenu = ({
     onDeleteClick,
     onEditClick,
 }: McpServerListItemDropdownMenuProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    // Delete is ADMIN-tier on the server (WorkspaceMcpServerFacadeImpl.deleteWorkspaceMcpServer), so offering it to a member without MCP_DELETE means a confirm dialog
+    // that ends in a 403.
+    const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'MCP_DELETE');
+    const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
+    if (!canEdit && !canDelete) {
+        return null;
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                <Button aria-label="MCP Server Actions" icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onAddComponentClick}>Add Component</DropdownMenuItem>
+                {canEdit && (
+                    <>
+                        <DropdownMenuItem onClick={onAddComponentClick}>Add Component</DropdownMenuItem>
 
-                <DropdownMenuItem onClick={onAddWorkflowsClick}>Add Workflows</DropdownMenuItem>
+                        <DropdownMenuItem onClick={onAddWorkflowsClick}>Add Workflows</DropdownMenuItem>
 
-                <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
+                    </>
+                )}
 
-                <DropdownMenuSeparator />
+                {canDelete && (
+                    <>
+                        {canEdit && <DropdownMenuSeparator />}
 
-                <DropdownMenuItem className="text-destructive" onClick={onDeleteClick}>
-                    Delete
-                </DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={onDeleteClick}>
+                            Delete
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
