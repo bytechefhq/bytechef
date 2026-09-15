@@ -50,6 +50,11 @@ public interface ProjectDeploymentFacade {
 
     ProjectDeploymentDTO getProjectDeployment(long id);
 
+    /**
+     * Returns the deployment workflow of the given project deployment that runs the workflow identified by its UUID.
+     */
+    ProjectDeploymentWorkflow getProjectDeploymentWorkflow(long projectDeploymentId, String workflowUuid);
+
     List<Tag> getProjectDeploymentTags();
 
     List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
