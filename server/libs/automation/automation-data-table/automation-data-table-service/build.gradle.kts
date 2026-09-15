@@ -1,5 +1,7 @@
 dependencies {
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
