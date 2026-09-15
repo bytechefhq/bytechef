@@ -13,6 +13,7 @@ All URIs are relative to */api/automation/internal*
 | [**getProjectWorkflows**](WorkflowApi.md#getprojectworkflows) | **GET** /projects/{id}/workflows | Get workflows for particular project. |
 | [**getWorkflow**](WorkflowApi.md#getworkflow) | **GET** /workflows/{id} | Get a workflow by id |
 | [**getWorkflows**](WorkflowApi.md#getworkflows) | **GET** /workflows | Get all workflows. |
+| [**getWorkspaceWorkflows**](WorkflowApi.md#getworkspaceworkflows) | **GET** /workspaces/{id}/workflows | Get workflows for particular workspace. |
 | [**restoreProjectVersionWorkflow**](WorkflowApi.md#restoreprojectversionworkflow) | **POST** /projects/{id}/versions/{projectVersion}/workflows/{workflowUuid}/restore | Loads a workflow of a published project version into the draft. |
 | [**updateWorkflow**](WorkflowApi.md#updateworkflow) | **PUT** /workflows/{id} | Update an existing workflow |
 
@@ -624,6 +625,73 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The array of workflows. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getWorkspaceWorkflows
+
+> Array&lt;Workflow&gt; getWorkspaceWorkflows(id)
+
+Get workflows for particular workspace.
+
+Get workflows for particular workspace.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowApi,
+} from '';
+import type { GetWorkspaceWorkflowsRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowApi();
+
+  const body = {
+    // number | The id of a workspace.
+    id: 789,
+  } satisfies GetWorkspaceWorkflowsRequest;
+
+  try {
+    const data = await api.getWorkspaceWorkflows(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;Workflow&gt;**](Workflow.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The array of workspace workflows. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 
