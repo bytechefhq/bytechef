@@ -42,6 +42,7 @@ dependencies {
 //    compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework:spring-tx")
     implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
