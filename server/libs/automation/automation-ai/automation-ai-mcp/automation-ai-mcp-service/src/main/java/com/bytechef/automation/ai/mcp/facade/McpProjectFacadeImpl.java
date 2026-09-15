@@ -116,7 +116,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     @Override
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
-        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
@@ -125,7 +125,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     @Override
     @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT') and " +
-        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
         List<WorkflowConfigurationDTO> workflowConfigurations) {
