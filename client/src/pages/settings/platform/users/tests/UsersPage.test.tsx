@@ -91,10 +91,14 @@ beforeEach(() => {
         handleInvite: vi.fn(),
         handleOpen: hoisted.handleInviteDialogOpen,
         handleRoleChange: vi.fn(),
+        handleWorkspaceRoleChange: vi.fn(),
+        handleWorkspaceToggle: vi.fn(),
         inviteDisabled: true,
         inviteEmail: '',
         inviteRole: null,
+        inviteWorkspaces: [],
         open: false,
+        workspaces: [],
     });
 });
 
