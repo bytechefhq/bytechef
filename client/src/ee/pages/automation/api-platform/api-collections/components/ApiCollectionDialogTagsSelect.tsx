@@ -1,6 +1,7 @@
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
 import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
 import {useGetApiCollectionTagsQuery} from '@/ee/shared/mutations/automation/apiCollectionTags.queries';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {ControllerRenderProps} from 'react-hook-form';
 
 const ApiCollectionDialogTagsSelect = ({
@@ -12,7 +13,9 @@ const ApiCollectionDialogTagsSelect = ({
     onCreateOption: (inputValue: string) => void;
     apiCollection?: ApiCollection;
 }) => {
-    const {data: tags} = useGetApiCollectionTagsQuery();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {data: tags} = useGetApiCollectionTagsQuery(currentWorkspaceId!);
 
     const tagNames = apiCollection?.tags?.map((tag) => tag.name);
 
