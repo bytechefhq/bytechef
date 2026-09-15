@@ -25,11 +25,20 @@ const hoisted = vi.hoisted(() => ({
     navigate: vi.fn(),
 }));
 
+const hoistedQueries = vi.hoisted(() => ({
+    useGetWorkspaceProjectDeploymentsQuery: vi.fn(() => ({data: [], isFetching: false, refetch: vi.fn()})),
+}));
+
 const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
 
 vi.mock('react-router-dom', async (importOriginal) => ({
     ...(await importOriginal<typeof import('react-router-dom')>()),
     useNavigate: () => hoisted.navigate,
+}));
+
+vi.mock('@/shared/queries/automation/projectDeployments.queries', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('@/shared/queries/automation/projectDeployments.queries')>()),
+    useGetWorkspaceProjectDeploymentsQuery: hoistedQueries.useGetWorkspaceProjectDeploymentsQuery,
 }));
 
 vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
@@ -253,4 +262,15 @@ it('hides deploying without DEPLOYMENT_CREATE', () => {
 
     expect(screen.queryByLabelText('Create Deployment')).not.toBeInTheDocument();
     expect(screen.queryByText('Save deployment false')).not.toBeInTheDocument();
+});
+
+it('looks up the project deployments of the current environment', () => {
+    environmentStore.setState({currentEnvironmentId: 2});
+
+    renderProjectListItem();
+
+    expect(hoistedQueries.useGetWorkspaceProjectDeploymentsQuery).toHaveBeenCalledWith(
+        expect.objectContaining({environmentId: 2, projectId: 7}),
+        false
+    );
 });
