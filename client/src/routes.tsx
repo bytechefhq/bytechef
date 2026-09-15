@@ -303,7 +303,7 @@ const platformSettingsRoutes = {
         },
         {
             element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <LazyLoadWrapper>
                         <AiAutoMemories />
                     </LazyLoadWrapper>

@@ -7,6 +7,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/DropdownMenu/DropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     McpComponent,
     useDeleteEmbeddedMcpComponentMutation,
@@ -24,6 +26,10 @@ interface McpComponentListItemDropDownProps {
 
 const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}: McpComponentListItemDropDownProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -61,11 +67,22 @@ const McpComponentListItemDropdownMenu = ({embedded, mcpComponent, onEditClick}:
         }
     };
 
+    // Embedded servers are a tenant admin's, outside any workspace, so workspace scopes do not apply to them.
+    if (!embedded && !canEditMcpServer) {
+        return null;
+    }
+
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button className="relative z-10" icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
+                    <Button
+                        aria-label="MCP Component Actions"
+                        className="relative z-10"
+                        icon={<EllipsisVerticalIcon />}
+                        size="iconSm"
+                        variant="ghost"
+                    />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
