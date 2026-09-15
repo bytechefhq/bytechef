@@ -13,10 +13,11 @@ const columnHelper = createColumnHelper<typeof coreTableFeatures, ApiKey>();
 
 interface ApiKeyTableProps {
     apiKeys: ApiKey[];
+    canDelete?: boolean;
     canManage?: boolean;
 }
 
-const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
+const ApiKeyTable = ({apiKeys, canDelete = true, canManage = true}: ApiKeyTableProps) => {
     const {setCurrentApiKey, setShowDeleteDialog, setShowEditDialog} = useApiKeysStore(
         useShallow((state) => ({
             setCurrentApiKey: state.setCurrentApiKey,
@@ -55,6 +56,7 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                         canManage && (
                             <>
                                 <Button
+                                    aria-label="Edit API Key"
                                     icon={<EditIcon className="size-4" />}
                                     onClick={() => {
                                         setCurrentApiKey(info.row.original);
@@ -64,22 +66,25 @@ const ApiKeyTable = ({apiKeys, canManage = true}: ApiKeyTableProps) => {
                                     variant="ghost"
                                 />
 
-                                <Button
-                                    icon={<Trash2Icon className="h-4 text-destructive" />}
-                                    onClick={() => {
-                                        setCurrentApiKey(info.row.original);
-                                        setShowDeleteDialog(true);
-                                    }}
-                                    size="icon"
-                                    variant="ghost"
-                                />
+                                {canDelete && (
+                                    <Button
+                                        aria-label="Delete API Key"
+                                        icon={<Trash2Icon className="h-4 text-destructive" />}
+                                        onClick={() => {
+                                            setCurrentApiKey(info.row.original);
+                                            setShowDeleteDialog(true);
+                                        }}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                )}
                             </>
                         ),
                     header: '',
                     id: 'actions',
                 }),
             ]),
-        [canManage, setCurrentApiKey, setShowDeleteDialog, setShowEditDialog]
+        [canDelete, canManage, setCurrentApiKey, setShowDeleteDialog, setShowEditDialog]
     );
 
     const reactTable = useTable({
