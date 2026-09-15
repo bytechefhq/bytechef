@@ -142,8 +142,10 @@ class PreAuthorizeAnnotationTest {
             clazz, "exportProject", "hasPermission(#id, 'Project', 'WORKFLOW_VIEW')");
         assertEveryPublicOverloadIsGated(
             clazz, "exportSharedProject", "hasPermission(#id, 'Project', 'PROJECT_SETTINGS')");
+        // Publishing needs its own scope on top of editing, so a custom role can let a member edit without releasing.
         assertEveryPublicOverloadIsGated(
-            clazz, "publishProject", "hasPermission(#id, 'Project', 'WORKFLOW_EDIT')");
+            clazz, "publishProject",
+            "hasPermission(#id, 'Project', 'WORKFLOW_EDIT') and hasPermission(#id, 'Project', 'PROJECT_PUBLISH')");
         assertEveryPublicOverloadIsGated(
             clazz, "updateProject", "hasPermission(#projectDTO.id, 'Project', 'WORKFLOW_EDIT')");
     }
@@ -254,7 +256,7 @@ class PreAuthorizeAnnotationTest {
         assertOverloadPreAuthorize(
             clazz, "createProjectDeployment", new Class<?>[] {
                 com.bytechef.automation.configuration.dto.ProjectDeploymentDTO.class
-            }, "hasPermission(#projectDeploymentDTO, 'WORKFLOW_EDIT')");
+            }, "hasPermission(#projectDeploymentDTO, 'DEPLOYMENT_CREATE')");
     }
 
     @Test
