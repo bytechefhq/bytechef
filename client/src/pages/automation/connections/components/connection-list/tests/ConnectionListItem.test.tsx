@@ -5,6 +5,15 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ConnectionListItem from '../ConnectionListItem';
 
+const ALL_SCOPES = ['CONNECTION_EDIT', 'CONNECTION_DELETE'];
+
+const hoistedScope = vi.hoisted(() => ({grantedScopes: [] as string[]}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 const hoisted = vi.hoisted(() => ({
     authenticationState: {
         account: {authorities: ['ROLE_USER'], login: 'owner@localhost.com'},
@@ -83,9 +92,33 @@ const renderConnectionListItem = (connection: Connection) =>
         </TooltipProvider>
     );
 
+const renderConnectionListItemWith = (connectionOverrides: Partial<Connection> = {}) =>
+    render(
+        <ConnectionListItem
+            componentDefinitions={[]}
+            connection={
+                {
+                    active: false,
+                    componentName: 'slack',
+                    credentialStatus: 'VALID',
+                    id: 1,
+                    name: 'Slack connection',
+                    tags: [],
+                    ...connectionOverrides,
+                } as Connection
+            }
+        />
+    );
+
 const openMenu = async () => {
-    // The ellipsis trigger has no accessible name and the item renders no other button (no tags, dialogs closed)
-    await userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button', {name: 'Connection actions'}));
+};
+
+const setTenantAdmin = (tenantAdmin: boolean) => {
+    hoisted.authenticationState = {
+        account: {authorities: tenantAdmin ? ['ROLE_ADMIN'] : ['ROLE_USER'], login: 'owner@localhost.com'},
+        authenticated: true,
+    };
 };
 
 const openEditDialog = async () => {
@@ -95,10 +128,10 @@ const openEditDialog = async () => {
 };
 
 beforeEach(() => {
-    hoisted.authenticationState = {
-        account: {authorities: ['ROLE_USER'], login: 'owner@localhost.com'},
-        authenticated: true,
-    };
+    hoistedScope.grantedScopes = [...ALL_SCOPES];
+
+    setTenantAdmin(true);
+
     windowResizeObserver();
 });
 
@@ -131,6 +164,8 @@ describe('ConnectionListItem', () => {
     });
 
     it('should let the owner replace the connection credentials', async () => {
+        setTenantAdmin(false);
+
         renderConnectionListItem({...inactiveConnection, createdBy: 'owner@localhost.com'});
 
         await openEditDialog();
@@ -152,6 +187,8 @@ describe('ConnectionListItem', () => {
     });
 
     it('should not let another user replace the connection credentials', async () => {
+        setTenantAdmin(false);
+
         renderConnectionListItem({...inactiveConnection, createdBy: 'someone-else@localhost.com'});
 
         await openEditDialog();
@@ -160,6 +197,8 @@ describe('ConnectionListItem', () => {
     });
 
     it('should not let anyone but a tenant admin replace the credentials of a connection without a creator', async () => {
+        setTenantAdmin(false);
+
         renderConnectionListItem(inactiveConnection);
 
         await openEditDialog();
@@ -255,5 +294,72 @@ describe('ConnectionListItem', () => {
             id: 7,
             updateTagsRequest: {tags: [{id: 2, name: 'second'}]},
         });
+    });
+});
+
+describe('ConnectionListItem scopes', () => {
+    it('should show Edit, Disconnect from all and Delete for a tenant admin', async () => {
+        const user = userEvent.setup();
+
+        renderConnectionListItemWith({active: true});
+
+        expect(screen.getByRole('button', {name: 'Add tag'})).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Disconnect from all'})).toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+    });
+
+    it('should hide Disconnect from all for a member who is not a tenant admin', async () => {
+        setTenantAdmin(false);
+
+        const user = userEvent.setup();
+
+        renderConnectionListItemWith({active: true});
+
+        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Disconnect from all'})).not.toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+    });
+
+    it('should hide Edit and make tags read-only without CONNECTION_EDIT', async () => {
+        hoistedScope.grantedScopes = ['CONNECTION_DELETE'];
+
+        const user = userEvent.setup();
+
+        renderConnectionListItemWith();
+
+        expect(screen.queryByRole('button', {name: 'Add tag'})).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Edit'})).not.toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Delete'})).toBeInTheDocument();
+    });
+
+    it('should hide Delete without CONNECTION_DELETE', async () => {
+        hoistedScope.grantedScopes = ['CONNECTION_EDIT'];
+
+        const user = userEvent.setup();
+
+        renderConnectionListItemWith();
+
+        await user.click(screen.getByRole('button', {name: 'Connection actions'}));
+
+        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
+        expect(screen.getByRole('menuitem', {name: 'Edit'})).toBeInTheDocument();
+    });
+
+    it('should hide the actions menu when no action is available', () => {
+        hoistedScope.grantedScopes = [];
+
+        setTenantAdmin(false);
+
+        renderConnectionListItemWith({active: true});
+
+        expect(screen.queryByRole('button', {name: 'Connection actions'})).not.toBeInTheDocument();
     });
 });

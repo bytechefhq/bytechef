@@ -1,5 +1,7 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import {AiAgentJudgeType} from '@/shared/middleware/graphql';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {act, renderHook} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -48,6 +50,7 @@ const getLastEnabledArgument = (queryMock: ReturnType<typeof vi.fn>) => queryMoc
 
 describe('useCreateJudgeDialog', () => {
     beforeEach(() => {
+        environmentStore.setState({currentEnvironmentId: PRODUCTION_ENVIRONMENT});
         useWorkspaceStore.setState({currentWorkspaceId: 1049});
 
         hoisted.useGetRootComponentClusterElementDefinitions.mockReset();
@@ -138,6 +141,7 @@ describe('useCreateJudgeDialog', () => {
             expect(getLastEnabledArgument(hoisted.useGetWorkspaceConnectionsQuery)).toBe(false);
             expect(hoisted.useGetWorkspaceConnectionsQuery.mock.lastCall?.[0]).toEqual({
                 componentName: undefined,
+                environmentId: PRODUCTION_ENVIRONMENT,
                 id: 1049,
             });
             expect(getLastEnabledArgument(hoisted.useGetClusterElementDefinitionQuery)).toBe(false);
@@ -149,7 +153,7 @@ describe('useCreateJudgeDialog', () => {
             act(() => result.current.handleProviderChange('openAi'));
 
             expect(hoisted.useGetWorkspaceConnectionsQuery).toHaveBeenLastCalledWith(
-                {componentName: 'openAi', id: 1049},
+                {componentName: 'openAi', environmentId: PRODUCTION_ENVIRONMENT, id: 1049},
                 true
             );
             expect(hoisted.useGetClusterElementDefinitionQuery).toHaveBeenLastCalledWith(

@@ -13,9 +13,9 @@ interface ConnectionListItemLayoutProps {
     credentialStatus?: string;
     icon?: string;
     id?: number;
-    menuItems: ReactNode;
+    menuItems?: ReactNode;
     name: string;
-    onEditClick: () => void;
+    onEditClick?: () => void;
     tagList: ReactNode;
 }
 
@@ -88,9 +88,11 @@ const ConnectionListItemLayout = ({
                         )}
                     </div>
 
-                    <ConnectionListItemDropdownMenu onEditClick={onEditClick}>
-                        {menuItems}
-                    </ConnectionListItemDropdownMenu>
+                    {(onEditClick || menuItems) && (
+                        <ConnectionListItemDropdownMenu onEditClick={onEditClick}>
+                            {menuItems}
+                        </ConnectionListItemDropdownMenu>
+                    )}
                 </div>
             </div>
         </div>
