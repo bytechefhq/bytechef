@@ -12,9 +12,12 @@ import {
     SidebarRail,
     useSidebar,
 } from '@/components/ui/sidebar';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {ENVIRONMENT_CONFIGS} from '@/shared/constants/environmentConfigs';
+import {useAccessibleEnvironmentIds} from '@/shared/hooks/useAccessibleEnvironmentIds';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type LucideIcon} from 'lucide-react';
 import {useEffect} from 'react';
@@ -40,6 +43,13 @@ export function AppSidebar({navigation}: AppSidebarProps) {
     const {isMobile, state} = useSidebar();
 
     const currentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.currentEnvironmentId);
+    const setCurrentEnvironmentId = useEnvironmentStore((environmentState) => environmentState.setCurrentEnvironmentId);
+    const currentType = usePlatformTypeStore((platformTypeState) => platformTypeState.currentType);
+    const currentWorkspaceId = useWorkspaceStore((workspaceState) => workspaceState.currentWorkspaceId);
+
+    const accessibleEnvironmentIds = useAccessibleEnvironmentIds(
+        currentType === PlatformType.AUTOMATION ? currentWorkspaceId : undefined
+    );
 
     const collapsed = state === 'collapsed' && !isMobile;
 
@@ -58,6 +68,23 @@ export function AppSidebar({navigation}: AppSidebarProps) {
             navigate('/embedded/configurations');
         }
     };
+
+    useEffect(() => {
+        if (
+            !accessibleEnvironmentIds ||
+            accessibleEnvironmentIds.length === 0 ||
+            accessibleEnvironmentIds.includes(currentEnvironmentId)
+        ) {
+            return;
+        }
+
+        const [firstAccessibleEnvironmentId] = accessibleEnvironmentIds;
+
+        setCurrentEnvironmentId(firstAccessibleEnvironmentId);
+
+        handleEnvironmentChange(firstAccessibleEnvironmentId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [accessibleEnvironmentIds, currentEnvironmentId, setCurrentEnvironmentId]);
 
     useEffect(() => {
         const {documentElement} = document;
@@ -86,7 +113,11 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                         <span className="text-lg font-semibold group-data-[collapsible=icon]:hidden">ByteChef</span>
                     </Link>
 
-                    <EnvironmentSelect onChange={handleEnvironmentChange} variant={collapsed ? 'icon' : 'compact'} />
+                    <EnvironmentSelect
+                        onChange={handleEnvironmentChange}
+                        variant={collapsed ? 'icon' : 'compact'}
+                        visibleEnvironmentIds={accessibleEnvironmentIds}
+                    />
                 </div>
             </SidebarHeader>
 

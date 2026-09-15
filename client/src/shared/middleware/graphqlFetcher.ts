@@ -2,6 +2,19 @@ import {getCookie} from '@/shared/util/cookie-utils';
 
 import {endpointUrl, fetchParams} from './config';
 
+export class GraphQlRequestError extends Error {
+    classification?: string;
+    status?: number;
+
+    constructor(message: string, {classification, status}: {classification?: string; status?: number} = {}) {
+        super(message);
+
+        this.classification = classification;
+        this.name = 'GraphQlRequestError';
+        this.status = status;
+    }
+}
+
 export function fetcher<TData, TVariables>(
     query: string | {toString(): string},
     variables?: TVariables,
@@ -21,15 +34,18 @@ export function fetcher<TData, TVariables>(
             const errorJson = await res.json().catch(() => null);
             const serverMessage = errorJson?.errors?.[0]?.message;
 
-            throw new Error(serverMessage || `GraphQL request failed with status ${res.status}`);
+            throw new GraphQlRequestError(serverMessage || `GraphQL request failed with status ${res.status}`, {
+                classification: errorJson?.errors?.[0]?.extensions?.classification,
+                status: res.status,
+            });
         }
 
         const json = await res.json();
 
         if (json.errors) {
-            const {message} = json.errors[0];
+            const {extensions, message} = json.errors[0];
 
-            throw new Error(message);
+            throw new GraphQlRequestError(message, {classification: extensions?.classification});
         }
 
         return json.data;
