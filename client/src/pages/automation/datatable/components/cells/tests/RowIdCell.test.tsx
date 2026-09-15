@@ -57,6 +57,18 @@ describe('RowIdCell', () => {
         });
     });
 
+    describe('read-only', () => {
+        it('should not render add row button for synthetic last row when readOnly is true', () => {
+            const props = createDefaultProps();
+            props.row = {id: '-1'};
+            props.rowIdx = 3;
+
+            render(<RowIdCell {...props} readOnly />);
+
+            expect(screen.queryByRole('button', {name: 'Add row'})).not.toBeInTheDocument();
+        });
+    });
+
     describe('row number display', () => {
         it('should display row number when not hovered and not selected', () => {
             const props = createDefaultProps();
