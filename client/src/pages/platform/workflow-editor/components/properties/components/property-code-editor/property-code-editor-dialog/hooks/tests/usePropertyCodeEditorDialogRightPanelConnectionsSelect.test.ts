@@ -1,4 +1,6 @@
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {act, renderHook} from '@testing-library/react';
+import {ReactNode, createElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => {
@@ -273,6 +275,49 @@ describe('usePropertyCodeEditorDialogRightPanelConnectionsSelect', () => {
             const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnectionsSelect(defaultProps));
 
             expect(result.current.ConnectionKeys).toEqual({connections: ['connections']});
+        });
+    });
+
+    describe('read-only mode', () => {
+        const renderSelectHook = (readOnly: boolean) =>
+            renderHook(
+                () =>
+                    usePropertyCodeEditorDialogRightPanelConnectionsSelect({
+                        componentConnection: {
+                            componentName: 'slack',
+                            componentVersion: 1,
+                            key: 'slack',
+                            required: true,
+                            workflowNodeName: 'script_1',
+                        },
+                        workflowId: 'workflow-1',
+                        workflowNodeName: 'script_1',
+                    }),
+                {
+                    wrapper: ({children}: {children: ReactNode}) =>
+                        createElement(WorkflowEditorReadOnlyContext.Provider, {value: readOnly}, children),
+                }
+            );
+
+        beforeEach(() => {
+            hoisted.currentNode = {name: 'script_1'};
+        });
+
+        it('saves the selected test connection when the editor is editable', () => {
+            const {result} = renderSelectHook(false);
+
+            act(() => result.current.handleValueChange(7, 'slack'));
+
+            expect(hoisted.mockMutateWorkflowNode).toHaveBeenCalledTimes(1);
+        });
+
+        it('never saves a selected test connection in read-only mode', () => {
+            const {result} = renderSelectHook(true);
+
+            act(() => result.current.handleValueChange(7, 'slack'));
+
+            expect(hoisted.mockMutateWorkflowNode).not.toHaveBeenCalled();
+            expect(hoisted.mockMutateClusterElement).not.toHaveBeenCalled();
         });
     });
 });
