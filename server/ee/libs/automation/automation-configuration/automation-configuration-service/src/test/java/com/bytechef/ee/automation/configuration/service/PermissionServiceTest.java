@@ -52,6 +52,7 @@ class PermissionServiceTest {
     private static final long USER_ID = 42L;
     private static final long PROJECT_ID = 100L;
     private static final long WORKSPACE_ID = 7L;
+    private static final String CONNECTED_USER_EXTERNAL_ID = "external-user-1";
     private static final String LOGIN = "alice";
 
     private CurrentUserResolver currentUserResolver;
@@ -485,6 +486,82 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testIsCurrentUserDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticateAsConnectedUser();
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.isCurrentUser(USER_ID));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testIsResourceOwnerDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticateAsConnectedUser();
+
+        PermissionServiceImpl service = createService(resolver("ApiKey", ResourceOwner.ofUser(USER_ID)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.isResourceOwner("ApiKey", 1L));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testHasResourceRoleDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticateAsConnectedUser();
+
+        PermissionServiceImpl service = createService(
+            resolver("KnowledgeBase", ResourceOwner.ofWorkspace(WORKSPACE_ID)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasResourceRole(1L, "KnowledgeBase", "VIEWER"));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceRoleDeniesAConnectedUserUnderAutomationAuthorizationSkip() throws Throwable {
+        authenticateAsConnectedUser();
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER"));
+
+        assertThat(granted).isFalse();
+    }
+
+    @Test
+    void testHasWorkspaceScopeInEveryEnvironmentDeniesAConnectedUserUnderAutomationAuthorizationSkip()
+        throws Throwable {
+
+        authenticateAsConnectedUser();
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "WORKSPACE_MEMBER_MANAGE"));
+
+        assertThat(granted).isFalse();
+        verify(workspaceScopeCacheService, never()).getWorkspaceScopes(anyLong(), anyLong(), any());
+    }
+
+    @Test
+    void testTenantAdminPassesThePrivilegedChecksUnderAutomationAuthorizationSkip() throws Throwable {
+        securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+            .thenReturn(true);
+
+        PermissionServiceImpl service = createService(
+            resolver("KnowledgeBase", ResourceOwner.ofWorkspace(WORKSPACE_ID)));
+
+        boolean granted = AutomationAuthorizationContext.callSkippingChecks(
+            () -> service.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "WORKSPACE_MEMBER_MANAGE") &&
+                service.hasWorkspaceRole(WORKSPACE_ID, "ADMIN") &&
+                service.hasResourceRole(1L, "KnowledgeBase", "ADMIN") &&
+                service.isResourceOwner("KnowledgeBase", 1L) &&
+                service.isCurrentUser(USER_ID));
+
+        assertThat(granted).isTrue();
+    }
+
+    @Test
     void testHasResourceScopeUsesWorkspaceScope() {
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("CONNECTION_DELETE"));
@@ -617,6 +694,13 @@ class PermissionServiceTest {
         permissionService.evictAllWorkspaceScopeCache();
 
         verify(workspaceScopeCacheService, times(1)).evictAllWorkspaceScopeCache();
+    }
+
+    private void authenticateAsConnectedUser() {
+        securityUtilsMock.when(SecurityUtils::fetchCurrentUserLogin)
+            .thenReturn(Optional.of(CONNECTED_USER_EXTERNAL_ID));
+
+        when(userService.getUser(CONNECTED_USER_EXTERNAL_ID)).thenThrow(new UserNotFoundException());
     }
 
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
