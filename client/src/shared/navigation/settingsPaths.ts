@@ -2,6 +2,7 @@ export const ORGANIZATION_SETTINGS_PATH = '/settings';
 
 export const ORGANIZATION_SETTINGS_PAGES: readonly string[] = [
     'users',
+    'global-custom-roles',
     'billing',
     'ai-providers',
     'ai/skills',
