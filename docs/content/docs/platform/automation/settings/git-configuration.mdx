@@ -54,11 +54,18 @@ the project's Git configuration is enabled.
 
 ### Required permissions
 
-| Action | Permission |
-|---|---|
-| Read or configure the workspace repository | `WORKSPACE_MANAGE` on the workspace. The settings page itself is additionally restricted to the organization admin authority. |
-| Push (publishing with sync enabled) | `DEPLOYMENT_PUSH` on the project |
-| Pull Project from Git, and listing the remote branches | `DEPLOYMENT_PULL` on the project |
+| Action | Permission | Built-in role |
+|---|---|---|
+| Read or configure the workspace repository | `WORKSPACE_MANAGE` on the workspace. The settings page itself is additionally restricted to the organization admin authority. | Admin |
+| Pick a project's branch, list the remote branches, enable sync | `WORKSPACE_MANAGE` on the project's workspace | Admin |
+| Push (publishing with sync enabled) | `PROJECT_PUBLISH`, `PROJECT_PUSH` and `WORKFLOW_EDIT` on the project | Editor |
+| Pull Project from Git | `PROJECT_PULL`, `PROJECT_PUBLISH` and `WORKFLOW_EDIT` on the project, plus `WORKFLOW_EDIT` in Development to overwrite workflows that already exist and `WORKFLOW_CREATE` in Development to add new ones | Admin |
+
+Push and pull use the same repository and branch but are split by what they do. A push writes the
+published workflows to the branch and changes nothing inside ByteChef, so an editor who can publish
+can push. A pull overwrites the project's workflows from the branch and publishes one new version,
+which can discard other members' work, so it is an admin operation. The workflows a pull writes are
+checked against the member's Development role, like any other workflow edit.
 
 ---
 
@@ -96,6 +103,60 @@ like one published from the editor.
     Matching is by label, and a pull never deletes. A file removed from the branch leaves its workflow
     in the project; renaming a workflow in ByteChef without renaming its file produces a second
     workflow on the next pull.
+</Callout>
+
+### Pull automatically on every commit
+
+<Callout type="warn" title="Coming soon">
+    Automated pulls from GitHub are not available in the latest released version of ByteChef. The
+    steps below describe how they will work.
+</Callout>
+
+A pull is also exposed on the automation public API, so a CI job can run it instead of someone
+clicking **Pull Project from Git**. With a GitHub Action, every commit that lands on the project's
+branch arrives in ByteChef as a new project version.
+
+1. **Create an API key.** In ByteChef, go to **Settings → API Keys**, set the **Environment**
+   selector, and create a key. The key acts as the member who created it, so that member needs
+   `PROJECT_PULL` on the project - the built-in **Admin** role.
+2. **Store the key in GitHub.** In the repository, go to **Settings → Secrets and variables →
+   Actions** and add:
+   - `BYTECHEF_API_KEY` - the key's secret.
+   - `BYTECHEF_URL` - your ByteChef base URL, for example `https://bytechef.example.com`.
+   - `BYTECHEF_PROJECT_ID` - the numeric id of the project, shown in the project's URL.
+3. **Add the workflow.** Commit `.github/workflows/bytechef-pull.yml`, replacing `main` with the
+   branch configured for the project:
+
+```yaml
+name: Pull into ByteChef
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull project from Git
+        run: |
+          curl --fail-with-body -X POST \
+            -H "Authorization: Bearer ${{ secrets.BYTECHEF_API_KEY }}" \
+            -H "X-ENVIRONMENT: PRODUCTION" \
+            "${{ secrets.BYTECHEF_URL }}/api/automation/v1/projects/${{ secrets.BYTECHEF_PROJECT_ID }}/git/pull"
+```
+
+Set `X-ENVIRONMENT` to the environment the key was created in; the value must be an exact
+environment name. A successful pull returns `204 No Content`, and `--fail-with-body` makes the job
+fail on anything else.
+
+The project's Git configuration must be enabled, as for a manual pull.
+
+<Callout>
+    Publishing from ByteChef pushes a commit to the same branch, which triggers the Action and pulls
+    that commit straight back. The pull matches every file to its existing workflow, so nothing is
+    lost, but it does add an extra project version after each publish.
 </Callout>
 
 ---

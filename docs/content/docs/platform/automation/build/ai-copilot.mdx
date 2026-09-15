@@ -62,7 +62,7 @@ Use Ask mode to get explanations, debug errors, research components, or plan cha
 
 ### Build mode
 
-Build mode has full access to **create and modify** content on the current surface. In the workflow editor it follows a structured process:
+Build mode can **create and modify** content on the current surface. In the workflow editor it is unavailable to a member without the Workflow Edit permission (`WORKFLOW_EDIT`). For such a member the editor opens [read-only](/platform/settings/users#the-workflow-editor-without-workflow-edit) and Copilot stays in Ask mode. For everyone else, Build mode follows a structured process:
 
 > discover the right components → configure them → pre-validate each task → build → validate the full workflow → deploy
 
