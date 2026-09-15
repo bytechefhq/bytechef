@@ -24,6 +24,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -65,6 +66,7 @@ public class ProjectDeploymentWorkflowGraphQlController {
     private static final String MANUAL_TRIGGER_NAME = "manual";
 
     private final EnvironmentService environmentService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
@@ -75,12 +77,14 @@ public class ProjectDeploymentWorkflowGraphQlController {
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentWorkflowGraphQlController(
-        EnvironmentService environmentService, ProjectDeploymentService projectDeploymentService,
+        EnvironmentService environmentService, ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ProjectWorkflowService projectWorkflowService, TriggerDefinitionService triggerDefinitionService,
         @Value("${bytechef.webhook.url}") String webhookUrl, WorkflowService workflowService) {
 
         this.environmentService = environmentService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
@@ -97,18 +101,11 @@ public class ProjectDeploymentWorkflowGraphQlController {
     }
 
     @QueryMapping(name = "projectDeploymentWorkflow")
-    @PreAuthorize("hasPermission(T(com.bytechef.platform.workflow.WorkflowExecutionId).parse(#id).getJobPrincipalId(), "
-        +
-        "'ProjectDeployment', 'DEPLOYMENT_VIEW')")
     public ProjectDeploymentWorkflow projectDeploymentWorkflow(@Argument String id) {
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(id);
 
-        long projectDeploymentId = workflowExecutionId.getJobPrincipalId();
-        String workflowUuid = workflowExecutionId.getWorkflowUuid();
-
-        String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid);
-
-        return projectDeploymentWorkflowService.getProjectDeploymentWorkflow(projectDeploymentId, workflowId);
+        return projectDeploymentFacade.getProjectDeploymentWorkflow(
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     @BatchMapping(typeName = "ProjectDeployment", field = "projectDeploymentWorkflows")
