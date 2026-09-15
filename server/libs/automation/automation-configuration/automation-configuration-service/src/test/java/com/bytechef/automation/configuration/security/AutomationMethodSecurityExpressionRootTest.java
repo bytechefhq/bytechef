@@ -124,6 +124,25 @@ class AutomationMethodSecurityExpressionRootTest {
     }
 
     @Test
+    void testHasWorkflowScopePassesArgumentsAndResultThrough() {
+        when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).thenReturn(true);
+
+        assertThat(root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).isTrue();
+        assertThat(root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_EDIT")).isFalse();
+    }
+
+    @Test
+    void testHasWorkflowScopeShortCircuitsUnderSkipChecks() throws Throwable {
+        AutomationAuthorizationContext.callSkippingChecks(() -> {
+            assertThat(root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).isTrue();
+
+            return null;
+        });
+
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
     void testHasWorkflowScopeInEnvironmentDelegatesWithTheEnvironment() {
         when(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
             .thenReturn(true);
@@ -264,23 +283,22 @@ class AutomationMethodSecurityExpressionRootTest {
     }
 
     @Test
-    void testHasWorkspaceScopeInEnvironmentIdKeepsTheEnvironmentUnawareCheckForNull() {
-        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE)).thenReturn(true);
+    void testHasWorkspaceScopeInEnvironmentIdRequiresEveryEnvironmentForNull() {
+        when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE)).thenReturn(true);
 
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null)).isTrue();
 
-        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE);
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE);
         verifyNoMoreInteractions(permissionService);
     }
 
     @Test
-    void testHasWorkspaceScopeInEnvironmentIdReturnsFalseWhenTheEnvironmentUnawareCheckDenies() {
-        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE)).thenReturn(false);
+    void testHasWorkspaceScopeInEnvironmentIdDeniesNullToAMemberWhoHoldsTheScopeOnlyInDevelopment() {
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE)).thenReturn(true);
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE, Environment.DEVELOPMENT)).thenReturn(true);
+        when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE)).thenReturn(false);
 
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null)).isFalse();
-
-        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE);
-        verifyNoMoreInteractions(permissionService);
     }
 
     @Test
