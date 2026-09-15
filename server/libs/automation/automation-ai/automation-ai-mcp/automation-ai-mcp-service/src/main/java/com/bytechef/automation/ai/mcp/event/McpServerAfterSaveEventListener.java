@@ -19,6 +19,7 @@ package com.bytechef.automation.ai.mcp.event;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -84,7 +85,7 @@ public class McpServerAfterSaveEventListener extends AbstractRelationalEventList
             return;
         }
 
-        checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled());
+        runSkippingChecks(() -> checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled()));
     }
 
     private void checkProjectDeploymentTriggers(long mcpServerId, boolean enabled) {
@@ -92,6 +93,20 @@ public class McpServerAfterSaveEventListener extends AbstractRelationalEventList
 
         for (McpProject mcpProject : mcpProjects) {
             projectDeploymentFacade.enableProjectDeployment(mcpProject.getProjectDeploymentId(), enabled);
+        }
+    }
+
+    private static void runSkippingChecks(Runnable runnable) {
+        try {
+            AutomationAuthorizationContext.callSkippingChecks(() -> {
+                runnable.run();
+
+                return null;
+            });
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
         }
     }
 }

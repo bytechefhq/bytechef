@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +34,7 @@ import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpComponent;
@@ -54,6 +56,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 /**
  * Integration tests for {@link WorkspaceMcpServerFacadeImpl}.
@@ -273,9 +276,12 @@ public class WorkspaceMcpServerFacadeIntTest {
         @Autowired
         private PermissionEvaluator permissionEvaluator;
 
+        @MockitoSpyBean
+        private PermissionService permissionService;
+
         @AfterEach
         void resetPermissionEvaluator() {
-            reset(permissionEvaluator);
+            reset(permissionEvaluator, permissionService);
         }
 
         @Test
@@ -303,8 +309,9 @@ public class WorkspaceMcpServerFacadeIntTest {
         }
 
         @Test
-        void testCreateRequiresEditor() {
-            when(permissionEvaluator.hasPermission(any(), eq(2L), eq("Workspace"), eq("MCP_CREATE"))).thenReturn(false);
+        void testCreateRequiresMcpCreateInTheServersEnvironment() {
+            doReturn(false).when(permissionService)
+                .hasWorkspaceScope(2L, "MCP_CREATE", Environment.DEVELOPMENT);
 
             assertThatThrownBy(() -> workspaceMcpServerFacade.createWorkspaceMcpServer(
                 "server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true, null, 2L))
@@ -371,8 +378,8 @@ public class WorkspaceMcpServerFacadeIntTest {
         }
 
         @Test
-        void testDeleteRequiresServerEditor() {
-            when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"))).thenReturn(false);
+        void testDeleteRequiresMcpDelete() {
+            when(permissionEvaluator.hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_DELETE"))).thenReturn(false);
 
             assertThatThrownBy(() -> workspaceMcpServerFacade.deleteWorkspaceMcpServer(3L))
                 .isInstanceOf(AccessDeniedException.class);

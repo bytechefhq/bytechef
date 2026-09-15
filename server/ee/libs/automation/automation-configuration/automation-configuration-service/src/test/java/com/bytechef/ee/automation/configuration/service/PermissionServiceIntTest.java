@@ -265,6 +265,39 @@ class PermissionServiceIntTest {
     }
 
     @Test
+    void testCanUseConnectionInWorkspaceGrantsAConnectionOfTheWorkspaceAndEnvironment() {
+        addMember(WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId, Environment.DEVELOPMENT);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkspace(1L, workspaceId, Environment.DEVELOPMENT))
+            .isTrue();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkspaceDeniesAConnectionOfAnotherWorkspace() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId + 1, Environment.DEVELOPMENT);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkspace(1L, workspaceId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkspaceDeniesAConnectionOfAnotherEnvironment() {
+        addMember(WorkspaceRole.ADMIN);
+
+        PermissionService connectionPermissionService = createConnectionPermissionService(
+            workspaceId, Environment.PRODUCTION);
+
+        assertThat(connectionPermissionService.canUseConnectionInWorkspace(1L, workspaceId, Environment.DEVELOPMENT))
+            .isFalse();
+    }
+
+    @Test
     void testCanUseConnectionInWorkflowGrantsATenantAdmin() {
         String workflowId = createProjectWorkflow();
 
@@ -571,6 +604,22 @@ class PermissionServiceIntTest {
         addMember(WorkspaceRole.EDITOR);
 
         assertThat(permissionService.getMyWorkspaceRole(workspaceId)).isEqualTo("EDITOR");
+    }
+
+    @Test
+    void testGetMyWorkspaceRoleIgnoresAnImplicitRowBesideEnvironmentRows() {
+        addMember(WorkspaceRole.ADMIN);
+        addMember(WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        assertThat(permissionService.getMyWorkspaceRole(workspaceId)).isNull();
+    }
+
+    @Test
+    void testHasWorkspaceRoleIgnoresAnImplicitRowBesideEnvironmentRows() {
+        addMember(WorkspaceRole.ADMIN);
+        addMember(WorkspaceRole.VIEWER, Environment.DEVELOPMENT);
+
+        assertThat(permissionService.hasWorkspaceRole(workspaceId, "VIEWER")).isFalse();
     }
 
     @Test

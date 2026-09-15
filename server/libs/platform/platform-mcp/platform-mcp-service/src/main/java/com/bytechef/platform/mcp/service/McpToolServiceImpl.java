@@ -87,7 +87,8 @@ public class McpToolServiceImpl implements McpToolService {
         @AuditData(key = "mcpComponentId", value = "#mcpTool.mcpComponentId"),
         @AuditData(key = "name", value = "#mcpTool.name")
     })
-    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')")
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT') or " +
+        "hasPermission(#mcpTool.id, 'McpTool', 'MCP_DELETE')")
     public void delete(McpTool mcpTool) {
         mcpToolRepository.delete(mcpTool);
     }
