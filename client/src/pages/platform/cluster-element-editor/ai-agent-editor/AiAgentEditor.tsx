@@ -6,6 +6,7 @@ import useAiAgentEvals from '@/pages/platform/cluster-element-editor/ai-agent-ev
 import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components/WorkflowEditorSkeletons';
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -48,6 +49,7 @@ export default function AiAgentEditor({
         workflowNodeOutputs,
     });
     const {handleClose: handleEvalsClose} = useAiAgentEvals();
+    const readOnly = useWorkflowEditorReadOnly();
 
     if (evalsPanelOpen) {
         return (
@@ -83,11 +85,13 @@ export default function AiAgentEditor({
                 </div>
 
                 <div className="relative mb-4 min-h-0">
-                    <div className="size-full overflow-hidden">
-                        <Suspense fallback={null}>
-                            <AiAgentTestingPanel />
-                        </Suspense>
-                    </div>
+                    {!readOnly && (
+                        <div className="size-full overflow-hidden">
+                            <Suspense fallback={null}>
+                                <AiAgentTestingPanel />
+                            </Suspense>
+                        </div>
+                    )}
 
                     {showNodeDetailsPanel && previousComponentDefinitions && workflowNodeOutputs && (
                         <>
