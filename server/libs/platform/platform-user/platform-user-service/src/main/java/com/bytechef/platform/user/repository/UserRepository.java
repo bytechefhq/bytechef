@@ -60,4 +60,16 @@ public interface UserRepository extends ListCrudRepository<User, Long>, ListPagi
     Optional<User> findByLogin(String login);
 
     Optional<User> findByResetKey(String resetKey);
+
+    /**
+     * Users holding the named tenant authority. Used to surface tenant admins as inherited workspace admins without
+     * paging every user in the tenant to find them — the membership view calls this on every load.
+     */
+    @Query("""
+        SELECT u.* FROM "user" u
+        JOIN user_authority ua ON ua.user_id = u.id
+        JOIN authority a ON a.id = ua.authority_id
+        WHERE a.name = :authorityName AND u.activated = true
+        """)
+    List<User> findAllByAuthorityName(@Param("authorityName") String authorityName);
 }

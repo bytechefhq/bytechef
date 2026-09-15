@@ -108,6 +108,11 @@ public class UserInvitationServiceImpl implements UserInvitationService {
         return user;
     }
 
+    @Override
+    public void notifyAddedToWorkspace(User user, String workspaceName) {
+        sendAfterCommit(() -> mailService.sendWorkspaceMembershipEmail(user, workspaceName));
+    }
+
     private boolean isLoginUsed(String login) {
         if (tenantService.isMultiTenantEnabled() && tenantService.tenantIdsByUserLoginExist(login)) {
             return true;
