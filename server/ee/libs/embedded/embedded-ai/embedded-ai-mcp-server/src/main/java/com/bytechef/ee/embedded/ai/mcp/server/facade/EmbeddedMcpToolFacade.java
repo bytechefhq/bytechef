@@ -363,6 +363,16 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         };
     }
 
+    private McpServer getMcpServer(long mcpServerId) {
+        try {
+            return AutomationAuthorizationContext.callSkippingChecks(() -> mcpServerService.getMcpServer(mcpServerId));
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
+    }
+
     private long getIntegrationId(String componentName) {
         return integrationService.getIntegrations()
             .stream()

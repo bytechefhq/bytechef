@@ -183,8 +183,7 @@ class PermissionServiceTest {
         // A behaviour change worth pinning: this member holds ADMIN in every environment there is, and is still denied,
         // because a per-environment role is not a workspace-wide one and there is no single role of theirs to compare.
         // The rows are stubbed to show the denial is not "no membership found" — hasWorkspaceRole deliberately never
-        // looks at them, which the verify below holds in place. Reached from @PreAuthorize through hasResourceRole, so
-        // this denies the connection sharing mutations on WorkspaceConnectionFacadeImpl for such a member.
+        // looks at them, which the verify below holds in place.
         when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
         when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
@@ -203,11 +202,6 @@ class PermissionServiceTest {
     @Test
     void testHasResourceRoleDeniesAMemberInExplicitMode() {
         // hasResourceRole resolves the owning workspace and then asks hasWorkspaceRole, so it inherits that denial.
-        // This
-        // is the path by which the explicit-mode denial reaches @PreAuthorize: setConnectionVisibility,
-        // grantConnectionAccess, revokeConnectionAccess and getConnectionGrants all gate on it, and owning the
-        // connection
-        // is the remaining way in for such a member.
         when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
         when(workspaceUserRepository.findAllByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
@@ -446,6 +440,26 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testGetMyWorkspaceRoleIgnoresAnImplicitRowBesideEnvironmentRows() {
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(true);
+        lenient().when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal())));
+
+        assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
+    }
+
+    @Test
+    void testHasWorkspaceRoleIgnoresAnImplicitRowBesideEnvironmentRows() {
+        when(workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(true);
+        lenient().when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(new WorkspaceUser(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN.ordinal())));
+
+        assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isFalse();
+    }
+
+    @Test
     void testGetMyWorkspaceRoleReturnsNullForNonMember() {
         when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
@@ -609,6 +623,36 @@ class PermissionServiceTest {
         PermissionServiceImpl service = createConnectionService(WORKSPACE_ID, Environment.DEVELOPMENT);
 
         assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkspaceGrantsAConnectionOfTheWorkspaceAndEnvironment() {
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID, Environment.DEVELOPMENT);
+
+        assertThat(service.canUseConnectionInWorkspace(1L, WORKSPACE_ID, Environment.DEVELOPMENT)).isTrue();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkspaceDeniesAConnectionOfAnotherWorkspace() {
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong(), any()))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID + 1, Environment.DEVELOPMENT);
+
+        assertThat(service.canUseConnectionInWorkspace(1L, WORKSPACE_ID, Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkspaceDeniesAConnectionOfAnotherEnvironment() {
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong(), any()))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID, Environment.PRODUCTION);
+
+        assertThat(service.canUseConnectionInWorkspace(1L, WORKSPACE_ID, Environment.DEVELOPMENT)).isFalse();
     }
 
     @Test

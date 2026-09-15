@@ -13,6 +13,7 @@ import com.bytechef.automation.configuration.security.AutomationAuthorizationCon
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -113,13 +114,7 @@ public class PermissionServiceImpl implements PermissionService {
         // The implicit row only. A member in explicit mode holds one row per environment and no workspace-wide role, so
         // there is nothing here to compare against a minimum: they are denied, and the environment-aware scope checks
         // are what serve them. Reading "whichever row comes first" would answer one environment's role for all of them.
-        //
-        // This denial reaches @PreAuthorize, through hasResourceRole below: the four connection sharing mutations on
-        // WorkspaceConnectionFacadeImpl gate on it, so a member who holds ADMIN in every environment is refused there
-        // where a member holding one implicit ADMIN row passes. Fail-closed and intended -- an explicit-mode member's
-        // reach is per environment, and these mutations are not -- but it is a behaviour difference, not a no-op, and
-        // PermissionServiceTest pins it.
-        return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId.getAsLong(), workspaceId)
+        return fetchImplicitWorkspaceUser(userId.getAsLong(), workspaceId)
             .map(member -> toWorkspaceRole(member.getWorkspaceRole()))
             .map(role -> role.hasAtLeast(minimum))
             .orElse(false);
@@ -426,6 +421,19 @@ public class PermissionServiceImpl implements PermissionService {
             return false;
         }
 
+        return canUseConnectionInWorkspace(connectionId, workspaceId, environment);
+    }
+
+    @Override
+    public boolean canUseConnectionInWorkspace(long connectionId, long workspaceId, Environment environment) {
+        if (isAutomationAuthorizationSkipped()) {
+            return true;
+        }
+
+        if (isTenantAdmin()) {
+            return true;
+        }
+
         ResourceOwnershipResolver connectionOwnershipResolver = resourceOwnershipResolvers.get(CONNECTION);
         ResourceEnvironmentResolver connectionEnvironmentResolver = resourceEnvironmentResolvers.get(CONNECTION);
 
@@ -471,11 +479,18 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         // Null for a member in explicit mode, which is the honest answer: they hold no one role across the workspace.
-        // The per-environment roles are read through fetchRole, which names the environment being asked about.
-        return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId.getAsLong(), workspaceId)
+        return fetchImplicitWorkspaceUser(userId.getAsLong(), workspaceId)
             .map(member -> toWorkspaceRole(member.getWorkspaceRole()))
             .map(WorkspaceRole::name)
             .orElse(null);
+    }
+
+    private Optional<WorkspaceUser> fetchImplicitWorkspaceUser(long userId, long workspaceId) {
+        if (workspaceUserRepository.existsByUserIdAndWorkspaceIdAndEnvironmentIsNotNull(userId, workspaceId)) {
+            return Optional.empty();
+        }
+
+        return workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(userId, workspaceId);
     }
 
     @Override

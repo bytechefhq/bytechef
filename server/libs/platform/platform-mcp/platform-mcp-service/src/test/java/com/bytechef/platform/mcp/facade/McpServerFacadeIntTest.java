@@ -315,11 +315,11 @@ class McpServerFacadeIntTest {
         }
 
         @Test
-        void testDeleteMcpServerRequiresEditor() {
+        void testDeleteMcpServerRequiresMcpDelete() {
             assertThatThrownBy(() -> securedMcpServerFacade.deleteMcpServer(3L))
                 .isInstanceOf(AccessDeniedException.class);
 
-            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_EDIT"));
+            verify(permissionEvaluator).hasPermission(any(), eq(3L), eq("McpServer"), eq("MCP_DELETE"));
         }
 
         @Test
