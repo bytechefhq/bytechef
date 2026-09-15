@@ -224,7 +224,7 @@ function App() {
     const userGuiding = useUserGuiding();
 
     useFetchInterceptor();
-    useLoadWorkspaceScopes(location.pathname.includes('/automation/') ? currentWorkspaceId : undefined);
+    useLoadWorkspaceScopes(authenticated ? currentWorkspaceId : undefined);
 
     const canEditWorkspace = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 
