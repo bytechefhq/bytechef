@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.log;
+package com.bytechef.platform.configuration.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -28,17 +25,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.file.storage.domain.FileEntry;
-import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.component.log.domain.LogEntry;
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,14 +38,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,72 +50,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Also evaluates the real {@code @PreAuthorize} expressions on {@link EditorLogFileStorageImpl} through the real
+ * Evaluates the real {@code @PreAuthorize} expression on every workflow node parameter mutation through the real
  * {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}, asserting each guard in
- * both directions and the exact check that reaches {@link PermissionService}. Editor test jobs never reach the
- * persistent job store, so the guards name the {@code TestJob} resource with the scope starting a test run requires.
+ * both directions and the exact check that reaches {@link PermissionService}. The guards use
+ * {@code hasWorkflowScopeIfProjectWorkflow} because the embedded integration editor shares these endpoints for
+ * workflows that belong to no automation project, and they check the Development environment whatever environment the
+ * request names, since a workflow definition is edited there.
  *
  * @author Ivica Cardic
  */
-@ExtendWith({
-    MockitoExtension.class, ObjectMapperSetupExtension.class
-})
-class EditorLogFileStorageTest {
+class WorkflowNodeParameterApiControllerTest {
 
-    private static final long JOB_ID = 7L;
-    private static final long TASK_EXECUTION_ID = 8L;
-    private static final String EDITOR_DIR = "editor/logs";
-    private static final String EDITOR_JOB_DIR = "editor/logs/7";
-
-    @Mock
-    private FileStorageService fileStorageService;
-
-    private EditorLogFileStorage editorLogFileStorage;
-
-    @BeforeEach
-    void beforeEach() {
-        editorLogFileStorage = new EditorLogFileStorageImpl(fileStorageService);
-    }
-
-    @Test
-    void testEntriesAreWrittenUnderTheEditorDirectory() {
-        when(fileStorageService.fileExists(EDITOR_JOB_DIR, "70.jsonl")).thenReturn(false);
-        when(fileStorageService.getFileEntries(EDITOR_JOB_DIR + "/")).thenReturn(Set.of());
-        when(fileStorageService.fileExists(EDITOR_DIR, "7.jsonl")).thenReturn(false);
-
-        editorLogFileStorage.storeLogEntries(JOB_ID, 70L, List.of(logEntry("editor run")));
-
-        editorLogFileStorage.logsExist(JOB_ID);
-
-        verify(fileStorageService).storeFileContent(eq(EDITOR_JOB_DIR), eq("70.jsonl"), any(byte[].class), eq(false));
-    }
-
-    @Test
-    void testLegacyEditorJobFilesAreStillRead() {
-        FileEntry legacyFile = new FileEntry("7.jsonl", "file://test/editor/7.jsonl");
-
-        when(fileStorageService.getFileEntries(EDITOR_JOB_DIR + "/")).thenReturn(Set.of());
-        when(fileStorageService.fileExists(EDITOR_DIR, "7.jsonl")).thenReturn(true);
-        when(fileStorageService.getFileEntry(EDITOR_DIR, "7.jsonl")).thenReturn(legacyFile);
-        when(fileStorageService.readFileToBytes(EDITOR_DIR, legacyFile))
-            .thenReturn((JsonUtils.write(logEntry("from before")) + "\n").getBytes(StandardCharsets.UTF_8));
-
-        List<LogEntry> logEntries = editorLogFileStorage.readLogEntriesByJobId(JOB_ID);
-
-        assertEquals(List.of("from before"), logEntries.stream()
-            .map(LogEntry::message)
-            .toList());
-    }
-
-    private static LogEntry logEntry(String message) {
-        return LogEntry.builder()
-            .timestamp(Instant.now())
-            .level(LogEntry.Level.DEBUG)
-            .componentName("logger")
-            .taskExecutionId(70L)
-            .message(message)
-            .build();
-    }
+    private static final long ENVIRONMENT_ID = 2L;
+    private static final String WORKFLOW_ID = "workflow-1";
 
     // The first guard evaluation in a test JVM loads, and under coverage instruments, the Spring Security and SpEL
     // class graph. That one-time cost belongs under the longer @BeforeAll limit, not the per-test one.
@@ -157,7 +91,7 @@ class EditorLogFileStorageTest {
 
     @Test
     void testEveryGuardedMethodHasAnEvaluatedCase() {
-        Set<String> guardedMethodNames = Arrays.stream(EditorLogFileStorageImpl.class.getDeclaredMethods())
+        Set<String> guardedMethodNames = Arrays.stream(WorkflowNodeParameterApiController.class.getDeclaredMethods())
             .filter(method -> method.isAnnotationPresent(PreAuthorize.class))
             .map(Method::getName)
             .collect(Collectors.toSet());
@@ -169,6 +103,18 @@ class EditorLogFileStorageTest {
         assertThat(evaluatedMethodNames).isEqualTo(guardedMethodNames);
     }
 
+    @Test
+    void testDisplayConditionReadsCarryNoGuard() throws NoSuchMethodException {
+        Method workflowNodeMethod = WorkflowNodeParameterApiController.class.getMethod(
+            "getWorkflowNodeParameterDisplayConditions", String.class, String.class, Long.class);
+        Method clusterElementMethod = WorkflowNodeParameterApiController.class.getMethod(
+            "getClusterElementParameterDisplayConditions", String.class, String.class, String.class, String.class,
+            Long.class);
+
+        assertThat(workflowNodeMethod.getAnnotation(PreAuthorize.class)).isNull();
+        assertThat(clusterElementMethod.getAnnotation(PreAuthorize.class)).isNull();
+    }
+
     static Stream<Arguments> guardCases() {
         return guardCaseStream()
             .flatMap(guardCase -> Stream.of(Arguments.of(guardCase, false), Arguments.of(guardCase, true)));
@@ -176,10 +122,13 @@ class EditorLogFileStorageTest {
 
     private static Stream<GuardCase> guardCaseStream() {
         return Stream.of(
-            new GuardCase("deleteLogEntries", Map.of("jobId", JOB_ID)),
-            new GuardCase("logsExist", Map.of("jobId", JOB_ID)),
-            new GuardCase("readLogEntries", Map.of("jobId", JOB_ID, "taskExecutionId", TASK_EXECUTION_ID)),
-            new GuardCase("readLogEntriesByJobId", Map.of("jobId", JOB_ID)));
+            "deleteClusterElementParameter", "deleteWorkflowNodeParameter", "updateClusterElementParameter",
+            "updateWorkflowNodeParameter")
+            .map(methodName -> new GuardCase(
+                methodName,
+                Map.of("id", WORKFLOW_ID, "workflowNodeName", "node_1", "environmentId", ENVIRONMENT_ID),
+                permissionService -> permissionService.hasWorkflowScopeIfProjectWorkflow(
+                    WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT)));
     }
 
     // The expression parsed here is read straight off our own @PreAuthorize annotation in this repository's compiled
@@ -216,7 +165,7 @@ class EditorLogFileStorageTest {
     }
 
     private static Method findMethod(String methodName) {
-        List<Method> methods = Arrays.stream(EditorLogFileStorageImpl.class.getDeclaredMethods())
+        List<Method> methods = Arrays.stream(WorkflowNodeParameterApiController.class.getDeclaredMethods())
             .filter(method -> !method.isSynthetic() && Modifier.isPublic(method.getModifiers()))
             .filter(method -> methodName.equals(method.getName()))
             .toList();
@@ -248,11 +197,8 @@ class EditorLogFileStorageTest {
         return arguments;
     }
 
-    private record GuardCase(String methodName, Map<String, Object> argumentsByName) {
-
-        Function<PermissionService, Boolean> expectedCheck() {
-            return permissionService -> permissionService.hasResourceScope(JOB_ID, "TestJob", "WORKFLOW_EDIT");
-        }
+    private record GuardCase(
+        String methodName, Map<String, Object> argumentsByName, Function<PermissionService, Boolean> expectedCheck) {
 
         @Override
         public String toString() {

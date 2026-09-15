@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -36,7 +37,8 @@ class WorkflowTestConfigurationGraphQlController {
     }
 
     @MutationMapping
-    boolean saveClusterElementTestConfigurationConnection(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    public boolean saveClusterElementTestConfigurationConnection(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String clusterElementType,
         @Argument String clusterElementWorkflowNodeName, @Argument String workflowConnectionKey,
         @Argument long connectionId, @Argument long environmentId) {
@@ -49,7 +51,8 @@ class WorkflowTestConfigurationGraphQlController {
     }
 
     @MutationMapping
-    boolean saveWorkflowTestConfigurationConnection(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#workflowId, 'WORKFLOW_EDIT', #environmentId)")
+    public boolean saveWorkflowTestConfigurationConnection(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String workflowConnectionKey,
         @Argument long connectionId, @Argument long environmentId) {
 

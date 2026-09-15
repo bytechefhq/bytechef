@@ -61,6 +61,12 @@ class EndpointGateCoverageTest {
             "ApiCollectionFacadeImpl#updateApiCollectionEndpoint"),
         Map.entry("ApiCollectionTagApiController#updateApiCollectionTags",
             "ApiCollectionFacadeImpl#updateApiCollectionTags"),
+        Map.entry("BillingApiController#cancelSubscription", "BillingSubscriptionFacadeImpl#cancelSubscription"),
+        Map.entry("BillingApiController#createCheckoutSession",
+            "BillingSubscriptionFacadeImpl#createCheckoutSession"),
+        Map.entry("BillingApiController#reactivateSubscription",
+            "BillingSubscriptionFacadeImpl#reactivateSubscription"),
+        Map.entry("BillingApiController#upgradeSubscription", "BillingSubscriptionFacadeImpl#updateSubscription"),
         Map.entry("ConnectionApiController#createConnection", "WorkspaceConnectionFacadeImpl#create"),
         Map.entry("ConnectionApiController#deleteConnection", "WorkspaceConnectionFacadeImpl#delete"),
         Map.entry("ConnectionApiController#updateConnection", "WorkspaceConnectionFacadeImpl#update"),
@@ -225,8 +231,6 @@ class EndpointGateCoverageTest {
             "ApiKeyFacadeImpl checks the caller owns the key"));
 
     private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.ofEntries(
-        Map.entry("AiAgentTestApiController#testAiAgent",
-            "runs any workflow's AI Agent node with its test connections"),
         Map.entry("ApiClientApiController#createApiClient", "any member manages the tenant's API platform clients"),
         Map.entry("ApiClientApiController#deleteApiClient", "any member manages the tenant's API platform clients"),
         Map.entry("ApiClientApiController#updateApiClient", "any member manages the tenant's API platform clients"),
@@ -250,23 +254,9 @@ class EndpointGateCoverageTest {
         Map.entry("ApprovalTaskGraphQlController#createApprovalTask", "any member writes any approval task"),
         Map.entry("ApprovalTaskGraphQlController#deleteApprovalTask", "any member writes any approval task"),
         Map.entry("ApprovalTaskGraphQlController#updateApprovalTask", "any member writes any approval task"),
-        Map.entry("BillingApiController#cancelSubscription", "any member changes the tenant's subscription"),
-        Map.entry("BillingApiController#createCheckoutSession", "any member changes the tenant's subscription"),
-        Map.entry("BillingApiController#reactivateSubscription", "any member changes the tenant's subscription"),
-        Map.entry("BillingApiController#upgradeSubscription", "any member changes the tenant's subscription"),
-        Map.entry(
-            "ManagementMcpServerGraphQlController#updateManagementMcpServerUrl",
-            "any member rotates the tenant's management MCP server URL"),
-        Map.entry("McpServerGraphQlController#createMcpServer", "any member creates a tenant MCP server"),
         Map.entry("NotificationApiController#createNotification", "any member writes the tenant's notifications"),
         Map.entry("NotificationApiController#deleteNotification", "any member writes the tenant's notifications"),
-        Map.entry("NotificationApiController#updateNotification", "any member writes the tenant's notifications"),
-        Map.entry(
-            "WebhookTriggerTestApiController#startWebhookTriggerTest",
-            "any member enables any workflow's trigger with its test connection"),
-        Map.entry(
-            "WebhookTriggerTestApiController#stopWebhookTriggerTest",
-            "any member disables any workflow's test trigger"));
+        Map.entry("NotificationApiController#updateNotification", "any member writes the tenant's notifications"));
 
     private static final Set<String> SKIPPED_DIRECTORY_NAMES =
         Set.of(".git", ".gradle", "bin", "build", "node_modules", "src");
