@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.security;
 
+import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
 import com.bytechef.automation.configuration.service.PermissionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
@@ -41,8 +42,22 @@ public class AutomationPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        // The two-argument hasPermission(target, permission) form carries no resource type and is not used by any
-        // @PreAuthorize gate (every gate passes a type via the three-argument overload); fail closed.
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
+
+        // Creating a project deployment is a promotion: the role that matters is the one the caller holds in the
+        // environment being deployed INTO, which only the deployment itself knows. Were the source environment
+        // checked instead, "editor in Development, viewer in Production" would be decorative -- anyone who could edit
+        // in Development could put code into Production. The environment is read off the object rather than
+        // EnvironmentContext, which holds the source environment at promotion time.
+        if (targetDomainObject instanceof ProjectDeploymentDTO projectDeploymentDTO) {
+            return permissionService.hasWorkspaceScopeForProject(
+                projectDeploymentDTO.projectId(), String.valueOf(permission), projectDeploymentDTO.environment());
+        }
+
+        // Every other use of the two-argument hasPermission(target, permission) form carries no resource type; fail
+        // closed rather than guessing one.
         return false;
     }
 

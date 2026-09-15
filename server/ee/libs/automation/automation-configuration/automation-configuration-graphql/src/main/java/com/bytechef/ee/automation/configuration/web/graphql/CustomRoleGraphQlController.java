@@ -142,7 +142,7 @@ public class CustomRoleGraphQlController {
         }
 
         // Membership validation (is each name a real, module-contributed scope?) lives in CustomRoleService against
-        // the PermissionScopeRegistry \u2014 the controller only enforces request shape (present, non-empty).
+        // the PermissionScopeRegistry — the controller only enforces request shape (present, non-empty).
         return Set.copyOf(scopeNames);
     }
 }

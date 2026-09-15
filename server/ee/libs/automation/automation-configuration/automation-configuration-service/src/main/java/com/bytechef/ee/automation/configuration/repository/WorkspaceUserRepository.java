@@ -49,8 +49,7 @@ public interface WorkspaceUserRepository extends ListCrudRepository<WorkspaceUse
     long countAdminsForEnvironment(long workspaceId, int workspaceRole, int environment);
 
     /**
-     * Deletes every row the member holds in the workspace — the implicit one and each per-environment one — because
-     * neither property of the derived query names the environment.
+     * Deletes every row the member holds in the workspace, the implicit one and each per-environment one.
      */
     void deleteByUserIdAndWorkspaceId(long userId, long workspaceId);
 
