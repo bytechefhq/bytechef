@@ -107,9 +107,7 @@ class UserManagementFacadeImpl implements UserManagementFacade {
             }
         }
 
-        // Every reason the placement could be refused is asked before anything is provisioned. Rolling back afterwards
-        // is not enough: the claim-link mail is dispatched from inside this transaction, so a rejection here used to
-        // take the user row and its reset_key away from a link that had already left for the invitee's mailbox.
+        // Every reason the placement could be refused is asked before anything is provisioned.
         WorkspaceMembershipAssigner workspaceMembershipAssigner = resolveWorkspaceMembershipAssigner(workspaces);
 
         if (workspaceMembershipAssigner != null) {
