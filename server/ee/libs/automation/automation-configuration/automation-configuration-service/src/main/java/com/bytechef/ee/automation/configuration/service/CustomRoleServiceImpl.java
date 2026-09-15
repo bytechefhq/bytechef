@@ -8,6 +8,8 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.audit.CustomRoleAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.CustomRoleAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.dto.BuiltInRoleDTO;
 import com.bytechef.ee.automation.configuration.dto.PermissionScopeGroupDTO;
@@ -16,11 +18,13 @@ import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +56,7 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
+    @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_CREATED, mapper = CustomRoleAuditMapper.class)
     @PreAuthorize("isTenantAdmin()")
     public CustomRole createCustomRole(String name, String description, Set<String> scopeNames) {
         validateScopeNames(scopeNames);
@@ -67,6 +72,7 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
+    @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_DELETED, mapper = CustomRoleAuditMapper.class)
     @PreAuthorize("isTenantAdmin()")
     public void deleteCustomRole(long roleId) {
         // Checked, not assumed: deleteById on an unknown id is a silent no-op in Spring Data, so without this an
@@ -86,7 +92,6 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         }
 
         customRoleRepository.deleteById(roleId);
-
     }
 
     @Override
@@ -100,13 +105,27 @@ public class CustomRoleServiceImpl implements CustomRoleService {
     }
 
     @Override
+    @Audited(event = CustomRoleAuditEvents.CUSTOM_ROLE_UPDATED, mapper = CustomRoleAuditMapper.class)
     @PreAuthorize("isTenantAdmin()")
     public CustomRole updateCustomRole(long roleId, String name, String description, Set<String> scopeNames) {
-        validateScopeNames(scopeNames);
-
         CustomRole customRole = customRoleRepository.findById(roleId)
             .orElseThrow(() -> new ConfigurationException(
                 "Custom role " + roleId + " does not exist", CustomRoleErrorType.CUSTOM_ROLE_NOT_FOUND));
+
+        Set<String> storedScopeNames = customRole.getScopeNames();
+        Set<String> registeredScopeNames = permissionScopeRegistry.getAllScopeNames();
+
+        Set<String> retainedScopeNames = scopeNames.stream()
+            .filter(scopeName -> registeredScopeNames.contains(scopeName) || !storedScopeNames.contains(scopeName))
+            .collect(Collectors.toSet());
+
+        validateScopeNames(retainedScopeNames);
+
+        if (retainedScopeNames.isEmpty()) {
+            throw new ConfigurationException(
+                "Custom role " + roleId + " would be left with no registered permission scope",
+                CustomRoleErrorType.SCOPES_REQUIRED);
+        }
 
         validateNameIsAvailable(name, customRole.getName());
 
@@ -120,8 +139,8 @@ public class CustomRoleServiceImpl implements CustomRoleService {
         // Both sides are normalized to immutable Set copies so equality is order- and source-independent: a HashSet
         // and a List-backed Set with the same names compare equal, and neither side can mutate underneath us between
         // the snapshot and the comparison.
-        Set<String> previousScopeNames = Set.copyOf(customRole.getScopeNames());
-        Set<String> requestedScopeNames = Set.copyOf(scopeNames);
+        Set<String> previousScopeNames = Set.copyOf(storedScopeNames);
+        Set<String> requestedScopeNames = Set.copyOf(retainedScopeNames);
 
         customRole.setName(name);
         customRole.setDescription(description);
