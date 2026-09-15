@@ -1,5 +1,7 @@
 dependencies {
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework:spring-context")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
@@ -19,6 +21,7 @@ dependencies {
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))

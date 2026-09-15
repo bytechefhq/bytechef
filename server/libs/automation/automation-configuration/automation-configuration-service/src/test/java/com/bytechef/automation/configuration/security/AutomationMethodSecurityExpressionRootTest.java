@@ -124,6 +124,25 @@ class AutomationMethodSecurityExpressionRootTest {
     }
 
     @Test
+    void testHasResourceScopeInEnvironmentIdChecksTheNamedEnvironment() {
+        when(permissionService.hasResourceScopeInEnvironment(
+            RESOURCE_ID, RESOURCE_TYPE, SCOPE, Environment.PRODUCTION)).thenReturn(true);
+
+        assertThat(root.hasResourceScopeInEnvironmentId(
+            RESOURCE_ID, RESOURCE_TYPE, SCOPE, (long) Environment.PRODUCTION.ordinal())).isTrue();
+        assertThat(root.hasResourceScopeInEnvironmentId(
+            RESOURCE_ID, RESOURCE_TYPE, SCOPE, (long) Environment.DEVELOPMENT.ordinal())).isFalse();
+    }
+
+    @Test
+    void testHasResourceScopeInEnvironmentIdDeniesNullAndAnOrdinalOutsideTheEnum() {
+        assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null)).isFalse();
+        assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, 99L)).isFalse();
+
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
     void testHasWorkflowScopePassesArgumentsAndResultThrough() {
         when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).thenReturn(true);
 

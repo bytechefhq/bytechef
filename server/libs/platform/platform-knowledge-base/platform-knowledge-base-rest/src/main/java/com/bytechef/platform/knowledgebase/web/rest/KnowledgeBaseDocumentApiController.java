@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +44,8 @@ class KnowledgeBaseDocumentApiController {
     }
 
     @PostMapping("/{id}/documents")
-    ResponseEntity<KnowledgeBaseDocument> uploadDocument(
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
+    public ResponseEntity<KnowledgeBaseDocument> uploadDocument(
         @PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
 
         return ResponseEntity.ok(
