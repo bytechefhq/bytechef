@@ -18,31 +18,35 @@ type TagType = {
 
 interface TagProps {
     tag: TagType;
-    onDeleteTag: (deletedTag: TagType) => void;
+    onDeleteTag?: (deletedTag: TagType) => void;
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
     <div className="group flex max-h-8 items-center justify-between rounded-full border border-border/50 pr-1 pl-2 text-xs text-gray-700">
         <span className="py-1">{tag.name}</span>
 
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button
-                    className="ml-1.5 rounded-full opacity-100"
-                    icon={<XIcon />}
-                    onClick={() => onDeleteTag(tag)}
-                    size="iconXxs"
-                    variant="destructiveGhost"
-                />
-            </TooltipTrigger>
+        {onDeleteTag && (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        aria-label="Remove tag"
+                        className="ml-1.5 rounded-full opacity-100"
+                        icon={<XIcon />}
+                        onClick={() => onDeleteTag(tag)}
+                        size="iconXxs"
+                        variant="destructiveGhost"
+                    />
+                </TooltipTrigger>
 
-            <TooltipContent>Remove tag</TooltipContent>
-        </Tooltip>
+                <TooltipContent>Remove tag</TooltipContent>
+            </Tooltip>
+        )}
     </div>
 );
 
 interface TagListProps {
     id: number;
+    readOnly?: boolean;
     remainingTags?: Array<TagType>;
     tags: Array<TagType>;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -51,7 +55,7 @@ interface TagListProps {
     getRequest: (id: number, tags: Array<TagType>) => any;
 }
 
-const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagListProps) => {
+const TagList = ({getRequest, id, readOnly = false, remainingTags, tags, updateTagsMutation}: TagListProps) => {
     const [showAllTags, setShowAllTags] = useState(false);
     const [isNewTagWindowVisible, setIsNewTagWindowVisible] = useState(false);
 
@@ -75,7 +79,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
             <span className="text-xs text-content-neutral-secondary">Tags:</span>
 
             {tags.slice(0, 3).map((tag) => (
-                <Tag key={tag.id ?? tag.name} onDeleteTag={handleDeleteTag} tag={tag} />
+                <Tag key={tag.id ?? tag.name} onDeleteTag={readOnly ? undefined : handleDeleteTag} tag={tag} />
             ))}
 
             {tags.length > 3 && (
@@ -93,14 +97,18 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                     <PopoverContent align="end" className="w-min p-2">
                         <div className="flex w-min flex-col space-y-1">
                             {tags.slice(3).map((tag) => (
-                                <Tag key={tag.id ?? tag.name} onDeleteTag={handleDeleteTag} tag={tag} />
+                                <Tag
+                                    key={tag.id ?? tag.name}
+                                    onDeleteTag={readOnly ? undefined : handleDeleteTag}
+                                    tag={tag}
+                                />
                             ))}
                         </div>
                     </PopoverContent>
                 </Popover>
             )}
 
-            {isNewTagWindowVisible ? (
+            {!readOnly && isNewTagWindowVisible && (
                 <>
                     <CreatableSelect
                         className="w-40 text-start"
@@ -150,10 +158,13 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                         <TooltipContent>Cancel adding a new tag</TooltipContent>
                     </Tooltip>
                 </>
-            ) : (
+            )}
+
+            {!readOnly && !isNewTagWindowVisible && (
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
+                            aria-label="Add new tag"
                             icon={<PlusIcon />}
                             onClick={(event) => {
                                 event.preventDefault();
