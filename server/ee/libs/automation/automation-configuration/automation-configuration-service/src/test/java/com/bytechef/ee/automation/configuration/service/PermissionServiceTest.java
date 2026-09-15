@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
@@ -33,6 +34,7 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.UserService;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -562,6 +564,64 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testCanUseConnectionInWorkflowGrantsAConnectionOfTheWorkflowsWorkspaceAndEnvironment() {
+        givenWorkflowInWorkspace(WORKSPACE_ID);
+
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID, Environment.DEVELOPMENT);
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isTrue();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowDeniesAConnectionOfAnotherWorkspace() {
+        givenWorkflowInWorkspace(WORKSPACE_ID);
+
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong(), any()))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID + 1, Environment.DEVELOPMENT);
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowDeniesAConnectionOfAnotherEnvironment() {
+        givenWorkflowInWorkspace(WORKSPACE_ID);
+
+        lenient().when(workspaceScopeCacheService.getWorkspaceScopes(anyLong(), anyLong(), any()))
+            .thenReturn(Set.of("CONNECTION_VIEW"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID, Environment.PRODUCTION);
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowDeniesWithoutTheConnectionViewScope() {
+        givenWorkflowInWorkspace(WORKSPACE_ID);
+
+        when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.DEVELOPMENT))
+            .thenReturn(Set.of("WORKFLOW_EDIT"));
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID, Environment.DEVELOPMENT);
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    @Test
+    void testCanUseConnectionInWorkflowGrantsATenantAdmin() {
+        securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
+            .thenReturn(true);
+
+        PermissionServiceImpl service = createConnectionService(WORKSPACE_ID + 1, Environment.PRODUCTION);
+
+        assertThat(service.canUseConnectionInWorkflow(1L, "workflow-1", Environment.DEVELOPMENT)).isTrue();
+    }
+
+    @Test
     void testHasResourceScopeUsesWorkspaceScope() {
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("CONNECTION_DELETE"));
@@ -713,6 +773,33 @@ class PermissionServiceTest {
             .thenReturn(Optional.of(CONNECTED_USER_EXTERNAL_ID));
 
         when(userService.getUser(CONNECTED_USER_EXTERNAL_ID)).thenThrow(new UserNotFoundException());
+    }
+
+    private PermissionServiceImpl createConnectionService(long connectionWorkspaceId, Environment environment) {
+        ResourceEnvironmentResolver connectionEnvironmentResolver = new ResourceEnvironmentResolver() {
+            @Override
+            public String resourceType() {
+                return "Connection";
+            }
+
+            @Override
+            public Optional<Environment> fetchEnvironment(Serializable id) {
+                return Optional.of(environment);
+            }
+        };
+
+        return new PermissionServiceImpl(
+            currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
+            workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
+            List.of(connectionEnvironmentResolver));
+    }
+
+    private void givenWorkflowInWorkspace(long workspaceId) {
+        Project project = new Project();
+
+        project.setWorkspaceId(workspaceId);
+
+        when(projectRepository.findByWorkflowId("workflow-1")).thenReturn(Optional.of(project));
     }
 
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {

@@ -16,6 +16,7 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.config.IntegrationIntTestConfiguration;
 import com.bytechef.encryption.EncryptionKey;
@@ -89,6 +90,11 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
+    }
+
+    @Bean
+    PermissionService permissionService() {
+        return mock(PermissionService.class);
     }
 
     @Bean

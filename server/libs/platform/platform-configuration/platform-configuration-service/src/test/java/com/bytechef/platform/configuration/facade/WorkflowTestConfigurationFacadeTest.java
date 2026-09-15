@@ -18,9 +18,16 @@ package com.bytechef.platform.configuration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.Format;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.platform.configuration.service.WorkflowConnectionUsageChecker;
+import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +72,53 @@ class WorkflowTestConfigurationFacadeTest {
             }
             """,
         Format.JSON);
+
+    @Test
+    void testSaveWorkflowTestConfigurationConnectionStopsWhenTheConnectionMayNotBeUsed() {
+        ConnectionService connectionService = mock(ConnectionService.class);
+        WorkflowService workflowService = mock(WorkflowService.class);
+        WorkflowTestConfigurationService workflowTestConfigurationService =
+            mock(WorkflowTestConfigurationService.class);
+
+        when(workflowService.getWorkflow("workflow1")).thenReturn(REQUIRED_INPUT_WORKFLOW);
+
+        WorkflowConnectionUsageChecker workflowConnectionUsageChecker = (workflowId, connectionId, environmentId) -> {
+            throw new IllegalStateException("denied");
+        };
+
+        WorkflowTestConfigurationFacadeImpl workflowTestConfigurationFacade = new WorkflowTestConfigurationFacadeImpl(
+            connectionService, mock(ComponentConnectionFacade.class), List.of(workflowConnectionUsageChecker),
+            workflowService, workflowTestConfigurationService);
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
+                "workflow1", "node_1", "connection", 9L, 0L));
+
+        verifyNoInteractions(connectionService, workflowTestConfigurationService);
+    }
+
+    @Test
+    void testSaveClusterElementTestConfigurationConnectionStopsWhenTheConnectionMayNotBeUsed() {
+        ConnectionService connectionService = mock(ConnectionService.class);
+        WorkflowTestConfigurationService workflowTestConfigurationService =
+            mock(WorkflowTestConfigurationService.class);
+
+        WorkflowConnectionUsageChecker workflowConnectionUsageChecker = (workflowId, connectionId, environmentId) -> {
+            throw new IllegalStateException("denied");
+        };
+
+        WorkflowTestConfigurationFacadeImpl workflowTestConfigurationFacade = new WorkflowTestConfigurationFacadeImpl(
+            connectionService, mock(ComponentConnectionFacade.class), List.of(workflowConnectionUsageChecker),
+            mock(WorkflowService.class), workflowTestConfigurationService);
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> workflowTestConfigurationFacade.saveClusterElementTestConfigurationConnection(
+                "workflow1", "node_1", "MODEL", "model_1", "connection", 9L, 0L));
+
+        verifyNoInteractions(connectionService, workflowTestConfigurationService);
+    }
 
     @Test
     void testValidateInputsAcceptsNonEmptyString() {
