@@ -31,6 +31,8 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -181,6 +183,12 @@ class McpProjectWorkflowFacadeIntTest {
         private ProjectRepository projectRepository;
 
         @Autowired
+        private WorkspaceMcpServerRepository workspaceMcpServerRepository;
+
+        @Autowired
+        private WorkspaceMcpServerService workspaceMcpServerService;
+
+        @Autowired
         private WorkspaceRepository workspaceRepository;
 
         private ProjectDeploymentWorkflow foreignProjectDeploymentWorkflow;
@@ -204,6 +212,8 @@ class McpProjectWorkflowFacadeIntTest {
 
             project = projectRepository.save(project);
 
+            workspaceMcpServerService.assignMcpServerToWorkspace(mcpServer.getId(), workspace.getId());
+
             ProjectDeployment projectDeployment = saveProjectDeployment(
                 "test-deployment", project.getId(), Environment.DEVELOPMENT);
 
@@ -222,6 +232,7 @@ class McpProjectWorkflowFacadeIntTest {
         void afterEach() {
             mcpProjectWorkflowRepository.deleteAll();
             mcpProjectRepository.deleteAll();
+            workspaceMcpServerRepository.deleteAll();
             projectDeploymentWorkflowRepository.deleteAll();
             projectDeploymentRepository.deleteAll();
             projectRepository.deleteAll();

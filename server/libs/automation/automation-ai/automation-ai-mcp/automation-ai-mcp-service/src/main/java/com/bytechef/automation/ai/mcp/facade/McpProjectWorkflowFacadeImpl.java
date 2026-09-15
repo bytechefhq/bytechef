@@ -21,6 +21,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.ai.mcp.audit.McpProjectAuditEvents;
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.util.McpWorkflowUtils;
@@ -52,6 +53,7 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
         "Invalid projectDeploymentWorkflowId for the given MCP project";
 
     private final McpProjectService mcpProjectService;
+    private final McpProjectWorkspaceGuard mcpProjectWorkspaceGuard;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -59,11 +61,13 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
 
     @SuppressFBWarnings("EI")
     public McpProjectWorkflowFacadeImpl(
-        McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
+        McpProjectService mcpProjectService, McpProjectWorkspaceGuard mcpProjectWorkspaceGuard,
+        McpProjectWorkflowService mcpProjectWorkflowService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
 
         this.mcpProjectService = mcpProjectService;
+        this.mcpProjectWorkspaceGuard = mcpProjectWorkspaceGuard;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectWorkflowService = projectWorkflowService;
@@ -196,5 +200,7 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
         if (!owned) {
             throw new IllegalArgumentException(INVALID_PROJECT_DEPLOYMENT_WORKFLOW);
         }
+
+        mcpProjectWorkspaceGuard.requireDeploymentInServerWorkspace(mcpProject.getMcpServerId(), projectDeploymentId);
     }
 }
