@@ -17,8 +17,12 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,11 +40,16 @@ import com.bytechef.automation.configuration.dto.WorkflowTemplateDTO;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
+import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
@@ -54,12 +63,21 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -518,5 +536,240 @@ public class ProjectWorkflowFacadeIntTest {
         assertThat(workflow.getTasks())
             .extracting(WorkflowTaskDTO::getName)
             .containsExactlyInAnyOrder("branch_1", "slack_1", "googleMail_1");
+    }
+
+    @Nested
+    @Import({
+        MethodSecurityEnforcement.Config.class, PostgreSQLContainerConfiguration.class
+    })
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final long PROJECT_ID = 42L;
+        private static final long PROJECT_WORKFLOW_ID = 7L;
+        private static final String WORKFLOW_ID = "workflow-1";
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @MockitoBean
+        private ProjectService projectService;
+
+        @MockitoBean
+        private ProjectWorkflowService projectWorkflowService;
+
+        @MockitoBean
+        private WorkflowFacade workflowFacade;
+
+        @BeforeEach
+        void authenticateAsNonAdmin() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            when(projectService.getProject(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getWorkflowProject(anyString())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectWorkflowService.getProjectWorkflow(anyLong()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectWorkflowService.getProjectWorkflows()).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectWorkflowService.getProjectWorkflows(anyLong(), anyInt()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectWorkflowService.getWorkflowProjectWorkflow(anyString()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(preBuiltTemplateService.getWorkflowTemplate(anyString()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+
+            doThrow(new IllegalStateException(BODY_REACHED)).when(workflowFacade)
+                .update(anyString(), anyString(), anyInt());
+        }
+
+        @AfterEach
+        void clearSecurityContext() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testUpdateWorkflowDeniesWhenTheWorkflowEditScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.updateWorkflow(WORKFLOW_ID, "{}", 1));
+        }
+
+        @Test
+        void testUpdateWorkflowAllowsWhenTheWorkflowEditScopeIsGranted() {
+            grantWorkflowScope("WORKFLOW_EDIT", Environment.DEVELOPMENT);
+
+            assertBodyReached(() -> projectWorkflowFacade.updateWorkflow(WORKFLOW_ID, "{}", 1));
+        }
+
+        @Test
+        void testUpdateWorkflowDeniesAMemberWhoHoldsTheWorkflowEditScopeOnlyInProduction() {
+            grantWorkflowScope("WORKFLOW_EDIT", Environment.PRODUCTION);
+
+            assertDenied(() -> projectWorkflowFacade.updateWorkflow(WORKFLOW_ID, "{}", 1));
+        }
+
+        @Test
+        void testExportSharedWorkflowDeniesWhenTheWorkflowEditScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.exportSharedWorkflow(WORKFLOW_ID, "description"));
+        }
+
+        @Test
+        void testExportSharedWorkflowAllowsWhenTheWorkflowEditScopeIsGranted() {
+            grantWorkflowScope("WORKFLOW_EDIT", Environment.DEVELOPMENT);
+
+            assertBodyReached(() -> projectWorkflowFacade.exportSharedWorkflow(WORKFLOW_ID, "description"));
+        }
+
+        @Test
+        void testDeleteSharedWorkflowDeniesWhenTheWorkflowDeleteScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.deleteSharedWorkflow(WORKFLOW_ID));
+        }
+
+        @Test
+        void testDeleteSharedWorkflowAllowsWhenTheWorkflowDeleteScopeIsGranted() {
+            grantWorkflowScope("WORKFLOW_DELETE", Environment.DEVELOPMENT);
+
+            assertBodyReached(() -> projectWorkflowFacade.deleteSharedWorkflow(WORKFLOW_ID));
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testGetProjectWorkflowByWorkflowIdRequiresWorkflowView(boolean granted) {
+            when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).thenReturn(granted);
+
+            assertGuarded(() -> projectWorkflowFacade.getProjectWorkflow(WORKFLOW_ID), granted);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testGetProjectWorkflowByProjectWorkflowIdRequiresWorkflowView(boolean granted) {
+            when(permissionService.hasResourceScope(PROJECT_WORKFLOW_ID, "ProjectWorkflow", "WORKFLOW_VIEW"))
+                .thenReturn(granted);
+
+            assertGuarded(() -> projectWorkflowFacade.getProjectWorkflow(PROJECT_WORKFLOW_ID), granted);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testGetProjectWorkflowsRequiresWorkflowViewOnTheProject(boolean granted) {
+            when(permissionService.hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW")).thenReturn(granted);
+
+            assertGuarded(() -> projectWorkflowFacade.getProjectWorkflows(PROJECT_ID), granted);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testGetProjectVersionWorkflowsRequiresWorkflowViewOnTheProject(boolean granted) {
+            when(permissionService.hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW")).thenReturn(granted);
+
+            assertGuarded(() -> projectWorkflowFacade.getProjectVersionWorkflows(PROJECT_ID, 1, true), granted);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testGetProjectWorkflowsOfTheWholeTenantRequiresATenantAdmin(boolean granted) {
+            when(permissionService.isTenantAdmin()).thenReturn(granted);
+
+            assertGuarded(() -> projectWorkflowFacade.getProjectWorkflows(), granted);
+        }
+
+        @Test
+        void testAddWorkflowDeniesWhenTheWorkflowCreateScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.addWorkflow(PROJECT_ID, "{}"));
+        }
+
+        @Test
+        void testAddWorkflowAllowsWhenTheWorkflowCreateScopeIsGranted() {
+            grantProjectWorkflowCreateScope();
+
+            assertBodyReached(() -> projectWorkflowFacade.addWorkflow(PROJECT_ID, "{}"));
+        }
+
+        @Test
+        void testImportWorkflowTemplateDeniesWhenTheWorkflowCreateScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.importWorkflowTemplate(PROJECT_ID, "template", false));
+        }
+
+        @Test
+        void testImportWorkflowTemplateAllowsWhenTheWorkflowCreateScopeIsGranted() {
+            grantProjectWorkflowCreateScope();
+
+            assertBodyReached(() -> projectWorkflowFacade.importWorkflowTemplate(PROJECT_ID, "template", false));
+        }
+
+        @Test
+        void testDuplicateWorkflowAllowsWhenCreateOnTheTargetAndViewOnTheSourceAreGranted() {
+            grantProjectWorkflowCreateScope();
+            grantWorkflowScope("WORKFLOW_VIEW", Environment.DEVELOPMENT);
+
+            assertBodyReached(() -> projectWorkflowFacade.duplicateWorkflow(PROJECT_ID, WORKFLOW_ID));
+        }
+
+        @Test
+        void testDuplicateWorkflowDeniesWhenTheWorkflowCreateScopeIsRefused() {
+            grantWorkflowScope("WORKFLOW_VIEW", Environment.DEVELOPMENT);
+
+            assertDenied(() -> projectWorkflowFacade.duplicateWorkflow(PROJECT_ID, WORKFLOW_ID));
+        }
+
+        @Test
+        void testDuplicateWorkflowDeniesWhenTheSourceWorkflowViewScopeIsRefused() {
+            grantProjectWorkflowCreateScope();
+
+            assertDenied(() -> projectWorkflowFacade.duplicateWorkflow(PROJECT_ID, WORKFLOW_ID));
+        }
+
+        @Test
+        void testDeleteWorkflowDeniesWhenTheWorkflowDeleteScopeIsRefused() {
+            assertDenied(() -> projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID));
+        }
+
+        @Test
+        void testDeleteWorkflowAllowsWhenTheWorkflowDeleteScopeIsGranted() {
+            grantWorkflowScope("WORKFLOW_DELETE", Environment.DEVELOPMENT);
+
+            assertBodyReached(() -> projectWorkflowFacade.deleteWorkflow(WORKFLOW_ID));
+        }
+
+        private void grantProjectWorkflowCreateScope() {
+            when(permissionService.hasResourceScopeInEnvironment(
+                PROJECT_ID, "Project", "WORKFLOW_CREATE", Environment.DEVELOPMENT)).thenReturn(true);
+        }
+
+        private void grantWorkflowScope(String scope, Environment environment) {
+            when(permissionService.hasWorkflowScope(WORKFLOW_ID, scope, environment)).thenReturn(true);
+        }
+
+        private static void assertBodyReached(ThrowingCallable throwingCallable) {
+            assertThatThrownBy(throwingCallable)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        private static void assertDenied(ThrowingCallable throwingCallable) {
+            assertThatThrownBy(throwingCallable).isInstanceOf(AccessDeniedException.class);
+        }
+
+        private static void assertGuarded(ThrowingCallable throwingCallable, boolean granted) {
+            if (granted) {
+                assertBodyReached(throwingCallable);
+            } else {
+                assertDenied(throwingCallable);
+            }
+        }
+
+        @EnableMethodSecurity
+        static class Config {
+        }
     }
 }

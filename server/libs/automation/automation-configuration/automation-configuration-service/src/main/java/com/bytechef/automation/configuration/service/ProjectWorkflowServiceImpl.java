@@ -193,7 +193,7 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'PROJECT_PUBLISH')")
     public void publishWorkflow(
         long projectId, int oldProjectVersion, String oldWorkflowId, ProjectWorkflow projectWorkflow) {
 

@@ -42,6 +42,8 @@ import org.springframework.security.core.Authentication;
  * {@code hasWorkspaceScopeInEnvironment}, for listings that carry an environment id.</li>
  * <li>{@code hasResourceScopeInEnvironment(#id, 'Type', 'SCOPE', #environment)} — for a resource that spans
  * environments and an operation that acts on one of them.</li>
+ * <li>{@code hasWorkflowScope(#workflowId, 'SCOPE')} — requires it in the workspace owning the workflow's project, for
+ * a read not confined to one environment.</li>
  * <li>{@code hasWorkflowScopeInEnvironment(#workflowId, 'SCOPE', #environment)} — requires it in the workspace owning
  * the workflow's project, in the environment the operation acts on.</li>
  * <li>{@code hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'SCOPE', #environment)} and
@@ -127,11 +129,10 @@ public final class AutomationMethodSecurityExpressionRoot
      * null argument matches both by reflection order — selecting the {@code Environment} overload and failing with an
      * NPE on {@code environment.ordinal()}. Do not merge the two.
      * <p>
-     * <b>A {@code null} ordinal keeps the environment-unaware check</b> rather than denying or requiring every
-     * environment. The listings that pass one use {@code null} as "no environment filter" and the clients routinely
-     * send nothing, so denying would refuse ordinary pages to exactly the members per-environment roles protect. This
-     * gate closes forgery — naming an environment the caller holds no role in — and a {@code null} names nothing. The
-     * unfiltered listing still returns rows from every environment; that union is pre-existing and not closed here.
+     * <b>A {@code null} ordinal requires {@code scope} in every environment.</b> The listings that pass one use
+     * {@code null} as "no environment filter" and return rows from every environment, so the caller must be able to
+     * read every environment. Treating {@code null} as Development would let a member who holds the scope only there
+     * read Production by omitting the parameter.
      */
     public boolean hasWorkspaceScopeInEnvironmentId(long workspaceId, String scope, @Nullable Long environmentId) {
         if (AutomationAuthorizationContext.isSkipChecks()) {
@@ -139,7 +140,7 @@ public final class AutomationMethodSecurityExpressionRoot
         }
 
         if (environmentId == null) {
-            return permissionService.hasWorkspaceScope(workspaceId, scope);
+            return permissionService.hasWorkspaceScopeInEveryEnvironment(workspaceId, scope);
         }
 
         Environment[] environments = Environment.values();
@@ -159,10 +160,9 @@ public final class AutomationMethodSecurityExpressionRoot
      * express, since it can only take the environment from a {@code ResourceEnvironmentResolver} and a resource
      * spanning environments has none to give.
      * <p>
-     * A {@code null} environment keeps the environment-unaware check, for the same reason the {@code null} ordinal does
-     * above, and guarding it here rather than at the call site is what makes the expression safe to point at a
-     * caller-supplied {@code Environment}: without it the path below reaches {@code environment.ordinal()} deeper in
-     * and a null turns a 403 into a 500.
+     * A {@code null} environment keeps the environment-unaware check, and guarding it here rather than at the call site
+     * is what makes the expression safe to point at a caller-supplied {@code Environment}: without it the path below
+     * reaches {@code environment.ordinal()} deeper in and a null turns a 403 into a 500.
      */
     public boolean hasResourceScopeInEnvironment(
         Serializable id, String resourceType, String scope, @Nullable Environment environment) {
@@ -176,6 +176,18 @@ public final class AutomationMethodSecurityExpressionRoot
         }
 
         return permissionService.hasResourceScopeInEnvironment(id, resourceType, scope, environment);
+    }
+
+    /**
+     * Requires {@code scope} in the workspace that owns the workflow's project, in any environment, for a read that is
+     * not confined to one environment. A workflow that belongs to no project is granted to a tenant administrator only.
+     */
+    public boolean hasWorkflowScope(String workflowId, String scope) {
+        if (AutomationAuthorizationContext.isSkipChecks()) {
+            return true;
+        }
+
+        return permissionService.hasWorkflowScope(workflowId, scope);
     }
 
     /**
@@ -195,8 +207,8 @@ public final class AutomationMethodSecurityExpressionRoot
     /**
      * The counterpart to {@link #hasWorkflowScopeInEnvironment(String, String, Environment)} for the platform
      * workflow-editor endpoints that embedded shares: requires {@code scope} for a workflow that belongs to an
-     * automation project and leaves a workflow that belongs to none, an embedded integration workflow, to the embedded
-     * surface's own authorization.
+     * automation project, and a tenant administrator for a workflow that belongs to none, such as an embedded
+     * integration workflow.
      */
     public boolean hasWorkflowScopeIfProjectWorkflowInEnvironment(
         String workflowId, String scope, Environment environment) {
