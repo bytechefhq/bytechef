@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -58,6 +59,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpComponent create(McpComponent mcpComponent, List<McpTool> mcpTools) {
         McpComponent savedComponent = mcpComponentService.create(mcpComponent);
 
@@ -73,6 +75,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')")
     public void deleteMcpComponent(long mcpComponentId) {
         for (McpTool mcpTool : mcpToolService.getMcpComponentMcpTools(mcpComponentId)) {
             mcpToolService.delete(mcpTool);
@@ -82,6 +85,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteMcpServer(long mcpServerId) {
         for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
@@ -134,6 +138,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')")
     public McpComponent update(McpComponent mcpComponent, List<McpTool> mcpTools) {
         McpComponent updatedComponent = mcpComponentService.update(mcpComponent);
 
@@ -154,6 +159,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpServer', 'MCP_EDIT')")
     public List<Tag> updateMcpServerTags(long id, List<Tag> tags) {
         List<Tag> validatedTags = checkTags(tags);
 

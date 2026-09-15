@@ -25,6 +25,7 @@ import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +54,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')")
     public List<McpServer> getWorkspaceMcpServers(Long workspaceId) {
         List<WorkspaceMcpServer> workspaceMcpServers = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId);
 
@@ -62,6 +64,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasWorkspaceScopeInEnvironment(#workspaceId, 'MCP_CREATE', #environment)")
     public McpServer createWorkspaceMcpServer(
         String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId) {
 
@@ -72,7 +75,10 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
         return mcpServer;
     }
 
+    // MCP_DELETE, the scope McpServerFacadeImpl.deleteMcpServer requires of the delete this reaches, so a caller is
+    // refused before the server is unassigned from the workspace rather than halfway through.
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_DELETE')")
     public void deleteWorkspaceMcpServer(Long mcpServerId) {
         workspaceMcpServerService.removeMcpServerFromWorkspace(mcpServerId);
 
