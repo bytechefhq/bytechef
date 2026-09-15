@@ -15,6 +15,7 @@ import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import upsertTrigger from './upsertTrigger';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 import {drainPendingSaves, enqueuePendingSave, isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface SaveWorkflowDefinitionProps {
@@ -30,6 +31,10 @@ interface SaveWorkflowDefinitionProps {
 }
 
 export default async function saveWorkflowDefinition(props: SaveWorkflowDefinitionProps) {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const {
         decorative,
         nodeData,
