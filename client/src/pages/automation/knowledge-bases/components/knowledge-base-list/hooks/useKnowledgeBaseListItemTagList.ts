@@ -1,3 +1,4 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     KnowledgeBaseTagsEntry,
     Tag,
@@ -5,6 +6,7 @@ import {
     UpdateKnowledgeBaseTagsInput,
     useUpdateKnowledgeBaseTagsMutation,
 } from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo} from 'react';
 
@@ -23,20 +25,28 @@ export default function useKnowledgeBaseListItemTagList({
     remainingTags,
     tags,
 }: UseKnowledgeBaseListItemTagListProps) {
+    const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const queryClient = useQueryClient();
+
+    const tagsByKnowledgeBaseQueryKey = [
+        'knowledgeBaseTagsByKnowledgeBase',
+        {environmentId: String(environmentId), workspaceId: String(workspaceId)},
+    ];
 
     const updateTagsMutation = useUpdateKnowledgeBaseTagsMutation({
         onError: (_err, _vars, ctx) => {
             if (ctx?.previous) {
-                queryClient.setQueryData(['knowledgeBaseTagsByKnowledgeBase'], ctx.previous);
+                queryClient.setQueryData(tagsByKnowledgeBaseQueryKey, ctx.previous);
             }
         },
         onMutate: async (variables: UpdateKnowledgeBaseTagsVarsI) => {
-            await queryClient.cancelQueries({queryKey: ['knowledgeBaseTagsByKnowledgeBase']});
+            await queryClient.cancelQueries({queryKey: tagsByKnowledgeBaseQueryKey});
 
-            const previous = queryClient.getQueryData<{knowledgeBaseTagsByKnowledgeBase: KnowledgeBaseTagsEntry[]}>([
-                'knowledgeBaseTagsByKnowledgeBase',
-            ]);
+            const previous = queryClient.getQueryData<{knowledgeBaseTagsByKnowledgeBase: KnowledgeBaseTagsEntry[]}>(
+                tagsByKnowledgeBaseQueryKey
+            );
 
             const next = (() => {
                 if (!previous?.knowledgeBaseTagsByKnowledgeBase) return previous;
@@ -65,7 +75,7 @@ export default function useKnowledgeBaseListItemTagList({
                       };
             })();
 
-            queryClient.setQueryData(['knowledgeBaseTagsByKnowledgeBase'], next);
+            queryClient.setQueryData(tagsByKnowledgeBaseQueryKey, next);
 
             return {previous};
         },
