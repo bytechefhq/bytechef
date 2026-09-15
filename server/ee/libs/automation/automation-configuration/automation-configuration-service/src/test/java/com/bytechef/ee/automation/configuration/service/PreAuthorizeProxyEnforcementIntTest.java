@@ -233,6 +233,9 @@ class PreAuthorizeProxyEnforcementIntTest {
     void testRealWorkspaceUserServiceImplAllowsAssignCustomRoleWhenTheScopeIsGranted() {
         when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE)).thenReturn(true);
 
+        // The caller also holds the role's scopes; granting a role that carries more than the caller holds is refused.
+        when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class))).thenReturn(true);
+
         stubAnAssignableCustomRoleAndMembership();
 
         WorkspaceUser workspaceUser = workspaceUserService.assignCustomRole(USER_ID, WORKSPACE_ID, CUSTOM_ROLE_ID);
@@ -319,6 +322,11 @@ class PreAuthorizeProxyEnforcementIntTest {
         @Bean("permissionService")
         PermissionService permissionService() {
             return mock(PermissionService.class);
+        }
+
+        @Bean
+        PermissionScopeRegistry permissionScopeRegistry() {
+            return mock(PermissionScopeRegistry.class);
         }
 
         @Bean

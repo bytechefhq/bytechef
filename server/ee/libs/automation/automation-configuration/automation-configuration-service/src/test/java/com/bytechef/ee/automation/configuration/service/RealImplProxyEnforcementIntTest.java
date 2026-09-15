@@ -26,6 +26,7 @@ import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
@@ -165,6 +166,9 @@ class RealImplProxyEnforcementIntTest {
     @Test
     void testRealWorkspaceUserServiceImplAllowsAssignCustomRoleWhenTheScopeIsGranted() {
         when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE)).thenReturn(true);
+
+        // The caller also holds the role's scopes; granting a role that carries more than the caller holds is refused.
+        when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class))).thenReturn(true);
 
         stubAnAssignableCustomRoleAndMembership();
 

@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -57,6 +59,9 @@ class WorkspaceUserModeSwitchingTest {
     private CustomRoleRepository customRoleRepository;
 
     @Mock
+    private PermissionScopeRegistry permissionScopeRegistry;
+
+    @Mock
     private PermissionService permissionService;
 
     @Mock
@@ -77,6 +82,10 @@ class WorkspaceUserModeSwitchingTest {
     @BeforeEach
     void setUp() {
         lenient().when(workspaceService.workspaceExists(WORKSPACE_ID))
+            .thenReturn(true);
+        lenient().when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class)))
+            .thenReturn(true);
+        lenient().when(permissionService.hasWorkspaceScopeInEveryEnvironment(anyLong(), anyString()))
             .thenReturn(true);
     }
 
