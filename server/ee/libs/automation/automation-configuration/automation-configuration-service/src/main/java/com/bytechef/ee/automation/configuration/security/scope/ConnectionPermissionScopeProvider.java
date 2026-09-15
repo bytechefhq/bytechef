@@ -14,15 +14,13 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
- * Declares the connection-domain permission scopes. Read is granted from VIEWER; edit and delete from ADMIN.
+ * Declares the connection-domain permission scopes. Read is granted from VIEWER, create from EDITOR, and edit and
+ * delete from ADMIN.
  *
  * <p>
  * A connection is shared: every workflow that uses it depends on it, including workflows other members built. So
- * changing one (its name and tags on this branch) or deleting one is not something any editor may do to a connection
- * that is not theirs. The exception is the connection's owner, who may edit and delete their own connection without
- * either scope - an editor keeps full control of the connections they created. That exception needs the connection's
- * owner, which the {@code Connection} ownership resolver supplies; the resolver and the connection guards arrive with
- * #4750, so none of the three scopes is enforced on this branch yet.
+ * changing one (its name and tags) or deleting one is not something any editor may do. Creating one is, because
+ * building a workflow needs connections; it is checked in the environment the new connection belongs to.
  *
  * <p>
  * There is no CONNECTION_USE. It named a real distinction -- using a connection in a workflow without being able to
@@ -42,6 +40,7 @@ public class ConnectionPermissionScopeProvider implements PermissionScopeProvide
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
             new ScopeDefinition(ConnectionPermissionScope.CONNECTION_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(ConnectionPermissionScope.CONNECTION_CREATE, WorkspaceRole.EDITOR),
             new ScopeDefinition(ConnectionPermissionScope.CONNECTION_EDIT, WorkspaceRole.ADMIN),
             new ScopeDefinition(ConnectionPermissionScope.CONNECTION_DELETE, WorkspaceRole.ADMIN));
     }
