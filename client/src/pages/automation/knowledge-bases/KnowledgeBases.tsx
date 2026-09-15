@@ -9,17 +9,20 @@ import useKnowledgeBaseEmbeddingActive from '@/pages/automation/knowledge-bases/
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {DatabaseIcon} from 'lucide-react';
 
 const KnowledgeBases = () => {
-    const currentWorkspaceId = String(useWorkspaceStore((state) => state.currentWorkspaceId));
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {allTags, error, filteredKnowledgeBases, isLoading, knowledgeBases, tagId, tagsByKnowledgeBaseData} =
         useKnowledgeBases();
 
     const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
+
+    const canCreateKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_CREATE');
 
     const showKnowledgeBases = embeddingActive && knowledgeBases.length > 0;
 
@@ -30,10 +33,11 @@ const KnowledgeBases = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        showKnowledgeBases && (
+                        showKnowledgeBases &&
+                        canCreateKnowledgeBase && (
                             <CreateKnowledgeBaseDialog
                                 trigger={<Button>New Knowledge Base</Button>}
-                                workspaceId={currentWorkspaceId}
+                                workspaceId={String(currentWorkspaceId)}
                             />
                         )
                     }
@@ -65,10 +69,12 @@ const KnowledgeBases = () => {
                         ) : (
                             <EmptyList
                                 button={
-                                    <CreateKnowledgeBaseDialog
-                                        trigger={<Button>Create Knowledge Base</Button>}
-                                        workspaceId={currentWorkspaceId}
-                                    />
+                                    canCreateKnowledgeBase ? (
+                                        <CreateKnowledgeBaseDialog
+                                            trigger={<Button>Create Knowledge Base</Button>}
+                                            workspaceId={String(currentWorkspaceId)}
+                                        />
+                                    ) : undefined
                                 }
                                 icon={<DatabaseIcon className="size-24 text-gray-300" />}
                                 message={
