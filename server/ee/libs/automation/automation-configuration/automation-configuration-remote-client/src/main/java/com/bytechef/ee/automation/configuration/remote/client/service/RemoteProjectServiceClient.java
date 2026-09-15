@@ -123,6 +123,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchWorkflowProject(String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Project getWorkflowProject(String workflowId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
