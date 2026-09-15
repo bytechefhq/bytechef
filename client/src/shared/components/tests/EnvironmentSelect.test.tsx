@@ -108,4 +108,17 @@ describe('EnvironmentSelect', () => {
         expect(await screen.findByText('STAGING')).toBeInTheDocument();
         expect(screen.getByText('PRODUCTION')).toBeInTheDocument();
     });
+
+    it('should offer only the visible environments', async () => {
+        render(
+            <MemoryRouter>
+                <EnvironmentSelect variant="compact" visibleEnvironmentIds={[0, 2]} />
+            </MemoryRouter>
+        );
+
+        await userEvent.click(screen.getByRole('button'));
+
+        expect(await screen.findByText('PRODUCTION')).toBeInTheDocument();
+        expect(screen.queryByText('STAGING')).not.toBeInTheDocument();
+    });
 });
