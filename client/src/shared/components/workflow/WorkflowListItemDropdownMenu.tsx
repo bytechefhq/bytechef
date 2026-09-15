@@ -15,6 +15,8 @@ interface WorkflowListItemDropdownMenuProps {
     dialogs?: ReactNode;
     onDelete: () => void;
     onEditClick: () => void;
+    showDeleteAction?: boolean;
+    showEditAction?: boolean;
     workflowLabel?: string | null;
 }
 
@@ -23,6 +25,8 @@ const WorkflowListItemDropdownMenu = ({
     dialogs,
     onDelete,
     onEditClick,
+    showDeleteAction = true,
+    showEditAction = true,
     workflowLabel,
 }: WorkflowListItemDropdownMenuProps) => {
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
@@ -44,18 +48,22 @@ const WorkflowListItemDropdownMenu = ({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />
+                    {showEditAction && <DropdownMenuItem icon={<EditIcon />} label="Edit" onClick={onEditClick} />}
 
                     {children}
 
-                    <DropdownMenuSeparator />
+                    {showDeleteAction && (
+                        <>
+                            <DropdownMenuSeparator />
 
-                    <DropdownMenuItem
-                        icon={<Trash2Icon />}
-                        label="Delete"
-                        onClick={() => setShowDeleteWorkflowAlertDialog(true)}
-                        variant="destructive"
-                    />
+                            <DropdownMenuItem
+                                icon={<Trash2Icon />}
+                                label="Delete"
+                                onClick={() => setShowDeleteWorkflowAlertDialog(true)}
+                                variant="destructive"
+                            />
+                        </>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 
