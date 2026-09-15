@@ -2,6 +2,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import useClusterElementStep from '@/pages/platform/cluster-element-editor/data-stream-editor/hooks/useClusterElementStep';
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 
 export default function DataStreamDestinationStep() {
     const {
@@ -20,6 +21,7 @@ export default function DataStreamDestinationStep() {
         testConnections,
         workflowId,
     } = useClusterElementStep('destination');
+    const readOnly = useWorkflowEditorReadOnly();
 
     return (
         <div className="space-y-6 py-4">
@@ -38,7 +40,7 @@ export default function DataStreamDestinationStep() {
                             Component
                         </label>
 
-                        <Select onValueChange={handleComponentChange} value={selectedComponentName}>
+                        <Select disabled={readOnly} onValueChange={handleComponentChange} value={selectedComponentName}>
                             <SelectTrigger id="destination-component-select">
                                 <SelectValue placeholder="Select a destination component..." />
                             </SelectTrigger>
@@ -59,7 +61,11 @@ export default function DataStreamDestinationStep() {
                                 Operation
                             </label>
 
-                            <Select onValueChange={handleOperationChange} value={selectedOperationName}>
+                            <Select
+                                disabled={readOnly}
+                                onValueChange={handleOperationChange}
+                                value={selectedOperationName}
+                            >
                                 <SelectTrigger id="destination-operation-select">
                                     <SelectValue placeholder="Select an operation..." />
                                 </SelectTrigger>
