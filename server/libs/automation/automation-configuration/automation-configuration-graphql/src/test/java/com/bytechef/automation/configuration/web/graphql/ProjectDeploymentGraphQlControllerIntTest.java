@@ -16,28 +16,53 @@
 
 package com.bytechef.automation.configuration.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
+ * Calls the guarded methods of {@link ProjectDeploymentGraphQlController} through the real Spring method-security
+ * interceptor, backed by the real {@link AutomationMethodSecurityExpressionHandler} and
+ * {@link AutomationPermissionEvaluator}.
+ *
  * @author Ivica Cardic
  */
 @ContextConfiguration(classes = {
-    AutomationConfigurationGraphQlTestConfiguration.class,
-    ProjectDeploymentGraphQlController.class
+    AutomationConfigurationGraphQlTestConfiguration.class, ProjectDeploymentGraphQlController.class,
+    ProjectDeploymentGraphQlControllerIntTest.MethodSecurityConfiguration.class
 })
 @GraphQlTest(
     controllers = ProjectDeploymentGraphQlController.class,
@@ -49,18 +74,64 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @AutomationConfigurationGraphQlConfigurationSharedMocks
 class ProjectDeploymentGraphQlControllerIntTest {
 
-    @MockitoBean
-    private EnvironmentService environmentService;
+    private static final String BODY_REACHED = "body reached";
+    private static final long ENVIRONMENT_ID = 2L;
+    private static final long WORKSPACE_ID = 42L;
 
     @Autowired
     private GraphQlTester graphQlTester;
 
+    @Autowired
+    private ProjectDeploymentGraphQlController projectDeploymentGraphQlController;
+
+    @MockitoBean
+    private EnvironmentService environmentService;
+
+    @MockitoBean
+    private PermissionService permissionService;
+
     @MockitoBean
     private ProjectDeploymentService projectDeploymentService;
 
+    @BeforeEach
+    void beforeEach() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken("member", null, List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        when(environmentService.getEnvironment(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+    }
+
+    @AfterEach
+    void afterEach() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {
+        false, true
+    })
+    void testWorkspaceProjectDeploymentsRequiresDeploymentViewInTheNamedEnvironment(boolean granted) {
+        Environment environment = Environment.values()[(int) ENVIRONMENT_ID];
+
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment)).thenReturn(granted);
+
+        assertInvocationOutcome(
+            () -> projectDeploymentGraphQlController.workspaceProjectDeployments(
+                WORKSPACE_ID, ENVIRONMENT_ID, null, null),
+            granted);
+
+        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", environment);
+    }
+
     @Test
     void testWorkspaceProjectDeploymentsRequestsTheNonEmbeddedDeploymentsFromTheService() {
-        when(environmentService.getEnvironment(2L)).thenReturn(Environment.PRODUCTION);
+        doReturn(Environment.PRODUCTION).when(environmentService)
+            .getEnvironment(2L);
+        when(permissionService.hasWorkspaceScope(1L, "DEPLOYMENT_VIEW", Environment.PRODUCTION)).thenReturn(true);
         when(projectDeploymentService.getProjectDeployments(false, Environment.PRODUCTION, null, null, 1L))
             .thenReturn(List.of(projectDeployment(10L, 100L, "Orders")));
 
@@ -89,5 +160,31 @@ class ProjectDeploymentGraphQlControllerIntTest {
         projectDeployment.setProjectVersion(1);
 
         return projectDeployment;
+    }
+
+    private static void assertInvocationOutcome(ThrowingCallable invocation, boolean allowed) {
+        if (allowed) {
+            assertThatThrownBy(invocation)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        } else {
+            assertThatThrownBy(invocation).isInstanceOf(AccessDeniedException.class);
+        }
+    }
+
+    @EnableMethodSecurity
+    static class MethodSecurityConfiguration {
+
+        @Bean
+        static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+            @Lazy PermissionService permissionService) {
+
+            AutomationMethodSecurityExpressionHandler expressionHandler =
+                new AutomationMethodSecurityExpressionHandler(permissionService);
+
+            expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+            return expressionHandler;
+        }
     }
 }

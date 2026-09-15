@@ -16,17 +16,22 @@
 
 package com.bytechef.automation.configuration.web.graphql;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.configuration.web.graphql.config.AutomationConfigurationGraphQlTestConfiguration;
@@ -36,11 +41,28 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import java.time.Instant;
 import java.util.List;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -360,5 +382,86 @@ public class ProjectGraphQlControllerIntTest {
 
     private Tag createMockTag(Long id, String name) {
         return new Tag(id, name);
+    }
+
+    @Nested
+    @Import(MethodSecurityEnforcement.MethodSecurityConfiguration.class)
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final long PROJECT_ID = 11L;
+
+        @Autowired
+        private ProjectGraphQlController projectGraphQlController;
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "member", null, List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            SecurityContextHolder.setContext(securityContext);
+
+            when(projectService.getProject(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectService.getProjects()).thenThrow(new IllegalStateException(BODY_REACHED));
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testProjectRequiresWorkflowViewOnTheProject(boolean granted) {
+            when(permissionService.hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW")).thenReturn(granted);
+
+            assertInvocationOutcome(() -> projectGraphQlController.project(PROJECT_ID), granted);
+
+            verify(permissionService).hasResourceScope(PROJECT_ID, "Project", "WORKFLOW_VIEW");
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testProjectsRequiresATenantAdmin(boolean granted) {
+            when(permissionService.isTenantAdmin()).thenReturn(granted);
+
+            assertInvocationOutcome(() -> projectGraphQlController.projects(), granted);
+        }
+
+        private void assertInvocationOutcome(ThrowingCallable invocation, boolean allowed) {
+            if (allowed) {
+                assertThatThrownBy(invocation)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+            } else {
+                assertThatThrownBy(invocation).isInstanceOf(AccessDeniedException.class);
+            }
+        }
+
+        @EnableMethodSecurity
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+                @Lazy PermissionService permissionService) {
+
+                AutomationMethodSecurityExpressionHandler expressionHandler =
+                    new AutomationMethodSecurityExpressionHandler(permissionService);
+
+                expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+                return expressionHandler;
+            }
+        }
     }
 }
