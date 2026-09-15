@@ -20,8 +20,8 @@ billing:
     product-growth-id: prod_UQl6ZIubWx3VS4
     meter-event-name: tenant_task_executions
     webhook-secret:
-    success-url: http://localhost:5173/automation/settings/billing?checkout=success
-    cancel-url: http://localhost:5173/automation/settings/billing
+    success-url: ${bytechef.public-url}/automation/settings/billing?checkout=success
+    cancel-url: ${bytechef.public-url}/automation/settings/billing
 
 github-proxy:
   baseUrl: https://github-proxy.bytechef.io/

@@ -38,6 +38,10 @@ post-hog:
   api-key: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
   host: https://eu.i.posthog.com
 
+billing:
+  stripe:
+    customer-portal-url: https://billing.stripe.com/p/login/9B68wP8Pz1BX5YfbKj4Ja00
+
 #####
 
 bytechef:
