@@ -108,7 +108,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
     @Override
     @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT') and " +
-        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public A2aProject createA2aProject(
         long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
@@ -117,7 +117,7 @@ public class A2aProjectFacadeImpl implements A2aProjectFacade {
 
     @Override
     @PreAuthorize("hasPermission(#a2aServerId, 'A2aServer', 'A2A_EDIT') and " +
-        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
+        "hasPermission(#projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public A2aProject createA2aProject(
         long a2aServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds,
         List<WorkflowConfigurationDTO> workflowConfigurations) {

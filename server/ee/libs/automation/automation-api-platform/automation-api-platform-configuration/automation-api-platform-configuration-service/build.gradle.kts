@@ -30,6 +30,7 @@ dependencies {
     testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     testImplementation(project(":server:libs:platform:platform-github-proxy-client"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:platform:platform-user:platform-user-api"))
