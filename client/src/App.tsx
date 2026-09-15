@@ -225,7 +225,7 @@ function App() {
     const platformMode = resolveShellPlatformMode(location.pathname, currentType);
 
     useFetchInterceptor();
-    useLoadWorkspaceScopes(platformMode === PlatformType.AUTOMATION ? currentWorkspaceId : undefined);
+    useLoadWorkspaceScopes(authenticated ? currentWorkspaceId : undefined);
 
     const canEditWorkspace = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
 

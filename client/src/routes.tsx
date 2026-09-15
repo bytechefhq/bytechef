@@ -27,6 +27,7 @@ import EEVersion from '@/shared/edition/EEVersion';
 import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
+import AutomationEnvironmentAccessGuard from '@/shared/layout/AutomationEnvironmentAccessGuard';
 import Settings from '@/shared/layout/Settings';
 import SettingsLayout from '@/shared/layout/SettingsLayout';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
@@ -144,6 +145,8 @@ const Integration = lazy(() => import('@/ee/pages/embedded/integration/Integrati
 const Integrations = lazy(() => import('@/ee/pages/embedded/integrations/Integrations'));
 const SigningKeys = lazy(() => import('@/ee/pages/settings/embedded/signing-keys/SigningKeys'));
 const WorkspaceApiKeys = lazy(() => import('@/pages/settings/automation/workspace-api-keys/WorkspaceApiKeys'));
+const WorkspaceUsers = lazy(() => import('@/ee/pages/settings/automation/users/WorkspaceUsers'));
+const GlobalCustomRoles = lazy(() => import('@/ee/pages/settings/platform/custom-roles/GlobalCustomRoles'));
 const Workspaces = lazy(() => import('@/ee/pages/settings/automation/workspaces/Workspaces'));
 const UsersPage = lazy(() => import('@/pages/settings/platform/users/UsersPage'));
 
@@ -206,6 +209,24 @@ const getAccountRoutes = (path: string) => ({
 const currentWorkspaceSettingsRoutes = {
     children: [
         {
+            // ADMIN *or* USER: a workspace admin need not be a tenant admin, and gating this on ROLE_ADMIN would
+            // reinstate the very problem the page exists to solve. The page itself checks the
+            // WORKSPACE_MEMBER_MANAGE scope for the current workspace.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <WorkspaceUsers />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            // Not 'users': the tenant Users page already claims that path, and both route sets are spread into the
+            // same children array under /automation/settings — so sharing it made this page shadow the tenant one,
+            // and the sidebar's `href === 'users'` feature-flag filter hid this one behind a flag meant for that one.
+            path: 'workspace-users',
+        },
+        {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <EEVersion>
@@ -228,6 +249,27 @@ const currentWorkspaceSettingsRoutes = {
             path: 'workspace-api-keys',
         },
     ],
+    navItems: [
+        {
+            title: 'Current Workspace',
+        },
+        {
+            href: 'workspace-users',
+            title: 'Users',
+        },
+        {
+            href: 'git-configuration',
+            title: 'Git Configuration',
+        },
+        {
+            href: 'workspace-api-keys',
+            title: 'API Keys',
+        },
+    ],
+};
+
+const organizationSettingsNavItem = {
+    title: 'Organization',
 };
 
 // Platform settings routes
@@ -252,6 +294,19 @@ const platformSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'users',
+        },
+        {
+            // Tenant-global roles are assignable in every workspace, so managing them is a tenant-wide act.
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <GlobalCustomRoles />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'global-custom-roles',
         },
         {
             element: (
@@ -432,6 +487,69 @@ const platformSettingsRoutes = {
                 </PrivateRoute>
             ),
             path: 'audit-events',
+        },
+    ],
+    navItems: [
+        {
+            href: 'users',
+            title: 'Users',
+        },
+        {
+            href: 'global-custom-roles',
+            title: 'Roles',
+        },
+        {
+            href: 'billing',
+            title: 'Billing',
+        },
+        {
+            items: [
+                {
+                    href: 'ai-providers',
+                    title: 'Providers',
+                },
+                {
+                    href: 'ai/skills',
+                    title: 'Skills',
+                },
+                {
+                    href: 'ai/memories',
+                    title: 'Memories',
+                },
+            ],
+            title: 'AI',
+        },
+        {
+            href: 'mcp-server',
+            title: 'MCP Server',
+        },
+        {
+            href: 'custom-components',
+            title: 'Custom Components',
+        },
+        {
+            href: `api-connectors`,
+            title: 'API Connectors',
+        },
+        {
+            href: 'notifications',
+            title: 'Notifications',
+        },
+        {
+            href: 'identity-providers',
+            title: 'Identity Providers',
+        },
+        {
+            href: 'registered-clients',
+            title: 'OAuth2 Clients',
+        },
+        {
+            href: 'admin-api-keys',
+            title: 'Admin API Keys',
+        },
+        {
+            href: 'audit-events',
+            title: 'Audit Events',
         },
     ],
 };
@@ -924,6 +1042,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'settings',
                                 },
                             ],
+                            element: <AutomationEnvironmentAccessGuard />,
                             errorElement: <ErrorPage />,
                             path: 'automation',
                         },
