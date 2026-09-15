@@ -1,5 +1,7 @@
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useRestartJobMutation, useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -10,9 +12,11 @@ import {toast} from 'sonner';
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
 const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecution}) => {
-    const queryClient = useQueryClient();
-
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
+
+    const canControlWorkflowExecution = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
+    const queryClient = useQueryClient();
 
     const restartJobMutation = useRestartJobMutation({
         onSuccess: () => {
@@ -77,22 +81,26 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
                     <ViewIcon /> View
                 </DropdownMenuItem>
 
-                <DropdownMenuItem
-                    className="dropdown-menu-item"
-                    disabled={restartDisabled}
-                    onClick={handleRestartWorkflowExecutionClick}
-                >
-                    <RotateCcwIcon /> Restart
-                </DropdownMenuItem>
+                {canControlWorkflowExecution && (
+                    <>
+                        <DropdownMenuItem
+                            className="dropdown-menu-item"
+                            disabled={restartDisabled}
+                            onClick={handleRestartWorkflowExecutionClick}
+                        >
+                            <RotateCcwIcon /> Restart
+                        </DropdownMenuItem>
 
-                <DropdownMenuItem
-                    className="dropdown-menu-item-destructive"
-                    disabled={stopDisabled}
-                    onClick={handleStopWorkflowExecutionClick}
-                    variant="destructive"
-                >
-                    <CircleStopIcon /> Stop
-                </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="dropdown-menu-item-destructive"
+                            disabled={stopDisabled}
+                            onClick={handleStopWorkflowExecutionClick}
+                            variant="destructive"
+                        >
+                            <CircleStopIcon /> Stop
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

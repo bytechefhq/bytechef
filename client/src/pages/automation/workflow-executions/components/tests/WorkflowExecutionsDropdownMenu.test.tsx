@@ -7,9 +7,14 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionsDropdownMenu from '../WorkflowExecutionsDropdownMenu';
 
-const {restartJobMutateMock, stopJobMutateMock} = vi.hoisted(() => ({
+const {hoisted, restartJobMutateMock, stopJobMutateMock} = vi.hoisted(() => ({
+    hoisted: {grantedScopes: [] as string[]},
     restartJobMutateMock: vi.fn(),
     stopJobMutateMock: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (workspaceId: number | undefined, scope: string) => hoisted.grantedScopes.includes(scope),
 }));
 
 vi.mock('@/shared/mutations/platform/jobs.mutations', () => ({
@@ -46,6 +51,8 @@ const renderMenu = (execution: WorkflowExecution) =>
 
 describe('WorkflowExecutionsDropdownMenu', () => {
     beforeEach(() => {
+        hoisted.grantedScopes = ['DEPLOYMENT_EDIT'];
+
         restartJobMutateMock.mockReset();
         stopJobMutateMock.mockReset();
 
@@ -130,5 +137,30 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         await user.click(screen.getByRole('button'));
 
         expect(await screen.findByRole('menuitem', {name: /Restart/})).toHaveAttribute('data-disabled');
+    });
+
+    it('offers Stop for a running job to a member holding DEPLOYMENT_EDIT', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(jobExecution);
+
+        await user.click(screen.getByRole('button'));
+        await user.click(await screen.findByRole('menuitem', {name: 'Stop'}));
+
+        expect(stopJobMutateMock).toHaveBeenCalledWith(5);
+    });
+
+    it('hides Restart and Stop from a member without DEPLOYMENT_EDIT', async () => {
+        hoisted.grantedScopes = ['WORKFLOW_VIEW'];
+
+        const user = userEvent.setup();
+
+        renderMenu(jobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menuitem', {name: 'View'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Stop'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: /Restart/})).not.toBeInTheDocument();
     });
 });
