@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import formatWorkflowInputTestValue from '@/pages/platform/workflow-editor/components/workflow-inputs/utils/formatWorkflowInputTestValue';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
@@ -20,79 +21,89 @@ const WorkflowInputsTable = ({
     openEditDialog,
     workflowInputs,
     workflowTestConfigurationInputs,
-}: WorkflowInputsTableProps) => (
-    <Table className="table-fixed">
-        <TableHeader>
-            <TableRow className="border-b-border/50">
-                <TableHead className="w-[16%] truncate">Name</TableHead>
+}: WorkflowInputsTableProps) => {
+    const readOnly = useWorkflowEditorReadOnly();
 
-                <TableHead className="w-[16%] truncate">Label</TableHead>
+    return (
+        <Table className="table-fixed">
+            <TableHeader>
+                <TableRow className="border-b-border/50">
+                    <TableHead className="w-[16%] truncate">Name</TableHead>
 
-                <TableHead className="w-[12%] truncate">Type</TableHead>
+                    <TableHead className="w-[16%] truncate">Label</TableHead>
 
-                <TableHead className="w-[12%] truncate">Required</TableHead>
+                    <TableHead className="w-[12%] truncate">Type</TableHead>
 
-                {internalOnlyVisible && <TableHead className="w-[12%] truncate">Internal only</TableHead>}
+                    <TableHead className="w-[12%] truncate">Required</TableHead>
 
-                <TableHead className={internalOnlyVisible ? 'w-[18%] truncate' : 'w-[30%] truncate'}>
-                    Test Value
-                </TableHead>
+                    {internalOnlyVisible && <TableHead className="w-[12%] truncate">Internal only</TableHead>}
 
-                <TableHead className="w-[14%] truncate">Actions</TableHead>
-            </TableRow>
-        </TableHeader>
+                    <TableHead className={internalOnlyVisible ? 'w-[18%] truncate' : 'w-[30%] truncate'}>
+                        Test Value
+                    </TableHead>
 
-        <TableBody>
-            {workflowInputs?.map((input, index) => {
-                const inputType = input.componentReference ? 'component' : input.type;
-                const testValue = formatWorkflowInputTestValue(workflowTestConfigurationInputs?.[input.name]);
+                    <TableHead className="w-[14%] truncate">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
 
-                return (
-                    <TableRow className="cursor-pointer border-b-border/50" key={`${input.name}-${index}`}>
-                        <TableCell className="truncate" title={input.name}>
-                            {input.name}
-                        </TableCell>
+            <TableBody>
+                {workflowInputs?.map((input, index) => {
+                    const inputType = input.componentReference ? 'component' : input.type;
+                    const testValue = formatWorkflowInputTestValue(workflowTestConfigurationInputs?.[input.name]);
 
-                        <TableCell className="truncate" title={input.label}>
-                            {input.label}
-                        </TableCell>
+                    return (
+                        <TableRow className="cursor-pointer border-b-border/50" key={`${input.name}-${index}`}>
+                            <TableCell className="truncate" title={input.name}>
+                                {input.name}
+                            </TableCell>
 
-                        <TableCell className="truncate" title={inputType}>
-                            {inputType}
-                        </TableCell>
+                            <TableCell className="truncate" title={input.label}>
+                                {input.label}
+                            </TableCell>
 
-                        <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
+                            <TableCell className="truncate" title={inputType}>
+                                {inputType}
+                            </TableCell>
 
-                        {internalOnlyVisible && <TableCell>{input.internalOnly === true ? 'true' : 'false'}</TableCell>}
+                            <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
 
-                        <TableCell className="truncate" title={testValue}>
-                            {testValue}
-                        </TableCell>
-
-                        <TableCell className="flex justify-end">
-                            <Button
-                                aria-label="Edit input"
-                                icon={<EditIcon />}
-                                onClick={() => openEditDialog(index)}
-                                size="icon"
-                                variant="ghost"
-                            />
-
-                            {!codeWorkflow && (
-                                <Button
-                                    aria-label="Delete input"
-                                    icon={<Trash2Icon className="text-destructive" />}
-                                    onClick={() => openDeleteDialog(index)}
-                                    size="icon"
-                                    variant="ghost"
-                                />
+                            {internalOnlyVisible && (
+                                <TableCell>{input.internalOnly === true ? 'true' : 'false'}</TableCell>
                             )}
-                        </TableCell>
-                    </TableRow>
-                );
-            })}
-        </TableBody>
-    </Table>
-);
+
+                            <TableCell className="truncate" title={testValue}>
+                                {testValue}
+                            </TableCell>
+
+                            <TableCell className="flex justify-end">
+                                {!readOnly && (
+                                    <>
+                                        <Button
+                                            aria-label="Edit input"
+                                            icon={<EditIcon />}
+                                            onClick={() => openEditDialog(index)}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+
+                                        {!codeWorkflow && (
+                                            <Button
+                                                aria-label="Delete input"
+                                                icon={<Trash2Icon className="text-destructive" />}
+                                                onClick={() => openDeleteDialog(index)}
+                                                size="icon"
+                                                variant="ghost"
+                                            />
+                                        )}
+                                    </>
+                                )}
+                            </TableCell>
+                        </TableRow>
+                    );
+                })}
+            </TableBody>
+        </Table>
+    );
+};
 
 export default WorkflowInputsTable;
