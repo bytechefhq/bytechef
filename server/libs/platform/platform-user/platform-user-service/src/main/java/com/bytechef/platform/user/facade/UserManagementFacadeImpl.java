@@ -22,20 +22,25 @@ import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import com.bytechef.tenant.service.TenantService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -47,31 +52,51 @@ class UserManagementFacadeImpl implements UserManagementFacade {
 
     private static final int DEFAULT_PAGE_SIZE = 20;
 
+    private final ObjectProvider<ApiKeyRevoker> apiKeyRevokerProvider;
     private final AuthorityService authorityService;
     private final TenantService tenantService;
     private final UserInvitationService userInvitationService;
     private final UserService userService;
+    private final ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider;
 
     @SuppressFBWarnings("EI")
     UserManagementFacadeImpl(
-        AuthorityService authorityService, TenantService tenantService, UserInvitationService userInvitationService,
-        UserService userService) {
+        ObjectProvider<ApiKeyRevoker> apiKeyRevokerProvider, AuthorityService authorityService,
+        TenantService tenantService, UserInvitationService userInvitationService, UserService userService,
+        ObjectProvider<WorkspaceMembershipAssigner> workspaceMembershipAssignerProvider) {
 
+        this.apiKeyRevokerProvider = apiKeyRevokerProvider;
         this.authorityService = authorityService;
         this.tenantService = tenantService;
         this.userInvitationService = userInvitationService;
         this.userService = userService;
+        this.workspaceMembershipAssignerProvider = workspaceMembershipAssignerProvider;
     }
 
+    /**
+     * An API key authenticates as the user who owns it, so the keys go with the account rather than outliving it. Not
+     * only a security property: {@code api_key.user_id} is NOT NULL under {@code fk_api_key_user}, so removing the user
+     * first fails on the constraint instead of orphaning the key.
+     *
+     * <p>
+     * Orchestrated here rather than inside {@code UserService}, which has no business calling another service.
+     * Transactional so a failed revocation rolls the account back with it, leaving neither half done.
+     */
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteUser(String login) {
+        userService.fetchUserByLogin(login)
+            .map(User::getId)
+            .ifPresent(this::revokeApiKeys);
+
         userService.delete(login);
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
-    public void inviteUser(String email, String role) {
+    public void inviteUser(String email, String role, List<WorkspaceAssignment> workspaces) {
         if (tenantService.isMultiTenantEnabled() && tenantService.tenantIdsByUserEmailExist(email)) {
             throw new EmailAlreadyUsedException();
         }
@@ -82,7 +107,42 @@ class UserManagementFacadeImpl implements UserManagementFacade {
             throw new EmailAlreadyUsedException();
         }
 
-        userInvitationService.inviteUser(email, role);
+        WorkspaceMembershipAssigner workspaceMembershipAssigner = resolveWorkspaceMembershipAssigner(workspaces);
+
+        if (workspaceMembershipAssigner != null) {
+            workspaceMembershipAssigner.validateAssignments(workspaces);
+        }
+
+        User user = userInvitationService.inviteUser(email, role);
+
+        if (workspaceMembershipAssigner != null) {
+            workspaceMembershipAssigner.assign(user.getId(), workspaces);
+        }
+    }
+
+    /**
+     * The {@link WorkspaceMembershipAssigner} that will place the invitee, or {@code null} when there is nothing to
+     * place. Workspace membership lives in the automation modules, which depend on this one, so the call has to invert
+     * through an SPI rather than a direct dependency.
+     *
+     * <p>
+     * An empty request needs no implementation at all: provisioning an account with no workspace is legitimate, and is
+     * how a second tenant admin is created. A non-empty request with no implementation registered means the deployment
+     * has no workspace concept (embedded), which is a caller error rather than something to silently drop.
+     */
+    private WorkspaceMembershipAssigner resolveWorkspaceMembershipAssigner(List<WorkspaceAssignment> workspaces) {
+        if (workspaces.isEmpty()) {
+            return null;
+        }
+
+        WorkspaceMembershipAssigner workspaceMembershipAssigner = workspaceMembershipAssignerProvider.getIfAvailable();
+
+        if (workspaceMembershipAssigner == null) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Workspaces cannot be assigned: this deployment has no workspace support");
+        }
+
+        return workspaceMembershipAssigner;
     }
 
     @Override
@@ -130,5 +190,18 @@ class UserManagementFacadeImpl implements UserManagementFacade {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return new UserWithAuthorities(updatedUser, allAuthorities);
+    }
+
+    /**
+     * Deployments carrying no security module register no revoker, and have no keys to revoke either.
+     */
+    private void revokeApiKeys(long userId) {
+        ApiKeyRevoker apiKeyRevoker = apiKeyRevokerProvider.getIfAvailable();
+
+        if (apiKeyRevoker == null) {
+            return;
+        }
+
+        apiKeyRevoker.revokeAll(userId);
     }
 }

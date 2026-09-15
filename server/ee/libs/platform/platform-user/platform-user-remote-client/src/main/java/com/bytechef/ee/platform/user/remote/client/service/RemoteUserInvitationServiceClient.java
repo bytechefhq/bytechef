@@ -23,4 +23,9 @@ public class RemoteUserInvitationServiceClient implements UserInvitationService 
     public User inviteUser(String email, String role) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void notifyAddedToWorkspace(User user, String workspaceName) {
+        throw new UnsupportedOperationException();
+    }
 }

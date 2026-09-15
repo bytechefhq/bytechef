@@ -34,6 +34,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,6 +56,7 @@ class UserServiceTest {
     private UserServiceImpl userService;
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() {
         CacheManager cacheManager = mock(CacheManager.class);
 
@@ -70,7 +72,7 @@ class UserServiceTest {
 
         userService = new UserServiceImpl(
             mock(AuthorityRepository.class), cacheManager, passwordEncoder, mock(PersistentTokenRepository.class),
-            userRepository);
+            userRepository, mock(ObjectProvider.class));
     }
 
     @Test
