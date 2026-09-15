@@ -16,7 +16,9 @@ import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platf
 import {useDeleteApiCollectionEndpointMutation} from '@/ee/shared/mutations/automation/apiCollectionEndpoints.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useReadOnlyWorkflow from '@/shared/components/read-only-workflow-editor/hooks/useReadOnlyWorkflow';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {useQueryClient} from '@tanstack/react-query';
@@ -54,6 +56,11 @@ const ApiCollectionEndpointListItem = ({
     const [showEditApiCollectionEndpointDialog, setShowEditApiCollectionEndpointDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditApiCollection = useHasWorkspaceScope(currentWorkspaceId, 'API_PLATFORM_EDIT');
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
     const {openReadOnlyWorkflowSheet} = useReadOnlyWorkflow();
 
@@ -175,39 +182,59 @@ const ApiCollectionEndpointListItem = ({
                     <span className="text-xs">No executions</span>
                 )}
 
-                <Switch checked={apiCollectionEndpoint.enabled} onCheckedChange={handleApiCollectionEndpointEnable} />
+                <Switch
+                    aria-label="Enable API Endpoint"
+                    checked={apiCollectionEndpoint.enabled}
+                    disabled={!canEditDeployment}
+                    onCheckedChange={handleApiCollectionEndpointEnable}
+                />
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                    </DropdownMenuTrigger>
+                {(canEditApiCollection || canEditDeployment) && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                aria-label="API Endpoint actions"
+                                icon={<EllipsisVerticalIcon />}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="p-0">
-                        <DropdownMenuItem
-                            className="dropdown-menu-item"
-                            onClick={() => setShowEditApiCollectionEndpointDialog(true)}
-                        >
-                            <EditIcon /> Edit Endpoint
-                        </DropdownMenuItem>
+                        <DropdownMenuContent align="end" className="p-0">
+                            {canEditApiCollection && (
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowEditApiCollectionEndpointDialog(true)}
+                                >
+                                    <EditIcon /> Edit Endpoint
+                                </DropdownMenuItem>
+                            )}
 
-                        <DropdownMenuItem
-                            className="dropdown-menu-item"
-                            onClick={() => setShowEditWorkflowDialog(true)}
-                        >
-                            <EditIcon /> Edit Workflow
-                        </DropdownMenuItem>
+                            {canEditDeployment && (
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item"
+                                    onClick={() => setShowEditWorkflowDialog(true)}
+                                >
+                                    <EditIcon /> Edit Workflow
+                                </DropdownMenuItem>
+                            )}
 
-                        <DropdownMenuSeparator className="m-0" />
+                            {canEditApiCollection && (
+                                <>
+                                    <DropdownMenuSeparator className="m-0" />
 
-                        <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
-                            onClick={() => setShowDeleteDialog(true)}
-                            variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                                    <DropdownMenuItem
+                                        className="dropdown-menu-item-destructive"
+                                        onClick={() => setShowDeleteDialog(true)}
+                                        variant="destructive"
+                                    >
+                                        <Trash2Icon /> Delete
+                                    </DropdownMenuItem>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
             </div>
 
             {showDeleteDialog && (
