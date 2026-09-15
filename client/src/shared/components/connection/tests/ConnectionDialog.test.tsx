@@ -1,5 +1,6 @@
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ComponentProps, ReactNode} from 'react';
@@ -36,6 +37,15 @@ vi.mock('@/shared/components/connection/Scopes', () => ({
     default: () => null,
 }));
 
+vi.mock('@/shared/middleware/graphql', async () => {
+    const actual = await vi.importActual<typeof import('@/shared/middleware/graphql')>('@/shared/middleware/graphql');
+
+    return {
+        ...actual,
+        useConnectionCredentialStoresQuery: vi.fn(() => ({data: undefined})),
+    };
+});
+
 vi.mock('@tanstack/react-query', async () => {
     const actual = await vi.importActual<typeof import('@tanstack/react-query')>('@tanstack/react-query');
 
@@ -55,18 +65,20 @@ const COMPONENT_DEFINITIONS = [
 // The documentation link renders a react-router Link, so the harness needs a router even though nothing navigates.
 const renderDialog = (props: Partial<ComponentProps<typeof ConnectionDialog>> = {}) =>
     render(
-        <MemoryRouter>
-            <ConnectionDialog
-                componentDefinitions={COMPONENT_DEFINITIONS as never}
-                connectionTagsQueryKey={['connectionTags']}
-                connectionsQueryKey={['connections']}
-                useCreateConnectionMutation={
-                    (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
-                }
-                useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
-                {...props}
-            />
-        </MemoryRouter>
+        <QueryClientProvider client={new QueryClient()}>
+            <MemoryRouter>
+                <ConnectionDialog
+                    componentDefinitions={COMPONENT_DEFINITIONS as never}
+                    connectionTagsQueryKey={['connectionTags']}
+                    connectionsQueryKey={['connections']}
+                    useCreateConnectionMutation={
+                        (() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never
+                    }
+                    useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
+                    {...props}
+                />
+            </MemoryRouter>
+        </QueryClientProvider>
     );
 
 describe('ConnectionDialog', () => {
@@ -179,23 +191,18 @@ describe('ConnectionDialog', () => {
         const renderEditDialog = (withCredentialsMutation: boolean) => {
             const updateConnectionMutate = vi.fn();
 
-            render(
-                <ConnectionDialog
-                    componentDefinitions={COMPONENT_DEFINITIONS as never}
-                    connection={invalidConnection as never}
-                    connectionTagsQueryKey={['connectionTags']}
-                    connectionsQueryKey={['connections']}
-                    useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
-                    useUpdateConnectionCredentialsMutation={
-                        withCredentialsMutation
-                            ? ((() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never)
-                            : undefined
-                    }
-                    useUpdateConnectionMutation={
-                        (() => ({isPending: false, mutate: updateConnectionMutate, reset: vi.fn()})) as never
-                    }
-                />
-            );
+            renderDialog({
+                connection: invalidConnection as never,
+                useCreateConnectionMutation: undefined,
+                useUpdateConnectionCredentialsMutation: withCredentialsMutation
+                    ? ((() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never)
+                    : undefined,
+                useUpdateConnectionMutation: (() => ({
+                    isPending: false,
+                    mutate: updateConnectionMutate,
+                    reset: vi.fn(),
+                })) as never,
+            });
 
             return {updateConnectionMutate};
         };
