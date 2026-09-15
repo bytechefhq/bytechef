@@ -2,8 +2,8 @@ extend type Query {
     knowledgeBases(environmentId: ID!, workspaceId: ID!): [KnowledgeBase]
     knowledgeBase(id: ID!): KnowledgeBase
     knowledgeBaseEmbeddingActive(environment: Int!): Boolean!
-    knowledgeBaseTags: [Tag!]
-    knowledgeBaseTagsByKnowledgeBase: [KnowledgeBaseTagsEntry!]
+    knowledgeBaseTags(environmentId: ID!, workspaceId: ID!): [Tag!]
+    knowledgeBaseTagsByKnowledgeBase(environmentId: ID!, workspaceId: ID!): [KnowledgeBaseTagsEntry!]
     searchKnowledgeBase(id: ID!, query: String!, metadataFilters: String): [KnowledgeBaseDocumentChunk]
 }
 
