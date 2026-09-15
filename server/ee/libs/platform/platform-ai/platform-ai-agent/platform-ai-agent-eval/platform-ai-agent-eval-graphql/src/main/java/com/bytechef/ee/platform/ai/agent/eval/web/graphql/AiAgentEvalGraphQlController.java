@@ -46,6 +46,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -54,6 +55,8 @@ import org.springframework.stereotype.Controller;
 @Controller
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiAgentEvalGraphQlController {
+
+    private static final String DEVELOPMENT = "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT";
 
     private final AiAgentEvalFileStorage agentEvalFileStorage;
     private final AiAgentEvalResultService agentEvalResultService;
@@ -158,7 +161,8 @@ class AiAgentEvalGraphQlController {
     // Mutation mappings - AiAgentJudge
 
     @MutationMapping
-    AiAgentJudge createAiAgentJudge(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentJudge createAiAgentJudge(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String name,
         @Argument AiAgentJudgeType type, @Argument Map<String, Object> configuration) {
 
@@ -174,7 +178,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    AiAgentJudge updateAiAgentJudge(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentJudge', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentJudge updateAiAgentJudge(
         @Argument Long id, @Argument @Nullable String name,
         @Argument @Nullable Map<String, Object> configuration) {
 
@@ -192,7 +199,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteAiAgentJudge(@Argument Long id) {
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentJudge', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public boolean deleteAiAgentJudge(@Argument Long id) {
         agentJudgeService.deleteAiAgentJudge(id);
 
         return true;
@@ -201,7 +211,8 @@ class AiAgentEvalGraphQlController {
     // Mutation mappings - AiAgentEvalTest
 
     @MutationMapping
-    AiAgentEvalTest createAiAgentEvalTest(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#workflowId, 'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentEvalTest createAiAgentEvalTest(
         @Argument String workflowId, @Argument String workflowNodeName, @Argument String name,
         @Argument @Nullable String description) {
 
@@ -216,7 +227,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    AiAgentEvalTest updateAiAgentEvalTest(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalTest', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentEvalTest updateAiAgentEvalTest(
         @Argument Long id, @Argument @Nullable String name, @Argument @Nullable String description) {
 
         AiAgentEvalTest aiAgentEvalTest = agentEvalTestService.getAgentEvalTest(id);
@@ -233,7 +247,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteAiAgentEvalTest(@Argument Long id) {
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalTest', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public boolean deleteAiAgentEvalTest(@Argument Long id) {
         agentEvalTestService.deleteAiAgentEvalTest(id);
 
         return true;
@@ -242,7 +259,10 @@ class AiAgentEvalGraphQlController {
     // Mutation mappings - AiAgentEvalScenario
 
     @MutationMapping
-    AiAgentEvalScenario createAiAgentEvalScenario(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalTest', #agentEvalTestId), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentEvalScenario createAiAgentEvalScenario(
         @Argument Long agentEvalTestId, @Argument String name, @Argument AiAgentScenarioType type,
         @Argument @Nullable String userMessage, @Argument @Nullable String expectedOutput,
         @Argument @Nullable String personaPrompt, @Argument @Nullable Integer maxTurns,
@@ -269,7 +289,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    AiAgentEvalScenario updateAiAgentEvalScenario(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalScenario', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentEvalScenario updateAiAgentEvalScenario(
         @Argument Long id, @Argument @Nullable String name, @Argument @Nullable String userMessage,
         @Argument @Nullable String expectedOutput, @Argument @Nullable String personaPrompt,
         @Argument @Nullable Integer maxTurns, @Argument @Nullable Integer numberOfRuns) {
@@ -304,7 +327,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteAiAgentEvalScenario(@Argument Long id) {
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalScenario', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public boolean deleteAiAgentEvalScenario(@Argument Long id) {
         agentEvalScenarioService.deleteAiAgentEvalScenario(id);
 
         return true;
@@ -313,7 +339,10 @@ class AiAgentEvalGraphQlController {
     // Mutation mappings - AiAgentScenarioJudge
 
     @MutationMapping
-    AiAgentScenarioJudge createAiAgentScenarioJudge(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalScenario', #agentEvalScenarioId), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentScenarioJudge createAiAgentScenarioJudge(
         @Argument Long agentEvalScenarioId, @Argument String name, @Argument AiAgentJudgeType type,
         @Argument Map<String, Object> configuration) {
 
@@ -328,7 +357,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    AiAgentScenarioJudge updateAiAgentScenarioJudge(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentScenarioJudge', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentScenarioJudge updateAiAgentScenarioJudge(
         @Argument Long id, @Argument @Nullable String name,
         @Argument @Nullable Map<String, Object> configuration) {
 
@@ -346,7 +378,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteAiAgentScenarioJudge(@Argument Long id) {
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentScenarioJudge', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public boolean deleteAiAgentScenarioJudge(@Argument Long id) {
         agentScenarioJudgeService.deleteAiAgentScenarioJudge(id);
 
         return true;
@@ -355,7 +390,10 @@ class AiAgentEvalGraphQlController {
     // Mutation mappings - AiAgentScenarioToolSimulation
 
     @MutationMapping
-    AiAgentScenarioToolSimulation createAiAgentScenarioToolSimulation(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalScenario', #agentEvalScenarioId), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentScenarioToolSimulation createAiAgentScenarioToolSimulation(
         @Argument Long agentEvalScenarioId, @Argument String toolName,
         @Argument String responsePrompt, @Argument @Nullable String simulationModel) {
 
@@ -370,7 +408,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    AiAgentScenarioToolSimulation updateAiAgentScenarioToolSimulation(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentScenarioToolSimulation', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public AiAgentScenarioToolSimulation updateAiAgentScenarioToolSimulation(
         @Argument Long id, @Argument @Nullable String toolName,
         @Argument @Nullable String responsePrompt, @Argument @Nullable String simulationModel) {
 
@@ -391,7 +432,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteAiAgentScenarioToolSimulation(@Argument Long id) {
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentScenarioToolSimulation', #id), "
+        + "'WORKFLOW_EDIT', " + DEVELOPMENT + ")")
+    public boolean deleteAiAgentScenarioToolSimulation(@Argument Long id) {
         agentScenarioToolSimulationService.deleteAiAgentScenarioToolSimulation(id);
 
         return true;
@@ -400,7 +444,10 @@ class AiAgentEvalGraphQlController {
     // Mutation mappings - AiAgentEvalRun
 
     @MutationMapping
-    AiAgentEvalRun startAiAgentEvalRun(
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalTest', #agentEvalTestId), "
+        + "'WORKFLOW_EDIT', #environmentId)")
+    public AiAgentEvalRun startAiAgentEvalRun(
         @Argument Long agentEvalTestId, @Argument String name, @Argument Long environmentId,
         @Argument @Nullable List<Long> scenarioIds, @Argument @Nullable List<Long> aiAgentJudgeIds) {
 
@@ -408,7 +455,10 @@ class AiAgentEvalGraphQlController {
     }
 
     @MutationMapping
-    AiAgentEvalRun cancelAiAgentEvalRun(@Argument Long id) {
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId("
+        + "@aiAgentEvalWorkflowResolver.getWorkflowId('AiAgentEvalRun', #id), 'WORKFLOW_EDIT', "
+        + "@aiAgentEvalWorkflowResolver.getEnvironmentId('AiAgentEvalRun', #id))")
+    public AiAgentEvalRun cancelAiAgentEvalRun(@Argument Long id) {
         return agentEvalRunFacade.cancelEvalRun(id);
     }
 

@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
     implementation("org.springframework:spring-web")
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-validator:platform-workflow-validator-api"))
