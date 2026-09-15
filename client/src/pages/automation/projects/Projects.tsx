@@ -19,6 +19,7 @@ import ProjectsFilterTitle from '@/pages/automation/projects/components/Projects
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import useButtonGroupDropdownAlign from '@/shared/hooks/useButtonGroupDropdownAlign';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import CategoryTagLeftSidebarNav from '@/shared/layout/CategoryTagLeftSidebarNav';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -74,6 +75,8 @@ const Projects = () => {
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
 
+    const canCreateProject = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_CREATE');
+
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
 
@@ -124,7 +127,7 @@ const Projects = () => {
             }),
         }) > 0;
 
-    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery(currentWorkspaceId!);
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 
@@ -146,42 +149,44 @@ const Projects = () => {
                             centerTitle={true}
                             position="main"
                             right={
-                                <ButtonGroup>
-                                    <ProjectDialog
-                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                        project={undefined}
-                                        triggerNode={
-                                            <Button
-                                                aria-label="Create Project"
-                                                onSelect={(event) => event.preventDefault()}
-                                            >
-                                                New Project
-                                            </Button>
-                                        }
-                                    />
+                                canCreateProject && (
+                                    <ButtonGroup>
+                                        <ProjectDialog
+                                            onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                            project={undefined}
+                                            triggerNode={
+                                                <Button
+                                                    aria-label="Create Project"
+                                                    onSelect={(event) => event.preventDefault()}
+                                                >
+                                                    New Project
+                                                </Button>
+                                            }
+                                        />
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button>
-                                                <ChevronDownIcon />
-                                            </Button>
-                                        </DropdownMenuTrigger>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button>
+                                                    <ChevronDownIcon />
+                                                </Button>
+                                            </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                icon={<LayoutTemplateIcon />}
-                                                label="From Template"
-                                                onClick={() => navigate(`templates`)}
-                                            />
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    icon={<LayoutTemplateIcon />}
+                                                    label="From Template"
+                                                    onClick={() => navigate(`templates`)}
+                                                />
 
-                                            <DropdownMenuItem
-                                                icon={<UploadIcon />}
-                                                label="Import Project"
-                                                onClick={() => fileInputRef.current?.click()}
-                                            />
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
+                                                <DropdownMenuItem
+                                                    icon={<UploadIcon />}
+                                                    label="Import Project"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                />
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </ButtonGroup>
+                                )
                             }
                             title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
                         />
@@ -223,47 +228,49 @@ const Projects = () => {
                 ) : (
                     <EmptyState
                         actions={
-                            <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
-                                <ProjectDialog
-                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                    project={undefined}
-                                    triggerNode={
-                                        <Button
-                                            aria-label="Create Project"
-                                            label="Create Project"
-                                            onClick={() =>
-                                                captureEmptyStateAction(
-                                                    'projects',
-                                                    'create_project',
-                                                    FIRST_RUN_JOURNEY.stage
-                                                )
-                                            }
-                                        />
-                                    }
-                                />
+                            canCreateProject && (
+                                <ButtonGroup className="mx-auto" ref={buttonGroupRef}>
+                                    <ProjectDialog
+                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                        project={undefined}
+                                        triggerNode={
+                                            <Button
+                                                aria-label="Create Project"
+                                                label="Create Project"
+                                                onClick={() =>
+                                                    captureEmptyStateAction(
+                                                        'projects',
+                                                        'create_project',
+                                                        FIRST_RUN_JOURNEY.stage
+                                                    )
+                                                }
+                                            />
+                                        }
+                                    />
 
-                                <DropdownMenu onOpenChange={handleOpenChange}>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button ref={dropdownMenuTriggerRef}>
-                                            <ChevronDownIcon />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <DropdownMenu onOpenChange={handleOpenChange}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button ref={dropdownMenuTriggerRef}>
+                                                <ChevronDownIcon />
+                                            </Button>
+                                        </DropdownMenuTrigger>
 
-                                    <DropdownMenuContent align="start" alignOffset={alignOffset}>
-                                        <DropdownMenuItem
-                                            icon={<LayoutTemplateIcon />}
-                                            label="From Template"
-                                            onClick={() => navigate(`templates`)}
-                                        />
+                                        <DropdownMenuContent align="start" alignOffset={alignOffset}>
+                                            <DropdownMenuItem
+                                                icon={<LayoutTemplateIcon />}
+                                                label="From Template"
+                                                onClick={() => navigate(`templates`)}
+                                            />
 
-                                        <DropdownMenuItem
-                                            icon={<UploadIcon />}
-                                            label="Import Project"
-                                            onClick={() => fileInputRef.current?.click()}
-                                        />
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </ButtonGroup>
+                                            <DropdownMenuItem
+                                                icon={<UploadIcon />}
+                                                label="Import Project"
+                                                onClick={() => fileInputRef.current?.click()}
+                                            />
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </ButtonGroup>
+                            )
                         }
                         description="A project groups related workflows. Build and test a workflow inside it, then publish and deploy it so it runs on its own."
                         docsLink={{href: PROJECTS_DOCUMENTATION_URL, label: 'How projects work'}}

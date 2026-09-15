@@ -42,6 +42,13 @@ vi.mock('@/shared/hooks/useAnalytics', () => ({
     }),
 }));
 
+const hoistedScope = vi.hoisted(() => ({canCreateProject: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        scope === 'PROJECT_CREATE' && hoistedScope.canCreateProject,
+}));
+
 // Mock the API queries
 vi.mock('@/shared/queries/automation/projectCategories.queries', () => ({
     useGetProjectCategoriesQuery: () => ({
@@ -128,6 +135,7 @@ beforeEach(() => {
     mockProjectsState.captureProjectImported.mockClear();
     mockProjectsState.navigate.mockClear();
     mockProjectsState.projects = [];
+    hoistedScope.canCreateProject = true;
 });
 
 afterEach(() => {
@@ -257,6 +265,15 @@ describe('Projects empty states', () => {
 
         expect(screen.queryByText('No defined tags.')).not.toBeInTheDocument();
         expect(screen.getByText('Projects')).toBeInTheDocument();
+    });
+
+    it('offers no create or import without PROJECT_CREATE', () => {
+        hoistedScope.canCreateProject = false;
+
+        renderProjects();
+
+        expect(screen.getByRole('heading', {level: 2, name: 'Create your first project'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /create project/i})).not.toBeInTheDocument();
     });
 
     // The filtered list and the unfiltered one were the same array, so a filter that matched nothing rendered
