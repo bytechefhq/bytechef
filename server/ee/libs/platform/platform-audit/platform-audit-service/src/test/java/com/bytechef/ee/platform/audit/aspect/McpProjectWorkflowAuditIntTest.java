@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacade;
 import com.bytechef.automation.ai.mcp.facade.McpProjectWorkflowFacadeImpl;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacadeImpl;
+import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
@@ -73,8 +74,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 @MockitoBean(types = {
     McpComponentService.class, McpProjectFacade.class, McpProjectService.class, McpProjectWorkflowService.class,
-    McpServerFacade.class, McpServerService.class, McpToolService.class, ProjectDeploymentWorkflowService.class,
-    ProjectWorkflowService.class, WorkflowService.class,
+    McpProjectWorkspaceGuard.class, McpServerFacade.class, McpServerService.class, McpToolService.class,
+    ProjectDeploymentWorkflowService.class, ProjectWorkflowService.class, WorkflowService.class,
     TagService.class, WorkspaceMcpServerService.class
 })
 class McpProjectWorkflowAuditIntTest {
