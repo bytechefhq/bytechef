@@ -19,7 +19,6 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
@@ -62,7 +61,8 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE') and "
+        + "hasPermission(#workspaceId, 'Workspace', 'PROJECT_PUBLISH')")
     public void save(long workspaceId, byte[] bytes, Language language) {
         ProjectDefinition projectDefinition;
 
