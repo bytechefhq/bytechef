@@ -489,6 +489,17 @@ export const loadEnvironments = async (queryClient: QueryClient) => {
     }
 };
 
+export const loadProjectWorkflowEditor = async (queryClient: QueryClient, projectId: number) => {
+    if (environmentStore.getState().currentEnvironmentId !== DEVELOPMENT_ENVIRONMENT) {
+        return redirect('/automation/deployments');
+    }
+
+    return queryClient.ensureQueryData({
+        queryFn: () => new ProjectApi().getProject({id: projectId}),
+        queryKey: ProjectKeys.project(projectId),
+    });
+};
+
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
         {
@@ -654,13 +665,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
-                                        queryClient.ensureQueryData({
-                                            queryFn: () =>
-                                                new ProjectApi().getProject({
-                                                    id: parseInt(params.projectId!),
-                                                }),
-                                            queryKey: ProjectKeys.project(parseInt(params.projectId!)),
-                                        }),
+                                        loadProjectWorkflowEditor(queryClient, parseInt(params.projectId!)),
                                     path: 'projects/:projectId/project-workflows/:projectWorkflowId',
                                 },
                                 {

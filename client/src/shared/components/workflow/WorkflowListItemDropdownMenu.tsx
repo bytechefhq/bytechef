@@ -17,6 +17,8 @@ interface WorkflowListItemDropdownMenuProps {
     dialogs?: ReactNode;
     onDelete: () => void;
     onEditClick: () => void;
+    showDeleteAction?: boolean;
+    showEditAction?: boolean;
     workflowLabel?: string | null;
 }
 
@@ -25,6 +27,8 @@ const WorkflowListItemDropdownMenu = ({
     dialogs,
     onDelete,
     onEditClick,
+    showDeleteAction = true,
+    showEditAction = true,
     workflowLabel,
 }: WorkflowListItemDropdownMenuProps) => {
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
@@ -46,21 +50,27 @@ const WorkflowListItemDropdownMenu = ({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="p-0">
-                    <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
-                        <EditIcon /> Edit
-                    </DropdownMenuItem>
+                    {showEditAction && (
+                        <DropdownMenuItem className="dropdown-menu-item" onClick={onEditClick}>
+                            <EditIcon /> Edit
+                        </DropdownMenuItem>
+                    )}
 
                     {children}
 
-                    <DropdownMenuSeparator className="m-0" />
+                    {showDeleteAction && (
+                        <>
+                            <DropdownMenuSeparator className="m-0" />
 
-                    <DropdownMenuItem
-                        className="dropdown-menu-item-destructive"
-                        onClick={() => setShowDeleteWorkflowAlertDialog(true)}
-                        variant="destructive"
-                    >
-                        <Trash2Icon /> Delete
-                    </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="dropdown-menu-item-destructive"
+                                onClick={() => setShowDeleteWorkflowAlertDialog(true)}
+                                variant="destructive"
+                            >
+                                <Trash2Icon /> Delete
+                            </DropdownMenuItem>
+                        </>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
 
