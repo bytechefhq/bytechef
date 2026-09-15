@@ -1,4 +1,5 @@
-import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test-utils';
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
+import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import PropertyCodeEditorDialogEditor from '../PropertyCodeEditorDialogEditor';
@@ -26,12 +27,14 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
         defaultLanguage,
         onChange,
         onMount,
+        options,
         value,
     }: {
         className?: string;
         defaultLanguage: string;
         onChange: (value: string | undefined) => void;
         onMount: (editor: {focus: () => void}) => void;
+        options?: {readOnly?: boolean};
         value?: string;
     }) => (
         <div data-testid="monaco-editor">
@@ -40,6 +43,8 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
             <span data-testid="editor-value">{value}</span>
 
             <span data-testid="editor-class">{className}</span>
+
+            <span data-testid="editor-read-only">{String(options?.readOnly)}</span>
 
             <button
                 data-testid="change-value-btn"
@@ -148,6 +153,35 @@ describe('PropertyCodeEditorDialogEditor', () => {
             changeBtn.click();
 
             expect(hoisted.mockSetEditorValue).toHaveBeenCalledWith('new value');
+        });
+    });
+
+    describe('read-only mode', () => {
+        const renderEditor = (readOnly: boolean) =>
+            render(
+                <WorkflowEditorReadOnlyContext.Provider value={readOnly}>
+                    <PropertyCodeEditorDialogEditor language="javascript" />
+                </WorkflowEditorReadOnlyContext.Provider>
+            );
+
+        it('passes readOnly to Monaco and keeps the edited value when editable', async () => {
+            renderEditor(false);
+
+            expect(await screen.findByTestId('editor-read-only')).toHaveTextContent('false');
+
+            await userEvent.click(screen.getByRole('button', {name: 'Change'}));
+
+            expect(hoisted.mockSetEditorValue).toHaveBeenCalledWith('new value');
+        });
+
+        it('makes Monaco read-only and ignores changes in read-only mode', async () => {
+            renderEditor(true);
+
+            expect(await screen.findByTestId('editor-read-only')).toHaveTextContent('true');
+
+            await userEvent.click(screen.getByRole('button', {name: 'Change'}));
+
+            expect(hoisted.mockSetEditorValue).not.toHaveBeenCalled();
         });
     });
 });
