@@ -27,11 +27,8 @@ public class WorkspaceUserErrorType extends AbstractErrorType {
     public static final WorkspaceUserErrorType INHERITED_MEMBERSHIP = new WorkspaceUserErrorType(105);
 
     /**
-     * The named custom role does not exist. Keeps error key 106, which was previously spelled
-     * {@code CUSTOM_ROLE_NOT_IN_WORKSPACE} and served three unrelated meanings — including a role-scoping model that
-     * {@code custom_role} never had, since it carries no {@code workspace_id}. Every custom role is tenant-global, so
-     * existence is the only thing there is to check and the key means exactly that. The role-argument violations it
-     * also used to carry now travel as {@link #ROLE_SELECTION_INVALID}.
+     * The named custom role does not exist. Every custom role is tenant-global, so existence is the only thing there is
+     * to check.
      */
     public static final WorkspaceUserErrorType CUSTOM_ROLE_NOT_FOUND = new WorkspaceUserErrorType(106);
     public static final WorkspaceUserErrorType SELF_PROMOTION_FORBIDDEN = new WorkspaceUserErrorType(107);
