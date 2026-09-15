@@ -15,17 +15,29 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
+import com.bytechef.ee.automation.configuration.audit.CustomRoleAuditMapper;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.CustomRole;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.CustomRoleRepository;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
+import com.bytechef.ee.platform.audit.aspect.AuditAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditCaptureAspect;
+import com.bytechef.ee.platform.audit.aspect.AuditMapperResolver;
+import com.bytechef.ee.platform.audit.aspect.AuditedMethodValidator;
+import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.ee.platform.audit.service.AuditEventService;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
@@ -33,23 +45,27 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.AdditionalAnswers;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.NestedTestConfiguration;
 
 /**
  * The same proxy enforcement as {@link PreAuthorizeProxyEnforcementIntTest}, but with no synthetic stand-ins: the
- * production {@code WorkspaceUserServiceImpl} and {@code CustomRoleServiceImpl} are the beans under test, so a guard
- * deleted from either one fails here.
+ * production {@code WorkspaceUserServiceImpl} is the bean under test, so a guard deleted from it fails here.
  * <p>
  * Each guard is asserted in both directions and the exact {@link PermissionService} call is verified. A deny-only
  * assertion against an unstubbed mock cannot tell "the named check refused" from "no gate named that check": Mockito
@@ -61,8 +77,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author Ivica Cardic
  */
 @SpringBootTest(
-    classes = RealImplProxyEnforcementIntTest.Config.class, properties = "bytechef.edition=ee")
-class RealImplProxyEnforcementIntTest {
+    classes = WorkspaceUserServiceIntTest.Config.class, properties = "bytechef.edition=ee")
+class WorkspaceUserServiceIntTest {
 
     private static final long CUSTOM_ROLE_ID = 3L;
     private static final String MEMBER_MANAGE = "WORKSPACE_MEMBER_MANAGE";
@@ -80,9 +96,6 @@ class RealImplProxyEnforcementIntTest {
 
     @Autowired
     private WorkspaceUserService workspaceUserService;
-
-    @Autowired
-    private CustomRoleService customRoleService;
 
     @BeforeEach
     void authenticateAsNonAdmin() {
@@ -166,6 +179,9 @@ class RealImplProxyEnforcementIntTest {
     void testRealWorkspaceUserServiceImplAllowsAssignCustomRoleWhenTheScopeIsGranted() {
         when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE)).thenReturn(true);
 
+        // The caller also holds the role's scopes; granting a role that carries more than the caller holds is refused.
+        when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class))).thenReturn(true);
+
         stubAnAssignableCustomRoleAndMembership();
 
         WorkspaceUser workspaceUser = workspaceUserService.assignCustomRole(USER_ID, WORKSPACE_ID, CUSTOM_ROLE_ID);
@@ -195,83 +211,6 @@ class RealImplProxyEnforcementIntTest {
         workspaceUserService.getWorkspaceWorkspaceUsers(WORKSPACE_ID);
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", "WORKSPACE_VIEW");
-        verifyNoMoreInteractions(permissionService);
-    }
-
-    @Test
-    void testRealCustomRoleServiceImplEnforcesCreateCustomRole() {
-        assertThatThrownBy(
-            () -> customRoleService.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
-                .isInstanceOf(AccessDeniedException.class);
-
-        verify(permissionService).isTenantAdmin();
-        verifyNoMoreInteractions(permissionService);
-    }
-
-    @Test
-    void testRealCustomRoleServiceImplAllowsCreateCustomRoleForATenantAdmin() {
-        when(permissionService.isTenantAdmin()).thenReturn(true);
-
-        // Reaching validateScopeNames — which rejects the name against an empty registry — is what proves the tenant
-        // admin got past the gate.
-        assertThatThrownBy(
-            () -> customRoleService.createCustomRole("r", "d", Set.of("WORKFLOW_VIEW")))
-                .isNotInstanceOf(AccessDeniedException.class);
-
-        verify(permissionService).isTenantAdmin();
-    }
-
-    @Test
-    void testRealCustomRoleServiceImplEnforcesDeleteCustomRole() {
-        assertThatThrownBy(() -> customRoleService.deleteCustomRole(1L))
-            .isInstanceOf(AccessDeniedException.class);
-
-        verify(permissionService).isTenantAdmin();
-        verifyNoMoreInteractions(permissionService);
-    }
-
-    @Test
-    void testRealCustomRoleServiceImplEnforcesGetCustomRoles() {
-        assertThatThrownBy(() -> customRoleService.getCustomRoles(null))
-            .isInstanceOf(AccessDeniedException.class);
-
-        // The null-workspaceId tier is tenant-admin-only, and SpEL short-circuits the second disjunct because
-        // '#workspaceId != null' is false — so isTenantAdmin is the only check that may run.
-        verify(permissionService).isTenantAdmin();
-        verifyNoMoreInteractions(permissionService);
-    }
-
-    @Test
-    void testRealCustomRoleServiceImplAllowsGetCustomRolesForATenantAdmin() {
-        when(permissionService.isTenantAdmin()).thenReturn(true);
-
-        assertThat(customRoleService.getCustomRoles(null)).isEmpty();
-
-        verify(permissionService).isTenantAdmin();
-        verifyNoMoreInteractions(permissionService);
-    }
-
-    /**
-     * The other tier of the same read: a workspace member manager populating the assignment picker. It must route
-     * through the {@code 'Workspace'} token rather than through {@code isTenantAdmin()}, or the picker would be empty
-     * for exactly the people who need it.
-     */
-    @Test
-    void testRealCustomRoleServiceImplEnforcesGetCustomRolesForAWorkspace() {
-        assertThatThrownBy(() -> customRoleService.getCustomRoles(WORKSPACE_ID))
-            .isInstanceOf(AccessDeniedException.class);
-
-        verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
-        verifyNoMoreInteractions(permissionService);
-    }
-
-    @Test
-    void testRealCustomRoleServiceImplAllowsGetCustomRolesForAWorkspaceMemberManager() {
-        when(permissionService.hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE)).thenReturn(true);
-
-        assertThat(customRoleService.getCustomRoles(WORKSPACE_ID)).isEmpty();
-
-        verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
         verifyNoMoreInteractions(permissionService);
     }
 
@@ -326,11 +265,6 @@ class RealImplProxyEnforcementIntTest {
             return mock(CustomRoleRepository.class);
         }
 
-        @Bean
-        WorkspaceUserAuditPublisher workspaceUserAuditPublisher() {
-            return mock(WorkspaceUserAuditPublisher.class);
-        }
-
         // The remaining WorkspaceUserServiceImpl collaborators, mocked like the ones above — a denial fires the
         // @PreAuthorize check before any of them is touched, and the positive controls only need Mockito's defaults.
         @Bean
@@ -353,6 +287,201 @@ class RealImplProxyEnforcementIntTest {
             when(workspaceService.workspaceExists(anyLong())).thenReturn(true);
 
             return workspaceService;
+        }
+    }
+
+    @Nested
+    @NestedTestConfiguration(OVERRIDE)
+    @SpringBootTest(classes = Audit.Config.class, properties = "bytechef.edition=ee")
+    class Audit {
+
+        private static final long USER_ID = 2L;
+        private static final long WORKSPACE_ID = 1L;
+
+        @Autowired
+        private AuditEventService auditEventService;
+
+        @Autowired
+        private CustomRoleRepository customRoleRepository;
+
+        @Autowired
+        private CustomRoleService customRoleService;
+
+        @Autowired
+        private PermissionScopeRegistry permissionScopeRegistry;
+
+        @Autowired
+        private PermissionService permissionService;
+
+        @Autowired
+        private UserInvitationService userInvitationService;
+
+        @Autowired
+        private UserService userService;
+
+        @Autowired
+        private WorkspaceUserRepository workspaceUserRepository;
+
+        @Autowired
+        private WorkspaceUserService workspaceUserService;
+
+        @BeforeEach
+        void beforeEach() {
+            reset(
+                auditEventService, customRoleRepository, permissionScopeRegistry, permissionService,
+                userInvitationService, userService, workspaceUserRepository);
+
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "alice", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            when(workspaceUserRepository.save(any(WorkspaceUser.class))).then(AdditionalAnswers.returnsFirstArg());
+            when(permissionScopeRegistry.getScopeNames(any(WorkspaceRole.class))).thenReturn(Set.of());
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testRoleUpdateRecordsPreviousAndNewRole() {
+            grantMemberManagement();
+
+            when(workspaceUserRepository.findByUserIdAndWorkspaceIdAndEnvironmentIsNull(USER_ID, WORKSPACE_ID))
+                .thenReturn(Optional.of(WorkspaceUser.forRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER)));
+
+            workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.EDITOR);
+
+            PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+            assertThat(persistentAuditEvent.getEventType())
+                .isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED);
+            assertThat(persistentAuditEvent.getPrincipal()).isEqualTo("alice");
+            assertThat(persistentAuditEvent.getData())
+                .containsEntry("result", "SUCCESS")
+                .containsEntry("workspaceId", "1")
+                .containsEntry("userId", "2")
+                .containsEntry("previousRole", "VIEWER")
+                .containsEntry("role", "EDITOR");
+        }
+
+        @Test
+        void testDeniedCallRecordsDeniedAndNeverTouchesTheRepository() {
+            when(permissionService.hasWorkspaceScopeInEveryEnvironment(anyLong(), anyString())).thenReturn(false);
+
+            assertThatThrownBy(
+                () -> workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.ADMIN))
+                    .isInstanceOf(AccessDeniedException.class);
+
+            verifyNoInteractions(workspaceUserRepository);
+
+            PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+            assertThat(persistentAuditEvent.getEventType())
+                .isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED);
+            assertThat(persistentAuditEvent.getData())
+                .containsEntry("result", "DENIED")
+                .containsEntry("role", "ADMIN")
+                .doesNotContainKey("previousRole");
+        }
+
+        @Test
+        void testInviteWritesExactlyOneRowWithoutTheEmail() {
+            grantMemberManagement();
+
+            User invitedUser = mock(User.class);
+
+            when(invitedUser.getId()).thenReturn(9L);
+            when(userService.fetchUserByEmail("someone@example.com")).thenReturn(Optional.empty());
+            when(userInvitationService.inviteUser(anyString(), anyString())).thenReturn(invitedUser);
+
+            workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, "someone@example.com", WorkspaceRole.VIEWER);
+
+            PersistentAuditEvent persistentAuditEvent = captureSavedEvent();
+
+            assertThat(persistentAuditEvent.getEventType()).isEqualTo(WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED);
+            assertThat(persistentAuditEvent.getData())
+                .containsEntry("userId", "9")
+                .containsEntry("invited", "true")
+                .containsEntry("role", "VIEWER");
+            assertThat(persistentAuditEvent.getData()
+                .values()).noneMatch(value -> value.contains("@"));
+        }
+
+        private void grantMemberManagement() {
+            when(permissionService.hasWorkspaceScopeInEveryEnvironment(anyLong(), anyString())).thenReturn(true);
+            when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class))).thenReturn(true);
+        }
+
+        @SuppressWarnings("unchecked")
+        private PersistentAuditEvent captureSavedEvent() {
+            ArgumentCaptor<List<PersistentAuditEvent>> argumentCaptor = ArgumentCaptor.forClass(List.class);
+
+            verify(auditEventService).saveAll(argumentCaptor.capture());
+
+            List<PersistentAuditEvent> persistentAuditEvents = argumentCaptor.getValue();
+
+            assertThat(persistentAuditEvents).hasSize(1);
+
+            return persistentAuditEvents.getFirst();
+        }
+
+        @SpringBootConfiguration
+        @EnableAspectJAutoProxy
+        @EnableMethodSecurity
+        @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
+        @Import({
+            AuditAspect.class, AuditCaptureAspect.class, AuditedMethodValidator.class, AuditMapperResolver.class,
+            CustomRoleAuditMapper.class, CustomRoleServiceImpl.class, WorkspaceUserAuditMapper.class,
+            WorkspaceUserServiceImpl.class
+        })
+        static class Config {
+
+            @Bean
+            AuditEventService auditEventService() {
+                return mock(AuditEventService.class);
+            }
+
+            @Bean
+            CustomRoleRepository customRoleRepository() {
+                return mock(CustomRoleRepository.class);
+            }
+
+            @Bean("permissionService")
+            PermissionService permissionService() {
+                return mock(PermissionService.class);
+            }
+
+            @Bean
+            PermissionScopeRegistry permissionScopeRegistry() {
+                return mock(PermissionScopeRegistry.class);
+            }
+
+            @Bean
+            UserInvitationService userInvitationService() {
+                return mock(UserInvitationService.class);
+            }
+
+            @Bean
+            UserService userService() {
+                return mock(UserService.class);
+            }
+
+            @Bean
+            WorkspaceService workspaceService() {
+                WorkspaceService workspaceService = mock(WorkspaceService.class);
+
+                when(workspaceService.workspaceExists(anyLong())).thenReturn(true);
+
+                return workspaceService;
+            }
+
+            @Bean
+            WorkspaceUserRepository workspaceUserRepository() {
+                return mock(WorkspaceUserRepository.class);
+            }
         }
     }
 }

@@ -17,6 +17,7 @@
 package com.bytechef.platform.mail;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -315,6 +316,21 @@ class MailServiceIntTest {
         DataHandler dataHandler = message.getDataHandler();
 
         assertThat(dataHandler.getContentType()).isEqualTo("text/html;charset=UTF-8");
+    }
+
+    @Test
+    void testCreationEmailThrowsWhenDeliveryFails() {
+        doThrow(MailSendException.class).when(javaMailSender)
+            .send(any(MimeMessage.class));
+
+        User user = new User();
+
+        user.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+        user.setLogin("john");
+        user.setEmail("john.doe@example.com");
+
+        assertThatThrownBy(() -> mailService.sendCreationEmail(user))
+            .isInstanceOf(MailSendException.class);
     }
 
     @Test
