@@ -39,6 +39,7 @@ import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import io.modelcontextprotocol.client.McpSyncClient;
 import org.springframework.ai.mcp.McpToolFilter;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.ai.mcp.ToolContextToMcpMetaConverter;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
@@ -103,9 +104,18 @@ public class McpClientTool {
 
         McpToolFilter toolFilter = createToolFilter(inputParameters);
 
+        return createToolCallbackProvider(mcpSyncClient, toolFilter);
+    }
+
+    /**
+     * The agent's tool context holds the job's action context and SSE emitter, so none of it is sent to the MCP server
+     * as request metadata.
+     */
+    static ToolCallbackProvider createToolCallbackProvider(McpSyncClient mcpSyncClient, McpToolFilter toolFilter) {
         return SyncMcpToolCallbackProvider.builder()
             .mcpClients(mcpSyncClient)
             .toolFilter(toolFilter)
+            .toolContextToMcpMetaConverter(ToolContextToMcpMetaConverter.noOp())
             .build();
     }
 }

@@ -25,6 +25,7 @@ import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsCreateAiSkillAct
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsRemoveFileFromAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAskUserQuestionTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
@@ -54,6 +55,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
         List<AiAgentUtilsClusterElementContributor> clusterElementContributors) {
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
+            AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
