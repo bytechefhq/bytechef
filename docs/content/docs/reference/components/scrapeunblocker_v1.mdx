@@ -1,0 +1,137 @@
+---
+title: "ScrapeUnblocker"
+description: "ScrapeUnblocker is a web scraping API that returns fully rendered HTML or AI-parsed JSON from any URL, bypassing anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai."
+---
+
+
+Categories: Analytics
+
+
+Type: scrapeunblocker/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### API Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| api_token | API Key | STRING | The API key from your ScrapeUnblocker dashboard. | true |
+
+
+
+## Connection Setup
+
+### Find your API Key
+
+1. Sign in to your ScrapeUnblocker dashboard at [app.scrapeunblocker.com](https://app.scrapeunblocker.com).
+2. Open the **API** section.
+3. Copy your API key and paste it here.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Get Page Source
+Name: getPageSource
+
+`Scrape a URL and return its fully rendered HTML, bypassing anti-bot protection such as Cloudflare, DataDome, PerimeterX and Akamai.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The URL of the page to scrape. | true |
+| proxy_country | Proxy Country | STRING | Two-letter country code for the proxy exit location (e.g. US, DE). | false |
+| time_sleep | Wait Seconds | INTEGER | Number of seconds to wait after the page loads before the HTML is captured. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Page Source",
+  "name" : "getPageSource",
+  "parameters" : {
+    "url" : "",
+    "proxy_country" : "",
+    "time_sleep" : 1
+  },
+  "type" : "scrapeunblocker/v1/getPageSource"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+### Get Parsed Data
+Name: getParsedData
+
+`Scrape a URL and return AI-parsed structured JSON instead of raw HTML.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| url | URL | STRING | The URL of the page to scrape. | true |
+| proxy_country | Proxy Country | STRING | Two-letter country code for the proxy exit location (e.g. US, DE). | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Parsed Data",
+  "name" : "getParsedData",
+  "parameters" : {
+    "url" : "",
+    "proxy_country" : ""
+  },
+  "type" : "scrapeunblocker/v1/getParsedData"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
