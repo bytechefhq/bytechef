@@ -25,14 +25,19 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.mongo.MongoChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
@@ -44,36 +49,73 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
  */
 public class MongoDbChatMemoryUtils {
 
+    private static final String DEFAULT_DATABASE_NAME = "spring_ai";
+
     private static final MongoDriverInformation DRIVER_INFORMATION = MongoDriverInformation.builder()
         .driverName("ByteChef")
+        .build();
+
+    private static final Duration CLIENT_IDLE_TIMEOUT = Duration.ofHours(24);
+
+    private static final Cache<MongoClientKey, MongoClient> CLIENTS = Caffeine.newBuilder()
+        .expireAfterAccess(CLIENT_IDLE_TIMEOUT)
+        .removalListener((MongoClientKey mongoClientKey, MongoClient mongoClient, RemovalCause removalCause) -> {
+            if (mongoClient != null) {
+                mongoClient.close();
+            }
+        })
         .build();
 
     private MongoDbChatMemoryUtils() {
     }
 
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
-        String connectionString = connectionParameters.getRequiredString(CONNECTION_STRING);
-        String databaseName = connectionParameters.getString(DATABASE_NAME, "spring_ai");
-        String username = connectionParameters.getString(USERNAME);
-        String password = connectionParameters.getString(PASSWORD);
-
-        MongoClientSettings.Builder mongoBuilder = MongoClientSettings.builder()
-            .applyConnectionString(new ConnectionString(connectionString));
-
-        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
-            mongoBuilder.credential(MongoCredential.createCredential(username, databaseName, password.toCharArray()));
-        }
-
-        MongoClient mongoClient = MongoClients.create(mongoBuilder.build(), DRIVER_INFORMATION);
+        String databaseName = connectionParameters.getString(DATABASE_NAME, DEFAULT_DATABASE_NAME);
 
         MongoTemplate mongoTemplate = new MongoTemplate(
-            new SimpleMongoClientDatabaseFactory(mongoClient, databaseName));
+            new SimpleMongoClientDatabaseFactory(getSharedMongoClient(connectionParameters), databaseName));
 
         ChatMemoryRepository delegate = MongoChatMemoryRepository.builder()
             .mongoTemplate(mongoTemplate)
             .build();
 
         return new OrderedMongoChatMemoryRepository(delegate, mongoTemplate);
+    }
+
+    static MongoClient getSharedMongoClient(Parameters connectionParameters) {
+        return CLIENTS.get(toMongoClientKey(connectionParameters), MongoDbChatMemoryUtils::buildMongoClient);
+    }
+
+    private static MongoClient buildMongoClient(MongoClientKey mongoClientKey) {
+        MongoClientSettings.Builder mongoBuilder = MongoClientSettings.builder()
+            .applyConnectionString(new ConnectionString(mongoClientKey.connectionString()));
+
+        String username = mongoClientKey.username();
+        String password = mongoClientKey.password();
+
+        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+            mongoBuilder.credential(
+                MongoCredential.createCredential(username, mongoClientKey.databaseName(), password.toCharArray()));
+        }
+
+        return MongoClients.create(mongoBuilder.build(), DRIVER_INFORMATION);
+    }
+
+    private static MongoClientKey toMongoClientKey(Parameters connectionParameters) {
+        return new MongoClientKey(
+            connectionParameters.getRequiredString(CONNECTION_STRING),
+            connectionParameters.getString(DATABASE_NAME, DEFAULT_DATABASE_NAME),
+            connectionParameters.getString(USERNAME),
+            connectionParameters.getString(PASSWORD));
+    }
+
+    private record MongoClientKey(
+        String connectionString, String databaseName, @Nullable String username, @Nullable String password) {
+
+        @Override
+        public String toString() {
+            return "MongoClientKey{databaseName=" + databaseName + ", username=" + username + "}";
+        }
     }
 
     public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
