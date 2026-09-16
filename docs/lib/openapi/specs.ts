@@ -23,6 +23,10 @@ export const SPECS = {
     SPECS_ROOT,
     'embedded/embedded-webhook/embedded-webhook-public-rest/openapi.yaml',
   ),
+  'automation-data-tables': path.join(
+    SPECS_ROOT,
+    'automation/automation-data-table/automation-data-table-public-rest/openapi.yaml',
+  ),
   automation: path.join(
     SPECS_ROOT,
     'automation/automation-configuration/automation-configuration-public-rest/openapi.yaml',
