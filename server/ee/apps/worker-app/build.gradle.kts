@@ -55,6 +55,7 @@ dependencies {
             .filter { it.path.startsWith(":server:libs:modules:components") }
             .filterNot { it.path in setOf(
                 ":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin",
+                ":server:libs:modules:components:ai:agent:chat-memory:chat-memory-builtin-session",
                 ":server:libs:modules:components:data-stream",
                 ":server:libs:modules:components:deepgram",
                 ":server:libs:modules:components:example") }
