@@ -10,7 +10,7 @@ import {
 
 import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
-import {BrushCleaningIcon} from 'lucide-react';
+import {BrushCleaningIcon, LockIcon, LockOpenIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -22,10 +22,12 @@ const SETTLE_DELAY = 350;
 const ClusterElementsWorkflowEditor = () => {
     const [canvasReady, setCanvasReady] = useState(false);
 
-    const {onEdgesChange, setCanvasZoom} = useClusterElementsDataStore(
+    const {nodesLocked, onEdgesChange, setCanvasZoom, setNodesLocked} = useClusterElementsDataStore(
         useShallow((state) => ({
+            nodesLocked: state.nodesLocked,
             onEdgesChange: state.onEdgesChange,
             setCanvasZoom: state.setCanvasZoom,
+            setNodesLocked: state.setNodesLocked,
         }))
     );
 
@@ -39,6 +41,10 @@ const ClusterElementsWorkflowEditor = () => {
         [setCanvasZoom]
     );
 
+    const handleToggleLock = useCallback(() => {
+        setNodesLocked(!nodesLocked);
+    }, [nodesLocked, setNodesLocked]);
+
     // Mount ReactFlow only after the hosting dialog's open transition settles. ReactFlow measures
     // handle positions once on mount; mounting it into a not-yet-settled layout caches wrong bounds
     // and renders edges non-vertical until a later remeasure corrects them (a visible snap on reopen).
@@ -47,6 +53,10 @@ const ClusterElementsWorkflowEditor = () => {
 
         return () => clearTimeout(timeoutId);
     }, []);
+
+    useEffect(() => {
+        setNodesLocked(true);
+    }, [setNodesLocked]);
 
     if (!canvasReady) {
         return <div className="size-full" />;
@@ -64,7 +74,7 @@ const ClusterElementsWorkflowEditor = () => {
                     nodeTypes={clusterElementsNodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
-                    nodesDraggable
+                    nodesDraggable={!nodesLocked}
                     onEdgesChange={onEdgesChange}
                     onNodesChange={handleNodesChange}
                     onViewportChange={handleViewportChange}
@@ -82,6 +92,13 @@ const ClusterElementsWorkflowEditor = () => {
                     >
                         <ControlButton onClick={handleResetLayout} title="Reset layout">
                             <BrushCleaningIcon className="size-3" />
+                        </ControlButton>
+
+                        <ControlButton
+                            onClick={handleToggleLock}
+                            title={nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
+                        >
+                            {nodesLocked ? <LockIcon className="size-3" /> : <LockOpenIcon className="size-3" />}
                         </ControlButton>
                     </Controls>
                 </ReactFlow>

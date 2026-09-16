@@ -14,6 +14,7 @@ import {useShallow} from 'zustand/react/shallow';
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
 import {WorkflowEditorReadOnlyContext} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import {getAxisCenteredViewport} from '../utils/axisCenteredViewportUtils';
 import NodeActionsHint from './NodeActionsHint';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
@@ -74,6 +75,13 @@ const WorkflowEditor = ({
         }))
     );
 
+    const {nodesLocked, setNodesLocked} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            nodesLocked: state.nodesLocked,
+            setNodesLocked: state.setNodesLocked,
+        }))
+    );
+
     const {edgeTypes, handleNodeDragStart, handleNodeDragStop, handleNodesChange, nodeTypes, onDragOver, onDrop} =
         useWorkflowEditorCanvas({
             componentDefinitions,
@@ -120,6 +128,10 @@ const WorkflowEditor = ({
         setViewport,
     ]);
 
+    useEffect(() => {
+        setNodesLocked(true);
+    }, [setNodesLocked]);
+
     return (
         <WorkflowEditorReadOnlyContext.Provider value={!!readOnlyWorkflow}>
             <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-background', className)}>
@@ -133,7 +145,7 @@ const WorkflowEditor = ({
                     nodeTypes={nodeTypes}
                     nodes={nodes}
                     nodesConnectable={false}
-                    nodesDraggable={!readOnlyWorkflow}
+                    nodesDraggable={!readOnlyWorkflow && !nodesLocked}
                     onDragOver={onDragOver}
                     onDrop={onDrop}
                     onEdgesChange={onEdgesChange}
