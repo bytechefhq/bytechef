@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.search;
+package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
@@ -22,8 +22,7 @@ import com.bytechef.automation.search.SearchResult;
 /**
  * @author Ivica Cardic
  */
-public record KnowledgeBaseDocumentSearchResult(Long id, long knowledgeBaseId, String name)
-    implements SearchResult<Long> {
+public record ConnectionSearchResult(Long id, String name, Long workspaceId) implements SearchResult<Long> {
 
     @Override
     public String description() {
@@ -32,6 +31,6 @@ public record KnowledgeBaseDocumentSearchResult(Long id, long knowledgeBaseId, S
 
     @Override
     public SearchAssetType type() {
-        return SearchAssetType.KNOWLEDGE_BASE_DOCUMENT;
+        return SearchAssetType.CONNECTION;
     }
 }

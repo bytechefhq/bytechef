@@ -17,9 +17,8 @@
 package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
-import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,9 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller exposing queries and mutations for data table row operations (DML).
+ * GraphQL controller exposing queries and mutations for data table row operations (DML). Authorization is enforced on
+ * {@link WorkspaceDataTableFacade} (the per-row {@code DataTableRowService} is shared with workflow execution and is
+ * not gated directly).
  *
  * @author Ivica Cardic
  */
@@ -38,24 +39,16 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableRowGraphQlController {
 
-    private final DataTableRowService dataTableRowService;
-    private final DataTableService dataTableService;
+    private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
-    public DataTableRowGraphQlController(
-        DataTableRowService dataTableRowService, DataTableService dataTableService) {
-
-        this.dataTableRowService = dataTableRowService;
-        this.dataTableService = dataTableService;
+    public DataTableRowGraphQlController(WorkspaceDataTableFacade workspaceDataTableFacade) {
+        this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
     @QueryMapping
     public List<Row> dataTableRows(@Argument Long environmentId, @Argument Long tableId) {
-        String baseName = dataTableService.getBaseNameById(tableId);
-
-        List<DataTableRow> dataTableRows = dataTableRowService.listRows(
-            baseName, Integer.MAX_VALUE, 0, environmentId);
-
-        return dataTableRows.stream()
+        return workspaceDataTableFacade.listRows(tableId, Integer.MAX_VALUE, 0, environmentId)
+            .stream()
             .map(dataTableRow -> new Row(dataTableRow.id(), dataTableRow.values()))
             .toList();
     }
@@ -64,12 +57,11 @@ public class DataTableRowGraphQlController {
     public RowPage dataTableRowsPage(
         @Argument Long environmentId, @Argument Long tableId, @Argument Integer limit, @Argument Integer offset) {
 
-        String baseName = dataTableService.getBaseNameById(tableId);
         int pageSize = (limit == null || limit <= 0) ? 100 : Math.min(limit, Integer.MAX_VALUE - 1);
         int pageOffset = (offset == null || offset < 0) ? 0 : offset;
 
-        List<DataTableRow> fetched = dataTableRowService.listRows(
-            baseName, pageSize + 1, pageOffset, environmentId);
+        List<DataTableRow> fetched = workspaceDataTableFacade.listRows(
+            tableId, pageSize + 1, pageOffset, environmentId);
 
         boolean hasMore = fetched.size() > pageSize;
 
@@ -86,48 +78,33 @@ public class DataTableRowGraphQlController {
 
     @MutationMapping
     public Row insertDataTableRow(@Argument InsertRowInput input) {
-        Long environmentId = input.environmentId();
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        DataTableRow dataTableRow = dataTableRowService.insertRow(
-            baseName, input.values(), environmentId);
+        DataTableRow dataTableRow = workspaceDataTableFacade.insertRow(
+            input.tableId(), input.values(), input.environmentId());
 
         return new Row(dataTableRow.id(), dataTableRow.values());
     }
 
     @MutationMapping
     public Row updateDataTableRow(@Argument UpdateRowInput input) {
-        Long environmentId = input.environmentId();
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        DataTableRow row = dataTableRowService.updateRow(
-            baseName, input.id(), input.values(), environmentId);
+        DataTableRow row = workspaceDataTableFacade.updateRow(
+            input.tableId(), input.id(), input.values(), input.environmentId());
 
         return new Row(row.id(), row.values());
     }
 
     @MutationMapping
     public boolean deleteDataTableRow(@Argument DeleteRowInput input) {
-        Long environmentId = input.environmentId();
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        return dataTableRowService.deleteRow(baseName, input.id(), environmentId);
+        return workspaceDataTableFacade.deleteRow(input.tableId(), input.id(), input.environmentId());
     }
 
     @QueryMapping
     public String exportDataTableCsv(@Argument Long environmentId, @Argument Long tableId) {
-        String baseName = dataTableService.getBaseNameById(tableId);
-
-        return dataTableRowService.exportCsv(baseName, environmentId);
+        return workspaceDataTableFacade.exportCsv(tableId, environmentId);
     }
 
     @MutationMapping
     public boolean importDataTableCsv(@Argument ImportCsvInput input) {
-        Long environmentId = input.environmentId();
-
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        dataTableRowService.importCsv(baseName, input.csv(), environmentId);
+        workspaceDataTableFacade.importCsv(input.tableId(), input.csv(), input.environmentId());
 
         return true;
     }

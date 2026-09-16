@@ -22,7 +22,7 @@ import com.bytechef.automation.search.SearchResult;
 /**
  * @author Ivica Cardic
  */
-public record DataTableSearchResult(Long id, String name) implements SearchResult<Long> {
+public record DataTableSearchResult(Long id, String name, Long workspaceId) implements SearchResult<Long> {
 
     @Override
     public String description() {

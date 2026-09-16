@@ -35,6 +35,14 @@ public interface DataTableTagService {
     List<Tag> getAllTags();
 
     /**
+     * Retrieves the distinct tags assigned to the given data tables.
+     *
+     * @param dataTableIds the ids of the data tables whose tags are to be retrieved
+     * @return a list of Tag objects assigned to the given data tables
+     */
+    List<Tag> getTags(List<Long> dataTableIds);
+
+    /**
      * Retrieves a mapping from data table base name to list of tags assigned to that table.
      *
      * @return a map where keys are data table base names and values are lists of Tag objects assigned to each table
