@@ -1,0 +1,15 @@
+mutation deleteAiAutoMemory(
+    $workspaceId: ID!
+    $id: ID!
+    $environment: Int!
+    $principalType: AiAutoMemoryPrincipalType
+    $principalId: Long
+) {
+    deleteAiAutoMemory(
+        workspaceId: $workspaceId
+        id: $id
+        environment: $environment
+        principalType: $principalType
+        principalId: $principalId
+    )
+}
