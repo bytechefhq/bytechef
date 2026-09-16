@@ -620,6 +620,7 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
+        private AutoMemory autoMemory = new AutoMemory();
         private Copilot copilot = new Copilot();
         private Firecrawl firecrawl = new Firecrawl();
         private KnowledgeBase knowledgeBase = new KnowledgeBase();
@@ -627,6 +628,10 @@ public class ApplicationProperties {
         private Memory memory = new Memory();
         private Provider provider = new Provider();
         private Vectorstore vectorstore = new Vectorstore();
+
+        public AutoMemory getAutoMemory() {
+            return autoMemory;
+        }
 
         public Copilot getCopilot() {
             return copilot;
@@ -656,6 +661,10 @@ public class ApplicationProperties {
             return vectorstore;
         }
 
+        public void setAutoMemory(AutoMemory autoMemory) {
+            this.autoMemory = autoMemory;
+        }
+
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
@@ -682,6 +691,43 @@ public class ApplicationProperties {
 
         public void setVectorstore(Vectorstore vectorstore) {
             this.vectorstore = vectorstore;
+        }
+
+        /**
+         * Auto-memory storage configuration.
+         */
+        public static class AutoMemory {
+
+            /**
+             * Auto-memory storage provider type.
+             */
+            public enum Provider {
+                /**
+                 * AWS S3 object storage; requires the EE AWS file storage module on the classpath
+                 */
+                AWS,
+                /**
+                 * Local filesystem storage
+                 */
+                FILESYSTEM,
+                /**
+                 * Relational JDBC storage
+                 */
+                JDBC
+            }
+
+            /**
+             * Auto-memory storage provider
+             */
+            private Provider provider = Provider.JDBC;
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
         }
 
         /**

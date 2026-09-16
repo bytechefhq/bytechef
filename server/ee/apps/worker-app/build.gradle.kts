@@ -62,6 +62,7 @@ dependencies {
     }
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-auto-memory:platform-ai-auto-memory-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-remote-client"))
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-metadata-api"))
