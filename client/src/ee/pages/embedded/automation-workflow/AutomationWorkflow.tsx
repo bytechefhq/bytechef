@@ -7,7 +7,10 @@ import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEdito
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {RequestI, WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
@@ -47,6 +50,8 @@ const AutomationWorkflow = () => {
     );
 
     const leftSidebarOpen = useAutomationWorkflowEditorSidebarStore((state) => state.leftSidebarOpen);
+    const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
+    const setWorkflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.setWorkflowTestChatPanelOpen);
 
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
@@ -105,6 +110,14 @@ const AutomationWorkflow = () => {
     const handleWorkflowExecutionsTestOutputCloseClick = () => {
         bottomResizablePanelRef.current?.resize(0);
     };
+
+    useEffect(() => {
+        setDataPillPanelOpen(false);
+        setWorkflowTestChatPanelOpen(false);
+
+        useWorkflowNodeDetailsPanelStore.getState().reset();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowId]);
 
     useEffect(() => {
         if (currentWorkflow && !isWorkflowLoading) {
