@@ -78,6 +78,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class KnowledgeBaseAuditIntTest {
 
     private static final String ADMIN_LOGIN = "admin";
+    private static final byte[] CONTENT = "Reset your password from the login page".getBytes(StandardCharsets.UTF_8);
     private static final String FILENAME = "handbook.txt";
 
     @Autowired
@@ -135,7 +136,7 @@ class KnowledgeBaseAuditIntTest {
             .thenReturn(new FileEntry(FILENAME, "file://test/" + FILENAME));
 
         KnowledgeBaseDocument knowledgeBaseDocument = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), FILENAME, "text/plain", newInputStream());
+            knowledgeBase.getId(), FILENAME, "text/plain", CONTENT.length, newInputStream());
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_DOCUMENT_CREATED);
 
@@ -157,7 +158,7 @@ class KnowledgeBaseAuditIntTest {
         Long knowledgeBaseId = knowledgeBase.getId();
 
         assertThatThrownBy(() -> knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBaseId, FILENAME, "text/plain", newInputStream()))
+            knowledgeBaseId, FILENAME, "text/plain", CONTENT.length, newInputStream()))
                 .isInstanceOf(IllegalStateException.class);
 
         PersistentAuditEvent persistentAuditEvent = findSingleEvent(KnowledgeBaseAuditEvents.KB_DOCUMENT_CREATED);
@@ -264,7 +265,7 @@ class KnowledgeBaseAuditIntTest {
     }
 
     private static InputStream newInputStream() {
-        return new ByteArrayInputStream("Reset your password from the login page".getBytes(StandardCharsets.UTF_8));
+        return new ByteArrayInputStream(CONTENT);
     }
 
     private KnowledgeBaseDocument saveKnowledgeBaseDocument() {

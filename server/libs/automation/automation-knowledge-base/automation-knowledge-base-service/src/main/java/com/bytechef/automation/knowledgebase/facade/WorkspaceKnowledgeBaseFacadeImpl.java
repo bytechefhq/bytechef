@@ -24,9 +24,11 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.knowledgebase.audit.KnowledgeBaseAuditEvents;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -49,17 +51,20 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseStorageService knowledgeBaseStorageService;
     private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceKnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseStorageService knowledgeBaseStorageService,
         WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeBaseStorageService = knowledgeBaseStorageService;
         this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
 
@@ -172,5 +177,11 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         workspaceKnowledgeBaseService.removeKnowledgeBaseFromWorkspace(knowledgeBaseId);
 
         knowledgeBaseService.deleteKnowledgeBase(knowledgeBaseId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public KnowledgeBaseStorageUsage getStorageUsage() {
+        return knowledgeBaseStorageService.getUsage();
     }
 }

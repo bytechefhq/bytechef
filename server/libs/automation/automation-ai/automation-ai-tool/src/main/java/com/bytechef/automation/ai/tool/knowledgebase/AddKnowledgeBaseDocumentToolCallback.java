@@ -155,7 +155,8 @@ public class AddKnowledgeBaseDocumentToolCallback implements ToolCallback {
                 .getBytes(StandardCharsets.UTF_8);
 
             KnowledgeBaseDocument document = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-                knowledgeBaseId, input.name(), input.mimeType(), new ByteArrayInputStream(contentBytes));
+                knowledgeBaseId, input.name(), input.mimeType(), contentBytes.length,
+                new ByteArrayInputStream(contentBytes));
 
             return jsonMapper.writeValueAsString(
                 new AddKnowledgeBaseDocumentOutput(true, document.getId()

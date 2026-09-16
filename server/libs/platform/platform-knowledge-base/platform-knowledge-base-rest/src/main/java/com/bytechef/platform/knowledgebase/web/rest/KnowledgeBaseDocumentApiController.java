@@ -17,11 +17,15 @@
 package com.bytechef.platform.knowledgebase.web.rest;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseStorageLimitExceededException;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,6 +52,15 @@ class KnowledgeBaseDocumentApiController {
 
         return ResponseEntity.ok(
             knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-                id, file.getOriginalFilename(), file.getContentType(), file.getInputStream()));
+                id, file.getOriginalFilename(), file.getContentType(), file.getSize(), file.getInputStream()));
+    }
+
+    @ExceptionHandler(KnowledgeBaseStorageLimitExceededException.class)
+    ResponseEntity<ProblemDetail> handleStorageLimitExceeded(KnowledgeBaseStorageLimitExceededException exception) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+            HttpStatus.CONTENT_TOO_LARGE, exception.getMessage());
+
+        return ResponseEntity.of(problemDetail)
+            .build();
     }
 }
