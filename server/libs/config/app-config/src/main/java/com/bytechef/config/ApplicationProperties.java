@@ -775,6 +775,8 @@ public class ApplicationProperties {
              */
             private Provider provider = Provider.JDBC;
 
+            private Redis redis = new Redis();
+
             public Aws getAws() {
                 return aws;
             }
@@ -783,12 +785,20 @@ public class ApplicationProperties {
                 return provider;
             }
 
+            public Redis getRedis() {
+                return redis;
+            }
+
             public void setAws(Aws aws) {
                 this.aws = aws;
             }
 
             public void setProvider(Provider provider) {
                 this.provider = provider;
+            }
+
+            public void setRedis(Redis redis) {
+                this.redis = redis;
             }
 
             /**
@@ -859,6 +869,55 @@ public class ApplicationProperties {
 
                 public void setKeyPrefix(String keyPrefix) {
                     this.keyPrefix = keyPrefix;
+                }
+            }
+
+            public static class Redis {
+
+                private String host = "localhost";
+                private String keyPrefix = "bytechef-session:";
+                private String password;
+                private int port = 6379;
+                private String username;
+
+                public String getHost() {
+                    return host;
+                }
+
+                public String getKeyPrefix() {
+                    return keyPrefix;
+                }
+
+                public String getPassword() {
+                    return password;
+                }
+
+                public int getPort() {
+                    return port;
+                }
+
+                public String getUsername() {
+                    return username;
+                }
+
+                public void setHost(String host) {
+                    this.host = host;
+                }
+
+                public void setKeyPrefix(String keyPrefix) {
+                    this.keyPrefix = keyPrefix;
+                }
+
+                public void setPassword(String password) {
+                    this.password = password;
+                }
+
+                public void setPort(int port) {
+                    this.port = port;
+                }
+
+                public void setUsername(String username) {
+                    this.username = username;
                 }
             }
         }

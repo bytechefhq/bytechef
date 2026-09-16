@@ -25,7 +25,7 @@ spring-cloud-aws = "4.2.0"
 spring-cloud-dependencies = "2025.1.3"
 spring-shell = "4.0.3"
 springaicommunity-agent-utils = "0.12.0"
-springaicommunity-spring-ai-session = "0.10.0"
+springaicommunity-spring-ai-session = "0.7.0"
 testcontainers = "1.21.3"
 
 [libraries]
@@ -67,8 +67,8 @@ org-springaicommunity-agent-judge-llm = { module = "io.github.markpollack:agent-
 org-springaicommunity-agents-agent-claude = { module = "io.github.markpollack:agent-claude", version.ref = "markpollack-agent-claude" }
 org-springaicommunity-agents-agent-client-core = { module = "io.github.markpollack:agent-client-core", version.ref = "markpollack-agent-claude" }
 org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:spring-ai-agent-utils", version.ref = "springaicommunity-agent-utils" }
+org-springaicommunity-spring-ai-session = { module = "org.springaicommunity:spring-ai-session", version.ref = "springaicommunity-spring-ai-session" }
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
-org-springaicommunity-spring-ai-session-management = "org.springaicommunity:spring-ai-session-management:0.5.0"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.13.2"
