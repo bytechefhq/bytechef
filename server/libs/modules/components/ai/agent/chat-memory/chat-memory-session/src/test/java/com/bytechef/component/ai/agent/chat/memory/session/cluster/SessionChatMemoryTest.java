@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.chat.memory.session.cluster;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,13 +36,19 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
+import org.springframework.ai.session.compaction.CompactionRequest;
+import org.springframework.ai.session.compaction.CompactionTrigger;
+import org.springframework.ai.tool.ToolCallback;
 
 /**
  * @author Ivica Cardic
@@ -102,6 +109,148 @@ class SessionChatMemoryTest {
         assertEquals(1, messages.size());
         assertEquals("live turn", messages.getFirst()
             .getText());
+    }
+
+    @Test
+    void testConversationSearchIsScopedToTheAgentBranch() throws Exception {
+        SessionRepository sessionRepository = InMemorySessionRepository.builder()
+            .build();
+
+        sessionRepository.save(Session.builder()
+            .id(CONVERSATION_ID)
+            .userId("user-1")
+            .createdAt(Instant.now())
+            .build());
+
+        appendEvent(sessionRepository, "alpha root", null);
+        appendEvent(sessionRepository, "alpha research", "orch.researcher");
+        appendEvent(sessionRepository, "alpha writer", "orch.writer");
+
+        ChatMemoryFunction.Result result = applySessionChatMemory(
+            sessionRepository,
+            Map.of(
+                "conversationId", CONVERSATION_ID, "enableConversationSearch", true, "agentBranch",
+                "orch.researcher"));
+
+        ToolCallback conversationSearchToolCallback = result.toolCallbacks()[0];
+
+        String searchResult = conversationSearchToolCallback.call(
+            "{\"innerThought\":\"recall\",\"query\":\"alpha\"}",
+            new ToolContext(Map.of("chat_memory_conversation_id", CONVERSATION_ID)));
+
+        assertThat(searchResult)
+            .contains("alpha root", "alpha research")
+            .doesNotContain("alpha writer");
+    }
+
+    @Test
+    void testSlidingWindowTriggerCountsEventsNotTurns() {
+        CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
+            MockParametersFactory.create(Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2)));
+
+        assertThat(compactionTrigger.shouldCompact(oneToolUsingTurn())).isTrue();
+    }
+
+    @Test
+    void testRecursiveSummarizationTriggerCountsEventsNotTurns() {
+        CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
+            MockParametersFactory
+                .create(Map.of("compactionStrategy", "RECURSIVE_SUMMARIZATION", "maxEventsToKeep", 2)));
+
+        assertThat(compactionTrigger.shouldCompact(oneToolUsingTurn())).isTrue();
+    }
+
+    @Test
+    void testEventCountTriggerIgnoresBranchAndSyntheticEventsLikeTheStrategies() {
+        CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
+            MockParametersFactory.create(Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2)));
+
+        Session session = compactionSession();
+
+        CompactionRequest compactionRequest = CompactionRequest.of(
+            session,
+            List.of(
+                compactionEvent(new UserMessage("question"), null, false),
+                compactionEvent(new AssistantMessage("answer"), null, false),
+                compactionEvent(new AssistantMessage("sub-agent work"), "orch.researcher", false),
+                compactionEvent(new AssistantMessage("summary"), null, true)));
+
+        assertThat(compactionTrigger.shouldCompact(compactionRequest)).isFalse();
+    }
+
+    private static ChatMemoryFunction.Result applySessionChatMemory(
+        SessionRepository sessionRepository, Map<String, Object> inputParameterValues) throws Exception {
+
+        ClusterElementDefinitionService clusterElementDefinitionService = mock(ClusterElementDefinitionService.class);
+
+        SessionRepositoryFunction sessionRepositoryFunction =
+            (inputParameters, connectionParameters, extensions, componentConnections) -> sessionRepository;
+
+        when(clusterElementDefinitionService.<SessionRepositoryFunction>getClusterElement(
+            eq("builtInSessionChatMemory"), eq(1), eq("sessionRepository"))).thenReturn(sessionRepositoryFunction);
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "sessionRepository",
+                    Map.of(
+                        "name", "sessionRepository_1",
+                        "type", "builtInSessionChatMemory/v1/sessionRepository",
+                        "parameters", Map.of()))));
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "builtInSessionChatMemory", 1, 1L, Map.of(), null);
+
+        ChatMemoryFunction chatMemoryFunction = SessionChatMemory.of(clusterElementDefinitionService)
+            .getElement();
+
+        return chatMemoryFunction.apply(
+            MockParametersFactory.create(inputParameterValues), MockParametersFactory.create(Map.of()), extensions,
+            Map.of("sessionRepository_1", componentConnection));
+    }
+
+    private static void appendEvent(SessionRepository sessionRepository, String text, String branch) {
+        sessionRepository.appendEvent(SessionEvent.builder()
+            .sessionId(CONVERSATION_ID)
+            .message(new UserMessage(text))
+            .branch(branch)
+            .build());
+    }
+
+    private static CompactionRequest oneToolUsingTurn() {
+        return CompactionRequest.of(
+            compactionSession(),
+            List.of(
+                compactionEvent(new UserMessage("look it up"), null, false),
+                compactionEvent(
+                    AssistantMessage.builder()
+                        .content("")
+                        .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "lookup", "{}")))
+                        .build(),
+                    null, false),
+                compactionEvent(
+                    ToolResponseMessage.builder()
+                        .responses(List.of(new ToolResponseMessage.ToolResponse("call-1", "lookup", "found")))
+                        .build(),
+                    null, false)));
+    }
+
+    private static Session compactionSession() {
+        return Session.builder()
+            .id("compaction-session")
+            .userId("user-1")
+            .createdAt(Instant.now())
+            .build();
+    }
+
+    private static SessionEvent compactionEvent(Message message, String branch, boolean synthetic) {
+        return SessionEvent.builder()
+            .sessionId("compaction-session")
+            .message(message)
+            .branch(branch)
+            .metadata(synthetic ? Map.of(SessionEvent.METADATA_SYNTHETIC, true) : Map.of())
+            .build();
     }
 
     private static void seedConversation(SessionRepository sessionRepository) {

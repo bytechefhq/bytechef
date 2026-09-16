@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.chat.memory.builtin.session.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,11 @@ import com.bytechef.tenant.TenantContext;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ServiceClientConfiguration;
+import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
+import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
@@ -64,15 +69,43 @@ class TenantRoutingS3SessionRepositoryTest {
         assertThat(createBucketNameForTenant("tenant_one")).isNotEqualTo(createBucketNameForTenant("tenant-one"));
     }
 
-    private static String createBucketNameForTenant(String tenantId) {
-        S3Client s3Client = mock(S3Client.class);
+    @Test
+    void testCreatesBucketWithLocationConstraintOutsideUsEast1() {
+        CreateBucketConfiguration createBucketConfiguration = createBucketRequest("public", Region.EU_WEST_1)
+            .createBucketConfiguration();
 
-        when(s3Client.headBucket(any(HeadBucketRequest.class)))
-            .thenThrow(NoSuchBucketException.builder()
+        assertThat(createBucketConfiguration).isNotNull();
+        assertThat(createBucketConfiguration.locationConstraintAsString()).isEqualTo("eu-west-1");
+    }
+
+    @Test
+    void testCreatesBucketWithoutLocationConstraintInUsEast1() {
+        assertThat(createBucketRequest("public", Region.US_EAST_1).createBucketConfiguration()).isNull();
+    }
+
+    @Test
+    void testBucketNameOwnedByAnotherAccountFailsLoudly() {
+        S3Client s3Client = mockS3ClientWithMissingBucket(Region.US_EAST_1);
+
+        when(s3Client.createBucket(any(CreateBucketRequest.class)))
+            .thenThrow(BucketAlreadyExistsException.builder()
                 .build());
-        when(s3Client.getObjectAsBytes(any(GetObjectRequest.class)))
-            .thenThrow(NoSuchKeyException.builder()
-                .build());
+
+        TenantRoutingS3SessionRepository repository = new TenantRoutingS3SessionRepository(
+            s3Client, "bytechef-session", "");
+
+        assertThatThrownBy(() -> TenantContext.runWithTenantId("public", () -> repository.findById("session-1")))
+            .hasCauseInstanceOf(IllegalStateException.class)
+            .rootCause()
+            .isInstanceOf(BucketAlreadyExistsException.class);
+    }
+
+    private static String createBucketNameForTenant(String tenantId) {
+        return createBucketRequest(tenantId, Region.US_EAST_1).bucket();
+    }
+
+    private static CreateBucketRequest createBucketRequest(String tenantId, Region region) {
+        S3Client s3Client = mockS3ClientWithMissingBucket(region);
 
         TenantRoutingS3SessionRepository repository = new TenantRoutingS3SessionRepository(
             s3Client, "bytechef-session", "");
@@ -83,8 +116,23 @@ class TenantRoutingS3SessionRepositoryTest {
 
         verify(s3Client).createBucket(requestCaptor.capture());
 
-        CreateBucketRequest createBucketRequest = requestCaptor.getValue();
+        return requestCaptor.getValue();
+    }
 
-        return createBucketRequest.bucket();
+    private static S3Client mockS3ClientWithMissingBucket(Region region) {
+        S3Client s3Client = mock(S3Client.class);
+
+        when(s3Client.serviceClientConfiguration())
+            .thenReturn(S3ServiceClientConfiguration.builder()
+                .region(region)
+                .build());
+        when(s3Client.headBucket(any(HeadBucketRequest.class)))
+            .thenThrow(NoSuchBucketException.builder()
+                .build());
+        when(s3Client.getObjectAsBytes(any(GetObjectRequest.class)))
+            .thenThrow(NoSuchKeyException.builder()
+                .build());
+
+        return s3Client;
     }
 }

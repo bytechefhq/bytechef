@@ -41,6 +41,8 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 
+import com.bytechef.component.ai.agent.chat.memory.session.compaction.EventCountTrigger;
+import com.bytechef.component.ai.agent.chat.memory.session.tool.SessionConversationSearchTools;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -70,7 +72,6 @@ import org.springframework.ai.session.compaction.TokenCountCompactionStrategy;
 import org.springframework.ai.session.compaction.TokenCountTrigger;
 import org.springframework.ai.session.compaction.TurnCountTrigger;
 import org.springframework.ai.session.compaction.TurnWindowCompactionStrategy;
-import org.springframework.ai.session.tool.SessionEventTools;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 
@@ -198,7 +199,7 @@ public class SessionChatMemory {
 
         BaseAdvisor advisor = builder.build();
 
-        ToolCallback[] toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService);
+        ToolCallback[] toolCallbacks = resolveRecallToolCallbacks(inputParameters, sessionService, eventFilter);
 
         return new ChatMemoryFunction.Result(
             advisor, new SessionServiceChatMemory(sessionService, eventFilter), toolCallbacks, true);
@@ -247,16 +248,16 @@ public class SessionChatMemory {
         };
     }
 
-    private CompactionTrigger resolveCompactionTrigger(Parameters inputParameters) {
+    static CompactionTrigger resolveCompactionTrigger(Parameters inputParameters) {
         String selection = inputParameters.getString(COMPACTION_STRATEGY, NONE);
 
         return switch (selection) {
-            case SLIDING_WINDOW -> new TurnCountTrigger(inputParameters.getInteger(MAX_EVENTS, DEFAULT_MAX_EVENTS));
+            case SLIDING_WINDOW -> new EventCountTrigger(inputParameters.getInteger(MAX_EVENTS, DEFAULT_MAX_EVENTS));
             case TURN_WINDOW -> new TurnCountTrigger(inputParameters.getInteger(MAX_TURNS, DEFAULT_MAX_TURNS));
             case TOKEN_COUNT -> TokenCountTrigger.builder()
                 .threshold(inputParameters.getInteger(MAX_TOKENS, DEFAULT_MAX_TOKENS))
                 .build();
-            case RECURSIVE_SUMMARIZATION -> new TurnCountTrigger(
+            case RECURSIVE_SUMMARIZATION -> new EventCountTrigger(
                 inputParameters.getInteger(MAX_EVENTS_TO_KEEP, DEFAULT_MAX_EVENTS_TO_KEEP));
             default -> throw new IllegalStateException("No compaction trigger for strategy: " + selection);
         };
@@ -285,15 +286,16 @@ public class SessionChatMemory {
             .build();
     }
 
-    private ToolCallback[] resolveRecallToolCallbacks(Parameters inputParameters, SessionService sessionService) {
+    private ToolCallback[] resolveRecallToolCallbacks(
+        Parameters inputParameters, SessionService sessionService, EventFilter eventFilter) {
+
         if (!Boolean.TRUE.equals(inputParameters.getBoolean(ENABLE_CONVERSATION_SEARCH, false))) {
             return null;
         }
 
-        SessionEventTools sessionEventTools = SessionEventTools.builder(sessionService)
-            .pageSize(inputParameters.getInteger(SEARCH_PAGE_SIZE, DEFAULT_SEARCH_PAGE_SIZE))
-            .build();
+        SessionConversationSearchTools sessionConversationSearchTools = new SessionConversationSearchTools(
+            sessionService, inputParameters.getInteger(SEARCH_PAGE_SIZE, DEFAULT_SEARCH_PAGE_SIZE), eventFilter);
 
-        return ToolCallbacks.from(sessionEventTools);
+        return ToolCallbacks.from(sessionConversationSearchTools);
     }
 }

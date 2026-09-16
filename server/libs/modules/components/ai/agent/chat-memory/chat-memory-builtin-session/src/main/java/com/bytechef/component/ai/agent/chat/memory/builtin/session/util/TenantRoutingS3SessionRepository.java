@@ -36,9 +36,12 @@ import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
 import org.springframework.ai.session.SessionRepository;
 import org.springframework.ai.session.s3.S3SessionRepository;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ServiceClientConfiguration;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
+import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
@@ -198,12 +201,33 @@ public final class TenantRoutingS3SessionRepository implements SessionRepository
             // below
         }
 
-        try {
-            s3Client.createBucket(CreateBucketRequest.builder()
-                .bucket(bucketName)
+        CreateBucketRequest.Builder createBucketRequestBuilder = CreateBucketRequest.builder()
+            .bucket(bucketName);
+
+        Region region = getRegion();
+
+        if (region != null && !Region.US_EAST_1.equals(region)) {
+            createBucketRequestBuilder.createBucketConfiguration(CreateBucketConfiguration.builder()
+                .locationConstraint(region.id())
                 .build());
-        } catch (BucketAlreadyOwnedByYouException | BucketAlreadyExistsException ignored) {
-            // another pod created it concurrently — bucket is ready
         }
+
+        try {
+            s3Client.createBucket(createBucketRequestBuilder.build());
+        } catch (BucketAlreadyOwnedByYouException ignored) {
+            // another pod created it concurrently — bucket is ready
+        } catch (BucketAlreadyExistsException bucketAlreadyExistsException) {
+            throw new IllegalStateException(
+                "S3 bucket " + bucketName + " is owned by another AWS account; configure a unique " +
+                    "bytechef.ai.memory.aws.bucket-prefix",
+                bucketAlreadyExistsException);
+        }
+    }
+
+    @Nullable
+    private Region getRegion() {
+        S3ServiceClientConfiguration s3ServiceClientConfiguration = s3Client.serviceClientConfiguration();
+
+        return s3ServiceClientConfiguration == null ? null : s3ServiceClientConfiguration.region();
     }
 }

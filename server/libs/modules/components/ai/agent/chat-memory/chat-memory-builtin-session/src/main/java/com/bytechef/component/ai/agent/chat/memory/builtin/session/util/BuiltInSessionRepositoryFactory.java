@@ -28,6 +28,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import redis.clients.jedis.DefaultJedisClientConfig;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.UnifiedJedis;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -70,7 +71,7 @@ public final class BuiltInSessionRepositoryFactory {
     }
 
     private static SessionRepository createInMemorySessionRepository() {
-        return new TenantRoutingSessionRepository(() -> InMemorySessionRepository.builder()
+        return new TenantRoutingSessionRepository(tenantId -> InMemorySessionRepository.builder()
             .build());
     }
 
@@ -88,11 +89,16 @@ public final class BuiltInSessionRepositoryFactory {
         JedisPooled jedisPooled = buildJedisPooled(environment);
 
         return new BuiltInSessionRepository(
-            RedisSessionRepository.builder()
-                .jedis(jedisPooled)
-                .keyPrefix(environment.getProperty("bytechef.ai.memory.redis.key-prefix", "bytechef-session:"))
-                .build(),
+            createRedisSessionRepository(
+                jedisPooled, environment.getProperty("bytechef.ai.memory.redis.key-prefix", "bytechef-session:")),
             jedisPooled);
+    }
+
+    static SessionRepository createRedisSessionRepository(UnifiedJedis jedis, String keyPrefix) {
+        return new TenantRoutingSessionRepository(tenantId -> RedisSessionRepository.builder()
+            .jedis(jedis)
+            .keyPrefix(keyPrefix + tenantId + ":")
+            .build());
     }
 
     private static BuiltInSessionRepository createS3SessionRepository(Environment environment) {
