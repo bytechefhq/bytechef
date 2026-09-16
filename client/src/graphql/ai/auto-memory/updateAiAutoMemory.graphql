@@ -1,0 +1,17 @@
+mutation updateAiAutoMemory($input: UpdateAiAutoMemoryInput!) {
+    updateAiAutoMemory(input: $input) {
+        id
+        workspaceId
+        principalType
+        principalId
+        name
+        title
+        description
+        memoryType
+        content
+        environmentId
+        createdAt
+        updatedAt
+        version
+    }
+}
