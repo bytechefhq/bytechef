@@ -161,3 +161,39 @@ describe('MemoryDeleteDialog', () => {
         expect(onClose).toHaveBeenCalled();
     });
 });
+
+describe('MemoryDeleteDialog failures and states', () => {
+    it('toasts a generic message when the delete fails with a non-Error value', async () => {
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync: vi.fn().mockRejectedValue('nope')}));
+
+        wrap(
+            <MemoryDeleteDialog environmentId={2} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={7} />
+        );
+
+        await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
+
+        await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to delete memory'));
+    });
+
+    it('shows the deleting state while the delete is pending', () => {
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({isPending: true}));
+
+        wrap(
+            <MemoryDeleteDialog environmentId={0} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />
+        );
+
+        expect(screen.getByRole('button', {name: 'Deleting...'})).toBeDisabled();
+    });
+
+    it('calls onClose when the dialog is dismissed with Escape', async () => {
+        const onClose = vi.fn();
+
+        wrap(
+            <MemoryDeleteDialog environmentId={0} memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />
+        );
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalled();
+    });
+});

@@ -187,3 +187,98 @@ describe('MemoryEditDialog', () => {
         expect(onClose).toHaveBeenCalled();
     });
 });
+
+describe('MemoryEditDialog edits and failures', () => {
+    it('sends description and content changes', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue(makeMemory());
+
+        mockUseUpdateMutation.mockReturnValue(makeMockMutation({mutateAsync}));
+
+        wrap(
+            <MemoryEditDialog environmentId={2} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={7} />
+        );
+
+        await userEvent.clear(screen.getByLabelText('Description'));
+        await userEvent.type(screen.getByLabelText('Description'), 'Tone preferences');
+        await userEvent.clear(screen.getByLabelText(/content/i));
+        await userEvent.type(screen.getByLabelText(/content/i), 'Keep replies short.');
+
+        await userEvent.click(screen.getByRole('button', {name: /save/i}));
+
+        await waitFor(() => {
+            const input = mutateAsync.mock.lastCall?.[0].input;
+
+            expect(input.description).toBe('Tone preferences');
+            expect(input.content).toBe('Keep replies short.');
+            expect(input.title).toBeUndefined();
+        });
+    });
+
+    it('shows an empty description for a memory without one', () => {
+        wrap(
+            <MemoryEditDialog
+                environmentId={0}
+                memory={makeMemory({description: null})}
+                onClose={vi.fn()}
+                open={true}
+                workspaceId={1}
+            />
+        );
+
+        expect(screen.getByLabelText('Description')).toHaveValue('');
+    });
+
+    it('toasts the error message when the update fails', async () => {
+        const onClose = vi.fn();
+
+        mockUseUpdateMutation.mockReturnValue(
+            makeMockMutation({mutateAsync: vi.fn().mockRejectedValue(new Error('update rejected'))})
+        );
+
+        wrap(
+            <MemoryEditDialog environmentId={2} memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />
+        );
+
+        await userEvent.type(screen.getByLabelText('Title'), ' v2');
+        await userEvent.click(screen.getByRole('button', {name: /save/i}));
+
+        await waitFor(() => expect(toast.error).toHaveBeenCalledWith('update rejected'));
+
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('toasts a generic message when the update fails with a non-Error value', async () => {
+        mockUseUpdateMutation.mockReturnValue(makeMockMutation({mutateAsync: vi.fn().mockRejectedValue('nope')}));
+
+        wrap(
+            <MemoryEditDialog environmentId={2} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={7} />
+        );
+
+        await userEvent.type(screen.getByLabelText('Title'), ' v2');
+        await userEvent.click(screen.getByRole('button', {name: /save/i}));
+
+        await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Failed to update memory'));
+    });
+
+    it('shows the saving state while the update is pending', () => {
+        mockUseUpdateMutation.mockReturnValue(makeMockMutation({isPending: true}));
+
+        wrap(
+            <MemoryEditDialog environmentId={0} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />
+        );
+
+        expect(screen.getByRole('button', {name: 'Saving...'})).toBeDisabled();
+    });
+
+    it('calls onClose when the dialog is dismissed with Escape', async () => {
+        const onClose = vi.fn();
+
+        wrap(
+            <MemoryEditDialog environmentId={0} memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />
+        );
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalled();
+    });
+});

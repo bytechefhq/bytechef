@@ -52,3 +52,29 @@ describe('MemoryDetailDialog', () => {
         expect(screen.queryByText(/alice prefers concise replies/i)).toBeNull();
     });
 });
+
+describe('MemoryDetailDialog timestamps and dismissal', () => {
+    it('falls back to the raw value when the updated timestamp is malformed', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        render(<MemoryDetailDialog memory={makeMemory({updatedAt: 'not-a-date'})} onClose={vi.fn()} open={true} />);
+
+        expect(screen.getByText(/updated not-a-date/i)).toBeInTheDocument();
+        expect(warn).toHaveBeenCalledWith(
+            'MemoryDetailDialog: formatTimestamp failed',
+            expect.objectContaining({value: 'not-a-date'})
+        );
+
+        warn.mockRestore();
+    });
+
+    it('calls onClose when the dialog is dismissed with Escape', async () => {
+        const onClose = vi.fn();
+
+        render(<MemoryDetailDialog memory={makeMemory()} onClose={onClose} open={true} />);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalled();
+    });
+});
