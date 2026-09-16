@@ -16,42 +16,65 @@
 
 package com.bytechef.component.ai.agent.chat.memory.builtin.util;
 
+import static com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants.DEFAULT_USER_ID;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.Session;
+import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.session.SessionRepository;
 
 /**
- * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
 public class ChatMemoryUtils {
 
     private ChatMemoryUtils() {
     }
 
-    public static ActionDefinition.OptionsFunction<String> getFirstMessages(ChatMemoryRepository chatMemoryRepository) {
+    /**
+     * Lists the built-in user's session ids as conversation options, using each session's first event text as the
+     * option description.
+     */
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages(SessionRepository sessionRepository) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
-            if (chatMemoryRepository == null) {
+            if (sessionRepository == null) {
                 return List.of();
             }
 
             List<ComponentDsl.ModifiableOption<String>> options = new ArrayList<>();
 
-            List<String> conversationIds = chatMemoryRepository.findConversationIds();
+            for (Session session : sessionRepository.findByUserId(DEFAULT_USER_ID)) {
+                List<SessionEvent> events = sessionRepository.findEvents(session.id(), EventFilter.all());
 
-            for (String conversationId : conversationIds) {
-                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+                String description = events.isEmpty()
+                    ? null
+                    : events.get(0)
+                        .getMessage()
+                        .getText();
 
-                Message message = messages.getFirst();
-
-                options.add(option(conversationId, conversationId, message.getText()));
+                options.add(option(session.id(), session.id(), description));
             }
 
             return options;
         };
+    }
+
+    /**
+     * Returns the session ids of every conversation the built-in chat memory owns (sessions created under
+     * {@link com.bytechef.component.ai.agent.chat.memory.builtin.constant.ChatMemoryConstants#DEFAULT_USER_ID}).
+     */
+    public static List<String> findConversationIds(SessionRepository sessionRepository) {
+        List<String> conversationIds = new ArrayList<>();
+
+        for (Session session : sessionRepository.findByUserId(DEFAULT_USER_ID)) {
+            conversationIds.add(session.id());
+        }
+
+        return conversationIds;
     }
 }

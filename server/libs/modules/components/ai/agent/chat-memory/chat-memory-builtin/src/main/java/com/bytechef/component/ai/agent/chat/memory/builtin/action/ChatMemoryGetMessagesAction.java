@@ -30,16 +30,18 @@ import com.bytechef.component.definition.Parameters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.SessionEvent;
+import org.springframework.ai.session.SessionRepository;
 
 /**
  * @author Ivica Cardic
  */
 public class ChatMemoryGetMessagesAction {
 
-    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+    public static ModifiableActionDefinition of(SessionRepository sessionRepository) {
         return action("getMessages")
             .title("Get Messages")
             .description("Retrieves all messages from a conversation.")
@@ -47,7 +49,7 @@ public class ChatMemoryGetMessagesAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation.")
-                    .options(ChatMemoryUtils.getFirstMessages(chatMemoryRepository))
+                    .options(ChatMemoryUtils.getFirstMessages(sessionRepository))
                     .required(true))
             .output(
                 outputSchema(
@@ -61,20 +63,19 @@ public class ChatMemoryGetMessagesAction {
                                             string("role"),
                                             string("content"))))))
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
-                inputParameters, chatMemoryRepository));
+                inputParameters, sessionRepository));
     }
 
     private ChatMemoryGetMessagesAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
-
+    protected static Object perform(Parameters inputParameters, SessionRepository sessionRepository) {
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
 
-        List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+        List<SessionEvent> events = sessionRepository.findEvents(conversationId, EventFilter.all());
 
-        List<Map<String, String>> messageList = messages.stream()
+        List<Map<String, String>> messageList = events.stream()
+            .map(SessionEvent::getMessage)
             .map(ChatMemoryGetMessagesAction::toMessageMap)
             .toList();
 
