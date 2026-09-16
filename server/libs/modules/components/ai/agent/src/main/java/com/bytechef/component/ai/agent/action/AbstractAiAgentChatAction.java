@@ -145,6 +145,10 @@ public abstract class AbstractAiAgentChatAction {
             })
             .orElse(null);
 
+        Optional<ChatMemoryFunction.Result> chatMemoryResult =
+            clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+                .map(clusterElement -> buildChatMemoryResult(connectionParameters, clusterElement, context));
+
         @SuppressWarnings("unchecked")
         Map<String, Map<String, String>> toolSimulations =
             (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
@@ -152,16 +156,24 @@ public abstract class AbstractAiAgentChatAction {
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
-        return createPrompt(chatClient, inputParameters, context)
-            .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context))
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(chatClient, inputParameters, context)
+            .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult))
             .advisors(getConversationAdvisor(conversationId))
             .advisors(new TextGenerationFirstAdvisor())
             .messages(ModelUtils.getMessages(inputParameters, context))
             .tools(
-                getToolCallbacks(
-                    clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    toolExecutionListener, toolSimulations, chatModel, context)
+                concatToolCallbacks(
+                    getToolCallbacks(
+                        clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
+                        toolExecutionListener, toolSimulations, chatModel, context),
+                    chatMemoryResult)
                         .toArray());
+
+        if (conversationId != null) {
+            chatClientRequestSpec.toolContext(Map.of("chat_memory_conversation_id", conversationId));
+        }
+
+        return chatClientRequestSpec;
     }
 
     private ChatMemoryFunction.Result buildChatMemoryResult(
@@ -330,7 +342,7 @@ public abstract class AbstractAiAgentChatAction {
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
-        ChatModel chatModel, ActionContext context) {
+        ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -357,10 +369,6 @@ public abstract class AbstractAiAgentChatAction {
                     "Configure at most one.");
         }
 
-        Optional<ChatMemoryFunction.Result> chatMemoryResult =
-            clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-                .map(clusterElement -> buildChatMemoryResult(connectionParameters, clusterElement, context));
-
         if (!guardrailClusterElements.isEmpty()) {
             List<Message> conversationHistory = chatMemoryResult
                 .map(result -> loadConversationHistory(result.chatMemory(), clusterElementMap))
@@ -379,10 +387,20 @@ public abstract class AbstractAiAgentChatAction {
 
         // tool call
 
-        advisors.add(
-            ToolCallingAdvisor.builder()
+        boolean persistToolMessagesInLoop = chatMemoryResult
+            .map(ChatMemoryFunction.Result::supportsToolMessagePersistence)
+            .orElse(false);
+
+        ToolCallingAdvisor toolCallingAdvisor = persistToolMessagesInLoop
+            ? ToolCallingAdvisor.builder()
                 .toolCallingManager(toolCallingManager)
-                .build());
+                .disableInternalConversationHistory()
+                .build()
+            : ToolCallingAdvisor.builder()
+                .toolCallingManager(toolCallingManager)
+                .build();
+
+        advisors.add(toolCallingAdvisor);
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
@@ -405,6 +423,8 @@ public abstract class AbstractAiAgentChatAction {
         return advisor -> {
             if (conversationId != null) {
                 advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
+
+                advisor.param("chat_memory_session_id", conversationId);
             }
         };
     }
@@ -479,6 +499,22 @@ public abstract class AbstractAiAgentChatAction {
 
             return TOOL_SIMULATION_UNAVAILABLE;
         }
+    }
+
+    private static List<ToolCallback> concatToolCallbacks(
+        List<? extends ToolCallback> toolCallbacks, Optional<ChatMemoryFunction.Result> chatMemoryResult) {
+
+        List<ToolCallback> combinedToolCallbacks = new ArrayList<>(toolCallbacks);
+
+        chatMemoryResult
+            .map(ChatMemoryFunction.Result::toolCallbacks)
+            .ifPresent(memoryToolCallbacks -> {
+                if (memoryToolCallbacks != null) {
+                    combinedToolCallbacks.addAll(Arrays.asList(memoryToolCallbacks));
+                }
+            });
+
+        return combinedToolCallbacks;
     }
 
     private List<ToolCallback> getToolCallbacks(
