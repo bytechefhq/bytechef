@@ -38,7 +38,7 @@ public class AwsSessionChatMemory {
     public static ClusterElementDefinition<SessionRepositoryFunction> of() {
         return ComponentDsl.<SessionRepositoryFunction>clusterElement("sessionRepository")
             .title("AWS S3 Session Repository")
-            .description("Stores session events as JSON objects in an Amazon S3 bucket.")
+            .description("Stores each session as a JSON object in an Amazon S3 bucket.")
             .type(SESSION_REPOSITORY)
             .object(() -> AwsSessionChatMemory::apply);
     }

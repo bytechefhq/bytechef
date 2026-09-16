@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "deleteConversation": [ "DATA_SOURCE" ],
+    "addMessages": [ "DATA_SOURCE" ],
     "getMessages": [ "DATA_SOURCE" ],
-    "listConversations": [ "DATA_SOURCE" ],
-    "addMessages": [ "DATA_SOURCE" ]
+    "deleteConversation": [ "DATA_SOURCE" ],
+    "listConversations": [ "DATA_SOURCE" ]
   },
   "actions": [ {
     "batch": null,
