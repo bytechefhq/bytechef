@@ -1,5 +1,13 @@
 import Button from '@/components/Button/Button';
-import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogBody,
+    DialogCancelButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+} from '@/components/Dialog';
 import useAiSkillUploadForm from '@/pages/automation/ai/skills/hooks/useAiSkillUploadForm';
 import {FileIcon, UploadIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
@@ -32,85 +40,95 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
 
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
-            <DialogContent className="sm:max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle>Upload Skill Files</DialogTitle>
-                </DialogHeader>
-
-                <div
-                    className={twMerge(
-                        'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 transition-colors',
-                        dragActive
-                            ? 'border-blue-500 bg-surface-brand-secondary'
-                            : 'border-stroke-neutral-tertiary hover:border-gray-400'
-                    )}
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                >
-                    <div className="flex flex-col items-center gap-2">
-                        <UploadIcon className="size-10 text-content-neutral-tertiary" />
-
-                        <p className="text-sm text-content-neutral-secondary">
-                            <span className="font-medium text-content-brand-primary">Pick file(s)</span> to upload or
-                            drag and drop
-                        </p>
-
-                        <p className="text-xs text-content-neutral-tertiary">
-                            Accepted formats: {acceptedExtensions.join(', ')}
-                        </p>
-                    </div>
-
-                    <input
-                        accept={acceptedExtensions.join(',')}
-                        className="hidden"
-                        multiple
-                        onChange={handleFileInputChange}
-                        ref={fileInputRef}
-                        type="file"
+            <DialogContent>
+                <DialogMain className="sm:min-w-[672px]">
+                    <DialogHeader
+                        description="Upload a file to create a skill."
+                        icon={<UploadIcon />}
+                        title="Upload Skill Files"
                     />
-                </div>
 
-                {selectedFiles.length > 0 && (
-                    <div className="space-y-2">
-                        {selectedFiles.map((file, index) => (
+                    <DialogBody>
+                        <div className="flex flex-col gap-4">
                             <div
-                                className="flex items-center gap-2 rounded border px-3 py-2"
-                                key={`${file.name}-${index}`}
+                                className={twMerge(
+                                    'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 transition-colors',
+                                    dragActive
+                                        ? 'border-blue-500 bg-surface-brand-secondary'
+                                        : 'border-stroke-neutral-tertiary hover:border-gray-400'
+                                )}
+                                onClick={() => fileInputRef.current?.click()}
+                                onDragLeave={handleDragLeave}
+                                onDragOver={handleDragOver}
+                                onDrop={handleDrop}
                             >
-                                <FileIcon className="size-4 shrink-0 text-content-neutral-tertiary" />
+                                <div className="flex flex-col items-center gap-2">
+                                    <UploadIcon className="size-10 text-content-neutral-tertiary" />
 
-                                <span className="flex-1 truncate text-sm">{file.name}</span>
+                                    <p className="text-sm text-content-neutral-secondary">
+                                        <span className="font-medium text-content-brand-primary">Pick file(s)</span> to
+                                        upload or drag and drop
+                                    </p>
 
-                                <span className="shrink-0 text-xs text-content-neutral-secondary">
-                                    {(file.size / 1024).toFixed(1)} KB
-                                </span>
+                                    <p className="text-xs text-content-neutral-tertiary">
+                                        Accepted formats: {acceptedExtensions.join(', ')}
+                                    </p>
+                                </div>
 
-                                <Button
-                                    className="shrink-0 text-content-neutral-tertiary hover:text-content-neutral-secondary-hover [&_svg]:size-4"
-                                    icon={<XIcon />}
-                                    onClick={() => handleRemoveFile(index)}
-                                    size="iconXs"
-                                    type="button"
-                                    variant="ghost"
+                                <input
+                                    accept={acceptedExtensions.join(',')}
+                                    className="hidden"
+                                    multiple
+                                    onChange={handleFileInputChange}
+                                    ref={fileInputRef}
+                                    type="file"
                                 />
                             </div>
-                        ))}
-                    </div>
-                )}
 
-                <DialogFooter>
-                    <Button onClick={() => onOpenChange(false)} variant="outline">
-                        Cancel
-                    </Button>
+                            {selectedFiles.length > 0 && (
+                                <div className="space-y-2">
+                                    {selectedFiles.map((file, index) => (
+                                        <div
+                                            className="flex items-center gap-2 rounded border px-3 py-2"
+                                            key={`${file.name}-${index}`}
+                                        >
+                                            <FileIcon className="size-4 shrink-0 text-content-neutral-tertiary" />
 
-                    <Button disabled={selectedFiles.length === 0 || isUploadPending} onClick={handleUpload}>
-                        {isUploadPending
-                            ? 'Uploading...'
-                            : `Upload${selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ''}`}
-                    </Button>
-                </DialogFooter>
+                                            <span className="flex-1 truncate text-sm">{file.name}</span>
+
+                                            <span className="shrink-0 text-xs text-content-neutral-secondary">
+                                                {(file.size / 1024).toFixed(1)} KB
+                                            </span>
+
+                                            <Button
+                                                className="shrink-0 text-content-neutral-tertiary hover:text-content-neutral-secondary-hover [&_svg]:size-4"
+                                                icon={<XIcon />}
+                                                onClick={() => handleRemoveFile(index)}
+                                                size="iconXs"
+                                                type="button"
+                                                variant="ghost"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </DialogBody>
+
+                    <DialogFooter>
+                        <DialogCancelButton />
+
+                        <Button
+                            disabled={selectedFiles.length === 0 || isUploadPending}
+                            label={
+                                isUploadPending
+                                    ? 'Uploading...'
+                                    : `Upload${selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ''}`
+                            }
+                            onClick={handleUpload}
+                        />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
