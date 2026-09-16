@@ -1,0 +1,28 @@
+import {
+    AI_AUTO_MEMORY_TYPES,
+    AI_AUTO_MEMORY_TYPE_META,
+    getAiAutoMemoryTypeLabel,
+} from '@/pages/automation/ai/memories/hooks/useAiAutoMemories';
+import {AiAutoMemoryType} from '@/shared/middleware/graphql';
+import {describe, expect, it} from 'vitest';
+
+describe('AI_AUTO_MEMORY_TYPES', () => {
+    it('covers every value of the generated AiAutoMemoryType enum', () => {
+        expect([...AI_AUTO_MEMORY_TYPES].sort()).toEqual([...Object.values(AiAutoMemoryType)].sort());
+    });
+
+    it('gives every type a non-empty label', () => {
+        for (const memoryType of AI_AUTO_MEMORY_TYPES) {
+            expect(AI_AUTO_MEMORY_TYPE_META[memoryType].label).toBeTruthy();
+        }
+    });
+
+    it('lists the types in the declared order rather than alphabetically', () => {
+        expect(AI_AUTO_MEMORY_TYPES).toEqual(['USER', 'FEEDBACK', 'PROJECT', 'REFERENCE']);
+    });
+
+    it('labels a type the client does not know with its raw name', () => {
+        expect(getAiAutoMemoryTypeLabel('FEEDBACK')).toBe('Feedback');
+        expect(getAiAutoMemoryTypeLabel('PREFERENCE')).toBe('PREFERENCE');
+    });
+});
