@@ -1255,6 +1255,14 @@ export type KnowledgeBaseSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+export type KnowledgeBaseStorageUsage = {
+  __typename?: 'KnowledgeBaseStorageUsage';
+  limitBytes: Scalars['Long']['output'];
+  percentage: Scalars['Float']['output'];
+  unlimited: Scalars['Boolean']['output'];
+  usedBytes: Scalars['Long']['output'];
+};
+
 export type KnowledgeBaseTagsEntry = {
   __typename?: 'KnowledgeBaseTagsEntry';
   knowledgeBaseId: Scalars['ID']['output'];
@@ -2733,6 +2741,7 @@ export type Query = {
   knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
   knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
   knowledgeBaseEmbeddingActive: Scalars['Boolean']['output'];
+  knowledgeBaseStorageUsage: KnowledgeBaseStorageUsage;
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
