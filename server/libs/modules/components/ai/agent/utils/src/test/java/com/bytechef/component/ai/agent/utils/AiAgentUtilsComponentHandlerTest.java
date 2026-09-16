@@ -31,6 +31,7 @@ public class AiAgentUtilsComponentHandlerTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of()).getDefinition());
+            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of(), null, null, null)
+                .getDefinition());
     }
 }
