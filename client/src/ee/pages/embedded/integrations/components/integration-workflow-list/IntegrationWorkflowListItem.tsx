@@ -1,6 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
-import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,6 +15,7 @@ import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries
 import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -84,32 +84,13 @@ const IntegrationWorkflowListItem = ({
             >
                 <div className="w-80 text-sm font-semibold">{workflow.label}</div>
 
-                <div className="flex">
-                    {filteredComponentNames?.map((name) => {
-                        const componentDefinition = workflowComponentDefinitions[name];
-                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
-
-                        return (
-                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <LazyLoadSVG
-                                            className="size-5 flex-none"
-                                            key={name}
-                                            src={
-                                                componentDefinition?.icon
-                                                    ? componentDefinition?.icon
-                                                    : (taskDispatcherDefinition?.icon ?? '')
-                                            }
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent side="top">{integration?.name}</TooltipContent>
-                                </Tooltip>
-                            </div>
-                        );
-                    })}
-                </div>
+                <WorkflowTriggerAndComponentsRow
+                    className="hidden sm:flex"
+                    filteredComponentNames={filteredComponentNames}
+                    workflow={workflow}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                />
             </Link>
 
             <div className="flex justify-end gap-x-6">

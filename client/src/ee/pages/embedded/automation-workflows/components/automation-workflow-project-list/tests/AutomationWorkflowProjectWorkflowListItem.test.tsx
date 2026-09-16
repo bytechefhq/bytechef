@@ -1,5 +1,6 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import AutomationWorkflowProjectWorkflowListItem from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-list/AutomationWorkflowProjectWorkflowListItem';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {render, screen} from '@testing-library/react';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -14,15 +15,17 @@ const workflow = {
 
 const renderRow = () =>
     render(
-        <TooltipProvider>
-            <ul>
-                <AutomationWorkflowProjectWorkflowListItem
-                    onDeleteWorkflow={vi.fn()}
-                    onSelectWorkflow={vi.fn()}
-                    workflow={workflow}
-                />
-            </ul>
-        </TooltipProvider>
+        <QueryClientProvider client={new QueryClient({defaultOptions: {queries: {retry: false}}})}>
+            <TooltipProvider>
+                <ul>
+                    <AutomationWorkflowProjectWorkflowListItem
+                        onDeleteWorkflow={vi.fn()}
+                        onSelectWorkflow={vi.fn()}
+                        workflow={workflow}
+                    />
+                </ul>
+            </TooltipProvider>
+        </QueryClientProvider>
     );
 
 describe('AutomationWorkflowProjectWorkflowListItem', () => {
