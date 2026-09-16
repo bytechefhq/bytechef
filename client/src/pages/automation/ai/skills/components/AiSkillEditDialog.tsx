@@ -1,15 +1,17 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import {PencilIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface AiSkillEditDialogProps {
@@ -39,51 +41,52 @@ const AiSkillEditDialog = ({currentDescription, currentName, onClose, onSave}: A
             open
         >
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <DialogTitle>Edit Skill</DialogTitle>
+                <DialogMain>
+                    <DialogHeader
+                        description="Update the skill name and description."
+                        icon={<PencilIcon />}
+                        title="Edit Skill"
+                    />
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                    <DialogBody>
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <Label htmlFor="edit-skill-name">Name</Label>
 
-                <div className="flex flex-col gap-4 py-2">
-                    <div>
-                        <Label htmlFor="edit-skill-name">Name</Label>
+                                <Input
+                                    className="mt-1"
+                                    id="edit-skill-name"
+                                    onChange={(event) => setName(event.target.value)}
+                                    placeholder="Enter skill name"
+                                    value={name}
+                                />
+                            </div>
 
-                        <Input
-                            className="mt-1"
-                            id="edit-skill-name"
-                            onChange={(event) => setName(event.target.value)}
-                            placeholder="Enter skill name"
-                            value={name}
+                            <div>
+                                <Label htmlFor="edit-skill-description">Description</Label>
+
+                                <Textarea
+                                    className="mt-1 resize-none"
+                                    id="edit-skill-description"
+                                    onChange={(event) => setDescription(event.target.value)}
+                                    placeholder="Enter skill description"
+                                    rows={4}
+                                    value={description}
+                                />
+                            </div>
+                        </div>
+                    </DialogBody>
+
+                    <DialogFooter>
+                        <DialogCancelButton />
+
+                        <Button
+                            disabled={!isValid || !hasChanges}
+                            label="Save"
+                            onClick={() => onSave(trimmedName, trimmedDescription || null)}
                         />
-                    </div>
-
-                    <div>
-                        <Label htmlFor="edit-skill-description">Description</Label>
-
-                        <Textarea
-                            className="mt-1 resize-none"
-                            id="edit-skill-description"
-                            onChange={(event) => setDescription(event.target.value)}
-                            placeholder="Enter skill description"
-                            rows={4}
-                            value={description}
-                        />
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button onClick={onClose} variant="outline">
-                        Cancel
-                    </Button>
-
-                    <Button
-                        disabled={!isValid || !hasChanges}
-                        onClick={() => onSave(trimmedName, trimmedDescription || null)}
-                    >
-                        Save
-                    </Button>
-                </DialogFooter>
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
