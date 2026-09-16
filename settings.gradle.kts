@@ -256,6 +256,7 @@ include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-cassand
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-in-memory")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-in-memory-session")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-jdbc")
+include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-jdbc-session")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-mongodb")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-neo4j")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-redis")
