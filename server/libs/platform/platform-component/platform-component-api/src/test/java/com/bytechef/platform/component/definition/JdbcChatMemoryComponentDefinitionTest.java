@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,8 +34,10 @@ class JdbcChatMemoryComponentDefinitionTest {
         JdbcChatMemoryComponentDefinition jdbcChatMemoryComponentDefinition =
             mock(JdbcChatMemoryComponentDefinition.class, CALLS_REAL_METHODS);
 
-        assertThat(jdbcChatMemoryComponentDefinition.getActionClusterElementTypes()
-            .keySet())
-                .containsExactly("addMessages", "getMessages", "deleteConversation", "listConversations");
+        Map<String, List<String>> actionClusterElementTypes =
+            jdbcChatMemoryComponentDefinition.getActionClusterElementTypes();
+
+        assertThat(actionClusterElementTypes.keySet())
+            .containsExactly("addMessages", "getMessages", "deleteConversation", "listConversations");
     }
 }

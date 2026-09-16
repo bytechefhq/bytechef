@@ -25,14 +25,18 @@ import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.Cas
 import static com.bytechef.component.ai.agent.chat.memory.cassandra.constant.CassandraChatMemoryConstants.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.commons.util.ClientCacheSettings;
+import com.bytechef.commons.util.ClientCacheUtils;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import com.github.benmanes.caffeine.cache.Cache;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.cassandra.CassandraChatMemoryRepositoryConfig;
@@ -43,41 +47,22 @@ import org.springframework.ai.chat.messages.Message;
  */
 public class CassandraChatMemoryUtils {
 
+    private static final Cache<CqlSessionKey, CqlSession> CLIENTS = createClientCache(
+        ClientCacheSettings.defaults());
+
     private CassandraChatMemoryUtils() {
     }
 
+    static <K> Cache<K, CqlSession> createClientCache(ClientCacheSettings clientCacheSettings) {
+        return ClientCacheUtils.createClientCache(clientCacheSettings, CqlSession::close);
+    }
+
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
-        String contactPoints = connectionParameters.getRequiredString(CONTACT_POINTS);
-        int port = connectionParameters.getRequiredInteger(PORT);
-        String datacenter = connectionParameters.getRequiredString(DATACENTER);
         String keyspace = connectionParameters.getString(KEYSPACE);
         String table = connectionParameters.getString(TABLE);
-        String username = connectionParameters.getString(USERNAME);
-        String password = connectionParameters.getString(PASSWORD);
-
-        CqlSessionBuilder sessionBuilder = CqlSession.builder()
-            .withLocalDatacenter(datacenter);
-
-        for (String contactPoint : contactPoints.split(",")) {
-            String host = contactPoint.trim();
-
-            if (!host.isEmpty()) {
-                sessionBuilder.addContactPoint(new InetSocketAddress(host, port));
-            }
-        }
-
-        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
-            sessionBuilder.withAuthCredentials(username, password);
-        }
-
-        if (keyspace != null && !keyspace.isBlank()) {
-            sessionBuilder.withKeyspace(keyspace);
-        }
-
-        CqlSession session = sessionBuilder.build();
 
         CassandraChatMemoryRepositoryConfig.Builder configBuilder = CassandraChatMemoryRepositoryConfig.builder()
-            .withCqlSession(session);
+            .withCqlSession(getSharedCqlSession(connectionParameters));
 
         if (keyspace != null && !keyspace.isBlank()) {
             configBuilder.withKeyspaceName(keyspace);
@@ -90,6 +75,58 @@ public class CassandraChatMemoryUtils {
         CassandraChatMemoryRepositoryConfig config = configBuilder.build();
 
         return CassandraChatMemoryRepository.create(config);
+    }
+
+    static CqlSession getSharedCqlSession(Parameters connectionParameters) {
+        return CLIENTS.get(toCqlSessionKey(connectionParameters), CassandraChatMemoryUtils::buildCqlSession);
+    }
+
+    private static CqlSession buildCqlSession(CqlSessionKey cqlSessionKey) {
+        CqlSessionBuilder sessionBuilder = CqlSession.builder()
+            .withLocalDatacenter(cqlSessionKey.datacenter());
+
+        for (String contactPoint : cqlSessionKey.contactPoints()
+            .split(",")) {
+
+            String host = contactPoint.trim();
+
+            if (!host.isEmpty()) {
+                sessionBuilder.addContactPoint(new InetSocketAddress(host, cqlSessionKey.port()));
+            }
+        }
+
+        String username = cqlSessionKey.username();
+        String password = cqlSessionKey.password();
+
+        if (username != null && !username.isBlank() && password != null && !password.isBlank()) {
+            sessionBuilder.withAuthCredentials(username, password);
+        }
+
+        String keyspace = cqlSessionKey.keyspace();
+
+        if (keyspace != null && !keyspace.isBlank()) {
+            sessionBuilder.withKeyspace(keyspace);
+        }
+
+        return sessionBuilder.build();
+    }
+
+    private static CqlSessionKey toCqlSessionKey(Parameters connectionParameters) {
+        return new CqlSessionKey(
+            connectionParameters.getRequiredString(CONTACT_POINTS), connectionParameters.getRequiredInteger(PORT),
+            connectionParameters.getRequiredString(DATACENTER), connectionParameters.getString(KEYSPACE),
+            connectionParameters.getString(USERNAME), connectionParameters.getString(PASSWORD));
+    }
+
+    private record CqlSessionKey(
+        String contactPoints, int port, String datacenter, @Nullable String keyspace, @Nullable String username,
+        @Nullable String password) {
+
+        @Override
+        public String toString() {
+            return "CqlSessionKey{contactPoints=" + contactPoints + ", port=" + port + ", datacenter=" + datacenter +
+                ", keyspace=" + keyspace + ", username=" + username + "}";
+        }
     }
 
     public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
