@@ -24,6 +24,10 @@ vi.mock('@/shared/middleware/graphql', () => ({
         Trace: 'TRACE',
         Warn: 'WARN',
     },
+    PlatformType: {
+        Automation: 'AUTOMATION',
+        Embedded: 'EMBEDDED',
+    },
     useAutomationWorkflowProjectCategoriesQuery: () => ({data: {automationWorkflowProjectCategories: []}}),
     useAutomationWorkflowProjectTagsQuery: () => ({data: {automationWorkflowProjectTags: []}}),
     useAutomationWorkflowProjectVersionsQuery: () => ({data: {automationWorkflowProjectVersions: []}}),

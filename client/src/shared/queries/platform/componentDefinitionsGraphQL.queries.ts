@@ -1,4 +1,4 @@
-import {useComponentDefinitionSearchQuery} from '@/shared/middleware/graphql';
+import {PlatformType, useComponentDefinitionSearchQuery} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {keepPreviousData} from '@tanstack/react-query';
 import {useMemo} from 'react';
@@ -21,12 +21,12 @@ export interface ComponentDefinitionWithActionsProps extends ComponentDefinition
     }>;
 }
 
-export const useGetComponentDefinitionsWithActionsQuery = (searchQuery?: string) => {
+export const useGetComponentDefinitionsWithActionsQuery = (platformType: PlatformType, searchQuery?: string) => {
     const trimmedQuery = searchQuery?.trim();
     const hasSearchQuery = Boolean(trimmedQuery && trimmedQuery.length > 0);
 
     const result = useComponentDefinitionSearchQuery(
-        {query: trimmedQuery || ''},
+        {platformType, query: trimmedQuery || ''},
         {
             enabled: hasSearchQuery,
             gcTime: 30 * 60 * 1000,

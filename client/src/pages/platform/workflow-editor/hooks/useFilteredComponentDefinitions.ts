@@ -6,6 +6,8 @@ import {
 import {Dispatch, SetStateAction, useMemo, useState} from 'react';
 import {useDebounce} from 'use-debounce';
 
+import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+
 type UseFilteredComponentDefinitionsReturnType = {
     componentsWithActions: Array<ComponentDefinitionBasic | ComponentDefinitionWithActionsProps>;
     filter: string;
@@ -19,12 +21,14 @@ export const useFilteredComponentDefinitions = (
 ): UseFilteredComponentDefinitionsReturnType => {
     const [filter, setFilter] = useState('');
 
+    const {platformType} = useWorkflowEditor();
+
     const [debouncedFilter] = useDebounce(filter, 300);
 
     const trimmedFilter = debouncedFilter.trim();
 
     const {data: searchedComponentDefinitions, isFetching: isSearchFetching} =
-        useGetComponentDefinitionsWithActionsQuery(trimmedFilter);
+        useGetComponentDefinitionsWithActionsQuery(platformType, trimmedFilter);
 
     const componentsWithActions = useMemo(() => {
         if (trimmedFilter && searchedComponentDefinitions) {
