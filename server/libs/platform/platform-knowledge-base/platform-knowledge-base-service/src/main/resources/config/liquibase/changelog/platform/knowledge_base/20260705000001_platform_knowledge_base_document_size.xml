@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/platform/knowledge_base/20260705000001_platform_knowledge_base_document_size.xml">
+
+    <changeSet id="20260705000001-1" author="Ivica Cardic">
+        <addColumn tableName="knowledge_base_document">
+            <column name="document_size" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

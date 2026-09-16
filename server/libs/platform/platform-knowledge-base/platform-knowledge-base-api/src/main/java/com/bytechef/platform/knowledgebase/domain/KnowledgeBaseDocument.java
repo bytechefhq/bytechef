@@ -49,6 +49,8 @@ public class KnowledgeBaseDocument {
 
     private int status;
 
+    private Long documentSize;
+
     @MappedCollection(idColumn = "knowledge_base_document_id")
     private Set<KnowledgeBaseDocumentTag> knowledgeBaseDocumentTags = new HashSet<>();
 
@@ -113,6 +115,14 @@ public class KnowledgeBaseDocument {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Long getDocumentSize() {
+        return documentSize;
+    }
+
+    public void setDocumentSize(Long documentSize) {
+        this.documentSize = documentSize;
     }
 
     public Instant getCreatedDate() {
@@ -198,6 +208,7 @@ public class KnowledgeBaseDocument {
             ", name='" + name + '\'' +
             ", document=" + document +
             ", status=" + status +
+            ", documentSize=" + documentSize +
             ", knowledgeBaseDocumentTags=" + knowledgeBaseDocumentTags +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +
