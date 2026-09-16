@@ -10,9 +10,11 @@ import useKnowledgeBaseEmbeddingActive from '@/pages/automation/knowledge-bases/
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useKnowledgeBaseStorageUsageQuery} from '@/shared/middleware/graphql';
 import {DatabaseIcon} from 'lucide-react';
 
 const KnowledgeBases = () => {
@@ -23,6 +25,8 @@ const KnowledgeBases = () => {
 
     const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
 
+    const {data: storageUsageData} = useKnowledgeBaseStorageUsageQuery();
+
     const initialLoadComplete = useInitialLoadComplete(isLoading || embeddingActiveLoading);
 
     const showKnowledgeBases = embeddingActive && knowledgeBases.length > 0;
@@ -32,6 +36,8 @@ const KnowledgeBases = () => {
     const isFirstRun = isLoaded && !tagId && knowledgeBases.length === 0;
 
     const leftSidebarHidden = isFirstRun || (isLoaded && !embeddingActive);
+
+    const storageUsage = storageUsageData?.knowledgeBaseStorageUsage;
 
     return (
         <LayoutContainer
@@ -70,20 +76,32 @@ const KnowledgeBases = () => {
                 ) : !embeddingActive ? (
                     <KnowledgeBaseEmbeddingInactiveEmptyState />
                 ) : (
-                    <div className="flex size-full">
-                        {filteredKnowledgeBases.length > 0 ? (
-                            <KnowledgeBaseList
-                                allTags={allTags}
-                                knowledgeBases={filteredKnowledgeBases}
-                                tagsByKnowledgeBaseData={tagsByKnowledgeBaseData}
-                            />
-                        ) : (
-                            <EmptyList
-                                icon={<DatabaseIcon className="size-24 text-stroke-neutral-tertiary" />}
-                                message="No knowledge bases match the selected tag."
-                                title="No Matching Knowledge Bases"
+                    <div className="flex size-full flex-col">
+                        {storageUsage && (
+                            <StorageUsageBanner
+                                label="Knowledge base"
+                                limitBytes={storageUsage.limitBytes}
+                                percentage={storageUsage.percentage}
+                                unlimited={storageUsage.unlimited}
+                                usedBytes={storageUsage.usedBytes}
                             />
                         )}
+
+                        <div className="flex flex-1">
+                            {filteredKnowledgeBases.length > 0 ? (
+                                <KnowledgeBaseList
+                                    allTags={allTags}
+                                    knowledgeBases={filteredKnowledgeBases}
+                                    tagsByKnowledgeBaseData={tagsByKnowledgeBaseData}
+                                />
+                            ) : (
+                                <EmptyList
+                                    icon={<DatabaseIcon className="size-24 text-stroke-neutral-tertiary" />}
+                                    message="No knowledge bases match the selected tag."
+                                    title="No Matching Knowledge Bases"
+                                />
+                            )}
+                        </div>
                     </div>
                 )}
             </PageLoader>
