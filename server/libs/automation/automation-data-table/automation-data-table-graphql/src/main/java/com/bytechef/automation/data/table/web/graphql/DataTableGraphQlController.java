@@ -27,6 +27,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -102,6 +103,11 @@ public class DataTableGraphQlController {
                     instant != null ? instant.toEpochMilli() : null);
             })
             .toList();
+    }
+
+    @QueryMapping
+    public DataTableStorageUsage dataTableStorageUsage() {
+        return workspaceDataTableFacade.getStorageUsage();
     }
 
     @MutationMapping
