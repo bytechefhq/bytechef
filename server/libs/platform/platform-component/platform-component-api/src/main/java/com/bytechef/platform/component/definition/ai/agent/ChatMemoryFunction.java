@@ -22,8 +22,10 @@ import com.bytechef.platform.component.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.core.Ordered;
 
 /**
  * @author Ivica Cardic
@@ -35,6 +37,8 @@ public interface ChatMemoryFunction {
      *
      */
     ClusterElementType CHAT_MEMORY = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Memory");
+
+    int TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER = Ordered.HIGHEST_PRECEDENCE + 400;
 
     /**
      * @param inputParameters
@@ -56,6 +60,20 @@ public interface ChatMemoryFunction {
     @SuppressFBWarnings({
         "EI", "EI2"
     })
-    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {
+    record Result(
+        BaseAdvisor advisor, @Nullable ChatMemory chatMemory, @Nullable ToolCallback[] toolCallbacks,
+        boolean supportsToolMessagePersistence) {
+
+        public Result(BaseAdvisor advisor, @Nullable ChatMemory chatMemory) {
+            this(advisor, chatMemory, null, false);
+        }
+
+        public Result(BaseAdvisor advisor, @Nullable ChatMemory chatMemory, boolean supportsToolMessagePersistence) {
+            this(advisor, chatMemory, null, supportsToolMessagePersistence);
+        }
+
+        public Result(BaseAdvisor advisor, @Nullable ChatMemory chatMemory, @Nullable ToolCallback[] toolCallbacks) {
+            this(advisor, chatMemory, toolCallbacks, false);
+        }
     }
 }
