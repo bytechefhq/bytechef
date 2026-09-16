@@ -2992,6 +2992,7 @@ export type QueryComponentDefinitionArgs = {
 
 
 export type QueryComponentDefinitionSearchArgs = {
+  platformType: PlatformType;
   query: Scalars['String']['input'];
 };
 
@@ -3006,6 +3007,7 @@ export type QueryComponentDefinitionsArgs = {
   clusterElementDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
   connectionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
   include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  platformType: PlatformType;
   triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
