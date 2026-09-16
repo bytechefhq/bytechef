@@ -34,7 +34,7 @@ public class AwsSessionChatMemoryComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component(AWS_SESSION_CHAT_MEMORY)
         .title("AWS S3 Session Repository")
-        .description("Stores session events as JSON objects in an Amazon S3 bucket.")
+        .description("Stores each session as a JSON object in an Amazon S3 bucket.")
         .icon("path:assets/aws-session-chat-memory.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AwsSessionChatMemoryConnection.CONNECTION_DEFINITION)
