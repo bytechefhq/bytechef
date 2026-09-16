@@ -1,6 +1,6 @@
 ---
 title: "Redis Session Repository"
-description: "Stores agent session events as JSON documents in Redis."
+description: "Stores each session as a Redis hash holding a JSON document."
 ---
 
 
@@ -26,7 +26,7 @@ Version: 1
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | username | Username | STRING | The Redis username (optional, for Redis 6.0+ ACL). | false |
-| password | Password | STRING | The Redis password. | false |
+| password | Password | STRING | The Redis password. Required when Username is set. | false |
 
 
 
