@@ -28,6 +28,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * @version ee
@@ -39,11 +43,13 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     private static final Base64.Decoder MIME_DECODER = Base64.getMimeDecoder();
     private static final String URL_PREFIX = "s3://";
 
+    private final S3Client s3Client;
     private final S3Template s3Template;
     private final String bucketName;
 
     @SuppressFBWarnings("EI")
-    public AwsFileStorageServiceImpl(S3Template s3Template, String bucketName) {
+    public AwsFileStorageServiceImpl(S3Client s3Client, S3Template s3Template, String bucketName) {
+        this.s3Client = s3Client;
         this.s3Template = s3Template;
         this.bucketName = bucketName;
     }
@@ -91,14 +97,25 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public Set<FileEntry> getFileEntries(String directory) throws FileStorageException {
-        String prefix = combinePaths(directory, null);
+        // Exactly one trailing slash: it keeps directory "1" from also matching the keys of its sibling directory "10",
+        // and callers that already pass "logs/123/" must not end up with a "logs/123//" prefix that matches nothing.
+        String prefix = StringUtils.stripEnd(combinePaths(directory, null), "/") + "/";
 
-        return s3Template.listObjects(bucketName, prefix)
+        // Paginated: a single ListObjectsV2 call returns at most 1000 keys.
+        ListObjectsV2Request listObjectsV2Request = ListObjectsV2Request.builder()
+            .bucket(bucketName)
+            .prefix(prefix)
+            .build();
+
+        return s3Client.listObjectsV2Paginator(listObjectsV2Request)
+            .contents()
             .stream()
-            .map(S3Resource::getFilename)
+            .map(S3Object::key)
             .filter(Objects::nonNull)
-            .map(filename -> new FileEntry(
-                filename.substring(filename.lastIndexOf('/')), URL_PREFIX + bucketName + "/" + filename))
+            // A key ending in '/' is a zero-byte "folder" marker that some S3 tools create, not a file.
+            .filter(key -> !key.endsWith("/"))
+            .map(key -> new FileEntry(
+                key.substring(key.lastIndexOf('/') + 1), URL_PREFIX + bucketName + "/" + key))
             .collect(Collectors.toSet());
     }
 
@@ -136,16 +153,13 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
         S3Resource s3Resource = resolveResource(fileEntry);
 
-        byte[] bytes;
-
         try (InputStream inputStream = s3Resource.getInputStream()) {
-            bytes = inputStream.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(
-                "Unable to read file %s in directory %s".formatted(fileEntry.getName(), directory), e);
+            return MIME_DECODER.decode(inputStream.readAllBytes());
+        } catch (IOException | SdkException | IllegalArgumentException exception) {
+            // IllegalArgumentException: the stored object is not the base64 text this service writes.
+            throw new FileStorageException(
+                "Unable to read file %s in directory %s".formatted(fileEntry.getName(), directory), exception);
         }
-
-        return MIME_DECODER.decode(bytes);
     }
 
     @Override

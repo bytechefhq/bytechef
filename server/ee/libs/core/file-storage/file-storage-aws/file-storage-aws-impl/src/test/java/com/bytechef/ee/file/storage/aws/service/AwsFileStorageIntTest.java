@@ -9,11 +9,13 @@ package com.bytechef.ee.file.storage.aws.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.tenant.TenantContext;
 import io.awspring.cloud.s3.S3Template;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,8 +42,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 /**
  * @version ee
@@ -61,6 +67,12 @@ class AwsFileStorageIntTest {
     @Container
     private static final LocalStackContainer localStack = new LocalStackContainer(
         DockerImageName.parse("localstack/localstack:3.0"));
+
+    @Autowired
+    private S3Client s3Client;
+
+    @Autowired
+    private S3Template s3Template;
 
     @Autowired
     private AwsFileStorageServiceImpl storageService;
@@ -208,6 +220,98 @@ class AwsFileStorageIntTest {
     }
 
     @Test
+    void getFileEntriesExcludesSiblingDirectoriesSharingANamePrefix() {
+        FileEntry fileEntry = storageService.storeFileContent("PrefixDirectory/1", KEY, DATA);
+
+        storageService.storeFileContent("PrefixDirectory/10", KEY, DATA);
+
+        assertThat(storageService.getFileEntries("PrefixDirectory/1")).containsExactly(fileEntry);
+    }
+
+    /**
+     * S3 returns at most 1000 keys per ListObjectsV2 call, so a directory larger than that is listed in full only when
+     * the listing follows the continuation pages.
+     */
+    @Test
+    void getFileEntriesListsPastOneThousandKeys() {
+        int fileCount = 1001;
+
+        for (int index = 0; index < fileCount; index++) {
+            storageService.storeFileContent("PagedDirectory", "key" + index, DATA);
+        }
+
+        assertThat(storageService.getFileEntries("PagedDirectory")).hasSize(fileCount);
+    }
+
+    /**
+     * Listing descends into subdirectories, which the auto-memory file-storage binding relies on to list a whole
+     * workspace. A delimiter on the request would silently drop these keys.
+     */
+    @Test
+    void getFileEntriesIncludesKeysInNestedDirectories() {
+        FileEntry topLevelFileEntry = storageService.storeFileContent("NestedDirectory/1", KEY, DATA);
+        FileEntry nestedFileEntry = storageService.storeFileContent("NestedDirectory/1/user_7/0", KEY, DATA);
+
+        assertThat(storageService.getFileEntries("NestedDirectory/1"))
+            .containsExactlyInAnyOrder(topLevelFileEntry, nestedFileEntry);
+    }
+
+    @Test
+    void getFileEntriesAcceptsADirectoryWithATrailingSlash() {
+        FileEntry fileEntry = storageService.storeFileContent("TrailingSlashDirectory/123", KEY, DATA);
+
+        assertThat(storageService.getFileEntries("TrailingSlashDirectory/123/")).containsExactly(fileEntry);
+    }
+
+    /**
+     * The S3 console and some sync tools create a "folder" object whose key ends in '/'. It is not a file, and listing
+     * it would hand callers an entry with an empty name. The markers here carry a body only because LocalStack rejects
+     * an empty upload; the listing decides by the key alone.
+     */
+    @Test
+    void getFileEntriesSkipsFolderMarkerKeys() {
+        FileEntry fileEntry = storageService.storeFileContent("MarkerDirectory/1", KEY, DATA);
+
+        putRawObject("MarkerDirectory/1/", DATA);
+        putRawObject("MarkerDirectory/1/nested/", DATA);
+
+        assertThat(storageService.getFileEntries("MarkerDirectory/1")).containsExactly(fileEntry);
+    }
+
+    /**
+     * Objects are stored as base64 text, so one written by anything else — for example a document copied in from a
+     * filesystem store — fails to decode; that must surface as the service's own exception, not a raw decoder error.
+     */
+    @Test
+    void readingAnObjectThatIsNotBase64ThrowsFileStorageException() {
+        putRawObject("RawDirectory/" + KEY, "a=b");
+
+        FileEntry fileEntry = storageService.getFileEntry("RawDirectory", KEY);
+
+        assertThatThrownBy(() -> storageService.readFileToBytes("RawDirectory", fileEntry))
+            .isInstanceOf(FileStorageException.class);
+    }
+
+    @Test
+    void readingAFileDeletedAfterTheExistenceCheckThrowsFileStorageException() {
+        S3Template existenceCheckPassingS3Template = Mockito.spy(s3Template);
+
+        Mockito.doReturn(true)
+            .when(existenceCheckPassingS3Template)
+            .objectExists(Mockito.anyString(), Mockito.anyString());
+
+        AwsFileStorageServiceImpl racingStorageService = new AwsFileStorageServiceImpl(
+            s3Client, existenceCheckPassingS3Template, BUCKET_NAME);
+
+        FileEntry fileEntry = storageService.storeFileContent("VanishingDirectory", KEY, DATA);
+
+        storageService.deleteFile("VanishingDirectory", fileEntry);
+
+        assertThatThrownBy(() -> racingStorageService.readFileToString("VanishingDirectory", fileEntry))
+            .isInstanceOf(FileStorageException.class);
+    }
+
+    @Test
     void canDeleteFile() {
         FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
 
@@ -281,6 +385,15 @@ class AwsFileStorageIntTest {
             });
     }
 
+    private void putRawObject(String path, String content) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+            .bucket(BUCKET_NAME)
+            .key(TENANT_ID + "/" + path)
+            .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromString(content));
+    }
+
     @Configuration
     @EnableConfigurationProperties(ApplicationProperties.class)
     @ImportAutoConfiguration({
@@ -294,9 +407,9 @@ class AwsFileStorageIntTest {
 
         @Bean
         AwsFileStorageServiceImpl awsFileStorageService(
-            S3Template s3Template, ApplicationProperties applicationProperties) {
+            S3Client s3Client, S3Template s3Template, ApplicationProperties applicationProperties) {
 
-            return new AwsFileStorageServiceImpl(s3Template, applicationProperties.getFileStorage()
+            return new AwsFileStorageServiceImpl(s3Client, s3Template, applicationProperties.getFileStorage()
                 .getAws()
                 .getBucket());
         }
