@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.TriggerDefinition.TriggerType.DY
 import com.bytechef.component.datatable.util.DataTableUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
@@ -79,14 +78,12 @@ public class DataTableRecordDeletedTrigger {
                     .resourceReference(ResourceType.DATA_TABLE)
                     .description("Select a Data Table.")
                     .required(true)
-                    .options(
-                        (OptionsFunction<String>) (
-                            inputParameters, connectionParameters, depends, searchText,
-                            context) -> DataTableUtils.getTableOptions(searchText, dataTableService)))
+                    .options(DataTableUtils.getTriggerTableOptions(dataTableService)))
             .output((inputParameters, connectionParameters, context) -> {
                 var baseName = inputParameters.getRequiredString(TABLE);
 
-                return DataTableUtils.createTriggerOutputResponse(dataTableRowService, dataTableService, baseName);
+                return DataTableUtils.createTriggerOutputResponse(
+                    dataTableRowService, dataTableService, baseName);
             })
             .webhookEnable((
                 inputParameters, connectionParameters, webhookUrl, workflowExecutionId,
@@ -106,8 +103,8 @@ public class DataTableRecordDeletedTrigger {
 
         String baseName = inputParameters.getRequiredString(TABLE);
 
-        long webhookId = dataTableWebhookService.addWebhook(
-            baseName, webhookUrl, DataTableWebhookType.RECORD_DELETED,
+        long webhookId = DataTableUtils.registerWebhook(
+            dataTableService, dataTableWebhookService, baseName, webhookUrl, DataTableWebhookType.RECORD_DELETED,
             Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);

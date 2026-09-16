@@ -17,12 +17,12 @@
 package com.bytechef.component.datatable.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,9 @@ class DataTableCreateRecordsActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRows() throws Exception {
-        when(dataTableRowService.insertRow(anyString(), anyMap(), anyLong()))
+        DataTableRef dataTableRef = stubResolvedDataTable();
+
+        when(dataTableRowService.insertRow(eq(dataTableRef), anyMap()))
             .thenReturn(new DataTableRow(1, Map.of("status", "BOT")));
 
         ModifiableActionDefinition actionDefinition = DataTableCreateRecordsAction.of(
@@ -45,6 +47,6 @@ class DataTableCreateRecordsActionTest extends AbstractDataTableActionTest {
             List.of(Map.of("id", 1L, "status", "BOT")),
             perform(
                 actionDefinition,
-                Map.of("table", "conversations", "records", Map.of("values", List.of(Map.of("status", "BOT"))))));
+                Map.of("table", BASE_NAME, "records", Map.of("values", List.of(Map.of("status", "BOT"))))));
     }
 }

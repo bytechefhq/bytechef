@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.datatable.util.DataTableUtils;
+import com.bytechef.component.datatable.util.DataTableUtils.ResolvedDataTable;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseProperty.ResourceType;
@@ -57,7 +58,9 @@ public class DataTableDeleteRecordsAction {
         return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService).build();
     }
 
-    private DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableDeleteRecordsAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
     }
@@ -100,12 +103,15 @@ public class DataTableDeleteRecordsAction {
         Object[] ids = inputParameters.getRequiredArray(IDS);
         List<Long> deletedIds = new ArrayList<>();
 
+        long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
+
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, baseName, environmentId);
+
         for (Object curId : ids) {
             long id = (curId instanceof Number number) ? number.longValue() : Long.parseLong(String.valueOf(curId));
 
-            if (dataTableRowService.deleteRow(
-                baseName, id, Objects.requireNonNull(actionContextAware.getEnvironmentId()))) {
-
+            if (dataTableRowService.deleteRow(resolvedDataTable.dataTableRef(), id)) {
                 deletedIds.add(id);
             }
         }

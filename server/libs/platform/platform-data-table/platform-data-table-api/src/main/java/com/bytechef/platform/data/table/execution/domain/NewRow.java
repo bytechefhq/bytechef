@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.data.table.configuration.exception;
+package com.bytechef.platform.data.table.execution.domain;
 
-import com.bytechef.exception.AbstractErrorType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
- * @author Igor Beslic
+ * One row bound for {@code DataTableRowService#insertRows}, with an optional caller-supplied external id.
+ *
+ * @author Ivica Cardic
  */
-public class DataTableErrorType extends AbstractErrorType {
-
-    public static final DataTableErrorType DATA_TABLE_NOT_FOUND = new DataTableErrorType(100);
-    public static final DataTableErrorType DATA_TABLE_NOT_CREATED = new DataTableErrorType(101);
-    public static final DataTableErrorType DATA_TABLE_NOT_DUPLICATED = new DataTableErrorType(102);
-
-    private DataTableErrorType(int errorKey) {
-        super(DataTableErrorType.class, errorKey);
-    }
+@SuppressFBWarnings("EI")
+public record NewRow(Map<String, Object> values, @Nullable String externalId) {
 }

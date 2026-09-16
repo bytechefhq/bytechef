@@ -16,21 +16,30 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.domain.DataTableResolution;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Unified service for managing dynamic data tables and querying their metadata.
  *
  * <p>
- * Physical table names are constructed internally using the pattern: <code>dt_&lt;envIndex&gt;_&lt;baseName&gt;</code>,
- * where envIndex is mapped as DEVELOPMENT=0, STAGING=1, PRODUCTION=2.
+ * A base name is unique within an environment, and the environment is part of the physical name. alone, identifies the
+ * table.
  * </p>
  *
  * <p>
- * Callers must pass only the logical base table name (without any <code>dt_</code> prefix). Inputs starting with
- * <code>dt_</code> will be rejected.
+ * ref for the row layer to use.
+ * </p>
+ *
+ * <p>
+ * Callers must pass only the logical base table name (without any <code>dt_</code>/<code>edt_</code> prefix). Inputs
+ * starting with <code>dt_</code> will be rejected.
  * </p>
  *
  * @author Ivica Cardic
@@ -48,32 +57,19 @@ public interface DataTableService {
     void addColumn(String baseName, ColumnSpec columnSpec, long environmentId);
 
     /**
-     * Creates a new dynamic data table in the specified environment with the given base name and column specifications.
-     * The physical table name is derived internally based on the environment and base name.
-     *
-     * @param baseName      The logical base name of the table. The name must not include a "dt_" prefix, as it will be
-     *                      automatically added.
-     * @param columnSpecs   A list of column specifications defining the structure of the table, including column names
-     *                      and types. This list must be non-null and non-empty.
-     * @param environmentId The target environment where the table should be created (e.g., DEVELOPMENT, STAGING,
-     *                      PRODUCTION).
-     */
-    void createTable(String baseName, List<ColumnSpec> columnSpecs, long environmentId);
-
-    /**
      * Creates a new dynamic data table in the specified environment with the given base name, description, and column
-     * specifications. The physical table name is derived internally based on the environment and base name.
+     * specifications. The physical table name is derived internally from the environment and base name.
      *
      * @param baseName      The logical base name of the table. The name must not include a "dt_" prefix, as it will be
      *                      automatically added.
-     * @param description   A description for the table to provide additional metadata about its purpose. Must not be
-     *                      null or empty.
+     * @param description   A description for the table to provide additional metadata about its purpose.
      * @param columnSpecs   A list of column specifications defining the structure of the table, including column names
      *                      and types. This list must be non-null and non-empty.
      * @param environmentId The target environment where the table should be created (e.g., DEVELOPMENT, STAGING,
      *                      PRODUCTION).
      */
-    void createTable(String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId);
+    void createTable(
+        String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId);
 
     /**
      * Deletes a dynamic data table in the specified environment with the given base name. This action is irreversible
@@ -87,12 +83,15 @@ public interface DataTableService {
 
     /**
      * Duplicates an existing dynamic data table in the specified environment. The new table will have a different base
-     * name while preserving the structure
+     * name while preserving the structure.
+     *
      */
     void duplicateTable(String fromBaseName, String toBaseName, long environmentId);
 
     /**
      * Retrieves the base name of a dynamic data table by its unique identifier.
+     *
+     * <p>
      *
      * @param id The unique identifier of the data table.
      * @return The base name of the data table corresponding to the given identifier. If no table is found for the
@@ -111,11 +110,62 @@ public interface DataTableService {
     long getIdByBaseName(String baseName);
 
     /**
-     * Retrieves a list of metadata for all dynamic data tables available in the specified environment.
+     * The registry row a base name names.
      *
-     * @param environmentId The target environment ID.
-     * @return A list of {@code DataTableInfo} objects representing the metadata of the tables in the environment. If no
-     *         tables exist, an empty list is returned.
+     * <p>
+     * One row, or none: a base name is unique within an environment, so there is nothing to choose between and nothing
+     * to choose it with.
+     *
+     * @param baseName the logical base name to resolve
+     * @return the registry row, or empty when no table of that name is registered
+     */
+    Optional<DataTable> fetchDataTable(String baseName);
+
+    /**
+     * The registry row whose physical table {@code dataTableRef} addresses -- the inverse of
+     * {@link #fetchDataTableResolution}, which produced the ref in the first place.
+     *
+     * <p>
+     * Exists so that a caller holding only a ref -- the webhook registry, whose events arrive from the row layer -- can
+     * name the table without rebuilding the base name by hand.
+     *
+     * @param dataTableRef the resolved table
+     * @return the registry row that table belongs to, or empty when no row claims it
+     */
+    Optional<DataTable> fetchDataTable(DataTableRef dataTableRef);
+
+    /**
+     * Resolves a base name to the one physical table that holds it.
+     *
+     * <p>
+     * One table per base name per environment, so resolution has nothing to choose between.
+     *
+     * @param baseName      the logical base name to resolve
+     * @param environmentId the environment the run is in; physical tables are per environment, registry rows are not
+     * @return the registry row and the physical table it addresses, or empty when no table of that name is registered
+     */
+    Optional<DataTableResolution> fetchDataTableResolution(
+        String baseName, long environmentId);
+
+    /**
+     * The table as it exists in one environment: registry metadata plus the physical table's user columns. Empty when
+     * either half is missing -- a registry row alone is a table that lives in some other environment.
+     *
+     * @param baseName      the logical base name to resolve
+     * @param environmentId the environment whose physical table must exist for a result to be returned
+     * @return the table's registry metadata and columns, or empty when the registry row or this environment's physical
+     *         table is missing
+     */
+    Optional<DataTableInfo> fetchDataTableInfo(String baseName, long environmentId);
+
+    /**
+     * Every data table in one environment, with its columns.
+     *
+     * <p>
+     * Unfiltered by account, because a table is not an account's to hide: every caller reaches the same tables and is
+     * separated inside them by the row predicate.
+     *
+     * @param environmentId the environment ID
      */
     List<DataTableInfo> listTables(long environmentId);
 
@@ -140,7 +190,8 @@ public interface DataTableService {
      *                       table.
      * @param environmentId  The target environment ID.
      */
-    void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId);
+    void renameColumn(
+        String baseName, String fromColumnName, String toColumnName, long environmentId);
 
     /**
      * Renames an existing dynamic data table in the specified environment from one base name to another. This method
@@ -149,8 +200,17 @@ public interface DataTableService {
      * @param fromBaseName  The current logical base name of the table. This name must not include a "dt_" prefix and
      *                      must match an existing table.
      * @param toBaseName    The new logical base name for the table. This name must not include a "dt_" prefix and must
-     *                      not conflict with any existing table's base name in the same environment .
+     *                      not conflict with any existing table's base name in the same environment.
      * @param environmentId The target environment ID.
      */
     void renameTable(String fromBaseName, String toBaseName, long environmentId);
+
+    /**
+     * Writes the registry description. Environment-independent -- the registry row is the logical table across every
+     * environment, so there is nothing here for an environment to select between.
+     *
+     * @param baseName    The logical base name of the table whose description is being updated.
+     * @param description The new description, or {@code null} to clear it.
+     */
+    void updateDescription(String baseName, @Nullable String description);
 }

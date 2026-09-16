@@ -20,6 +20,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinitio
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunction;
 import com.bytechef.component.definition.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 
 /**
@@ -40,6 +41,8 @@ abstract class AbstractDataTableTriggerTest {
         return webhookRequestFunction.apply(null, null, null, null, new TestWebhookBody(content), null, null, null);
     }
 
+    // The content is an immutable map built by the tests, so handing it straight back is safe here.
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     private record TestWebhookBody(Map<String, Object> content) implements WebhookBody {
 
         @Override

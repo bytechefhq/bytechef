@@ -28,11 +28,13 @@ import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
 import com.bytechef.component.datatable.util.DataTableUtils;
+import com.bytechef.component.datatable.util.DataTableUtils.ResolvedDataTable;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
@@ -59,7 +61,9 @@ public class DataTableCreateRecordsAction {
         return new DataTableCreateRecordsAction(dataTableService, dataTableRowService).build();
     }
 
-    private DataTableCreateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableCreateRecordsAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
     }
@@ -76,7 +80,8 @@ public class DataTableCreateRecordsAction {
                     .options(DataTableUtils.getActionTableOptions(dataTableService)),
                 dynamicProperties(RECORDS)
                     .propertiesLookupDependsOn(TABLE)
-                    .properties(DataTableUtils.createDynamicProperties(dataTableService, false))
+                    .properties(
+                        DataTableUtils.createDynamicProperties(dataTableService, false))
                     .required(true))
             .output(this::output)
             .perform(this::perform);
@@ -88,9 +93,14 @@ public class DataTableCreateRecordsAction {
 
         String baseName = inputParameters.getRequiredString(TABLE);
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, baseName, DEVELOPMENT.ordinal());
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        DataTableInfo dataTableInfo = resolvedDataTable.dataTableInfo();
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(resolvedDataTable.dataTableRef(), 1, 0);
 
         if (rows.isEmpty()) {
             return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema));
@@ -99,7 +109,7 @@ public class DataTableCreateRecordsAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleOutput = DataTableUtils.createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema), List.of(sampleOutput));
     }
@@ -119,13 +129,17 @@ public class DataTableCreateRecordsAction {
 
         List<DataTableRow> created = new ArrayList<>();
 
+        long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
+
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, baseName, environmentId);
+
         if (valuesObj instanceof List<?> valuesList) {
             for (Object record : valuesList) {
                 if (record instanceof Map<?, ?> map) {
                     created.add(
                         dataTableRowService.insertRow(
-                            baseName, (Map<String, Object>) map,
-                            Objects.requireNonNull(actionContextAware.getEnvironmentId())));
+                            resolvedDataTable.dataTableRef(), (Map<String, Object>) map));
                 }
             }
         }

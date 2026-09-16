@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.security.web.authentication;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.exception.UserNotActivatedException;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -57,6 +58,10 @@ public class AutomationApiKeyAuthenticationProvider implements AuthenticationPro
                 automationApiKeyAuthenticationToken.getEnvironmentId());
         } catch (IllegalArgumentException e) {
             throw new BadCredentialsException("Unknown API secret key", e);
+        }
+
+        if (apiKey.getType() != PlatformType.AUTOMATION) {
+            throw new BadCredentialsException("Unknown API secret key");
         }
 
         org.springframework.security.core.userdetails.User user = userService.fetchUser(apiKey.getUserId())

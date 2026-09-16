@@ -20,10 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.test.config.h2.H2DataSourceConfiguration;
@@ -42,6 +44,8 @@ import org.springframework.context.annotation.Import;
 class DataTableServiceH2IntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
+
+    private static final PlatformType PLATFORM_TYPE = PlatformType.AUTOMATION;
 
     @Autowired
     private DataTableService dataTableService;
@@ -66,11 +70,12 @@ class DataTableServiceH2IntTest {
         dataTableService.createTable(
             "columns", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
 
-        dataTableService.addColumn("columns", new ColumnSpec("amount", ColumnType.NUMBER), DEV_ENVIRONMENT_ID);
+        dataTableService.addColumn(
+            "columns", new ColumnSpec("amount", ColumnType.NUMBER), DEV_ENVIRONMENT_ID);
         dataTableService.renameColumn("columns", "amount", "total", DEV_ENVIRONMENT_ID);
 
         DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "columns", Map.of("title", "renamed", "total", 12), DEV_ENVIRONMENT_ID);
+            ref("columns"), Map.of("title", "renamed", "total", 12));
 
         assertTrue(dataTableRow.values()
             .containsKey("total"));
@@ -83,29 +88,29 @@ class DataTableServiceH2IntTest {
         dataTableService.createTable(
             "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
 
-        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRef dataTableRef = ref("rows");
+
+        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
         assertNotNull(insertedDataTableRow);
         assertEquals("first", insertedDataTableRow.values()
             .get("title"));
 
         DataTableRow updatedDataTableRow = dataTableRowService.updateRow(
-            "rows", insertedDataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID);
+            dataTableRef, insertedDataTableRow.id(), Map.of("title", "second"));
 
         assertEquals("second", updatedDataTableRow.values()
             .get("title"));
 
-        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(
-            "rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID);
+        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(dataTableRef, insertedDataTableRow.id());
 
         assertEquals("second", fetchedDataTableRow.values()
             .get("title"));
 
-        assertEquals(1, dataTableRowService.listRows("rows", 10, 0, DEV_ENVIRONMENT_ID)
+        assertEquals(1, dataTableRowService.listRows(dataTableRef, 10, 0)
             .size());
 
-        assertTrue(dataTableRowService.deleteRow("rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertTrue(dataTableRowService.deleteRow(dataTableRef, insertedDataTableRow.id()));
     }
 
     @Test
@@ -113,15 +118,25 @@ class DataTableServiceH2IntTest {
         dataTableService.createTable(
             "source", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
 
-        dataTableRowService.insertRow("source", Map.of("title", "copied"), DEV_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(ref("source"), Map.of("title", "copied"));
 
         dataTableService.duplicateTable("source", "duplicate", DEV_ENVIRONMENT_ID);
 
-        assertEquals(1, dataTableRowService.listRows("duplicate", 10, 0, DEV_ENVIRONMENT_ID)
+        assertEquals(1, dataTableRowService.listRows(ref("duplicate"), 10, 0)
             .size());
 
         dataTableService.renameTable("duplicate", "renamed", DEV_ENVIRONMENT_ID);
 
-        assertEquals("renamed", dataTableService.getBaseNameById(dataTableService.getIdByBaseName("renamed")));
+        assertEquals(
+            "renamed",
+            dataTableService.getBaseNameById(dataTableService.getIdByBaseName("renamed")));
+    }
+
+    /**
+     * A vendor's own ref: these cases exercise the H2 statement paths, not owner scoping, so every row they write
+     * belongs to nobody.
+     */
+    private static DataTableRef ref(String baseName) {
+        return new DataTableRef(baseName, DEV_ENVIRONMENT_ID);
     }
 }

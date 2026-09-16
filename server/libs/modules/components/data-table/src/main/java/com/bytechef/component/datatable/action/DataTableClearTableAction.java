@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.datatable.util.DataTableUtils;
+import com.bytechef.component.datatable.util.DataTableUtils.ResolvedDataTable;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseProperty.ResourceType;
@@ -55,7 +56,9 @@ public class DataTableClearTableAction {
         return new DataTableClearTableAction(dataTableService, dataTableRowService).build();
     }
 
-    private DataTableClearTableAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableClearTableAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
     }
@@ -85,12 +88,17 @@ public class DataTableClearTableAction {
 
         String baseName = inputParameters.getRequiredString(TABLE);
 
+        long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
+
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, baseName, environmentId);
+
         List<DataTableRow> dataTableRows = dataTableRowService.listRows(
-            baseName, Integer.MAX_VALUE, 0, Objects.requireNonNull(actionContextAware.getEnvironmentId()));
+            resolvedDataTable.dataTableRef(), Integer.MAX_VALUE, 0);
         int count = 0;
 
         for (DataTableRow dataTableRow : dataTableRows) {
-            if (dataTableRowService.deleteRow(baseName, dataTableRow.id(), actionContextAware.getEnvironmentId())) {
+            if (dataTableRowService.deleteRow(resolvedDataTable.dataTableRef(), dataTableRow.id())) {
                 count++;
             }
         }

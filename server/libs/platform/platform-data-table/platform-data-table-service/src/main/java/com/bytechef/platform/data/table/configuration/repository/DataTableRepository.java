@@ -25,7 +25,8 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface DataTableRepository extends CrudRepository<DataTable, Long> {
 
+    /**
+     * The row a base name holds. One row or none: the name is unique.
+     */
     Optional<DataTable> findByName(String name);
-
-    long deleteByName(String name);
 }

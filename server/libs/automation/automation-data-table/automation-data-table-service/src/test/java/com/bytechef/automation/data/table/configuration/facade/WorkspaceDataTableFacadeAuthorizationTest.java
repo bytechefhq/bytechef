@@ -19,6 +19,9 @@ package com.bytechef.automation.data.table.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -116,27 +119,105 @@ class WorkspaceDataTableFacadeAuthorizationTest {
         assertExpression("listWebhooks", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
     }
 
+    @Test
+    void testGetTableRequiresTableViewer() {
+        assertExpression("getTable", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
+    }
+
+    @Test
+    void testUpdateDescriptionRequiresTableEditor() {
+        assertExpression("updateDescription", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testListRowsOverloadsBothRequireTableViewer() {
+        assertExpression("listRows", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
+    }
+
+    @Test
+    void testGetRowRequiresTableViewer() {
+        assertExpression("getRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
+    }
+
+    @Test
+    void testFetchRowByExternalIdRequiresTableViewer() {
+        assertExpression("fetchRowByExternalId", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
+    }
+
+    @Test
+    void testInsertRowOverloadsBothRequireTableEditor() {
+        assertExpression("insertRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testUpdateRowOverloadsBothRequireTableEditor() {
+        assertExpression("updateRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testUpsertRowRequiresTableEditor() {
+        assertExpression("upsertRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testDeleteRowByExternalIdRequiresTableEditor() {
+        assertExpression("deleteRowByExternalId", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testInsertRowsRequiresTableEditor() {
+        assertExpression("insertRows", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testDeleteRowsRequiresTableEditor() {
+        assertExpression("deleteRows", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testClearRowsRequiresTableEditor() {
+        assertExpression("clearRows", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
+    }
+
+    @Test
+    void testGetTagsByTableIdRequiresWorkspaceViewer() {
+        assertExpression("getTagsByTableId", "hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_VIEW')");
+    }
+
+    @Test
+    void testGetWorkspaceIdRequiresTableViewer() {
+        assertExpression("getWorkspaceId", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
+    }
+
+    /**
+     * Asserts the expression on EVERY declared method with this name, not just the first one {@code getDeclaredMethods}
+     * happens to return -- {@code getDeclaredMethods} order is unspecified, and several of these names are overloaded
+     * (e.g. {@code listRows}, {@code insertRow}, {@code updateRow}), so checking only one match would silently skip the
+     * other overload's guard.
+     */
     private static void assertExpression(String methodName, String expression) {
-        Method method = null;
+        List<Method> methods = new ArrayList<>();
 
         for (Method candidate : WorkspaceDataTableFacadeImpl.class.getDeclaredMethods()) {
             if (candidate.getName()
                 .equals(methodName)) {
-                method = candidate;
-
-                break;
+                methods.add(candidate);
             }
         }
 
-        assertThat(method)
+        assertThat(methods)
             .as("method %s", methodName)
-            .isNotNull();
+            .isNotEmpty();
 
-        PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+        for (Method method : methods) {
+            PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
 
-        assertThat(preAuthorize)
-            .as("@PreAuthorize on %s", methodName)
-            .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo(expression);
+            assertThat(preAuthorize)
+                .as("@PreAuthorize on %s%s", methodName, Arrays.toString(method.getParameterTypes()))
+                .isNotNull();
+            assertThat(preAuthorize.value())
+                .as("@PreAuthorize value on %s%s", methodName, Arrays.toString(method.getParameterTypes()))
+                .isEqualTo(expression);
+        }
     }
 }

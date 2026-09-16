@@ -27,8 +27,12 @@ import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTabl
 import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +50,19 @@ class WorkspaceDataTableFacadeTest {
     private static final long ENVIRONMENT_ID = 0L;
 
     @Mock
+    private DataTableRowService dataTableRowService;
+
+    @Mock
     private DataTableService dataTableService;
+
+    @Mock
+    private DataTableStorageService dataTableStorageService;
+
+    @Mock
+    private DataTableTagService dataTableTagService;
+
+    @Mock
+    private DataTableWebhookService dataTableWebhookService;
 
     @Mock
     private WorkspaceDataTableService workspaceDataTableService;
@@ -55,7 +71,9 @@ class WorkspaceDataTableFacadeTest {
 
     @BeforeEach
     void setUp() {
-        workspaceDataTableFacade = new WorkspaceDataTableFacadeImpl(dataTableService, workspaceDataTableService);
+        workspaceDataTableFacade = new WorkspaceDataTableFacadeImpl(
+            dataTableRowService, dataTableService, dataTableStorageService, dataTableTagService,
+            dataTableWebhookService, workspaceDataTableService);
     }
 
     @Test

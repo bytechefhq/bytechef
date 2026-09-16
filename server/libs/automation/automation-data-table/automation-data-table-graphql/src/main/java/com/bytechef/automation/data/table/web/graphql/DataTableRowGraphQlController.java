@@ -104,6 +104,7 @@ public class DataTableRowGraphQlController {
 
     @MutationMapping
     public boolean importDataTableCsv(@Argument ImportCsvInput input) {
+        // The row count importCsv returns has no GraphQL field yet -- this mutation still just reports success.
         workspaceDataTableFacade.importCsv(input.tableId(), input.csv(), input.environmentId());
 
         return true;
