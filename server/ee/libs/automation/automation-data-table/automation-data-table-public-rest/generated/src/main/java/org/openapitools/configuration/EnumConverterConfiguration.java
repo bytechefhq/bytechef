@@ -8,8 +8,6 @@ import com.bytechef.ee.automation.data.table.public_.web.rest.model.ColumnTypeMo
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.CreateStrategyModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.EnvironmentModel;
 
-import jakarta.annotation.Generated;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -21,7 +19,6 @@ import org.springframework.core.convert.converter.Converter;
  * correct conversion if the OpenAPI specification is using an `enumPropertyNaming` other than
  * `original` or the specification has an integer enum.
  */
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-03T11:52:44.578282+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
 @Configuration(value = "org.openapitools.configuration.enumConverterConfiguration")
 public class EnumConverterConfiguration {
 

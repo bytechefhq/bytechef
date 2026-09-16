@@ -23,9 +23,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("UpsertRowRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-03T11:52:44.578282+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-16T16:07:06.618979+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class UpsertRowRequestModel {
 
+  @Valid
   private Map<String, Object> values = new HashMap<>();
 
   public UpsertRowRequestModel() {

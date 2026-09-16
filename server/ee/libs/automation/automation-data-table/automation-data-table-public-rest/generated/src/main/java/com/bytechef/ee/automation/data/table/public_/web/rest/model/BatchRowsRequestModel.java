@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.BatchRowModel;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.CreateStrategyModel;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,9 +27,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("BatchRowsRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-03T11:52:44.578282+02:00[Europe/Zagreb]", comments = "Generator version: 7.24.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-16T16:07:06.618979+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class BatchRowsRequestModel {
 
+  @Valid
   private List<@Valid BatchRowModel> rows = new ArrayList<>();
 
   private @Nullable CreateStrategyModel createStrategy;
