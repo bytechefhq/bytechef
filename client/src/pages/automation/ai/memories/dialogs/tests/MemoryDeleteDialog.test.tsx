@@ -35,6 +35,7 @@ const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     principalType: 'USER',
     title: 'User profile',
     updatedAt: '2026-04-10T00:00:00Z',
+    version: 3,
     workspaceId: 1,
     ...overrides,
 });
@@ -46,11 +47,20 @@ const makeMockMutation = (overrides: Record<string, unknown> = {}): any => ({
     isPending: false,
     isSuccess: false,
     mutate: vi.fn(),
-    mutateAsync: vi.fn().mockResolvedValue(undefined),
     reset: vi.fn(),
     status: 'idle' as const,
     ...overrides,
 });
+
+// Stands in for a mutation that settles successfully: TanStack invokes the per-call onSuccess.
+const makeSucceedingMutate = () =>
+    vi.fn((_variables: unknown, options?: {onSuccess?: () => void}) => {
+        options?.onSuccess?.();
+    });
+
+// Stands in for a mutation that fails: the per-call onSuccess never runs. Error display belongs to the global fetch
+// interceptor, not to this dialog.
+const makeFailingMutate = () => vi.fn();
 
 const wrap = (ui: ReactNode) =>
     render(
@@ -74,14 +84,15 @@ describe('MemoryDeleteDialog', () => {
 
         expect(screen.getByRole('heading', {name: /delete this memory permanently\?/i})).toBeInTheDocument();
         expect(screen.getByText(/"User profile"/)).toBeInTheDocument();
-        expect(screen.getByText(/bypass the 30-minute agent-undo window/i)).toBeInTheDocument();
+        expect(screen.getByText(/the deletion is permanent and cannot be undone/i)).toBeInTheDocument();
+        expect(screen.queryByText(/undo window/i)).toBeNull();
     });
 
     it('invokes the delete mutation and closes on confirm', async () => {
-        const mutateAsync = vi.fn().mockResolvedValue(undefined);
+        const mutate = makeSucceedingMutate();
         const onClose = vi.fn();
 
-        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync}));
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutate}));
 
         wrap(
             <MemoryDeleteDialog environmentId={2} memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />
@@ -90,23 +101,25 @@ describe('MemoryDeleteDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
 
         await waitFor(() => {
-            expect(mutateAsync).toHaveBeenCalledWith({
-                environment: 2,
-                id: '1',
-                principalId: 42,
-                principalType: 'USER',
-                workspaceId: '7',
-            });
+            expect(mutate).toHaveBeenCalledWith(
+                {
+                    environment: 2,
+                    id: '1',
+                    principal: {principalId: 42, principalType: 'USER'},
+                    workspaceId: '7',
+                },
+                expect.objectContaining({onSuccess: expect.any(Function)})
+            );
         });
 
         expect(toast.success).toHaveBeenCalledWith('Memory "User profile" deleted');
         expect(onClose).toHaveBeenCalled();
     });
 
-    it('sends the row own principal pair when the memory is deployment-owned', async () => {
-        const mutateAsync = vi.fn().mockResolvedValue(undefined);
+    it('sends the row own principal when the memory is deployment-owned', async () => {
+        const mutate = makeSucceedingMutate();
 
-        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync}));
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutate}));
 
         wrap(
             <MemoryDeleteDialog
@@ -121,32 +134,35 @@ describe('MemoryDeleteDialog', () => {
         await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
 
         await waitFor(() => {
-            // Without the pair the server resolves the CALLER's principal and answers NotFound, so a
-            // deployment-owned delete would fail even for an admin. Both must travel, never one.
-            expect(mutateAsync).toHaveBeenCalledWith({
+            // Without the principal the server resolves the CALLER's and answers NotFound, so a deployment-owned
+            // delete would fail even for an admin.
+            expect(mutate.mock.lastCall?.[0]).toEqual({
                 environment: 2,
                 id: '1',
-                principalId: 9,
-                principalType: 'PROJECT_DEPLOYMENT',
+                principal: {principalId: 9, principalType: 'PROJECT_DEPLOYMENT'},
                 workspaceId: '7',
             });
         });
     });
 
-    it('shows an error toast when the delete mutation fails', async () => {
-        const mutateAsync = vi.fn().mockRejectedValue(new Error('boom'));
+    it('stays open without a toast of its own when the delete mutation fails', async () => {
+        const mutate = makeFailingMutate();
+        const onClose = vi.fn();
 
-        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutateAsync}));
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({mutate}));
 
         wrap(
-            <MemoryDeleteDialog environmentId={2} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={7} />
+            <MemoryDeleteDialog environmentId={2} memory={makeMemory()} onClose={onClose} open={true} workspaceId={7} />
         );
 
         await userEvent.click(screen.getByRole('button', {name: /delete permanently/i}));
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('boom');
-        });
+        await waitFor(() => expect(mutate).toHaveBeenCalled());
+
+        // The global fetch interceptor already toasts the GraphQL error; a second toast here would duplicate it.
+        expect(toast.error).not.toHaveBeenCalled();
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(onClose).not.toHaveBeenCalled();
     });
 
     it('calls onClose when Cancel is clicked', async () => {
@@ -157,6 +173,30 @@ describe('MemoryDeleteDialog', () => {
         );
 
         await userEvent.click(screen.getByRole('button', {name: /cancel/i}));
+
+        expect(onClose).toHaveBeenCalled();
+    });
+});
+
+describe('MemoryDeleteDialog failures and states', () => {
+    it('shows the deleting state while the delete is pending', () => {
+        mockUseDeleteMutation.mockReturnValue(makeMockMutation({isPending: true}));
+
+        wrap(
+            <MemoryDeleteDialog environmentId={0} memory={makeMemory()} onClose={vi.fn()} open={true} workspaceId={1} />
+        );
+
+        expect(screen.getByRole('button', {name: 'Deleting...'})).toBeDisabled();
+    });
+
+    it('calls onClose when the dialog is dismissed with Escape', async () => {
+        const onClose = vi.fn();
+
+        wrap(
+            <MemoryDeleteDialog environmentId={0} memory={makeMemory()} onClose={onClose} open={true} workspaceId={1} />
+        );
+
+        await userEvent.keyboard('{Escape}');
 
         expect(onClose).toHaveBeenCalled();
     });

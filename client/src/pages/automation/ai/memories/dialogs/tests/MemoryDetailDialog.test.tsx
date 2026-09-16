@@ -17,6 +17,7 @@ const makeMemory = (overrides: Partial<AiAutoMemoryI> = {}): AiAutoMemoryI => ({
     principalType: 'USER',
     title: 'User profile',
     updatedAt: '2026-04-10T12:00:00Z',
+    version: 3,
     workspaceId: 1,
     ...overrides,
 });
@@ -30,10 +31,11 @@ describe('MemoryDetailDialog', () => {
         expect(screen.getByText(/alice prefers concise replies/i)).toBeInTheDocument();
     });
 
-    it('shows the memory type badge', () => {
+    it('shows the memory type badge by its label rather than the raw enum value', () => {
         render(<MemoryDetailDialog memory={makeMemory({memoryType: 'FEEDBACK'})} onClose={vi.fn()} open={true} />);
 
-        expect(screen.getByText('FEEDBACK')).toBeInTheDocument();
+        expect(screen.getByText('Feedback')).toBeInTheDocument();
+        expect(screen.queryByText('FEEDBACK')).toBeNull();
     });
 
     it('invokes onClose when Close is clicked', async () => {
@@ -50,5 +52,31 @@ describe('MemoryDetailDialog', () => {
         render(<MemoryDetailDialog memory={makeMemory()} onClose={vi.fn()} open={false} />);
 
         expect(screen.queryByText(/alice prefers concise replies/i)).toBeNull();
+    });
+});
+
+describe('MemoryDetailDialog timestamps and dismissal', () => {
+    it('falls back to the raw value when the updated timestamp is malformed', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        render(<MemoryDetailDialog memory={makeMemory({updatedAt: 'not-a-date'})} onClose={vi.fn()} open={true} />);
+
+        expect(screen.getByText(/updated not-a-date/i)).toBeInTheDocument();
+        expect(warn).toHaveBeenCalledWith(
+            'MemoryDetailDialog: formatTimestamp failed',
+            expect.objectContaining({value: 'not-a-date'})
+        );
+
+        warn.mockRestore();
+    });
+
+    it('calls onClose when the dialog is dismissed with Escape', async () => {
+        const onClose = vi.fn();
+
+        render(<MemoryDetailDialog memory={makeMemory()} onClose={onClose} open={true} />);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onClose).toHaveBeenCalled();
     });
 });
