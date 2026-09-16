@@ -144,6 +144,73 @@ class ClusterElementDefinitionServiceTest {
     }
 
     @Test
+    void testGetClusterElementDefinitionsMatchesTheTypeByNameWhateverItsRequiredFlag() {
+        ClusterElementType requiredModelType = new ClusterElementType("MODEL", "model", "Model", true);
+        ClusterElementType optionalModelType = new ClusterElementType("MODEL", "model", "Model", false);
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(
+            List.of(createMatchableClusterElementDefinition("openai", requiredModelType)));
+
+        when(componentDefinitionRegistry.getComponentDefinitions()).thenReturn(List.of(componentDefinition));
+
+        List<ClusterElementDefinition> clusterElementDefinitions =
+            clusterElementDefinitionService.getClusterElementDefinitions(optionalModelType);
+
+        assertEquals(1, clusterElementDefinitions.size());
+        assertEquals("openai", clusterElementDefinitions.getFirst()
+            .getName());
+    }
+
+    @Test
+    void testGetComponentClusterElementDefinitionsMatchesTheTypeByNameWhateverItsRequiredFlag() {
+        ClusterElementType requiredModelType = new ClusterElementType("MODEL", "model", "Model", true);
+        ClusterElementType optionalModelType = new ClusterElementType("MODEL", "model", "Model", false);
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(
+            List.of(createMatchableClusterElementDefinition("openai", requiredModelType)));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        List<ClusterElementDefinition> clusterElementDefinitions =
+            clusterElementDefinitionService.getClusterElementDefinitions(
+                COMPONENT_NAME, COMPONENT_VERSION, optionalModelType);
+
+        assertEquals(1, clusterElementDefinitions.size());
+    }
+
+    @Test
+    void testGetClusterElementDefinitionsLeavesOutClusterElementsOfAnotherType() {
+        ComponentDefinition componentDefinition = createComponentDefinitionWithModelAndChatMemory();
+
+        when(componentDefinitionRegistry.getComponentDefinitions()).thenReturn(List.of(componentDefinition));
+
+        List<ClusterElementDefinition> clusterElementDefinitions =
+            clusterElementDefinitionService.getClusterElementDefinitions(
+                new ClusterElementType("MODEL", "model", "Model"));
+
+        assertEquals(1, clusterElementDefinitions.size());
+        assertEquals("openai", clusterElementDefinitions.getFirst()
+            .getName());
+    }
+
+    @Test
+    void testGetComponentClusterElementDefinitionsLeavesOutClusterElementsOfAnotherType() {
+        ComponentDefinition componentDefinition = createComponentDefinitionWithModelAndChatMemory();
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        List<ClusterElementDefinition> clusterElementDefinitions =
+            clusterElementDefinitionService.getClusterElementDefinitions(
+                COMPONENT_NAME, COMPONENT_VERSION, new ClusterElementType("MODEL", "model", "Model"));
+
+        assertEquals(1, clusterElementDefinitions.size());
+        assertEquals("openai", clusterElementDefinitions.getFirst()
+            .getName());
+    }
+
+    @Test
     void testGetClusterElementDefinitionWithNonMatchingTypeThrowsException() {
         String clusterElementName = "openai";
         String clusterElementTypeName = "NONEXISTENT";
@@ -399,6 +466,19 @@ class ClusterElementDefinitionServiceTest {
         when(componentDefinition.getIcon()).thenReturn(Optional.empty());
 
         return componentDefinition;
+    }
+
+    private ComponentDefinition createComponentDefinitionWithModelAndChatMemory() {
+        com.bytechef.component.definition.ClusterElementDefinition<?> chatMemoryElementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(chatMemoryElementDefinition.getType())
+            .thenReturn(new ClusterElementType("CHAT_MEMORY", "chatMemory", "Chat Memory"));
+
+        return createComponentDefinitionForMatch(
+            List.of(
+                createMatchableClusterElementDefinition("openai", new ClusterElementType("MODEL", "model", "Model")),
+                chatMemoryElementDefinition));
     }
 
     private ComponentDefinition createComponentDefinitionForError(
