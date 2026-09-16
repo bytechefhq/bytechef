@@ -8,7 +8,6 @@ bytechef:
     knowledge-base:
       enabled: false
     memory:
-      # Chat memory provider (inmemory | jdbc | redis | aws) default: jdbc
       provider: jdbc
     provider:
       chat:
