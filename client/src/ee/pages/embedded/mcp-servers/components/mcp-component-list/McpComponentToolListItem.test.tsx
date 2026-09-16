@@ -15,7 +15,9 @@ vi.mock('./hooks/useMcpComponentToolDropdownMenu', () => ({
 }));
 
 vi.mock('@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover', () => ({
-    default: () => <div>tool-properties-popover</div>,
+    default: ({connectionRequired}: {connectionRequired?: boolean}) => (
+        <div data-connection-required={String(connectionRequired)}>tool-properties-popover</div>
+    ),
 }));
 
 const mcpTool = {id: '42', name: 'createOpportunity', title: 'Create Opportunity'} as McpTool;
@@ -50,6 +52,23 @@ const Harness = () => {
 };
 
 describe('McpComponentToolListItem', () => {
+    it('passes connectionRequired through to the tool properties popover', () => {
+        render(
+            <McpActivePopoverProvider>
+                <McpComponentToolListItem
+                    componentName="affinity"
+                    componentVersion={1}
+                    connectionId={null}
+                    connectionRequired
+                    mcpTool={mcpTool}
+                />
+            </McpActivePopoverProvider>
+        );
+
+        fireEvent.click(screen.getByTitle('Configure'));
+
+        expect(screen.getByText('tool-properties-popover')).toHaveAttribute('data-connection-required', 'true');
+    });
     it('clears the active popover when the item unmounts (card collapse)', () => {
         render(<Harness />);
 

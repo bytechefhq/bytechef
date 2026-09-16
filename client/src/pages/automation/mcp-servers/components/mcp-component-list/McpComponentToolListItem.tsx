@@ -12,6 +12,7 @@ interface McpComponentToolListItemProps {
     componentName: string;
     componentVersion: number;
     connectionId?: string | null;
+    connectionRequired?: boolean;
     description?: string | null;
     mcpTool: McpTool;
 }
@@ -20,6 +21,7 @@ const McpComponentToolListItem = ({
     componentName,
     componentVersion,
     connectionId,
+    connectionRequired,
     description,
     mcpTool,
 }: McpComponentToolListItemProps) => {
@@ -76,6 +78,7 @@ const McpComponentToolListItem = ({
                         componentName={componentName}
                         componentVersion={componentVersion}
                         connectionId={connectionId}
+                        connectionRequired={connectionRequired}
                         mcpTool={mcpTool}
                         onClose={closePopover}
                     />

@@ -13,6 +13,7 @@ interface McpComponentToolPropertiesPopoverProps {
     componentName: string;
     componentVersion: number;
     connectionId?: string | null;
+    connectionRequired?: boolean;
     mcpTool: McpTool;
     onClose: () => void;
 }
@@ -21,6 +22,7 @@ const McpComponentToolPropertiesPopover = ({
     componentName,
     componentVersion,
     connectionId,
+    connectionRequired,
     mcpTool,
     onClose,
 }: McpComponentToolPropertiesPopoverProps) => {
@@ -53,6 +55,7 @@ const McpComponentToolPropertiesPopover = ({
                         componentName,
                         componentVersion,
                         connectionId: connectionId ? Number(connectionId) : undefined,
+                        connectionRequired,
                         inputParameters: formValues,
                     }}
                 >
@@ -71,6 +74,7 @@ const McpComponentToolPropertiesPopover = ({
         componentName,
         componentVersion,
         connectionId,
+        connectionRequired,
         control,
         displayConditions,
         formState,
