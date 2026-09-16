@@ -36,11 +36,6 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
  */
 public class InMemoryChatMemory {
 
-    private static final MessageWindowChatMemory inMemoryChatMemory =
-        MessageWindowChatMemory.builder()
-            .chatMemoryRepository(InMemoryChatMemoryRepositoryHolder.getInstance())
-            .build();
-
     public static final ClusterElementDefinition<ChatMemoryFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("In Memory Chat Memory")
@@ -57,6 +52,10 @@ public class InMemoryChatMemory {
     protected static ChatMemoryFunction.Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
+
+        MessageWindowChatMemory inMemoryChatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(InMemoryChatMemoryRepositoryHolder.getInstance())
+            .build();
 
         return new ChatMemoryFunction.Result(
             MessageChatMemoryAdvisor.builder(inMemoryChatMemory)
