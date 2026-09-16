@@ -9,4 +9,10 @@ export const APIPage = createOpenAPIPage({
       light: 'vitesse-light',
     },
   },
+  mediaAdapters: {
+    'text/csv': {
+      encode: (data) => data.body as BodyInit,
+      generateExample: () => undefined,
+    },
+  },
 });

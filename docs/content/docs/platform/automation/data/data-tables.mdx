@@ -161,6 +161,16 @@ For example, a workflow with **Record Created** on a *Customers* table can send 
 
 ---
 
+## Public REST API
+
+Tables, columns and rows are also available over `/api/automation/v1` - see the
+[Data Tables API reference](/openapi/automation-data-tables-data-table) for tables and columns, and
+the [Data Table Rows reference](/openapi/automation-data-tables-data-table-row) for rows. Rows can be
+queried with `filter=column:OPERATOR:value`, written in batches, imported and exported as CSV, and
+upserted on a caller-supplied `externalId`.
+
+---
+
 ## Scope and access
 
 - **Workspace** - A table is available to every project and workflow in its workspace.
