@@ -4,7 +4,9 @@ import {RocketIcon} from 'lucide-react';
 
 import {Dialog, DialogClose, DialogContent, DialogTrigger} from './Dialog';
 import {DialogSidebar} from './DialogSidebar';
-import {type DialogStepI, type DialogStepStatusI, DialogStepsProvider} from './DialogStepsProvider';
+import {DialogStepIndicator} from './DialogStepIndicator';
+import {DialogSteps} from './DialogSteps';
+import {type DialogStepI, DialogStepsProvider} from './DialogStepsProvider';
 import {useDialogSteps} from './hooks/useDialogSteps';
 
 import type {Meta, StoryObj} from '@storybook/react-vite';
@@ -57,7 +59,8 @@ export const WithSidebar: Story = {
             <DialogContent>
                 <DialogSidebar description="Deploy a project version" icon={<RocketIcon />} title="New Deployment">
                     <p className="text-sm text-content-neutral-secondary">
-                        Sidebar children render here. DialogSteps and DialogStepIndicator go here later.
+                        Sidebar children render here. The steps story puts DialogSteps and DialogStepIndicator in this
+                        spot.
                     </p>
                 </DialogSidebar>
 
@@ -84,55 +87,16 @@ const storySteps: DialogStepI[] = [
 
 const validateAfterDelay = () => new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 600));
 
-function getStepStateLabel({isCompleted, isReachable}: DialogStepStatusI) {
-    if (isCompleted) {
-        return 'completed';
-    }
-
-    if (isReachable) {
-        return 'reachable';
-    }
-
-    return 'locked';
-}
-
-const StepsPreview = () => {
-    const {currentStep, currentStepIndex, getStepStatus, goToNextStep, goToStep, isLastStep, isPending, steps} =
-        useDialogSteps();
+const StepsMainPanel = () => {
+    const {currentStep, goToNextStep, isLastStep, isPending} = useDialogSteps();
 
     return (
-        <div className="flex w-[512px] max-w-full flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6">
-            <ShadcnDialogTitle>
-                Step {currentStepIndex + 1} of {steps.length}: {currentStep.label}
-            </ShadcnDialogTitle>
-
+        <div className="flex w-[512px] max-w-full flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6 lg:w-auto lg:flex-1">
             <p className="text-sm text-content-neutral-secondary">
-                Locked steps can&apos;t be clicked. Next validates for 600 ms, then completes the step.
+                {currentStep.label} content. Next validates for 600 ms, then the step list and the indicator move on.
             </p>
 
-            <ol className="flex flex-col gap-1">
-                {steps.map((step) => {
-                    const stepStatus = getStepStatus(step.id);
-
-                    return (
-                        <li key={step.id}>
-                            <button
-                                aria-current={stepStatus.isCurrent ? 'step' : undefined}
-                                className="flex w-full justify-between rounded-md px-3 py-2 text-sm hover:bg-surface-neutral-secondary disabled:cursor-not-allowed disabled:opacity-50 aria-[current=step]:font-semibold"
-                                disabled={!stepStatus.isReachable}
-                                onClick={() => goToStep(step.id)}
-                                type="button"
-                            >
-                                <span>{step.label}</span>
-
-                                <span className="text-content-neutral-secondary">{getStepStateLabel(stepStatus)}</span>
-                            </button>
-                        </li>
-                    );
-                })}
-            </ol>
-
-            <div className="flex justify-end gap-2">
+            <div className="mt-auto flex justify-end gap-2">
                 <DialogClose asChild>
                     <Button label="Cancel" variant="outline" />
                 </DialogClose>
@@ -143,16 +107,22 @@ const StepsPreview = () => {
     );
 };
 
-export const WithSteps: Story = {
+export const WithStepsAndIndicator: Story = {
     render: () => (
         <Dialog defaultOpen>
             <DialogTrigger asChild>
                 <Button label="Open dialog" />
             </DialogTrigger>
 
-            <DialogContent aria-describedby={undefined}>
+            <DialogContent>
                 <DialogStepsProvider steps={storySteps} validateStep={validateAfterDelay}>
-                    <StepsPreview />
+                    <DialogSidebar description="Deploy a project version" icon={<RocketIcon />} title="New Deployment">
+                        <DialogSteps />
+
+                        <DialogStepIndicator />
+                    </DialogSidebar>
+
+                    <StepsMainPanel />
                 </DialogStepsProvider>
             </DialogContent>
         </Dialog>
