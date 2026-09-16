@@ -3,6 +3,8 @@ dependencies {
     api("tools.jackson.core:jackson-databind")
     api("tools.jackson.dataformat:jackson-dataformat-xml")
 
+    compileOnly("com.github.ben-manes.caffeine:caffeine")
+
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
@@ -10,5 +12,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.slf4j:slf4j-api")
 
+    testImplementation("com.github.ben-manes.caffeine:caffeine")
     testImplementation(project(":server:libs:config:jackson-config"))
 }
