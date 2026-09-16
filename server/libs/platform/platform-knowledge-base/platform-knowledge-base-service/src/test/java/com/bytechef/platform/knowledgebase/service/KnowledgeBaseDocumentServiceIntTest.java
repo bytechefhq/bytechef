@@ -17,14 +17,17 @@
 package com.bytechef.platform.knowledgebase.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfigurationSharedMocks;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
+import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseStorageLimitExceededException;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -45,6 +48,11 @@ import org.springframework.context.annotation.Import;
 @Import(PostgreSQLContainerConfiguration.class)
 @KnowledgeBaseIntTestConfigurationSharedMocks
 class KnowledgeBaseDocumentServiceIntTest {
+
+    private static final long DEFAULT_MAX_SIZE_BYTES = new ApplicationProperties.Ai.KnowledgeBase().getMaxSizeBytes();
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     @Autowired
     private KnowledgeBaseDocumentService knowledgeBaseDocumentService;
@@ -71,6 +79,8 @@ class KnowledgeBaseDocumentServiceIntTest {
 
     @AfterEach
     public void afterEach() {
+        getKnowledgeBaseProperties().setMaxSizeBytes(DEFAULT_MAX_SIZE_BYTES);
+
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
     }
@@ -156,6 +166,69 @@ class KnowledgeBaseDocumentServiceIntTest {
         KnowledgeBaseDocument updatedDocument = knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
 
         assertThat(updatedDocument.getStatus()).isEqualTo(KnowledgeBaseDocument.STATUS_READY);
+    }
+
+    @Test
+    void testSaveNewDocumentOverTheLimitIsRejected() {
+        knowledgeBaseDocumentRepository.save(createDocument("Existing", 600L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(1_000L);
+
+        assertThatThrownBy(
+            () -> knowledgeBaseDocumentService.saveKnowledgeBaseDocument(createDocument("New", 500L)))
+                .isInstanceOf(KnowledgeBaseStorageLimitExceededException.class);
+
+        assertThat(knowledgeBaseDocumentRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    void testSaveGrowingDocumentChecksOnlyTheGrowth() {
+        KnowledgeBaseDocument document = knowledgeBaseDocumentRepository.save(createDocument("Growing", 300L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(600L);
+
+        document.setDocumentSize(500L);
+
+        KnowledgeBaseDocument savedDocument = knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document);
+
+        assertThat(savedDocument.getDocumentSize()).isEqualTo(500L);
+    }
+
+    @Test
+    void testSaveShrinkingDocumentSkipsTheCheck() {
+        KnowledgeBaseDocument document = knowledgeBaseDocumentRepository.save(createDocument("Shrinking", 800L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(100L);
+
+        document.setDocumentSize(500L);
+
+        assertThatCode(() -> knowledgeBaseDocumentService.saveKnowledgeBaseDocument(document))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testSaveDocumentWithoutSizeSkipsTheCheck() {
+        knowledgeBaseDocumentRepository.save(createDocument("Existing", 800L));
+
+        getKnowledgeBaseProperties().setMaxSizeBytes(100L);
+
+        assertThatCode(
+            () -> knowledgeBaseDocumentService.saveKnowledgeBaseDocument(createDocument("Unsized", null)))
+                .doesNotThrowAnyException();
+    }
+
+    private KnowledgeBaseDocument createDocument(String name, Long documentSize) {
+        KnowledgeBaseDocument document = createDocument(name);
+
+        document.setDocumentSize(documentSize);
+
+        return document;
+    }
+
+    private ApplicationProperties.Ai.KnowledgeBase getKnowledgeBaseProperties() {
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        return ai.getKnowledgeBase();
     }
 
     private KnowledgeBaseDocument createDocument(String name) {
