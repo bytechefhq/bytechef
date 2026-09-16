@@ -22,57 +22,27 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
 /**
- * The ref is the only thing that names a physical table, so the base name it accepts is what every generated
- * statement's identifier allowlist rests on.
+ * The ref is the only thing that names a physical table, so what it accepts is what every generated statement's
+ * identifier rests on.
  *
  * @author Ivica Cardic
  */
 class DataTableRefTest {
 
-    private static final long ENVIRONMENT_ID = 0L;
-
     @Test
-    void testThePhysicalNameIsThePrefixAndTheBaseName() {
-        DataTableRef dataTableRef = new DataTableRef("orders", ENVIRONMENT_ID);
+    void testPhysicalNameIsTheEnvironmentAndTheId() {
+        DataTableRef dataTableRef = new DataTableRef(1051L, 0L);
 
-        assertThat(dataTableRef.physicalName()).isEqualTo("dt_0_orders");
+        assertThat(dataTableRef.physicalName()).isEqualTo("dt_0_1051");
     }
 
     @Test
-    void testAMixedCaseBaseNameIsLowercased() {
-        DataTableRef dataTableRef = new DataTableRef("Orders", ENVIRONMENT_ID);
-
-        assertThat(dataTableRef.baseName()).isEqualTo("orders");
-        assertThat(dataTableRef.physicalName()).isEqualTo("dt_0_orders");
-    }
-
-    /**
-     * Postgres truncates an over-long identifier rather than refusing it, so two tables whose names agree in their
-     * first 63 bytes would silently become one table. A long enough base name is all it takes.
-     */
-    @Test
-    void testANameThatWouldTruncateIsRefused() {
-        assertThat(new DataTableRef("a".repeat(50), ENVIRONMENT_ID)
-            .physicalName())
-                .hasSizeLessThanOrEqualTo(63);
-
-        assertThatThrownBy(
-            () -> new DataTableRef("a".repeat(70), ENVIRONMENT_ID))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("exceeds 63 bytes");
+    void testRejectsANonPositiveId() {
+        assertThatThrownBy(() -> new DataTableRef(0L, 0L)).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void testABaseNameSpelledAsAPhysicalNameIsRefused() {
-        assertThatThrownBy(() -> new DataTableRef("dt_0_orders", ENVIRONMENT_ID))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("must not start with 'dt_'");
-    }
-
-    @Test
-    void testABaseNameOutsideTheIdentifierAllowlistIsRefused() {
-        assertThatThrownBy(() -> new DataTableRef("orders; DROP TABLE x", ENVIRONMENT_ID))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Invalid base name");
+    void testRejectsANegativeEnvironment() {
+        assertThatThrownBy(() -> new DataTableRef(1051L, -1L)).isInstanceOf(IllegalArgumentException.class);
     }
 }

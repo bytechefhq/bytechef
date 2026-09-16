@@ -17,12 +17,20 @@
 package com.bytechef.platform.data.table.execution.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.exception.DataTableStorageLimitExceededException;
+import com.bytechef.platform.data.table.execution.domain.CreateStrategy;
+import com.bytechef.platform.data.table.execution.domain.NewRow;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,10 +49,10 @@ class DataTableRowServiceEnforcementTest {
     void testInsertRowBlockedWhenOverLimit() {
         doThrow(new DataTableStorageLimitExceededException(60_000_000L, 52_428_800L))
             .when(dataTableStorageService)
-            .checkWithinLimit(0);
+            .checkWithinLimit(anyLong());
 
         assertThatThrownBy(
-            () -> dataTableRowService.insertRow(dataTableRef("orders", 1),
+            () -> dataTableRowService.insertRow(dataTableRef(),
                 Map.of("name", "x")))
                     .isInstanceOf(DataTableStorageLimitExceededException.class);
 
@@ -58,8 +66,42 @@ class DataTableRowServiceEnforcementTest {
             .checkWithinLimit(0);
 
         assertThatThrownBy(
-            () -> dataTableRowService.updateRow(dataTableRef("orders", 1), 1,
+            () -> dataTableRowService.updateRow(dataTableRef(), 1,
                 Map.of("name", "x")))
+                    .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verifyNoInteractions(jdbcTemplate);
+    }
+
+    @Test
+    void testInsertRowThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = createNearLimitDataTableRowService();
+
+        assertThatThrownBy(
+            () -> nearLimitDataTableRowService.insertRow(dataTableRef(), Map.of("name", "x".repeat(100))))
+                .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verifyNoInteractions(jdbcTemplate);
+    }
+
+    @Test
+    void testUpsertRowThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = createNearLimitDataTableRowService();
+
+        assertThatThrownBy(
+            () -> nearLimitDataTableRowService.upsertRow(dataTableRef(), "ORD-1", Map.of("name", "x".repeat(100))))
+                .isInstanceOf(DataTableStorageLimitExceededException.class);
+
+        verifyNoInteractions(jdbcTemplate);
+    }
+
+    @Test
+    void testInsertRowsThatWouldCrossTheLimitIsBlocked() {
+        DataTableRowServiceImpl nearLimitDataTableRowService = createNearLimitDataTableRowService();
+
+        assertThatThrownBy(
+            () -> nearLimitDataTableRowService.insertRows(
+                dataTableRef(), List.of(new NewRow(Map.of("name", "x".repeat(100)), null)), CreateStrategy.INSERT))
                     .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verifyNoInteractions(jdbcTemplate);
@@ -69,17 +111,32 @@ class DataTableRowServiceEnforcementTest {
     void testImportCsvBlockedWhenOverLimit() {
         doThrow(new DataTableStorageLimitExceededException(60_000_000L, 52_428_800L))
             .when(dataTableStorageService)
-            .checkWithinLimit(org.mockito.ArgumentMatchers.anyLong());
+            .checkWithinLimit(anyLong());
 
         assertThatThrownBy(
-            () -> dataTableRowService.importCsv(dataTableRef("orders", 1), "name\nx\n"))
+            () -> dataTableRowService.importCsv(dataTableRef(), "name\nx\n"))
                 .isInstanceOf(DataTableStorageLimitExceededException.class);
 
         verifyNoInteractions(jdbcTemplate);
     }
 
-    private static DataTableRef dataTableRef(String baseName, long environmentId) {
-        return new DataTableRef(baseName, environmentId);
+    @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
+    private DataTableRowServiceImpl createNearLimitDataTableRowService() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getDataTable()
+            .setMaxSizeBytes(1_000L);
+
+        JdbcTemplate storageJdbcTemplate = mock(JdbcTemplate.class);
+
+        when(storageJdbcTemplate.queryForObject(eq(DataTableStorageServiceImpl.USAGE_SQL), eq(Long.class)))
+            .thenReturn(990L);
+
+        return new DataTableRowServiceImpl(
+            eventPublisher, jdbcTemplate, new DataTableStorageServiceImpl(applicationProperties, storageJdbcTemplate));
     }
 
+    private static DataTableRef dataTableRef() {
+        return new DataTableRef(1051L, 0L);
+    }
 }

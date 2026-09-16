@@ -577,7 +577,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         outputResponse = actionDefinitionFacade.executeOutput(
             workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
-            connectionIds);
+            connectionIds, workflowId);
 
         return outputResponse;
     }
@@ -675,7 +675,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         return Optional.ofNullable(
             triggerDefinitionFacade.executeOutput(
                 workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
-                connectionId));
+                connectionId, workflowId));
     }
 
     private record WorkflowTaskDispatcherDynamicOutputResponse(

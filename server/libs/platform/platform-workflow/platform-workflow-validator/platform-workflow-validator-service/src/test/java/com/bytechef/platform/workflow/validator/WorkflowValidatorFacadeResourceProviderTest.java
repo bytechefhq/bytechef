@@ -38,22 +38,22 @@ class WorkflowValidatorFacadeResourceProviderTest {
             }
 
             @Override
-            public String findProblem(String reference, long environmentId) {
-                return reference + "@" + environmentId;
+            public String findProblem(String reference, long environmentId, String workflowId) {
+                return reference + "@" + environmentId + "@" + workflowId;
             }
         };
 
         WorkflowValidator.ResourceReferenceProvider provider =
             WorkflowValidatorFacadeImpl.createResourceReferenceProvider(
-                Map.of(ResourceType.DATA_TABLE, dataTableResolver), 2L);
+                Map.of(ResourceType.DATA_TABLE, dataTableResolver), 2L, "workflow-1");
 
-        assertEquals("conversations@2", provider.findProblem("DATA_TABLE", "conversations"));
+        assertEquals("conversations@2@workflow-1", provider.findProblem("DATA_TABLE", "conversations"));
     }
 
     @Test
     void unknownResourceTypeResolvesToNoProblem() {
         WorkflowValidator.ResourceReferenceProvider provider =
-            WorkflowValidatorFacadeImpl.createResourceReferenceProvider(Map.of(), 0L);
+            WorkflowValidatorFacadeImpl.createResourceReferenceProvider(Map.of(), 0L, null);
 
         assertNull(provider.findProblem("KNOWLEDGE_BASE", "7"));
     }

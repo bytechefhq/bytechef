@@ -27,5 +27,5 @@ public interface ResourceReferenceResolver {
     ResourceType getResourceType();
 
     @Nullable
-    String findProblem(String reference, long environmentId);
+    String findProblem(String reference, long environmentId, @Nullable String workflowId);
 }

@@ -33,6 +33,7 @@ import com.bytechef.platform.component.definition.TriggerContextAware;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -48,23 +49,25 @@ public class DataTableRecordDeletedTrigger {
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
     private final DataTableWebhookService dataTableWebhookService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableTriggerDefinition of(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
-        DataTableWebhookService dataTableWebhookService) {
+        DataTableWebhookService dataTableWebhookService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         return new DataTableRecordDeletedTrigger(
-            dataTableRowService, dataTableService, dataTableWebhookService).build();
+            dataTableRowService, dataTableService, dataTableWebhookService, dataTableWorkspaceResolver).build();
     }
 
     private DataTableRecordDeletedTrigger(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
-        DataTableWebhookService dataTableWebhookService) {
+        DataTableWebhookService dataTableWebhookService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
         this.dataTableWebhookService = dataTableWebhookService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableTriggerDefinition build() {
@@ -78,16 +81,17 @@ public class DataTableRecordDeletedTrigger {
                     .resourceReference(ResourceType.DATA_TABLE)
                     .description("Select a Data Table.")
                     .required(true)
-                    .options(DataTableUtils.getTriggerTableOptions(dataTableService)))
+                    .options(DataTableUtils.getTriggerTableOptions(dataTableService, dataTableWorkspaceResolver)))
             .output((inputParameters, connectionParameters, context) -> {
-                var baseName = inputParameters.getRequiredString(TABLE);
+                String name = inputParameters.getRequiredString(TABLE);
 
                 return DataTableUtils.createTriggerOutputResponse(
-                    dataTableRowService, dataTableService, baseName);
+                    dataTableRowService, dataTableService,
+                    DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, context), name);
             })
             .webhookEnable((
                 inputParameters, connectionParameters, webhookUrl, workflowExecutionId,
-                context) -> webhookEnable(inputParameters, webhookUrl, context))
+                context) -> webhookEnable(inputParameters, webhookUrl, workflowExecutionId, context))
             .webhookDisable((
                 inputParameters, connectionParameters, webhookEnableOutputParameters, workflowExecutionId,
                 context) -> webhookDisable(webhookEnableOutputParameters))
@@ -97,14 +101,17 @@ public class DataTableRecordDeletedTrigger {
     }
 
     private WebhookEnableOutput webhookEnable(
-        Parameters inputParameters, String webhookUrl, TriggerContext triggerContext) {
+        Parameters inputParameters, String webhookUrl, String workflowExecutionId, TriggerContext triggerContext) {
 
         TriggerContextAware triggerContextAware = (TriggerContextAware) triggerContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, workflowExecutionId);
 
         long webhookId = DataTableUtils.registerWebhook(
-            dataTableService, dataTableWebhookService, baseName, webhookUrl, DataTableWebhookType.RECORD_DELETED,
+            dataTableService, dataTableWebhookService, workspaceId, name, webhookUrl,
+            DataTableWebhookType.RECORD_DELETED,
             Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);

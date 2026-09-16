@@ -17,27 +17,27 @@
 package com.bytechef.automation.data.table.security;
 
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.repository.WorkspaceDataTableRepository;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Maps a data-table id to its owning workspace via the {@code workspace_data_table} relation. Data tables are
+ * Maps a data-table id to its owning workspace via the {@code data_table.workspace_id} column. Data tables are
  * collaborative, workspace-scoped resources: EE authorizes by the caller's workspace role; CE is permissive (shared
- * within the single workspace). Fails closed when the table is not mapped to any workspace.
+ * within the single workspace). Fails closed when the table does not exist or belongs to no workspace.
  *
  * @author Ivica Cardic
  */
 @Component
 public class DataTableOwnershipResolver implements ResourceOwnershipResolver {
 
-    private final WorkspaceDataTableRepository workspaceDataTableRepository;
+    private final DataTableService dataTableService;
 
     @SuppressFBWarnings("EI")
-    public DataTableOwnershipResolver(WorkspaceDataTableRepository workspaceDataTableRepository) {
-        this.workspaceDataTableRepository = workspaceDataTableRepository;
+    public DataTableOwnershipResolver(DataTableService dataTableService) {
+        this.dataTableService = dataTableService;
     }
 
     @Override
@@ -47,14 +47,20 @@ public class DataTableOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        List<WorkspaceDataTable> workspaceDataTables = workspaceDataTableRepository.findByDataTableId(id);
+        DataTable dataTable;
 
-        if (workspaceDataTables.isEmpty()) {
+        try {
+            dataTable = dataTableService.getDataTable(id);
+        } catch (DataTableException dataTableException) {
             return ResourceOwner.unknown();
         }
 
-        WorkspaceDataTable workspaceDataTable = workspaceDataTables.getFirst();
+        Long workspaceId = dataTable.getWorkspaceId();
 
-        return ResourceOwner.ofWorkspace(workspaceDataTable.getWorkspaceId());
+        if (workspaceId == null) {
+            return ResourceOwner.unknown();
+        }
+
+        return ResourceOwner.ofWorkspace(workspaceId);
     }
 }

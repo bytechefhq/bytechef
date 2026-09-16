@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -43,9 +44,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.RowMapper;
 
 /**
  * @author Ivica Cardic
@@ -76,12 +76,12 @@ class DataTableServiceTest {
      */
     @Test
     void testCreateTableExecutesTheSharedCreateStatement() {
-        when(dataTableRepository.save(any(DataTable.class))).thenReturn(new DataTable(1L, "conversations"));
+        when(dataTableRepository.findByWorkspaceIdAndName(1L, "conversations")).thenReturn(Optional.empty());
+        when(dataTableRepository.save(any(DataTable.class))).thenReturn(new DataTable(1051L, "conversations"));
 
         List<ColumnSpec> columnSpecs = List.of(new ColumnSpec("title", ColumnType.STRING));
 
-        dataTableService.createTable(
-            "conversations", null, columnSpecs, 0);
+        long dataTableId = dataTableService.createTable(1L, "conversations", null, columnSpecs, 0);
 
         ArgumentCaptor<String> sqlArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -89,10 +89,24 @@ class DataTableServiceTest {
 
         List<String> executedSqls = sqlArgumentCaptor.getAllValues();
 
+        assertEquals(1051L, dataTableId);
         assertTrue(
-            executedSqls.contains(DataTableServiceImpl.buildCreateTableSql("dt_0_conversations", columnSpecs)),
+            executedSqls.contains(DataTableServiceImpl.buildCreateTableSql("dt_0_1051", columnSpecs)),
             "createTable must build its DDL through buildCreateTableSql: " + executedSqls);
+    }
 
+    @Test
+    void testCreateTableReusesTheWorkspaceRowInASecondEnvironment() {
+        when(dataTableRepository.findByWorkspaceIdAndName(1L, "conversations"))
+            .thenReturn(Optional.of(new DataTable(1051L, "conversations")));
+
+        List<ColumnSpec> columnSpecs = List.of(new ColumnSpec("title", ColumnType.STRING));
+
+        long dataTableId = dataTableService.createTable(1L, "conversations", null, columnSpecs, 2);
+
+        assertEquals(1051L, dataTableId);
+        verify(dataTableRepository, never()).save(any(DataTable.class));
+        verify(jdbcTemplate).execute(DataTableServiceImpl.buildCreateTableSql("dt_2_1051", columnSpecs));
     }
 
     @Test
@@ -100,7 +114,7 @@ class DataTableServiceTest {
         DataTableException dataTableException = assertThrows(
             DataTableException.class,
             () -> dataTableService.createTable(
-                "conversations", null, List.of(new ColumnSpec("external_id", ColumnType.STRING)), 0));
+                1L, "conversations", null, List.of(new ColumnSpec("external_id", ColumnType.STRING)), 0));
 
         assertEquals(DataTableErrorType.COLUMN_NAME_INVALID.getErrorKey(), dataTableException.getErrorKey());
     }
@@ -109,12 +123,9 @@ class DataTableServiceTest {
     void testDropTableShouldDeleteMetadataWhenNoPhysicalTablesRemain() {
         givenRegistryRow();
 
-        when(jdbcTemplate.query(anyString(), any(PreparedStatementSetter.class), any(RowMapper.class)))
-            .thenReturn(List.of());
+        dataTableService.dropTable(DATA_TABLE_ID, 1L);
 
-        dataTableService.dropTable("mytable", 1L);
-
-        verify(jdbcTemplate).execute(contains("DROP TABLE IF EXISTS"));
+        verify(jdbcTemplate).execute("DROP TABLE IF EXISTS \"dt_1_7\"");
         verify(dataTableRepository).deleteById(DATA_TABLE_ID);
     }
 
@@ -122,13 +133,46 @@ class DataTableServiceTest {
     void testDropTableShouldPreserveMetadataWhenPhysicalTablesExistInOtherEnvironments() {
         givenRegistryRow();
 
-        when(jdbcTemplate.query(anyString(), any(PreparedStatementSetter.class), any(RowMapper.class)))
-            .thenReturn(List.of("dt_2_mytable"));
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), any()))
+            .thenAnswer(invocation -> "dt_2_7".equals(invocation.getArgument(2)) ? 1 : 0);
 
-        dataTableService.dropTable("mytable", 1L);
+        dataTableService.dropTable(DATA_TABLE_ID, 1L);
 
         verify(jdbcTemplate).execute(contains("DROP TABLE IF EXISTS"));
         verify(dataTableRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testDropTableOfAnUnknownIdDoesNothing() {
+        when(dataTableRepository.findById(DATA_TABLE_ID)).thenReturn(Optional.empty());
+
+        dataTableService.dropTable(DATA_TABLE_ID, 1L);
+
+        verify(jdbcTemplate, never()).execute(anyString());
+        verify(dataTableRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testFetchDataTableWithoutAWorkspaceLooksUpTheUnscopedRow() {
+        DataTable dataTable = new DataTable(DATA_TABLE_ID, "mytable");
+
+        when(dataTableRepository.findByWorkspaceIdIsNullAndName("mytable")).thenReturn(Optional.of(dataTable));
+
+        assertEquals(Optional.of(dataTable), dataTableService.fetchDataTable(null, "MyTable"));
+    }
+
+    @Test
+    void testRenameTableTranslatesAConcurrentDuplicateName() {
+        givenRegistryRow();
+
+        when(dataTableRepository.findByWorkspaceIdIsNullAndName("orders")).thenReturn(Optional.empty());
+        when(dataTableRepository.save(any(DataTable.class))).thenThrow(new DuplicateKeyException("duplicate"));
+
+        DataTableException dataTableException = assertThrows(
+            DataTableException.class, () -> dataTableService.renameTable(DATA_TABLE_ID, "orders"));
+
+        assertEquals("Data table 'orders' already exists in this workspace", dataTableException.getMessage());
+        assertEquals(DataTableErrorType.DATA_TABLE_ALREADY_EXISTS.getErrorKey(), dataTableException.getErrorKey());
     }
 
     /**
@@ -138,7 +182,7 @@ class DataTableServiceTest {
     private void givenRegistryRow() {
         DataTable dataTable = new DataTable(DATA_TABLE_ID, "mytable");
 
-        when(dataTableRepository.findByName("mytable"))
+        when(dataTableRepository.findById(DATA_TABLE_ID))
             .thenReturn(Optional.of(dataTable));
     }
 }

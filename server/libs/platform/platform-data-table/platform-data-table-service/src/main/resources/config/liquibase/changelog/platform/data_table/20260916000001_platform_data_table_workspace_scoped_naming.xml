@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd"
+                   logicalFilePath="config/liquibase/changelog/platform/data_table/20260916000001_platform_data_table_workspace_scoped_naming.xml">
+
+    <changeSet id="20260916000001-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="data_table" columnName="workspace_id"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="data_table">
+            <column name="workspace_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260916000001-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE UPPER(table_schema) = UPPER(COALESCE(NULLIF('${database.defaultSchemaName}', ''), current_schema()))
+                AND UPPER(table_name) = 'DATA_TABLE'
+                AND UPPER(constraint_name) = 'UK_DATA_TABLE_NAME' AND constraint_type = 'UNIQUE'
+            </sqlCheck>
+        </preConditions>
+
+        <dropUniqueConstraint tableName="data_table" constraintName="uk_data_table_name"/>
+    </changeSet>
+
+    <changeSet id="20260916000001-3" author="Ivica Cardic">
+        <customChange class="com.bytechef.platform.data.table.configuration.migration.DataTableWorkspaceScopedNamingChange"/>
+    </changeSet>
+
+    <changeSet id="20260916000001-4" author="Ivica Cardic">
+        <addUniqueConstraint tableName="data_table" columnNames="workspace_id,name"
+                             constraintName="uk_data_table_workspace_name"/>
+    </changeSet>
+
+    <changeSet id="20260916000001-5" author="Ivica Cardic" context="mono">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="workspace"/>
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_data_table_workspace"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint
+            baseColumnNames="workspace_id"
+            baseTableName="data_table"
+            constraintName="fk_data_table_workspace"
+            referencedColumnNames="id"
+            referencedTableName="workspace"/>
+    </changeSet>
+</databaseChangeLog>

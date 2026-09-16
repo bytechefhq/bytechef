@@ -35,6 +35,7 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -51,19 +52,24 @@ public class DataTableUpdateRecordAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableUpdateRecordAction(dataTableService, dataTableRowService).build();
+        return new DataTableUpdateRecordAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
     private DataTableUpdateRecordAction(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -75,14 +81,14 @@ public class DataTableUpdateRecordAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 integer(ID)
                     .label("Record ID")
                     .required(true),
                 dynamicProperties(VALUES)
                     .propertiesLookupDependsOn(TABLE)
                     .properties(
-                        DataTableUtils.createDynamicProperties(dataTableService, true))
+                        DataTableUtils.createDynamicProperties(dataTableService, dataTableWorkspaceResolver, true))
                     .required(true))
             .output(this::output)
             .perform(this::perform);
@@ -92,10 +98,12 @@ public class DataTableUpdateRecordAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
 
         ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
-            dataTableService, baseName, DEVELOPMENT.ordinal());
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
 
         DataTableInfo dataTableInfo = resolvedDataTable.dataTableInfo();
 
@@ -123,14 +131,16 @@ public class DataTableUpdateRecordAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
         long id = inputParameters.getRequiredLong(ID);
         Map<String, Object> values = (Map<String, Object>) inputParameters.getRequired(VALUES, Map.class);
 
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
 
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
+
         ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
-            dataTableService, baseName, environmentId);
+            dataTableService, workspaceId, name, environmentId);
 
         return DataTableUtils.flattenRow(
             dataTableRowService.updateRow(resolvedDataTable.dataTableRef(), id, values));

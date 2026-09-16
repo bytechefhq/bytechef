@@ -11,6 +11,7 @@ import com.bytechef.ee.automation.data.table.public_.web.rest.model.EnvironmentM
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -50,12 +51,16 @@ public class DataTableApiSupport {
     }
 
     /**
-     * Resolves the public name to the guarded id; an unknown name is the typed not-found the handler maps to 404.
+     * Resolves the public name within the path workspace to the guarded id; a name unknown in that workspace is the
+     * typed not-found the handler maps to 404.
      */
-    public long resolveTableId(String name) {
+    public long resolveTableId(long workspaceId, String name) {
         validateTableName(name);
 
-        return dataTableService.getIdByBaseName(name);
+        return dataTableService.fetchDataTable(workspaceId, name)
+            .map(DataTable::getId)
+            .orElseThrow(() -> new DataTableException(
+                "Data table '" + name + "' not found in this workspace", DataTableErrorType.DATA_TABLE_NOT_FOUND));
     }
 
     public static void validateTableName(String name) {

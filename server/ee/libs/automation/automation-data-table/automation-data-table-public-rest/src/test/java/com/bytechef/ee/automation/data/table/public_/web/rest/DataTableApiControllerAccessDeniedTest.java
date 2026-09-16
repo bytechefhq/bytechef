@@ -16,8 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
@@ -54,7 +56,11 @@ class DataTableApiControllerAccessDeniedTest {
     @BeforeEach
     void beforeEach() {
         when(environmentService.getEnvironment((String) null)).thenReturn(Environment.PRODUCTION);
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        DataTable orders = new DataTable(7L, "orders");
+
+        orders.setWorkspaceId(1L);
+
+        when(dataTableService.fetchDataTable(1L, "orders")).thenReturn(Optional.of(orders));
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
             .thenThrow(new AccessDeniedException("denied"));
 
@@ -68,7 +74,7 @@ class DataTableApiControllerAccessDeniedTest {
 
     @Test
     void testAccessDeniedOnAnItemUrlIs404() throws Exception {
-        mockMvc.perform(get("/api/automation/v1/data-tables/orders"))
+        mockMvc.perform(get("/api/automation/v1/workspaces/1/data-tables/orders"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()));
     }

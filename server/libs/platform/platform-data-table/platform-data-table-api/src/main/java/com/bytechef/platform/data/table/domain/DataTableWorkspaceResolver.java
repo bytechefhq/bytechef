@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.data.table.configuration.repository;
+package com.bytechef.platform.data.table.domain;
 
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import java.util.List;
-import org.springframework.data.repository.ListCrudRepository;
+import com.bytechef.platform.constant.PlatformType;
+import java.util.OptionalLong;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkspaceDataTableRepository extends ListCrudRepository<WorkspaceDataTable, Long> {
+public interface DataTableWorkspaceResolver {
 
-    List<WorkspaceDataTable> findAllByWorkspaceId(Long workspaceId);
+    OptionalLong resolveByWorkflowId(String workflowId);
 
-    List<WorkspaceDataTable> findByDataTableId(Long dataTableId);
+    OptionalLong resolveByJobPrincipalId(long jobPrincipalId, PlatformType platformType);
 
-    WorkspaceDataTable findByWorkspaceIdAndDataTableId(Long workspaceId, Long dataTableId);
+    OptionalLong resolveByWorkflowUuid(String workflowUuid);
 }

@@ -95,9 +95,9 @@ public abstract class AbstractDataTableApiController {
     }
 
     /**
-     * Names are guessable, so on item URLs a denial answers exactly like a missing table: a caller learns nothing about
-     * tables in workspaces they cannot see. Under /workspaces the caller already named the workspace, so a plain 403
-     * leaks nothing and is the more useful answer.
+     * Names are guessable, so on table URLs a denial answers exactly like a missing table: a caller learns nothing
+     * about which names exist in workspaces they cannot see. On the workspace's collection URL no table name is
+     * involved, so a plain 403 leaks nothing and is the more useful answer.
      */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ProblemDetail> handleAccessDenied(

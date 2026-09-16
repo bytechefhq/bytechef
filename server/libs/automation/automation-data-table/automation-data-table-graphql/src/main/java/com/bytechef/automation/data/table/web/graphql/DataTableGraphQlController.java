@@ -99,7 +99,7 @@ public class DataTableGraphQlController {
                     .toList();
 
                 return new DataTable(
-                    info.id(), info.baseName(), info.description(), dataTableColumns,
+                    info.id(), info.name(), info.description(), dataTableColumns,
                     instant != null ? instant.toEpochMilli() : null);
             })
             .toList();
@@ -150,9 +150,7 @@ public class DataTableGraphQlController {
 
     @MutationMapping
     public boolean renameDataTable(@Argument RenameDataTableInput input) {
-        Environment environment = environmentService.getEnvironment(input.environmentId());
-
-        workspaceDataTableFacade.renameTable(input.tableId(), input.newBaseName(), environment.ordinal());
+        workspaceDataTableFacade.renameTable(input.tableId(), input.newBaseName());
 
         return true;
     }

@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.data.table.public_.web.rest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,6 +20,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.ColumnTypeModel;
@@ -31,7 +35,9 @@ import com.bytechef.ee.automation.data.table.public_.web.rest.model.RenameColumn
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.UpdateDataTableRequestModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
@@ -40,11 +46,15 @@ import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
  * @version ee
@@ -57,20 +67,26 @@ class DataTableApiControllerTest {
     private final DataTableService dataTableService = mock(DataTableService.class);
     private final EnvironmentService environmentService = mock(EnvironmentService.class);
     private DataTableApiController controller;
+    private MockMvc mockMvc;
 
     @BeforeEach
     void beforeEach() {
         when(environmentService.getEnvironment((String) null)).thenReturn(Environment.PRODUCTION);
         when(environmentService.getEnvironment("STAGING")).thenReturn(Environment.STAGING);
+        when(environmentService.getEnvironment("DEVELOPMENT")).thenReturn(Environment.DEVELOPMENT);
 
         controller = new DataTableApiController(facade, new DataTableApiSupport(dataTableService, environmentService));
+
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .addPlaceholderValue("openapi.openAPIDefinition.base-path.automation", "/api/automation")
+            .build();
     }
 
     @Test
     void testListFiltersByTagAndMapsColumns() {
-        DataTableInfo orders = new DataTableInfo(
-            7L, "orders", "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH);
-        DataTableInfo other = new DataTableInfo(8L, "other", null, List.of(), Instant.EPOCH);
+        DataTableInfo orders = new DataTableInfo(7L, "orders", 1L, "d",
+            List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH);
+        DataTableInfo other = new DataTableInfo(8L, "other", 1L, null, List.of(), Instant.EPOCH);
 
         when(facade.listTables(1L, Environment.STAGING.ordinal())).thenReturn(List.of(orders, other));
         when(facade.getDataTableTags(1L)).thenReturn(List.of());
@@ -98,8 +114,8 @@ class DataTableApiControllerTest {
 
     @Test
     void testListWithNoTagFilterReturnsEveryTable() {
-        DataTableInfo orders = new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH);
-        DataTableInfo other = new DataTableInfo(8L, "other", null, List.of(), Instant.EPOCH);
+        DataTableInfo orders = new DataTableInfo(7L, "orders", 1L, "d", List.of(), Instant.EPOCH);
+        DataTableInfo other = new DataTableInfo(8L, "other", 1L, null, List.of(), Instant.EPOCH);
 
         when(facade.listTables(1L, Environment.PRODUCTION.ordinal())).thenReturn(List.of(orders, other));
         when(facade.getTagsByTableId(1L)).thenReturn(Map.of(7L, List.of(new Tag("hot"))));
@@ -112,9 +128,10 @@ class DataTableApiControllerTest {
 
     @Test
     void testCreateValidatesNamesThenCreatesThenReturnsTheTable() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        when(facade.createTable(eq("orders"), any(), anyList(), eq(1L), eq((long) Environment.PRODUCTION.ordinal())))
+            .thenReturn(7L);
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, "d", List.of(), Instant.EPOCH));
         when(facade.getTagsByTableId(1L)).thenReturn(Map.of());
 
         ResponseEntity<DataTableModel> response = controller.createDataTable(
@@ -138,13 +155,20 @@ class DataTableApiControllerTest {
                 tags -> tags.size() == 1 && "hot".equals(
                     tags.getFirst()
                         .getName())));
+        verifyNoInteractions(dataTableService);
+
+        DataTableModel dataTableModel = Objects.requireNonNull(response.getBody());
+
+        assertEquals(7L, dataTableModel.getId());
+        assertEquals(1L, dataTableModel.getWorkspaceId());
     }
 
     @Test
     void testCreateWithoutTagsNeverCallsUpdateTags() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        when(facade.createTable(eq("orders"), any(), anyList(), eq(1L), eq((long) Environment.PRODUCTION.ordinal())))
+            .thenReturn(7L);
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", null, List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, null, List.of(), Instant.EPOCH));
         when(facade.getTagsByTableId(1L)).thenReturn(Map.of());
 
         controller.createDataTable(
@@ -193,36 +217,71 @@ class DataTableApiControllerTest {
 
     @Test
     void testGetDataTable() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)),
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, "d", List.of(new ColumnSpec("total", ColumnType.NUMBER)),
                 Instant.EPOCH));
-        when(facade.getWorkspaceId(7L)).thenReturn(1L);
         when(facade.getTagsByTableId(1L)).thenReturn(Map.of(7L, List.of(new Tag("hot"))));
 
-        ResponseEntity<DataTableModel> response = controller.getDataTable("orders", null);
+        ResponseEntity<DataTableModel> response = controller.getDataTable(1L, "orders", null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         DataTableModel model = response.getBody();
 
+        assertEquals(7L, model.getId());
+        assertEquals(1L, model.getWorkspaceId());
         assertEquals("orders", model.getName());
         assertEquals(
             ColumnTypeModel.NUMBER, model.getColumns()
                 .getFirst()
                 .getType());
         assertEquals(List.of("hot"), model.getTags());
+
+        verify(facade, never()).getWorkspaceId(anyLong());
+    }
+
+    @Test
+    void testGetDataTableResolvesTheNameWithinThePathWorkspace() throws Exception {
+        DataTable ordersInWorkspaceEight = new DataTable(2051L, "orders");
+
+        ordersInWorkspaceEight.setWorkspaceId(8L);
+
+        when(dataTableService.fetchDataTable(8L, "orders")).thenReturn(Optional.of(ordersInWorkspaceEight));
+        when(facade.getTable(2051L, 0L)).thenReturn(
+            new DataTableInfo(2051L, "orders", 8L, null, List.of(), Instant.EPOCH));
+
+        mockMvc
+            .perform(get("/api/automation/v1/workspaces/8/data-tables/orders").header("X-Environment", "DEVELOPMENT"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(2051))
+            .andExpect(jsonPath("$.workspaceId").value(8));
+
+        verify(facade).getTagsByTableId(8L);
+    }
+
+    @Test
+    void testGetDataTableReturnsNotFoundForAnotherWorkspacesName() throws Exception {
+        when(dataTableService.fetchDataTable(7L, "orders")).thenReturn(Optional.empty());
+
+        mockMvc
+            .perform(get("/api/automation/v1/workspaces/7/data-tables/orders").header("X-Environment", "DEVELOPMENT"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()))
+            .andExpect(jsonPath("$.detail").value("Data table 'orders' not found in this workspace"));
+
+        verifyNoInteractions(facade);
     }
 
     @Test
     void testUpdateLeavesOmittedFieldsAlone() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, "d", List.of(), Instant.EPOCH));
         when(facade.getTagsByTableId(anyLong())).thenReturn(Map.of());
 
-        ResponseEntity<DataTableModel> response = controller.updateDataTable(
-            "orders", new UpdateDataTableRequestModel().description("new"), null);
+        ResponseEntity<DataTableModel> response =
+            controller.updateDataTable(1L, "orders", new UpdateDataTableRequestModel().description("new"), null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
@@ -232,12 +291,12 @@ class DataTableApiControllerTest {
 
     @Test
     void testUpdateWithOnlyTagsLeavesDescriptionAlone() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, "d", List.of(), Instant.EPOCH));
         when(facade.getTagsByTableId(anyLong())).thenReturn(Map.of());
 
-        controller.updateDataTable("orders", new UpdateDataTableRequestModel().tags(List.of("hot")), null);
+        controller.updateDataTable(1L, "orders", new UpdateDataTableRequestModel().tags(List.of("hot")), null);
 
         verify(facade, never()).updateDescription(anyLong(), anyString());
         verify(facade).updateTags(
@@ -255,12 +314,12 @@ class DataTableApiControllerTest {
      */
     @Test
     void testUpdateTreatsTagsAsThreeState() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", "d", List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, "d", List.of(), Instant.EPOCH));
         when(facade.getTagsByTableId(anyLong())).thenReturn(Map.of());
 
-        controller.updateDataTable("orders", new UpdateDataTableRequestModel().description("new"), null);
+        controller.updateDataTable(1L, "orders", new UpdateDataTableRequestModel().description("new"), null);
 
         verify(facade, never()).updateTags(anyLong(), anyList());
 
@@ -268,11 +327,11 @@ class DataTableApiControllerTest {
 
         clearRequest.setTags(JsonNullable.of(null));
 
-        controller.updateDataTable("orders", clearRequest, null);
+        controller.updateDataTable(1L, "orders", clearRequest, null);
 
         verify(facade).updateTags(eq(7L), argThat(List::isEmpty));
 
-        controller.updateDataTable("orders", new UpdateDataTableRequestModel().tags(List.of("hot")), null);
+        controller.updateDataTable(1L, "orders", new UpdateDataTableRequestModel().tags(List.of("hot")), null);
 
         verify(facade).updateTags(
             eq(7L), argThat(
@@ -283,10 +342,10 @@ class DataTableApiControllerTest {
 
     @Test
     void testDeleteIs204() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
 
         assertEquals(
-            HttpStatus.NO_CONTENT, controller.deleteDataTable("orders", null)
+            HttpStatus.NO_CONTENT, controller.deleteDataTable(1L, "orders", null)
                 .getStatusCode());
 
         verify(facade).dropTable(7L, Environment.PRODUCTION.ordinal());
@@ -294,18 +353,18 @@ class DataTableApiControllerTest {
 
     @Test
     void testColumnOperationsResolveTheTableOnce() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal()))
-            .thenReturn(new DataTableInfo(7L, "orders", null, List.of(), Instant.EPOCH));
+            .thenReturn(new DataTableInfo(7L, "orders", 1L, null, List.of(), Instant.EPOCH));
         when(facade.getTagsByTableId(anyLong())).thenReturn(Map.of());
 
-        ResponseEntity<DataTableModel> createColumnResponse = controller.createColumn(
-            "orders", new CreateColumnRequestModel().name("qty")
+        ResponseEntity<DataTableModel> createColumnResponse = controller.createColumn(1L, "orders",
+            new CreateColumnRequestModel().name("qty")
                 .type(ColumnTypeModel.INTEGER),
             null);
-        ResponseEntity<DataTableModel> renameColumnResponse = controller.renameColumn(
-            "orders", "qty", new RenameColumnRequestModel().newName("quantity"), null);
-        ResponseEntity<Void> deleteColumnResponse = controller.deleteColumn("orders", "quantity", null);
+        ResponseEntity<DataTableModel> renameColumnResponse =
+            controller.renameColumn(1L, "orders", "qty", new RenameColumnRequestModel().newName("quantity"), null);
+        ResponseEntity<Void> deleteColumnResponse = controller.deleteColumn(1L, "orders", "quantity", null);
 
         assertEquals(HttpStatus.CREATED, createColumnResponse.getStatusCode());
         assertEquals(HttpStatus.OK, renameColumnResponse.getStatusCode());
@@ -320,12 +379,19 @@ class DataTableApiControllerTest {
     void testCreateColumnRejectsAReservedNameBeforeTouchingTheFacade() {
         assertThrows(
             DataTableException.class,
-            () -> controller.createColumn(
-                "orders", new CreateColumnRequestModel().name("external_id")
-                    .type(ColumnTypeModel.STRING),
+            () -> controller.createColumn(1L, "orders", new CreateColumnRequestModel().name("external_id")
+                .type(ColumnTypeModel.STRING),
                 null));
 
         verifyNoInteractions(facade);
         verifyNoInteractions(dataTableService);
+    }
+
+    private void stubOrders() {
+        DataTable orders = new DataTable(7L, "orders");
+
+        orders.setWorkspaceId(1L);
+
+        when(dataTableService.fetchDataTable(1L, "orders")).thenReturn(Optional.of(orders));
     }
 }

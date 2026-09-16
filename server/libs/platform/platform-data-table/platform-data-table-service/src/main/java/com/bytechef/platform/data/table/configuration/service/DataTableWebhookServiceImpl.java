@@ -17,7 +17,6 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhook;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.repository.DataTableWebhookRepository;
@@ -25,7 +24,6 @@ import com.bytechef.platform.data.table.domain.DataTableRef;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,7 +32,7 @@ import org.springframework.stereotype.Service;
  * retrieval, and removal of webhooks.
  *
  * <p>
- * Registration and delivery go through the same table resolution, which is what makes them meet: whatever table a ref
+ * Registration and delivery both key on the ref's registry id, which is what makes them meet: whatever table a ref
  * addresses at registration time is the table an event on that same ref is delivered to.
  *
  * @author Ivica Cardic
@@ -42,24 +40,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
-    private final DataTableService dataTableService;
     private final DataTableWebhookRepository webhookRepository;
 
     @SuppressFBWarnings("EI")
-    public DataTableWebhookServiceImpl(
-        DataTableService dataTableService, DataTableWebhookRepository webhookRepository) {
-
-        this.dataTableService = dataTableService;
+    public DataTableWebhookServiceImpl(DataTableWebhookRepository webhookRepository) {
         this.webhookRepository = webhookRepository;
     }
 
     @Override
     public long addWebhook(DataTableRef dataTableRef, String url, DataTableWebhookType type) {
-        DataTable dataTable = resolveDataTable(dataTableRef);
-
         DataTableWebhook dataTableWebhook = new DataTableWebhook();
 
-        dataTableWebhook.setDataTableId(dataTable.getId());
+        dataTableWebhook.setDataTableId(dataTableRef.dataTableId());
         dataTableWebhook.setType(type);
         dataTableWebhook.setUrl(url);
         dataTableWebhook.setEnvironment(Environment.values()[(int) dataTableRef.environmentId()]);
@@ -71,15 +63,7 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
 
     @Override
     public List<Webhook> listWebhooks(DataTableRef dataTableRef) {
-        Optional<DataTable> dataTableOptional = dataTableService.fetchDataTable(dataTableRef);
-
-        if (dataTableOptional.isEmpty()) {
-            return List.of();
-        }
-
-        DataTable dataTable = dataTableOptional.get();
-
-        return findWebhooks(dataTable.getId(), dataTableRef.environmentId());
+        return findWebhooks(dataTableRef.dataTableId(), dataTableRef.environmentId());
     }
 
     @Override
@@ -108,12 +92,5 @@ public class DataTableWebhookServiceImpl implements DataTableWebhookService {
         }
 
         return webhooks;
-    }
-
-    private DataTable resolveDataTable(DataTableRef dataTableRef) {
-        Optional<DataTable> dataTableOptional = dataTableService.fetchDataTable(dataTableRef);
-
-        return dataTableOptional.orElseThrow(
-            () -> new IllegalArgumentException("Table not found: " + dataTableRef.baseName()));
     }
 }

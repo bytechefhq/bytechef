@@ -43,8 +43,8 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public void createTable(
-        String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
+    public long createTable(
+        String name, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
 
         throw new UnsupportedOperationException();
     }
@@ -55,7 +55,7 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public void duplicateTable(long dataTableId, String newBaseName, long environmentId) {
+    public long duplicateTable(long dataTableId, String newName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 
@@ -75,7 +75,7 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
-    public void renameTable(long dataTableId, String newBaseName, long environmentId) {
+    public void renameTable(long dataTableId, String newName) {
         throw new UnsupportedOperationException();
     }
 

@@ -16,13 +16,16 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import com.bytechef.platform.data.table.domain.DataTableRef;
@@ -31,10 +34,12 @@ import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.test.config.h2.H2DataSourceConfiguration;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -44,8 +49,8 @@ import org.springframework.context.annotation.Import;
 class DataTableServiceH2IntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
-
-    private static final PlatformType PLATFORM_TYPE = PlatformType.AUTOMATION;
+    private static final long STAGE_ENVIRONMENT_ID = 1;
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -53,42 +58,125 @@ class DataTableServiceH2IntTest {
     @Autowired
     private DataTableRowService dataTableRowService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void beforeEach() {
+        DataTableServiceIntTest.dropAll(jdbcTemplate);
+    }
+
+    @Test
+    void testTwoWorkspacesCanOwnTheSameName() {
+        long firstId = dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long secondId = dataTableService.createTable(
+            2L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRowService.insertRow(new DataTableRef(firstId, DEV_ENVIRONMENT_ID), Map.of("title", "first"));
+        dataTableRowService.insertRow(new DataTableRef(secondId, DEV_ENVIRONMENT_ID), Map.of("title", "second"));
+
+        assertThat(firstId).isNotEqualTo(secondId);
+        assertThat(dataTableService.fetchDataTable(1L, "orders")).map(DataTable::getId)
+            .contains(firstId);
+        assertThat(dataTableService.fetchDataTable(2L, "orders")).map(DataTable::getId)
+            .contains(secondId);
+        assertThat(dataTableRowService.listRows(new DataTableRef(secondId, DEV_ENVIRONMENT_ID), 10, 0))
+            .extracting(dataTableRow -> dataTableRow.values()
+                .get("title"))
+            .containsExactly("second");
+    }
+
+    @Test
+    void testCreatingTheSameNameTwiceInOneEnvironmentIsRejected() {
+        dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        assertThatThrownBy(() -> dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID))
+                .isInstanceOf(DataTableException.class)
+                .hasMessage("Data table 'orders' already exists in this workspace");
+    }
+
+    @Test
+    void testRenamingOntoAnExistingNameInTheWorkspaceIsRejected() {
+        dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        long invoicesId = dataTableService.createTable(
+            1L, "invoices", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        assertThatThrownBy(() -> dataTableService.renameTable(invoicesId, "orders"))
+            .isInstanceOf(DataTableException.class)
+            .hasMessage("Data table 'orders' already exists in this workspace");
+    }
+
+    @Test
+    void testDuplicateLandsInTheSourceWorkspaceAndRejectsAnExistingName() {
+        long ordersId = dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        long copyId = dataTableService.duplicateTable(ordersId, "orders_copy", DEV_ENVIRONMENT_ID);
+
+        assertThat(dataTableService.getDataTable(copyId)
+            .getWorkspaceId()).isEqualTo(1L);
+        assertThatThrownBy(() -> dataTableService.duplicateTable(ordersId, "orders_copy", DEV_ENVIRONMENT_ID))
+            .isInstanceOf(DataTableException.class)
+            .hasMessage("Data table 'orders_copy' already exists in this workspace");
+    }
+
+    @Test
+    void testRenameKeepsEveryEnvironmentReachable() {
+        long ordersId = dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableService.createTable(
+            1L, "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), STAGE_ENVIRONMENT_ID);
+        dataTableRowService.insertRow(new DataTableRef(ordersId, STAGE_ENVIRONMENT_ID), Map.of("title", "staged"));
+
+        dataTableService.renameTable(ordersId, "purchases");
+
+        assertThat(dataTableService.fetchDataTable(1L, "purchases")).map(DataTable::getId)
+            .contains(ordersId);
+        assertThat(dataTableRowService.listRows(new DataTableRef(ordersId, STAGE_ENVIRONMENT_ID), 10, 0)).hasSize(1);
+    }
+
     @Test
     void testCreateTableAndListTables() {
-        dataTableService.createTable(
-            "created", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long createdId = dataTableService.createTable(
+            WORKSPACE_ID, "created", "a description", List.of(new ColumnSpec("title", ColumnType.STRING)),
+            DEV_ENVIRONMENT_ID);
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEV_ENVIRONMENT_ID);
+        List<DataTableInfo> dataTableInfos = dataTableService.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
         assertTrue(
             dataTableInfos.stream()
-                .anyMatch(dataTableInfo -> "created".equals(dataTableInfo.baseName())));
+                .anyMatch(dataTableInfo -> dataTableInfo.id() == createdId && "created".equals(dataTableInfo.name())));
     }
 
     @Test
     void testAddRenameAndRemoveColumn() {
-        dataTableService.createTable(
-            "columns", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long columnsId = dataTableService.createTable(
+            WORKSPACE_ID, "columns", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
 
-        dataTableService.addColumn(
-            "columns", new ColumnSpec("amount", ColumnType.NUMBER), DEV_ENVIRONMENT_ID);
-        dataTableService.renameColumn("columns", "amount", "total", DEV_ENVIRONMENT_ID);
+        dataTableService.addColumn(columnsId, new ColumnSpec("amount", ColumnType.NUMBER), DEV_ENVIRONMENT_ID);
+        dataTableService.renameColumn(columnsId, "amount", "total", DEV_ENVIRONMENT_ID);
 
         DataTableRow dataTableRow = dataTableRowService.insertRow(
-            ref("columns"), Map.of("title", "renamed", "total", 12));
+            new DataTableRef(columnsId, DEV_ENVIRONMENT_ID), Map.of("title", "renamed", "total", 12));
 
         assertTrue(dataTableRow.values()
             .containsKey("total"));
 
-        dataTableService.removeColumn("columns", "total", DEV_ENVIRONMENT_ID);
+        dataTableService.removeColumn(columnsId, "total", DEV_ENVIRONMENT_ID);
     }
 
     @Test
     void testInsertUpdateAndReadRows() {
-        dataTableService.createTable(
-            "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long rowsId = dataTableService.createTable(
+            WORKSPACE_ID, "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
 
-        DataTableRef dataTableRef = ref("rows");
+        DataTableRef dataTableRef = new DataTableRef(rowsId, DEV_ENVIRONMENT_ID);
 
         DataTableRow insertedDataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
@@ -115,28 +203,19 @@ class DataTableServiceH2IntTest {
 
     @Test
     void testDuplicateAndRenameTable() {
-        dataTableService.createTable(
-            "source", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long sourceId = dataTableService.createTable(
+            WORKSPACE_ID, "source", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
 
-        dataTableRowService.insertRow(ref("source"), Map.of("title", "copied"));
+        dataTableRowService.insertRow(new DataTableRef(sourceId, DEV_ENVIRONMENT_ID), Map.of("title", "copied"));
 
-        dataTableService.duplicateTable("source", "duplicate", DEV_ENVIRONMENT_ID);
+        long duplicateId = dataTableService.duplicateTable(sourceId, "duplicate", DEV_ENVIRONMENT_ID);
 
-        assertEquals(1, dataTableRowService.listRows(ref("duplicate"), 10, 0)
+        assertEquals(1, dataTableRowService.listRows(new DataTableRef(duplicateId, DEV_ENVIRONMENT_ID), 10, 0)
             .size());
 
-        dataTableService.renameTable("duplicate", "renamed", DEV_ENVIRONMENT_ID);
+        dataTableService.renameTable(duplicateId, "renamed");
 
-        assertEquals(
-            "renamed",
-            dataTableService.getBaseNameById(dataTableService.getIdByBaseName("renamed")));
-    }
-
-    /**
-     * A vendor's own ref: these cases exercise the H2 statement paths, not owner scoping, so every row they write
-     * belongs to nobody.
-     */
-    private static DataTableRef ref(String baseName) {
-        return new DataTableRef(baseName, DEV_ENVIRONMENT_ID);
+        assertEquals("renamed", dataTableService.getDataTable(duplicateId)
+            .getName());
     }
 }

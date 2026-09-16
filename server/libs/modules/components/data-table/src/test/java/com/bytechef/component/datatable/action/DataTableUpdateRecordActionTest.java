@@ -40,13 +40,20 @@ class DataTableUpdateRecordActionTest extends AbstractDataTableActionTest {
         when(dataTableRowService.updateRow(eq(dataTableRef), anyLong(), anyMap()))
             .thenReturn(new DataTableRow(7, Map.of("status", "BOT")));
 
-        ModifiableActionDefinition actionDefinition = DataTableUpdateRecordAction.of(
-            dataTableService, dataTableRowService);
-
         assertEquals(
             Map.of("id", 7L, "status", "BOT"),
             perform(
-                actionDefinition,
-                Map.of("table", BASE_NAME, "id", 7, "values", Map.of("status", "BOT"))));
+                createActionDefinition(),
+                Map.of("table", TABLE_NAME, "id", 7, "values", Map.of("status", "BOT"))));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableUpdateRecordAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "id", 7, "values", Map.of("status", "BOT"));
     }
 }

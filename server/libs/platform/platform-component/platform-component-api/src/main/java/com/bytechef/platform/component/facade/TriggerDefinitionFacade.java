@@ -33,9 +33,19 @@ import org.jspecify.annotations.Nullable;
  */
 public interface TriggerDefinitionFacade {
 
+    default List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId) {
+
+        return executeDynamicProperties(
+            componentName, componentVersion, triggerName, propertyName, inputParameters, lookupDependsOnPaths,
+            connectionId, null);
+    }
+
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId);
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable Long connectionId,
+        @Nullable String workflowId);
 
     /**
      * Renews webhook subscription definition at provider side. <br>
@@ -63,14 +73,31 @@ public interface TriggerDefinitionFacade {
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, @Nullable Long connectionId);
 
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable Long connectionId) {
+
+        return executeOptions(
+            componentName, componentVersion, triggerName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, connectionId, null);
+    }
+
     List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable Long connectionId);
+        @Nullable Long connectionId, @Nullable String workflowId);
+
+    default OutputResponse executeOutput(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
+
+        return executeOutput(componentName, componentVersion, triggerName, inputParameters, connectionId, null);
+    }
 
     OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        @Nullable Long connectionId);
+        @Nullable Long connectionId, @Nullable String workflowId);
 
     TriggerOutput executeTrigger(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,

@@ -20,11 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,18 +39,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class WorkspaceDataTableTagFacadeImplTest {
 
     @Mock
-    private DataTableTagService dataTableTagService;
+    private DataTableService dataTableService;
 
     @Mock
-    private WorkspaceDataTableService workspaceDataTableService;
+    private DataTableTagService dataTableTagService;
 
     @InjectMocks
     private WorkspaceDataTableFacadeImpl workspaceDataTableFacade;
 
     @Test
     void testGetDataTableTagsScopesToWorkspace() {
-        when(workspaceDataTableService.getWorkspaceDataTables(5L))
-            .thenReturn(List.of(workspaceDataTable(1L), workspaceDataTable(2L)));
+        when(dataTableService.getWorkspaceDataTables(5L))
+            .thenReturn(List.of(new DataTable(1L, "orders"), new DataTable(2L, "invoices")));
         when(dataTableTagService.getTags(List.of(1L, 2L))).thenReturn(List.of(new Tag("a"), new Tag("b")));
 
         List<Tag> tags = workspaceDataTableFacade.getDataTableTags(5L);
@@ -59,11 +60,16 @@ class WorkspaceDataTableTagFacadeImplTest {
         verify(dataTableTagService).getTags(List.of(1L, 2L));
     }
 
-    private static WorkspaceDataTable workspaceDataTable(long dataTableId) {
-        WorkspaceDataTable workspaceDataTable = new WorkspaceDataTable();
+    @Test
+    void testGetTagsByTableIdKeepsOnlyWorkspaceTables() {
+        Tag tag = new Tag("a");
 
-        workspaceDataTable.setDataTableId(dataTableId);
+        when(dataTableService.getWorkspaceDataTables(5L))
+            .thenReturn(List.of(new DataTable(1L, "orders"), new DataTable(2L, "invoices")));
+        when(dataTableTagService.getTagsByTableId()).thenReturn(Map.of(1L, List.of(tag), 3L, List.of(new Tag("b"))));
 
-        return workspaceDataTable;
+        Map<Long, List<Tag>> tagsByTableId = workspaceDataTableFacade.getTagsByTableId(5L);
+
+        assertThat(tagsByTableId).isEqualTo(Map.of(1L, List.of(tag), 2L, List.of()));
     }
 }

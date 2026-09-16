@@ -71,8 +71,7 @@ class DataTableRowServiceTest {
     @Mock
     private JdbcTemplate jdbcTemplate;
 
-    private static final DataTableRef DATA_TABLE_REF =
-        new DataTableRef("conversations", 1);
+    private static final DataTableRef DATA_TABLE_REF = new DataTableRef(1051L, 0L);
 
     private DataTableRowServiceImpl dataTableRowService;
 

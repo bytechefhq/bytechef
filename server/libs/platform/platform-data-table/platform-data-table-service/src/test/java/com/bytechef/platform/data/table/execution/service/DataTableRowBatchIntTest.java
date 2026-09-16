@@ -45,7 +45,7 @@ import org.springframework.context.annotation.Import;
 class DataTableRowBatchIntTest {
 
     private static final long ENVIRONMENT_ID = 0;
-    private static final DataTableRef REF = new DataTableRef("batched", ENVIRONMENT_ID);
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -53,49 +53,55 @@ class DataTableRowBatchIntTest {
     @Autowired
     private DataTableRowService dataTableRowService;
 
+    private DataTableRef dataTableRef;
+
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("batched", ENVIRONMENT_ID);
+        dataTableService.fetchDataTable(WORKSPACE_ID, "batched")
+            .ifPresent(dataTable -> dataTableService.dropTable(dataTable.getId(), ENVIRONMENT_ID));
 
-        dataTableService.createTable(
-            "batched", null,
+        long dataTableId = dataTableService.createTable(
+            WORKSPACE_ID, "batched", null,
             List.of(new ColumnSpec("title", ColumnType.STRING), new ColumnSpec("score", ColumnType.INTEGER)),
             ENVIRONMENT_ID);
+
+        dataTableRef = new DataTableRef(dataTableId, ENVIRONMENT_ID);
     }
 
     @Test
     void testCountRowsHonoursFilters() {
-        dataTableRowService.insertRow(REF, Map.of("title", "a", "score", 1));
-        dataTableRowService.insertRow(REF, Map.of("title", "b", "score", 5));
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "a", "score", 1));
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "b", "score", 5));
 
-        assertEquals(2, dataTableRowService.countRows(REF, List.of()));
+        assertEquals(2, dataTableRowService.countRows(dataTableRef, List.of()));
         assertEquals(1,
-            dataTableRowService.countRows(REF, List.of(new RowFilter("score", RowFilter.Operator.GT, "2"))));
+            dataTableRowService.countRows(dataTableRef, List.of(new RowFilter("score", RowFilter.Operator.GT, "2"))));
     }
 
     @Test
     void testInsertRowsInsertsAll() {
         List<DataTableRow> rows = dataTableRowService.insertRows(
-            REF, List.of(new NewRow(Map.of("title", "a"), null), new NewRow(Map.of("title", "b"), "k2")),
+            dataTableRef, List.of(new NewRow(Map.of("title", "a"), null), new NewRow(Map.of("title", "b"), "k2")),
             CreateStrategy.INSERT);
 
         assertEquals(2, rows.size());
         assertEquals("k2", rows.get(1)
             .externalId());
-        assertEquals(2, dataTableRowService.countRows(REF, List.of()));
+        assertEquals(2, dataTableRowService.countRows(dataTableRef, List.of()));
     }
 
     @Test
     void testInsertRowsIsAllOrNothing() {
-        dataTableRowService.insertRow(REF, Map.of("title", "taken"), "k1");
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "taken"), "k1");
 
         assertThrows(
             DataTableException.class,
             () -> dataTableRowService.insertRows(
-                REF, List.of(new NewRow(Map.of("title", "new"), null), new NewRow(Map.of("title", "dup"), "k1")),
+                dataTableRef,
+                List.of(new NewRow(Map.of("title", "new"), null), new NewRow(Map.of("title", "dup"), "k1")),
                 CreateStrategy.INSERT));
 
-        assertEquals(1, dataTableRowService.countRows(REF, List.of()));
+        assertEquals(1, dataTableRowService.countRows(dataTableRef, List.of()));
     }
 
     @Test
@@ -103,21 +109,21 @@ class DataTableRowBatchIntTest {
         DataTableException dataTableException = assertThrows(
             DataTableException.class,
             () -> dataTableRowService.insertRows(
-                REF, List.of(new NewRow(Map.of("title", "a"), null)), CreateStrategy.UPSERT));
+                dataTableRef, List.of(new NewRow(Map.of("title", "a"), null)), CreateStrategy.UPSERT));
 
         assertEquals(DataTableErrorType.ROW_EXTERNAL_ID_REQUIRED.getErrorKey(), dataTableException.getErrorKey());
     }
 
     @Test
     void testUpsertStrategyMergesExistingKeys() {
-        dataTableRowService.insertRow(REF, Map.of("title", "old"), "k1");
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "old"), "k1");
 
         dataTableRowService.insertRows(
-            REF, List.of(new NewRow(Map.of("title", "new"), "k1"), new NewRow(Map.of("title", "b"), "k2")),
+            dataTableRef, List.of(new NewRow(Map.of("title", "new"), "k1"), new NewRow(Map.of("title", "b"), "k2")),
             CreateStrategy.UPSERT);
 
-        assertEquals(2, dataTableRowService.countRows(REF, List.of()));
-        assertEquals("new", dataTableRowService.fetchRowByExternalId(REF, "k1")
+        assertEquals(2, dataTableRowService.countRows(dataTableRef, List.of()));
+        assertEquals("new", dataTableRowService.fetchRowByExternalId(dataTableRef, "k1")
             .orElseThrow()
             .values()
             .get("title"));
@@ -125,22 +131,23 @@ class DataTableRowBatchIntTest {
 
     @Test
     void testDeleteRowsReturnsOnlyWhatItDeleted() {
-        DataTableRow first = dataTableRowService.insertRow(REF, Map.of("title", "a"));
-        DataTableRow second = dataTableRowService.insertRow(REF, Map.of("title", "b"));
+        DataTableRow first = dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"));
+        DataTableRow second = dataTableRowService.insertRow(dataTableRef, Map.of("title", "b"));
 
-        List<Long> deletedIds = dataTableRowService.deleteRows(REF, List.of(first.id(), second.id(), 999_999L));
+        List<Long> deletedIds =
+            dataTableRowService.deleteRows(dataTableRef, List.of(first.id(), second.id(), 999_999L));
 
         assertEquals(List.of(first.id(), second.id()), deletedIds);
-        assertEquals(0, dataTableRowService.countRows(REF, List.of()));
+        assertEquals(0, dataTableRowService.countRows(dataTableRef, List.of()));
     }
 
     @Test
     void testClearRowsEmptiesTheTable() {
-        dataTableRowService.insertRow(REF, Map.of("title", "a"));
-        dataTableRowService.insertRow(REF, Map.of("title", "b"));
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"));
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "b"));
 
-        assertEquals(2, dataTableRowService.clearRows(REF));
-        assertEquals(0, dataTableRowService.countRows(REF, List.of()));
+        assertEquals(2, dataTableRowService.clearRows(dataTableRef));
+        assertEquals(0, dataTableRowService.countRows(dataTableRef, List.of()));
     }
 
     /**
@@ -151,10 +158,10 @@ class DataTableRowBatchIntTest {
      */
     @Test
     void testImportCsvCountsAndHonoursExternalId() {
-        int imported = dataTableRowService.importCsv(REF, "title,score,external_id\na,1,k1\nb,2,\n");
+        int imported = dataTableRowService.importCsv(dataTableRef, "title,score,external_id\na,1,k1\nb,2,\n");
 
         assertEquals(2, imported);
-        assertEquals("a", dataTableRowService.fetchRowByExternalId(REF, "k1")
+        assertEquals("a", dataTableRowService.fetchRowByExternalId(dataTableRef, "k1")
             .orElseThrow()
             .values()
             .get("title"));
@@ -171,23 +178,24 @@ class DataTableRowBatchIntTest {
 
         DataTableException dataTableException = assertThrows(
             DataTableException.class,
-            () -> dataTableRowService.importCsv(REF, "title,external_id\na," + oversizeExternalId + "\n"));
+            () -> dataTableRowService.importCsv(dataTableRef, "title,external_id\na," + oversizeExternalId + "\n"));
 
         assertEquals(DataTableErrorType.CSV_INVALID.getErrorKey(), dataTableException.getErrorKey());
-        assertEquals(0, dataTableRowService.countRows(REF, List.of()));
+        assertEquals(0, dataTableRowService.countRows(dataTableRef, List.of()));
     }
 
     @Test
     void testImportCsvAcceptsAnExternalIdAtTheCap() {
         String maximumExternalId = "k".repeat(255);
 
-        assertEquals(1, dataTableRowService.importCsv(REF, "title,external_id\na," + maximumExternalId + "\n"));
+        assertEquals(1,
+            dataTableRowService.importCsv(dataTableRef, "title,external_id\na," + maximumExternalId + "\n"));
     }
 
     @Test
     void testImportCsvRejectsAnUnknownHeader() {
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> dataTableRowService.importCsv(REF, "title,nosuch\na,b\n"));
+            DataTableException.class, () -> dataTableRowService.importCsv(dataTableRef, "title,nosuch\na,b\n"));
 
         assertEquals(DataTableErrorType.CSV_INVALID.getErrorKey(), dataTableException.getErrorKey());
     }
@@ -199,11 +207,11 @@ class DataTableRowBatchIntTest {
      */
     @Test
     void testImportCsvStillSkipsReservedHeaders() {
-        int imported = dataTableRowService.importCsv(REF, "id,title\n999,a\n");
+        int imported = dataTableRowService.importCsv(dataTableRef, "id,title\n999,a\n");
 
         assertEquals(1, imported);
 
-        DataTableRow row = dataTableRowService.listRows(REF, 10, 0)
+        DataTableRow row = dataTableRowService.listRows(dataTableRef, 10, 0)
             .getFirst();
 
         assertEquals("a", row.values()

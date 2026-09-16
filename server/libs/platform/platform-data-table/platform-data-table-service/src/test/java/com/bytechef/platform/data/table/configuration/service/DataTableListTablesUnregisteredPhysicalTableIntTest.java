@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,14 +29,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * {@code listTables} reads the physical tables out of {@code information_schema} and then asks the registry what each
- * one is. A physical table no registry row claims is skipped with a warning rather than reported under whatever base
- * name its remainder happens to spell.
- *
- * <p>
- * Not hypothetical. Leftover physical tables exist in databases built by earlier schemas, and their remainder past the
- * environment prefix reads as a base name ({@code 5_connecteduser_orders}). Reporting them would put an identifier no
- * workflow can name in the console's table list.
+ * {@code listTables} reads the registry and then asks each environment whether the row's physical table exists. A
+ * physical table no registry row claims is never reported, whatever id its name spells.
  *
  * @author Ivica Cardic
  */
@@ -45,6 +39,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 class DataTableListTablesUnregisteredPhysicalTableIntTest {
 
     private static final long ENVIRONMENT_ID = 0;
+    private static final long UNREGISTERED_DATA_TABLE_ID = 999999L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -52,17 +47,22 @@ class DataTableListTablesUnregisteredPhysicalTableIntTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @AfterEach
+    void afterEach() {
+        jdbcTemplate.execute("DROP TABLE IF EXISTS dt_0_999999");
+    }
+
     @Test
     void testAPhysicalTableNoRegistryRowClaimsIsSkipped() {
         jdbcTemplate.execute(
-            "CREATE TABLE dt_0_5_connecteduser_leftovers (\"id\" BIGSERIAL PRIMARY KEY, "
-                + "\"title\" VARCHAR(255))");
+            "CREATE TABLE IF NOT EXISTS dt_0_999999 (\"id\" BIGSERIAL PRIMARY KEY, \"title\" VARCHAR(255))");
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(ENVIRONMENT_ID);
-
-        assertThat(dataTableInfos)
-            .extracting(DataTableInfo::baseName)
-            .as("a leftover physical table must not be listed under the name its remainder spells")
-            .doesNotContain("5_connecteduser_leftovers", "leftovers");
+        assertThat(dataTableService.listTables(1L, ENVIRONMENT_ID))
+            .extracting(DataTableInfo::id)
+            .as("a physical table without a registry row must not be listed")
+            .doesNotContain(UNREGISTERED_DATA_TABLE_ID);
+        assertThat(dataTableService.listAllTables(ENVIRONMENT_ID))
+            .extracting(DataTableInfo::id)
+            .doesNotContain(UNREGISTERED_DATA_TABLE_ID);
     }
 }

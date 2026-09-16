@@ -49,7 +49,7 @@ import org.springframework.context.annotation.Import;
 class DataTableRowExternalIdIntTest {
 
     private static final long ENVIRONMENT_ID = 0;
-    private static final DataTableRef REF = new DataTableRef("keyedrows", ENVIRONMENT_ID);
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -57,17 +57,22 @@ class DataTableRowExternalIdIntTest {
     @Autowired
     private DataTableRowService dataTableRowService;
 
+    private DataTableRef dataTableRef;
+
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("keyedrows", ENVIRONMENT_ID);
+        dataTableService.fetchDataTable(WORKSPACE_ID, "keyedrows")
+            .ifPresent(dataTable -> dataTableService.dropTable(dataTable.getId(), ENVIRONMENT_ID));
 
-        dataTableService.createTable(
-            "keyedrows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
+        long dataTableId = dataTableService.createTable(
+            WORKSPACE_ID, "keyedrows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), ENVIRONMENT_ID);
+
+        dataTableRef = new DataTableRef(dataTableId, ENVIRONMENT_ID);
     }
 
     @Test
     void testInsertWithAnExternalIdReturnsIt() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(REF, Map.of("title", "a"), "ORD-1");
+        DataTableRow dataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"), "ORD-1");
 
         assertEquals("ORD-1", dataTableRow.externalId());
         assertEquals("a", dataTableRow.values()
@@ -76,20 +81,20 @@ class DataTableRowExternalIdIntTest {
 
     @Test
     void testInsertWithoutAnExternalIdLeavesItNull() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(REF, Map.of("title", "a"));
+        DataTableRow dataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"));
 
         assertNull(dataTableRow.externalId());
     }
 
     @Test
     void testReadsCarryTheExternalId() {
-        DataTableRow inserted = dataTableRowService.insertRow(REF, Map.of("title", "a"), "ORD-1");
+        DataTableRow inserted = dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"), "ORD-1");
 
-        DataTableRow read = dataTableRowService.getRow(REF, inserted.id());
+        DataTableRow read = dataTableRowService.getRow(dataTableRef, inserted.id());
 
         assertEquals("ORD-1", read.externalId());
 
-        List<DataTableRow> listed = dataTableRowService.listRows(REF, 10, 0);
+        List<DataTableRow> listed = dataTableRowService.listRows(dataTableRef, 10, 0);
 
         assertEquals("ORD-1", listed.getFirst()
             .externalId());
@@ -97,25 +102,25 @@ class DataTableRowExternalIdIntTest {
 
     @Test
     void testFetchByExternalId() {
-        dataTableRowService.insertRow(REF, Map.of("title", "a"), "ORD-1");
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"), "ORD-1");
 
-        Optional<DataTableRow> found = dataTableRowService.fetchRowByExternalId(REF, "ORD-1");
+        Optional<DataTableRow> found = dataTableRowService.fetchRowByExternalId(dataTableRef, "ORD-1");
 
         assertTrue(found.isPresent());
         assertEquals("a", found.get()
             .values()
             .get("title"));
-        assertTrue(dataTableRowService.fetchRowByExternalId(REF, "missing")
+        assertTrue(dataTableRowService.fetchRowByExternalId(dataTableRef, "missing")
             .isEmpty());
     }
 
     @Test
     void testFilteringOnExternalIdReturnsTheKeyedRow() {
-        dataTableRowService.insertRow(REF, Map.of("title", "a"), "ORD-1");
-        dataTableRowService.insertRow(REF, Map.of("title", "b"), "ORD-2");
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"), "ORD-1");
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "b"), "ORD-2");
 
         List<DataTableRow> rows = dataTableRowService.listRows(
-            REF, 10, 0, List.of(new RowFilter(ReservedColumns.EXTERNAL_ID, RowFilter.Operator.EQ, "ORD-1")),
+            dataTableRef, 10, 0, List.of(new RowFilter(ReservedColumns.EXTERNAL_ID, RowFilter.Operator.EQ, "ORD-1")),
             List.of());
 
         assertEquals(1, rows.size());
@@ -128,44 +133,44 @@ class DataTableRowExternalIdIntTest {
 
     @Test
     void testDuplicateExternalIdOnInsertIsATypedConflict() {
-        dataTableRowService.insertRow(REF, Map.of("title", "a"), "ORD-1");
+        dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"), "ORD-1");
 
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> dataTableRowService.insertRow(REF, Map.of("title", "b"), "ORD-1"));
+            DataTableException.class, () -> dataTableRowService.insertRow(dataTableRef, Map.of("title", "b"), "ORD-1"));
 
         assertEquals(DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT.getErrorKey(), dataTableException.getErrorKey());
     }
 
     @Test
     void testUpdateCanSetAndClearTheExternalId() {
-        DataTableRow inserted = dataTableRowService.insertRow(REF, Map.of("title", "a"));
+        DataTableRow inserted = dataTableRowService.insertRow(dataTableRef, Map.of("title", "a"));
 
         DataTableRow keyed = dataTableRowService.updateRow(
-            REF, inserted.id(), Map.of(), new ExternalIdPatch("ORD-9"));
+            dataTableRef, inserted.id(), Map.of(), new ExternalIdPatch("ORD-9"));
 
         assertEquals("ORD-9", keyed.externalId());
 
-        DataTableRow untouched = dataTableRowService.updateRow(REF, inserted.id(), Map.of("title", "b"), null);
+        DataTableRow untouched = dataTableRowService.updateRow(dataTableRef, inserted.id(), Map.of("title", "b"), null);
 
         assertEquals("ORD-9", untouched.externalId());
         assertEquals("b", untouched.values()
             .get("title"));
 
         DataTableRow cleared = dataTableRowService.updateRow(
-            REF, inserted.id(), Map.of(), new ExternalIdPatch(null));
+            dataTableRef, inserted.id(), Map.of(), new ExternalIdPatch(null));
 
         assertNull(cleared.externalId());
     }
 
     @Test
     void testUpsertCreatesThenMerges() {
-        UpsertResult first = dataTableRowService.upsertRow(REF, "ORD-1", Map.of("title", "a"));
+        UpsertResult first = dataTableRowService.upsertRow(dataTableRef, "ORD-1", Map.of("title", "a"));
 
         assertTrue(first.created());
         assertEquals("ORD-1", first.row()
             .externalId());
 
-        UpsertResult second = dataTableRowService.upsertRow(REF, "ORD-1", Map.of("title", "b"));
+        UpsertResult second = dataTableRowService.upsertRow(dataTableRef, "ORD-1", Map.of("title", "b"));
 
         assertFalse(second.created());
         assertEquals(first.row()
@@ -175,15 +180,15 @@ class DataTableRowExternalIdIntTest {
         assertEquals("b", second.row()
             .values()
             .get("title"));
-        assertEquals(1, dataTableRowService.listRows(REF, 10, 0)
+        assertEquals(1, dataTableRowService.listRows(dataTableRef, 10, 0)
             .size());
     }
 
     @Test
     void testUpsertWithNoValuesReturnsTheExistingRowUnchanged() {
-        dataTableRowService.upsertRow(REF, "ORD-1", Map.of("title", "a"));
+        dataTableRowService.upsertRow(dataTableRef, "ORD-1", Map.of("title", "a"));
 
-        UpsertResult result = dataTableRowService.upsertRow(REF, "ORD-1", Map.of());
+        UpsertResult result = dataTableRowService.upsertRow(dataTableRef, "ORD-1", Map.of());
 
         assertFalse(result.created());
         assertEquals("a", result.row()

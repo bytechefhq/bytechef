@@ -36,7 +36,8 @@ class AbstractDataTableApiControllerTest {
     @Test
     void testDataTableExceptionsMapByKey() {
         assertEquals(HttpStatus.NOT_FOUND, controller.handleDataTableException(
-            new DataTableException("x", DataTableErrorType.ROW_NOT_FOUND), request("/api/automation/v1/data-tables/t"))
+            new DataTableException("x", DataTableErrorType.ROW_NOT_FOUND),
+            request("/api/automation/v1/workspaces/1/data-tables/t"))
             .getStatusCode());
         assertEquals(HttpStatus.CONFLICT, controller.handleDataTableException(
             new DataTableException("x", DataTableErrorType.ROW_EXTERNAL_ID_CONFLICT), request("/x"))
@@ -84,7 +85,7 @@ class AbstractDataTableApiControllerTest {
     @Test
     void testAccessDeniedIs404OnItemUrlsAndRethrownOnWorkspaceUrls() {
         assertEquals(HttpStatus.NOT_FOUND, controller.handleAccessDenied(
-            new AccessDeniedException("x"), request("/api/automation/v1/data-tables/orders"))
+            new AccessDeniedException("x"), request("/api/automation/v1/workspaces/1/data-tables/orders"))
             .getStatusCode());
 
         // On a workspace URL the handler rethrows: nothing in a plain unit-test call resolves it further, but at

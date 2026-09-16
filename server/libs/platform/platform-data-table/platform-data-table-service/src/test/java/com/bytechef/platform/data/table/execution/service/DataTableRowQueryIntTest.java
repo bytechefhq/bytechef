@@ -25,6 +25,7 @@ import com.bytechef.platform.data.table.domain.RowFilter;
 import com.bytechef.platform.data.table.domain.RowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +50,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 @SpringBootTest(classes = DataTableIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
+@SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
 class DataTableRowQueryIntTest {
 
     private static final long ENVIRONMENT_ID = 0;
-    private static final String BASE_NAME = "messages";
+    private static final long MESSAGES_DATA_TABLE_ID = 4242L;
 
     @Autowired
     private DataTableRowService dataTableRowService;
@@ -62,9 +64,11 @@ class DataTableRowQueryIntTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.execute("DROP TABLE IF EXISTS \"dt_0_messages\"");
+        String physicalName = dataTableRef().physicalName();
+
+        jdbcTemplate.execute("DROP TABLE IF EXISTS \"" + physicalName + "\"");
         jdbcTemplate.execute(
-            "CREATE TABLE \"dt_0_messages\" (\"id\" BIGSERIAL PRIMARY KEY, \"title\" TEXT, " +
+            "CREATE TABLE \"" + physicalName + "\" (\"id\" BIGSERIAL PRIMARY KEY, \"title\" TEXT, " +
                 "\"score\" BIGINT)");
     }
 
@@ -74,7 +78,7 @@ class DataTableRowQueryIntTest {
         insert("beta", 2);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRowService.listRows(dataTableRef(), 100, 0,
                 List.of(new RowFilter("title", RowFilter.Operator.EQ, "alpha")), List.of());
 
         assertEquals(1, dataTableRows.size());
@@ -93,7 +97,7 @@ class DataTableRowQueryIntTest {
         insert("beta", 9);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRowService.listRows(dataTableRef(), 100, 0,
                 List.of(
                     new RowFilter("title", RowFilter.Operator.EQ, "alpha"),
                     new RowFilter("score", RowFilter.Operator.GT, "5")),
@@ -107,7 +111,7 @@ class DataTableRowQueryIntTest {
         insert("alpha", 42);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRowService.listRows(dataTableRef(), 100, 0,
                 List.of(new RowFilter("score", RowFilter.Operator.EQ, "42")), List.of());
 
         assertEquals(1, dataTableRows.size());
@@ -119,7 +123,7 @@ class DataTableRowQueryIntTest {
         insert("goodbye", 2);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRowService.listRows(dataTableRef(), 100, 0,
                 List.of(new RowFilter("title", RowFilter.Operator.CONTAINS, "lo wo")), List.of());
 
         assertEquals(1, dataTableRows.size());
@@ -131,7 +135,7 @@ class DataTableRowQueryIntTest {
         insert("100 sure", 2);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRowService.listRows(dataTableRef(), 100, 0,
                 List.of(new RowFilter("title", RowFilter.Operator.CONTAINS, "100%")), List.of());
 
         assertEquals(1, dataTableRows.size());
@@ -144,7 +148,7 @@ class DataTableRowQueryIntTest {
         insert("gamma", 3);
 
         List<DataTableRow> dataTableRows = dataTableRowService.listRows(
-            dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRef(), 100, 0,
             List.of(new RowFilter("title", RowFilter.Operator.IN, List.of("alpha", "gamma"))), List.of());
 
         assertEquals(2, dataTableRows.size());
@@ -157,7 +161,7 @@ class DataTableRowQueryIntTest {
         insert("c", 3);
 
         List<DataTableRow> dataTableRows = dataTableRowService.listRows(
-            dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            dataTableRef(), 100, 0,
             List.of(new RowFilter("score", RowFilter.Operator.BETWEEN, List.of("1", "2"))), List.of());
 
         assertEquals(2, dataTableRows.size());
@@ -170,7 +174,7 @@ class DataTableRowQueryIntTest {
         }
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 2, 1,
+            dataTableRowService.listRows(dataTableRef(), 2, 1,
                 List.of(new RowFilter("score", RowFilter.Operator.GTE, "1")), List.of());
 
         assertEquals(2, dataTableRows.size());
@@ -189,7 +193,7 @@ class DataTableRowQueryIntTest {
         insert("c", 3);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 2, 0,
+            dataTableRowService.listRows(dataTableRef(), 2, 0,
                 List.of(), List.of(new RowSort("score", RowSort.Direction.DESC)));
 
         assertEquals(2, dataTableRows.size());
@@ -208,7 +212,7 @@ class DataTableRowQueryIntTest {
         insert("third", 1);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 1, 0,
+            dataTableRowService.listRows(dataTableRef(), 1, 0,
                 List.of(), List.of(new RowSort("id", RowSort.Direction.DESC)));
 
         DataTableRow dataTableRow = dataTableRows.getFirst();
@@ -230,7 +234,7 @@ class DataTableRowQueryIntTest {
 
         for (int offset = 0; offset < 6; offset += 2) {
             List<DataTableRow> page =
-                dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 2,
+                dataTableRowService.listRows(dataTableRef(), 2,
                     offset, List.of(), rowSorts);
 
             for (DataTableRow dataTableRow : page) {
@@ -252,7 +256,7 @@ class DataTableRowQueryIntTest {
         insert("drop", 9);
 
         List<DataTableRow> dataTableRows =
-            dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 10, 0,
+            dataTableRowService.listRows(dataTableRef(), 10, 0,
                 List.of(new RowFilter("title", RowFilter.Operator.EQ, "keep")),
                 List.of(new RowSort("score", RowSort.Direction.DESC)));
 
@@ -269,20 +273,16 @@ class DataTableRowQueryIntTest {
     void testFilteringOnAnUnknownColumnIsRejected() {
         assertThrows(
             IllegalArgumentException.class,
-            () -> dataTableRowService.listRows(dataTableRef(BASE_NAME, ENVIRONMENT_ID), 100, 0,
+            () -> dataTableRowService.listRows(dataTableRef(), 100, 0,
                 List.of(new RowFilter("nope", RowFilter.Operator.EQ, "x")), List.of()));
     }
 
     private void insert(String title, int score) {
-        dataTableRowService.insertRow(dataTableRef(BASE_NAME, ENVIRONMENT_ID),
+        dataTableRowService.insertRow(dataTableRef(),
             Map.of("title", title, "score", score));
     }
 
-    /**
-     * These tables are all created shared, so naming the shared physical form here states a fact about the fixture
-     * rather than skipping resolution.
-     */
-    private static DataTableRef dataTableRef(String baseName, long environmentId) {
-        return new DataTableRef(baseName, environmentId);
+    private static DataTableRef dataTableRef() {
+        return new DataTableRef(MESSAGES_DATA_TABLE_ID, ENVIRONMENT_ID);
     }
 }

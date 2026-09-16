@@ -45,6 +45,7 @@ import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.domain.RowFilter;
 import com.bytechef.platform.data.table.domain.RowSort;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
@@ -66,19 +67,24 @@ public class DataTableFindRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableFindRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableFindRecordsAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
     private DataTableFindRecordsAction(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -90,7 +96,7 @@ public class DataTableFindRecordsAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 array(FILTERS)
                     .label("Filters")
                     .description(
@@ -160,10 +166,12 @@ public class DataTableFindRecordsAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
 
         ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
-            dataTableService, baseName, DEVELOPMENT.ordinal());
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
 
         DataTableInfo dataTableInfo = resolvedDataTable.dataTableInfo();
 
@@ -189,7 +197,7 @@ public class DataTableFindRecordsAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
         int limit = inputParameters.getInteger(LIMIT, 100);
         int offset = inputParameters.getInteger(OFFSET, 0);
 
@@ -200,8 +208,10 @@ public class DataTableFindRecordsAction {
 
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
 
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
+
         ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
-            dataTableService, baseName, environmentId);
+            dataTableService, workspaceId, name, environmentId);
 
         return DataTableUtils.flattenRows(
             dataTableRowService.listRows(resolvedDataTable.dataTableRef(), limit, offset, rowFilters, rowSorts));

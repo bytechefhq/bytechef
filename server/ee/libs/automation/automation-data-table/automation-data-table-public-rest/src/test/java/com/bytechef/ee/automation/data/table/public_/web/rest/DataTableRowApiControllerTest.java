@@ -22,6 +22,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.BatchRowModel;
@@ -37,6 +40,7 @@ import com.bytechef.ee.automation.data.table.public_.web.rest.model.UpdateRowReq
 import com.bytechef.ee.automation.data.table.public_.web.rest.model.UpsertRowRequestModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
@@ -66,6 +70,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 /**
  * @version ee
@@ -80,6 +86,7 @@ class DataTableRowApiControllerTest {
     private final DataTableService dataTableService = mock(DataTableService.class);
     private final EnvironmentService environmentService = mock(EnvironmentService.class);
     private DataTableRowApiController controller;
+    private MockMvc mockMvc;
 
     @BeforeEach
     void beforeEach() {
@@ -87,12 +94,25 @@ class DataTableRowApiControllerTest {
 
         controller = new DataTableRowApiController(
             facade, new DataTableApiSupport(dataTableService, environmentService));
+
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+            .addPlaceholderValue("openapi.openAPIDefinition.base-path.automation", "/api/automation")
+            .build();
+    }
+
+    private void stubOrders() {
+        DataTable orders = new DataTable(7L, "orders");
+
+        orders.setWorkspaceId(1L);
+
+        when(dataTableService.fetchDataTable(1L, "orders")).thenReturn(Optional.of(orders));
     }
 
     private void stubTable() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getTable(7L, Environment.PRODUCTION.ordinal())).thenReturn(
-            new DataTableInfo(7L, "orders", null, List.of(new ColumnSpec("total", ColumnType.NUMBER)), Instant.EPOCH));
+            new DataTableInfo(7L, "orders", 1L, null, List.of(new ColumnSpec("total", ColumnType.NUMBER)),
+                Instant.EPOCH));
     }
 
     @Test
@@ -103,7 +123,7 @@ class DataTableRowApiControllerTest {
             .thenReturn(new PageImpl<>(List.of(new DataTableRow(1L, "k", Map.of("total", new BigDecimal("9.5"))))));
 
         ResponseEntity<Page> response = controller.listRows(
-            "orders", null, List.of("total:GTE:5", "externalId:EQ:k"), List.of("total:DESC"), 0, 9_999);
+            1L, "orders", null, List.of("total:GTE:5", "externalId:EQ:k"), List.of("total:DESC"), 0, 9_999);
 
         ArgumentCaptor<List<RowFilter>> filters = ArgumentCaptor.forClass(List.class);
 
@@ -126,7 +146,7 @@ class DataTableRowApiControllerTest {
         when(facade.listRows(eq(7L), anyList(), anyList(), eq(0), eq(50), eq(PRODUCTION_ENVIRONMENT_ID)))
             .thenReturn(new PageImpl<>(List.of()));
 
-        controller.listRows("orders", null, List.of("total:EQ:10:30"), null, null, null);
+        controller.listRows(1L, "orders", null, List.of("total:EQ:10:30"), null, null, null);
 
         ArgumentCaptor<List<RowFilter>> filters = ArgumentCaptor.forClass(List.class);
 
@@ -147,7 +167,7 @@ class DataTableRowApiControllerTest {
                 new PageImpl<>(
                     List.of(new DataTableRow(1L, null, Map.of())), PageRequest.of(0, 1), 5));
 
-        ResponseEntity<Page> response = controller.listRows("orders", null, null, null, 0, 1);
+        ResponseEntity<Page> response = controller.listRows(1L, "orders", null, null, null, 0, 1);
         Page body = Objects.requireNonNull(response.getBody());
 
         assertEquals(1, body.getContent()
@@ -167,7 +187,7 @@ class DataTableRowApiControllerTest {
             .thenReturn(new DataTableRow(1L, null, Map.of("total", new BigDecimal("5"))));
 
         ResponseEntity<DataTableRowModel> response = controller.createRow(
-            "orders", new CreateRowRequestModel().values(Map.of("total", "5")), null);
+            1L, "orders", new CreateRowRequestModel().values(Map.of("total", "5")), null);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(facade).insertRow(7L, Map.of("total", "5"), null, PRODUCTION_ENVIRONMENT_ID);
@@ -180,7 +200,7 @@ class DataTableRowApiControllerTest {
         when(facade.insertRow(7L, Map.of("total", "5"), "k", PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableRow(1L, "k", Map.of("total", new BigDecimal("5"))));
 
-        controller.createRow("orders", new CreateRowRequestModel().values(Map.of("total", "5"))
+        controller.createRow(1L, "orders", new CreateRowRequestModel().values(Map.of("total", "5"))
             .externalId("k"), null);
 
         verify(facade).insertRow(7L, Map.of("total", "5"), "k", PRODUCTION_ENVIRONMENT_ID);
@@ -191,18 +211,40 @@ class DataTableRowApiControllerTest {
         stubTable();
 
         assertThrows(DataTableException.class, () -> controller.createRow(
-            "orders", new CreateRowRequestModel().values(Map.of("total", "lots")), null));
+            1L, "orders", new CreateRowRequestModel().values(Map.of("total", "lots")), null));
 
         verify(facade, never()).insertRow(anyLong(), anyMap(), any(), anyLong());
     }
 
     @Test
+    void testGetRowReturnsNotFoundForAnotherWorkspacesName() throws Exception {
+        when(dataTableService.fetchDataTable(7L, "orders")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/automation/v1/workspaces/7/data-tables/orders/rows/3"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()));
+
+        verifyNoInteractions(facade);
+    }
+
+    @Test
+    void testListRowsReturnsNotFoundForAnotherWorkspacesName() throws Exception {
+        when(dataTableService.fetchDataTable(7L, "orders")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/automation/v1/workspaces/7/data-tables/orders/rows"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.errorKey").value(DataTableErrorType.DATA_TABLE_NOT_FOUND.getErrorKey()));
+
+        verifyNoInteractions(facade);
+    }
+
+    @Test
     void testGetRowReturns200() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.getRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(new DataTableRow(3L, null, Map.of("total", BigDecimal.ONE)));
 
-        ResponseEntity<DataTableRowModel> response = controller.getRow("orders", 3L, null);
+        ResponseEntity<DataTableRowModel> response = controller.getRow(1L, "orders", 3L, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(
@@ -218,13 +260,13 @@ class DataTableRowApiControllerTest {
             .thenReturn(new DataTableRow(3L, null, Map.of()));
 
         ResponseEntity<DataTableRowModel> absentResponse = controller.updateRow(
-            "orders", 3L, new UpdateRowRequestModel().values(Map.of()), null);
+            1L, "orders", 3L, new UpdateRowRequestModel().values(Map.of()), null);
         ResponseEntity<DataTableRowModel> nullResponse = controller.updateRow(
-            "orders", 3L, new UpdateRowRequestModel().values(Map.of())
+            1L, "orders", 3L, new UpdateRowRequestModel().values(Map.of())
                 .externalId(null),
             null);
         ResponseEntity<DataTableRowModel> valueResponse = controller.updateRow(
-            "orders", 3L, new UpdateRowRequestModel().values(Map.of())
+            1L, "orders", 3L, new UpdateRowRequestModel().values(Map.of())
                 .externalId("k"),
             null);
 
@@ -247,39 +289,39 @@ class DataTableRowApiControllerTest {
         stubTable();
 
         assertThrows(DataTableException.class, () -> controller.updateRow(
-            "orders", 3L, new UpdateRowRequestModel().values(Map.of("total", "lots")), null));
+            1L, "orders", 3L, new UpdateRowRequestModel().values(Map.of("total", "lots")), null));
 
         verify(facade, never()).updateRow(anyLong(), anyLong(), anyMap(), any(), anyLong());
     }
 
     @Test
     void testDeleteRowReturns204() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.deleteRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID)).thenReturn(true);
 
         assertEquals(
-            HttpStatus.NO_CONTENT, controller.deleteRow("orders", 3L, null)
+            HttpStatus.NO_CONTENT, controller.deleteRow(1L, "orders", 3L, null)
                 .getStatusCode());
     }
 
     @Test
     void testDeleteRowFalseIsRowNotFound() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.deleteRow(7L, 3L, PRODUCTION_ENVIRONMENT_ID)).thenReturn(false);
 
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> controller.deleteRow("orders", 3L, null));
+            DataTableException.class, () -> controller.deleteRow(1L, "orders", 3L, null));
 
         assertEquals(DataTableErrorType.ROW_NOT_FOUND.getErrorKey(), dataTableException.getErrorKey());
     }
 
     @Test
     void testGetRowByExternalIdReturns200() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.fetchRowByExternalId(7L, "k", PRODUCTION_ENVIRONMENT_ID))
             .thenReturn(Optional.of(new DataTableRow(1L, "k", Map.of())));
 
-        ResponseEntity<DataTableRowModel> response = controller.getRowByExternalId("orders", "k", null);
+        ResponseEntity<DataTableRowModel> response = controller.getRowByExternalId(1L, "orders", "k", null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(
@@ -289,11 +331,11 @@ class DataTableRowApiControllerTest {
 
     @Test
     void testGetRowByExternalIdEmptyIsRowNotFound() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.fetchRowByExternalId(7L, "missing", PRODUCTION_ENVIRONMENT_ID)).thenReturn(Optional.empty());
 
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> controller.getRowByExternalId("orders", "missing", null));
+            DataTableException.class, () -> controller.getRowByExternalId(1L, "orders", "missing", null));
 
         assertEquals(DataTableErrorType.ROW_NOT_FOUND.getErrorKey(), dataTableException.getErrorKey());
     }
@@ -309,10 +351,10 @@ class DataTableRowApiControllerTest {
         UpsertRowRequestModel request = new UpsertRowRequestModel().values(Map.of());
 
         assertEquals(
-            HttpStatus.CREATED, controller.upsertRowByExternalId("orders", "k", request, null)
+            HttpStatus.CREATED, controller.upsertRowByExternalId(1L, "orders", "k", request, null)
                 .getStatusCode());
         assertEquals(
-            HttpStatus.OK, controller.upsertRowByExternalId("orders", "k", request, null)
+            HttpStatus.OK, controller.upsertRowByExternalId(1L, "orders", "k", request, null)
                 .getStatusCode());
     }
 
@@ -321,28 +363,28 @@ class DataTableRowApiControllerTest {
         stubTable();
 
         assertThrows(DataTableException.class, () -> controller.upsertRowByExternalId(
-            "orders", "", new UpsertRowRequestModel().values(Map.of()), null));
+            1L, "orders", "", new UpsertRowRequestModel().values(Map.of()), null));
 
         verify(facade, never()).upsertRow(anyLong(), any(), anyMap(), anyLong());
     }
 
     @Test
     void testDeleteRowByExternalIdReturns204() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.deleteRowByExternalId(7L, "k", PRODUCTION_ENVIRONMENT_ID)).thenReturn(true);
 
         assertEquals(
-            HttpStatus.NO_CONTENT, controller.deleteRowByExternalId("orders", "k", null)
+            HttpStatus.NO_CONTENT, controller.deleteRowByExternalId(1L, "orders", "k", null)
                 .getStatusCode());
     }
 
     @Test
     void testDeleteRowByExternalIdFalseIsRowNotFound() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.deleteRowByExternalId(7L, "missing", PRODUCTION_ENVIRONMENT_ID)).thenReturn(false);
 
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> controller.deleteRowByExternalId("orders", "missing", null));
+            DataTableException.class, () -> controller.deleteRowByExternalId(1L, "orders", "missing", null));
 
         assertEquals(DataTableErrorType.ROW_NOT_FOUND.getErrorKey(), dataTableException.getErrorKey());
     }
@@ -355,7 +397,7 @@ class DataTableRowApiControllerTest {
             .thenReturn(List.of(new DataTableRow(1L, null, Map.of("total", BigDecimal.ONE))));
 
         ResponseEntity<BatchRowsResponseModel> response = controller.batchRows(
-            "orders", new BatchRowsRequestModel().rows(
+            1L, "orders", new BatchRowsRequestModel().rows(
                 List.of(new BatchRowModel().values(Map.of("total", "1")))),
             null);
 
@@ -374,7 +416,7 @@ class DataTableRowApiControllerTest {
             .thenReturn(List.of());
 
         controller.batchRows(
-            "orders", new BatchRowsRequestModel()
+            1L, "orders", new BatchRowsRequestModel()
                 .rows(List.of(new BatchRowModel().values(Map.of("total", "1"))
                     .externalId("k")))
                 .createStrategy(CreateStrategyModel.UPSERT),
@@ -391,7 +433,7 @@ class DataTableRowApiControllerTest {
 
         DataTableException dataTableException = assertThrows(
             DataTableException.class,
-            () -> controller.batchRows("orders", new BatchRowsRequestModel().rows(rows), null));
+            () -> controller.batchRows(1L, "orders", new BatchRowsRequestModel().rows(rows), null));
 
         assertEquals(DataTableErrorType.BATCH_TOO_LARGE.getErrorKey(), dataTableException.getErrorKey());
         verify(facade, never()).insertRows(anyLong(), anyList(), any(), anyLong());
@@ -402,7 +444,7 @@ class DataTableRowApiControllerTest {
         stubTable();
 
         assertThrows(DataTableException.class, () -> controller.batchRows(
-            "orders", new BatchRowsRequestModel().rows(
+            1L, "orders", new BatchRowsRequestModel().rows(
                 List.of(new BatchRowModel().values(Map.of("total", "lots")))),
             null));
 
@@ -414,7 +456,7 @@ class DataTableRowApiControllerTest {
         stubTable();
 
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> controller.deleteRows("orders", List.of(), null));
+            DataTableException.class, () -> controller.deleteRows(1L, "orders", List.of(), null));
 
         assertEquals(DataTableErrorType.ROW_VALUE_INVALID.getErrorKey(), dataTableException.getErrorKey());
         verifyNoInteractions(facade);
@@ -429,7 +471,7 @@ class DataTableRowApiControllerTest {
             .toList();
 
         DataTableException dataTableException = assertThrows(
-            DataTableException.class, () -> controller.deleteRows("orders", ids, null));
+            DataTableException.class, () -> controller.deleteRows(1L, "orders", ids, null));
 
         assertEquals(DataTableErrorType.BATCH_TOO_LARGE.getErrorKey(), dataTableException.getErrorKey());
         verifyNoInteractions(facade);
@@ -437,10 +479,10 @@ class DataTableRowApiControllerTest {
 
     @Test
     void testDeleteRowsReturns200WithTheDeletedIds() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.deleteRows(7L, List.of(1L, 2L), PRODUCTION_ENVIRONMENT_ID)).thenReturn(List.of(1L, 2L));
 
-        ResponseEntity<DeleteRowsResponseModel> response = controller.deleteRows("orders", List.of(1L, 2L), null);
+        ResponseEntity<DeleteRowsResponseModel> response = controller.deleteRows(1L, "orders", List.of(1L, 2L), null);
         DeleteRowsResponseModel body = Objects.requireNonNull(response.getBody());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -450,10 +492,10 @@ class DataTableRowApiControllerTest {
 
     @Test
     void testClearRowsReturnsTheDeletedCount() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.clearRows(7L, PRODUCTION_ENVIRONMENT_ID)).thenReturn(42L);
 
-        ResponseEntity<ClearRowsResponseModel> response = controller.clearRows("orders", null);
+        ResponseEntity<ClearRowsResponseModel> response = controller.clearRows(1L, "orders", null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(
@@ -463,10 +505,10 @@ class DataTableRowApiControllerTest {
 
     @Test
     void testImportRowsReturnsTheImportedCount() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.importCsv(7L, "total\n1\n", PRODUCTION_ENVIRONMENT_ID)).thenReturn(1);
 
-        ResponseEntity<ImportRowsResponseModel> response = controller.importRows("orders", "total\n1\n", null);
+        ResponseEntity<ImportRowsResponseModel> response = controller.importRows(1L, "orders", "total\n1\n", null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(
@@ -476,10 +518,10 @@ class DataTableRowApiControllerTest {
 
     @Test
     void testExportSetsCsvHeaders() {
-        when(dataTableService.getIdByBaseName("orders")).thenReturn(7L);
+        stubOrders();
         when(facade.exportCsv(7L, PRODUCTION_ENVIRONMENT_ID)).thenReturn("external_id,total\n,1\n");
 
-        ResponseEntity<String> response = controller.exportRows("orders", null);
+        ResponseEntity<String> response = controller.exportRows(1L, "orders", null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(

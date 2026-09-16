@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.listener.DataTableWebhookEventListener;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -52,6 +53,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class DataTableIntTestConfiguration {
+
+    @Bean
+    DataTableWorkspaceResolver dataTableWorkspaceResolver() {
+        return mock(DataTableWorkspaceResolver.class);
+    }
 
     @Bean
     TagService tagService() {

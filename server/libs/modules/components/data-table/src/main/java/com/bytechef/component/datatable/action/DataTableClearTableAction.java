@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,19 +49,23 @@ public class DataTableClearTableAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableClearTableAction(dataTableService, dataTableRowService).build();
+        return new DataTableClearTableAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver).build();
     }
 
     private DataTableClearTableAction(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -72,7 +77,7 @@ public class DataTableClearTableAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)))
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)))
             .output(
                 outputSchema(
                     object()
@@ -86,12 +91,14 @@ public class DataTableClearTableAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
         long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
 
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
+
         ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
-            dataTableService, baseName, environmentId);
+            dataTableService, workspaceId, name, environmentId);
 
         List<DataTableRow> dataTableRows = dataTableRowService.listRows(
             resolvedDataTable.dataTableRef(), Integer.MAX_VALUE, 0);

@@ -45,9 +45,7 @@ import org.springframework.context.annotation.Import;
 class DataTableRowServiceIntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
-
-    private static final DataTableRef DATA_TABLE_REF =
-        new DataTableRef("rows", DEV_ENVIRONMENT_ID);
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -55,17 +53,22 @@ class DataTableRowServiceIntTest {
     @Autowired
     private DataTableRowService dataTableRowService;
 
+    private DataTableRef dataTableRef;
+
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("rows", DEV_ENVIRONMENT_ID);
+        dataTableService.fetchDataTable(WORKSPACE_ID, "rows")
+            .ifPresent(dataTable -> dataTableService.dropTable(dataTable.getId(), DEV_ENVIRONMENT_ID));
 
-        dataTableService.createTable(
-            "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        long dataTableId = dataTableService.createTable(
+            WORKSPACE_ID, "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRef = new DataTableRef(dataTableId, DEV_ENVIRONMENT_ID);
     }
 
     @Test
     void testInsertRowReturnsTheStoredValues() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "first"));
+        DataTableRow dataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
         assertNotNull(dataTableRow);
         assertEquals("first", dataTableRow.values()
@@ -74,16 +77,16 @@ class DataTableRowServiceIntTest {
 
     @Test
     void testUpdateRowReturnsTheUpdatedValues() {
-        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "first"));
+        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
         DataTableRow updatedDataTableRow = dataTableRowService.updateRow(
-            DATA_TABLE_REF, insertedDataTableRow.id(), Map.of("title", "second"));
+            dataTableRef, insertedDataTableRow.id(), Map.of("title", "second"));
 
         assertEquals(insertedDataTableRow.id(), updatedDataTableRow.id());
         assertEquals("second", updatedDataTableRow.values()
             .get("title"));
 
-        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(DATA_TABLE_REF, insertedDataTableRow.id());
+        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(dataTableRef, insertedDataTableRow.id());
 
         assertEquals("second", fetchedDataTableRow.values()
             .get("title"));
@@ -91,18 +94,18 @@ class DataTableRowServiceIntTest {
 
     @Test
     void testDeleteRowRemovesTheRow() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(DATA_TABLE_REF, Map.of("title", "first"));
+        DataTableRow dataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
-        assertTrue(dataTableRowService.deleteRow(DATA_TABLE_REF, dataTableRow.id()));
+        assertTrue(dataTableRowService.deleteRow(dataTableRef, dataTableRow.id()));
 
-        assertNull(dataTableRowService.getRow(DATA_TABLE_REF, dataTableRow.id()));
+        assertNull(dataTableRowService.getRow(dataTableRef, dataTableRow.id()));
 
-        assertTrue(dataTableRowService.listRows(DATA_TABLE_REF, 10, 0)
+        assertTrue(dataTableRowService.listRows(dataTableRef, 10, 0)
             .isEmpty());
     }
 
     @Test
     void testDeleteRowOfMissingRowReturnsFalse() {
-        assertFalse(dataTableRowService.deleteRow(DATA_TABLE_REF, Long.MAX_VALUE));
+        assertFalse(dataTableRowService.deleteRow(dataTableRef, Long.MAX_VALUE));
     }
 }

@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
 import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
@@ -70,15 +70,11 @@ class WorkspaceDataTableFacadeRowsTest {
     @Mock
     private DataTableWebhookService dataTableWebhookService;
 
-    @Mock
-    private WorkspaceDataTableService workspaceDataTableService;
-
     @InjectMocks
     private WorkspaceDataTableFacadeImpl workspaceDataTableFacade;
 
     @Test
     void testListRowsBuildsAPageFromRowsAndCount() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("orders");
         when(dataTableRowService.listRows(any(), eq(50), eq(100), eq(List.of()), eq(List.of())))
             .thenReturn(List.of(new DataTableRow(1L, Map.of())));
         when(dataTableRowService.countRows(any(), eq(List.of()))).thenReturn(151L);
@@ -93,7 +89,6 @@ class WorkspaceDataTableFacadeRowsTest {
 
     @Test
     void testGetRowTranslatesMissingIntoATypedNotFound() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("orders");
         when(dataTableRowService.getRow(any(), eq(9L))).thenReturn(null);
 
         DataTableException dataTableException = assertThrows(
@@ -104,8 +99,7 @@ class WorkspaceDataTableFacadeRowsTest {
 
     @Test
     void testGetTableTranslatesMissingIntoATypedNotFound() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("orders");
-        when(dataTableService.fetchDataTableInfo("orders", ENVIRONMENT_ID))
+        when(dataTableService.fetchDataTableInfo(7L, ENVIRONMENT_ID))
             .thenReturn(Optional.empty());
 
         DataTableException dataTableException = assertThrows(
@@ -116,7 +110,7 @@ class WorkspaceDataTableFacadeRowsTest {
 
     @Test
     void testGetWorkspaceIdTranslatesMissingIntoATypedNotFound() {
-        when(workspaceDataTableService.fetchWorkspaceId(7L)).thenReturn(Optional.empty());
+        when(dataTableService.getDataTable(7L)).thenReturn(new DataTable(7L, "orders"));
 
         DataTableException dataTableException = assertThrows(
             DataTableException.class, () -> workspaceDataTableFacade.getWorkspaceId(7L));
@@ -126,7 +120,6 @@ class WorkspaceDataTableFacadeRowsTest {
 
     @Test
     void testEveryRowMethodUsesAnUnownedAutomationRef() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("orders");
 
         workspaceDataTableFacade.clearRows(7L, ENVIRONMENT_ID);
 
@@ -134,5 +127,6 @@ class WorkspaceDataTableFacadeRowsTest {
 
         verify(dataTableRowService).clearRows(captor.capture());
 
+        assertEquals(new DataTableRef(7L, ENVIRONMENT_ID), captor.getValue());
     }
 }

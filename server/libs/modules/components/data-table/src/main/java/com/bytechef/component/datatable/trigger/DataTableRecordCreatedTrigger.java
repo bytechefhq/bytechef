@@ -37,6 +37,7 @@ import com.bytechef.platform.component.definition.TriggerContextAware;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -52,23 +53,25 @@ public class DataTableRecordCreatedTrigger {
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
     private final DataTableWebhookService dataTableWebhookService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableTriggerDefinition of(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
-        DataTableWebhookService dataTableWebhookService) {
+        DataTableWebhookService dataTableWebhookService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         return new DataTableRecordCreatedTrigger(
-            dataTableRowService, dataTableService, dataTableWebhookService).build();
+            dataTableRowService, dataTableService, dataTableWebhookService, dataTableWorkspaceResolver).build();
     }
 
     private DataTableRecordCreatedTrigger(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
-        DataTableWebhookService dataTableWebhookService) {
+        DataTableWebhookService dataTableWebhookService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
         this.dataTableWebhookService = dataTableWebhookService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableTriggerDefinition build() {
@@ -82,7 +85,7 @@ public class DataTableRecordCreatedTrigger {
                     .resourceReference(ResourceType.DATA_TABLE)
                     .description("Select a Data Table.")
                     .required(true)
-                    .options(DataTableUtils.getTriggerTableOptions(dataTableService)))
+                    .options(DataTableUtils.getTriggerTableOptions(dataTableService, dataTableWorkspaceResolver)))
             .output(this::output)
             .webhookEnable(this::webhookEnable)
             .webhookDisable(this::webhookDisable)
@@ -93,9 +96,11 @@ public class DataTableRecordCreatedTrigger {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext triggerContext) {
 
-        var baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
-        return DataTableUtils.createTriggerOutputResponse(dataTableRowService, dataTableService, baseName);
+        return DataTableUtils.createTriggerOutputResponse(
+            dataTableRowService, dataTableService,
+            DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, triggerContext), name);
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
@@ -105,10 +110,13 @@ public class DataTableRecordCreatedTrigger {
 
         TriggerContextAware triggerContextAware = (TriggerContextAware) triggerContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
+
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, workflowExecutionId);
 
         long webhookId = DataTableUtils.registerWebhook(
-            dataTableService, dataTableWebhookService, baseName, webhookUrl, DataTableWebhookType.RECORD_CREATED,
+            dataTableService, dataTableWebhookService, workspaceId, name, webhookUrl,
+            DataTableWebhookType.RECORD_CREATED,
             Objects.requireNonNull(triggerContextAware.getEnvironmentId()));
 
         return new WebhookEnableOutput(Map.of("webhookId", webhookId), null);
