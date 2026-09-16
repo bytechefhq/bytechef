@@ -1,32 +1,27 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import CreateKnowledgeBaseDialog from '@/pages/automation/knowledge-bases/components/CreateKnowledgeBaseDialog';
+import KnowledgeBaseEmbeddingInactiveAlert from '@/pages/automation/knowledge-bases/components/KnowledgeBaseEmbeddingInactiveAlert';
 import KnowledgeBasesFilterTitle from '@/pages/automation/knowledge-bases/components/KnowledgeBasesFilterTitle';
 import KnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/components/KnowledgeBasesLeftSidebarNav';
+import useKnowledgeBaseEmbeddingActive from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBaseEmbeddingActive';
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useKnowledgeBaseEmbeddingActiveQuery} from '@/shared/middleware/graphql';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {DatabaseIcon} from 'lucide-react';
 
 const KnowledgeBases = () => {
     const currentWorkspaceId = String(useWorkspaceStore((state) => state.currentWorkspaceId));
 
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-
     const {allTags, error, filteredKnowledgeBases, isLoading, knowledgeBases, tagId, tagsByKnowledgeBaseData} =
         useKnowledgeBases();
 
-    const {data: embeddingActiveData} = useKnowledgeBaseEmbeddingActiveQuery({
-        environment: currentEnvironmentId,
-    });
+    const {embeddingActive, isLoading: embeddingActiveLoading} = useKnowledgeBaseEmbeddingActive();
 
-    const embeddingActive = embeddingActiveData?.knowledgeBaseEmbeddingActive ?? true;
+    const showKnowledgeBases = embeddingActive && knowledgeBases.length > 0;
 
     return (
         <LayoutContainer
@@ -35,7 +30,7 @@ const KnowledgeBases = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        knowledgeBases.length > 0 && (
+                        showKnowledgeBases && (
                             <CreateKnowledgeBaseDialog
                                 trigger={<Button>New Knowledge Base</Button>}
                                 workspaceId={currentWorkspaceId}
@@ -43,7 +38,7 @@ const KnowledgeBases = () => {
                         )
                     }
                     title={
-                        knowledgeBases.length > 0 ? (
+                        showKnowledgeBases ? (
                             <KnowledgeBasesFilterTitle
                                 allTags={allTags}
                                 tagsByKnowledgeBaseData={tagsByKnowledgeBaseData}
@@ -54,30 +49,13 @@ const KnowledgeBases = () => {
                     }
                 />
             }
-            leftSidebarBody={<KnowledgeBasesLeftSidebarNav />}
+            leftSidebarBody={embeddingActive && <KnowledgeBasesLeftSidebarNav />}
             leftSidebarHeader={<Header position="sidebar" title="Knowledge Bases" />}
             leftSidebarWidth="64"
         >
-            <PageLoader errors={[error]} loading={isLoading}>
-                <div className="flex size-full flex-col">
-                    {!embeddingActive && (
-                        <Alert className="m-4 mb-0 w-auto" variant="destructive">
-                            <AlertTitle>No embedding model is active</AlertTitle>
-
-                            <AlertDescription className="flex flex-col gap-1">
-                                <span>
-                                    Knowledge Base documents can&apos;t be processed until an embedding-capable AI
-                                    provider is activated for this environment.
-                                </span>
-
-                                <a className="font-medium underline" href="/automation/settings/ai-providers">
-                                    Go to AI Providers
-                                </a>
-                            </AlertDescription>
-                        </Alert>
-                    )}
-
-                    <div className="flex flex-1">
+            <PageLoader errors={[error]} loading={isLoading || embeddingActiveLoading}>
+                {embeddingActive ? (
+                    <div className="flex size-full">
                         {filteredKnowledgeBases.length > 0 ? (
                             <KnowledgeBaseList
                                 allTags={allTags}
@@ -102,7 +80,9 @@ const KnowledgeBases = () => {
                             />
                         )}
                     </div>
-                </div>
+                ) : (
+                    <KnowledgeBaseEmbeddingInactiveAlert />
+                )}
             </PageLoader>
         </LayoutContainer>
     );

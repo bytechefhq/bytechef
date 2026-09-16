@@ -312,7 +312,7 @@ describe('KnowledgeBases embedding banner', () => {
         vi.clearAllMocks();
     });
 
-    it('shows the banner when embedding is not active', () => {
+    it('shows only the banner when embedding is not active', () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
             data: {knowledgeBaseEmbeddingActive: false},
         });
@@ -321,6 +321,11 @@ describe('KnowledgeBases embedding banner', () => {
 
         expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
         expect(screen.getByText('Go to AI Providers')).toBeInTheDocument();
+        expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('empty-list')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('filter-title')).not.toBeInTheDocument();
+        expect(screen.queryByText('New Knowledge Base')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('left-sidebar-nav')).not.toBeInTheDocument();
     });
 
     it('hides the banner when embedding is active', () => {
@@ -331,6 +336,7 @@ describe('KnowledgeBases embedding banner', () => {
         render(<KnowledgeBases />);
 
         expect(screen.queryByText('No embedding model is active')).not.toBeInTheDocument();
+        expect(screen.getByTestId('knowledge-base-list')).toBeInTheDocument();
     });
 
     it('hides the banner by default when query has no data (fail-open)', () => {
@@ -341,7 +347,16 @@ describe('KnowledgeBases embedding banner', () => {
         expect(screen.queryByText('No embedding model is active')).not.toBeInTheDocument();
     });
 
-    it('shows the banner even when the knowledge base list is empty', () => {
+    it('shows the loader while the embedding query is loading', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({data: undefined, isLoading: true});
+
+        render(<KnowledgeBases />);
+
+        expect(screen.getByTestId('page-loader-loading')).toBeInTheDocument();
+        expect(screen.queryByTestId('knowledge-base-list')).not.toBeInTheDocument();
+    });
+
+    it('shows only the banner when the knowledge base list is empty', () => {
         hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
             data: {knowledgeBaseEmbeddingActive: false},
         });
@@ -355,5 +370,6 @@ describe('KnowledgeBases embedding banner', () => {
         render(<KnowledgeBases />);
 
         expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
+        expect(screen.queryByText('Create Knowledge Base')).not.toBeInTheDocument();
     });
 });

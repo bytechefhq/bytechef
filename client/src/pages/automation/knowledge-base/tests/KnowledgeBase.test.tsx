@@ -6,11 +6,16 @@ import KnowledgeBase from '../KnowledgeBase';
 const hoisted = vi.hoisted(() => {
     return {
         mockUseKnowledgeBase: vi.fn(),
+        mockUseKnowledgeBaseEmbeddingActive: vi.fn(),
     };
 });
 
 vi.mock('../hooks/useKnowledgeBase', () => ({
     default: hoisted.mockUseKnowledgeBase,
+}));
+
+vi.mock('@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBaseEmbeddingActive', () => ({
+    default: hoisted.mockUseKnowledgeBaseEmbeddingActive,
 }));
 
 vi.mock('@/components/PageLoader', () => ({
@@ -102,6 +107,7 @@ const defaultMockReturn = {
 beforeEach(() => {
     windowResizeObserver();
     hoisted.mockUseKnowledgeBase.mockReturnValue({...defaultMockReturn});
+    hoisted.mockUseKnowledgeBaseEmbeddingActive.mockReturnValue({embeddingActive: true, isLoading: false});
 });
 
 afterEach(() => {
@@ -184,5 +190,26 @@ describe('KnowledgeBase', () => {
 
         expect(screen.queryByTestId('knowledge-base-info-card')).not.toBeInTheDocument();
         expect(screen.queryByTestId('knowledge-base-tabs')).not.toBeInTheDocument();
+    });
+});
+
+describe('KnowledgeBase embedding gate', () => {
+    it('shows only the banner when embedding is not active', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActive.mockReturnValue({embeddingActive: false, isLoading: false});
+
+        render(<KnowledgeBase />);
+
+        expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
+        expect(screen.queryByTestId('knowledge-base-info-card')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('knowledge-base-tabs')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('knowledge-base-left-sidebar')).not.toBeInTheDocument();
+    });
+
+    it('shows the loader while the embedding status is loading', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActive.mockReturnValue({embeddingActive: true, isLoading: true});
+
+        render(<KnowledgeBase />);
+
+        expect(screen.getByTestId('page-loader-loading')).toBeInTheDocument();
     });
 });
