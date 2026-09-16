@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.Session;
@@ -34,9 +34,9 @@ import org.springframework.ai.session.SessionRepository;
 public final class TenantRoutingSessionRepository implements SessionRepository {
 
     private final Map<String, SessionRepository> repositories = new ConcurrentHashMap<>();
-    private final Supplier<SessionRepository> repositoryFactory;
+    private final Function<String, SessionRepository> repositoryFactory;
 
-    public TenantRoutingSessionRepository(Supplier<SessionRepository> repositoryFactory) {
+    public TenantRoutingSessionRepository(Function<String, SessionRepository> repositoryFactory) {
         this.repositoryFactory = repositoryFactory;
     }
 
@@ -90,7 +90,6 @@ public final class TenantRoutingSessionRepository implements SessionRepository {
     }
 
     private SessionRepository resolve() {
-        return repositories.computeIfAbsent(
-            TenantContext.getCurrentTenantId(), tenantId -> repositoryFactory.get());
+        return repositories.computeIfAbsent(TenantContext.getCurrentTenantId(), repositoryFactory);
     }
 }

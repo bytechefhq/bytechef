@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory.BuiltInSessionRepository;
 import com.bytechef.tenant.TenantContext;
@@ -27,9 +29,9 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionRepository;
-import org.springframework.ai.session.redis.RedisSessionRepository;
 import org.springframework.mock.env.MockEnvironment;
 import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.UnifiedJedis;
 import software.amazon.awssdk.services.s3.S3Client;
 
 /**
@@ -67,7 +69,7 @@ class BuiltInSessionRepositoryFactoryTest {
         BuiltInSessionRepository builtInSessionRepository = BuiltInSessionRepositoryFactory.create(environment, null);
 
         try {
-            assertInstanceOf(RedisSessionRepository.class, builtInSessionRepository.sessionRepository());
+            assertInstanceOf(TenantRoutingSessionRepository.class, builtInSessionRepository.sessionRepository());
             assertInstanceOf(JedisPooled.class, builtInSessionRepository.closeable());
         } finally {
             AutoCloseable closeable = builtInSessionRepository.closeable();
@@ -108,6 +110,20 @@ class BuiltInSessionRepositoryFactoryTest {
                 closeable.close();
             }
         }
+    }
+
+    @Test
+    void testRedisSessionKeysAreScopedPerTenant() {
+        UnifiedJedis jedis = mock(UnifiedJedis.class);
+
+        SessionRepository sessionRepository = BuiltInSessionRepositoryFactory.createRedisSessionRepository(
+            jedis, "bytechef-session:");
+
+        TenantContext.runWithTenantId("tenantA", () -> sessionRepository.findById("session-1"));
+        TenantContext.runWithTenantId("tenantB", () -> sessionRepository.findById("session-1"));
+
+        verify(jedis).get("bytechef-session:tenantA:session-1");
+        verify(jedis).get("bytechef-session:tenantB:session-1");
     }
 
     private static void assertSessionsAreIsolatedPerTenant(SessionRepository sessionRepository) {
