@@ -1,4 +1,5 @@
 import {type ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {
     ComponentDefinitionBasic,
     type DeleteClusterElementParameter200Response,
@@ -34,6 +35,7 @@ export const workflowEditorProviderTestValue = {
         unknown
     >,
     invalidateWorkflowQueries: () => {},
+    platformType: PlatformType.Automation,
     updateClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
         DeleteClusterElementParameter200Response,
         Error,

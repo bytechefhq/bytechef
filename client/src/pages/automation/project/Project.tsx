@@ -11,6 +11,7 @@ import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeave
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
@@ -100,6 +101,7 @@ const Project = () => {
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,
+                                    platformType: PlatformType.Automation,
                                     updateClusterElementParameterMutation,
                                     updateWorkflowMutation: updateWorkflowEditorMutation,
                                     updateWorkflowNodeParameterMutation,

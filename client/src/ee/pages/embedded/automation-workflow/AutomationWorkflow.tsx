@@ -11,7 +11,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
-import {useAutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
+import {PlatformType, useAutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {useUpdateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {
@@ -160,6 +160,7 @@ const AutomationWorkflow = () => {
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,
+                                    platformType: PlatformType.Automation,
                                     updateClusterElementParameterMutation,
                                     updateWorkflowMutation: updateWorkflowEditorMutation,
                                     updateWorkflowNodeParameterMutation,

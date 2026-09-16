@@ -84,6 +84,7 @@ import {
 } from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {
     ComponentDefinitionBasic,
     type DeleteClusterElementParameter200Response,
@@ -199,6 +200,7 @@ describe('PropertyMentionsInput', () => {
                         unknown
                     >,
                     invalidateWorkflowQueries: () => {},
+                    platformType: PlatformType.Automation,
                     updateClusterElementParameterMutation,
                     updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
                     updateWorkflowNodeParameterMutation,
@@ -315,6 +317,7 @@ describe('PropertyMentionsInput', () => {
                         unknown
                     >,
                     invalidateWorkflowQueries: () => {},
+                    platformType: PlatformType.Automation,
                     updateClusterElementParameterMutation,
                     updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
                     updateWorkflowNodeParameterMutation,
@@ -415,6 +418,7 @@ describe('PropertyMentionsInput', () => {
                         unknown
                     >,
                     invalidateWorkflowQueries: () => {},
+                    platformType: PlatformType.Automation,
                     updateClusterElementParameterMutation,
                     updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
                     updateWorkflowNodeParameterMutation,
@@ -494,6 +498,7 @@ describe('PropertyMentionsInput', () => {
                 unknown
             >,
             invalidateWorkflowQueries: () => {},
+            platformType: PlatformType.Automation,
             updateClusterElementParameterMutation,
             updateWorkflowMutation: {} as unknown as UpdateWorkflowMutationType,
             updateWorkflowNodeParameterMutation,
