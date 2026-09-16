@@ -276,7 +276,12 @@ const PropertyComboBox = ({
     }, [clusterElementInputParameters, lookupDependsOnPaths]);
 
     const clusterElementContextQueryEnabled = useMemo(() => {
-        if (!clusterElementContext || !optionsDataSource || currentNode) {
+        if (
+            !clusterElementContext ||
+            (clusterElementContext.connectionRequired === true && clusterElementContext.connectionId == null) ||
+            !optionsDataSource ||
+            currentNode
+        ) {
             return false;
         }
 
