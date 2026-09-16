@@ -260,6 +260,7 @@ include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-jdbc-se
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-mongodb")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-neo4j")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-redis")
+include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-redis-session")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-session")
 include("server:libs:modules:components:ai:agent:chat-memory:chat-memory-vectorstore")
 include("server:libs:modules:components:ai:agent:guardrails")
