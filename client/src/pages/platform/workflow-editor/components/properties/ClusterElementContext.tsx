@@ -5,6 +5,7 @@ export interface ClusterElementContextI {
     componentName: string;
     componentVersion: number;
     connectionId?: number;
+    connectionRequired?: boolean;
     inputParameters: Record<string, unknown>;
 }
 

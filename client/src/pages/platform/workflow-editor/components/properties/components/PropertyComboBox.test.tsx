@@ -270,6 +270,62 @@ describe('PropertyComboBox', () => {
             expect(queryOptions.enabled).toBe(false);
         });
 
+        it('should not enable query when the component requires a connection and none is bound', () => {
+            hoisted.mockClusterElementContext.mockReturnValue({
+                ...clusterElementContext,
+                connectionId: undefined,
+                connectionRequired: true,
+            });
+
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
+                data: undefined,
+                isLoading: false,
+            });
+
+            render(
+                <PropertyComboBox
+                    {...defaultProps}
+                    lookupDependsOnPaths={['serverId']}
+                    lookupDependsOnValues={['srv-1']}
+                    options={[]}
+                    optionsDataSource={optionsDataSource}
+                />
+            );
+
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
+            const queryOptions = queryCall[1];
+
+            expect(queryOptions.enabled).toBe(false);
+        });
+
+        it('should still enable query when connectionId is missing but the component does not require a connection', () => {
+            hoisted.mockClusterElementContext.mockReturnValue({
+                ...clusterElementContext,
+                connectionId: undefined,
+                connectionRequired: false,
+            });
+
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
+                data: undefined,
+                isLoading: false,
+            });
+
+            render(
+                <PropertyComboBox
+                    {...defaultProps}
+                    lookupDependsOnPaths={['serverId']}
+                    lookupDependsOnValues={['srv-1']}
+                    options={[]}
+                    optionsDataSource={optionsDataSource}
+                />
+            );
+
+            const queryCall = hoisted.mockClusterElementOptionsQuery.mock.calls[0];
+            const queryOptions = queryCall[1];
+
+            expect(queryOptions.enabled).toBe(true);
+        });
+
         it('should not enable query when no optionsDataSource is provided', () => {
             hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
