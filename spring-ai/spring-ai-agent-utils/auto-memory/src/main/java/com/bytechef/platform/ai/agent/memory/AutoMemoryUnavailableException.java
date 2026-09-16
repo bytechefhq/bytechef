@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
+package com.bytechef.platform.ai.agent.memory;
 
-import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import java.io.Serial;
 
 /**
+ * Thrown by a {@link MemoryResourceResolver} or {@link AutoMemoryDirectoryOps} when this run has no memory to use at
+ * all. {@link AutoMemoryTools} returns the message to the model, so it should say why memory is unavailable.
+ *
  * @author Ivica Cardic
  */
-public class AiAgentUtilsComponentHandlerTest {
+public class AutoMemoryUnavailableException extends RuntimeException {
 
-    @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of(), null, null, null)
-                .getDefinition());
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public AutoMemoryUnavailableException(String message) {
+        super(message);
     }
 }

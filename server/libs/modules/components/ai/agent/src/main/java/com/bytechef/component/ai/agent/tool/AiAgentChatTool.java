@@ -29,9 +29,13 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
+import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 public class AiAgentChatTool {
 
@@ -54,10 +58,22 @@ public class AiAgentChatTool {
             .type(TOOLS)
             .object(
                 () -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> performFn
-                    .apply(inputParameters, componentConnections, extensions, new ActionContextAdapter(context)));
+                    .apply(inputParameters, componentConnections, extensions, toActionContext(context)));
     }
 
     private AiAgentChatTool() {
+    }
+
+    /**
+     * Keeps the parent run's job reachable, so the nested agent's own tools that are scoped to the running workflow -
+     * such as auto memory - resolve the same owner a top-level agent would.
+     */
+    private static ActionContext toActionContext(ClusterElementContext context) {
+        if (context instanceof ClusterElementContextAware clusterElementContextAware) {
+            return new JobAwareActionContextAdapter(clusterElementContextAware);
+        }
+
+        return new ActionContextAdapter(context);
     }
 
     private static class ActionContextAdapter implements ActionContext {
@@ -146,6 +162,30 @@ public class AiAgentChatTool {
         @Override
         public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
             return context.xml(xmlFunction);
+        }
+    }
+
+    private static final class JobAwareActionContextAdapter extends ActionContextAdapter implements JobContextAware {
+
+        private final ClusterElementContextAware context;
+
+        private JobAwareActionContextAdapter(ClusterElementContextAware context) {
+            super(context);
+
+            this.context = context;
+        }
+
+        @Override
+        public ActionContext toActionContext(
+            String componentName, int componentVersion, String actionName,
+            @Nullable ComponentConnection componentConnection) {
+
+            return context.toActionContext(componentName, componentVersion, actionName, componentConnection);
+        }
+
+        @Override
+        public @Nullable Long getEnvironmentId() {
+            return context.getEnvironmentId();
         }
     }
 }
