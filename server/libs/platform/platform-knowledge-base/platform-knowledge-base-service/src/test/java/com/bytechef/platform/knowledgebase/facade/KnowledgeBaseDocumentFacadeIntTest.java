@@ -17,17 +17,21 @@
 package com.bytechef.platform.knowledgebase.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfiguration;
 import com.bytechef.platform.knowledgebase.config.KnowledgeBaseIntTestConfigurationSharedMocks;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseStorageLimitExceededException;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentChunkRepository;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseDocumentRepository;
@@ -53,6 +57,11 @@ import org.springframework.context.annotation.Import;
 @Import(PostgreSQLContainerConfiguration.class)
 @KnowledgeBaseIntTestConfigurationSharedMocks
 class KnowledgeBaseDocumentFacadeIntTest {
+
+    private static final long DEFAULT_MAX_SIZE_BYTES = new ApplicationProperties.Ai.KnowledgeBase().getMaxSizeBytes();
+
+    @Autowired
+    private ApplicationProperties applicationProperties;
 
     @Autowired
     private KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
@@ -86,6 +95,8 @@ class KnowledgeBaseDocumentFacadeIntTest {
 
     @AfterEach
     public void afterEach() {
+        getKnowledgeBaseProperties().setMaxSizeBytes(DEFAULT_MAX_SIZE_BYTES);
+
         knowledgeBaseDocumentChunkRepository.deleteAll();
         knowledgeBaseDocumentRepository.deleteAll();
         knowledgeBaseRepository.deleteAll();
@@ -103,7 +114,8 @@ class KnowledgeBaseDocumentFacadeIntTest {
         when(knowledgeBaseFileStorage.storeDocument(eq(filename), any(InputStream.class))).thenReturn(mockFileEntry);
 
         KnowledgeBaseDocument document = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), filename, contentType, inputStream);
+            knowledgeBase.getId(), filename, contentType, content.getBytes(StandardCharsets.UTF_8).length,
+            inputStream);
 
         assertThat(document).isNotNull();
         assertThat(document.getId()).isNotNull();
@@ -111,8 +123,25 @@ class KnowledgeBaseDocumentFacadeIntTest {
         assertThat(document.getKnowledgeBaseId()).isEqualTo(knowledgeBase.getId());
         assertThat(document.getStatus()).isEqualTo(KnowledgeBaseDocument.STATUS_UPLOADED);
         assertThat(document.getDocument()).isEqualTo(mockFileEntry);
+        assertThat(document.getDocumentSize()).isEqualTo(content.getBytes(StandardCharsets.UTF_8).length);
 
         verify(knowledgeBaseFileStorage).storeDocument(eq(filename), any(InputStream.class));
+    }
+
+    @Test
+    void testCreateKnowledgeBaseDocumentOverTheLimitStoresNothing() {
+        getKnowledgeBaseProperties().setMaxSizeBytes(100L);
+
+        Long knowledgeBaseId = knowledgeBase.getId();
+        InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+
+        assertThatThrownBy(() -> knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
+            knowledgeBaseId, "too-large.txt", "text/plain", 500, inputStream))
+                .isInstanceOf(KnowledgeBaseStorageLimitExceededException.class);
+
+        verify(knowledgeBaseFileStorage, never()).storeDocument(eq("too-large.txt"), any(InputStream.class));
+
+        assertThat(knowledgeBaseDocumentRepository.count()).isZero();
     }
 
     @Test
@@ -229,11 +258,11 @@ class KnowledgeBaseDocumentFacadeIntTest {
         when(knowledgeBaseFileStorage.storeDocument(eq("doc2.txt"), any(InputStream.class))).thenReturn(mockFileEntry2);
 
         KnowledgeBaseDocument document1 = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), "doc1.txt", "text/plain",
+            knowledgeBase.getId(), "doc1.txt", "text/plain", "Content 1".getBytes(StandardCharsets.UTF_8).length,
             new ByteArrayInputStream("Content 1".getBytes(StandardCharsets.UTF_8)));
 
         KnowledgeBaseDocument document2 = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), "doc2.txt", "text/plain",
+            knowledgeBase.getId(), "doc2.txt", "text/plain", "Content 2".getBytes(StandardCharsets.UTF_8).length,
             new ByteArrayInputStream("Content 2".getBytes(StandardCharsets.UTF_8)));
 
         assertThat(document1.getId()).isNotEqualTo(document2.getId());
@@ -244,5 +273,11 @@ class KnowledgeBaseDocumentFacadeIntTest {
             knowledgeBaseDocumentRepository.findAllByKnowledgeBaseId(knowledgeBase.getId());
 
         assertThat(documents).hasSize(2);
+    }
+
+    private ApplicationProperties.Ai.KnowledgeBase getKnowledgeBaseProperties() {
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        return ai.getKnowledgeBase();
     }
 }

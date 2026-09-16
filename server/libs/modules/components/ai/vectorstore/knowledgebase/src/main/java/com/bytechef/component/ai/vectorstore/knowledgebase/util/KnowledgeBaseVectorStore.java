@@ -49,9 +49,12 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
@@ -120,6 +123,21 @@ public final class KnowledgeBaseVectorStore {
             knowledgeBaseService, vectorStore);
     }
 
+    private static long getContentBytes(List<Document> documents) {
+        long contentBytes = 0;
+
+        for (Document document : documents) {
+            String text = document.getText();
+
+            if (text != null) {
+                contentBytes += text.replace("\0", "")
+                    .getBytes(StandardCharsets.UTF_8).length;
+            }
+        }
+
+        return contentBytes;
+    }
+
     private static String deriveDocumentName(List<Document> documents, Parameters inputParameters) {
         if (!documents.isEmpty()) {
             Document document = documents.getLast();
@@ -182,6 +200,17 @@ public final class KnowledgeBaseVectorStore {
             Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
             DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
 
+            load(inputParameters, documentReader, documentTransformers, null);
+        }
+
+        /**
+         * @param replacedChunkBytes the size of the single chunk being replaced in an existing document, or
+         *                           {@code null} when the whole document content is replaced
+         */
+        private void load(
+            Parameters inputParameters, DocumentReader documentReader, List<DocumentTransformer> documentTransformers,
+            @Nullable Long replacedChunkBytes) {
+
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
 
             KnowledgeBase knowledgeBase = knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
@@ -197,15 +226,28 @@ public final class KnowledgeBaseVectorStore {
 
             Long existingDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
 
+            long contentBytes = getContentBytes(documents);
+
             KnowledgeBaseDocument knowledgeBaseDocument;
 
             if (existingDocumentId != null) {
                 knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(existingDocumentId);
+
+                long documentSize = contentBytes;
+
+                if (replacedChunkBytes != null) {
+                    long previousDocumentSize = Objects.requireNonNullElse(knowledgeBaseDocument.getDocumentSize(), 0L);
+
+                    documentSize += Math.max(0, previousDocumentSize - replacedChunkBytes);
+                }
+
+                knowledgeBaseDocument.setDocumentSize(documentSize);
                 knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
             } else {
                 knowledgeBaseDocument = new KnowledgeBaseDocument();
                 knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBaseId);
                 knowledgeBaseDocument.setName(deriveDocumentName(documents, inputParameters));
+                knowledgeBaseDocument.setDocumentSize(contentBytes);
                 knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
             }
 
@@ -315,6 +357,8 @@ public final class KnowledgeBaseVectorStore {
 
             Map<String, Object> loadMetadata = new HashMap<>();
 
+            Long replacedChunkBytes = null;
+
             if (knowledgeBaseDocumentChunkId != null) {
                 FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
 
@@ -329,6 +373,8 @@ public final class KnowledgeBaseVectorStore {
                         .similarityThreshold(0.0)
                         .filterExpression(chunkFilter)
                         .build());
+
+                replacedChunkBytes = getContentBytes(existingDocuments);
 
                 if (!existingDocuments.isEmpty()) {
                     Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst()
@@ -384,9 +430,7 @@ public final class KnowledgeBaseVectorStore {
                 loadParametersMap.put(KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
             }
 
-            load(
-                ParametersFactory.create(loadParametersMap), connectionParameters, embeddingModel, documentReader,
-                documentTransformers);
+            load(ParametersFactory.create(loadParametersMap), documentReader, documentTransformers, replacedChunkBytes);
         }
 
         @Override

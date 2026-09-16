@@ -29,6 +29,7 @@ import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
@@ -274,6 +275,37 @@ class KnowledgeBaseGraphQlControllerIntTest {
                 """)
             .execute()
             .path("knowledgeBaseEmbeddingActive")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+    }
+
+    @Test
+    void testKnowledgeBaseStorageUsageReturnsTheFacadeValue() {
+        when(workspaceKnowledgeBaseFacade.getStorageUsage())
+            .thenReturn(new KnowledgeBaseStorageUsage(800L, 1_000L, 80.0, false));
+
+        this.graphQlTester
+            .document("""
+                query {
+                    knowledgeBaseStorageUsage {
+                        usedBytes
+                        limitBytes
+                        percentage
+                        unlimited
+                    }
+                }
+                """)
+            .execute()
+            .path("knowledgeBaseStorageUsage.usedBytes")
+            .entity(Long.class)
+            .isEqualTo(800L)
+            .path("knowledgeBaseStorageUsage.limitBytes")
+            .entity(Long.class)
+            .isEqualTo(1_000L)
+            .path("knowledgeBaseStorageUsage.percentage")
+            .entity(Double.class)
+            .isEqualTo(80.0)
+            .path("knowledgeBaseStorageUsage.unlimited")
             .entity(Boolean.class)
             .isEqualTo(false);
     }
