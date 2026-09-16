@@ -966,6 +966,11 @@ public class ApplicationProperties {
             private boolean enabled;
 
             /**
+             * Maximum total size in bytes of all knowledge base documents in a tenant. 0 means unlimited. Default 1 GB.
+             */
+            private long maxSizeBytes = 1_073_741_824L;
+
+            /**
              * OCR configuration
              */
             private Ocr ocr = new Ocr();
@@ -981,6 +986,14 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public long getMaxSizeBytes() {
+                return maxSizeBytes;
+            }
+
+            public void setMaxSizeBytes(long maxSizeBytes) {
+                this.maxSizeBytes = maxSizeBytes;
             }
 
             public Ocr getOcr() {

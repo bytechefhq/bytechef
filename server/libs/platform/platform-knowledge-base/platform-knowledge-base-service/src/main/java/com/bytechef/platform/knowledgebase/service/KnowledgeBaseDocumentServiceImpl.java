@@ -31,9 +31,14 @@ import org.springframework.transaction.annotation.Transactional;
 class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
 
     private final KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository;
+    private final KnowledgeBaseStorageService knowledgeBaseStorageService;
 
-    KnowledgeBaseDocumentServiceImpl(KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository) {
+    KnowledgeBaseDocumentServiceImpl(
+        KnowledgeBaseDocumentRepository knowledgeBaseDocumentRepository,
+        KnowledgeBaseStorageService knowledgeBaseStorageService) {
+
         this.knowledgeBaseDocumentRepository = knowledgeBaseDocumentRepository;
+        this.knowledgeBaseStorageService = knowledgeBaseStorageService;
     }
 
     @Override
@@ -64,6 +69,26 @@ class KnowledgeBaseDocumentServiceImpl implements KnowledgeBaseDocumentService {
 
     @Override
     public KnowledgeBaseDocument saveKnowledgeBaseDocument(KnowledgeBaseDocument knowledgeBaseDocument) {
+        Long documentSize = knowledgeBaseDocument.getDocumentSize();
+
+        if (documentSize != null) {
+            long incomingBytes = documentSize - getStoredDocumentSize(knowledgeBaseDocument.getId());
+
+            if (incomingBytes > 0) {
+                knowledgeBaseStorageService.checkWithinLimit(incomingBytes);
+            }
+        }
+
         return knowledgeBaseDocumentRepository.save(knowledgeBaseDocument);
+    }
+
+    private long getStoredDocumentSize(Long id) {
+        if (id == null) {
+            return 0;
+        }
+
+        return knowledgeBaseDocumentRepository.findById(id)
+            .map(KnowledgeBaseDocument::getDocumentSize)
+            .orElse(0L);
     }
 }
