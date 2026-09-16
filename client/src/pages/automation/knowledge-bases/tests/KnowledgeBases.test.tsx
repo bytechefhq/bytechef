@@ -8,6 +8,7 @@ const hoisted = vi.hoisted(() => {
         currentEnvironmentId: 1,
         currentWorkspaceId: 1049,
         mockUseKnowledgeBaseEmbeddingActiveQuery: vi.fn(),
+        mockUseKnowledgeBaseStorageUsageQuery: vi.fn(),
         mockUseKnowledgeBases: vi.fn(),
     };
 });
@@ -34,6 +35,7 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
     return {
         ...actual,
         useKnowledgeBaseEmbeddingActiveQuery: hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery,
+        useKnowledgeBaseStorageUsageQuery: hoisted.mockUseKnowledgeBaseStorageUsageQuery,
     };
 });
 
@@ -171,6 +173,7 @@ beforeEach(() => {
     hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
         data: {knowledgeBaseEmbeddingActive: true},
     });
+    hoisted.mockUseKnowledgeBaseStorageUsageQuery.mockReturnValue({data: undefined});
 });
 
 afterEach(() => {
@@ -305,6 +308,7 @@ describe('KnowledgeBases embedding banner', () => {
     beforeEach(() => {
         windowResizeObserver();
         hoisted.mockUseKnowledgeBases.mockReturnValue({...defaultMockReturn});
+        hoisted.mockUseKnowledgeBaseStorageUsageQuery.mockReturnValue({data: undefined});
     });
 
     afterEach(() => {
@@ -355,5 +359,51 @@ describe('KnowledgeBases embedding banner', () => {
         render(<KnowledgeBases />);
 
         expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
+    });
+});
+
+describe('KnowledgeBases storage usage banner', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+        hoisted.mockUseKnowledgeBases.mockReturnValue({...defaultMockReturn});
+        hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
+            data: {knowledgeBaseEmbeddingActive: true},
+        });
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('shows the banner when usage is at or above 80 percent', () => {
+        hoisted.mockUseKnowledgeBaseStorageUsageQuery.mockReturnValue({
+            data: {
+                knowledgeBaseStorageUsage: {limitBytes: 1_000, percentage: 90, unlimited: false, usedBytes: 900},
+            },
+        });
+
+        render(<KnowledgeBases />);
+
+        expect(screen.getByText('Knowledge base storage is at 90%')).toBeInTheDocument();
+        expect(screen.getByText(/Using 900 B of 1000 B/)).toBeInTheDocument();
+    });
+
+    it('hides the banner when the limit is unlimited', () => {
+        hoisted.mockUseKnowledgeBaseStorageUsageQuery.mockReturnValue({
+            data: {
+                knowledgeBaseStorageUsage: {limitBytes: 0, percentage: 0, unlimited: true, usedBytes: 5_000_000},
+            },
+        });
+
+        render(<KnowledgeBases />);
+
+        expect(screen.queryByText(/storage is at/)).not.toBeInTheDocument();
+    });
+
+    it('hides the banner while usage is unknown', () => {
+        render(<KnowledgeBases />);
+
+        expect(screen.queryByText(/storage is at/)).not.toBeInTheDocument();
     });
 });

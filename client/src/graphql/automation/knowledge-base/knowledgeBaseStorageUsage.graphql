@@ -1,0 +1,8 @@
+query KnowledgeBaseStorageUsage {
+    knowledgeBaseStorageUsage {
+        limitBytes
+        percentage
+        unlimited
+        usedBytes
+    }
+}
