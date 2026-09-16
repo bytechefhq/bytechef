@@ -1,3 +1,4 @@
+import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import {McpTool} from '@/shared/middleware/graphql';
 import {PropertyAllType} from '@/shared/types';
 import {render, screen} from '@/shared/util/test-utils';
@@ -17,9 +18,20 @@ vi.mock('@/components/ui/popover', () => ({
     PopoverContent: ({children}: {children: ReactNode}) => <div>{children}</div>,
 }));
 
-vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => ({
-    default: () => <div data-testid="properties" />,
-}));
+vi.mock('@/pages/platform/workflow-editor/components/properties/Properties', () => {
+    const PropertiesStub = () => {
+        const clusterElementContext = useClusterElementContext();
+
+        return (
+            <div
+                data-connection-required={String(clusterElementContext?.connectionRequired)}
+                data-testid="properties"
+            />
+        );
+    };
+
+    return {default: PropertiesStub};
+});
 
 vi.mock('@/components/ui/tooltip', async () => {
     const actual = await vi.importActual<Record<string, unknown>>('@/components/ui/tooltip');
@@ -53,11 +65,12 @@ vi.mock('@/pages/platform/mcp-servers/hooks/useMcpToolFormDisplayConditions', ()
 
 const mcpTool = {id: '1', mcpComponentId: '1', name: 'post', title: 'POST', version: 1} as McpTool;
 
-const renderPopover = () =>
+const renderPopover = (connectionRequired?: boolean) =>
     render(
         <McpComponentToolPropertiesPopover
             componentName="httpClient"
             componentVersion={1}
+            connectionRequired={connectionRequired}
             mcpTool={mcpTool}
             onClose={vi.fn()}
         />
@@ -76,6 +89,34 @@ describe('McpComponentToolPropertiesPopover', () => {
     // Property inputs carry the native `required` attribute. Without noValidate the browser blocks the submit
     // with a transient bubble before react-hook-form runs, so Save looked like a button that did nothing and
     // the edited values were never persisted.
+    it('passes connectionRequired through to the cluster element context', () => {
+        hoisted.displayConditions = {};
+
+        renderPopover(true);
+
+        expect(screen.getByTestId('properties')).toHaveAttribute('data-connection-required', 'true');
+    });
+
+    it('picks up connectionRequired when it arrives after the first render', () => {
+        hoisted.displayConditions = {};
+
+        const {rerender} = renderPopover(undefined);
+
+        expect(screen.getByTestId('properties')).toHaveAttribute('data-connection-required', 'undefined');
+
+        rerender(
+            <McpComponentToolPropertiesPopover
+                componentName="httpClient"
+                componentVersion={1}
+                connectionRequired
+                mcpTool={mcpTool}
+                onClose={vi.fn()}
+            />
+        );
+
+        expect(screen.getByTestId('properties')).toHaveAttribute('data-connection-required', 'true');
+    });
+
     it('opts the form out of native validation so react-hook-form can report required fields', () => {
         const {container} = renderPopover();
 

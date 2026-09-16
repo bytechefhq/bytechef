@@ -52,6 +52,7 @@ const McpComponentToolList = ({
                     componentName={componentName}
                     componentVersion={componentVersion}
                     connectionId={connectionId}
+                    connectionRequired={componentDefinition?.connectionRequired ?? true}
                     description={toolDescriptionsByName[tool.name]}
                     key={tool.name}
                     mcpTool={tool}
