@@ -19,6 +19,34 @@ describe('StorageUsageBanner', () => {
         expect(screen.getByText(/87%/)).toBeInTheDocument();
     });
 
+    it('shows sizes below one megabyte in smaller units', () => {
+        render(
+            <StorageUsageBanner
+                label="Knowledge base"
+                limitBytes={500_000}
+                percentage={80}
+                unlimited={false}
+                usedBytes={400_000}
+            />
+        );
+
+        expect(screen.getByText(/Using 391 KB of 488 KB/)).toBeInTheDocument();
+    });
+
+    it('shows sizes of one gigabyte and more in gigabytes', () => {
+        render(
+            <StorageUsageBanner
+                label="Knowledge base"
+                limitBytes={1_073_741_824}
+                percentage={95}
+                unlimited={false}
+                usedBytes={1_020_054_733}
+            />
+        );
+
+        expect(screen.getByText(/Using 973 MB of 1.0 GB/)).toBeInTheDocument();
+    });
+
     it('renders nothing below 80 percent', () => {
         const {container} = render(
             <StorageUsageBanner
