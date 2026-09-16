@@ -701,3 +701,4 @@ include("server:ee:libs:modules:components:code-workflow")
 include("server:ee:libs:modules:components:request")
 
 include("spring-ai:spring-ai-model-chat-memory-repository-aws")
+include("spring-ai:spring-ai-session-store")
