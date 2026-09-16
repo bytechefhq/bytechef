@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
-import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
-import {RocketIcon} from 'lucide-react';
+import {PencilIcon, RocketIcon} from 'lucide-react';
 
 import {Dialog, DialogClose, DialogContent, DialogTrigger} from './Dialog';
+import {DialogBody, DialogFooter, DialogHeader, DialogMain} from './DialogMain';
 import {DialogSidebar} from './DialogSidebar';
 import {DialogStepIndicator} from './DialogStepIndicator';
 import {DialogSteps} from './DialogSteps';
@@ -32,18 +32,30 @@ export const Default: Story = {
                 <Button label="Open dialog" />
             </DialogTrigger>
 
-            <DialogContent aria-describedby={undefined}>
-                <div className="flex w-[512px] max-w-full flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6">
-                    <ShadcnDialogTitle>Dialog title</ShadcnDialogTitle>
+            <DialogContent>
+                <DialogMain>
+                    <DialogHeader
+                        description="Update the skill instructions"
+                        endContent={<Button label="Help" size="xs" variant="ghost" />}
+                        icon={<PencilIcon />}
+                        title="Edit Skill"
+                    />
 
-                    <p className="text-sm text-content-neutral-secondary">
-                        DialogContent has no surface of its own, so this box carries the background.
-                    </p>
+                    <DialogBody>
+                        <p className="text-sm text-content-neutral-secondary">
+                            Without a sidebar, DialogHeader owns the dialog title and description, so the dialog needs
+                            no aria-describedby of its own. The body scrolls; the header and footer stay put.
+                        </p>
+                    </DialogBody>
 
-                    <DialogClose asChild>
-                        <Button label="Close" variant="outline" />
-                    </DialogClose>
-                </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button label="Cancel" variant="outline" />
+                        </DialogClose>
+
+                        <Button label="Save" />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     ),
@@ -64,16 +76,22 @@ export const WithSidebar: Story = {
                     </p>
                 </DialogSidebar>
 
-                <div className="flex w-[512px] max-w-full flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6 lg:w-auto lg:flex-1">
-                    <p className="text-sm text-content-neutral-secondary">
-                        From 1024 px the sidebar shows and DialogContent switches to the 860 × 648 layout. Narrower, the
-                        sidebar hides, but its title and description stay in the DOM for screen readers.
-                    </p>
+                <DialogMain>
+                    <DialogHeader title="Details" />
 
-                    <DialogClose asChild>
-                        <Button label="Close" variant="outline" />
-                    </DialogClose>
-                </div>
+                    <DialogBody>
+                        <p className="text-sm text-content-neutral-secondary">
+                            The sidebar owns the dialog title, so this header renders a plain h2 instead of a second
+                            one. From 1024 px the sidebar shows and DialogContent switches to the 860 × 648 layout.
+                        </p>
+                    </DialogBody>
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button label="Close" variant="outline" />
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     ),
@@ -87,24 +105,10 @@ const storySteps: DialogStepI[] = [
 
 const validateAfterDelay = () => new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 600));
 
-const StepsMainPanel = () => {
-    const {currentStep, goToNextStep, isLastStep, isPending} = useDialogSteps();
+const WizardNextButton = () => {
+    const {goToNextStep, isLastStep, isPending} = useDialogSteps();
 
-    return (
-        <div className="flex w-[512px] max-w-full flex-col gap-4 rounded-lg bg-surface-neutral-primary p-6 lg:w-auto lg:flex-1">
-            <p className="text-sm text-content-neutral-secondary">
-                {currentStep.label} content. Next validates for 600 ms, then the step list and the indicator move on.
-            </p>
-
-            <div className="mt-auto flex justify-end gap-2">
-                <DialogClose asChild>
-                    <Button label="Cancel" variant="outline" />
-                </DialogClose>
-
-                <Button disabled={isPending} label={isLastStep ? 'Finish' : 'Next'} onClick={() => goToNextStep()} />
-            </div>
-        </div>
-    );
+    return <Button disabled={isPending} label={isLastStep ? 'Finish' : 'Next'} onClick={() => goToNextStep()} />;
 };
 
 export const WithStepsAndIndicator: Story = {
@@ -122,7 +126,27 @@ export const WithStepsAndIndicator: Story = {
                         <DialogStepIndicator />
                     </DialogSidebar>
 
-                    <StepsMainPanel />
+                    <DialogMain>
+                        <DialogHeader />
+
+                        <DialogBody>
+                            <p className="text-sm text-content-neutral-secondary">
+                                The header title defaults to the current step label, and focus moves to it on every step
+                                change. Below 1024 px it also shows the step position, because the sidebar is hidden
+                                there.
+                            </p>
+                        </DialogBody>
+
+                        <DialogFooter
+                            startContent={
+                                <DialogClose asChild>
+                                    <Button label="Cancel" variant="ghost" />
+                                </DialogClose>
+                            }
+                        >
+                            <WizardNextButton />
+                        </DialogFooter>
+                    </DialogMain>
                 </DialogStepsProvider>
             </DialogContent>
         </Dialog>
