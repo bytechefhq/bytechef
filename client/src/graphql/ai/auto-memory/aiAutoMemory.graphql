@@ -1,0 +1,17 @@
+query aiAutoMemory($workspaceId: ID!, $id: ID!, $environment: Int!, $principal: AiAutoMemoryPrincipalInput) {
+    aiAutoMemory(workspaceId: $workspaceId, id: $id, environment: $environment, principal: $principal) {
+        id
+        workspaceId
+        principalType
+        principalId
+        name
+        title
+        description
+        memoryType
+        content
+        environmentId
+        createdAt
+        updatedAt
+        version
+    }
+}
