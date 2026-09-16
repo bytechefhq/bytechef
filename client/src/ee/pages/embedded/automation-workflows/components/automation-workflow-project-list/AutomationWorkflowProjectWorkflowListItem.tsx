@@ -1,11 +1,12 @@
 import '@/shared/styles/dropdownMenu.css';
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {ComponentIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
-import InlineSVG from 'react-inlinesvg';
+import {EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {useMemo} from 'react';
 
 type AutomationWorkflowProjectWorkflowTemplateType =
     AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
@@ -21,7 +22,30 @@ const AutomationWorkflowProjectWorkflowListItem = ({
     onSelectWorkflow,
     workflow,
 }: AutomationWorkflowProjectWorkflowListItemProps) => {
-    const trigger = workflow.triggers[0];
+    const filteredComponentNames = useMemo(() => {
+        const componentNames = [...workflow.triggers, ...workflow.components].map((component) => component.name);
+
+        return componentNames.filter((name, index) => componentNames.indexOf(name) === index);
+    }, [workflow.components, workflow.triggers]);
+
+    const workflowComponentDefinitions = useMemo(
+        () =>
+            Object.fromEntries(
+                [...workflow.triggers, ...workflow.components].map((component) => [
+                    component.name,
+                    {icon: component.icon ?? undefined, name: component.name, title: component.title ?? undefined},
+                ])
+            ) as Record<string, WorkflowComponentIconDefinitionType>,
+        [workflow.components, workflow.triggers]
+    );
+
+    const triggerSource = useMemo(
+        () => ({
+            triggers: workflow.triggers.map((trigger) => ({label: trigger.title || trigger.name})),
+            workflowTriggerComponentNames: workflow.triggers.map((trigger) => trigger.name),
+        }),
+        [workflow.triggers]
+    );
 
     const modifiedDate = workflow.lastModifiedDate
         ? new Date(workflow.lastModifiedDate).toLocaleDateString()
@@ -50,44 +74,13 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                     </Tooltip>
                 </div>
 
-                {trigger && (
-                    <div className="flex shrink-0 items-center gap-1">
-                        <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
-                            {trigger.icon ? (
-                                <InlineSVG
-                                    className="size-5"
-                                    loader={<ComponentIcon className="size-5 flex-none" />}
-                                    src={trigger.icon}
-                                    title={null}
-                                />
-                            ) : (
-                                <ComponentIcon className="size-3 flex-none text-content-neutral-primary" />
-                            )}
-                        </div>
-
-                        <div className="shrink-0">
-                            <Badge
-                                label={trigger.title || trigger.name}
-                                styleType="outline-outline"
-                                weight="semibold"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {workflow.components.length > 0 && (
-                    <div className="flex items-center gap-2">
-                        {workflow.components.map((component) => (
-                            <div
-                                className="flex shrink-0 items-center justify-center rounded-full border bg-background p-1"
-                                key={`component-${component.name}`}
-                                title={component.title ?? component.name}
-                            >
-                                {component.icon && <InlineSVG className="size-5 flex-none" src={component.icon} />}
-                            </div>
-                        ))}
-                    </div>
-                )}
+                <WorkflowTriggerAndComponentsRow
+                    className="hidden sm:flex"
+                    filteredComponentNames={filteredComponentNames}
+                    workflow={triggerSource}
+                    workflowComponentDefinitions={workflowComponentDefinitions}
+                    workflowTaskDispatcherDefinitions={workflowComponentDefinitions}
+                />
             </div>
 
             <div className="flex justify-end gap-x-6">
