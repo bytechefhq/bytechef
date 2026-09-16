@@ -146,7 +146,7 @@ const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProp
     });
 
     useEffect(() => {
-        if (editor && body) {
+        if (editor) {
             editor.commands.setContent(body);
         }
     }, [body, editor]);
