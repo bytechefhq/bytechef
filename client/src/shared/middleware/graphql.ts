@@ -221,6 +221,51 @@ export type UpdateAiAgentScenarioToolSimulationMutationVariables = Exact<{
 
 export type UpdateAiAgentScenarioToolSimulationMutation = { updateAiAgentScenarioToolSimulation: { id: string, toolName: string, responsePrompt: string, simulationModel: string | null } };
 
+export type AiAutoMemoriesQueryVariables = Exact<{
+  workspaceId: string | number;
+  environment: number;
+  memoryType?: Types.AiAutoMemoryType | null | undefined;
+  principal?: Types.AiAutoMemoryPrincipalInput | null | undefined;
+}>;
+
+
+export type AiAutoMemoriesQuery = { aiAutoMemories: Array<{ id: string, workspaceId: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, environmentId: any, createdAt: any, updatedAt: any, version: any }> };
+
+export type AiAutoMemoryQueryVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  environment: number;
+  principal?: Types.AiAutoMemoryPrincipalInput | null | undefined;
+}>;
+
+
+export type AiAutoMemoryQuery = { aiAutoMemory: { id: string, workspaceId: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any, version: any } | null };
+
+export type AiAutoMemoryPrincipalsQueryVariables = Exact<{
+  workspaceId: string | number;
+  environment: number;
+}>;
+
+
+export type AiAutoMemoryPrincipalsQuery = { aiAutoMemoryPrincipals: Array<{ principalType: Types.AiAutoMemoryPrincipalType, principalId: any, label: string, memoryCount: number }> };
+
+export type DeleteAiAutoMemoryMutationVariables = Exact<{
+  workspaceId: string | number;
+  id: string | number;
+  environment: number;
+  principal?: Types.AiAutoMemoryPrincipalInput | null | undefined;
+}>;
+
+
+export type DeleteAiAutoMemoryMutation = { deleteAiAutoMemory: boolean };
+
+export type UpdateAiAutoMemoryMutationVariables = Exact<{
+  input: Types.UpdateAiAutoMemoryInput;
+}>;
+
+
+export type UpdateAiAutoMemoryMutation = { updateAiAutoMemory: { id: string, workspaceId: any, principalType: Types.AiAutoMemoryPrincipalType, principalId: any, name: string, title: string, description: string | null, memoryType: Types.AiAutoMemoryType, content: string, environmentId: any, createdAt: any, updatedAt: any, version: any } };
+
 export type AiSkillQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -2771,6 +2816,171 @@ export const useUpdateAiAgentScenarioToolSimulationMutation = <
       {
     mutationKey: ['updateAiAgentScenarioToolSimulation'],
     mutationFn: (variables?: UpdateAiAgentScenarioToolSimulationMutationVariables) => fetcher<UpdateAiAgentScenarioToolSimulationMutation, UpdateAiAgentScenarioToolSimulationMutationVariables>(UpdateAiAgentScenarioToolSimulationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiAutoMemoriesDocument = new TypedDocumentString(`
+    query aiAutoMemories($workspaceId: ID!, $environment: Int!, $memoryType: AiAutoMemoryType, $principal: AiAutoMemoryPrincipalInput) {
+  aiAutoMemories(
+    workspaceId: $workspaceId
+    environment: $environment
+    memoryType: $memoryType
+    principal: $principal
+  ) {
+    id
+    workspaceId
+    principalType
+    principalId
+    name
+    title
+    description
+    memoryType
+    environmentId
+    createdAt
+    updatedAt
+    version
+  }
+}
+    `);
+
+export const useAiAutoMemoriesQuery = <
+      TData = AiAutoMemoriesQuery,
+      TError = unknown
+    >(
+      variables: AiAutoMemoriesQueryVariables,
+      options?: Omit<UseQueryOptions<AiAutoMemoriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAutoMemoriesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAutoMemoriesQuery, TError, TData>(
+      {
+    queryKey: ['aiAutoMemories', variables],
+    queryFn: fetcher<AiAutoMemoriesQuery, AiAutoMemoriesQueryVariables>(AiAutoMemoriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiAutoMemoryDocument = new TypedDocumentString(`
+    query aiAutoMemory($workspaceId: ID!, $id: ID!, $environment: Int!, $principal: AiAutoMemoryPrincipalInput) {
+  aiAutoMemory(
+    workspaceId: $workspaceId
+    id: $id
+    environment: $environment
+    principal: $principal
+  ) {
+    id
+    workspaceId
+    principalType
+    principalId
+    name
+    title
+    description
+    memoryType
+    content
+    environmentId
+    createdAt
+    updatedAt
+    version
+  }
+}
+    `);
+
+export const useAiAutoMemoryQuery = <
+      TData = AiAutoMemoryQuery,
+      TError = unknown
+    >(
+      variables: AiAutoMemoryQueryVariables,
+      options?: Omit<UseQueryOptions<AiAutoMemoryQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAutoMemoryQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAutoMemoryQuery, TError, TData>(
+      {
+    queryKey: ['aiAutoMemory', variables],
+    queryFn: fetcher<AiAutoMemoryQuery, AiAutoMemoryQueryVariables>(AiAutoMemoryDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiAutoMemoryPrincipalsDocument = new TypedDocumentString(`
+    query aiAutoMemoryPrincipals($workspaceId: ID!, $environment: Int!) {
+  aiAutoMemoryPrincipals(workspaceId: $workspaceId, environment: $environment) {
+    principalType
+    principalId
+    label
+    memoryCount
+  }
+}
+    `);
+
+export const useAiAutoMemoryPrincipalsQuery = <
+      TData = AiAutoMemoryPrincipalsQuery,
+      TError = unknown
+    >(
+      variables: AiAutoMemoryPrincipalsQueryVariables,
+      options?: Omit<UseQueryOptions<AiAutoMemoryPrincipalsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiAutoMemoryPrincipalsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AiAutoMemoryPrincipalsQuery, TError, TData>(
+      {
+    queryKey: ['aiAutoMemoryPrincipals', variables],
+    queryFn: fetcher<AiAutoMemoryPrincipalsQuery, AiAutoMemoryPrincipalsQueryVariables>(AiAutoMemoryPrincipalsDocument, variables),
+    ...options
+  }
+    )};
+
+export const DeleteAiAutoMemoryDocument = new TypedDocumentString(`
+    mutation deleteAiAutoMemory($workspaceId: ID!, $id: ID!, $environment: Int!, $principal: AiAutoMemoryPrincipalInput) {
+  deleteAiAutoMemory(
+    workspaceId: $workspaceId
+    id: $id
+    environment: $environment
+    principal: $principal
+  )
+}
+    `);
+
+export const useDeleteAiAutoMemoryMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAiAutoMemoryMutation, TError, DeleteAiAutoMemoryMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAiAutoMemoryMutation, TError, DeleteAiAutoMemoryMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAiAutoMemory'],
+    mutationFn: (variables?: DeleteAiAutoMemoryMutationVariables) => fetcher<DeleteAiAutoMemoryMutation, DeleteAiAutoMemoryMutationVariables>(DeleteAiAutoMemoryDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiAutoMemoryDocument = new TypedDocumentString(`
+    mutation updateAiAutoMemory($input: UpdateAiAutoMemoryInput!) {
+  updateAiAutoMemory(input: $input) {
+    id
+    workspaceId
+    principalType
+    principalId
+    name
+    title
+    description
+    memoryType
+    content
+    environmentId
+    createdAt
+    updatedAt
+    version
+  }
+}
+    `);
+
+export const useUpdateAiAutoMemoryMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiAutoMemoryMutation, TError, UpdateAiAutoMemoryMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiAutoMemoryMutation, TError, UpdateAiAutoMemoryMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiAutoMemory'],
+    mutationFn: (variables?: UpdateAiAutoMemoryMutationVariables) => fetcher<UpdateAiAutoMemoryMutation, UpdateAiAutoMemoryMutationVariables>(UpdateAiAutoMemoryDocument, variables)(),
     ...options
   }
     )};
