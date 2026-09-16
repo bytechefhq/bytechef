@@ -657,6 +657,11 @@ export type DataTableRowsPageQueryVariables = Exact<{
 
 export type DataTableRowsPageQuery = { dataTableRowsPage: { hasMore: boolean, nextOffset: number | null, items: Array<{ id: string, values: any }> } };
 
+export type DataTableStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataTableStorageUsageQuery = { dataTableStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
+
 export type DataTableTagsQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
@@ -4236,6 +4241,33 @@ export const useDataTableRowsPageQuery = <
       {
     queryKey: ['dataTableRowsPage', variables],
     queryFn: fetcher<DataTableRowsPageQuery, DataTableRowsPageQueryVariables>(DataTableRowsPageDocument, variables),
+    ...options
+  }
+    )};
+
+export const DataTableStorageUsageDocument = new TypedDocumentString(`
+    query DataTableStorageUsage {
+  dataTableStorageUsage {
+    limitBytes
+    percentage
+    unlimited
+    usedBytes
+  }
+}
+    `);
+
+export const useDataTableStorageUsageQuery = <
+      TData = DataTableStorageUsageQuery,
+      TError = unknown
+    >(
+      variables?: DataTableStorageUsageQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableStorageUsageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableStorageUsageQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableStorageUsageQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['DataTableStorageUsage'] : ['DataTableStorageUsage', variables],
+    queryFn: fetcher<DataTableStorageUsageQuery, DataTableStorageUsageQueryVariables>(DataTableStorageUsageDocument, variables),
     ...options
   }
     )};
