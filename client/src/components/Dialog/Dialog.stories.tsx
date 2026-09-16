@@ -1,13 +1,13 @@
 import Button from '@/components/Button/Button';
 import {PencilIcon, RocketIcon} from 'lucide-react';
 
-import {Dialog, DialogClose, DialogContent, DialogTrigger} from './Dialog';
+import {Dialog, DialogContent, DialogTrigger} from './Dialog';
+import {DialogCancelButton, DialogNextButton} from './DialogButtons';
 import {DialogBody, DialogFooter, DialogHeader, DialogMain} from './DialogMain';
 import {DialogSidebar} from './DialogSidebar';
 import {DialogStepIndicator} from './DialogStepIndicator';
 import {DialogSteps} from './DialogSteps';
 import {type DialogStepI, DialogStepsProvider} from './DialogStepsProvider';
-import {useDialogSteps} from './hooks/useDialogSteps';
 
 import type {Meta, StoryObj} from '@storybook/react-vite';
 
@@ -44,14 +44,13 @@ export const Default: Story = {
                     <DialogBody>
                         <p className="text-sm text-content-neutral-secondary">
                             Without a sidebar, DialogHeader owns the dialog title and description, so the dialog needs
-                            no aria-describedby of its own. The body scrolls; the header and footer stay put.
+                            no aria-describedby of its own. DialogCancelButton closes the dialog; Save is a plain
+                            Button, because DialogNextButton only works inside a steps provider.
                         </p>
                     </DialogBody>
 
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button label="Cancel" variant="outline" />
-                        </DialogClose>
+                        <DialogCancelButton />
 
                         <Button label="Save" />
                     </DialogFooter>
@@ -87,9 +86,7 @@ export const WithSidebar: Story = {
                     </DialogBody>
 
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button label="Close" variant="outline" />
-                        </DialogClose>
+                        <DialogCancelButton label="Close" />
                     </DialogFooter>
                 </DialogMain>
             </DialogContent>
@@ -104,12 +101,6 @@ const storySteps: DialogStepI[] = [
 ];
 
 const validateAfterDelay = () => new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 600));
-
-const WizardNextButton = () => {
-    const {goToNextStep, isLastStep, isPending} = useDialogSteps();
-
-    return <Button disabled={isPending} label={isLastStep ? 'Finish' : 'Next'} onClick={() => goToNextStep()} />;
-};
 
 export const WithStepsAndIndicator: Story = {
     render: () => (
@@ -131,20 +122,14 @@ export const WithStepsAndIndicator: Story = {
 
                         <DialogBody>
                             <p className="text-sm text-content-neutral-secondary">
-                                The header title defaults to the current step label, and focus moves to it on every step
-                                change. Below 1024 px it also shows the step position, because the sidebar is hidden
-                                there.
+                                DialogNextButton reads Continue until the last step, where lastStepLabel makes it
+                                Deploy. Clicking it validates for 600 ms, showing a spinner and disabling itself, then
+                                advances the steps and the indicator.
                             </p>
                         </DialogBody>
 
-                        <DialogFooter
-                            startContent={
-                                <DialogClose asChild>
-                                    <Button label="Cancel" variant="ghost" />
-                                </DialogClose>
-                            }
-                        >
-                            <WizardNextButton />
+                        <DialogFooter startContent={<DialogCancelButton />}>
+                            <DialogNextButton lastStepLabel="Deploy" />
                         </DialogFooter>
                     </DialogMain>
                 </DialogStepsProvider>
