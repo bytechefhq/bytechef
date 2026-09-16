@@ -1,6 +1,7 @@
 version = "1.0"
 
 dependencies {
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("software.amazon.awssdk:s3")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
