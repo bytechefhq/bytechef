@@ -50,21 +50,21 @@ client/src/components/<Name>/
 
 These come from the exemplars and `CLAUDE.md`. Breaking any of them fails review or lint.
 
-| # | Rule |
-|---|------|
-| 1 | Import the base as `Shadcn<Name>`: `import {Switch as ShadcnSwitch} from '@/components/ui/switch'`. |
-| 2 | Merge classes with `twMerge` from `tailwind-merge`. **Never** `cn()` — `cn` is for the `ui/*` base layer only. |
-| 3 | Refs are **props**, not `forwardRef`. Accept `ref` via `React.ComponentPropsWithRef<...>` and spread it through. (See §5 — this is a deliberate divergence from the older Button/Switch exemplars.) |
-| 4 | Set `<Name>.displayName = '<Name>'`. |
-| 5 | `export default <Name>;` — and also `export type {<Name>Props};` (named type export). |
-| 6 | Re-map **all** variants to semantic tokens. Do not pass shadcn's `variant`/`size` through. |
-| 7 | Model `label` / `icon` / `children` / `aria-label` combinations as a discriminated union of interfaces (see §4). |
-| 8 | Keep a single `basicStyles` string for shadcn resets (`shadow-none`, `[&_svg]:size-*`, etc.). |
-| 9 | Class-map records (`variants`, sizes) are typed `Record<SomeUnionType, string>`. When keys break alphabetical order, add `// eslint-disable-next-line sort-keys` on the offending line — do not reorder to satisfy the token design. |
-| 10 | Descriptive names everywhere — no `e`, `el`, `v`. Loop/arrow params included (CLAUDE.md). |
-| 11 | Lucide icons imported with the `Icon` suffix (`CheckIcon`, not `Check`). |
-| 12 | Object keys in stories/tests sorted ascending (ESLint `sort-keys`, not auto-fixable). |
-| 13 | Prop type name ends in `Props` or `I`; the wrapper's exported union is `<Name>Props`. |
+| #   | Rule                                                                                                                                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Import the base as `Shadcn<Name>`: `import {Switch as ShadcnSwitch} from '@/components/ui/switch'`.                                                                                                                                  |
+| 2   | Merge classes with `twMerge` from `tailwind-merge`. **Never** `cn()` — `cn` is for the `ui/*` base layer only.                                                                                                                       |
+| 3   | Refs are **props**, not `forwardRef`. Accept `ref` via `React.ComponentPropsWithRef<...>` and spread it through. (See §5 — this is a deliberate divergence from the older Button/Switch exemplars.)                                  |
+| 4   | Set `<Name>.displayName = '<Name>'`.                                                                                                                                                                                                 |
+| 5   | `export default <Name>;` — and also `export type {<Name>Props};` (named type export).                                                                                                                                                |
+| 6   | Re-map **all** variants to semantic tokens. Do not pass shadcn's `variant`/`size` through.                                                                                                                                           |
+| 7   | Model `label` / `icon` / `children` / `aria-label` combinations as a discriminated union of interfaces (see §4).                                                                                                                     |
+| 8   | Keep a single `basicStyles` string for shadcn resets (`shadow-none`, `[&_svg]:size-*`, etc.).                                                                                                                                        |
+| 9   | Class-map records (`variants`, sizes) are typed `Record<SomeUnionType, string>`. When keys break alphabetical order, add `// eslint-disable-next-line sort-keys` on the offending line — do not reorder to satisfy the token design. |
+| 10  | Descriptive names everywhere — no `e`, `el`, `v`. Loop/arrow params included (CLAUDE.md).                                                                                                                                            |
+| 11  | Lucide icons imported with the `Icon` suffix (`CheckIcon`, not `Check`).                                                                                                                                                             |
+| 12  | Object keys in stories/tests sorted ascending (ESLint `sort-keys`, not auto-fixable).                                                                                                                                                |
+| 13  | Prop type name ends in `Props` or `I`; the wrapper's exported union is `<Name>Props`.                                                                                                                                                |
 
 ---
 
@@ -76,25 +76,25 @@ ones. Type them so that `@ts-expect-error` tests in §8 hold.
 
 ```tsx
 // Base: strip the shadcn props you are replacing, keep ref via ComponentPropsWithRef.
-interface BaseBadgeProps extends Omit<React.ComponentPropsWithRef<typeof ShadcnBadge>, 'variant'> {
-    className?: string;
-    styleType?: StyleType;
-    weight?: WeightType;
+interface BaseBadgeProps extends Omit<React.ComponentPropsWithRef<typeof ShadcnBadge>, "variant"> {
+  className?: string;
+  styleType?: StyleType;
+  weight?: WeightType;
 }
 
 // Members: each legal content shape; `never` forbids the rest.
 interface TextBadgeProps extends BaseBadgeProps {
-    'aria-label'?: never;   // text is its own accessible name
-    children?: never;
-    icon?: never;
-    label: string;
+  "aria-label"?: never; // text is its own accessible name
+  children?: never;
+  icon?: never;
+  label: string;
 }
 
 interface IconBadgeProps extends BaseBadgeProps {
-    'aria-label': string;   // icon-only REQUIRES an accessible name
-    children?: never;
-    icon: React.ReactElement;
-    label?: never;
+  "aria-label": string; // icon-only REQUIRES an accessible name
+  children?: never;
+  icon: React.ReactElement;
+  label?: never;
 }
 // ...IconTextBadgeProps, CustomBadgeProps (children) ...
 
@@ -125,11 +125,11 @@ exemplars now follow this pattern — `ref` arrives as a normal prop and flows t
 - `displayName` is still required (dev tools / lint).
 
 ```tsx
-function Switch({className, variant = 'default', ...props}: SwitchPropsType) {
-    return <ShadcnSwitch className={twMerge(basicStyles, variants[variant], className)} {...props} />;
+function Switch({ className, variant = "default", ...props }: SwitchPropsType) {
+  return <ShadcnSwitch className={twMerge(basicStyles, variants[variant], className)} {...props} />;
 }
 
-Switch.displayName = 'Switch';
+Switch.displayName = "Switch";
 ```
 
 ---
@@ -224,16 +224,17 @@ Never hardcode colors or use shadcn's generic tokens (`bg-primary`, `text-foregr
 Always use ByteChef semantic tokens. They auto-adapt to light/dark.
 
 **Source of truth:**
+
 - CSS variables (light + dark values): [client/src/styles/index.css](../../client/src/styles/index.css)
 - Tailwind class mapping: [client/tailwind.config.js](../../client/tailwind.config.js)
 
 **Token families** (pattern: `<utility>-<group>-<role>-<rank>[-state]`):
 
-| Prefix | Use | Examples |
-|--------|-----|----------|
-| `bg-surface-*` | backgrounds/fills | `bg-surface-brand-primary`, `bg-surface-neutral-secondary`, `bg-surface-destructive-primary` |
-| `text-content-*` | text/icon color | `text-content-onsurface-primary`, `text-content-neutral-primary`, `text-content-brand-primary` |
-| `border-stroke-*` | borders/rings | `border-stroke-neutral-secondary`, `border-stroke-brand-primary` |
+| Prefix            | Use               | Examples                                                                                       |
+| ----------------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| `bg-surface-*`    | backgrounds/fills | `bg-surface-brand-primary`, `bg-surface-neutral-secondary`, `bg-surface-destructive-primary`   |
+| `text-content-*`  | text/icon color   | `text-content-onsurface-primary`, `text-content-neutral-primary`, `text-content-brand-primary` |
+| `border-stroke-*` | borders/rings     | `border-stroke-neutral-secondary`, `border-stroke-brand-primary`                               |
 
 **States** are suffixes on the same token, used with Tailwind pseudo-prefixes:
 `hover:bg-surface-brand-primary-hover`, `active:bg-surface-brand-primary-active`,
@@ -251,6 +252,7 @@ vitest + Testing Library. Import `render`/`screen` from the project's `test-util
 React Query client) — **not** from `@testing-library/react` directly.
 
 Cover, in this order:
+
 1. Default render (content present, default tokens applied).
 2. Each `variant`/`styleType` maps to the expected token classes (`toHaveClass`).
 3. Each `size` maps to expected sizing classes.
@@ -302,6 +304,7 @@ describe('TypeScript tests', () => {
 ```
 
 Notes:
+
 - Assert specific token classes, not layout minutiae — mirror `Badge.test.tsx`.
 - `@ts-expect-error` lines are real tests: if the type stops forbidding the combo, the build
   fails. Keep one per illegal shape.
@@ -376,8 +379,9 @@ export const <Name>Variants: Story = {
 ```
 
 Story conventions:
+
 - Map icons/labels/custom-content into `as const` objects and expose via `argTypes` `mapping`
-  + `options` (`'no-icon'` sentinel → `undefined`).
+  - `options` (`'no-icon'` sentinel → `undefined`).
 - One "showcase grid" story per prop axis (all variants, all sizes, icons, real use-cases).
 - `meta.component` and `type Story` need the eslint-disable comments shown above.
 
@@ -423,7 +427,7 @@ Real snags that surfaced building `Input`. Check these before shipping any wrapp
 1. **Don't shadow a native attribute with a house prop.** The wrapped element may already own
    the name you want. `<input>` has a native numeric `size` attribute, so reusing `size` for
    the house scale breaks any caller that spreads a wide `{...props}` object (its `size:
-   number` no longer matches `size: SizeType`). Rename the house prop (`inputSize`) and let the
+number` no longer matches `size: SizeType`). Rename the house prop (`inputSize`) and let the
    native attribute pass through. Same risk applies to `type`, `color`, `width`, `height`, etc.,
    depending on the base element. `button`/`div`/radix `Switch` have no such collision, which is
    why Button/Badge/Switch can use plain `size`/`variant`.
@@ -440,9 +444,9 @@ Real snags that surfaced building `Input`. Check these before shipping any wrapp
 3. **Single-interface props type must be named `<Name>Props`, not `<Name>PropsType`.** The
    `@typescript-eslint/naming-convention` rule requires an `interface` to end in `Props`/`I`.
    The `type <Name>PropsType = A | B` alias used by the union exemplars is exempt because it's a
-   *type alias*, not an interface — so `export type {<Name>PropsType as <Name>Props}` only works
+   _type alias_, not an interface — so `export type {<Name>PropsType as <Name>Props}` only works
    for unions. For a single interface, name it `<Name>Props` directly and `export type
-   {<Name>Props}`.
+{<Name>Props}`.
 
 4. **Preserve existing named exports when a wrapper already has callers.** `Input` had ~85
    `import {Input}` sites. Adding `export default Input` for blueprint conformance while keeping
