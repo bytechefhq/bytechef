@@ -17,6 +17,7 @@
 package com.bytechef.platform.knowledgebase.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.exception.KnowledgeBaseStorageLimitExceededException;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.web.rest.config.PlatformKnowledgeBaseRestTestConfiguration;
 import java.io.InputStream;
@@ -65,7 +67,8 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         KnowledgeBaseDocument mockDocument = createMockDocument(1L, filename);
 
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument);
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class)))
+                .thenReturn(mockDocument);
 
         MockMultipartFile file = new MockMultipartFile(
             "file", filename, contentType, content.getBytes(StandardCharsets.UTF_8));
@@ -76,7 +79,7 @@ class KnowledgeBaseDocumentApiControllerIntTest {
             .andExpect(jsonPath("$.name").value(filename));
 
         verify(knowledgeBaseDocumentFacade).createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class));
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class));
     }
 
     @Test
@@ -89,7 +92,8 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         KnowledgeBaseDocument mockDocument = createMockDocument(1L, filename);
 
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument);
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class)))
+                .thenReturn(mockDocument);
 
         MockMultipartFile file = new MockMultipartFile(
             "file", filename, contentType, content.getBytes(StandardCharsets.UTF_8));
@@ -98,7 +102,7 @@ class KnowledgeBaseDocumentApiControllerIntTest {
             .andExpect(status().isOk());
 
         verify(knowledgeBaseDocumentFacade).createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class));
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class));
     }
 
     @Test
@@ -111,9 +115,9 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         KnowledgeBaseDocument mockDocument2 = createMockDocument(2L, filename);
 
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(1L), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument1);
+            eq(1L), eq(filename), eq(contentType), anyLong(), any(InputStream.class))).thenReturn(mockDocument1);
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(2L), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument2);
+            eq(2L), eq(filename), eq(contentType), anyLong(), any(InputStream.class))).thenReturn(mockDocument2);
 
         MockMultipartFile file1 = new MockMultipartFile(
             "file", filename, contentType, content.getBytes(StandardCharsets.UTF_8));
@@ -128,6 +132,22 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         mockMvc.perform(multipart("/internal/knowledge-bases/{id}/documents", 2L).file(file2))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(2));
+    }
+
+    @Test
+    void testUploadDocumentOverStorageLimitReturnsContentTooLarge() throws Exception {
+        when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
+            eq(1L), eq("big.txt"), eq("text/plain"), anyLong(), any(InputStream.class)))
+                .thenThrow(new KnowledgeBaseStorageLimitExceededException(900L, 2_048L));
+
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "big.txt", "text/plain", "content".getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/internal/knowledge-bases/{id}/documents", 1L).file(file))
+            .andExpect(status().isContentTooLarge())
+            .andExpect(jsonPath("$.detail").value(
+                "Knowledge base storage limit reached (900 B of 2 KB used). Delete documents or increase " +
+                    "bytechef.ai.knowledge-base.max-size-bytes."));
     }
 
     private KnowledgeBaseDocument createMockDocument(Long id, String name) {

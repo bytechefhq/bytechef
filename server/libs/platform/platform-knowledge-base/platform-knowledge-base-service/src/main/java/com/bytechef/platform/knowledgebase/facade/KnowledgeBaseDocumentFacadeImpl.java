@@ -28,6 +28,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseStorageService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
@@ -53,6 +54,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
     private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseStorageService knowledgeBaseStorageService;
     private final KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataService;
     private final VectorStore vectorStore;
 
@@ -63,7 +65,8 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
         KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataService,
-        @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
+        @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore,
+        KnowledgeBaseStorageService knowledgeBaseStorageService) {
 
         this.eventPublisher = eventPublisher;
         this.knowledgeBaseDocumentChunkService = knowledgeBaseDocumentChunkService;
@@ -73,11 +76,14 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         this.knowledgeBaseService = knowledgeBaseService;
         this.knowledgeBaseVectorStoreMetadataService = knowledgeBaseVectorStoreMetadataService;
         this.vectorStore = vectorStore;
+        this.knowledgeBaseStorageService = knowledgeBaseStorageService;
     }
 
     @Override
     public KnowledgeBaseDocument createKnowledgeBaseDocument(
-        Long knowledgeBaseId, String filename, String contentType, InputStream inputStream) {
+        Long knowledgeBaseId, String filename, String contentType, long size, InputStream inputStream) {
+
+        knowledgeBaseStorageService.checkWithinLimit(size);
 
         FileEntry fileEntry = knowledgeBaseFileStorage.storeDocument(filename, inputStream);
 
@@ -86,6 +92,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBaseId);
         knowledgeBaseDocument.setName(filename);
         knowledgeBaseDocument.setDocument(fileEntry);
+        knowledgeBaseDocument.setDocumentSize(size);
         knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_UPLOADED);
 
         knowledgeBaseDocument = knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);

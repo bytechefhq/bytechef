@@ -825,6 +825,11 @@ export type KnowledgeBaseEmbeddingActiveQueryVariables = Exact<{
 
 export type KnowledgeBaseEmbeddingActiveQuery = { knowledgeBaseEmbeddingActive: boolean };
 
+export type KnowledgeBaseStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KnowledgeBaseStorageUsageQuery = { knowledgeBaseStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
+
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4790,6 +4795,33 @@ export const useKnowledgeBaseEmbeddingActiveQuery = <
       {
     queryKey: ['knowledgeBaseEmbeddingActive', variables],
     queryFn: fetcher<KnowledgeBaseEmbeddingActiveQuery, KnowledgeBaseEmbeddingActiveQueryVariables>(KnowledgeBaseEmbeddingActiveDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseStorageUsageDocument = new TypedDocumentString(`
+    query KnowledgeBaseStorageUsage {
+  knowledgeBaseStorageUsage {
+    limitBytes
+    percentage
+    unlimited
+    usedBytes
+  }
+}
+    `);
+
+export const useKnowledgeBaseStorageUsageQuery = <
+      TData = KnowledgeBaseStorageUsageQuery,
+      TError = unknown
+    >(
+      variables?: KnowledgeBaseStorageUsageQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseStorageUsageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseStorageUsageQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseStorageUsageQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['KnowledgeBaseStorageUsage'] : ['KnowledgeBaseStorageUsage', variables],
+    queryFn: fetcher<KnowledgeBaseStorageUsageQuery, KnowledgeBaseStorageUsageQueryVariables>(KnowledgeBaseStorageUsageDocument, variables),
     ...options
   }
     )};

@@ -8,9 +8,10 @@ import KnowledgeBasesLeftSidebarNav from '@/pages/automation/knowledge-bases/com
 import useKnowledgeBases from '@/pages/automation/knowledge-bases/components/hooks/useKnowledgeBases';
 import KnowledgeBaseList from '@/pages/automation/knowledge-bases/components/knowledge-base-list/KnowledgeBaseList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useKnowledgeBaseEmbeddingActiveQuery} from '@/shared/middleware/graphql';
+import {useKnowledgeBaseEmbeddingActiveQuery, useKnowledgeBaseStorageUsageQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {DatabaseIcon} from 'lucide-react';
 
@@ -26,7 +27,11 @@ const KnowledgeBases = () => {
         environment: currentEnvironmentId,
     });
 
+    const {data: storageUsageData} = useKnowledgeBaseStorageUsageQuery();
+
     const embeddingActive = embeddingActiveData?.knowledgeBaseEmbeddingActive ?? true;
+
+    const storageUsage = storageUsageData?.knowledgeBaseStorageUsage;
 
     return (
         <LayoutContainer
@@ -60,6 +65,16 @@ const KnowledgeBases = () => {
         >
             <PageLoader errors={[error]} loading={isLoading}>
                 <div className="flex size-full flex-col">
+                    {storageUsage && (
+                        <StorageUsageBanner
+                            label="Knowledge base"
+                            limitBytes={storageUsage.limitBytes}
+                            percentage={storageUsage.percentage}
+                            unlimited={storageUsage.unlimited}
+                            usedBytes={storageUsage.usedBytes}
+                        />
+                    )}
+
                     {!embeddingActive && (
                         <Alert className="m-4 mb-0 w-auto" variant="destructive">
                             <AlertTitle>No embedding model is active</AlertTitle>
