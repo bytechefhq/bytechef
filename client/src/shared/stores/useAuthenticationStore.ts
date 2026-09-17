@@ -98,12 +98,20 @@ export const authenticationStore = createStore<AuthenticationI>()(
             return {
                 ...initialState,
 
+                /*
+                 * useFetchInterceptor calls this for every 401, including the one an account
+                 * request answers with, and that abandons the very request whose handler would
+                 * have recorded the session as fetched. The session is known either way once a
+                 * 401 arrives, so record it here as well; otherwise PrivateRoute keeps rendering
+                 * its blank loading branch instead of redirecting to the login page.
+                 */
                 clearAuthentication: () => {
                     invalidateAccountRequest();
 
                     setAuthenticationState({
                         loading: false,
                         mfaRequired: false,
+                        sessionHasBeenFetched: true,
                         showLogin: true,
                         authenticated: false,
                     });
@@ -188,6 +196,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                             return getAccount();
                         } else if (response.status === 202) {
+                            invalidateAccountRequest();
+
                             setAuthenticationState({
                                 loginError: false,
                                 mfaRequired: true,
@@ -245,6 +255,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                             return getAccount();
                         } else {
+                            invalidateAccountRequest();
+
                             setAuthenticationState({
                                 loginError: true,
                             });
