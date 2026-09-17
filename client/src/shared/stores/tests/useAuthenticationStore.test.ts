@@ -500,6 +500,36 @@ describe('authenticationStore', () => {
             expect(state.showLogin).toBe(true);
         });
 
+        it('marks the session as fetched when the post-logout refresh fails', async () => {
+            authenticationStore.setState({account: ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+
+            const unhandledRejections: unknown[] = [];
+            const onUnhandledRejection = (event: PromiseRejectionEvent) => {
+                event.preventDefault();
+
+                unhandledRejections.push(event.reason);
+            };
+
+            window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+            stubFetch()
+                .mockResolvedValueOnce(emptyResponse(200))
+                .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+            await authenticationStore.getState().logout();
+
+            await vi.waitFor(() => expect(authenticationStore.getState().sessionHasBeenFetched).toBe(true));
+
+            const state = authenticationStore.getState();
+
+            expect(state.authenticated).toBe(false);
+            expect(state.loading).toBe(false);
+            expect(state.showLogin).toBe(true);
+            expect(unhandledRejections).toEqual([]);
+
+            window.removeEventListener('unhandledrejection', onUnhandledRejection);
+        });
+
         it('keeps the session state but still fetches the account when logout fails', async () => {
             authenticationStore.setState({account: ACCOUNT, authenticated: true});
 
