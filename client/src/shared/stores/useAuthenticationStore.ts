@@ -235,10 +235,15 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         permissionStore.getState().clearPermissions();
                     }
 
-                    // fetch new csrf token
                     const {getAccount} = get();
 
-                    getAccount();
+                    // fetch new csrf token; a failed refresh still leaves the session determined,
+                    // otherwise PrivateRoute keeps rendering its blank loading branch
+                    getAccount().catch(() => {
+                        setAuthenticationState({
+                            sessionHasBeenFetched: true,
+                        });
+                    });
                 },
 
                 verifyMfa: async (code: string): Promise<UserI | undefined> => {
