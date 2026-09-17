@@ -1,21 +1,13 @@
-import {
-    Background,
-    BackgroundVariant,
-    ControlButton,
-    Controls,
-    ReactFlow,
-    ReactFlowProvider,
-    type Viewport,
-} from '@xyflow/react';
+import {Background, BackgroundVariant, ReactFlow, ReactFlowProvider, type Viewport} from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
-import {BrushCleaningIcon, LockIcon, LockOpenIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsWorkflowEditor from '../hooks/useClusterElementsWorkflowEditor';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
+import ClusterElementsWorkflowEditorToolbar from './ClusterElementsWorkflowEditorToolbar';
 
 const SETTLE_DELAY = 350;
 
@@ -40,10 +32,6 @@ const ClusterElementsWorkflowEditor = () => {
         },
         [setCanvasZoom]
     );
-
-    const handleToggleLock = useCallback(() => {
-        setNodesLocked(!nodesLocked);
-    }, [nodesLocked, setNodesLocked]);
 
     // Mount ReactFlow only after the hosting dialog's open transition settles. ReactFlow measures
     // handle positions once on mount; mounting it into a not-yet-settled layout caches wrong bounds
@@ -86,21 +74,7 @@ const ClusterElementsWorkflowEditor = () => {
                 >
                     <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
-                    <Controls
-                        className="m-2 rounded-md border border-stroke-neutral-secondary bg-background"
-                        showInteractive={false}
-                    >
-                        <ControlButton onClick={handleResetLayout} title="Reset layout">
-                            <BrushCleaningIcon className="size-3" />
-                        </ControlButton>
-
-                        <ControlButton
-                            onClick={handleToggleLock}
-                            title={nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
-                        >
-                            {nodesLocked ? <LockIcon className="size-3" /> : <LockOpenIcon className="size-3" />}
-                        </ControlButton>
-                    </Controls>
+                    <ClusterElementsWorkflowEditorToolbar onResetLayout={handleResetLayout} />
                 </ReactFlow>
             </ReactFlowProvider>
         </div>
