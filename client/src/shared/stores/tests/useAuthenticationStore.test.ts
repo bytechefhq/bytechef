@@ -226,6 +226,28 @@ describe('authenticationStore', () => {
             await expect(staleRequest).resolves.toBeUndefined();
         });
 
+        it('records the session as fetched when the interceptor clears the session first', async () => {
+            stubFetch().mockImplementation(() =>
+                // useFetchInterceptor wraps window.fetch, so it clears the session when the 401
+                // arrives, before the promise the store is holding resolves
+                Promise.resolve().then(() => {
+                    authenticationStore.getState().clearAuthentication();
+
+                    return emptyResponse(401);
+                })
+            );
+
+            const account = await authenticationStore.getState().getAccount();
+
+            const state = authenticationStore.getState();
+
+            expect(account).toBeUndefined();
+            expect(state.authenticated).toBe(false);
+            expect(state.loading).toBe(false);
+            expect(state.sessionHasBeenFetched).toBe(true);
+            expect(state.showLogin).toBe(true);
+        });
+
         it('sends the XSRF token from the cookie', async () => {
             document.cookie = 'XSRF-TOKEN=token-value';
 
@@ -334,6 +356,28 @@ describe('authenticationStore', () => {
             expect(state.showLogin).toBe(false);
         });
 
+        it('does not let an account request started before an MFA challenge authenticate the user', async () => {
+            const preLoginDeferred = createDeferred<Response>();
+            const fetchMock = stubFetch()
+                .mockReturnValueOnce(preLoginDeferred.promise)
+                .mockResolvedValueOnce(emptyResponse(202));
+
+            const preLoginRequest = authenticationStore.getState().getAccount();
+
+            await authenticationStore.getState().login(LOGIN_EMAIL, LOGIN_CREDENTIAL, false);
+
+            expect(accountRequestSignal(fetchMock).aborted).toBe(true);
+
+            preLoginDeferred.resolve(accountResponse());
+
+            await preLoginRequest;
+
+            const state = authenticationStore.getState();
+
+            expect(state.authenticated).toBe(false);
+            expect(state.mfaRequired).toBe(true);
+        });
+
         it('resets the session and flags a login error on failure', async () => {
             authenticationStore.setState({account: ACCOUNT, authenticated: true, mfaRequired: true});
 
@@ -401,6 +445,31 @@ describe('authenticationStore', () => {
             expect(account).toBeUndefined();
             expect(authenticationStore.getState().loginError).toBe(true);
             expect(authenticationStore.getState().mfaRequired).toBe(true);
+        });
+
+        it('does not let an account request started before a rejected code authenticate the user', async () => {
+            const preVerifyDeferred = createDeferred<Response>();
+            const fetchMock = stubFetch()
+                .mockReturnValueOnce(preVerifyDeferred.promise)
+                .mockResolvedValueOnce(emptyResponse(401));
+
+            authenticationStore.setState({mfaRequired: true});
+
+            const preVerifyRequest = authenticationStore.getState().getAccount();
+
+            await authenticationStore.getState().verifyMfa('000000');
+
+            expect(accountRequestSignal(fetchMock).aborted).toBe(true);
+
+            preVerifyDeferred.resolve(accountResponse());
+
+            await preVerifyRequest;
+
+            const state = authenticationStore.getState();
+
+            expect(state.authenticated).toBe(false);
+            expect(state.loginError).toBe(true);
+            expect(state.mfaRequired).toBe(true);
         });
 
         it('flags a login error when the request fails', async () => {
@@ -527,7 +596,7 @@ describe('authenticationStore', () => {
             expect(state.showLogin).toBe(true);
         });
 
-        it('marks the session unauthenticated and shows the login', () => {
+        it('marks the session unauthenticated, fetched and shows the login', () => {
             authenticationStore.setState({authenticated: true, loading: true, mfaRequired: true, showLogin: false});
 
             authenticationStore.getState().clearAuthentication();
@@ -537,6 +606,7 @@ describe('authenticationStore', () => {
             expect(state.authenticated).toBe(false);
             expect(state.loading).toBe(false);
             expect(state.mfaRequired).toBe(false);
+            expect(state.sessionHasBeenFetched).toBe(true);
             expect(state.showLogin).toBe(true);
         });
     });
