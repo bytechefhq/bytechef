@@ -6,9 +6,15 @@ import {useDialogSteps} from './hooks/useDialogSteps';
 
 interface DialogNextButtonProps {
     className?: string;
+    isPending?: boolean;
     label?: string;
 
     lastStepLabel?: string;
+}
+
+interface DialogPreviousButtonProps {
+    className?: string;
+    label?: string;
 }
 
 interface DialogCancelButtonProps {
@@ -16,24 +22,55 @@ interface DialogCancelButtonProps {
     label?: string;
 }
 
-function DialogNextButton({className, label = 'Continue', lastStepLabel}: DialogNextButtonProps) {
+function DialogNextButton({
+    className,
+    isPending: isExternalPending = false,
+    label = 'Continue',
+    lastStepLabel,
+}: DialogNextButtonProps) {
     const {currentStep, goToNextStep, isLastStep, isPending} = useDialogSteps();
 
     const buttonLabel = isLastStep ? lastStepLabel || label : label;
+    const isBusy = isPending || isExternalPending;
+
+    const handleClick = () => {
+        goToNextStep().catch((error) => console.error('DialogNextButton failed to advance the dialog:', error));
+    };
 
     return (
         <Button
             className={className}
-            disabled={isPending || currentStep.canProceed === false}
-            icon={isPending ? <LoadingIcon /> : undefined}
+            disabled={isBusy || currentStep.canProceed === false}
+            icon={isBusy ? <LoadingIcon /> : undefined}
             label={buttonLabel}
-            onClick={() => goToNextStep()}
+            onClick={handleClick}
             type="button"
         />
     );
 }
 
 DialogNextButton.displayName = 'DialogNextButton';
+
+function DialogPreviousButton({className, label = 'Previous'}: DialogPreviousButtonProps) {
+    const {goToPreviousStep, isFirstStep, isPending} = useDialogSteps();
+
+    if (isFirstStep) {
+        return null;
+    }
+
+    return (
+        <Button
+            className={className}
+            disabled={isPending}
+            label={label}
+            onClick={goToPreviousStep}
+            type="button"
+            variant="outline"
+        />
+    );
+}
+
+DialogPreviousButton.displayName = 'DialogPreviousButton';
 
 function DialogCancelButton({className, label = 'Cancel'}: DialogCancelButtonProps) {
     return (
@@ -45,5 +82,5 @@ function DialogCancelButton({className, label = 'Cancel'}: DialogCancelButtonPro
 
 DialogCancelButton.displayName = 'DialogCancelButton';
 
-export {DialogCancelButton, DialogNextButton};
-export type {DialogCancelButtonProps, DialogNextButtonProps};
+export {DialogCancelButton, DialogNextButton, DialogPreviousButton};
+export type {DialogCancelButtonProps, DialogNextButtonProps, DialogPreviousButtonProps};

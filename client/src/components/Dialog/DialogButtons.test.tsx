@@ -3,7 +3,7 @@ import {act, render, screen, userEvent} from '@/shared/util/test-utils';
 import {describe, expect, it, vi} from 'vitest';
 
 import {Dialog, DialogContent} from './Dialog';
-import {DialogCancelButton, DialogNextButton} from './DialogButtons';
+import {DialogCancelButton, DialogNextButton, DialogPreviousButton} from './DialogButtons';
 import {type DialogStepI, DialogStepsProvider, type DialogStepsProviderProps} from './DialogStepsProvider';
 import {useDialogSteps} from './hooks/useDialogSteps';
 
@@ -91,6 +91,70 @@ describe('DialogNextButton', () => {
         renderNextButton({defaultStepId: 'review'});
 
         expect(screen.getByRole('button', {name: 'Continue'})).toBeInTheDocument();
+    });
+});
+
+describe('DialogNextButton - External pending', () => {
+    it('should keep the spinner while work started by onComplete is still running', () => {
+        render(
+            <DialogStepsProvider defaultStepId="review" steps={steps}>
+                <DialogNextButton isPending lastStepLabel="Save" />
+            </DialogStepsProvider>
+        );
+
+        const saveButton = screen.getByRole('button', {name: 'Save'});
+
+        expect(saveButton).toBeDisabled();
+        expect(saveButton.querySelector('svg.animate-spin')).toBeInTheDocument();
+    });
+
+    it('should report a rejected step transition instead of throwing at the click handler', async () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        const validateStep = vi.fn().mockRejectedValue(new Error('Validation failed'));
+
+        renderNextButton({validateStep});
+
+        await userEvent.click(screen.getByRole('button', {name: 'Continue'}));
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'DialogNextButton failed to advance the dialog:',
+            expect.any(Error)
+        );
+        expect(screen.getByTestId('current-step')).toHaveTextContent('basics');
+
+        consoleErrorSpy.mockRestore();
+    });
+});
+
+describe('DialogPreviousButton', () => {
+    function renderPreviousButton(providerOptions: ProviderOptionsType = {}) {
+        return render(
+            <DialogStepsProvider steps={steps} {...providerOptions}>
+                <DialogNextButton />
+
+                <DialogPreviousButton />
+
+                <CurrentStepProbe />
+            </DialogStepsProvider>
+        );
+    }
+
+    it('should not render on the first step', () => {
+        renderPreviousButton();
+
+        expect(screen.queryByRole('button', {name: 'Previous'})).not.toBeInTheDocument();
+    });
+
+    it('should go back to the previous step', async () => {
+        renderPreviousButton();
+
+        await userEvent.click(screen.getByRole('button', {name: 'Continue'}));
+
+        expect(screen.getByTestId('current-step')).toHaveTextContent('review');
+
+        await userEvent.click(screen.getByRole('button', {name: 'Previous'}));
+
+        expect(screen.getByTestId('current-step')).toHaveTextContent('basics');
     });
 });
 

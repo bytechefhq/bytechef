@@ -41,7 +41,7 @@ const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialo
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
             <DialogContent>
-                <DialogMain className="sm:min-w-[672px]">
+                <DialogMain className="sm:w-[672px] sm:max-w-full">
                     <DialogHeader
                         description="Upload a file to create a skill."
                         icon={<UploadIcon />}

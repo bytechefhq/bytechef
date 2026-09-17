@@ -8,7 +8,7 @@ import {useDialogSteps} from './hooks/useDialogSteps';
 type DialogStepsPropsType = ComponentPropsWithRef<'nav'>;
 
 const stepStyles =
-    'w-full justify-start px-3 text-content-neutral-secondary hover:text-content-neutral-secondary focus-visible:ring-2 focus-visible:ring-stroke-brand-focus disabled:opacity-100';
+    'w-full justify-start px-3 text-content-neutral-secondary hover:text-content-neutral-secondary focus-visible:ring-2 focus-visible:ring-stroke-brand-focus aria-disabled:cursor-not-allowed';
 
 const currentStepStyles =
     'bg-surface-brand-secondary text-content-brand-primary hover:bg-surface-brand-secondary hover:text-content-brand-primary';
@@ -26,8 +26,8 @@ const DialogSteps = ({'aria-label': ariaLabel = 'Steps', className, ...props}: D
                         <li key={step.id}>
                             <Button
                                 aria-current={isCurrent ? 'step' : undefined}
+                                aria-disabled={!isReachable && !isCurrent ? true : undefined}
                                 className={twMerge(stepStyles, isCurrent && currentStepStyles)}
-                                disabled={!isReachable && !isCurrent}
                                 icon={
                                     isCompleted ? (
                                         <CircleCheckIcon aria-hidden="true" />

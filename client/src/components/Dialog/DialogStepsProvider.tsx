@@ -1,5 +1,5 @@
-import {useControllableState} from '@radix-ui/react-use-controllable-state';
-import {type ReactNode, createContext, useCallback, useMemo, useRef, useState} from 'react';
+import {useControllableState} from 'radix-ui/internal';
+import {type ReactNode, createContext, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 interface DialogStepI {
     canProceed?: boolean;
@@ -19,6 +19,7 @@ interface DialogStepsContextI {
     currentStepIndex: number;
     getStepStatus: (stepId: string) => DialogStepStatusI;
     goToNextStep: () => Promise<void>;
+    goToPreviousStep: () => void;
     goToStep: (stepId: string) => void;
     isFirstStep: boolean;
     isLastStep: boolean;
@@ -28,9 +29,7 @@ interface DialogStepsContextI {
 
 interface DialogStepsProviderProps {
     children: ReactNode;
-    /** Controlled current step. */
     currentStepId?: string;
-    /** Uncontrolled initial step. Falls back to the first step. */
     defaultStepId?: string;
     onComplete?: () => void | Promise<void>;
     onCurrentStepChange?: (stepId: string) => void;
@@ -59,6 +58,10 @@ function DialogStepsProvider({
     steps,
     validateStep,
 }: DialogStepsProviderProps) {
+    if (steps.length === 0) {
+        throw new Error('DialogStepsProvider requires at least one step');
+    }
+
     const [completedStepIds, setCompletedStepIds] = useState<ReadonlySet<string>>(() => new Set());
     const [isPending, setIsPending] = useState(false);
 
@@ -106,6 +109,14 @@ function DialogStepsProvider({
         [getStepStatus, setSelectedStepId]
     );
 
+    const goToPreviousStep = useCallback(() => {
+        if (isPendingRef.current || currentStepIndex === 0) {
+            return;
+        }
+
+        setSelectedStepId(steps[currentStepIndex - 1].id);
+    }, [currentStepIndex, setSelectedStepId, steps]);
+
     const goToNextStep = useCallback(async () => {
         if (isPendingRef.current || currentStep.canProceed === false) {
             return;
@@ -122,6 +133,12 @@ function DialogStepsProvider({
                 return;
             }
 
+            if (isLastStep) {
+                await onComplete?.();
+            } else {
+                setSelectedStepId(steps[currentStepIndex + 1].id);
+            }
+
             setCompletedStepIds((previousCompletedStepIds) => {
                 const nextCompletedStepIds = new Set(previousCompletedStepIds);
 
@@ -129,12 +146,6 @@ function DialogStepsProvider({
 
                 return nextCompletedStepIds;
             });
-
-            if (isLastStep) {
-                await onComplete?.();
-            } else {
-                setSelectedStepId(steps[currentStepIndex + 1].id);
-            }
         } finally {
             isPendingRef.current = false;
 
@@ -149,6 +160,7 @@ function DialogStepsProvider({
             currentStepIndex,
             getStepStatus,
             goToNextStep,
+            goToPreviousStep,
             goToStep,
             isFirstStep,
             isLastStep,
@@ -161,6 +173,7 @@ function DialogStepsProvider({
             currentStepIndex,
             getStepStatus,
             goToNextStep,
+            goToPreviousStep,
             goToStep,
             isFirstStep,
             isLastStep,
@@ -169,9 +182,11 @@ function DialogStepsProvider({
         ]
     );
 
-    if (steps.length === 0) {
-        throw new Error('DialogStepsProvider requires at least one step');
-    }
+    useEffect(() => {
+        if (currentStepId === undefined && selectedStepId !== currentStep.id) {
+            setSelectedStepId(currentStep.id);
+        }
+    }, [currentStep, currentStepId, selectedStepId, setSelectedStepId]);
 
     return <DialogStepsContext value={contextValue}>{children}</DialogStepsContext>;
 }

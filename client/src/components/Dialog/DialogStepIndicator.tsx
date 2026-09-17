@@ -12,7 +12,9 @@ function DialogStepIndicator({className, showLabel = true, ...props}: DialogStep
     const {currentStepIndex, steps} = useDialogSteps();
 
     const stepNumber = currentStepIndex + 1;
+
     const label = `Step ${stepNumber} of ${steps.length}`;
+    const completedPercentage = Math.round((stepNumber / steps.length) * 100);
 
     return (
         <div
@@ -24,9 +26,9 @@ function DialogStepIndicator({className, showLabel = true, ...props}: DialogStep
 
             <ShadcnProgress
                 aria-label={label}
-                aria-valuenow={(stepNumber / steps.length) * 100}
+                aria-valuenow={completedPercentage}
                 className="h-2 bg-surface-brand-secondary *:data-[slot=progress-indicator]:bg-surface-brand-primary"
-                value={(stepNumber / steps.length) * 100}
+                value={completedPercentage}
             />
         </div>
     );

@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {PencilIcon, RocketIcon} from 'lucide-react';
 
 import {Dialog, DialogContent, DialogTrigger} from './Dialog';
-import {DialogCancelButton, DialogNextButton} from './DialogButtons';
+import {DialogCancelButton, DialogNextButton, DialogPreviousButton} from './DialogButtons';
 import {DialogBody, DialogFooter, DialogHeader, DialogMain} from './DialogMain';
 import {DialogSidebar} from './DialogSidebar';
 import {DialogStepIndicator} from './DialogStepIndicator';
@@ -67,7 +67,7 @@ export const WithSidebar: Story = {
                 <Button label="Open dialog" />
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent hasSidebar>
                 <DialogSidebar description="Deploy a project version" icon={<RocketIcon />} title="New Deployment">
                     <p className="text-sm text-content-neutral-secondary">
                         Sidebar children render here. The steps story puts DialogSteps and DialogStepIndicator in this
@@ -76,12 +76,17 @@ export const WithSidebar: Story = {
                 </DialogSidebar>
 
                 <DialogMain>
-                    <DialogHeader title="Details" />
+                    <DialogHeader
+                        dialogDescription="Deploy a project version"
+                        dialogTitle="New Deployment"
+                        title="Details"
+                    />
 
                     <DialogBody>
                         <p className="text-sm text-content-neutral-secondary">
-                            The sidebar owns the dialog title, so this header renders a plain h2 instead of a second
-                            one. From 1024 px the sidebar shows and DialogContent switches to the 860 × 648 layout.
+                            DialogHeader owns the single dialog title, so dialogTitle prefixes it below 1024 px, where
+                            the sidebar is hidden, and turns screen-reader only above it. From 1024 px the sidebar shows
+                            and DialogContent switches to the 860 × 648 layout.
                         </p>
                     </DialogBody>
 
@@ -109,7 +114,7 @@ export const WithStepsAndIndicator: Story = {
                 <Button label="Open dialog" />
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent hasSidebar>
                 <DialogStepsProvider steps={storySteps} validateStep={validateAfterDelay}>
                     <DialogSidebar description="Deploy a project version" icon={<RocketIcon />} title="New Deployment">
                         <DialogSteps />
@@ -118,17 +123,20 @@ export const WithStepsAndIndicator: Story = {
                     </DialogSidebar>
 
                     <DialogMain>
-                        <DialogHeader />
+                        <DialogHeader dialogDescription="Deploy a project version" dialogTitle="New Deployment" />
 
                         <DialogBody>
                             <p className="text-sm text-content-neutral-secondary">
                                 DialogNextButton reads Continue until the last step, where lastStepLabel makes it
                                 Deploy. Clicking it validates for 600 ms, showing a spinner and disabling itself, then
-                                advances the steps and the indicator.
+                                advances the steps and the indicator. DialogPreviousButton covers the widths where the
+                                sidebar step list is hidden.
                             </p>
                         </DialogBody>
 
                         <DialogFooter startContent={<DialogCancelButton />}>
+                            <DialogPreviousButton className="lg:hidden" />
+
                             <DialogNextButton lastStepLabel="Deploy" />
                         </DialogFooter>
                     </DialogMain>
