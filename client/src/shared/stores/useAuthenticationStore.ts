@@ -36,9 +36,7 @@ const initialState = {
 
 let accountRequest: Promise<UserI | undefined> | undefined;
 
-const invalidateAccountRequest = () => {
-    accountRequest = undefined;
-};
+let accountRequestAbortController: AbortController | undefined;
 
 const fetchAuthenticate = async (data: string): Promise<Response> => {
     return await fetch('/api/authentication', {
@@ -51,12 +49,13 @@ const fetchAuthenticate = async (data: string): Promise<Response> => {
     }).then((response) => response);
 };
 
-const fetchGetAccount = async (): Promise<Response> => {
+const fetchGetAccount = async (signal: AbortSignal): Promise<Response> => {
     return await fetch('/api/account', {
         headers: {
             'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         method: 'GET',
+        signal,
     }).then((response) => response);
 };
 
@@ -73,6 +72,28 @@ export const authenticationStore = createStore<AuthenticationI>()(
     devtools(
         (set, get) => {
             const setAuthenticationState = (partialState: Partial<AuthenticationI>) => set(partialState);
+
+            /*
+             * Abandons the in-flight account request. Aborting it, rather than only dropping the
+             * reference, keeps its response away from useFetchInterceptor: that interceptor calls
+             * clearAuthentication() on every 401, including /api/account, so a superseded request
+             * answering 401 would otherwise discard the request that replaced it.
+             */
+            const invalidateAccountRequest = () => {
+                if (!accountRequest) {
+                    return;
+                }
+
+                accountRequest = undefined;
+
+                accountRequestAbortController?.abort();
+
+                accountRequestAbortController = undefined;
+
+                setAuthenticationState({
+                    loading: false,
+                });
+            };
 
             return {
                 ...initialState,
@@ -97,7 +118,9 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         loading: true,
                     });
 
-                    const request: Promise<UserI | undefined> = fetchGetAccount()
+                    const abortController = new AbortController();
+
+                    const request: Promise<UserI | undefined> = fetchGetAccount(abortController.signal)
                         .then(async (response) => {
                             if (response.status === 200) {
                                 const account: UserI = await response.json();
@@ -123,9 +146,18 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                             return undefined;
                         })
+                        .catch((error) => {
+                            if (abortController.signal.aborted) {
+                                return undefined;
+                            }
+
+                            throw error;
+                        })
                         .finally(() => {
                             if (accountRequest === request) {
                                 accountRequest = undefined;
+
+                                accountRequestAbortController = undefined;
 
                                 setAuthenticationState({
                                     loading: false,
@@ -135,6 +167,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                     accountRequest = request;
 
+                    accountRequestAbortController = abortController;
+
                     return request;
                 },
 
@@ -143,6 +177,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                     return fetchAuthenticate(data).then((response) => {
                         if (response.status === 200) {
+                            invalidateAccountRequest();
+
                             setAuthenticationState({
                                 loginError: false,
                                 showLogin: false,
@@ -170,6 +206,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                 },
 
                 logout: async () => {
+                    invalidateAccountRequest();
+
                     const response = await fetchLogout();
 
                     if (response.status === 200) {
@@ -180,8 +218,6 @@ export const authenticationStore = createStore<AuthenticationI>()(
                     }
 
                     // fetch new csrf token
-                    invalidateAccountRequest();
-
                     const {getAccount} = get();
 
                     getAccount();
@@ -199,6 +235,8 @@ export const authenticationStore = createStore<AuthenticationI>()(
                         });
 
                         if (response.status === 200) {
+                            invalidateAccountRequest();
+
                             setAuthenticationState({
                                 mfaRequired: false,
                             });

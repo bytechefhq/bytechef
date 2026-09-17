@@ -32,6 +32,9 @@ const stubFetch = () => {
     return fetchMock;
 };
 
+const accountRequestSignal = (fetchMock: ReturnType<typeof vi.fn>, callIndex = 0): AbortSignal =>
+    fetchMock.mock.calls[callIndex][1].signal;
+
 const requestedUrls = (fetchMock: ReturnType<typeof vi.fn>) => fetchMock.mock.calls.map((call) => call[0]);
 
 describe('authenticationStore', () => {
@@ -162,6 +165,67 @@ describe('authenticationStore', () => {
             expect(fetchMock).toHaveBeenCalledTimes(2);
         });
 
+        it('aborts a superseded request so its response cannot reach the fetch interceptor', async () => {
+            const deferred = createDeferred<Response>();
+            const fetchMock = stubFetch()
+                .mockReturnValueOnce(deferred.promise)
+                .mockResolvedValueOnce(emptyResponse(401));
+
+            const staleRequest = authenticationStore.getState().getAccount();
+
+            expect(accountRequestSignal(fetchMock).aborted).toBe(false);
+
+            authenticationStore.getState().clearAuthentication();
+
+            expect(accountRequestSignal(fetchMock).aborted).toBe(true);
+
+            deferred.resolve(accountResponse());
+
+            await expect(staleRequest).resolves.toEqual(ACCOUNT);
+
+            expect(authenticationStore.getState().authenticated).toBe(false);
+        });
+
+        it('lets a request started after the session was cleared update the store', async () => {
+            const staleDeferred = createDeferred<Response>();
+            const freshDeferred = createDeferred<Response>();
+
+            stubFetch().mockReturnValueOnce(staleDeferred.promise).mockReturnValueOnce(freshDeferred.promise);
+
+            const staleRequest = authenticationStore.getState().getAccount();
+
+            authenticationStore.getState().clearAuthentication();
+
+            const freshRequest = authenticationStore.getState().getAccount();
+
+            staleDeferred.resolve(emptyResponse(401));
+
+            await staleRequest;
+
+            freshDeferred.resolve(accountResponse());
+
+            await expect(freshRequest).resolves.toEqual(ACCOUNT);
+
+            const state = authenticationStore.getState();
+
+            expect(state.account).toEqual(ACCOUNT);
+            expect(state.authenticated).toBe(true);
+        });
+
+        it('resolves an aborted request instead of rejecting it', async () => {
+            const deferred = createDeferred<Response>();
+
+            stubFetch().mockReturnValueOnce(deferred.promise);
+
+            const staleRequest = authenticationStore.getState().getAccount();
+
+            authenticationStore.getState().reset();
+
+            deferred.reject(new DOMException('The operation was aborted.', 'AbortError'));
+
+            await expect(staleRequest).resolves.toBeUndefined();
+        });
+
         it('sends the XSRF token from the cookie', async () => {
             document.cookie = 'XSRF-TOKEN=token-value';
 
@@ -172,6 +236,7 @@ describe('authenticationStore', () => {
             expect(fetchMock).toHaveBeenCalledWith('/api/account', {
                 headers: {'X-XSRF-TOKEN': 'token-value'},
                 method: 'GET',
+                signal: expect.any(AbortSignal),
             });
 
             document.cookie = 'XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
@@ -232,6 +297,29 @@ describe('authenticationStore', () => {
             expect(state.loginError).toBe(true);
         });
 
+        it('does not reuse an account request started before the login succeeded', async () => {
+            const preLoginDeferred = createDeferred<Response>();
+            const fetchMock = stubFetch()
+                .mockReturnValueOnce(preLoginDeferred.promise)
+                .mockResolvedValueOnce(emptyResponse(200))
+                .mockResolvedValueOnce(accountResponse());
+
+            const preLoginRequest = authenticationStore.getState().getAccount();
+
+            const account = await authenticationStore.getState().login(LOGIN_EMAIL, LOGIN_CREDENTIAL, false);
+
+            expect(requestedUrls(fetchMock)).toEqual(['/api/account', '/api/authentication', '/api/account']);
+            expect(accountRequestSignal(fetchMock).aborted).toBe(true);
+            expect(account).toEqual(ACCOUNT);
+            expect(authenticationStore.getState().authenticated).toBe(true);
+
+            preLoginDeferred.resolve(emptyResponse(401));
+
+            await preLoginRequest;
+
+            expect(authenticationStore.getState().authenticated).toBe(true);
+        });
+
         it('requires MFA on 202 without fetching the account', async () => {
             const fetchMock = stubFetch().mockResolvedValueOnce(emptyResponse(202));
 
@@ -278,6 +366,28 @@ describe('authenticationStore', () => {
             expect(requestedUrls(fetchMock)).toEqual(['/api/mfa/verify', '/api/account']);
             expect(fetchMock.mock.calls[0][1].body).toBe(JSON.stringify({code: '123456'}));
             expect(authenticationStore.getState().mfaRequired).toBe(false);
+            expect(authenticationStore.getState().authenticated).toBe(true);
+        });
+
+        it('does not reuse an account request started before the code was verified', async () => {
+            const preVerifyDeferred = createDeferred<Response>();
+            const fetchMock = stubFetch()
+                .mockReturnValueOnce(preVerifyDeferred.promise)
+                .mockResolvedValueOnce(emptyResponse(200))
+                .mockResolvedValueOnce(accountResponse());
+
+            const preVerifyRequest = authenticationStore.getState().getAccount();
+
+            const account = await authenticationStore.getState().verifyMfa('123456');
+
+            expect(requestedUrls(fetchMock)).toEqual(['/api/account', '/api/mfa/verify', '/api/account']);
+            expect(accountRequestSignal(fetchMock).aborted).toBe(true);
+            expect(account).toEqual(ACCOUNT);
+
+            preVerifyDeferred.resolve(emptyResponse(401));
+
+            await preVerifyRequest;
+
             expect(authenticationStore.getState().authenticated).toBe(true);
         });
 
@@ -336,6 +446,32 @@ describe('authenticationStore', () => {
             expect(authenticationStore.getState().authenticated).toBe(true);
 
             deferred.resolve(accountResponse());
+        });
+
+        it('abandons the in-flight request even when the logout request fails', async () => {
+            const deferred = createDeferred<Response>();
+            const fetchMock = stubFetch()
+                .mockReturnValueOnce(deferred.promise)
+                .mockRejectedValueOnce(new TypeError('Failed to fetch'));
+
+            authenticationStore.setState({account: ACCOUNT, authenticated: true});
+
+            const staleRequest = authenticationStore.getState().getAccount();
+
+            await expect(authenticationStore.getState().logout()).rejects.toThrow('Failed to fetch');
+
+            expect(accountRequestSignal(fetchMock).aborted).toBe(true);
+            expect(authenticationStore.getState().loading).toBe(false);
+
+            deferred.resolve(accountResponse());
+
+            await staleRequest;
+
+            expect(authenticationStore.getState().account).toEqual(ACCOUNT);
+
+            authenticationStore.getState().clearAuthentication();
+
+            expect(authenticationStore.getState().authenticated).toBe(false);
         });
 
         it('does not let a request started before logout restore the old session', async () => {
