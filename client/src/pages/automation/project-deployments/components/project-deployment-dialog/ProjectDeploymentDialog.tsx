@@ -1,19 +1,25 @@
 import Button from '@/components/Button/Button';
-import LoadingDots from '@/components/LoadingDots';
-import LoadingIcon from '@/components/LoadingIcon';
-import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
+    DialogNextButton,
+    DialogSidebar,
+    type DialogStepI,
+    DialogStepIndicator,
+    DialogSteps,
+    DialogStepsProvider,
     DialogTrigger,
-} from '@/components/ui/dialog';
+    useDialogSteps,
+} from '@/components/Dialog';
+import LoadingDots from '@/components/LoadingDots';
+import LoadingIcon from '@/components/LoadingIcon';
+import Switch from '@/components/Switch/Switch';
 import {Form} from '@/components/ui/form';
-import {Progress} from '@/components/ui/progress';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -36,16 +42,107 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
 import {useQueryClient} from '@tanstack/react-query';
-import {InfoIcon} from 'lucide-react';
+import {InfoIcon, RocketIcon} from 'lucide-react';
 import {ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useNavigate} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import ProjectDeploymentDialogBasicStep from './ProjectDeploymentDialogBasicStep';
 import ProjectDeploymentDialogWorkflowsStep from './ProjectDeploymentDialogWorkflowsStep';
 import getWorkflowComponentConnections, {buildDeploymentWorkflows} from './projectDeploymentDialog-utils';
+
+interface ProjectDeploymentDialogStepContentProps {
+    basicStepContent: ReactNode;
+    isWorkflowsPending: boolean;
+    workflowsStepContent: ReactNode;
+}
+
+interface ProjectDeploymentDialogFooterProps {
+    connectionsGrouped: boolean;
+    hasEnabledWorkflows: boolean;
+    hasVisibleConnections?: boolean;
+    isDeploymentPending: boolean;
+    onConnectionsGroupedChange: (grouped: boolean) => void;
+}
+
+const ProjectDeploymentDialogStepContent = ({
+    basicStepContent,
+    isWorkflowsPending,
+    workflowsStepContent,
+}: ProjectDeploymentDialogStepContentProps) => {
+    const {currentStep} = useDialogSteps();
+
+    if (currentStep.id !== 'workflows') {
+        return <>{basicStepContent}</>;
+    }
+
+    if (isWorkflowsPending) {
+        return (
+            <div className="flex justify-center py-12">
+                <LoadingDots />
+            </div>
+        );
+    }
+
+    return <>{workflowsStepContent}</>;
+};
+
+ProjectDeploymentDialogStepContent.displayName = 'ProjectDeploymentDialogStepContent';
+
+const ProjectDeploymentDialogFooter = ({
+    connectionsGrouped,
+    hasEnabledWorkflows,
+    hasVisibleConnections,
+    isDeploymentPending,
+    onConnectionsGroupedChange,
+}: ProjectDeploymentDialogFooterProps) => {
+    const {isLastStep} = useDialogSteps();
+
+    return (
+        <DialogFooter
+            startContent={
+                <>
+                    <DialogCancelButton />
+
+                    {isLastStep && hasVisibleConnections && (
+                        <div className="ml-2 flex items-center gap-2">
+                            <Switch
+                                checked={connectionsGrouped}
+                                label="Group Connections"
+                                onCheckedChange={onConnectionsGroupedChange}
+                            />
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <InfoIcon className="size-4 cursor-default text-content-neutral-secondary" />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Connections grouped by their app.</TooltipContent>
+                            </Tooltip>
+                        </div>
+                    )}
+                </>
+            }
+        >
+            {isLastStep && !hasEnabledWorkflows ? (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="inline-flex">
+                            <DialogNextButton label="Next" lastStepLabel={isDeploymentPending ? 'Saving...' : 'Save'} />
+                        </span>
+                    </TooltipTrigger>
+
+                    <TooltipContent>Enable at least one workflow to save this deployment</TooltipContent>
+                </Tooltip>
+            ) : (
+                <DialogNextButton label="Next" lastStepLabel={isDeploymentPending ? 'Saving...' : 'Save'} />
+            )}
+        </DialogFooter>
+    );
+};
+
+ProjectDeploymentDialogFooter.displayName = 'ProjectDeploymentDialogFooter';
 
 interface ProjectDeploymentDialogProps {
     changeProjectVersion?: boolean;
@@ -76,7 +173,6 @@ const ProjectDeploymentDialog = ({
     showTabs,
     triggerNode,
 }: ProjectDeploymentDialogProps) => {
-    const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [basicStepTab, setBasicStepTab] = useState<'new-deployment' | 'change-version'>(
         changeProjectVersion ? 'change-version' : 'new-deployment'
     );
@@ -200,7 +296,6 @@ const ProjectDeploymentDialog = ({
         }
 
         closeDialog();
-        setActiveStepIndex(0);
 
         if (redirectOnSubmit) {
             if (submittedEnvironmentId != null) {
@@ -274,49 +369,54 @@ const ProjectDeploymentDialog = ({
         initializedProjectKeyRef.current = '';
     };
 
-    const projectDeploymentDialogSteps = [
-        {
-            content:
-                showTabs && !tabInitialized ? null : (
-                    <ProjectDeploymentDialogBasicStep
-                        basicStepTab={basicStepTab}
-                        changeProjectVersion={effectiveChangeProjectVersion}
-                        control={control}
-                        environmentEditable={environmentEditable}
-                        getValues={getValues}
-                        handleTabChange={handleBasicStepTabChange}
-                        onDeploymentSelect={handleExistingDeploymentSelect}
-                        projectDeployment={effectiveProjectDeployment}
-                        projectDeployments={projectDeployments}
-                        projectDeploymentsLoading={projectDeploymentsLoading}
-                        setValue={setValue}
-                        showTabs={showTabs}
-                    />
-                ),
-            name: 'Basic',
-        },
-        {
-            content: workflows && (
-                <ProjectDeploymentDialogWorkflowsStep
-                    connections={connections}
-                    connectionsGrouped={connectionsGrouped}
-                    control={control}
-                    formState={formState}
-                    setValue={setValue}
-                    workflows={workflows}
-                />
-            ),
-            name: 'Workflows',
-        },
-    ];
+    const basicStepContent =
+        showTabs && !tabInitialized ? null : (
+            <ProjectDeploymentDialogBasicStep
+                basicStepTab={basicStepTab}
+                changeProjectVersion={effectiveChangeProjectVersion}
+                control={control}
+                environmentEditable={environmentEditable}
+                getValues={getValues}
+                handleTabChange={handleBasicStepTabChange}
+                onDeploymentSelect={handleExistingDeploymentSelect}
+                projectDeployment={effectiveProjectDeployment}
+                projectDeployments={projectDeployments}
+                projectDeploymentsLoading={projectDeploymentsLoading}
+                setValue={setValue}
+                showTabs={showTabs}
+            />
+        );
+
+    const workflowsStepContent = workflows && (
+        <ProjectDeploymentDialogWorkflowsStep
+            connections={connections}
+            connectionsGrouped={connectionsGrouped}
+            control={control}
+            formState={formState}
+            setValue={setValue}
+            workflows={workflows}
+        />
+    );
+
+    const isBasicStepBlocked =
+        basicStepTab === 'change-version' &&
+        !projectDeploymentsLoading &&
+        (projectDeployments?.length ?? 0) === 0 &&
+        !!showTabs;
+
+    const steps = useMemo<DialogStepI[]>(
+        () => [
+            {canProceed: !isBasicStepBlocked, id: 'basic', label: 'Basic'},
+            {canProceed: !isSaveDisabled, id: 'workflows', label: 'Workflows'},
+        ],
+        [isBasicStepBlocked, isSaveDisabled]
+    );
 
     const closeDialog = () => {
         setIsOpen(false);
 
         setTimeout(() => {
             reset();
-
-            setActiveStepIndex(0);
 
             initializedProjectKeyRef.current = '';
 
@@ -336,7 +436,7 @@ const ProjectDeploymentDialog = ({
         }, 300);
     };
 
-    const handleNextClick = () => setActiveStepIndex(activeStepIndex + 1);
+    const validateStep = (step: DialogStepI) => (step.id === 'basic' ? form.trigger() : true);
 
     const handleConnectionsGroupedChange = (grouped: boolean) => {
         setConnectionsGrouped(grouped);
@@ -479,21 +579,13 @@ const ProjectDeploymentDialog = ({
         setTabInitialized(true);
     }, [isOpen, projectDeploymentsLoading, projectDeployments, changeProjectVersion, tabInitialized]);
 
-    let dialogTitle = '';
+    const isWizard = !effectiveProjectDeployment?.id || effectiveChangeProjectVersion;
 
-    if (effectiveChangeProjectVersion) {
-        dialogTitle = 'Change Project Version';
-    }
+    const wizardTitle = effectiveChangeProjectVersion ? 'Change Project Version' : 'New Deployment';
 
-    if (!effectiveChangeProjectVersion && effectiveProjectDeployment) {
-        const {id: projectDeploymentId} = effectiveProjectDeployment;
-
-        if (!projectDeploymentId) {
-            dialogTitle = `New Deployment - ${projectDeploymentDialogSteps[activeStepIndex].name}`;
-        } else {
-            dialogTitle = `Edit Deployment - ${effectiveProjectDeployment.name}`;
-        }
-    }
+    const wizardDescription = effectiveChangeProjectVersion
+        ? 'Deploy a different version of this project.'
+        : 'Deploy a project version.';
 
     return (
         <Dialog
@@ -513,91 +605,69 @@ const ProjectDeploymentDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent
-                className="flex flex-col gap-0 p-0"
                 onClick={(event) => event.stopPropagation()}
                 onInteractOutside={(event) => event.preventDefault()}
             >
-                <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 px-6 pt-6 pb-3">
-                    <div className="flex w-full flex-col space-y-2">
-                        <DialogTitle>{dialogTitle}</DialogTitle>
-
-                        {!effectiveProjectDeployment?.id && !effectiveChangeProjectVersion && (
-                            <Progress
-                                aria-label="Progress"
-                                className="h-1"
-                                value={((activeStepIndex + 1) / projectDeploymentDialogSteps.length) * 100}
-                            />
-                        )}
-                    </div>
-
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                <WorkflowMockProvider>
-                    <div
-                        className={twMerge('px-6 py-3', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}
+                {isWizard ? (
+                    <DialogStepsProvider
+                        onComplete={handleSubmit(handleSaveClick)}
+                        steps={steps}
+                        validateStep={validateStep}
                     >
-                        {activeStepIndex === 1 && isWorkflowsPending ? (
-                            <div className="flex justify-center py-12">
-                                <LoadingDots />
-                            </div>
-                        ) : (
-                            <Form {...form}>{projectDeploymentDialogSteps[activeStepIndex].content}</Form>
-                        )}
-                    </div>
-                </WorkflowMockProvider>
+                        <DialogSidebar description={wizardDescription} icon={<RocketIcon />} title={wizardTitle}>
+                            <DialogSteps />
 
-                <DialogFooter className="px-6 pt-3 pb-6">
-                    {activeStepIndex === 0 && (
-                        <>
-                            <DialogClose asChild>
-                                <Button label="Cancel" variant="outline" />
-                            </DialogClose>
+                            <DialogStepIndicator />
+                        </DialogSidebar>
 
-                            {(!effectiveProjectDeployment?.id || effectiveChangeProjectVersion) && (
+                        <DialogMain>
+                            <DialogHeader />
+
+                            <DialogBody>
+                                <WorkflowMockProvider>
+                                    <Form {...form}>
+                                        <ProjectDeploymentDialogStepContent
+                                            basicStepContent={basicStepContent}
+                                            isWorkflowsPending={isWorkflowsPending}
+                                            workflowsStepContent={workflowsStepContent}
+                                        />
+                                    </Form>
+                                </WorkflowMockProvider>
+                            </DialogBody>
+
+                            <ProjectDeploymentDialogFooter
+                                connectionsGrouped={connectionsGrouped}
+                                hasEnabledWorkflows={hasEnabledWorkflows}
+                                hasVisibleConnections={hasVisibleConnections}
+                                isDeploymentPending={isDeploymentPending}
+                                onConnectionsGroupedChange={handleConnectionsGroupedChange}
+                            />
+                        </DialogMain>
+                    </DialogStepsProvider>
+                ) : (
+                    <DialogMain>
+                        <DialogHeader
+                            description="Update the deployment name, description and tags."
+                            title={`Edit Deployment - ${effectiveProjectDeployment?.name}`}
+                        />
+
+                        <DialogBody>
+                            <WorkflowMockProvider>
+                                <Form {...form}>{basicStepContent}</Form>
+                            </WorkflowMockProvider>
+                        </DialogBody>
+
+                        <DialogFooter>
+                            <DialogCancelButton />
+
+                            {hasEnabledWorkflows ? (
                                 <Button
-                                    disabled={
-                                        basicStepTab === 'change-version' &&
-                                        !projectDeploymentsLoading &&
-                                        (projectDeployments?.length ?? 0) === 0 &&
-                                        showTabs
-                                    }
-                                    label="Next"
-                                    onClick={handleSubmit(handleNextClick)}
+                                    disabled={isSaveDisabled}
+                                    icon={isDeploymentPending ? <LoadingIcon /> : undefined}
+                                    label={isDeploymentPending ? 'Saving...' : 'Save'}
+                                    onClick={handleSubmit(handleSaveClick)}
                                 />
-                            )}
-                        </>
-                    )}
-
-                    {(activeStepIndex === 1 || (effectiveProjectDeployment?.id && !effectiveChangeProjectVersion)) && (
-                        <>
-                            {activeStepIndex === 1 && hasVisibleConnections && (
-                                <div className="mr-auto flex items-center gap-2">
-                                    <Switch
-                                        checked={connectionsGrouped}
-                                        label="Group Connections"
-                                        onCheckedChange={handleConnectionsGroupedChange}
-                                    />
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Connections grouped by their app.</TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            )}
-
-                            {activeStepIndex === 1 && (
-                                <Button
-                                    label="Previous"
-                                    onClick={() => setActiveStepIndex(activeStepIndex - 1)}
-                                    variant="outline"
-                                />
-                            )}
-
-                            {!hasEnabledWorkflows ? (
+                            ) : (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <span className="inline-flex">
@@ -614,17 +684,10 @@ const ProjectDeploymentDialog = ({
                                         Enable at least one workflow to save this deployment
                                     </TooltipContent>
                                 </Tooltip>
-                            ) : (
-                                <Button
-                                    disabled={isSaveDisabled}
-                                    icon={isDeploymentPending ? <LoadingIcon /> : undefined}
-                                    label={isDeploymentPending ? 'Saving...' : 'Save'}
-                                    onClick={handleSubmit(handleSaveClick)}
-                                />
                             )}
-                        </>
-                    )}
-                </DialogFooter>
+                        </DialogFooter>
+                    </DialogMain>
+                )}
             </DialogContent>
         </Dialog>
     );

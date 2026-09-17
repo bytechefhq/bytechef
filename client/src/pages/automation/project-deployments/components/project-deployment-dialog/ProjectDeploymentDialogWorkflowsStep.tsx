@@ -28,7 +28,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     );
 
     return (
-        <div className="h-full space-y-5">
+        <div className="min-h-full space-y-5">
             {nonSubflowWorkflows?.map((workflow, workflowIndex) => (
                 <ProjectDeploymentDialogWorkflowsStepItem
                     connections={connections}
