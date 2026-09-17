@@ -13,7 +13,7 @@ export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitions
             new ComponentDefinitionApi().getComponentDefinitions({
                 ...request,
             }),
-        queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
+        queryKey: [...ComponentDefinitionKeys.componentDefinitions, 'embedded', request],
         staleTime: DEFINITION_STALE_TIME,
     });
 };

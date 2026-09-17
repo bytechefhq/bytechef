@@ -17,19 +17,17 @@ export const ConnectionKeys = {
     filteredConnections: (filters: RequestI) => [...ConnectionKeys.connections, filters],
 };
 
-export const getConnectedUserConnectionsQuery =
-    (connectedUserId: number, connectionIds?: Array<number>) => (request: RequestI, enabled?: boolean) =>
-        useQuery<Connection[], Error>({
-            queryKey: ConnectionKeys.filteredConnections(request),
-            queryFn: () =>
-                new ConnectionApi().getConnectedUserConnections({
-                    componentName: request.componentName!,
-                    connectedUserId,
-                    connectionIds,
-                }),
-            enabled: enabled === undefined ? true : enabled,
-            staleTime: DEFINITION_STALE_TIME,
-        });
+export const getConnectedUserConnectionsQuery = (connectedUserId: number) => (request: RequestI, enabled?: boolean) =>
+    useQuery<Connection[], Error>({
+        queryKey: ConnectionKeys.filteredConnections(request),
+        queryFn: () =>
+            new ConnectionApi().getConnectedUserConnections({
+                componentName: request.componentName!,
+                connectedUserId,
+            }),
+        enabled: enabled === undefined ? true : enabled,
+        staleTime: DEFINITION_STALE_TIME,
+    });
 
 export const useGetConnectionsQuery = (filters: GetConnectionsRequest, enabled?: boolean) =>
     useQuery<Connection[], Error>({
