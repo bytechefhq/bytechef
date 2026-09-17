@@ -1,3 +1,4 @@
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -15,27 +16,34 @@ vi.mock('../hooks/useClusterElementsWorkflowEditor', () => ({
     }),
 }));
 
+const renderEditor = () =>
+    render(
+        <TooltipProvider>
+            <ClusterElementsWorkflowEditor />
+        </TooltipProvider>
+    );
+
 describe('ClusterElementsWorkflowEditor - lock button', () => {
     beforeEach(() => {
         useClusterElementsDataStore.setState({edges: [], nodes: [], nodesLocked: true});
     });
 
     it('renders the unlock affordance when locked', async () => {
-        render(<ClusterElementsWorkflowEditor />);
+        renderEditor();
 
-        // The canvas (and its control toolbar) mounts only after the settle delay, so
+        // The canvas (and its toolbar) mounts only after the settle delay, so
         // wait for the control to appear rather than querying synchronously.
-        expect(await screen.findByTitle('Unlock node movement')).toBeInTheDocument();
+        expect(await screen.findByLabelText('Unlock node movement')).toBeInTheDocument();
     });
 
     it('toggles nodesLocked when clicked', async () => {
         const user = userEvent.setup();
 
-        render(<ClusterElementsWorkflowEditor />);
+        renderEditor();
 
-        await user.click(await screen.findByTitle('Unlock node movement'));
+        await user.click(await screen.findByLabelText('Unlock node movement'));
 
         expect(useClusterElementsDataStore.getState().nodesLocked).toBe(false);
-        expect(screen.getByTitle('Lock node movement')).toBeInTheDocument();
+        expect(screen.getByLabelText('Lock node movement')).toBeInTheDocument();
     });
 });
