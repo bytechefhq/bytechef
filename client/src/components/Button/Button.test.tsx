@@ -114,6 +114,14 @@ describe('Button sizes', () => {
         expect(container.querySelector('svg')).toBeInTheDocument();
         expect(container.querySelector('svg')).toHaveClass('lucide-circle');
     });
+
+    it('should not apply the shadcn text-size padding to icon sizes so they stay square', () => {
+        render(<Button icon={<CircleIcon />} size="iconXxs" />);
+
+        expect(screen.getByRole('button')).not.toHaveClass('px-4');
+        expect(screen.getByRole('button')).not.toHaveClass('py-2');
+        expect(screen.getByRole('button')).not.toHaveClass('has-[>svg]:px-3');
+    });
 });
 
 describe('Button variants', () => {

@@ -145,7 +145,7 @@ const DialogHeader = ({
 
                 {showCloseButton && (
                     <ShadcnDialogClose asChild>
-                        <Button aria-label="Close" icon={<XIcon />} size="iconXxs" variant="ghost" />
+                        <Button aria-label="Close" icon={<XIcon />} size="iconXs" variant="ghost" />
                     </ShadcnDialogClose>
                 )}
             </div>

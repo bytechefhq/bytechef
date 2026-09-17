@@ -106,7 +106,7 @@ const Button = ({
 
     const iconSizeClass = hasOwnIconSize || isInlineSize ? '' : DEFAULT_ICON_SIZE_CLASS;
 
-    const shadcnSize = isInlineSize ? null : undefined;
+    const shadcnSize = isInlineSize || isIconSize(size) ? null : undefined;
 
     return (
         <ShadcnButton
