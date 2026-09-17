@@ -1,17 +1,9 @@
 import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
-import {type ReactNode, useLayoutEffect} from 'react';
+import {type ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
 import {Dialog, DialogClose, DialogContent, DialogTrigger, useDialogLayout} from './Dialog';
-
-function SidebarProbe() {
-    const {registerSidebar} = useDialogLayout();
-
-    useLayoutEffect(() => registerSidebar(), [registerSidebar]);
-
-    return null;
-}
 
 function LayoutProbe() {
     const {hasSidebar} = useDialogLayout();
@@ -19,10 +11,10 @@ function LayoutProbe() {
     return <span data-testid="layout-probe">{String(hasSidebar)}</span>;
 }
 
-function renderOpenDialog(content?: ReactNode, className?: string) {
+function renderOpenDialog(content?: ReactNode, className?: string, hasSidebar?: boolean) {
     return render(
         <Dialog open>
-            <DialogContent aria-describedby={undefined} className={className}>
+            <DialogContent aria-describedby={undefined} className={className} hasSidebar={hasSidebar}>
                 <ShadcnDialogTitle>Title</ShadcnDialogTitle>
 
                 {content}
@@ -44,16 +36,22 @@ describe('DialogContent - Surface', () => {
         expect(dialog).not.toHaveClass('sm:max-w-lg');
     });
 
-    it('should switch to the sidebar layout from lg up when a sidebar is present', () => {
-        renderOpenDialog();
+    it('should switch to the sidebar layout from lg up when hasSidebar is set', () => {
+        renderOpenDialog(undefined, undefined, true);
 
         expect(screen.getByRole('dialog')).toHaveClass(
-            'lg:has-[[data-slot=dialog-sidebar]]:h-[648px]',
-            'lg:has-[[data-slot=dialog-sidebar]]:w-[860px]',
-            'lg:has-[[data-slot=dialog-sidebar]]:gap-2',
-            'lg:has-[[data-slot=dialog-sidebar]]:bg-surface-main',
-            'lg:has-[[data-slot=dialog-sidebar]]:p-2'
+            'lg:h-[648px]',
+            'lg:w-[860px]',
+            'lg:gap-2',
+            'lg:bg-surface-main',
+            'lg:p-2'
         );
+    });
+
+    it('should keep the single card layout without hasSidebar', () => {
+        renderOpenDialog();
+
+        expect(screen.getByRole('dialog')).not.toHaveClass('lg:w-[860px]');
     });
 
     it('should merge className', () => {
@@ -73,14 +71,8 @@ describe('DialogContent - Layout context', () => {
         expect(screen.getByTestId('layout-probe')).toHaveTextContent('false');
     });
 
-    it('should report a sidebar once one registers', () => {
-        renderOpenDialog(
-            <>
-                <SidebarProbe />
-
-                <LayoutProbe />
-            </>
-        );
+    it('should report a sidebar when hasSidebar is set', () => {
+        renderOpenDialog(<LayoutProbe />, undefined, true);
 
         expect(screen.getByTestId('layout-probe')).toHaveTextContent('true');
     });

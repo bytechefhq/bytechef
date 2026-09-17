@@ -134,6 +134,27 @@ describe('DialogStepsProvider - Navigation', () => {
         expect(result.current.completedStepIds.size).toBe(0);
     });
 
+    it('should go back with goToPreviousStep and stay put on the first step', async () => {
+        const {result} = renderDialogSteps();
+
+        act(() => {
+            result.current.goToPreviousStep();
+        });
+
+        expect(result.current.currentStep.id).toBe('basics');
+
+        await act(async () => {
+            await result.current.goToNextStep();
+        });
+
+        act(() => {
+            result.current.goToPreviousStep();
+        });
+
+        expect(result.current.currentStep.id).toBe('basics');
+        expect(result.current.getStepStatus('workflows').isReachable).toBe(true);
+    });
+
     it('should call onComplete instead of advancing on the last step', async () => {
         const onComplete = vi.fn();
         const {result} = renderDialogSteps({defaultStepId: 'review', onComplete});
@@ -206,6 +227,20 @@ describe('DialogStepsProvider - Validation', () => {
     });
 });
 
+describe('DialogStepsProvider - Completion', () => {
+    it('should leave the last step incomplete when onComplete fails', async () => {
+        const onComplete = vi.fn().mockRejectedValue(new Error('Deployment failed'));
+        const {result} = renderDialogSteps({defaultStepId: 'review', onComplete});
+
+        await act(async () => {
+            await expect(result.current.goToNextStep()).rejects.toThrow('Deployment failed');
+        });
+
+        expect(result.current.completedStepIds.has('review')).toBe(false);
+        expect(result.current.isPending).toBe(false);
+    });
+});
+
 describe('DialogStepsProvider - Controlled and changing steps', () => {
     it('should report step changes without moving in controlled mode', async () => {
         const onCurrentStepChange = vi.fn();
@@ -240,6 +275,36 @@ describe('DialogStepsProvider - Controlled and changing steps', () => {
 
         expect(result.current.currentStep.id).toBe('review');
         expect(result.current.currentStepIndex).toBe(1);
+    });
+
+    it('should not jump back when a removed step returns', async () => {
+        let providerSteps = steps;
+
+        const {rerender, result} = renderHook(() => useDialogSteps(), {
+            wrapper: ({children}: {children: ReactNode}) => (
+                <DialogStepsProvider steps={providerSteps}>{children}</DialogStepsProvider>
+            ),
+        });
+
+        await act(async () => {
+            await result.current.goToNextStep();
+        });
+
+        providerSteps = [steps[0], steps[2]];
+
+        act(() => {
+            rerender();
+        });
+
+        expect(result.current.currentStep.id).toBe('review');
+
+        providerSteps = steps;
+
+        act(() => {
+            rerender();
+        });
+
+        expect(result.current.currentStep.id).toBe('review');
     });
 });
 

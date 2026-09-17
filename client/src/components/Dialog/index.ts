@@ -5,6 +5,8 @@ export {
     type DialogCancelButtonProps,
     DialogNextButton,
     type DialogNextButtonProps,
+    DialogPreviousButton,
+    type DialogPreviousButtonProps,
 } from './DialogButtons';
 
 export {

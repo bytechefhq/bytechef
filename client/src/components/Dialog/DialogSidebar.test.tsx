@@ -1,31 +1,29 @@
+import {DialogTitle as ShadcnDialogTitle} from '@/components/ui/dialog';
 import {render, screen} from '@/shared/util/test-utils';
 import {RocketIcon} from 'lucide-react';
 import {type ReactNode} from 'react';
 import {describe, expect, it} from 'vitest';
 
-import {Dialog, DialogContent, useDialogLayout} from './Dialog';
+import {Dialog, DialogContent} from './Dialog';
 import {DialogSidebar} from './DialogSidebar';
-
-function LayoutProbe() {
-    const {hasSidebar} = useDialogLayout();
-
-    return <span data-testid="layout-probe">{String(hasSidebar)}</span>;
-}
 
 function renderInDialog(content: ReactNode) {
     return render(
         <Dialog open>
-            <DialogContent aria-describedby={undefined}>{content}</DialogContent>
+            <DialogContent aria-describedby={undefined} hasSidebar>
+                <ShadcnDialogTitle>Deployment</ShadcnDialogTitle>
+
+                {content}
+            </DialogContent>
         </Dialog>
     );
 }
 
 describe('DialogSidebar - Content', () => {
-    it('should name the dialog with its title', () => {
+    it('should render its title with the sidebar heading tokens', () => {
         renderInDialog(<DialogSidebar title="New Deployment" />);
 
-        expect(screen.getByRole('dialog', {name: 'New Deployment'})).toBeInTheDocument();
-        expect(screen.getByRole('heading', {name: 'New Deployment'})).toHaveClass(
+        expect(screen.getByText('New Deployment')).toHaveClass(
             'text-xl',
             'leading-7',
             'font-bold',
@@ -33,16 +31,18 @@ describe('DialogSidebar - Content', () => {
         );
     });
 
-    it('should describe the dialog with its description', () => {
-        render(
-            <Dialog open>
-                <DialogContent>
-                    <DialogSidebar description="Deploy a project version" title="New Deployment" />
-                </DialogContent>
-            </Dialog>
-        );
+    it('should leave the dialog title and description to DialogHeader', () => {
+        renderInDialog(<DialogSidebar description="Deploy a project version" title="New Deployment" />);
 
-        expect(screen.getByRole('dialog')).toHaveAccessibleDescription('Deploy a project version');
+        expect(screen.getByRole('dialog', {name: 'Deployment'})).toBeInTheDocument();
+        expect(screen.getByText('New Deployment')).toHaveAttribute('aria-hidden', 'true');
+        expect(screen.getByText('Deploy a project version')).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('should render the description with the secondary tokens', () => {
+        renderInDialog(<DialogSidebar description="Deploy a project version" title="New Deployment" />);
+
+        expect(screen.getByText('Deploy a project version')).toHaveClass('text-sm', 'text-content-neutral-secondary');
     });
 
     it('should render the icon', () => {
@@ -69,18 +69,6 @@ describe('DialogSidebar - Layout', () => {
         const sidebar = screen.getByRole('dialog').querySelector('[data-slot="dialog-sidebar"]');
 
         expect(sidebar).toHaveClass('hidden', 'w-80', 'shrink-0', 'flex-col', 'gap-4', 'p-6', 'lg:flex');
-    });
-
-    it('should register itself in the layout context', () => {
-        renderInDialog(
-            <>
-                <DialogSidebar title="New Deployment" />
-
-                <LayoutProbe />
-            </>
-        );
-
-        expect(screen.getByTestId('layout-probe')).toHaveTextContent('true');
     });
 
     it('should merge className', () => {

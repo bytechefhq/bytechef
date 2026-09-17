@@ -27,7 +27,7 @@ function NextStepProbe() {
 function renderWizard() {
     return render(
         <Dialog open>
-            <DialogContent aria-describedby={undefined}>
+            <DialogContent aria-describedby={undefined} hasSidebar>
                 <DialogStepsProvider steps={steps}>
                     <DialogSidebar title="New Deployment" />
 
@@ -59,14 +59,45 @@ describe('DialogHeader - One dialog title', () => {
         expect(screen.getByRole('dialog', {name: 'Edit Skill'})).toBeInTheDocument();
     });
 
-    it('should leave the dialog title to the sidebar', () => {
+    it('should stay the only dialog title next to a sidebar', () => {
         renderWizard();
 
-        const dialog = screen.getByRole('dialog', {name: 'New Deployment'});
+        const dialog = screen.getByRole('dialog', {name: 'Basics'});
         const titleId = dialog.getAttribute('aria-labelledby');
 
         expect(document.querySelectorAll(`[id="${titleId}"]`)).toHaveLength(1);
-        expect(screen.getByRole('heading', {name: 'Basics'})).not.toHaveAttribute('id');
+        expect(screen.getByRole('heading', {name: 'Basics'})).toHaveAttribute('id', titleId);
+    });
+
+    it('should name the dialog with the sidebar title at every width', () => {
+        render(
+            <Dialog open>
+                <DialogContent aria-describedby={undefined} hasSidebar>
+                    <DialogMain>
+                        <DialogHeader dialogTitle="New Deployment" title="Basics" />
+                    </DialogMain>
+                </DialogContent>
+            </Dialog>
+        );
+
+        expect(screen.getByRole('dialog', {name: 'New Deployment - Basics'})).toBeInTheDocument();
+        expect(screen.getByText('New Deployment -')).toHaveClass('lg:hidden');
+        expect(screen.getByText('Basics')).toBeInTheDocument();
+    });
+
+    it('should describe the dialog with the sidebar description at every width', () => {
+        render(
+            <Dialog open>
+                <DialogContent hasSidebar>
+                    <DialogMain>
+                        <DialogHeader dialogDescription="Deploy a project version" dialogTitle="New Deployment" />
+                    </DialogMain>
+                </DialogContent>
+            </Dialog>
+        );
+
+        expect(screen.getByRole('dialog')).toHaveAccessibleDescription('Deploy a project version');
+        expect(screen.getByRole('dialog').querySelector('[data-slot="dialog-description"]')).toHaveClass('lg:sr-only');
     });
 
     it('should describe a main-only dialog with its description', () => {

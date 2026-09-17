@@ -5,7 +5,7 @@ import {
     DialogTitle as ShadcnDialogTitle,
 } from '@/components/ui/dialog';
 import {XIcon} from 'lucide-react';
-import {type ComponentPropsWithRef, type ReactElement, type ReactNode, type RefObject, useEffect, useRef} from 'react';
+import {type ComponentPropsWithRef, type ReactElement, type ReactNode, useEffect, useRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {useDialogLayout} from './Dialog';
@@ -17,26 +17,16 @@ type DialogBodyPropsType = ComponentPropsWithRef<'div'>;
 
 interface DialogHeaderProps extends Omit<ComponentPropsWithRef<'div'>, 'title'> {
     description?: ReactNode;
+    dialogDescription?: string;
+    dialogTitle?: string;
     endContent?: ReactNode;
     icon?: ReactElement;
     showCloseButton?: boolean;
-    /** Defaults to the current step's label inside a DialogStepsProvider. */
     title?: string;
 }
 
 interface DialogFooterProps extends ComponentPropsWithRef<'div'> {
     startContent?: ReactNode;
-}
-
-interface HeaderHeadingProps {
-    children: ReactNode;
-    headingRef: RefObject<HTMLHeadingElement | null>;
-    isDialogTitle: boolean;
-}
-
-interface HeaderDescriptionProps {
-    children: ReactNode;
-    isDialogDescription: boolean;
 }
 
 const headingStyles = 'text-xl leading-7 font-medium text-content-neutral-primary outline-none';
@@ -56,33 +46,11 @@ const DialogMain = ({className, ...props}: DialogMainPropsType) => (
 
 DialogMain.displayName = 'DialogMain';
 
-const HeaderHeading = ({children, headingRef, isDialogTitle}: HeaderHeadingProps) => {
-    if (isDialogTitle) {
-        return (
-            <ShadcnDialogTitle className={headingStyles} ref={headingRef} tabIndex={-1}>
-                {children}
-            </ShadcnDialogTitle>
-        );
-    }
-
-    return (
-        <h2 className={headingStyles} ref={headingRef} tabIndex={-1}>
-            {children}
-        </h2>
-    );
-};
-
-const HeaderDescription = ({children, isDialogDescription}: HeaderDescriptionProps) => {
-    if (isDialogDescription) {
-        return <ShadcnDialogDescription className={descriptionStyles}>{children}</ShadcnDialogDescription>;
-    }
-
-    return <p className={descriptionStyles}>{children}</p>;
-};
-
 const DialogHeader = ({
     className,
     description,
+    dialogDescription,
+    dialogTitle,
     endContent,
     icon,
     showCloseButton = true,
@@ -124,14 +92,36 @@ const DialogHeader = ({
                         </span>
                     )}
 
-                    {headingText && (
-                        <HeaderHeading headingRef={headingRef} isDialogTitle={!hasSidebar}>
-                            {headingText}
-                        </HeaderHeading>
+                    {(headingText || dialogTitle) && (
+                        <ShadcnDialogTitle className={headingStyles} ref={headingRef} tabIndex={-1}>
+                            {dialogTitle ? (
+                                <>
+                                    <span className="sr-only">
+                                        {headingText ? `${dialogTitle} - ${headingText}` : dialogTitle}
+                                    </span>
+
+                                    <span aria-hidden="true" className="lg:hidden">{`${dialogTitle} - `}</span>
+
+                                    <span aria-hidden="true">{headingText}</span>
+                                </>
+                            ) : (
+                                headingText
+                            )}
+                        </ShadcnDialogTitle>
                     )}
                 </div>
 
-                {description && <HeaderDescription isDialogDescription={!hasSidebar}>{description}</HeaderDescription>}
+                {(description || dialogDescription) && (
+                    <ShadcnDialogDescription className={twMerge(descriptionStyles, !description && 'lg:sr-only')}>
+                        {dialogDescription && (
+                            <span className={description ? 'lg:sr-only' : undefined}>
+                                {description ? `${dialogDescription} ` : dialogDescription}
+                            </span>
+                        )}
+
+                        {description}
+                    </ShadcnDialogDescription>
+                )}
 
                 {stepPositionLabel && (
                     <span className="text-xs leading-4 font-medium text-content-neutral-secondary lg:hidden">

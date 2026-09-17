@@ -59,12 +59,21 @@ describe('DialogSteps - Rendering', () => {
 });
 
 describe('DialogSteps - Gating', () => {
-    it('should disable locked steps', () => {
+    it('should mark locked steps as aria-disabled while keeping them focusable', () => {
         renderSteps();
 
-        expect(screen.getByRole('button', {name: /Basics/})).toBeEnabled();
-        expect(screen.getByRole('button', {name: /Workflows/})).toBeDisabled();
-        expect(screen.getByRole('button', {name: /Review/})).toBeDisabled();
+        expect(screen.getByRole('button', {name: /Basics/})).not.toHaveAttribute('aria-disabled');
+        expect(screen.getByRole('button', {name: /Workflows/})).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('button', {name: /Review/})).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.getByRole('button', {name: /Review/})).toBeEnabled();
+    });
+
+    it('should ignore clicks on a locked step', async () => {
+        renderSteps();
+
+        await userEvent.click(screen.getByRole('button', {name: /Review/}));
+
+        expect(screen.getByRole('button', {name: /Basics/})).toHaveAttribute('aria-current', 'step');
     });
 
     it('should move to a completed step when it is clicked', async () => {
@@ -77,7 +86,7 @@ describe('DialogSteps - Gating', () => {
         await userEvent.click(screen.getByRole('button', {name: /Basics/}));
 
         expect(screen.getByRole('button', {name: /Basics/})).toHaveAttribute('aria-current', 'step');
-        expect(screen.getByRole('button', {name: /Workflows/})).toBeEnabled();
+        expect(screen.getByRole('button', {name: /Workflows/})).not.toHaveAttribute('aria-disabled');
     });
 
     it('should announce completed steps to screen readers', async () => {

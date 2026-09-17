@@ -8,6 +8,7 @@ import {
     DialogHeader,
     DialogMain,
     DialogNextButton,
+    DialogPreviousButton,
     DialogSidebar,
     type DialogStepI,
     DialogStepIndicator,
@@ -43,7 +44,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon, RocketIcon} from 'lucide-react';
-import {ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -125,18 +126,28 @@ const ProjectDeploymentDialogFooter = ({
                 </>
             }
         >
+            <DialogPreviousButton className="lg:hidden" />
+
             {isLastStep && !hasEnabledWorkflows ? (
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <span className="inline-flex">
-                            <DialogNextButton label="Next" lastStepLabel={isDeploymentPending ? 'Saving...' : 'Save'} />
+                            <DialogNextButton
+                                isPending={isDeploymentPending}
+                                label="Next"
+                                lastStepLabel={isDeploymentPending ? 'Saving...' : 'Save'}
+                            />
                         </span>
                     </TooltipTrigger>
 
                     <TooltipContent>Enable at least one workflow to save this deployment</TooltipContent>
                 </Tooltip>
             ) : (
-                <DialogNextButton label="Next" lastStepLabel={isDeploymentPending ? 'Saving...' : 'Save'} />
+                <DialogNextButton
+                    isPending={isDeploymentPending}
+                    label="Next"
+                    lastStepLabel={isDeploymentPending ? 'Saving...' : 'Save'}
+                />
             )}
         </DialogFooter>
     );
@@ -436,7 +447,10 @@ const ProjectDeploymentDialog = ({
         }, 300);
     };
 
-    const validateStep = (step: DialogStepI) => (step.id === 'basic' ? form.trigger() : true);
+    const validateStep = useCallback(
+        (step: DialogStepI) => (step.id === 'basic' ? form.trigger(undefined, {shouldFocus: true}) : true),
+        [form]
+    );
 
     const handleConnectionsGroupedChange = (grouped: boolean) => {
         setConnectionsGrouped(grouped);
@@ -471,30 +485,41 @@ const ProjectDeploymentDialog = ({
         });
     };
 
-    const handleSaveClick = (formData: ProjectDeployment) => {
-        if (!formData) {
-            return;
-        }
+    const handleSaveClick = useCallback(
+        (formData: ProjectDeployment) => {
+            if (!formData) {
+                return;
+            }
 
-        const projectDeploymentWorkflows = buildDeploymentWorkflows(
-            formData.projectDeploymentWorkflows,
-            workflows ?? []
-        );
+            const projectDeploymentWorkflows = buildDeploymentWorkflows(
+                formData.projectDeploymentWorkflows,
+                workflows ?? []
+            );
 
-        if (effectiveProjectDeployment?.id) {
-            updateProjectDeploymentMutation.mutate({
-                ...effectiveProjectDeployment,
-                ...formData,
-                projectDeploymentWorkflows,
-            } as ProjectDeployment);
-        } else {
-            createProjectDeploymentMutation.mutate({
-                ...formData,
-                environmentId: formData.environmentId ?? currentEnvironmentId,
-                projectDeploymentWorkflows,
-            });
-        }
-    };
+            if (effectiveProjectDeployment?.id) {
+                updateProjectDeploymentMutation.mutate({
+                    ...effectiveProjectDeployment,
+                    ...formData,
+                    projectDeploymentWorkflows,
+                } as ProjectDeployment);
+            } else {
+                createProjectDeploymentMutation.mutate({
+                    ...formData,
+                    environmentId: formData.environmentId ?? currentEnvironmentId,
+                    projectDeploymentWorkflows,
+                });
+            }
+        },
+        [
+            createProjectDeploymentMutation,
+            currentEnvironmentId,
+            effectiveProjectDeployment,
+            updateProjectDeploymentMutation,
+            workflows,
+        ]
+    );
+
+    const handleCompleteClick = useCallback(() => handleSubmit(handleSaveClick)(), [handleSaveClick, handleSubmit]);
 
     useEffect(() => {
         if (!workflows?.length) {
@@ -605,15 +630,12 @@ const ProjectDeploymentDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent
+                hasSidebar={isWizard}
                 onClick={(event) => event.stopPropagation()}
                 onInteractOutside={(event) => event.preventDefault()}
             >
                 {isWizard ? (
-                    <DialogStepsProvider
-                        onComplete={handleSubmit(handleSaveClick)}
-                        steps={steps}
-                        validateStep={validateStep}
-                    >
+                    <DialogStepsProvider onComplete={handleCompleteClick} steps={steps} validateStep={validateStep}>
                         <DialogSidebar description={wizardDescription} icon={<RocketIcon />} title={wizardTitle}>
                             <DialogSteps />
 
@@ -621,7 +643,7 @@ const ProjectDeploymentDialog = ({
                         </DialogSidebar>
 
                         <DialogMain>
-                            <DialogHeader />
+                            <DialogHeader dialogDescription={wizardDescription} dialogTitle={wizardTitle} />
 
                             <DialogBody>
                                 <WorkflowMockProvider>
@@ -665,7 +687,7 @@ const ProjectDeploymentDialog = ({
                                     disabled={isSaveDisabled}
                                     icon={isDeploymentPending ? <LoadingIcon /> : undefined}
                                     label={isDeploymentPending ? 'Saving...' : 'Save'}
-                                    onClick={handleSubmit(handleSaveClick)}
+                                    onClick={handleCompleteClick}
                                 />
                             ) : (
                                 <Tooltip>
@@ -675,7 +697,7 @@ const ProjectDeploymentDialog = ({
                                                 disabled={isSaveDisabled}
                                                 icon={isDeploymentPending ? <LoadingIcon /> : undefined}
                                                 label={isDeploymentPending ? 'Saving...' : 'Save'}
-                                                onClick={handleSubmit(handleSaveClick)}
+                                                onClick={handleCompleteClick}
                                             />
                                         </span>
                                     </TooltipTrigger>
