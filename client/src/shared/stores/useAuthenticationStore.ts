@@ -276,8 +276,6 @@ export const authenticationStore = createStore<AuthenticationI>()(
                 },
 
                 reset: () => {
-                    invalidateAccountRequest();
-
                     setAuthenticationState({
                         ...initialState,
                     });
