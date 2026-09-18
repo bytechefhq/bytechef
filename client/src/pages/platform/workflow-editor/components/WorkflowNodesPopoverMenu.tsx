@@ -3,7 +3,7 @@ import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/p
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {MouseEvent, PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
+import {MouseEvent, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -51,6 +51,8 @@ const WorkflowNodesPopoverMenu = ({
     const [internalOpen, setInternalOpen] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
+    const isPointerDownInsideRef = useRef(false);
+
     const actionPanelOpen = !!componentDefinitionToBeAdded?.name;
 
     const popoverOpen = externalOpen ?? internalOpen;
@@ -86,6 +88,10 @@ const WorkflowNodesPopoverMenu = ({
     );
 
     const handleStopPropagation = useCallback((event: MouseEvent) => event.stopPropagation(), []);
+
+    const handlePointerDownInsideCapture = useCallback(() => {
+        isPointerDownInsideRef.current = true;
+    }, []);
 
     const handlePasteClose = useCallback(() => setPopoverOpen(false), [setPopoverOpen]);
 
@@ -147,6 +153,26 @@ const WorkflowNodesPopoverMenu = ({
     );
 
     useEffect(() => {
+        if (!popoverOpen) {
+            return;
+        }
+
+        const handleDocumentPointerDown = () => {
+            isPointerDownInsideRef.current = false;
+
+            setTimeout(() => {
+                if (!isPointerDownInsideRef.current) {
+                    handlePopoverOpenChange(false);
+                }
+            }, 0);
+        };
+
+        document.addEventListener('pointerdown', handleDocumentPointerDown, true);
+
+        return () => document.removeEventListener('pointerdown', handleDocumentPointerDown, true);
+    }, [handlePopoverOpenChange, popoverOpen]);
+
+    useEffect(() => {
         return () => {
             setComponentDefinitionToBeAdded(null);
             setPopoverOpen(false);
@@ -163,7 +189,11 @@ const WorkflowNodesPopoverMenu = ({
             open={popoverOpen}
         >
             {children ? (
-                <PopoverTrigger asChild onClick={handleStopPropagation}>
+                <PopoverTrigger
+                    asChild
+                    onClick={handleStopPropagation}
+                    onPointerDownCapture={handlePointerDownInsideCapture}
+                >
                     {children}
                 </PopoverTrigger>
             ) : (
@@ -178,6 +208,7 @@ const WorkflowNodesPopoverMenu = ({
                 )}
                 onClick={handleStopPropagation}
                 onContextMenu={handleStopPropagation}
+                onPointerDownCapture={handlePointerDownInsideCapture}
                 side="right"
                 sideOffset={-34}
             >
