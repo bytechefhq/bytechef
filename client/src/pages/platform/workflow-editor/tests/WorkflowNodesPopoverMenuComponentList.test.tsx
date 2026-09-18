@@ -58,6 +58,7 @@ describe('WorkflowNodesPopoverMenuComponentList', () => {
         hoisted.mockFilterResult.isSearchFetching = false;
         hoisted.mockFilterResult.filter = '';
         hoisted.mockFilterResult.trimmedFilter = '';
+        hoisted.lastWorkflowNodesTabsProps = {};
     });
 
     afterEach(() => {
@@ -105,6 +106,19 @@ describe('WorkflowNodesPopoverMenuComponentList', () => {
         render(<WorkflowNodesPopoverMenuComponentList actionPanelOpen={false} />);
 
         expect(hoisted.lastWorkflowNodesTabsProps.showSearchMatchCounts).toBe(true);
+    });
+
+    it('should not show search match counts in tabs while search results are loading', async () => {
+        hoisted.mockFilterResult.filter = 'ai text';
+        hoisted.mockFilterResult.isSearchFetching = true;
+        hoisted.mockFilterResult.trimmedFilter = 'ai text';
+
+        const {default: WorkflowNodesPopoverMenuComponentList} =
+            await import('../components/WorkflowNodesPopoverMenuComponentList');
+
+        render(<WorkflowNodesPopoverMenuComponentList actionPanelOpen={false} />);
+
+        expect(hoisted.lastWorkflowNodesTabsProps.showSearchMatchCounts).toBe(false);
     });
 
     it('should not show search match counts in tabs when not searching', async () => {

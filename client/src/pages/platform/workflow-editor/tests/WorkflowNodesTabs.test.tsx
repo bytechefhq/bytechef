@@ -99,6 +99,22 @@ describe('WorkflowNodesTabs', () => {
         expect(screen.queryByText('Claude Code')).not.toBeInTheDocument();
     });
 
+    it('should show feature-flagged helpers when their flag is on', async () => {
+        hoisted.featureFlagEnabled = true;
+
+        renderWorkflowNodesTabs();
+
+        await userEvent.click(screen.getByRole('tab', {name: 'Helpers'}));
+
+        expect(screen.getByText('Claude Code')).toBeInTheDocument();
+    });
+
+    it('should highlight the selected component in the Actions tab', () => {
+        renderWorkflowNodesTabs({selectedComponentName: 'gmail'});
+
+        expect(screen.getByText('Gmail').closest('li')).toHaveClass('border-blue-500');
+    });
+
     it('should highlight the selected component in the Helpers tab', async () => {
         renderWorkflowNodesTabs({selectedComponentName: 'logger'});
 
@@ -112,6 +128,14 @@ describe('WorkflowNodesTabs', () => {
             renderWorkflowNodesTabs({showSearchMatchCounts: true});
 
             expect(screen.getByRole('tab', {name: 'Helpers (2 matches)'})).toBeInTheDocument();
+        });
+
+        it('should render the match count as phrasing content, which is all a tab button may contain', () => {
+            renderWorkflowNodesTabs({showSearchMatchCounts: true});
+
+            const helpersTab = screen.getByRole('tab', {name: 'Helpers (2 matches)'});
+
+            expect(helpersTab.querySelector('div')).toBeNull();
         });
 
         it('should use the singular form for a single match', async () => {
