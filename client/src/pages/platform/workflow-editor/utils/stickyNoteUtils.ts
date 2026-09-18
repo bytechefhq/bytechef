@@ -6,8 +6,9 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
 import {
     consumePendingDefinition,
+    drainPendingSaves,
+    enqueuePendingSave,
     isWorkflowMutating,
-    setPendingDefinition,
     setWorkflowMutating,
 } from './workflowMutationGuard';
 
@@ -136,6 +137,23 @@ export function splitStickyNoteContent(content: string): Array<StickyNoteContent
     return segments;
 }
 
+function isValidStickyNote(stickyNote: WorkflowStickyNoteType | null | undefined): boolean {
+    if (!stickyNote || typeof stickyNote !== 'object') {
+        return false;
+    }
+
+    const {color, content, id, position, size} = stickyNote;
+
+    return (
+        typeof id === 'string' &&
+        typeof content === 'string' &&
+        typeof position?.x === 'number' &&
+        typeof position?.y === 'number' &&
+        (color === undefined || typeof color === 'string') &&
+        (size === undefined || (typeof size?.width === 'number' && typeof size?.height === 'number'))
+    );
+}
+
 /**
  * Parses the sticky notes out of a workflow definition JSON string. Notes are
  * decorative canvas annotations stored under the workflow-level `metadata.ui`
@@ -156,13 +174,7 @@ export function extractStickyNotes(definition?: string): Array<WorkflowStickyNot
             return [];
         }
 
-        return stickyNotes.filter(
-            (stickyNote: WorkflowStickyNoteType) =>
-                stickyNote &&
-                typeof stickyNote.id === 'string' &&
-                typeof stickyNote.position?.x === 'number' &&
-                typeof stickyNote.position?.y === 'number'
-        );
+        return stickyNotes.filter(isValidStickyNote);
     } catch {
         return [];
     }
@@ -258,13 +270,20 @@ interface SaveStickyNotesProps {
 /**
  * Single funnel for all sticky note mutations: applies `updater` to the
  * definition's `metadata.ui.stickyNotes` array, records the change as an undo
- * step through the store, and persists it honoring the pending-definition queue
- * so overlapping decorative saves are never lost.
+ * step through the store, and persists it. While another save is in flight the
+ * whole operation waits in the shared pending-save queue, so overlapping saves
+ * are never lost.
  */
 export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNotesProps) {
     const {workflow} = useWorkflowDataStore.getState();
 
     if (!workflow.definition) {
+        return;
+    }
+
+    if (isWorkflowMutating(workflow.id!)) {
+        enqueuePendingSave(workflow.id!, () => saveStickyNotes({updateWorkflowMutation, updater}));
+
         return;
     }
 
@@ -322,13 +341,6 @@ export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNot
             definition: updatedDefinition,
         },
     }));
-
-    if (isWorkflowMutating(workflow.id!)) {
-        // Queue the definition so it can be sent when the current mutation settles
-        setPendingDefinition(workflow.id!, updatedDefinition);
-
-        return;
-    }
 
     fireStickyNoteMutation({
         definition: updatedDefinition,
@@ -433,6 +445,8 @@ function fireStickyNoteMutation({
                         version: currentWorkflow.version,
                         workflowId,
                     });
+                } else {
+                    drainPendingSaves(workflowId);
                 }
             },
             onSuccess: (updatedWorkflow) => {
