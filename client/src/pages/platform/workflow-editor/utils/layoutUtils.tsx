@@ -17,6 +17,7 @@ import {
     ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
     TRIGGER_PLACEHOLDER_NODE_ID,
+    TRIGGER_PLACEHOLDER_NODE_SIZE,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -83,6 +84,28 @@ const TRIGGER_PLACEHOLDER_GAP = 40;
 const TRIGGER_NODE_DAGRE_WIDTH = 160;
 
 const TRIGGER_NODE_BOX_SIZE = 72;
+
+const TRIGGER_PLACEHOLDER_BOX_MARGIN = 8;
+
+const TRIGGER_LABEL_BLOCK_HEIGHT = 64;
+
+const NODE_LABEL_MAX_CROSS_OVERHANG = 200;
+
+const LABEL_CHAR_WIDTH = 9;
+
+const LABEL_BLOCK_MARGIN = 16;
+
+export function getLabelCrossOverhang(node: Node): number {
+    const nodeData = node.data as NodeDataType;
+
+    const longestLabelLength = Math.max(
+        String(nodeData.title || nodeData.label || '').length,
+        String(nodeData.operationName || '').length,
+        String(nodeData.workflowNodeName || nodeData.name || '').length
+    );
+
+    return Math.min(NODE_LABEL_MAX_CROSS_OVERHANG, LABEL_BLOCK_MARGIN + longestLabelLength * LABEL_CHAR_WIDTH);
+}
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
 
@@ -264,25 +287,32 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
         return;
     }
 
-    if (direction === 'LR') {
-        const lowestTrigger = triggerNodes.reduce(
-            (lowest, node) => (node.position.y > lowest.position.y ? node : lowest),
-            triggerNodes[0]
-        );
+    const isVertical = direction === 'LR';
 
+    const lastTrigger = triggerNodes.reduce(
+        (furthest, node) =>
+            (isVertical ? node.position.y > furthest.position.y : node.position.x > furthest.position.x)
+                ? node
+                : furthest,
+        triggerNodes[0]
+    );
+
+    const triggerExtent = isVertical
+        ? TRIGGER_NODE_BOX_SIZE + TRIGGER_LABEL_BLOCK_HEIGHT
+        : TRIGGER_NODE_BOX_SIZE + getLabelCrossOverhang(lastTrigger);
+
+    if (isVertical) {
         placeholderNode.position = {
-            x: lowestTrigger.position.x,
-            y: lowestTrigger.position.y + NODE_HEIGHT + NODE_HEIGHT / 4 + TRIGGER_PLACEHOLDER_GAP,
+            x:
+                lastTrigger.position.x +
+                (TRIGGER_NODE_BOX_SIZE - TRIGGER_PLACEHOLDER_NODE_SIZE) / 2 -
+                TRIGGER_PLACEHOLDER_BOX_MARGIN,
+            y: lastTrigger.position.y + triggerExtent + TRIGGER_PLACEHOLDER_GAP,
         };
     } else {
-        const rightmostTrigger = triggerNodes.reduce(
-            (rightmost, node) => (node.position.x > rightmost.position.x ? node : rightmost),
-            triggerNodes[0]
-        );
-
         placeholderNode.position = {
-            x: rightmostTrigger.position.x + NODE_WIDTH + TRIGGER_PLACEHOLDER_GAP,
-            y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - PLACEHOLDER_NODE_HEIGHT) / 2,
+            x: lastTrigger.position.x + triggerExtent + TRIGGER_PLACEHOLDER_GAP,
+            y: lastTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - TRIGGER_PLACEHOLDER_NODE_SIZE) / 2,
         };
     }
 };
