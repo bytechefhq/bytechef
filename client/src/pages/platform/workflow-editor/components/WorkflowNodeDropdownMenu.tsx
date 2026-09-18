@@ -149,7 +149,7 @@ const WorkflowNodeDropdownMenu = ({
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {!data.trigger && showDeleteAction && (
+            {showDeleteAction && (
                 <DeleteAlertDialog
                     nodeName={data.label}
                     onCancel={handleDeleteCancel}

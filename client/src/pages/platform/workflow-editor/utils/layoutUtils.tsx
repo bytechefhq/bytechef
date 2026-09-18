@@ -16,11 +16,13 @@ import {
     PLACEHOLDER_NODE_HEIGHT,
     ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
+    TRIGGER_PLACEHOLDER_NODE_ID,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     WorkflowTask,
+    WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {
     BranchCaseType,
@@ -76,6 +78,11 @@ export const CLUSTER_ELEMENT_GAP = 70;
 export const CLUSTER_ELEMENT_LABEL_PADDING = 20;
 export const CLUSTER_ELEMENT_OVERLAP_PADDING = 20;
 export const CLUSTER_ROOT_GAP = 40;
+const TRIGGER_PLACEHOLDER_GAP = 40;
+
+const TRIGGER_NODE_DAGRE_WIDTH = 160;
+
+const TRIGGER_NODE_BOX_SIZE = 72;
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
 
@@ -135,6 +142,8 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
 export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
     const height = calculateNodeHeight(node);
 
+    const isTrigger = (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID;
+
     if (direction === 'LR') {
         const isGhostNode =
             node.type === 'taskDispatcherTopGhostNode' ||
@@ -153,11 +162,15 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
             width = 292;
         }
 
-        return {height: NODE_WIDTH, width};
+        return {height: isTrigger ? TRIGGER_NODE_DAGRE_WIDTH : NODE_WIDTH, width};
     }
 
     if (rendersClusterElements(node)) {
         return {height, width: CLUSTER_ROOT_NODE_WIDTH};
+    }
+
+    if (isTrigger) {
+        return {height, width: TRIGGER_NODE_DAGRE_WIDTH};
     }
 
     return {height, width: NODE_WIDTH};
@@ -166,7 +179,7 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
 export const convertTaskToNode = (
     task: WorkflowTask,
     taskDefinition: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic,
-    index: number
+    isTrigger: boolean
 ): Node => {
     const componentName = task.type.split('/')[0];
 
@@ -186,13 +199,90 @@ export const convertTaskToNode = (
             operationName: task.type.split('/')[2],
             taskDispatcher: isTaskDispatcher,
             taskDispatcherId: isTaskDispatcher ? task.name : undefined,
-            trigger: index === 0,
+            trigger: isTrigger,
             workflowNodeName: task.name,
         },
         id: task.name,
         position: {x: 0, y: 0},
         type: task.clusterRoot ? 'clusterRoot' : 'workflow',
     };
+};
+
+export const buildTriggerNodes = (
+    triggers: WorkflowTrigger[] | undefined,
+    componentDefinitions: ComponentDefinitionBasic[],
+    canvasWidth: number
+): {placeholderNode: Node; triggerNodes: Node[]} => {
+    const placeholderNode: Node = {
+        data: {label: '+'},
+        id: TRIGGER_PLACEHOLDER_NODE_ID,
+        position: {x: 0, y: 0},
+        type: 'triggerPlaceholder',
+    };
+
+    if (!triggers || triggers.length === 0) {
+        return {placeholderNode, triggerNodes: [createDefaultNodes(canvasWidth)[0]]};
+    }
+
+    const triggerNodes = triggers.map((trigger) => {
+        const componentName = trigger.type.split('/')[0];
+
+        const triggerDefinition = componentDefinitions.find((definition) => definition.name === componentName);
+
+        if (triggerDefinition) {
+            return convertTaskToNode(trigger, triggerDefinition, true);
+        }
+
+        return {
+            data: {
+                ...trigger,
+                componentName,
+                icon: <ComponentIcon className="size-9 flex-none text-gray-900" />,
+                operationName: trigger.type.split('/')[2],
+                trigger: true,
+                workflowNodeName: trigger.name,
+            },
+            id: trigger.name,
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        } as Node;
+    });
+
+    return {placeholderNode, triggerNodes};
+};
+
+export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirectionType): void => {
+    const placeholderNode = nodes.find((node) => node.id === TRIGGER_PLACEHOLDER_NODE_ID);
+
+    if (!placeholderNode) {
+        return;
+    }
+
+    const triggerNodes = nodes.filter((node) => node.data?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID);
+
+    if (triggerNodes.length === 0) {
+        return;
+    }
+
+    if (direction === 'LR') {
+        const lowestTrigger = triggerNodes.reduce((lowest, node) =>
+            node.position.y > lowest.position.y ? node : lowest
+        );
+
+        placeholderNode.position = {
+            x: lowestTrigger.position.x,
+            y: lowestTrigger.position.y + NODE_HEIGHT + NODE_HEIGHT / 4 + TRIGGER_PLACEHOLDER_GAP,
+        };
+    } else {
+        const rightmostTrigger = triggerNodes.reduce((rightmost, node) =>
+            node.position.x > rightmost.position.x ? node : rightmost
+        );
+
+        placeholderNode.position = {
+            x: rightmostTrigger.position.x + NODE_WIDTH + TRIGGER_PLACEHOLDER_GAP,
+            y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - PLACEHOLDER_NODE_HEIGHT) / 2,
+        };
+    }
 };
 
 interface GetLayoutElementsProps {
@@ -604,7 +694,9 @@ export const getLayoutElements = async ({
     });
 
     edges.forEach((edge) => {
-        if (edge.target.includes('bottom-ghost')) {
+        if ((edge.data as Record<string, unknown> | undefined)?.triggerFanIn) {
+            dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+        } else if (edge.target.includes('bottom-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
         } else if (edge.target.includes('top-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 1});
@@ -638,7 +730,16 @@ export const getLayoutElements = async ({
 
     const triggerCrossHalf = direction === 'LR' ? NODE_WIDTH / 2 : 72 / 2;
 
-    const canvasCenteringOffset = canvasCrossDimension / 2 - dagreGraph.node(nodes[0].id)[crossAxis] - triggerCrossHalf;
+    const entryNodeCrossPositions = nodes
+        .filter((node) => (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID)
+        .map((node) => dagreGraph.node(node.id)[crossAxis]);
+
+    const entryAnchorCross =
+        entryNodeCrossPositions.length > 0
+            ? (Math.min(...entryNodeCrossPositions) + Math.max(...entryNodeCrossPositions)) / 2
+            : dagreGraph.node(nodes[0].id)[crossAxis];
+
+    const canvasCenteringOffset = canvasCrossDimension / 2 - entryAnchorCross - triggerCrossHalf;
 
     const allNodes = nodes.map((node) => {
         const dagreNode = dagreGraph.node(node.id);
@@ -689,6 +790,8 @@ export const getLayoutElements = async ({
     if (direction === 'LR') {
         centerLRSmallNodes(allNodes, crossAxis);
     }
+
+    positionTriggerPlaceholder(allNodes, direction);
 
     const mainAxis = direction === 'TB' ? 'y' : 'x';
 

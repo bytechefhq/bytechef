@@ -14,6 +14,7 @@ import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
 import insertTaskDispatcherSubtask from './insertTaskDispatcherSubtask';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
+import upsertTrigger from './upsertTrigger';
 import {drainPendingSaves, enqueuePendingSave, isWorkflowMutating, setWorkflowMutating} from './workflowMutationGuard';
 
 interface SaveWorkflowDefinitionProps {
@@ -95,13 +96,16 @@ export default async function saveWorkflowDefinition(props: SaveWorkflowDefiniti
         const newTrigger: WorkflowTrigger = {
             description,
             label,
+            metadata,
             name: name!,
             parameters,
             type,
         };
 
+        const existingTriggers: Array<WorkflowTrigger> = workflowDefinition.triggers ?? [];
+
         executeWorkflowMutation({
-            definitionUpdate: {triggers: [newTrigger]},
+            definitionUpdate: {triggers: upsertTrigger(existingTriggers, newTrigger)},
             onError,
             onSuccess: () => {
                 if (onSuccess) {

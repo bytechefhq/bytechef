@@ -87,10 +87,10 @@ describe('saveWorkflowDefinition', () => {
             const mutateArgs = (mutation.mutate as ReturnType<typeof vi.fn>).mock.calls[0][0];
             const updatedDefinition = JSON.parse(mutateArgs.workflow.definition);
 
-            expect(updatedDefinition.triggers).toHaveLength(1);
-            expect(updatedDefinition.triggers[0].name).toBe('webhook_trigger');
-            expect(updatedDefinition.triggers[0].type).toBe('webhook/v1/onReceive');
-            expect(updatedDefinition.triggers[0].parameters).toEqual({path: '/hook'});
+            expect(updatedDefinition.triggers).toHaveLength(2);
+            expect(updatedDefinition.triggers[1].name).toBe('webhook_trigger');
+            expect(updatedDefinition.triggers[1].type).toBe('webhook/v1/onReceive');
+            expect(updatedDefinition.triggers[1].parameters).toEqual({path: '/hook'});
         });
 
         it('should construct type from componentName/version/operationName when type is not provided', async () => {
