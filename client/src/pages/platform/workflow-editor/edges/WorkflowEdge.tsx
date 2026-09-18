@@ -17,6 +17,7 @@ import pasteNode from '../utils/pasteNode';
 import BranchCaseLabel from './BranchCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
+import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './computeTriggerFanIn';
 
 export default function WorkflowEdge({
     data,
@@ -74,8 +75,22 @@ export default function WorkflowEdge({
         targetY,
     });
 
+    const isTriggerFanIn = !!(data as Record<string, unknown>)?.triggerFanIn;
+
+    const busCenter = useMemo(
+        () =>
+            getTriggerFanInBusCenter({
+                isTriggerFanIn,
+                sourcePosition: correctedSourcePosition,
+                sourceX: correctedSourceX,
+                sourceY: correctedSourceY,
+            }),
+        [correctedSourcePosition, correctedSourceX, correctedSourceY, isTriggerFanIn]
+    );
+
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
         borderRadius: 10,
+        ...busCenter,
         sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,
@@ -90,35 +105,39 @@ export default function WorkflowEdge({
 
     const isSourceTaskDispatcherTopGhostNode = sourceNode?.type === 'taskDispatcherTopGhostNode';
 
-    const buttonPosition = useMemo(
-        () =>
-            computeEdgeButtonPosition({
-                correctedSourceX,
-                correctedSourceY,
-                correctedTargetX,
-                correctedTargetY,
-                edgeCenterX,
-                edgeCenterY,
-                isHorizontal,
-                sourceNodeComponentName,
-                sourceNodeTaskDispatcherId: (sourceNode?.data as NodeDataType)?.taskDispatcherId,
-                sourceNodeType: sourceNode?.type,
-                targetNodeType: targetNode?.type,
-            }),
-        [
-            isHorizontal,
+    const buttonPosition = useMemo(() => {
+        if (isTriggerFanIn && targetNode) {
+            return getTriggerFanInButtonPosition({busCenter, targetX: correctedTargetX, targetY: correctedTargetY});
+        }
+
+        return computeEdgeButtonPosition({
             correctedSourceX,
             correctedSourceY,
             correctedTargetX,
             correctedTargetY,
-            sourceNode?.type,
-            sourceNode?.data,
-            targetNode?.type,
-            sourceNodeComponentName,
             edgeCenterX,
             edgeCenterY,
-        ]
-    );
+            isHorizontal,
+            sourceNodeComponentName,
+            sourceNodeTaskDispatcherId: (sourceNode?.data as NodeDataType)?.taskDispatcherId,
+            sourceNodeType: sourceNode?.type,
+            targetNodeType: targetNode?.type,
+        });
+    }, [
+        busCenter,
+        isTriggerFanIn,
+        isHorizontal,
+        correctedSourceX,
+        correctedSourceY,
+        correctedTargetX,
+        correctedTargetY,
+        sourceNode?.type,
+        sourceNode?.data,
+        targetNode,
+        sourceNodeComponentName,
+        edgeCenterX,
+        edgeCenterY,
+    ]);
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);

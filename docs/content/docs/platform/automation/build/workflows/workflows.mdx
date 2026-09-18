@@ -279,9 +279,13 @@ After picking **Schedule → Cron**, set the expression and timezone on the **Pr
 
 #### Multiple triggers
 
-> **Coming soon.** Multiple triggers per workflow are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+A workflow can have **more than one trigger** - for example, run on a schedule *and* on an incoming webhook. On deployment every trigger is enabled, and any of them can start a run of the same workflow.
 
-A workflow can have **more than one trigger** - for example, run on a schedule *and* on an incoming webhook. Use the add-trigger button next to the existing trigger to attach another one; on deployment every trigger is enabled, and any of them can start a run of the same workflow.
+- **Add a trigger:** click the dashed **+** slot next to the last trigger (to its right in the vertical layout, below it in the horizontal layout) and pick a trigger, or drag a trigger from the components list onto the slot.
+- **Replace a trigger:** open the trigger's node menu and choose **Replace**, or drop a different trigger onto it.
+- **Remove a trigger:** open the trigger's node menu, or right-click the trigger, and choose **Delete**. Delete is offered only while the workflow has more than one trigger, so a workflow always keeps at least one.
+
+Every trigger connects to the first step of the workflow, and their connections join into a single line with one **+** for inserting a step after the triggers.
 
 ### Edit Component
 

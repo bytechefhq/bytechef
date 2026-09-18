@@ -1,6 +1,8 @@
 import {
     CLUSTER_ELEMENT_NODE_WIDTH,
     CLUSTER_ROOT_NODE_WIDTH,
+    FINAL_PLACEHOLDER_NODE_ID,
+    FINAL_PLACEHOLDER_NODE_SIZE,
     LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
@@ -1766,6 +1768,8 @@ export function centerLRSmallNodes(allNodes: Node[], crossAxis: 'x' | 'y'): void
 
         if (node.type === 'taskDispatcherLeftGhostNode') {
             visualCrossSize = LEFT_GHOST_VISUAL_SIZE;
+        } else if (node.id === FINAL_PLACEHOLDER_NODE_ID) {
+            visualCrossSize = FINAL_PLACEHOLDER_NODE_SIZE;
         } else if (node.type === 'placeholder') {
             visualCrossSize = PLACEHOLDER_NODE_HEIGHT;
         } else {
@@ -2650,8 +2654,11 @@ export function alignTrailingPlaceholder(
             // In LR mode, centerLRSmallNodes applied different cross-axis centering
             // offsets: +84 for workflow nodes (72px) vs +106 for placeholders (28px).
             // Compensate so visual centers align on the cross-axis.
+            const placeholderCrossSize =
+                targetNode.id === FINAL_PLACEHOLDER_NODE_ID ? FINAL_PLACEHOLDER_NODE_SIZE : PLACEHOLDER_NODE_HEIGHT;
+
             const crossAxisCenteringAdjustment =
-                direction === 'LR' ? (CLUSTER_ELEMENT_NODE_WIDTH - PLACEHOLDER_NODE_HEIGHT) / 2 : 0;
+                direction === 'LR' ? (CLUSTER_ELEMENT_NODE_WIDTH - placeholderCrossSize) / 2 : 0;
 
             targetNode.position = {
                 [crossAxis]: sourceNode.position[crossAxis] + crossAxisCenteringAdjustment,

@@ -157,17 +157,25 @@ export default function removeWorkflowNodePosition({
 
     const workflowDefinition = JSON.parse(workflow.definition);
 
-    if (workflowDefinition.triggers?.[0]?.name === nodeName) {
-        workflowDefinition.triggers[0] = {
-            ...workflowDefinition.triggers[0],
-            metadata: {
-                ...workflowDefinition.triggers[0].metadata,
-                ui: {
-                    ...workflowDefinition.triggers[0].metadata?.ui,
-                    nodePosition: undefined,
+    if (Array.isArray(workflowDefinition.triggers)) {
+        const triggerIndex = workflowDefinition.triggers.findIndex(
+            (trigger: {name: string}) => trigger.name === nodeName
+        );
+
+        if (triggerIndex !== -1) {
+            const matchedTrigger = workflowDefinition.triggers[triggerIndex];
+
+            workflowDefinition.triggers[triggerIndex] = {
+                ...matchedTrigger,
+                metadata: {
+                    ...matchedTrigger.metadata,
+                    ui: {
+                        ...matchedTrigger.metadata?.ui,
+                        nodePosition: undefined,
+                    },
                 },
-            },
-        };
+            };
+        }
     }
 
     if (workflowDefinition.tasks) {

@@ -1,6 +1,9 @@
 import {BaseEdge, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 
+import {getTriggerFanInBusCenter} from './computeTriggerFanIn';
+
 export default function RoundedSmoothStepEdge({
+    data,
     id,
     sourcePosition,
     sourceX,
@@ -10,8 +13,16 @@ export default function RoundedSmoothStepEdge({
     targetX,
     targetY,
 }: EdgeProps) {
+    const busCenter = getTriggerFanInBusCenter({
+        isTriggerFanIn: !!(data as Record<string, unknown>)?.triggerFanIn,
+        sourcePosition,
+        sourceX,
+        sourceY,
+    });
+
     const [edgePath] = getSmoothStepPath({
         borderRadius: 10,
+        ...busCenter,
         sourcePosition,
         sourceX,
         sourceY,

@@ -121,6 +121,20 @@ export function getWorkflowNodeMenuItems({
             });
         }
 
+        if (showDeleteAction) {
+            menuItems.push(
+                {key: 'separator-delete', type: 'separator'},
+                {
+                    icon: <Trash2Icon className="size-4 shrink-0" />,
+                    key: 'delete',
+                    label: 'Delete',
+                    onSelect: onDelete,
+                    type: 'item',
+                    variant: 'destructive',
+                }
+            );
+        }
+
         return menuItems;
     }
 

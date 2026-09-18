@@ -1,4 +1,9 @@
-import {CLUSTER_ROOT_NODE_WIDTH, NODE_WIDTH} from '@/shared/constants';
+import {
+    CLUSTER_ROOT_NODE_WIDTH,
+    FINAL_PLACEHOLDER_NODE_ID,
+    FINAL_PLACEHOLDER_NODE_SIZE,
+    NODE_WIDTH,
+} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
@@ -1355,6 +1360,19 @@ describe('constrainLeftGhostPositions', () => {
 });
 
 describe('centerLRSmallNodes', () => {
+    it('centers the final placeholder by its 48px box, not the 28px insert chip', () => {
+        const finalPlaceholder: Node = {
+            data: {label: '+'},
+            id: FINAL_PLACEHOLDER_NODE_ID,
+            position: {x: 100, y: 300},
+            type: 'placeholder',
+        };
+
+        centerLRSmallNodes([finalPlaceholder], 'y');
+
+        expect(finalPlaceholder.position.y).toBe(300 + (NODE_WIDTH - FINAL_PLACEHOLDER_NODE_SIZE) / 2);
+    });
+
     it('should offset in-frame placeholder (with taskDispatcherId) by (NODE_WIDTH - PLACEHOLDER_NODE_HEIGHT) / 2', () => {
         const placeholder: Node = {
             data: {taskDispatcherId: 'condition_1'},
@@ -2597,6 +2615,26 @@ describe('alignTrailingPlaceholder', () => {
 
         // LR: cross-axis (y) = 400 + 22 centering adjustment, main-axis (x) = 200 + 160
         expect(trailingPlaceholder.position).toEqual({x: 360, y: 422});
+    });
+
+    it('centers the final placeholder by its 48px box when it follows a saved node in LR', () => {
+        const savedNode: Node = {
+            data: {componentName: 'accelo', metadata: {ui: {nodePosition: {x: 200, y: 400}}}},
+            id: 'accelo_3',
+            position: {x: 200, y: 400},
+            type: 'workflow',
+        };
+        const finalPlaceholder: Node = {
+            data: {label: '+'},
+            id: FINAL_PLACEHOLDER_NODE_ID,
+            position: {x: 500, y: 600},
+            type: 'placeholder',
+        };
+        const edges: Edge[] = [{id: 'accelo_3=>final', source: 'accelo_3', target: FINAL_PLACEHOLDER_NODE_ID}];
+
+        alignTrailingPlaceholder([savedNode, finalPlaceholder], edges, 'y', 'LR');
+
+        expect(finalPlaceholder.position.y).toBe(400 + (72 - FINAL_PLACEHOLDER_NODE_SIZE) / 2);
     });
 
     it('should skip in-frame placeholders (with taskDispatcherId)', () => {

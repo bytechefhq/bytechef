@@ -85,6 +85,14 @@ export const toEnvironmentName = (environmentId: number): string => {
 
 export const FINAL_PLACEHOLDER_NODE_ID = getRandomId();
 
+export const TRIGGER_PLACEHOLDER_NODE_ID = 'trigger-placeholder';
+
+export const TRIGGER_FAN_IN_BUS_OFFSET = 40;
+
+export const TRIGGER_PLACEHOLDER_NODE_SIZE = 48;
+
+export const FINAL_PLACEHOLDER_NODE_SIZE = 48;
+
 export const EDITOR_PLACEHOLDER = (
     <>
         <pre>{'//'}Write sample output value, for example:</pre>
