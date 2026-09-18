@@ -2617,6 +2617,26 @@ describe('alignTrailingPlaceholder', () => {
         expect(trailingPlaceholder.position).toEqual({x: 360, y: 422});
     });
 
+    it('centers the final placeholder by its 48px box when it follows a saved node in LR', () => {
+        const savedNode: Node = {
+            data: {componentName: 'accelo', metadata: {ui: {nodePosition: {x: 200, y: 400}}}},
+            id: 'accelo_3',
+            position: {x: 200, y: 400},
+            type: 'workflow',
+        };
+        const finalPlaceholder: Node = {
+            data: {label: '+'},
+            id: FINAL_PLACEHOLDER_NODE_ID,
+            position: {x: 500, y: 600},
+            type: 'placeholder',
+        };
+        const edges: Edge[] = [{id: 'accelo_3=>final', source: 'accelo_3', target: FINAL_PLACEHOLDER_NODE_ID}];
+
+        alignTrailingPlaceholder([savedNode, finalPlaceholder], edges, 'y', 'LR');
+
+        expect(finalPlaceholder.position.y).toBe(400 + (72 - FINAL_PLACEHOLDER_NODE_SIZE) / 2);
+    });
+
     it('should skip in-frame placeholders (with taskDispatcherId)', () => {
         const dispatcher: Node = {
             data: {
