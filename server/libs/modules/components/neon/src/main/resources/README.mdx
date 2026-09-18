@@ -1,0 +1,21 @@
+### Filters and row data
+
+The **Filters** and **Row Data** properties map directly to the
+[PostgREST query syntax](https://neon.com/docs/data-api/get-started) that the Neon Data API is built on.
+
+- **Filters** is a list of `column=operator.value` entries, e.g. `status=eq.active` or `price=gt.10`.
+  Supported operators include `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `in` and `is`. Add multiple
+  entries for the same column (e.g. `price=gt.10` and `price=lt.100`) to combine conditions on it.
+- **Row Data** is a JSON object mapping column names to the values to insert or update, e.g.
+  `{"title": "Hello world"}`.
+
+### Get Row
+
+**Get Row** always limits the query to one row. If your filters match more than one row, only the first match
+(by the table's default ordering) is returned — use **List Rows** with an **Order By** if you need a specific
+one. If nothing matches, the action returns no output.
+
+### Table and view names
+
+The Data API is enabled per branch for a single database, so every action operates on the tables and views
+that belong to that database. Table names are case-sensitive and must match the underlying Postgres schema.

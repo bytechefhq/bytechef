@@ -1,0 +1,87 @@
+## Connection Setup
+
+[Official documentation](https://neon.com/docs/data-api/get-started)
+
+ByteChef connects to Neon through its Data API, a REST interface built on PostgREST that lets you query,
+insert, update and delete rows in your database over HTTP.
+
+1. Open your project in the [Neon Console](https://console.neon.tech).
+2. Go to **Postgres database** → **Data API** and enable it for the branch you want to use.
+3. Copy the **Data API URL** shown there (for example,
+   `https://ep-example.apirest.us-east-1.aws.neon.tech/neondb/rest/v1`) and enter it when creating the
+   connection. This field is required for every authorization method below.
+
+The Data API only accepts a JWT, and JWTs issued by Neon's auth stack expire after about 15 minutes, so pick
+the authorization method that matches how the workflow runs:
+
+### Self-Signed JWT (no third-party auth provider required)
+
+ByteChef signs a fresh RS256 JWT locally, using a private key you control, immediately before every request.
+There is no external token endpoint involved, so this works even if you don't already use Auth0, Clerk or a
+similar provider for the project.
+
+1. Generate a PKCS#8 RSA key pair:
+   ```
+   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private_key.pem
+   openssl rsa -pubout -in private_key.pem -out public_key.pem
+   ```
+2. Turn the public key into a JWKS document (a JSON Web Key Set). For example, with Python's `cryptography`
+   package:
+   ```python
+   import base64, json
+   from cryptography.hazmat.primitives.serialization import load_pem_public_key
+
+   def b64url(n: int) -> str:
+       raw = n.to_bytes((n.bit_length() + 7) // 8, "big")
+       return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+
+   public_key = load_pem_public_key(open("public_key.pem", "rb").read())
+   numbers = public_key.public_numbers()
+
+   jwks = {"keys": [{
+       "kty": "RSA", "use": "sig", "alg": "RS256", "kid": "neon-key-1",
+       "n": b64url(numbers.n), "e": b64url(numbers.e),
+   }]}
+
+   print(json.dumps(jwks))
+   ```
+   Pick your own `kid` value; you'll reuse it below.
+3. Host that JSON document at a stable, public URL that never changes — for example, a ByteChef workflow with
+   a webhook/API-endpoint trigger that always returns this static body, or any static file host you control.
+   Neon fetches this URL live to verify every token, so it must stay reachable.
+4. In the [Neon Console](https://console.neon.tech), go to **Postgres database** → **Data API** → **Auth**,
+   choose **Other Provider**, and enter that JWKS URL (plus a JWT Audience if you want one enforced).
+5. In the ByteChef connection, choose **Self-Signed JWT** and enter:
+   - **Private Key** – the PEM content of `private_key.pem`.
+   - **Subject** – the value Row-Level Security policies should see via `auth.user_id()`.
+   - **Key Id** – the same `kid` you used in the JWKS document, so Neon picks the right key.
+   - **Audience** – only if you set one in step 4.
+
+Treat the private key like any other credential: whoever holds it can mint valid tokens for your database.
+
+### OAuth2 Client Credentials (alternative, if you already use Auth0/Clerk)
+
+Use this for scheduled or recurring workflows. ByteChef requests a brand-new access token from your auth
+provider's token endpoint immediately before every action runs, so the 15-minute expiry never comes into play
+and there is nothing to refresh manually.
+
+This requires a custom auth provider configured for the Neon project (Neon's own Managed Better Auth is
+interactive-only and has no machine-to-machine flow). Set up a machine-to-machine / service application in
+Auth0, Clerk or another OIDC provider that issues JWTs containing a `sub` claim, then enter:
+
+- **Token URL** – the provider's OAuth2 token endpoint.
+- **Client Id** / **Client Secret** – the machine-to-machine application's credentials.
+- **Scopes** – optional, comma-delimited.
+
+Make sure the JWTs this application issues carry the `sub` claim your Row-Level Security policies expect.
+
+### Bearer Token
+
+Paste a JWT directly (for example, one obtained by calling `/get-session` on your Auth URL as described in the
+Neon docs). This is the quickest way to test a table or action, but the token will stop working after about 15
+minutes, so it isn't suitable for scheduled workflows.
+
+### Row-Level Security
+
+RLS policies are enforced at the database level for every request made through the Data API, so make sure the
+policies for the tables you plan to use allow the actions this connection needs to perform.
