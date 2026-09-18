@@ -17,7 +17,15 @@ import {
     saveStickyNotes,
     splitStickyNoteContent,
 } from './stickyNoteUtils';
-import {clearAllWorkflowMutations, consumePendingDefinition, setWorkflowMutating} from './workflowMutationGuard';
+import {
+    clearAllWorkflowMutations,
+    drainPendingSaves,
+    enqueuePendingSave,
+    hasPendingSaves,
+    isWorkflowMutating,
+    setPendingDefinition,
+    setWorkflowMutating,
+} from './workflowMutationGuard';
 
 function makeStickyNote(overrides: Partial<WorkflowStickyNoteType> = {}): WorkflowStickyNoteType {
     return {
@@ -75,6 +83,24 @@ describe('extractStickyNotes', () => {
         });
 
         expect(extractStickyNotes(definition)).toEqual([makeStickyNote()]);
+    });
+
+    it('should filter out entries with missing content or mistyped optional fields', () => {
+        const definition = JSON.stringify({
+            metadata: {
+                ui: {
+                    stickyNotes: [
+                        {id: 'noContent', position: {x: 0, y: 0}},
+                        makeStickyNote({content: 42 as unknown as string, id: 'numberContent'}),
+                        makeStickyNote({color: 7 as unknown as string, id: 'numberColor'}),
+                        makeStickyNote({id: 'partialSize', size: {width: 200} as {height: number; width: number}}),
+                        makeStickyNote({id: 'valid', size: {height: 120, width: 200}}),
+                    ],
+                },
+            },
+        });
+
+        expect(extractStickyNotes(definition).map((stickyNote) => stickyNote.id)).toEqual(['valid']);
     });
 });
 
@@ -378,8 +404,10 @@ describe('saveStickyNotes', () => {
         expect(mutateMock).not.toHaveBeenCalled();
     });
 
-    it('should queue the definition instead of firing while another mutation is in flight', () => {
+    it('should wait in the shared save queue while another mutation is in flight', () => {
         setWorkflowMutating(workflowId, true);
+
+        const definitionBeforeSave = useWorkflowDataStore.getState().workflow.definition;
 
         saveStickyNotes({
             updateWorkflowMutation,
@@ -387,9 +415,82 @@ describe('saveStickyNotes', () => {
         });
 
         expect(mutateMock).not.toHaveBeenCalled();
+        expect(useWorkflowDataStore.getState().workflow.definition).toBe(definitionBeforeSave);
+        expect(hasPendingSaves(workflowId)).toBe(true);
 
-        const pendingDefinition = consumePendingDefinition(workflowId);
+        setWorkflowMutating(workflowId, false);
 
-        expect(pendingDefinition).toBe(useWorkflowDataStore.getState().workflow.definition);
+        drainPendingSaves(workflowId);
+
+        const storedDefinition = useWorkflowDataStore.getState().workflow.definition!;
+
+        expect(JSON.parse(storedDefinition).metadata.ui.stickyNotes).toEqual([makeStickyNote()]);
+        expect(mutateMock).toHaveBeenCalledTimes(1);
+        expect(mutateMock.mock.calls[0][0].workflow.definition).toBe(storedDefinition);
+    });
+
+    it('should apply a queued note change on top of the definition saved in the meantime', () => {
+        setWorkflowMutating(workflowId, true);
+
+        saveStickyNotes({
+            updateWorkflowMutation,
+            updater: (stickyNotes) => [...stickyNotes, makeStickyNote()],
+        });
+
+        useWorkflowDataStore.setState((state) => ({
+            workflow: {
+                ...state.workflow,
+                definition: JSON.stringify({label: 'Test Workflow', tasks: [{name: 'task_1'}]}, null, SPACE),
+            },
+        }));
+
+        setWorkflowMutating(workflowId, false);
+
+        drainPendingSaves(workflowId);
+
+        const parsedDefinition = JSON.parse(useWorkflowDataStore.getState().workflow.definition!);
+
+        expect(parsedDefinition.tasks).toEqual([{name: 'task_1'}]);
+        expect(parsedDefinition.metadata.ui.stickyNotes).toEqual([makeStickyNote()]);
+    });
+
+    it('should run saves queued behind the note mutation once it settles', () => {
+        const queuedSave = vi.fn();
+
+        saveStickyNotes({
+            updateWorkflowMutation,
+            updater: (stickyNotes) => [...stickyNotes, makeStickyNote()],
+        });
+
+        expect(isWorkflowMutating(workflowId)).toBe(true);
+
+        enqueuePendingSave(workflowId, queuedSave);
+
+        mutateMock.mock.calls[0][1].onSettled();
+
+        expect(isWorkflowMutating(workflowId)).toBe(false);
+        expect(queuedSave).toHaveBeenCalledTimes(1);
+    });
+
+    it('should send a queued position definition before draining other saves', () => {
+        const queuedSave = vi.fn();
+
+        saveStickyNotes({
+            updateWorkflowMutation,
+            updater: (stickyNotes) => [...stickyNotes, makeStickyNote()],
+        });
+
+        setPendingDefinition(workflowId, makeDefinition([makeStickyNote({position: {x: 5, y: 5}})]));
+
+        enqueuePendingSave(workflowId, queuedSave);
+
+        mutateMock.mock.calls[0][1].onSettled();
+
+        expect(mutateMock).toHaveBeenCalledTimes(2);
+        expect(queuedSave).not.toHaveBeenCalled();
+
+        mutateMock.mock.calls[1][1].onSettled();
+
+        expect(queuedSave).toHaveBeenCalledTimes(1);
     });
 });

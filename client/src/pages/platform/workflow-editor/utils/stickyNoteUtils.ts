@@ -6,8 +6,9 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
 import {
     consumePendingDefinition,
+    drainPendingSaves,
+    enqueuePendingSave,
     isWorkflowMutating,
-    setPendingDefinition,
     setWorkflowMutating,
 } from './workflowMutationGuard';
 
@@ -118,6 +119,23 @@ export function splitStickyNoteContent(content: string): Array<StickyNoteContent
     return segments;
 }
 
+function isValidStickyNote(stickyNote: WorkflowStickyNoteType | null | undefined): boolean {
+    if (!stickyNote || typeof stickyNote !== 'object') {
+        return false;
+    }
+
+    const {color, content, id, position, size} = stickyNote;
+
+    return (
+        typeof id === 'string' &&
+        typeof content === 'string' &&
+        typeof position?.x === 'number' &&
+        typeof position?.y === 'number' &&
+        (color === undefined || typeof color === 'string') &&
+        (size === undefined || (typeof size?.width === 'number' && typeof size?.height === 'number'))
+    );
+}
+
 export function extractStickyNotes(definition?: string): Array<WorkflowStickyNoteType> {
     if (!definition) {
         return [];
@@ -132,13 +150,7 @@ export function extractStickyNotes(definition?: string): Array<WorkflowStickyNot
             return [];
         }
 
-        return stickyNotes.filter(
-            (stickyNote: WorkflowStickyNoteType) =>
-                stickyNote &&
-                typeof stickyNote.id === 'string' &&
-                typeof stickyNote.position?.x === 'number' &&
-                typeof stickyNote.position?.y === 'number'
-        );
+        return stickyNotes.filter(isValidStickyNote);
     } catch {
         return [];
     }
@@ -227,6 +239,12 @@ export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNot
         return;
     }
 
+    if (isWorkflowMutating(workflow.id!)) {
+        enqueuePendingSave(workflow.id!, () => saveStickyNotes({updateWorkflowMutation, updater}));
+
+        return;
+    }
+
     let workflowDefinition;
 
     try {
@@ -279,12 +297,6 @@ export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNot
             definition: updatedDefinition,
         },
     }));
-
-    if (isWorkflowMutating(workflow.id!)) {
-        setPendingDefinition(workflow.id!, updatedDefinition);
-
-        return;
-    }
 
     fireStickyNoteMutation({
         definition: updatedDefinition,
@@ -386,6 +398,8 @@ function fireStickyNoteMutation({
                         version: currentWorkflow.version,
                         workflowId,
                     });
+                } else {
+                    drainPendingSaves(workflowId);
                 }
             },
             onSuccess: (updatedWorkflow) => {
