@@ -24,6 +24,49 @@ type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
 const HIDDEN_ACTION_COMPONENT_NAMES = new Set(['approvalLink']);
 const HIDDEN_TASK_DISPATCHER_NAMES = new Set(['waitForApproval']);
 
+// Components that don't need a connection. Hardcoded until the component definitions list exposes connection info.
+const HELPER_COMPONENT_NAMES = new Set([
+    'aiImage',
+    'aiText',
+    'apiPlatform',
+    'approval',
+    'bash',
+    'chat',
+    'claudeCode',
+    'codeWorkflow',
+    'cryptoHelper',
+    'csvFile',
+    'dataMapper',
+    'dataStorage',
+    'dataStream',
+    'dataTable',
+    'dateHelper',
+    'embeddedWorkflowBuilder',
+    'fileStorage',
+    'filesystem',
+    'imageHelper',
+    'jsonFile',
+    'jsonHelper',
+    'jwtHelper',
+    'knowledgeBase',
+    'logger',
+    'mathHelper',
+    'mergeHelper',
+    'objectHelper',
+    'odsFile',
+    'pdfHelper',
+    'randomHelper',
+    'script',
+    'textHelper',
+    'var',
+    'wait',
+    'webhook',
+    'workflow',
+    'xlsxFile',
+    'xmlFile',
+    'xmlHelper',
+]);
+
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
     clusterElementComponentDefinitions?: Array<ComponentDefinitionBasic>;
@@ -89,13 +132,27 @@ const WorkflowNodesTabs = ({
     const visibleActionComponentDefinitions = useMemo(
         () =>
             actionComponentDefinitions.filter(
-                (componentDefinition) => !HIDDEN_ACTION_COMPONENT_NAMES.has(componentDefinition.name)
+                (componentDefinition) =>
+                    !HIDDEN_ACTION_COMPONENT_NAMES.has(componentDefinition.name) &&
+                    !HELPER_COMPONENT_NAMES.has(componentDefinition.name)
+            ),
+        [actionComponentDefinitions]
+    );
+
+    const helperComponentDefinitions = useMemo(
+        () =>
+            actionComponentDefinitions.filter((componentDefinition) =>
+                HELPER_COMPONENT_NAMES.has(componentDefinition.name)
             ),
         [actionComponentDefinitions]
     );
 
     const actionFiltering = useComponentFiltering({
         componentDefinitions: visibleActionComponentDefinitions,
+    });
+
+    const helperFiltering = useComponentFiltering({
+        componentDefinitions: helperComponentDefinitions,
     });
 
     const triggerFiltering = useComponentFiltering({
@@ -220,6 +277,10 @@ const WorkflowNodesTabs = ({
                         : 'No filtered components found.',
                 items: actionFiltering.filteredComponents,
             },
+            helpers: {
+                emptyMessage: 'No helper components found.',
+                items: helperFiltering.filteredComponents,
+            },
             taskDispatchers: {
                 emptyMessage: 'No flow controls found.',
                 items: availableTaskDispatchers,
@@ -238,6 +299,7 @@ const WorkflowNodesTabs = ({
             actionFiltering.filterState.activeView,
             availableTaskDispatchers,
             availableClusterElements,
+            helperFiltering.filteredComponents,
             triggerFiltering.filterState.activeView,
         ]
     );
@@ -268,6 +330,12 @@ const WorkflowNodesTabs = ({
                     {!hideTaskDispatchers && (
                         <TabsTrigger className="w-full data-[state=active]:shadow-none" value="taskDispatchers">
                             Flows
+                        </TabsTrigger>
+                    )}
+
+                    {!hideActionComponents && (
+                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="helpers">
+                            Helpers
                         </TabsTrigger>
                     )}
 
@@ -405,6 +473,17 @@ const WorkflowNodesTabs = ({
                     onItemClick={onItemClick}
                     selectedComponentName={selectedComponentName}
                     tabValue="taskDispatchers"
+                />
+            )}
+
+            {!hideActionComponents && (
+                <WorkflowNodesTabContent
+                    emptyMessage={tabContentConfigs.helpers.emptyMessage}
+                    items={tabContentConfigs.helpers.items}
+                    itemsDraggable={itemsDraggable}
+                    onItemClick={onItemClick}
+                    selectedComponentName={selectedComponentName}
+                    tabValue="helpers"
                 />
             )}
         </Tabs>
