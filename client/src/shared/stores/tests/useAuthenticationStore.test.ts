@@ -219,7 +219,7 @@ describe('authenticationStore', () => {
 
             const staleRequest = authenticationStore.getState().getAccount();
 
-            authenticationStore.getState().reset();
+            authenticationStore.getState().clearAuthentication();
 
             deferred.reject(new DOMException('The operation was aborted.', 'AbortError'));
 
@@ -664,28 +664,81 @@ describe('authenticationStore', () => {
             expect(state.showLogin).toBe(false);
         });
 
-        it('drops the in-flight request so the next call fetches again', async () => {
+        it('keeps the in-flight account request so the session still settles', async () => {
             const deferred = createDeferred<Response>();
-            const fetchMock = stubFetch()
-                .mockReturnValueOnce(deferred.promise)
-                .mockResolvedValueOnce(accountResponse());
+            const fetchMock = stubFetch().mockReturnValueOnce(deferred.promise);
 
-            const staleRequest = authenticationStore.getState().getAccount();
+            const request = authenticationStore.getState().getAccount();
 
             authenticationStore.getState().reset();
 
-            const freshRequest = authenticationStore.getState().getAccount();
-
-            expect(freshRequest).not.toBe(staleRequest);
-            expect(fetchMock).toHaveBeenCalledTimes(2);
-
-            await freshRequest;
+            expect(accountRequestSignal(fetchMock).aborted).toBe(false);
+            expect(authenticationStore.getState().getAccount()).toBe(request);
+            expect(fetchMock).toHaveBeenCalledTimes(1);
 
             deferred.resolve(emptyResponse(401));
 
-            await staleRequest;
+            await request;
 
-            expect(authenticationStore.getState().authenticated).toBe(true);
+            const state = authenticationStore.getState();
+
+            expect(state.authenticated).toBe(false);
+            expect(state.sessionHasBeenFetched).toBe(true);
+            expect(state.showLogin).toBe(true);
+        });
+    });
+
+    describe('logout followed by reset', () => {
+        it('settles the session when reset runs while the post-logout refresh is in flight', async () => {
+            authenticationStore.setState({account: ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+
+            const refreshDeferred = createDeferred<Response>();
+
+            stubFetch().mockResolvedValueOnce(emptyResponse(200)).mockReturnValueOnce(refreshDeferred.promise);
+
+            await authenticationStore.getState().logout();
+
+            authenticationStore.getState().reset();
+
+            refreshDeferred.resolve(emptyResponse(401));
+
+            await vi.waitFor(() => expect(authenticationStore.getState().sessionHasBeenFetched).toBe(true));
+
+            const state = authenticationStore.getState();
+
+            expect(state.account).toBeUndefined();
+            expect(state.authenticated).toBe(false);
+            expect(state.showLogin).toBe(true);
+        });
+
+        it('settles the session when the fetch interceptor clears it as the refresh answers 401', async () => {
+            authenticationStore.setState({account: ACCOUNT, authenticated: true, sessionHasBeenFetched: true});
+
+            const refreshDeferred = createDeferred<void>();
+
+            stubFetch()
+                .mockResolvedValueOnce(emptyResponse(200))
+                .mockImplementationOnce((_url: string, init: RequestInit) =>
+                    refreshDeferred.promise.then(() => {
+                        if (init.signal?.aborted) {
+                            throw new DOMException('The operation was aborted.', 'AbortError');
+                        }
+
+                        authenticationStore.getState().clearAuthentication();
+
+                        return emptyResponse(401);
+                    })
+                );
+
+            await authenticationStore.getState().logout();
+
+            authenticationStore.getState().reset();
+
+            refreshDeferred.resolve();
+
+            await vi.waitFor(() => expect(authenticationStore.getState().sessionHasBeenFetched).toBe(true));
+
+            expect(authenticationStore.getState().authenticated).toBe(false);
         });
     });
 });
