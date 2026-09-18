@@ -79,6 +79,21 @@ describe('useFlowCenterOffset', () => {
         expect(result.current).toBe(-250);
     });
 
+    it('measures the whole top row when several triggers share it top to bottom', () => {
+        mockStore(
+            createDomNode([
+                {left: 100, top: 20, width: 100},
+                {left: 400, top: 20, width: 100},
+                {left: 700, top: 20, width: 100},
+                {left: 400, top: 200, width: 100},
+            ])
+        );
+
+        const {result} = renderHook(() => useFlowCenterOffset());
+
+        expect(result.current).toBe(-50);
+    });
+
     it('measures the whole row left to right', () => {
         useLayoutDirectionStore.setState({layoutDirection: 'LR'});
 

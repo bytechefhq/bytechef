@@ -3,6 +3,8 @@ import {useLayoutEffect, useState} from 'react';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 
+const TOP_ROW_TOLERANCE_PX = 2;
+
 export default function useFlowCenterOffset(): number {
     const [offset, setOffset] = useState(0);
 
@@ -28,10 +30,7 @@ export default function useFlowCenterOffset(): number {
 
         const nodeElements = domNode.querySelectorAll<HTMLElement>('.react-flow__node[data-id]');
 
-        let topBox: HTMLElement | undefined;
-        let topY = Number.POSITIVE_INFINITY;
-        let minLeft = Number.POSITIVE_INFINITY;
-        let maxRight = Number.NEGATIVE_INFINITY;
+        const boxRects: Array<Pick<DOMRect, 'left' | 'right' | 'top'>> = [];
 
         for (const nodeElement of nodeElements) {
             const box = nodeElement.querySelector<HTMLElement>('[data-node-box]');
@@ -40,30 +39,29 @@ export default function useFlowCenterOffset(): number {
                 continue;
             }
 
-            const {left, right, top} = box.getBoundingClientRect();
-
-            minLeft = Math.min(minLeft, left);
-            maxRight = Math.max(maxRight, right);
-
-            if (top < topY) {
-                topY = top;
-                topBox = box;
-            }
+            boxRects.push(box.getBoundingClientRect());
         }
 
-        if (!topBox) {
+        if (boxRects.length === 0) {
             setOffset(0);
 
             return;
         }
 
+        const topY = Math.min(...boxRects.map((boxRect) => boxRect.top));
+
+        const measuredRects =
+            layoutDirection === 'LR'
+                ? boxRects
+                : boxRects.filter((boxRect) => boxRect.top - topY < TOP_ROW_TOLERANCE_PX);
+
+        const flowLeft = Math.min(...measuredRects.map((boxRect) => boxRect.left));
+        const flowRight = Math.max(...measuredRects.map((boxRect) => boxRect.right));
+
         const containerRect = domNode.getBoundingClientRect();
         const containerCenterX = containerRect.left + containerRect.width / 2;
 
-        const flowCenterX =
-            layoutDirection === 'LR'
-                ? (minLeft + maxRight) / 2
-                : topBox.getBoundingClientRect().left + topBox.getBoundingClientRect().width / 2;
+        const flowCenterX = (flowLeft + flowRight) / 2;
 
         setOffset(Math.round(flowCenterX - containerCenterX));
     }, [containerWidth, domNode, layoutDirection, nodePositions, transform]);

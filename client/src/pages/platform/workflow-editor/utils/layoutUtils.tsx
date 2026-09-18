@@ -296,8 +296,10 @@ export const buildTriggerFanInEdges = (triggerNodes: Node[], firstDownstreamNode
     return triggerNodes.map((triggerNode, triggerIndex) => {
         let type = 'smoothstep';
 
-        if (triggerIndex === middleTriggerIndex) {
-            type = targetIsFinalPlaceholder ? 'placeholder' : 'workflow';
+        if (targetIsFinalPlaceholder) {
+            type = 'placeholder';
+        } else if (triggerIndex === middleTriggerIndex) {
+            type = 'workflow';
         }
 
         return {

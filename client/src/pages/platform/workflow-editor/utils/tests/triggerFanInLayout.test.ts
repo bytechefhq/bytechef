@@ -34,13 +34,21 @@ describe('buildTriggerFanInEdges', () => {
         expect(edges.every((edge) => (edge.data as {triggerFanIn?: boolean})?.triggerFanIn === true)).toBe(true);
     });
 
-    it('uses a placeholder middle edge when the triggers feed the final placeholder', () => {
+    it('draws every trigger edge as a placeholder edge when the triggers feed the final placeholder', () => {
         const edges = buildTriggerFanInEdges(
-            [triggerNode('trigger_1'), triggerNode('trigger_2')],
+            [triggerNode('trigger_1'), triggerNode('trigger_2'), triggerNode('trigger_3')],
             FINAL_PLACEHOLDER_NODE_ID
         );
 
-        expect(edges.map((edge) => edge.type)).toEqual(['smoothstep', 'placeholder']);
+        expect(edges.map((edge) => edge.type)).toEqual(['placeholder', 'placeholder', 'placeholder']);
+        expect(edges.every((edge) => (edge.data as {triggerFanIn?: boolean})?.triggerFanIn === true)).toBe(true);
+    });
+
+    it('keeps a single trigger feeding the final placeholder as a plain placeholder edge', () => {
+        const [edge] = buildTriggerFanInEdges([triggerNode('trigger_1')], FINAL_PLACEHOLDER_NODE_ID);
+
+        expect(edge.type).toBe('placeholder');
+        expect(edge.data).toBeUndefined();
     });
 });
 

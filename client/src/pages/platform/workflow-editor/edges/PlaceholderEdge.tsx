@@ -1,6 +1,9 @@
-import {EdgeProps, getBezierPath} from '@xyflow/react';
+import {EdgeProps, getBezierPath, getSmoothStepPath} from '@xyflow/react';
+
+import {getTriggerFanInBusCenter} from './computeTriggerFanIn';
 
 export default function PlaceholderEdge({
+    data,
     id,
     sourcePosition,
     sourceX,
@@ -10,14 +13,17 @@ export default function PlaceholderEdge({
     targetX,
     targetY,
 }: EdgeProps) {
-    const [edgePath] = getBezierPath({
-        sourcePosition,
-        sourceX,
-        sourceY,
-        targetPosition,
-        targetX,
-        targetY,
-    });
+    const isTriggerFanIn = !!(data as Record<string, unknown>)?.triggerFanIn;
+
+    const pathParameters = {sourcePosition, sourceX, sourceY, targetPosition, targetX, targetY};
+
+    const [edgePath] = isTriggerFanIn
+        ? getSmoothStepPath({
+              borderRadius: 10,
+              ...getTriggerFanInBusCenter({isTriggerFanIn, sourceX, sourceY, targetX, targetY}),
+              ...pathParameters,
+          })
+        : getBezierPath(pathParameters);
 
     return (
         <path
