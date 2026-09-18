@@ -81,12 +81,11 @@ export default function WorkflowEdge({
         () =>
             getTriggerFanInBusCenter({
                 isTriggerFanIn,
+                sourcePosition: correctedSourcePosition,
                 sourceX: correctedSourceX,
                 sourceY: correctedSourceY,
-                targetX: correctedTargetX,
-                targetY: correctedTargetY,
             }),
-        [correctedSourceX, correctedSourceY, correctedTargetX, correctedTargetY, isTriggerFanIn]
+        [correctedSourcePosition, correctedSourceX, correctedSourceY, isTriggerFanIn]
     );
 
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({

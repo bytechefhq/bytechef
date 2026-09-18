@@ -1,4 +1,5 @@
 import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
+import {Position} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './computeTriggerFanIn';
@@ -6,26 +7,46 @@ import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './compute
 describe('getTriggerFanInBusCenter', () => {
     it('returns no bus center for an edge that is not a trigger fan-in', () => {
         expect(
-            getTriggerFanInBusCenter({isTriggerFanIn: false, sourceX: 0, sourceY: 0, targetX: 0, targetY: 200})
+            getTriggerFanInBusCenter({isTriggerFanIn: false, sourcePosition: Position.Bottom, sourceX: 0, sourceY: 0})
         ).toEqual({});
     });
 
-    it('pins a horizontal bus below the trigger row for a mostly vertical edge', () => {
+    it('pins a horizontal bus below the trigger row when triggers connect from the bottom', () => {
         expect(
-            getTriggerFanInBusCenter({isTriggerFanIn: true, sourceX: 100, sourceY: 50, targetX: 160, targetY: 250})
+            getTriggerFanInBusCenter({isTriggerFanIn: true, sourcePosition: Position.Bottom, sourceX: 100, sourceY: 50})
         ).toEqual({centerY: 50 + TRIGGER_FAN_IN_BUS_OFFSET});
     });
 
-    it('pins a vertical bus beside the trigger column for a mostly horizontal edge', () => {
+    it('pins a vertical bus beside the trigger column when triggers connect from the right', () => {
         expect(
-            getTriggerFanInBusCenter({isTriggerFanIn: true, sourceX: 50, sourceY: 100, targetX: 250, targetY: 160})
+            getTriggerFanInBusCenter({isTriggerFanIn: true, sourcePosition: Position.Right, sourceX: 50, sourceY: 100})
         ).toEqual({centerX: 50 + TRIGGER_FAN_IN_BUS_OFFSET});
     });
 
-    it('treats an edge with equal horizontal and vertical spans as vertical', () => {
+    it('puts a far-off outer trigger on the same bus as an inner one', () => {
+        const innerTriggerBus = getTriggerFanInBusCenter({
+            isTriggerFanIn: true,
+            sourcePosition: Position.Bottom,
+            sourceX: 480,
+            sourceY: 50,
+        });
+        const outerTriggerBus = getTriggerFanInBusCenter({
+            isTriggerFanIn: true,
+            sourcePosition: Position.Bottom,
+            sourceX: 0,
+            sourceY: 50,
+        });
+
+        expect(outerTriggerBus).toEqual(innerTriggerBus);
+    });
+
+    it('mirrors the bus for top and left handles', () => {
         expect(
-            getTriggerFanInBusCenter({isTriggerFanIn: true, sourceX: 0, sourceY: 0, targetX: 100, targetY: 100})
-        ).toEqual({centerY: TRIGGER_FAN_IN_BUS_OFFSET});
+            getTriggerFanInBusCenter({isTriggerFanIn: true, sourcePosition: Position.Top, sourceX: 0, sourceY: 100})
+        ).toEqual({centerY: 100 - TRIGGER_FAN_IN_BUS_OFFSET});
+        expect(
+            getTriggerFanInBusCenter({isTriggerFanIn: true, sourcePosition: Position.Left, sourceX: 100, sourceY: 0})
+        ).toEqual({centerX: 100 - TRIGGER_FAN_IN_BUS_OFFSET});
     });
 });
 
@@ -52,18 +73,17 @@ describe('getTriggerFanInButtonPosition', () => {
     });
 
     it('places the button on the bus that the edge path is drawn with', () => {
-        const coordinates = {sourceX: 100, sourceY: 50, targetX: 160, targetY: 250};
-
-        const busCenter = getTriggerFanInBusCenter({isTriggerFanIn: true, ...coordinates});
-
-        const buttonPosition = getTriggerFanInButtonPosition({
-            busCenter,
-            targetX: coordinates.targetX,
-            targetY: coordinates.targetY,
+        const busCenter = getTriggerFanInBusCenter({
+            isTriggerFanIn: true,
+            sourcePosition: Position.Bottom,
+            sourceX: 100,
+            sourceY: 50,
         });
 
-        expect(buttonPosition.x).toBe(coordinates.targetX);
+        const buttonPosition = getTriggerFanInButtonPosition({busCenter, targetX: 160, targetY: 250});
+
+        expect(buttonPosition.x).toBe(160);
         expect(buttonPosition.y).toBeGreaterThan(busCenter.centerY!);
-        expect(buttonPosition.y).toBeLessThan(coordinates.targetY);
+        expect(buttonPosition.y).toBeLessThan(250);
     });
 });

@@ -1,4 +1,5 @@
 import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
+import {Position} from '@xyflow/react';
 
 export interface TriggerFanInBusCenterI {
     centerX?: number;
@@ -7,10 +8,9 @@ export interface TriggerFanInBusCenterI {
 
 interface GetTriggerFanInBusCenterProps {
     isTriggerFanIn: boolean;
+    sourcePosition: Position;
     sourceX: number;
     sourceY: number;
-    targetX: number;
-    targetY: number;
 }
 
 interface GetTriggerFanInButtonPositionProps {
@@ -21,22 +21,24 @@ interface GetTriggerFanInButtonPositionProps {
 
 export function getTriggerFanInBusCenter({
     isTriggerFanIn,
+    sourcePosition,
     sourceX,
     sourceY,
-    targetX,
-    targetY,
 }: GetTriggerFanInBusCenterProps): TriggerFanInBusCenterI {
     if (!isTriggerFanIn) {
         return {};
     }
 
-    const isVertical = Math.abs(targetY - sourceY) >= Math.abs(targetX - sourceX);
-
-    if (isVertical) {
-        return {centerY: sourceY + TRIGGER_FAN_IN_BUS_OFFSET};
+    switch (sourcePosition) {
+        case Position.Top:
+            return {centerY: sourceY - TRIGGER_FAN_IN_BUS_OFFSET};
+        case Position.Left:
+            return {centerX: sourceX - TRIGGER_FAN_IN_BUS_OFFSET};
+        case Position.Right:
+            return {centerX: sourceX + TRIGGER_FAN_IN_BUS_OFFSET};
+        default:
+            return {centerY: sourceY + TRIGGER_FAN_IN_BUS_OFFSET};
     }
-
-    return {centerX: sourceX + TRIGGER_FAN_IN_BUS_OFFSET};
 }
 
 export function getTriggerFanInButtonPosition({busCenter, targetX, targetY}: GetTriggerFanInButtonPositionProps): {

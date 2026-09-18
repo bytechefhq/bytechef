@@ -1,4 +1,9 @@
-import {CLUSTER_ROOT_NODE_WIDTH, NODE_WIDTH} from '@/shared/constants';
+import {
+    CLUSTER_ROOT_NODE_WIDTH,
+    FINAL_PLACEHOLDER_NODE_ID,
+    FINAL_PLACEHOLDER_NODE_SIZE,
+    NODE_WIDTH,
+} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
@@ -1355,6 +1360,19 @@ describe('constrainLeftGhostPositions', () => {
 });
 
 describe('centerLRSmallNodes', () => {
+    it('centers the final placeholder by its 48px box, not the 28px insert chip', () => {
+        const finalPlaceholder: Node = {
+            data: {label: '+'},
+            id: FINAL_PLACEHOLDER_NODE_ID,
+            position: {x: 100, y: 300},
+            type: 'placeholder',
+        };
+
+        centerLRSmallNodes([finalPlaceholder], 'y');
+
+        expect(finalPlaceholder.position.y).toBe(300 + (NODE_WIDTH - FINAL_PLACEHOLDER_NODE_SIZE) / 2);
+    });
+
     it('should offset in-frame placeholder (with taskDispatcherId) by (NODE_WIDTH - PLACEHOLDER_NODE_HEIGHT) / 2', () => {
         const placeholder: Node = {
             data: {taskDispatcherId: 'condition_1'},
