@@ -2,7 +2,7 @@ import {FINAL_PLACEHOLDER_NODE_ID, NODE_WIDTH, TRIGGER_PLACEHOLDER_NODE_ID} from
 import {Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
-import {buildTriggerFanInEdges, getDagreNodeSize, getLayoutElements} from '../layoutUtils';
+import {buildTriggerFanInEdges, getDagreNodeSize, getLabelCrossOverhang, getLayoutElements} from '../layoutUtils';
 
 const triggerNode = (id: string): Node => ({data: {trigger: true}, id, position: {x: 0, y: 0}, type: 'workflow'});
 
@@ -91,5 +91,24 @@ describe('getLayoutElements with multiple triggers', () => {
         const triggerRowCenter = (position('trigger_1').x + position('trigger_2').x) / 2;
 
         expect(Math.abs(triggerRowCenter + 72 / 2 - canvasWidth / 2)).toBeLessThan(1);
+    });
+});
+
+describe('getLabelCrossOverhang', () => {
+    it('grows with the longest label line', () => {
+        const shortLabel: Node = {data: {operationName: 'get', title: 'Chat'}, id: 'trigger_1', position: {x: 0, y: 0}};
+        const longLabel: Node = {
+            data: {operationName: 'newIncomingWebhookRequest', title: 'Chat'},
+            id: 'trigger_2',
+            position: {x: 0, y: 0},
+        };
+
+        expect(getLabelCrossOverhang(longLabel)).toBeGreaterThan(getLabelCrossOverhang(shortLabel));
+    });
+
+    it('caps the overhang for very long labels', () => {
+        const veryLongLabel: Node = {data: {title: 'x'.repeat(120)}, id: 'trigger_1', position: {x: 0, y: 0}};
+
+        expect(getLabelCrossOverhang(veryLongLabel)).toBe(200);
     });
 });

@@ -1,10 +1,11 @@
+import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
 import {render} from '@testing-library/react';
 import {EdgeProps, Position} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import PlaceholderEdge from './PlaceholderEdge';
 
-const renderEdgePath = (data?: Record<string, unknown>) => {
+const renderEdgePath = (data?: Record<string, unknown>, sourceX = 100) => {
     const {container} = render(
         <svg>
             <PlaceholderEdge
@@ -12,7 +13,7 @@ const renderEdgePath = (data?: Record<string, unknown>) => {
                     data,
                     id: 'trigger_1=>final',
                     sourcePosition: Position.Bottom,
-                    sourceX: 100,
+                    sourceX,
                     sourceY: 50,
                     targetPosition: Position.Top,
                     targetX: 300,
@@ -35,5 +36,17 @@ describe('PlaceholderEdge', () => {
 
         expect(edgePath).not.toContain('C');
         expect(edgePath).toContain('Q');
+    });
+
+    it('keeps a far-off outer trigger on the same bus as a nearby one', () => {
+        const busY = 50 + TRIGGER_FAN_IN_BUS_OFFSET;
+
+        const passesThroughBus = (edgePath: string) =>
+            [...edgePath.matchAll(/(-?\d+(?:\.\d+)?)[ ,](-?\d+(?:\.\d+)?)/g)].some(
+                (match) => Number(match[2]) === busY
+            );
+
+        expect(passesThroughBus(renderEdgePath({triggerFanIn: true}, 280))).toBe(true);
+        expect(passesThroughBus(renderEdgePath({triggerFanIn: true}, -600))).toBe(true);
     });
 });
