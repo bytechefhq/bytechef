@@ -20,10 +20,12 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
+import org.springframework.data.relational.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,25 +44,55 @@ import org.springframework.stereotype.Component;
 public class McpServerAfterSaveEventListener extends AbstractRelationalEventListener<McpServer> {
 
     private final McpProjectService mcpProjectService;
+    private final McpServerService mcpServerService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
 
     @SuppressFBWarnings("EI")
     public McpServerAfterSaveEventListener(
-        McpProjectService mcpProjectService, ProjectDeploymentFacade projectDeploymentFacade) {
+        McpProjectService mcpProjectService, McpServerService mcpServerService,
+        ProjectDeploymentFacade projectDeploymentFacade) {
 
         this.mcpProjectService = mcpProjectService;
+        this.mcpServerService = mcpServerService;
         this.projectDeploymentFacade = projectDeploymentFacade;
+    }
+
+    @Override
+    protected void onBeforeConvert(BeforeConvertEvent<McpServer> event) {
+        McpServer mcpServer = event.getEntity();
+
+        Long mcpServerId = mcpServer.getId();
+
+        if (mcpServerId == null) {
+            return;
+        }
+
+        McpServer storedMcpServer = mcpServerService.getMcpServer(mcpServerId);
+
+        mcpServer.setStoredEnabled(storedMcpServer.isEnabled());
     }
 
     @Override
     protected void onAfterSave(AfterSaveEvent<McpServer> event) {
         McpServer mcpServer = event.getEntity();
 
+        Boolean storedEnabled = mcpServer.getStoredEnabled();
+
+        mcpServer.setStoredEnabled(null);
+
+        if (storedEnabled != null && storedEnabled == mcpServer.isEnabled()) {
+            return;
+        }
+
         checkProjectDeploymentTriggers(mcpServer.getId(), mcpServer.isEnabled());
     }
 
     private void checkProjectDeploymentTriggers(long mcpServerId, boolean enabled) {
         List<McpProject> mcpProjects = mcpProjectService.getMcpServerMcpProjects(mcpServerId);
+
+        for (McpProject mcpProject : mcpProjects) {
+            projectDeploymentFacade.checkEnableProjectDeployment(mcpProject.getProjectDeploymentId(), enabled);
+        }
 
         for (McpProject mcpProject : mcpProjects) {
             projectDeploymentFacade.enableProjectDeployment(mcpProject.getProjectDeploymentId(), enabled);

@@ -71,6 +71,10 @@ public class McpServerBeforeDeleteEventListener extends AbstractRelationalEventL
         List<McpProject> mcpProjects = mcpProjectService.getMcpServerMcpProjects(mcpServerId);
 
         for (McpProject mcpProject : mcpProjects) {
+            projectDeploymentFacade.checkEnableProjectDeployment(mcpProject.getProjectDeploymentId(), false);
+        }
+
+        for (McpProject mcpProject : mcpProjects) {
             projectDeploymentFacade.enableProjectDeployment(mcpProject.getProjectDeploymentId(), false);
 
             List<McpProjectWorkflow> mcpProjectWorkflows = mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(
