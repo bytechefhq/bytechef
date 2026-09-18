@@ -14,6 +14,10 @@ insert, update and delete rows in your database over HTTP.
 The Data API only accepts a JWT, and JWTs issued by Neon's auth stack expire after about 15 minutes, so pick
 the authorization method that matches how the workflow runs:
 
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(56.25% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/be9e30c2-4893-4b5d-a393-c6fb44d6b3ae?theme=light&type=0&height=parent" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
 ### Self-Signed JWT (no third-party auth provider required)
 
 ByteChef signs a fresh RS256 JWT locally, using a private key you control, immediately before every request.
