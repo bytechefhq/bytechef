@@ -1,0 +1,71 @@
+## Connection Setup
+
+[Official documentation](https://neon.com/docs/data-api/get-started)
+
+ByteChef connects to Neon through its Data API, a REST interface built on PostgREST that lets you query,
+insert, update and delete rows in your database over HTTP.
+
+1. Open your project in the [Neon Console](https://console.neon.tech).
+2. Go to **Postgres database** → **Data API** and enable it for the branch you want to use.
+3. Copy the **Data API URL** shown there (for example,
+   `https://ep-example.apirest.us-east-1.aws.neon.tech/neondb/rest/v1`) and enter it when creating the
+   connection. This field is required for every authorization method below.
+
+The Data API only accepts a JWT, and JWTs issued by Neon's auth stack expire after about 15 minutes, so pick
+the authorization method that matches how the workflow runs:
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(56.25% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/be9e30c2-4893-4b5d-a393-c6fb44d6b3ae?theme=light&type=0&height=parent" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+### Self-Signed JWT (no third-party auth provider required)
+
+ByteChef signs a fresh RS256 JWT locally, using a private key you control, immediately before every request.
+There is no external token endpoint involved, so this works even if you don't already use Auth0, Clerk or a
+similar provider for the project. This is the verified, working setup:
+
+1. Run this component's **Generate Service Account** action once (e.g. from the component's test panel, or as
+   a throwaway step in a workflow). It returns `privateKey`, `keyId`, `subject` and a `jwks` object — no
+   `openssl` or Python needed.
+2. Copy the `jwks` output value (the whole `{"keys": [...]}` object) into a **public** GitHub Gist named
+   `jwks.json` (create one at [gist.github.com](https://gist.github.com/)).
+3. Click **Raw** on that file, then swap the host in the URL: use
+   `https://gist.githubusercontent.com/<user>/<gist-id>/raw/jwks.json` (**not**
+   `https://gist.github.com/<user>/<gist-id>/raw/jwks.json`). Verify with `curl -s <url>` before moving on
+   — it must print the JSON, not nothing.
+4. In the [Neon Console](https://console.neon.tech), go to **Postgres database** → **Data API** → **Configure Data API**,
+   choose **Add Provider**, and enter that `https://gist.githubusercontent.com/<user>/<gist-id>/raw/jwks.json` URL as the
+   JWKS URL.
+5. Create the ByteChef connection: choose **Self-Signed JWT** and enter the `privateKey`, `subject` and `keyId`
+   from step 1.
+6. Grant the Postgres role your token executes as access to the tables you need — see
+   [Row-Level Security](#row-level-security) below. This step trips people up: a self-signed JWT with no
+   explicit `role` claim runs as the **`anonymous`** Postgres role on Neon, not `authenticated`. Grants made to
+   `authenticated` alone will not apply.
+
+Treat the private key like any other credential: whoever holds it can mint valid tokens for your database.
+
+### Bearer Token
+
+Paste a JWT directly (for example, one obtained by calling `/get-session` on your Auth URL as described in the
+Neon docs). This is the quickest way to test a table or action, but the token will stop working after about 15
+minutes, so it isn't suitable for scheduled workflows.
+
+### Row-Level Security
+
+RLS policies are enforced at the database level for every request made through the Data API. Postgres denies
+access to a table by default, regardless of a valid JWT, until you explicitly grant the executing role
+privileges on it — this is separate from and prior to RLS. For a self-signed JWT with no `role` claim, that
+role is `anonymous`:
+
+```sql
+GRANT USAGE ON SCHEMA public TO anonymous;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public."your_table" TO anonymous;
+
+-- if RLS is enabled
+ALTER TABLE public."your_table" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "service account access" ON public."your_table"
+    FOR ALL
+    USING (auth.user_id() = 'the-subject-you-set-in-the-connection')
+    WITH CHECK (auth.user_id() = 'the-subject-you-set-in-the-connection');
+```
