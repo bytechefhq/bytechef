@@ -26,6 +26,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyFunction;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
+import com.bytechef.component.definition.ConnectionDefinition.BaseUriFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.security.KeyPair;
@@ -37,6 +38,30 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class NeonConnectionTest {
+
+    @Test
+    void testBaseUriStripsTrailingSlash() {
+        BaseUriFunction baseUriFunction = NeonConnection.CONNECTION_DEFINITION.getBaseUri()
+            .orElseThrow();
+
+        Parameters connectionParameters = MockParametersFactory.create(
+            Map.of("baseUri", "https://example.apirest.neon.tech/neondb/rest/v1/"));
+
+        assertEquals(
+            "https://example.apirest.neon.tech/neondb/rest/v1", baseUriFunction.apply(connectionParameters, null));
+    }
+
+    @Test
+    void testBaseUriKeepsUriWithoutTrailingSlash() {
+        BaseUriFunction baseUriFunction = NeonConnection.CONNECTION_DEFINITION.getBaseUri()
+            .orElseThrow();
+
+        Parameters connectionParameters = MockParametersFactory.create(
+            Map.of("baseUri", "https://example.apirest.neon.tech/neondb/rest/v1"));
+
+        assertEquals(
+            "https://example.apirest.neon.tech/neondb/rest/v1", baseUriFunction.apply(connectionParameters, null));
+    }
 
     @Test
     void testApplySelfSignedJwt() throws Exception {

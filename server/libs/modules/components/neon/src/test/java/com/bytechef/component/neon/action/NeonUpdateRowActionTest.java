@@ -20,6 +20,7 @@ import static com.bytechef.component.neon.constant.NeonConstants.FILTERS;
 import static com.bytechef.component.neon.constant.NeonConstants.ROW_DATA;
 import static com.bytechef.component.neon.constant.NeonConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -82,5 +83,25 @@ class NeonUpdateRowActionTest {
 
         assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
             .getType());
+    }
+
+    @Test
+    void testPerformThrowsWhenNoRowsMatched(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.patch(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryParametersArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(List.of());
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> NeonUpdateRowAction.perform(mockedParameters, null, mockedContext));
     }
 }

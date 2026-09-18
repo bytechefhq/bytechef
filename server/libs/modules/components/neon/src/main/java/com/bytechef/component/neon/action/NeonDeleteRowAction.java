@@ -31,7 +31,8 @@ public class NeonDeleteRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete Row")
-        .description("Deletes the row(s) matching the given filters.")
+        .description(
+            "Deletes the row(s) matching the given filters. Fails if no row matches.")
         .properties(
             string(TABLE)
                 .label("Table")
@@ -45,12 +46,18 @@ public class NeonDeleteRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.delete("/" + inputParameters.getRequiredString(TABLE)))
+        String table = inputParameters.getRequiredString(TABLE);
+
+        Object body = context
+            .http(http -> http.delete("/" + table))
             .queryParameters(NeonUtils.getFilterQueryParameters(inputParameters))
             .header("Prefer", "return=representation")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
+
+        NeonUtils.requireRowsAffected(body, table);
+
+        return body;
     }
 }

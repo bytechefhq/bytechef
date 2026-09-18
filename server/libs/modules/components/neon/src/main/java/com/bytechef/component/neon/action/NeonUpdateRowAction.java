@@ -33,7 +33,8 @@ public class NeonUpdateRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
         .title("Update Row")
-        .description("Updates the row(s) matching the given filters.")
+        .description(
+            "Updates the row(s) matching the given filters. Fails if no row matches.")
         .properties(
             string(TABLE)
                 .label("Table")
@@ -51,13 +52,19 @@ public class NeonUpdateRowAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        return context
-            .http(http -> http.patch("/" + inputParameters.getRequiredString(TABLE)))
+        String table = inputParameters.getRequiredString(TABLE);
+
+        Object body = context
+            .http(http -> http.patch("/" + table))
             .queryParameters(NeonUtils.getFilterQueryParameters(inputParameters))
             .header("Prefer", "return=representation")
             .body(Http.Body.of(inputParameters.getRequiredMap(ROW_DATA)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody();
+
+        NeonUtils.requireRowsAffected(body, table);
+
+        return body;
     }
 }

@@ -59,4 +59,11 @@ public class NeonUtils {
 
         return body;
     }
+
+    public static void requireRowsAffected(Object body, String table) {
+        if (body instanceof List<?> rows && rows.isEmpty()) {
+            throw new IllegalStateException(
+                "No rows in table \"" + table + "\" matched the given filters; nothing was affected.");
+        }
+    }
 }

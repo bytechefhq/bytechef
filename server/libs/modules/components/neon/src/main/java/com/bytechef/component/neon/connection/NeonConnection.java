@@ -61,7 +61,11 @@ public class NeonConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/neon_v1#connection-setup")
-        .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(BASE_URI))
+        .baseUri((connectionParameters, context) -> {
+            String baseUri = connectionParameters.getRequiredString(BASE_URI);
+
+            return baseUri.endsWith("/") ? baseUri.substring(0, baseUri.length() - 1) : baseUri;
+        })
         .properties(
             string(BASE_URI)
                 .label("Data API URL")
