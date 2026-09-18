@@ -18,62 +18,28 @@ the authorization method that matches how the workflow runs:
 
 ByteChef signs a fresh RS256 JWT locally, using a private key you control, immediately before every request.
 There is no external token endpoint involved, so this works even if you don't already use Auth0, Clerk or a
-similar provider for the project.
+similar provider for the project. This is the verified, working setup:
 
-1. Generate a PKCS#8 RSA key pair:
-   ```
-   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out private_key.pem
-   openssl rsa -pubout -in private_key.pem -out public_key.pem
-   ```
-2. Turn the public key into a JWKS document (a JSON Web Key Set). For example, with Python's `cryptography`
-   package:
-   ```python
-   import base64, json
-   from cryptography.hazmat.primitives.serialization import load_pem_public_key
-
-   def b64url(n: int) -> str:
-       raw = n.to_bytes((n.bit_length() + 7) // 8, "big")
-       return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
-
-   public_key = load_pem_public_key(open("public_key.pem", "rb").read())
-   numbers = public_key.public_numbers()
-
-   jwks = {"keys": [{
-       "kty": "RSA", "use": "sig", "alg": "RS256", "kid": "neon-key-1",
-       "n": b64url(numbers.n), "e": b64url(numbers.e),
-   }]}
-
-   print(json.dumps(jwks))
-   ```
-   Pick your own `kid` value; you'll reuse it below.
-3. Host that JSON document at a stable, public URL that never changes — for example, a ByteChef workflow with
-   a webhook/API-endpoint trigger that always returns this static body, or any static file host you control.
-   Neon fetches this URL live to verify every token, so it must stay reachable.
-4. In the [Neon Console](https://console.neon.tech), go to **Postgres database** → **Data API** → **Auth**,
-   choose **Other Provider**, and enter that JWKS URL (plus a JWT Audience if you want one enforced).
-5. In the ByteChef connection, choose **Self-Signed JWT** and enter:
-   - **Private Key** – the PEM content of `private_key.pem`.
-   - **Subject** – the value Row-Level Security policies should see via `auth.user_id()`.
-   - **Key Id** – the same `kid` you used in the JWKS document, so Neon picks the right key.
-   - **Audience** – only if you set one in step 4.
+1. Run this component's **Generate Service Account** action once (e.g. from the component's test panel, or as
+   a throwaway step in a workflow). It returns `privateKey`, `keyId`, `subject` and a `jwks` object — no
+   `openssl` or Python needed.
+2. Copy the `jwks` output value (the whole `{"keys": [...]}` object) into a **public** GitHub Gist named
+   `jwks.json` (create one at [gist.github.com](https://gist.github.com/)).
+3. Click **Raw** on that file, then swap the host in the URL: use
+   `https://gist.githubusercontent.com/<user>/<gist-id>/raw/jwks.json` (**not**
+   `https://gist.github.com/<user>/<gist-id>/raw/jwks.json`). Verify with `curl -s <url>` before moving on
+   — it must print the JSON, not nothing.
+4. In the [Neon Console](https://console.neon.tech), go to **Postgres database** → **Data API** → **Configure Data API**,
+   choose **Add Provider**, and enter that `https://gist.githubusercontent.com/<user>/<gist-id>/raw/jwks.json` URL as the
+   JWKS URL.
+5. Create the ByteChef connection: choose **Self-Signed JWT** and enter the `privateKey`, `subject` and `keyId`
+   from step 1.
+6. Grant the Postgres role your token executes as access to the tables you need — see
+   [Row-Level Security](#row-level-security) below. This step trips people up: a self-signed JWT with no
+   explicit `role` claim runs as the **`anonymous`** Postgres role on Neon, not `authenticated`. Grants made to
+   `authenticated` alone will not apply.
 
 Treat the private key like any other credential: whoever holds it can mint valid tokens for your database.
-
-### OAuth2 Client Credentials (alternative, if you already use Auth0/Clerk)
-
-Use this for scheduled or recurring workflows. ByteChef requests a brand-new access token from your auth
-provider's token endpoint immediately before every action runs, so the 15-minute expiry never comes into play
-and there is nothing to refresh manually.
-
-This requires a custom auth provider configured for the Neon project (Neon's own Managed Better Auth is
-interactive-only and has no machine-to-machine flow). Set up a machine-to-machine / service application in
-Auth0, Clerk or another OIDC provider that issues JWTs containing a `sub` claim, then enter:
-
-- **Token URL** – the provider's OAuth2 token endpoint.
-- **Client Id** / **Client Secret** – the machine-to-machine application's credentials.
-- **Scopes** – optional, comma-delimited.
-
-Make sure the JWTs this application issues carry the `sub` claim your Row-Level Security policies expect.
 
 ### Bearer Token
 
@@ -83,5 +49,19 @@ minutes, so it isn't suitable for scheduled workflows.
 
 ### Row-Level Security
 
-RLS policies are enforced at the database level for every request made through the Data API, so make sure the
-policies for the tables you plan to use allow the actions this connection needs to perform.
+RLS policies are enforced at the database level for every request made through the Data API. Postgres denies
+access to a table by default, regardless of a valid JWT, until you explicitly grant the executing role
+privileges on it — this is separate from and prior to RLS. For a self-signed JWT with no `role` claim, that
+role is `anonymous`:
+
+```sql
+GRANT USAGE ON SCHEMA public TO anonymous;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public."your_table" TO anonymous;
+
+-- if RLS is enabled
+ALTER TABLE public."your_table" ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "service account access" ON public."your_table"
+    FOR ALL
+    USING (auth.user_id() = 'the-subject-you-set-in-the-connection')
+    WITH CHECK (auth.user_id() = 'the-subject-you-set-in-the-connection');
+```
