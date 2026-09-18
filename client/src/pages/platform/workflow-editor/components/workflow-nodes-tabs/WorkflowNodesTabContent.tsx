@@ -7,6 +7,7 @@ import WorkflowNodesTabsItem from './WorkflowNodesTabsItem';
 
 interface WorkflowNodesTabContentProps {
     emptyMessage: string;
+    highlightSelected?: boolean;
     items: Array<ComponentDefinitionBasic | DefinitionType> | undefined;
     itemsDraggable: boolean;
     onItemClick?: (clickedItem: ClickedDefinitionType) => void;
@@ -16,6 +17,7 @@ interface WorkflowNodesTabContentProps {
 
 const WorkflowNodesTabContent = ({
     emptyMessage,
+    highlightSelected = false,
     items,
     itemsDraggable,
     onItemClick,
@@ -35,11 +37,7 @@ const WorkflowNodesTabContent = ({
                         handleClick={() => onItemClick && onItemClick(item as ClickedDefinitionType)}
                         key={item.name}
                         node={item as DefinitionType}
-                        selected={
-                            tabValue === 'components' || tabValue === 'helpers'
-                                ? selectedComponentName === item.name
-                                : undefined
-                        }
+                        selected={highlightSelected ? selectedComponentName === item.name : undefined}
                     />
                 ))}
             </ul>

@@ -1,9 +1,9 @@
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -25,7 +25,9 @@ type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
 const HIDDEN_ACTION_COMPONENT_NAMES = new Set(['approvalLink']);
 const HIDDEN_TASK_DISPATCHER_NAMES = new Set(['waitForApproval']);
 
-// Components that don't need a connection. Hardcoded until the component definitions list exposes connection info.
+// Curated connection-less components listed under the Helpers tab. Some connection-less components (e.g. aiAgent,
+// graphQl, hackerNews) deliberately stay under Actions. Hardcoded until the component definitions list exposes
+// connection info.
 const HELPER_COMPONENT_NAMES = new Set([
     'aiImage',
     'aiText',
@@ -89,11 +91,20 @@ interface WorkflowNodesTabsProps {
     updateWorkflowMutation?: UpdateWorkflowMutationType;
 }
 
+const TAB_TRIGGER_CLASS_NAME = 'w-full gap-1 px-1.5 transition-none data-[state=active]:shadow-none';
+
+// A span rather than the Badge component: Badge renders a div, and a tab button may only contain phrasing content.
+// The whitespace text node separates the tab label from the screen reader text in the accessible name; the flex
+// layout of the tab doesn't render it.
 const TabSearchMatchCount = ({count}: {count: number}) => (
     <>
-        <Badge aria-hidden="true" label={String(count)} styleType="outline-outline" />
-
-        <span className="sr-only">{` (${count} ${count === 1 ? 'match' : 'matches'})`}</span>
+        <span
+            aria-hidden="true"
+            className="inline-flex min-w-5 shrink-0 items-center justify-center rounded-full border border-stroke-neutral-secondary bg-surface-neutral-primary px-1 py-0.5 text-xs font-normal text-content-neutral-primary"
+        >
+            {count}
+        </span>{' '}
+        <span className="sr-only">{`(${count} ${count === 1 ? 'match' : 'matches'})`}</span>
     </>
 );
 
@@ -140,6 +151,10 @@ const WorkflowNodesTabs = ({
         }))
     );
 
+    const getFeatureFlag = useFeatureFlagsStore();
+
+    const ff_3158 = getFeatureFlag('ff-3158');
+
     const visibleActionComponentDefinitions = useMemo(
         () =>
             actionComponentDefinitions.filter(
@@ -150,25 +165,21 @@ const WorkflowNodesTabs = ({
         [actionComponentDefinitions]
     );
 
-    const helperComponentDefinitions = useMemo(
-        () =>
-            actionComponentDefinitions.filter((componentDefinition) =>
-                HELPER_COMPONENT_NAMES.has(componentDefinition.name)
-            ),
-        [actionComponentDefinitions]
-    );
-
     const actionFiltering = useComponentFiltering({
         componentDefinitions: visibleActionComponentDefinitions,
-    });
-
-    const helperFiltering = useComponentFiltering({
-        componentDefinitions: helperComponentDefinitions,
     });
 
     const triggerFiltering = useComponentFiltering({
         componentDefinitions: triggerComponentDefinitions,
     });
+
+    const helperComponentDefinitions = useMemo(
+        () =>
+            actionComponentDefinitions.filter(
+                ({name}) => HELPER_COMPONENT_NAMES.has(name) && (ff_3158 || name !== 'claudeCode')
+            ),
+        [actionComponentDefinitions, ff_3158]
+    );
 
     const canPaste = showPaste && !!copiedNode && copiedWorkflowId === workflow.id;
 
@@ -290,7 +301,7 @@ const WorkflowNodesTabs = ({
             },
             helpers: {
                 emptyMessage: 'No helper components found.',
-                items: helperFiltering.filteredComponents,
+                items: helperComponentDefinitions,
             },
             taskDispatchers: {
                 emptyMessage: 'No flow controls found.',
@@ -310,7 +321,7 @@ const WorkflowNodesTabs = ({
             actionFiltering.filterState.activeView,
             availableTaskDispatchers,
             availableClusterElements,
-            helperFiltering.filteredComponents,
+            helperComponentDefinitions,
             triggerFiltering.filterState.activeView,
         ]
     );
@@ -337,47 +348,35 @@ const WorkflowNodesTabs = ({
             <div className="px-2">
                 <TabsList className="my-2 flex w-full justify-between bg-surface-neutral-secondary">
                     {!hideTriggerComponents && (
-                        <TabsTrigger
-                            className="w-full transition-none data-[state=active]:shadow-none"
-                            value="triggers"
-                        >
+                        <TabsTrigger className={TAB_TRIGGER_CLASS_NAME} value="triggers">
                             Triggers
                             {renderSearchMatchCount('triggers')}
                         </TabsTrigger>
                     )}
 
                     {!hideActionComponents && (
-                        <TabsTrigger
-                            className="w-full transition-none data-[state=active]:shadow-none"
-                            value="components"
-                        >
+                        <TabsTrigger className={TAB_TRIGGER_CLASS_NAME} value="components">
                             Actions
                             {renderSearchMatchCount('components')}
                         </TabsTrigger>
                     )}
 
                     {!hideTaskDispatchers && (
-                        <TabsTrigger
-                            className="w-full transition-none data-[state=active]:shadow-none"
-                            value="taskDispatchers"
-                        >
+                        <TabsTrigger className={TAB_TRIGGER_CLASS_NAME} value="taskDispatchers">
                             Flows
                             {renderSearchMatchCount('taskDispatchers')}
                         </TabsTrigger>
                     )}
 
                     {!hideActionComponents && (
-                        <TabsTrigger className="w-full transition-none data-[state=active]:shadow-none" value="helpers">
+                        <TabsTrigger className={TAB_TRIGGER_CLASS_NAME} value="helpers">
                             Helpers
                             {renderSearchMatchCount('helpers')}
                         </TabsTrigger>
                     )}
 
                     {!hideClusterElementComponents && (
-                        <TabsTrigger
-                            className="w-full transition-none data-[state=active]:shadow-none"
-                            value="clusterElements"
-                        >
+                        <TabsTrigger className={TAB_TRIGGER_CLASS_NAME} value="clusterElements">
                             {clusterElementType ? getClusterElementsLabel(clusterElementType) : 'Cluster Elements'}
 
                             {renderSearchMatchCount('clusterElements')}
@@ -496,6 +495,7 @@ const WorkflowNodesTabs = ({
             {!hideActionComponents && (
                 <WorkflowNodesTabContent
                     emptyMessage={tabContentConfigs.components.emptyMessage}
+                    highlightSelected
                     items={tabContentConfigs.components.items}
                     itemsDraggable={itemsDraggable}
                     onItemClick={onItemClick}
@@ -518,6 +518,7 @@ const WorkflowNodesTabs = ({
             {!hideActionComponents && (
                 <WorkflowNodesTabContent
                     emptyMessage={tabContentConfigs.helpers.emptyMessage}
+                    highlightSelected
                     items={tabContentConfigs.helpers.items}
                     itemsDraggable={itemsDraggable}
                     onItemClick={onItemClick}

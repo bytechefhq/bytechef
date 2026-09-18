@@ -18,7 +18,7 @@ const WorkflowNodesSidebar = ({
     };
     visible: boolean;
 }) => {
-    const {componentsWithActions, filter, setFilter, trimmedFilter} = useFilteredComponentDefinitions(
+    const {componentsWithActions, filter, isSearchFetching, setFilter, trimmedFilter} = useFilteredComponentDefinitions(
         data.componentDefinitions
     );
 
@@ -84,7 +84,7 @@ const WorkflowNodesSidebar = ({
                     actionComponentDefinitions={filteredActionComponentDefinitions}
                     hideClusterElementComponents
                     itemsDraggable
-                    showSearchMatchCounts={!!trimmedFilter}
+                    showSearchMatchCounts={!!trimmedFilter && !isSearchFetching}
                     taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />
