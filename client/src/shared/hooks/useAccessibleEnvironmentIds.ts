@@ -1,16 +1,12 @@
 import {DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT, STAGING_ENVIRONMENT} from '@/shared/constants';
 import useEeEdition from '@/shared/edition/useEeEdition';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {EnvironmentEnum, type MyWorkspaceScopesQuery, useMyWorkspaceScopesQuery} from '@/shared/middleware/graphql';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useMemo} from 'react';
 
 export const useAccessibleEnvironmentIds = (workspaceId: number | undefined): number[] | undefined => {
-    const account = useAuthenticationStore((state) => state.account);
-    const authenticated = useAuthenticationStore((state) => state.authenticated);
-
     const eeEdition = useEeEdition();
-
-    const tenantAdmin = authenticated && (account?.authorities?.includes('ROLE_ADMIN') ?? false);
+    const tenantAdmin = useIsTenantAdmin();
 
     const enabled = eeEdition && !tenantAdmin && workspaceId != null && workspaceId > 0;
 
