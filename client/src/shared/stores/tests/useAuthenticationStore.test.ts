@@ -228,8 +228,6 @@ describe('authenticationStore', () => {
 
         it('records the session as fetched when the interceptor clears the session first', async () => {
             stubFetch().mockImplementation(() =>
-                // useFetchInterceptor wraps window.fetch, so it clears the session when the 401
-                // arrives, before the promise the store is holding resolves
                 Promise.resolve().then(() => {
                     authenticationStore.getState().clearAuthentication();
 
