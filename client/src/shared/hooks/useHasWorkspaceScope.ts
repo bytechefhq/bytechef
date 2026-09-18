@@ -1,6 +1,6 @@
 import useCeEdition from '@/shared/edition/useCeEdition';
 import useEditionResolved from '@/shared/edition/useEditionResolved';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {usePermissionStore} from '@/shared/stores/usePermissionStore';
 
@@ -66,15 +66,6 @@ export interface WorkspaceScopeStateI {
     loading: boolean;
 }
 
-// Tenant-admin short-circuit requires both an authenticated session AND the ROLE_ADMIN authority. Gating on
-// `authenticated` (not just `account.authorities`) prevents a flash-of-privilege where the account field still carries
-// a prior session's authorities during a logout/re-login transition — the store clears `authenticated` to `false` in
-// `useAuthenticationStore.logout/reset/clearAuthentication` before `getAccount()` re-reconciles `account` for the new
-// user. Without this gate, a component mounting during that transition would see `ROLE_ADMIN` on the stale account and
-// hand the new (possibly non-admin) user admin-only UI until the refetch lands.
-const isTenantAdmin = (account: {authorities?: string[] | null} | undefined, authenticated: boolean): boolean =>
-    authenticated && (account?.authorities?.includes('ROLE_ADMIN') ?? false);
-
 /**
  * Returns `true` when the authenticated user holds the given permission scope on the workspace. Tenant admins
  * (`ROLE_ADMIN` authority) always return `true`. The answer is for the environment currently selected in
@@ -102,8 +93,6 @@ export const useHasWorkspaceScope = (
     scope: WorkspaceScopeType,
     environmentId?: number
 ): boolean => {
-    const account = useAuthenticationStore((state) => state.account);
-    const authenticated = useAuthenticationStore((state) => state.authenticated);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceScopeState = usePermissionStore((state) =>
         workspaceId === undefined
@@ -111,8 +100,9 @@ export const useHasWorkspaceScope = (
             : state.workspaceScopeStates[workspaceId]?.[environmentId ?? currentEnvironmentId]
     );
     const ceEdition = useCeEdition();
+    const tenantAdmin = useIsTenantAdmin();
 
-    if (ceEdition || isTenantAdmin(account, authenticated)) {
+    if (ceEdition || tenantAdmin) {
         return true;
     }
 
@@ -139,8 +129,6 @@ export const useWorkspaceScopeState = (
     scope: WorkspaceScopeType,
     environmentId?: number
 ): WorkspaceScopeStateI => {
-    const account = useAuthenticationStore((state) => state.account);
-    const authenticated = useAuthenticationStore((state) => state.authenticated);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceScopeState = usePermissionStore((state) =>
         workspaceId === undefined
@@ -149,8 +137,9 @@ export const useWorkspaceScopeState = (
     );
     const ceEdition = useCeEdition();
     const editionResolved = useEditionResolved();
+    const tenantAdmin = useIsTenantAdmin();
 
-    if (ceEdition || isTenantAdmin(account, authenticated)) {
+    if (ceEdition || tenantAdmin) {
         return {editionUnknown: false, error: false, granted: true, loading: false};
     }
 
