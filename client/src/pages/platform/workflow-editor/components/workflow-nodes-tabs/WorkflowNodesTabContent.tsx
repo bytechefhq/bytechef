@@ -35,7 +35,11 @@ const WorkflowNodesTabContent = ({
                         handleClick={() => onItemClick && onItemClick(item as ClickedDefinitionType)}
                         key={item.name}
                         node={item as DefinitionType}
-                        selected={tabValue === 'components' ? selectedComponentName === item.name : undefined}
+                        selected={
+                            tabValue === 'components' || tabValue === 'helpers'
+                                ? selectedComponentName === item.name
+                                : undefined
+                        }
                     />
                 ))}
             </ul>
