@@ -19,10 +19,11 @@ package com.bytechef.component.datatable.action;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,16 +35,25 @@ class DataTableUpdateRecordActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRow() throws Exception {
-        when(dataTableRowService.updateRow(anyString(), anyLong(), anyMap(), anyLong()))
-            .thenReturn(new DataTableRow(7, Map.of("status", "BOT")));
+        DataTableRef dataTableRef = stubResolvedDataTable();
 
-        ModifiableActionDefinition actionDefinition = DataTableUpdateRecordAction.of(
-            dataTableService, dataTableRowService);
+        when(dataTableRowService.updateRow(eq(dataTableRef), anyLong(), anyMap()))
+            .thenReturn(new DataTableRow(7, Map.of("status", "BOT")));
 
         assertEquals(
             Map.of("id", 7L, "status", "BOT"),
             perform(
-                actionDefinition,
-                Map.of("table", "conversations", "id", 7, "values", Map.of("status", "BOT"))));
+                createActionDefinition(),
+                Map.of("table", TABLE_NAME, "id", 7, "values", Map.of("status", "BOT"))));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableUpdateRecordAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "id", 7, "values", Map.of("status", "BOT"));
     }
 }

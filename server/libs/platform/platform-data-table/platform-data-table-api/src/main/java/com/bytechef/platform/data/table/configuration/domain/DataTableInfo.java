@@ -20,6 +20,7 @@ import com.bytechef.platform.data.table.domain.ColumnSpec;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Metadata description of a dynamic data table and its columns.
@@ -28,5 +29,6 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record DataTableInfo(
-    Long id, String baseName, String description, List<ColumnSpec> columns, Instant lastModifiedDate) {
+    Long id, String name, @Nullable Long workspaceId, @Nullable String description, List<ColumnSpec> columns,
+    Instant lastModifiedDate) {
 }

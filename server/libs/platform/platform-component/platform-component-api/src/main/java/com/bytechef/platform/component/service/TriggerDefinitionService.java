@@ -37,9 +37,19 @@ import org.jspecify.annotations.Nullable;
  */
 public interface TriggerDefinitionService extends OperationDefinitionService {
 
+    default List<Property> executeDynamicProperties(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection) {
+
+        return executeDynamicProperties(
+            componentName, componentVersion, triggerName, inputParameters, propertyName, lookupDependsOnPaths,
+            componentConnection, null);
+    }
+
     List<Property> executeDynamicProperties(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection);
+        String propertyName, List<String> lookupDependsOnPaths, @Nullable ComponentConnection componentConnection,
+        @Nullable String workflowId);
 
     WebhookEnableOutput executeDynamicWebhookRefresh(
         String componentName, int componentVersion, String triggerName,
@@ -56,15 +66,32 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
         String workflowExecutionId, @Nullable ComponentConnection componentConnection);
 
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
+        @Nullable ComponentConnection componentConnection) {
+
+        return executeOptions(
+            componentName, componentVersion, triggerName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnection, null);
+    }
+
     List<Option> executeOptions(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, @Nullable String searchText,
-        @Nullable ComponentConnection componentConnection);
+        @Nullable ComponentConnection componentConnection, @Nullable String workflowId);
+
+    default @Nullable OutputResponse executeOutput(
+        String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection) {
+
+        return executeOutput(componentName, componentVersion, triggerName, inputParameters, componentConnection, null);
+    }
 
     @Nullable
     OutputResponse executeOutput(
         String componentName, int componentVersion, String triggerName, Map<String, ?> inputParameters,
-        @Nullable ComponentConnection componentConnection);
+        @Nullable ComponentConnection componentConnection, @Nullable String workflowId);
 
     ProviderException executeProcessErrorResponse(
         String componentName, int componentVersion, int connectionVersion, @Nullable String componentOperationName,

@@ -486,7 +486,8 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
         List<Property> expectedProperties = List.of(mock(Property.class));
 
         when(triggerDefinitionFacade.executeDynamicProperties(
-            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId)))
+            eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId),
+            eq(workflowId)))
                 .thenReturn(expectedProperties);
 
         try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
@@ -499,7 +500,8 @@ class WorkflowNodeDynamicPropertiesFacadeTest {
             assertEquals(expectedProperties, result);
 
             verify(triggerDefinitionFacade).executeDynamicProperties(
-                eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId));
+                eq("github"), eq(1), eq("newIssue"), eq(propertyName), anyMap(), anyList(), eq(connectionId),
+                eq(workflowId));
         }
     }
 

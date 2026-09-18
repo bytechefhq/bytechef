@@ -29,6 +29,12 @@ public class DataTableConstants {
     public static final String RECORDS = "records";
     public static final String LIMIT = "limit";
     public static final String OFFSET = "offset";
+    public static final String FILTERS = "filters";
+    public static final String FIELD = "field";
+    public static final String OPERATOR = "operator";
+    public static final String VALUE = "value";
+    public static final String SORTS = "sorts";
+    public static final String DIRECTION = "direction";
 
     private DataTableConstants() {
     }

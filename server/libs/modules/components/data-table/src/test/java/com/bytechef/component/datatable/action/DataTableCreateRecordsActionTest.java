@@ -17,12 +17,12 @@
 package com.bytechef.component.datatable.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.List;
 import java.util.Map;
@@ -35,16 +35,25 @@ class DataTableCreateRecordsActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRows() throws Exception {
-        when(dataTableRowService.insertRow(anyString(), anyMap(), anyLong()))
-            .thenReturn(new DataTableRow(1, Map.of("status", "BOT")));
+        DataTableRef dataTableRef = stubResolvedDataTable();
 
-        ModifiableActionDefinition actionDefinition = DataTableCreateRecordsAction.of(
-            dataTableService, dataTableRowService);
+        when(dataTableRowService.insertRow(eq(dataTableRef), anyMap()))
+            .thenReturn(new DataTableRow(1, Map.of("status", "BOT")));
 
         assertEquals(
             List.of(Map.of("id", 1L, "status", "BOT")),
             perform(
-                actionDefinition,
-                Map.of("table", "conversations", "records", Map.of("values", List.of(Map.of("status", "BOT"))))));
+                createActionDefinition(),
+                Map.of("table", TABLE_NAME, "records", Map.of("values", List.of(Map.of("status", "BOT"))))));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableCreateRecordsAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "records", Map.of("values", List.of(Map.of("status", "BOT"))));
     }
 }

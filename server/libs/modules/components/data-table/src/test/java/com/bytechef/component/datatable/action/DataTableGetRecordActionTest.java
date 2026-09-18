@@ -19,10 +19,11 @@ package com.bytechef.component.datatable.action;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,24 +35,32 @@ class DataTableGetRecordActionTest extends AbstractDataTableActionTest {
 
     @Test
     void testPerformEmitsFlatRow() throws Exception {
-        when(dataTableRowService.getRow(anyString(), anyLong(), anyLong()))
-            .thenReturn(new DataTableRow(7, Map.of("staff_reply", "on my way")));
+        DataTableRef dataTableRef = stubResolvedDataTable();
 
-        ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
-            dataTableService, dataTableRowService);
+        when(dataTableRowService.getRow(eq(dataTableRef), anyLong()))
+            .thenReturn(new DataTableRow(7, Map.of("staff_reply", "on my way")));
 
         assertEquals(
             Map.of("id", 7L, "staff_reply", "on my way"),
-            perform(actionDefinition, Map.of("table", "conversations", "id", 7)));
+            perform(createActionDefinition(), Map.of("table", TABLE_NAME, "id", 7)));
     }
 
     @Test
     void testPerformOfMissingRecordStaysNull() throws Exception {
-        when(dataTableRowService.getRow(anyString(), anyLong(), anyLong())).thenReturn(null);
+        DataTableRef dataTableRef = stubResolvedDataTable();
 
-        ModifiableActionDefinition actionDefinition = DataTableGetRecordAction.of(
-            dataTableService, dataTableRowService);
+        when(dataTableRowService.getRow(eq(dataTableRef), anyLong())).thenReturn(null);
 
-        assertNull(perform(actionDefinition, Map.of("table", "conversations", "id", 7)));
+        assertNull(perform(createActionDefinition(), Map.of("table", TABLE_NAME, "id", 7)));
+    }
+
+    @Override
+    protected ModifiableActionDefinition createActionDefinition() {
+        return DataTableGetRecordAction.of(dataTableService, dataTableRowService, dataTableWorkspaceResolver);
+    }
+
+    @Override
+    protected Map<String, Object> createInputParameters(String tableName) {
+        return Map.of("table", tableName, "id", 7);
     }
 }

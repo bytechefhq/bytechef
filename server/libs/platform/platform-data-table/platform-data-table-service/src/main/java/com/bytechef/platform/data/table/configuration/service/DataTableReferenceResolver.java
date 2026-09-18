@@ -17,9 +17,14 @@
 package com.bytechef.platform.data.table.configuration.service;
 
 import com.bytechef.definition.BaseProperty.ResourceType;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import com.bytechef.platform.workflow.validator.ResourceReferenceResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Optional;
+import java.util.OptionalLong;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -31,11 +36,16 @@ public class DataTableReferenceResolver implements ResourceReferenceResolver {
 
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
-    public DataTableReferenceResolver(DataTableRowService dataTableRowService, DataTableService dataTableService) {
+    public DataTableReferenceResolver(
+        DataTableRowService dataTableRowService, DataTableService dataTableService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     @Override
@@ -45,19 +55,31 @@ public class DataTableReferenceResolver implements ResourceReferenceResolver {
 
     @Override
     @Nullable
-    public String findProblem(String reference, long environmentId) {
-        boolean exists = dataTableService.listTables(environmentId)
-            .stream()
-            .anyMatch(dataTableInfo -> reference.equalsIgnoreCase(dataTableInfo.baseName()));
-
-        if (!exists) {
-            return "Data table '" + reference + "' does not exist in this environment";
+    public String findProblem(String reference, long environmentId, @Nullable String workflowId) {
+        if (workflowId == null) {
+            return null;
         }
 
+        OptionalLong workspaceId = dataTableWorkspaceResolver.resolveByWorkflowId(workflowId);
+
+        if (workspaceId.isEmpty()) {
+            return null;
+        }
+
+        Optional<DataTableInfo> dataTableInfoOptional = dataTableService.fetchDataTable(
+            workspaceId.getAsLong(), reference)
+            .flatMap(dataTable -> dataTableService.fetchDataTableInfo(dataTable.getId(), environmentId));
+
+        if (dataTableInfoOptional.isEmpty()) {
+            return "Data table '" + reference + "' not found in this workspace";
+        }
+
+        DataTableInfo dataTableInfo = dataTableInfoOptional.get();
+
         try {
-            dataTableRowService.listRows(reference, 1, 0, environmentId);
-        } catch (IllegalStateException e) {
-            return e.getMessage();
+            dataTableRowService.listRows(new DataTableRef(dataTableInfo.id(), environmentId), 1, 0);
+        } catch (IllegalStateException illegalStateException) {
+            return illegalStateException.getMessage();
         }
 
         return null;

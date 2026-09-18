@@ -60,6 +60,14 @@ public interface TriggerContextAware extends TriggerContext {
     PlatformType getType();
 
     /**
+     * Retrieves the id of the workflow an editor call runs for, if the call has one.
+     *
+     * @return the workflow id, or {@code null}
+     */
+    @Nullable
+    String getWorkflowId();
+
+    /**
      * Retrieves the unique identifier of the workflow associated with the current trigger context.
      *
      * @return the workflow UUID, or {@code null} if the workflow UUID is not set or applicable.
