@@ -25,14 +25,13 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/stores/useAuthenticationStore', () => ({
-    useAuthenticationStore: vi.fn(() => ({
-        account: {authorities: hoisted.authorities, id: 1},
-        authenticated: hoisted.authenticated,
-    })),
-}));
-
-vi.mock('zustand/react/shallow', () => ({
-    useShallow: vi.fn((selector: unknown) => selector),
+    useAuthenticationStore: vi.fn(
+        (selector: (state: {account: {authorities: string[]; id: number}; authenticated: boolean}) => unknown) =>
+            selector({
+                account: {authorities: hoisted.authorities, id: 1},
+                authenticated: hoisted.authenticated,
+            })
+    ),
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({

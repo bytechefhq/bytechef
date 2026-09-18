@@ -22,8 +22,8 @@ import {
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
-import {AUTHORITIES} from '@/shared/constants';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
@@ -34,12 +34,10 @@ import {
 } from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
 import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
-import {useShallow} from 'zustand/react/shallow';
 
 import TagList from '../../../../../shared/components/TagList';
 
@@ -55,12 +53,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const {account, authenticated} = useAuthenticationStore(
-        useShallow((state) => ({account: state.account, authenticated: state.authenticated}))
-    );
 
     const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
     const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_DELETE');
+    const isTenantAdmin = useIsTenantAdmin();
 
     const queryClient = useQueryClient();
 
@@ -128,8 +124,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         );
     }, [componentDefinitions, connection.componentName]);
 
-    const canDisconnect =
-        authenticated && (account?.authorities?.includes(AUTHORITIES.ADMIN) ?? false) && connection.active === true;
+    const canDisconnect = isTenantAdmin && connection.active === true;
 
     const hasSecondaryActions = canDisconnect || canDelete;
 

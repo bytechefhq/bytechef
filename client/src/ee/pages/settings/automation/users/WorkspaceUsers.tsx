@@ -22,6 +22,7 @@ import {
 import {CUSTOM_ROLE_PREFIX, toRoleArguments} from '@/ee/pages/settings/automation/users/util/workspace-role-values';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkspaceScopeType} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {
@@ -40,12 +41,10 @@ import {
     useWorkspaceUsersQuery,
 } from '@/shared/middleware/graphql';
 import {invalidateMyPermissionQueries} from '@/shared/queries/permissions.queries';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getRoleLabel} from '@/shared/util/role-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {Trash2Icon} from 'lucide-react';
 import {useMemo, useState} from 'react';
-import {useShallow} from 'zustand/react/shallow';
 
 // Derive from the generated GraphQL enum so a new server-side role appears here without a client change.
 const WORKSPACE_ROLES = Object.values(WorkspaceRole);
@@ -54,8 +53,6 @@ const WORKSPACE_ROLES = Object.values(WorkspaceRole);
 // instead of a silently-always-false permission check.
 const MEMBER_MANAGE_SCOPE: WorkspaceScopeType = 'WORKSPACE_MEMBER_MANAGE';
 
-const TENANT_ADMIN_AUTHORITY = 'ROLE_ADMIN';
-
 const WorkspaceUsers = () => {
     const [actionError, setActionError] = useState<string | null>(null);
     const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
@@ -63,9 +60,8 @@ const WorkspaceUsers = () => {
     const [splittingUserId, setSplittingUserId] = useState<string | null>(null);
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
-    const {account, authenticated} = useAuthenticationStore(
-        useShallow((state) => ({account: state.account, authenticated: state.authenticated}))
-    );
+
+    const isTenantAdmin = useIsTenantAdmin();
 
     const queryClient = useQueryClient();
 
@@ -113,12 +109,6 @@ const WorkspaceUsers = () => {
     // organisation's user list. A workspace admin therefore gets no picker; adding a colleague who already has an
     // account is the invite-by-email path above, which reuses the existing account rather than provisioning a
     // second one.
-    //
-    // Requires `authenticated` as well as the authority, the same pairing `useHasWorkspaceScope` uses: the store clears
-    // `authenticated` before `getAccount()` reconciles `account` for the new user, so during a logout/re-login
-    // transition the stale account still carries ROLE_ADMIN and would hand the incoming user the admin-only picker.
-    const isTenantAdmin = authenticated && (account?.authorities ?? []).includes(TENANT_ADMIN_AUTHORITY);
-
     const {data: tenantUsersData} = useUsersQuery({pageNumber: 0, pageSize: 100}, {enabled: isTenantAdmin});
 
     const addableUsers = useMemo(() => {
