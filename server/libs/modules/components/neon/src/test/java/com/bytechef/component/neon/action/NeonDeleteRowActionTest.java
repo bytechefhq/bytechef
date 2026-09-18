@@ -19,6 +19,7 @@ package com.bytechef.component.neon.action;
 import static com.bytechef.component.neon.constant.NeonConstants.FILTERS;
 import static com.bytechef.component.neon.constant.NeonConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -75,5 +76,23 @@ class NeonDeleteRowActionTest {
 
         assertEquals(Http.ResponseType.Type.JSON, configuration.getResponseType()
             .getType());
+    }
+
+    @Test
+    void testPerformThrowsWhenNoRowsMatched(
+        Context mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(queryParametersArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(List.of());
+
+        assertThrows(
+            IllegalStateException.class,
+            () -> NeonDeleteRowAction.perform(mockedParameters, null, mockedContext));
     }
 }
