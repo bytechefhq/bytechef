@@ -61,6 +61,12 @@ describe('WorkflowNodesTabs', () => {
         expect(tabNames).toEqual(['Actions', 'Flows', 'Helpers']);
     });
 
+    it('should switch tabs without animating the active tab, so it keeps pace with the list', () => {
+        renderWorkflowNodesTabs();
+
+        screen.getAllByRole('tab').forEach((tab) => expect(tab).toHaveClass('transition-none'));
+    });
+
     it('should not show the Helpers tab when action components are hidden', () => {
         renderWorkflowNodesTabs({hideActionComponents: true});
 
@@ -99,5 +105,41 @@ describe('WorkflowNodesTabs', () => {
         await userEvent.click(screen.getByRole('tab', {name: 'Helpers'}));
 
         expect(screen.getByText('Logger').closest('li')).toHaveClass('border-blue-500');
+    });
+
+    describe('search match counts', () => {
+        it('should show the match count on an unselected tab with matches', () => {
+            renderWorkflowNodesTabs({showSearchMatchCounts: true});
+
+            expect(screen.getByRole('tab', {name: 'Helpers (2 matches)'})).toBeInTheDocument();
+        });
+
+        it('should use the singular form for a single match', async () => {
+            renderWorkflowNodesTabs({showSearchMatchCounts: true});
+
+            await userEvent.click(screen.getByRole('tab', {name: 'Helpers (2 matches)'}));
+
+            expect(screen.getByRole('tab', {name: 'Actions (1 match)'})).toBeInTheDocument();
+        });
+
+        it('should not show the match count on the selected tab', async () => {
+            renderWorkflowNodesTabs({showSearchMatchCounts: true});
+
+            await userEvent.click(screen.getByRole('tab', {name: 'Helpers (2 matches)'}));
+
+            expect(screen.getByRole('tab', {name: 'Helpers'})).toBeInTheDocument();
+        });
+
+        it('should not show the match count on a tab without matches', () => {
+            renderWorkflowNodesTabs({showSearchMatchCounts: true});
+
+            expect(screen.getByRole('tab', {name: 'Flows'})).toBeInTheDocument();
+        });
+
+        it('should not show match counts when not searching', () => {
+            renderWorkflowNodesTabs();
+
+            expect(screen.getByRole('tab', {name: 'Helpers'})).toBeInTheDocument();
+        });
     });
 });
