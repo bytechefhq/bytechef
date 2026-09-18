@@ -16,14 +16,8 @@
 
 package com.bytechef.component.neon.connection;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static com.bytechef.component.definition.Authorization.AUTHORIZATION;
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.Authorization.HEADER_PREFIX;
-import static com.bytechef.component.definition.Authorization.SCOPES;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.definition.Authorization.TOKEN_URL;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -41,7 +35,6 @@ import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import java.security.KeyFactory;
@@ -49,7 +42,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,35 +104,6 @@ public class NeonConnection {
                         .defaultValue(300)
                         .required(false))
                 .apply(NeonConnection::applySelfSignedJwt),
-            authorization(AuthorizationType.OAUTH2_CLIENT_CREDENTIALS)
-                .title("OAuth2 Client Credentials")
-                .properties(
-                    string(TOKEN_URL)
-                        .label("Token URL")
-                        .description(
-                            "The token endpoint of the auth provider configured for this Neon project (e.g. an " +
-                                "Auth0 or Clerk machine-to-machine application).")
-                        .required(true),
-                    string(CLIENT_ID)
-                        .label("Client Id")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .required(true),
-                    string(AUDIENCE)
-                        .label("Audience")
-                        .description(
-                            "Required by some providers, e.g. Auth0, to get back a JWT instead of an opaque " +
-                                "token. Set it to the API identifier registered with the provider.")
-                        .required(false),
-                    string(HEADER_PREFIX)
-                        .label("Header Prefix")
-                        .defaultValue(Authorization.BEARER),
-                    string(SCOPES)
-                        .label("Scopes")
-                        .description("Optional comma-delimited list of scopes.")
-                        .controlType(ControlType.TEXT_AREA))
-                .apply(NeonConnection::applyOAuth2ClientCredentials),
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
@@ -197,53 +160,5 @@ public class NeonConnection {
         return (RSAPrivateKey) keyFactory.generatePrivate(
             new PKCS8EncodedKeySpec(Base64.getDecoder()
                 .decode(sanitizedPem)));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static ApplyResponse applyOAuth2ClientCredentials(Parameters connectionParameters, Context context)
-        throws Exception {
-
-        Map<String, String> formParameters = new LinkedHashMap<>();
-
-        formParameters.put("grant_type", "client_credentials");
-
-        String scopes = connectionParameters.getString(SCOPES);
-
-        if (scopes != null && !scopes.isBlank()) {
-            formParameters.put("scope", scopes.replace(",", " ")
-                .trim());
-        }
-
-        String audience = connectionParameters.getString(AUDIENCE);
-
-        if (audience != null && !audience.isBlank()) {
-            formParameters.put(AUDIENCE, audience.trim());
-        }
-
-        String basicCredentials = context.encoder(
-            encoder -> encoder.base64Encode(
-                connectionParameters.getRequiredString(CLIENT_ID), ":",
-                connectionParameters.getRequiredString(CLIENT_SECRET)));
-
-        Http.Response tokenResponse = context
-            .http(http -> http.post(connectionParameters.getRequiredString(TOKEN_URL)))
-            .body(Http.Body.of(formParameters, Http.BodyContentType.FORM_URL_ENCODED))
-            .header(AUTHORIZATION, "Basic " + basicCredentials)
-            .configuration(
-                Http.responseType(Http.ResponseType.JSON)
-                    .disableAuthorization(true))
-            .execute();
-
-        Map<String, ?> responseBody = tokenResponse.getBody(Map.class);
-
-        Object accessTokenObject = responseBody == null ? null : responseBody.get(ACCESS_TOKEN);
-
-        if (!(accessTokenObject instanceof String accessToken) || accessToken.isBlank()) {
-            throw new IllegalStateException("OAuth provider did not return an access token");
-        }
-
-        String headerPrefix = connectionParameters.getString(HEADER_PREFIX, Authorization.BEARER);
-
-        return ApplyResponse.ofHeaders(Map.of(AUTHORIZATION, List.of(headerPrefix + " " + accessToken)));
     }
 }
