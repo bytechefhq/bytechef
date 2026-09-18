@@ -7,6 +7,7 @@ import {
     ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     PROJECT_LEFT_SIDEBAR_WIDTH,
     TASK_DISPATCHER_NAMES,
+    TRIGGER_PLACEHOLDER_NODE_ID,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -43,9 +44,9 @@ import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
 import {
+    buildTriggerNodes,
     collectTaskDispatcherData,
     convertTaskToNode,
-    createDefaultNodes,
     createEdgeFromTaskDispatcherBottomGhostNode,
     getLayoutElements,
     getTaskAncestry,
@@ -182,22 +183,12 @@ export default function useLayout({
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
 
-    const triggerComponentName = useMemo(() => triggers?.[0]?.type.split('/')[0], [triggers]);
-
-    const triggerDefinition = useMemo(
-        () => componentDefinitions.find((definition) => definition.name === triggerComponentName),
-        [componentDefinitions, triggerComponentName]
+    const {placeholderNode: triggerPlaceholderNode, triggerNodes} = useMemo(
+        () => buildTriggerNodes(triggers, componentDefinitions, canvasWidth),
+        [canvasWidth, componentDefinitions, triggers]
     );
 
-    const triggerNode = useMemo(() => {
-        if (triggerDefinition && triggers?.[0]) {
-            return convertTaskToNode(triggers[0], triggerDefinition, 0);
-        }
-
-        return createDefaultNodes(canvasWidth)[0];
-    }, [triggerDefinition, triggers, canvasWidth]);
-
-    let allNodes: Array<Node> = [triggerNode];
+    let allNodes: Array<Node> = [];
 
     if (tasks) {
         const branchChildTasks = {};
@@ -238,7 +229,7 @@ export default function useLayout({
 
             // Convert task to node
             if (taskDefinition) {
-                taskNode = convertTaskToNode(task, taskDefinition, 1);
+                taskNode = convertTaskToNode(task, taskDefinition, false);
             } else {
                 taskNode = {
                     data: {
@@ -382,14 +373,14 @@ export default function useLayout({
         });
     }
 
-    const finalPlaceholderNode: Node = useMemo(() => {
-        return {
-            data: {label: '+'},
-            id: FINAL_PLACEHOLDER_NODE_ID,
-            position: {x: 0, y: 0},
-            type: 'placeholder',
-        };
-    }, []);
+    const finalPlaceholderNode: Node = {
+        data: {label: '+'},
+        id: FINAL_PLACEHOLDER_NODE_ID,
+        position: {x: 0, y: 0},
+        type: 'placeholder',
+    };
+
+    const firstDownstreamNodeId = allNodes[0]?.id ?? FINAL_PLACEHOLDER_NODE_ID;
 
     const taskEdges: Array<Edge> = [];
 
@@ -599,6 +590,38 @@ export default function useLayout({
         }
     });
 
+    if (!allNodes.some((node) => node.id === FINAL_PLACEHOLDER_NODE_ID)) {
+        allNodes.push(finalPlaceholderNode);
+    }
+
+    const isFanIn = triggerNodes.length > 1;
+    const middleTriggerIndex = Math.floor(triggerNodes.length / 2);
+
+    const targetIsFinalPlaceholder = firstDownstreamNodeId === FINAL_PLACEHOLDER_NODE_ID;
+
+    const triggerFanInEdges: Array<Edge> = triggerNodes.map((triggerNode, triggerIndex) => {
+        const isMiddleEdge = triggerIndex === middleTriggerIndex;
+
+        let type: string = 'smoothstep';
+
+        if (isMiddleEdge) {
+            type = targetIsFinalPlaceholder ? 'placeholder' : 'workflow';
+        }
+
+        return {
+            data: isFanIn ? {triggerFanIn: true} : undefined,
+            id: `${triggerNode.id}=>${firstDownstreamNodeId}`,
+            source: triggerNode.id,
+            style: EDGE_STYLES,
+            target: firstDownstreamNodeId,
+            type,
+        };
+    });
+
+    allNodes = [...triggerNodes, triggerPlaceholderNode, ...allNodes];
+
+    taskEdges.unshift(...triggerFanInEdges);
+
     useEffect(() => {
         // Skip shift updates while the cluster elements canvas covers the main
         // graph — the canvasWidth change from the dialog's panel is transient
@@ -719,6 +742,8 @@ export default function useLayout({
 
                 return node;
             });
+
+            layoutNodes = layoutNodes.filter((node) => node.id !== TRIGGER_PLACEHOLDER_NODE_ID);
 
             layoutNodes.pop();
 

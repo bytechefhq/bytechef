@@ -32,17 +32,20 @@ import {TASK_DISPATCHER_CONFIG} from '../utils/taskDispatcherConfig';
 async function createWorkflowNodeData(
     droppedNode: ClickedDefinitionType,
     queryClient: QueryClient,
-    taskDispatcherDefinitions: TaskDispatcherDefinition[]
+    taskDispatcherDefinitions: TaskDispatcherDefinition[],
+    targetTriggerName?: string
 ): Promise<{nodeData: NodeDataType; operationName?: string}> {
+    const triggerName = droppedNode.trigger ? (targetTriggerName ?? getFormattedName('trigger')) : undefined;
+
     const baseNodeData: NodeDataType = {
         componentName: droppedNode.name!,
         label: droppedNode.title,
-        name: droppedNode.trigger ? 'trigger_1' : getFormattedName(droppedNode.name!),
+        name: droppedNode.trigger ? triggerName! : getFormattedName(droppedNode.name!),
         taskDispatcher: droppedNode.taskDispatcher,
         title: droppedNode?.title,
         trigger: droppedNode.trigger,
         version: droppedNode.version,
-        workflowNodeName: droppedNode.trigger ? 'trigger_1' : getFormattedName(droppedNode.name!),
+        workflowNodeName: droppedNode.trigger ? triggerName! : getFormattedName(droppedNode.name!),
     };
 
     if (baseNodeData.taskDispatcher) {
@@ -189,6 +192,7 @@ export default function useHandleDrop({
 }): [
     (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
+    (droppedNode: ClickedDefinitionType, targetTriggerName: string) => void,
     (droppedNode: ClickedDefinitionType) => void,
 ] {
     const {captureComponentUsed} = useAnalytics();
@@ -238,7 +242,24 @@ export default function useHandleDrop({
         });
     }
 
-    async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType) {
+    async function handleDropOnTriggerNode(droppedNode: ClickedDefinitionType, targetTriggerName: string) {
+        const {nodeData, operationName} = await createWorkflowNodeData(
+            droppedNode,
+            queryClient,
+            taskDispatcherDefinitions,
+            targetTriggerName
+        );
+
+        await saveDroppedNode({
+            captureComponentUsed,
+            nodeData,
+            operationName,
+            queryClient,
+            updateWorkflowMutation: updateWorkflowMutation!,
+        });
+    }
+
+    async function handleDropOnTriggerPlaceholder(droppedNode: ClickedDefinitionType) {
         const {nodeData, operationName} = await createWorkflowNodeData(
             droppedNode,
             queryClient,
@@ -254,5 +275,10 @@ export default function useHandleDrop({
         });
     }
 
-    return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode];
+    return [
+        handleDropOnPlaceholderNode,
+        handleDropOnWorkflowEdge,
+        handleDropOnTriggerNode,
+        handleDropOnTriggerPlaceholder,
+    ];
 }
