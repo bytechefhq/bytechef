@@ -28,6 +28,8 @@ public class NeonConstants {
     public static final String LIMIT = "limit";
     public static final String OFFSET = "offset";
     public static final String ORDER = "order";
+    public static final String ORDER_BY_COLUMN = "orderByColumn";
+    public static final String ORDER_DIRECTION = "orderDirection";
     public static final String PRIVATE_KEY = "privateKey";
     public static final String ROW_DATA = "rowData";
     public static final String SELECT = "select";
