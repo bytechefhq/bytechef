@@ -28,6 +28,7 @@ import com.bytechef.component.neon.action.NeonGenerateServiceAccountAction;
 import com.bytechef.component.neon.action.NeonListRowsAction;
 import com.bytechef.component.neon.action.NeonUpdateRowAction;
 import com.bytechef.component.neon.connection.NeonConnection;
+import com.bytechef.component.neon.trigger.NeonNewRowTrigger;
 import com.google.auto.service.AutoService;
 
 @AutoService(ComponentHandler.class)
@@ -55,6 +56,7 @@ public class NeonComponentHandler implements ComponentHandler {
             tool(NeonCreateRowAction.ACTION_DEFINITION),
             tool(NeonUpdateRowAction.ACTION_DEFINITION),
             tool(NeonDeleteRowAction.ACTION_DEFINITION))
+        .triggers(NeonNewRowTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override
