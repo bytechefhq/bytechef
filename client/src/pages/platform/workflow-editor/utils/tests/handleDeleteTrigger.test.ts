@@ -4,6 +4,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 import handleDeleteTrigger from '../handleDeleteTrigger';
+import {isWorkflowMutating, setWorkflowMutating} from '../workflowMutationGuard';
 
 vi.mock('../../utils/workflowMutationGuard', () => ({
     isWorkflowMutating: vi.fn().mockReturnValue(false),
@@ -116,5 +117,97 @@ describe('handleDeleteTrigger', () => {
         });
 
         expect(useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen).toBe(true);
+    });
+
+    it('does nothing when the workflow has no definition', () => {
+        handleDeleteTrigger({
+            cancelWorkflowQueries,
+            invalidateWorkflowQueries,
+            triggerName: 'trigger_1',
+            updateWorkflowMutation,
+            workflow: {...makeWorkflow([]), definition: undefined} as unknown as ReturnType<typeof makeWorkflow>,
+        });
+
+        expect(cancelWorkflowQueries).not.toHaveBeenCalled();
+        expect(mutateMock).not.toHaveBeenCalled();
+    });
+
+    it('does nothing while another save of the same workflow is in flight', () => {
+        vi.mocked(isWorkflowMutating).mockReturnValueOnce(true);
+
+        handleDeleteTrigger({
+            cancelWorkflowQueries,
+            invalidateWorkflowQueries,
+            triggerName: 'trigger_1',
+            updateWorkflowMutation,
+            workflow: makeWorkflow([makeTrigger('trigger_1'), makeTrigger('trigger_2')]),
+        });
+
+        expect(cancelWorkflowQueries).not.toHaveBeenCalled();
+        expect(mutateMock).not.toHaveBeenCalled();
+    });
+
+    it('restores the previous workflow and refetches when the save fails', () => {
+        const workflow = makeWorkflow([makeTrigger('trigger_1'), makeTrigger('trigger_2')]);
+
+        handleDeleteTrigger({
+            cancelWorkflowQueries,
+            invalidateWorkflowQueries,
+            triggerName: 'trigger_1',
+            updateWorkflowMutation,
+            workflow,
+        });
+
+        const {onError} = mutateMock.mock.calls[0][1] as {onError: () => void};
+
+        onError();
+
+        expect(useWorkflowDataStore.getState().workflow.triggers?.map((trigger) => trigger.name)).toEqual([
+            'trigger_1',
+            'trigger_2',
+        ]);
+        expect(invalidateWorkflowQueries).toHaveBeenCalledOnce();
+    });
+
+    it('releases the mutation guard and refetches once the save settles', () => {
+        const workflow = makeWorkflow([makeTrigger('trigger_1'), makeTrigger('trigger_2')]);
+
+        handleDeleteTrigger({
+            cancelWorkflowQueries,
+            invalidateWorkflowQueries,
+            triggerName: 'trigger_1',
+            updateWorkflowMutation,
+            workflow,
+        });
+
+        expect(setWorkflowMutating).toHaveBeenLastCalledWith('workflow-1', true);
+
+        const {onSettled} = mutateMock.mock.calls[0][1] as {onSettled: () => void};
+
+        onSettled();
+
+        expect(setWorkflowMutating).toHaveBeenLastCalledWith('workflow-1', false);
+        expect(invalidateWorkflowQueries).toHaveBeenCalledOnce();
+    });
+
+    it('keeps the updated triggers and takes the saved version on success', () => {
+        const workflow = makeWorkflow([makeTrigger('trigger_1'), makeTrigger('trigger_2')]);
+
+        handleDeleteTrigger({
+            cancelWorkflowQueries,
+            invalidateWorkflowQueries,
+            triggerName: 'trigger_1',
+            updateWorkflowMutation,
+            workflow,
+        });
+
+        const {onSuccess} = mutateMock.mock.calls[0][1] as {onSuccess: (updatedWorkflow: {version: number}) => void};
+
+        onSuccess({version: 2});
+
+        const storedWorkflow = useWorkflowDataStore.getState().workflow;
+
+        expect(storedWorkflow.version).toBe(2);
+        expect(storedWorkflow.triggers?.map((trigger) => trigger.name)).toEqual(['trigger_2']);
     });
 });

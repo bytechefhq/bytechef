@@ -265,8 +265,9 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
     }
 
     if (direction === 'LR') {
-        const lowestTrigger = triggerNodes.reduce((lowest, node) =>
-            node.position.y > lowest.position.y ? node : lowest
+        const lowestTrigger = triggerNodes.reduce(
+            (lowest, node) => (node.position.y > lowest.position.y ? node : lowest),
+            triggerNodes[0]
         );
 
         placeholderNode.position = {
@@ -274,8 +275,9 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
             y: lowestTrigger.position.y + NODE_HEIGHT + NODE_HEIGHT / 4 + TRIGGER_PLACEHOLDER_GAP,
         };
     } else {
-        const rightmostTrigger = triggerNodes.reduce((rightmost, node) =>
-            node.position.x > rightmost.position.x ? node : rightmost
+        const rightmostTrigger = triggerNodes.reduce(
+            (rightmost, node) => (node.position.x > rightmost.position.x ? node : rightmost),
+            triggerNodes[0]
         );
 
         placeholderNode.position = {
@@ -283,6 +285,30 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
             y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - PLACEHOLDER_NODE_HEIGHT) / 2,
         };
     }
+};
+
+export const buildTriggerFanInEdges = (triggerNodes: Node[], firstDownstreamNodeId: string): Edge[] => {
+    const isFanIn = triggerNodes.length > 1;
+    const middleTriggerIndex = Math.floor(triggerNodes.length / 2);
+
+    const targetIsFinalPlaceholder = firstDownstreamNodeId === FINAL_PLACEHOLDER_NODE_ID;
+
+    return triggerNodes.map((triggerNode, triggerIndex) => {
+        let type = 'smoothstep';
+
+        if (triggerIndex === middleTriggerIndex) {
+            type = targetIsFinalPlaceholder ? 'placeholder' : 'workflow';
+        }
+
+        return {
+            data: isFanIn ? {triggerFanIn: true} : undefined,
+            id: `${triggerNode.id}=>${firstDownstreamNodeId}`,
+            source: triggerNode.id,
+            style: EDGE_STYLES,
+            target: firstDownstreamNodeId,
+            type,
+        };
+    });
 };
 
 interface GetLayoutElementsProps {
