@@ -1496,6 +1496,7 @@ export type ClusterElementScriptInputQueryVariables = Exact<{
 export type ClusterElementScriptInputQuery = { clusterElementScriptInput: any };
 
 export type ComponentDefinitionSearchQueryVariables = Exact<{
+  platformType: Types.PlatformType;
   query: string;
 }>;
 
@@ -7557,8 +7558,8 @@ export const useClusterElementScriptInputQuery = <
     )};
 
 export const ComponentDefinitionSearchDocument = new TypedDocumentString(`
-    query ComponentDefinitionSearch($query: String!) {
-  componentDefinitionSearch(query: $query) {
+    query ComponentDefinitionSearch($platformType: PlatformType!, $query: String!) {
+  componentDefinitionSearch(platformType: $platformType, query: $query) {
     name
     title
     icon

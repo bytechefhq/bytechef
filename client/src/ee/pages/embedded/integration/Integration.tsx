@@ -13,6 +13,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -95,6 +96,7 @@ const Integration = () => {
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,
+                                    platformType: PlatformType.Embedded,
                                     updateClusterElementParameterMutation,
                                     updateWorkflowMutation: updateWorkflowEditorMutation,
                                     updateWorkflowNodeParameterMutation,

@@ -7,7 +7,7 @@ const hoisted = vi.hoisted(() => {
         isFetching: false,
     };
 
-    return {mockQueryResult};
+    return {mockQueryResult, platformType: 'EMBEDDED', queryArgs: [] as unknown[][]};
 });
 
 vi.mock('use-debounce', () => ({
@@ -15,7 +15,15 @@ vi.mock('use-debounce', () => ({
 }));
 
 vi.mock('@/shared/queries/platform/componentDefinitionsGraphQL.queries', () => ({
-    useGetComponentDefinitionsWithActionsQuery: () => hoisted.mockQueryResult,
+    useGetComponentDefinitionsWithActionsQuery: (...args: unknown[]) => {
+        hoisted.queryArgs.push(args);
+
+        return hoisted.mockQueryResult;
+    },
+}));
+
+vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
+    useWorkflowEditor: () => ({platformType: hoisted.platformType}),
 }));
 
 const componentDefinitions = [
@@ -28,6 +36,7 @@ describe('useFilteredComponentDefinitions', () => {
     beforeEach(() => {
         hoisted.mockQueryResult.data = null;
         hoisted.mockQueryResult.isFetching = false;
+        hoisted.queryArgs.length = 0;
     });
 
     afterEach(() => {
@@ -111,5 +120,17 @@ describe('useFilteredComponentDefinitions', () => {
         });
 
         expect(result.current.trimmedFilter).toBe('gmail');
+    });
+
+    it('should search with the platform type provided by the workflow editor', async () => {
+        const {useFilteredComponentDefinitions} = await import('../useFilteredComponentDefinitions');
+
+        const {result} = renderHook(() => useFilteredComponentDefinitions(componentDefinitions));
+
+        act(() => {
+            result.current.setFilter('webhook');
+        });
+
+        expect(hoisted.queryArgs.at(-1)).toEqual(['EMBEDDED', 'webhook']);
     });
 });

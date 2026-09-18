@@ -1,3 +1,4 @@
+import {PlatformType} from '@/shared/middleware/graphql';
 import {
     AuthorizationType,
     ComponentDefinitionBasic,
@@ -101,6 +102,7 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
         unknown
     >;
     invalidateWorkflowQueries: () => void;
+    platformType: PlatformType;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     updateWorkflowNodeParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,

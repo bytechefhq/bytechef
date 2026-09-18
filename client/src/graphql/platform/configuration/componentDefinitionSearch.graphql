@@ -1,5 +1,5 @@
-query ComponentDefinitionSearch($query: String!) {
-    componentDefinitionSearch(query: $query) {
+query ComponentDefinitionSearch($platformType: PlatformType!, $query: String!) {
+    componentDefinitionSearch(platformType: $platformType, query: $query) {
         name
         title
         icon

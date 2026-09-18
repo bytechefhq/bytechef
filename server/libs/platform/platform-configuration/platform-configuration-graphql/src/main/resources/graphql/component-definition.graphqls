@@ -2,6 +2,8 @@ extend type Query {
     componentDefinition(componentName: String!, componentVersion: Int!): ComponentDefinition!
     connectionComponentDefinition(componentName: String!, connectionVersion: Int!): ComponentDefinition!
     componentDefinitionVersions(componentName: String!): [ComponentDefinition!]!
+    componentDefinitions(actionDefinitions: Boolean, clusterElementDefinitions: Boolean, connectionDefinitions: Boolean, triggerDefinitions: Boolean, include: [String], platformType: PlatformType!): [ComponentDefinition!]!
+    componentDefinitionSearch(query: String!, platformType: PlatformType!): [ComponentDefinition!]!
     unifiedApiComponentDefinitions(category: UnifiedApiCategory!): [ComponentDefinition!]!
 }
 

@@ -21,6 +21,7 @@ import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.UnifiedApiDefinitionService;
+import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -61,8 +62,26 @@ public class ComponentDefinitionGraphQlController {
     }
 
     @QueryMapping
+    public List<ComponentDefinition> componentDefinitionSearch(
+        @Argument String query, @Argument PlatformType platformType) {
+
+        return componentDefinitionService.getComponentDefinitions(query, platformType);
+    }
+
+    @QueryMapping
     public List<ComponentDefinition> componentDefinitionVersions(@Argument String componentName) {
         return componentDefinitionService.getComponentDefinitionVersions(componentName);
+    }
+
+    @QueryMapping
+    public List<ComponentDefinition> componentDefinitions(
+        @Argument Boolean actionDefinitions, @Argument Boolean clusterElementDefinitions,
+        @Argument Boolean connectionDefinitions, @Argument Boolean triggerDefinitions,
+        @Argument List<String> include, @Argument PlatformType platformType) {
+
+        return componentDefinitionService.getComponentDefinitions(
+            actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include,
+            platformType);
     }
 
     @QueryMapping

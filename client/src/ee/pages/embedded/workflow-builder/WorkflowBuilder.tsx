@@ -15,6 +15,7 @@ import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
+import {PlatformType} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -86,6 +87,7 @@ const WorkflowBuilder = () => {
                                 deleteClusterElementParameterMutation,
                                 deleteWorkflowNodeParameterMutation,
                                 invalidateWorkflowQueries,
+                                platformType: PlatformType.Automation,
                                 updateClusterElementParameterMutation,
                                 updateWorkflowMutation: updateWorkflowEditorMutation,
                                 updateWorkflowNodeParameterMutation,
