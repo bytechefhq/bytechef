@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {toEnvironmentName} from '@/shared/constants';
 import useEeEdition from '@/shared/edition/useEeEdition';
-import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {usePermissionStore} from '@/shared/stores/usePermissionStore';
 import {ShieldOffIcon} from 'lucide-react';
@@ -11,8 +11,6 @@ import {Outlet, useLocation} from 'react-router-dom';
 const UNGUARDED_PATH_PREFIXES = ['/automation/account', '/automation/settings'];
 
 const AutomationEnvironmentAccessGuard = () => {
-    const account = useAuthenticationStore((state) => state.account);
-    const authenticated = useAuthenticationStore((state) => state.authenticated);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const workspaceScopeState = usePermissionStore((state) =>
@@ -21,8 +19,7 @@ const AutomationEnvironmentAccessGuard = () => {
 
     const eeEdition = useEeEdition();
     const location = useLocation();
-
-    const tenantAdmin = authenticated && (account?.authorities?.includes('ROLE_ADMIN') ?? false);
+    const tenantAdmin = useIsTenantAdmin();
 
     const unguardedPath = UNGUARDED_PATH_PREFIXES.some(
         (pathPrefix) => location.pathname === pathPrefix || location.pathname.startsWith(`${pathPrefix}/`)
