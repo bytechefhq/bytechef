@@ -1,6 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
-import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
@@ -18,6 +17,7 @@ import pasteNode from '../utils/pasteNode';
 import BranchCaseLabel from './BranchCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
+import {getTriggerFanInBusCenter, getTriggerFanInButtonPosition} from './computeTriggerFanIn';
 
 export default function WorkflowEdge({
     data,
@@ -76,15 +76,18 @@ export default function WorkflowEdge({
     });
 
     const isTriggerFanIn = !!(data as Record<string, unknown>)?.triggerFanIn;
-    const isVerticalFanIn =
-        Math.abs(correctedTargetY - correctedSourceY) >= Math.abs(correctedTargetX - correctedSourceX);
 
-    const busCenter =
-        isTriggerFanIn && isVerticalFanIn
-            ? {centerY: correctedSourceY + TRIGGER_FAN_IN_BUS_OFFSET}
-            : isTriggerFanIn
-              ? {centerX: correctedSourceX + TRIGGER_FAN_IN_BUS_OFFSET}
-              : {};
+    const busCenter = useMemo(
+        () =>
+            getTriggerFanInBusCenter({
+                isTriggerFanIn,
+                sourceX: correctedSourceX,
+                sourceY: correctedSourceY,
+                targetX: correctedTargetX,
+                targetY: correctedTargetY,
+            }),
+        [correctedSourceX, correctedSourceY, correctedTargetX, correctedTargetY, isTriggerFanIn]
+    );
 
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
         borderRadius: 10,
@@ -105,15 +108,7 @@ export default function WorkflowEdge({
 
     const buttonPosition = useMemo(() => {
         if (isTriggerFanIn && targetNode) {
-            if (isHorizontal) {
-                const busX = sourceX + TRIGGER_FAN_IN_BUS_OFFSET;
-
-                return {x: (busX + targetX) / 2, y: targetY};
-            }
-
-            const busY = sourceY + TRIGGER_FAN_IN_BUS_OFFSET;
-
-            return {x: targetX, y: (busY + targetY) / 2};
+            return getTriggerFanInButtonPosition({busCenter, targetX: correctedTargetX, targetY: correctedTargetY});
         }
 
         return computeEdgeButtonPosition({
@@ -130,6 +125,7 @@ export default function WorkflowEdge({
             targetNodeType: targetNode?.type,
         });
     }, [
+        busCenter,
         isTriggerFanIn,
         isHorizontal,
         correctedSourceX,
@@ -140,10 +136,6 @@ export default function WorkflowEdge({
         sourceNode?.data,
         targetNode,
         sourceNodeComponentName,
-        sourceX,
-        sourceY,
-        targetX,
-        targetY,
         edgeCenterX,
         edgeCenterY,
     ]);

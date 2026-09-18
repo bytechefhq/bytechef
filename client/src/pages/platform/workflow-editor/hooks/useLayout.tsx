@@ -44,6 +44,7 @@ import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
 import {
+    buildTriggerFanInEdges,
     buildTriggerNodes,
     collectTaskDispatcherData,
     convertTaskToNode,
@@ -594,29 +595,7 @@ export default function useLayout({
         allNodes.push(finalPlaceholderNode);
     }
 
-    const isFanIn = triggerNodes.length > 1;
-    const middleTriggerIndex = Math.floor(triggerNodes.length / 2);
-
-    const targetIsFinalPlaceholder = firstDownstreamNodeId === FINAL_PLACEHOLDER_NODE_ID;
-
-    const triggerFanInEdges: Array<Edge> = triggerNodes.map((triggerNode, triggerIndex) => {
-        const isMiddleEdge = triggerIndex === middleTriggerIndex;
-
-        let type: string = 'smoothstep';
-
-        if (isMiddleEdge) {
-            type = targetIsFinalPlaceholder ? 'placeholder' : 'workflow';
-        }
-
-        return {
-            data: isFanIn ? {triggerFanIn: true} : undefined,
-            id: `${triggerNode.id}=>${firstDownstreamNodeId}`,
-            source: triggerNode.id,
-            style: EDGE_STYLES,
-            target: firstDownstreamNodeId,
-            type,
-        };
-    });
+    const triggerFanInEdges = buildTriggerFanInEdges(triggerNodes, firstDownstreamNodeId);
 
     allNodes = [...triggerNodes, triggerPlaceholderNode, ...allNodes];
 
