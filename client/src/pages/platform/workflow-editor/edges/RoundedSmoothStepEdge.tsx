@@ -15,10 +15,9 @@ export default function RoundedSmoothStepEdge({
 }: EdgeProps) {
     const busCenter = getTriggerFanInBusCenter({
         isTriggerFanIn: !!(data as Record<string, unknown>)?.triggerFanIn,
+        sourcePosition,
         sourceX,
         sourceY,
-        targetX,
-        targetY,
     });
 
     const [edgePath] = getSmoothStepPath({

@@ -20,7 +20,7 @@ export default function PlaceholderEdge({
     const [edgePath] = isTriggerFanIn
         ? getSmoothStepPath({
               borderRadius: 10,
-              ...getTriggerFanInBusCenter({isTriggerFanIn, sourceX, sourceY, targetX, targetY}),
+              ...getTriggerFanInBusCenter({isTriggerFanIn, sourcePosition, sourceX, sourceY}),
               ...pathParameters,
           })
         : getBezierPath(pathParameters);
