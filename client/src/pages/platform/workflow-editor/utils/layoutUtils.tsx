@@ -85,6 +85,10 @@ const TRIGGER_NODE_DAGRE_WIDTH = 160;
 
 const TRIGGER_NODE_BOX_SIZE = 72;
 
+const TRIGGER_NODE_MENU_GUTTER = 96;
+
+const DAGRE_NODE_SEPARATION = 50;
+
 const TRIGGER_PLACEHOLDER_BOX_MARGIN = 8;
 
 const TRIGGER_LABEL_BLOCK_HEIGHT = 64;
@@ -105,6 +109,19 @@ export function getLabelCrossOverhang(node: Node): number {
     );
 
     return Math.min(NODE_LABEL_MAX_CROSS_OVERHANG, LABEL_BLOCK_MARGIN + longestLabelLength * LABEL_CHAR_WIDTH);
+}
+
+export function getTriggerRowDagreWidth(triggerNodes: Node[]): number {
+    return Math.max(
+        TRIGGER_NODE_DAGRE_WIDTH,
+        ...triggerNodes.map(
+            (triggerNode) =>
+                TRIGGER_NODE_BOX_SIZE +
+                getLabelCrossOverhang(triggerNode) +
+                TRIGGER_NODE_MENU_GUTTER -
+                DAGRE_NODE_SEPARATION
+        )
+    );
 }
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
@@ -162,7 +179,11 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
     return 72;
 }
 
-export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+export function getDagreNodeSize(
+    node: Node,
+    direction: LayoutDirectionType,
+    triggerRowWidth: number = TRIGGER_NODE_DAGRE_WIDTH
+): {height: number; width: number} {
     const height = calculateNodeHeight(node);
 
     const isTrigger = (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID;
@@ -193,7 +214,7 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
     }
 
     if (isTrigger) {
-        return {height, width: TRIGGER_NODE_DAGRE_WIDTH};
+        return {height, width: triggerRowWidth};
     }
 
     return {height, width: NODE_WIDTH};
@@ -743,12 +764,16 @@ export const getLayoutElements = async ({
     const effectiveDirection = direction;
 
     dagreGraph.setGraph({
-        nodesep: 50,
+        nodesep: DAGRE_NODE_SEPARATION,
         rankdir: effectiveDirection,
     });
 
+    const triggerRowWidth = getTriggerRowDagreWidth(
+        nodes.filter((node) => (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID)
+    );
+
     nodes.forEach((node) => {
-        dagreGraph.setNode(node.id, getDagreNodeSize(node, effectiveDirection));
+        dagreGraph.setNode(node.id, getDagreNodeSize(node, effectiveDirection, triggerRowWidth));
     });
 
     edges.forEach((edge) => {

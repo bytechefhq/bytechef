@@ -2,9 +2,22 @@ import {FINAL_PLACEHOLDER_NODE_ID, NODE_WIDTH, TRIGGER_PLACEHOLDER_NODE_ID} from
 import {Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
-import {buildTriggerFanInEdges, getDagreNodeSize, getLabelCrossOverhang, getLayoutElements} from '../layoutUtils';
+import {
+    buildTriggerFanInEdges,
+    getDagreNodeSize,
+    getLabelCrossOverhang,
+    getLayoutElements,
+    getTriggerRowDagreWidth,
+} from '../layoutUtils';
 
 const triggerNode = (id: string): Node => ({data: {trigger: true}, id, position: {x: 0, y: 0}, type: 'workflow'});
+
+const labelledTriggerNode = (id: string, label: string): Node => ({
+    data: {label, operationName: 'newRecord', trigger: true, workflowNodeName: id},
+    id,
+    position: {x: 0, y: 0},
+    type: 'workflow',
+});
 
 const taskNode = (id: string): Node => ({data: {}, id, position: {x: 0, y: 0}, type: 'workflow'});
 
@@ -61,6 +74,13 @@ describe('getDagreNodeSize for triggers', () => {
         expect(getDagreNodeSize(triggerNode('trigger_1'), 'LR').height).toBeLessThan(NODE_WIDTH);
     });
 
+    it('uses the shared trigger row width in TB only', () => {
+        expect(getDagreNodeSize(triggerNode('trigger_1'), 'TB', 300).width).toBe(300);
+        expect(getDagreNodeSize(triggerNode('trigger_1'), 'LR', 300).height).toBe(
+            getDagreNodeSize(triggerNode('trigger_1'), 'LR').height
+        );
+    });
+
     it('does not treat the add-trigger slot as a trigger', () => {
         const slot: Node = {data: {trigger: true}, id: TRIGGER_PLACEHOLDER_NODE_ID, position: {x: 0, y: 0}};
 
@@ -91,6 +111,55 @@ describe('getLayoutElements with multiple triggers', () => {
         const triggerRowCenter = (position('trigger_1').x + position('trigger_2').x) / 2;
 
         expect(Math.abs(triggerRowCenter + 72 / 2 - canvasWidth / 2)).toBeLessThan(1);
+    });
+});
+
+describe('getTriggerRowDagreWidth', () => {
+    it('keeps the default width when every label is short', () => {
+        expect(getTriggerRowDagreWidth([triggerNode('trigger_1'), triggerNode('trigger_2')])).toBe(
+            getDagreNodeSize(triggerNode('trigger_1'), 'TB').width
+        );
+    });
+
+    it('sizes the whole row by its longest label', () => {
+        const shortTrigger = labelledTriggerNode('trigger_1', 'Manual');
+        const longTrigger = labelledTriggerNode('trigger_2', 'A trigger with a much longer label');
+
+        expect(getTriggerRowDagreWidth([shortTrigger, longTrigger])).toBe(
+            getTriggerRowDagreWidth([longTrigger, shortTrigger])
+        );
+        expect(getTriggerRowDagreWidth([shortTrigger, longTrigger])).toBeGreaterThan(
+            getTriggerRowDagreWidth([shortTrigger])
+        );
+    });
+});
+
+describe('getLayoutElements trigger row spacing', () => {
+    it('leaves room for the node menu button between a label and the next trigger in TB', async () => {
+        const triggers = [
+            labelledTriggerNode('trigger_1', 'Agile CRM'),
+            labelledTriggerNode('trigger_2', 'Airtable'),
+            labelledTriggerNode('trigger_3', 'Manual'),
+        ];
+        const nodes = [...triggers, taskNode('task_1')];
+
+        const {nodes: layoutNodes} = await getLayoutElements({
+            canvasWidth: 1200,
+            direction: 'TB',
+            edges: buildTriggerFanInEdges(triggers, 'task_1'),
+            nodes,
+        });
+
+        const laidOutTriggers = layoutNodes
+            .filter((node) => node.id.startsWith('trigger_'))
+            .sort((first, second) => first.position.x - second.position.x);
+
+        for (let index = 1; index < laidOutTriggers.length; index++) {
+            const previousTrigger = laidOutTriggers[index - 1];
+            const previousLabelEnd = previousTrigger.position.x + 72 + getLabelCrossOverhang(previousTrigger);
+
+            expect(laidOutTriggers[index].position.x - previousLabelEnd).toBeGreaterThanOrEqual(96);
+        }
     });
 });
 
