@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -81,11 +82,20 @@ interface WorkflowNodesTabsProps {
     onPasteClose?: () => void;
     selectedComponentName?: string;
     showPaste?: boolean;
+    showSearchMatchCounts?: boolean;
     sourceNodeId?: string;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
     triggerComponentDefinitions: Array<ComponentDefinitionBasic>;
     updateWorkflowMutation?: UpdateWorkflowMutationType;
 }
+
+const TabSearchMatchCount = ({count}: {count: number}) => (
+    <>
+        <Badge aria-hidden="true" label={String(count)} styleType="outline-outline" />
+
+        <span className="sr-only">{` (${count} ${count === 1 ? 'match' : 'matches'})`}</span>
+    </>
+);
 
 const WorkflowNodesTabs = ({
     actionComponentDefinitions,
@@ -101,6 +111,7 @@ const WorkflowNodesTabs = ({
     onPasteClose,
     selectedComponentName,
     showPaste = false,
+    showSearchMatchCounts = false,
     sourceNodeId,
     taskDispatcherDefinitions,
     triggerComponentDefinitions,
@@ -304,6 +315,16 @@ const WorkflowNodesTabs = ({
         ]
     );
 
+    const renderSearchMatchCount = (tabValue: keyof typeof tabContentConfigs) => {
+        const count = tabContentConfigs[tabValue].items?.length || 0;
+
+        if (!showSearchMatchCounts || tabValue === activeTab || count === 0) {
+            return null;
+        }
+
+        return <TabSearchMatchCount count={count} />;
+    };
+
     const copiedNodeDisplayName = [
         copiedNode?.label || copiedNode?.componentName,
         copiedNode?.name ? `(${copiedNode.name})` : null,
@@ -316,32 +337,50 @@ const WorkflowNodesTabs = ({
             <div className="px-2">
                 <TabsList className="my-2 flex w-full justify-between bg-surface-neutral-secondary">
                     {!hideTriggerComponents && (
-                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="triggers">
+                        <TabsTrigger
+                            className="w-full transition-none data-[state=active]:shadow-none"
+                            value="triggers"
+                        >
                             Triggers
+                            {renderSearchMatchCount('triggers')}
                         </TabsTrigger>
                     )}
 
                     {!hideActionComponents && (
-                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="components">
+                        <TabsTrigger
+                            className="w-full transition-none data-[state=active]:shadow-none"
+                            value="components"
+                        >
                             Actions
+                            {renderSearchMatchCount('components')}
                         </TabsTrigger>
                     )}
 
                     {!hideTaskDispatchers && (
-                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="taskDispatchers">
+                        <TabsTrigger
+                            className="w-full transition-none data-[state=active]:shadow-none"
+                            value="taskDispatchers"
+                        >
                             Flows
+                            {renderSearchMatchCount('taskDispatchers')}
                         </TabsTrigger>
                     )}
 
                     {!hideActionComponents && (
-                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="helpers">
+                        <TabsTrigger className="w-full transition-none data-[state=active]:shadow-none" value="helpers">
                             Helpers
+                            {renderSearchMatchCount('helpers')}
                         </TabsTrigger>
                     )}
 
                     {!hideClusterElementComponents && (
-                        <TabsTrigger className="w-full data-[state=active]:shadow-none" value="clusterElements">
+                        <TabsTrigger
+                            className="w-full transition-none data-[state=active]:shadow-none"
+                            value="clusterElements"
+                        >
                             {clusterElementType ? getClusterElementsLabel(clusterElementType) : 'Cluster Elements'}
+
+                            {renderSearchMatchCount('clusterElements')}
                         </TabsTrigger>
                     )}
                 </TabsList>

@@ -171,6 +171,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         onPasteClose={onPasteClose}
                         selectedComponentName={selectedComponentName}
                         showPaste={showPaste}
+                        showSearchMatchCounts={!!trimmedFilter}
                         sourceNodeId={sourceNodeId}
                         taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                         triggerComponentDefinitions={filteredTriggerComponentDefinitions}

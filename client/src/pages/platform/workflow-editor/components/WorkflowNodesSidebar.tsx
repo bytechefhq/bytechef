@@ -84,6 +84,7 @@ const WorkflowNodesSidebar = ({
                     actionComponentDefinitions={filteredActionComponentDefinitions}
                     hideClusterElementComponents
                     itemsDraggable
+                    showSearchMatchCounts={!!trimmedFilter}
                     taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
                     triggerComponentDefinitions={filteredTriggerComponentDefinitions}
                 />

@@ -2,6 +2,7 @@ import {render, resetAll, screen, windowResizeObserver} from '@/shared/util/test
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    lastWorkflowNodesTabsProps: {} as Record<string, unknown>,
     mockFilterResult: {
         componentsWithActions: [
             {actionsCount: 3, name: 'gmail', triggersCount: 1, version: 1},
@@ -43,7 +44,11 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 }));
 
 vi.mock('../components/workflow-nodes-tabs/WorkflowNodesTabs', () => ({
-    default: () => <div data-testid="workflow-nodes-tabs">Tabs</div>,
+    default: (props: Record<string, unknown>) => {
+        hoisted.lastWorkflowNodesTabsProps = props;
+
+        return <div data-testid="workflow-nodes-tabs">Tabs</div>;
+    },
 }));
 
 describe('WorkflowNodesPopoverMenuComponentList', () => {
@@ -88,5 +93,26 @@ describe('WorkflowNodesPopoverMenuComponentList', () => {
         render(<WorkflowNodesPopoverMenuComponentList actionPanelOpen={false} />);
 
         expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+
+    it('should show search match counts in tabs while searching', async () => {
+        hoisted.mockFilterResult.filter = 'ai text';
+        hoisted.mockFilterResult.trimmedFilter = 'ai text';
+
+        const {default: WorkflowNodesPopoverMenuComponentList} =
+            await import('../components/WorkflowNodesPopoverMenuComponentList');
+
+        render(<WorkflowNodesPopoverMenuComponentList actionPanelOpen={false} />);
+
+        expect(hoisted.lastWorkflowNodesTabsProps.showSearchMatchCounts).toBe(true);
+    });
+
+    it('should not show search match counts in tabs when not searching', async () => {
+        const {default: WorkflowNodesPopoverMenuComponentList} =
+            await import('../components/WorkflowNodesPopoverMenuComponentList');
+
+        render(<WorkflowNodesPopoverMenuComponentList actionPanelOpen={false} />);
+
+        expect(hoisted.lastWorkflowNodesTabsProps.showSearchMatchCounts).toBe(false);
     });
 });
