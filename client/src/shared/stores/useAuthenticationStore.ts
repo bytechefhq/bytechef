@@ -75,12 +75,6 @@ export const authenticationStore = createStore<AuthenticationI>()(
         (set, get) => {
             const setAuthenticationState = (partialState: Partial<AuthenticationI>) => set(partialState);
 
-            /*
-             * Abandons the in-flight account request. Aborting it, rather than only dropping the
-             * reference, keeps its response away from useFetchInterceptor: that interceptor calls
-             * clearAuthentication() on every 401, including /api/account, so a superseded request
-             * answering 401 would otherwise discard the request that replaced it.
-             */
             const invalidateAccountRequest = () => {
                 if (!accountRequest) {
                     return;
@@ -100,13 +94,6 @@ export const authenticationStore = createStore<AuthenticationI>()(
             return {
                 ...initialState,
 
-                /*
-                 * useFetchInterceptor calls this for every 401, including the one an account
-                 * request answers with, and that abandons the very request whose handler would
-                 * have recorded the session as fetched. The session is known either way once a
-                 * 401 arrives, so record it here as well; otherwise PrivateRoute keeps rendering
-                 * its blank loading branch instead of redirecting to the login page.
-                 */
                 clearAuthentication: () => {
                     invalidateAccountRequest();
 
@@ -237,8 +224,7 @@ export const authenticationStore = createStore<AuthenticationI>()(
 
                     const {getAccount} = get();
 
-                    // fetch new csrf token; a failed refresh still leaves the session determined,
-                    // otherwise PrivateRoute keeps rendering its blank loading branch
+                    // fetch new csrf token
                     getAccount().catch(() => {
                         setAuthenticationState({
                             sessionHasBeenFetched: true,
