@@ -441,6 +441,7 @@ const IntegrationInstanceConfigurationDialog = ({
                                 authorizationParameters={
                                     integrationInstanceConfiguration.connectionAuthorizationParameters
                                 }
+                                authorizationType={integrationInstanceConfiguration.authorizationType}
                                 connectionDefinition={connectionDefinition}
                                 connectionParameters={integrationInstanceConfiguration.connectionConnectionParameters}
                             />

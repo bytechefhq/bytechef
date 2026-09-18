@@ -20,27 +20,22 @@ const ConnectionParameters = ({
 }: ConnectionParametersProps) => {
     const {authorizations, properties: connectionProperties} = connectionDefinition;
 
-    const existingAuthorizations = authorizations?.filter(
-        (authorization) =>
-            authorization.type === authorizationType &&
-            authorization.properties &&
-            authorization.properties.filter((property) => !!authorizationParameters![property.name!]).length > 0
-    );
-
-    if (
-        connectionParameters &&
-        Object.values(connectionParameters).every((parameter) => parameter === null || parameter === '') &&
-        authorizationParameters &&
-        Object.values(authorizationParameters).every((parameter) => parameter === null || parameter === '')
-    ) {
-        return <></>;
-    }
+    const existingAuthorizations =
+        authorizations?.filter(
+            (authorization) =>
+                authorization.type === authorizationType &&
+                authorization.properties &&
+                authorization.properties.some((property) => !!authorizationParameters?.[property.name!])
+        ) ?? [];
 
     const hasConnectionParameters =
-        connectionProperties && connectionParameters && !!Object.keys(connectionParameters).length;
+        !!connectionParameters && !!connectionProperties?.some((property) => !!connectionParameters[property.name!]);
 
-    const hasAuthorizationParameters =
-        existingAuthorizations && authorizationParameters && !!Object.keys(authorizationParameters).length;
+    const hasAuthorizationParameters = !!authorizationParameters && existingAuthorizations.length > 0;
+
+    if (!hasConnectionParameters && !hasAuthorizationParameters && !baseUri) {
+        return <></>;
+    }
 
     return (
         <div className="w-full space-y-2 overflow-hidden">
@@ -52,9 +47,11 @@ const ConnectionParameters = ({
                 </div>
             )}
 
-            <h2 className="text-sm heading-tertiary">
-                {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
-            </h2>
+            {(hasConnectionParameters || hasAuthorizationParameters) && (
+                <h2 className="text-sm heading-tertiary">
+                    {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
+                </h2>
+            )}
 
             <ul className="flex w-full flex-col space-y-1 text-sm">
                 {hasConnectionParameters &&
