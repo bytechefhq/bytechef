@@ -456,6 +456,26 @@ describe('PropertyMentionsInputEditor', () => {
             });
         });
 
+        it('should turn pasted data pill syntax into mention spans', async () => {
+            renderEditor();
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.paste('Link: ${trigger_1.data.json.result[index].itemUrl} end');
+
+            await waitFor(() => {
+                expect(textbox.querySelector('.property-mention')).toBeInTheDocument();
+            });
+
+            const mentions = textbox.querySelectorAll('.property-mention[data-id]');
+
+            expect(mentions).toHaveLength(1);
+            expect(mentions[0].getAttribute('data-id')).toBe('trigger_1.data.json.result[index].itemUrl');
+            expect(textbox.textContent).toContain('Link: ');
+            expect(textbox.textContent).toContain(' end');
+        });
+
         it('should render plain text without data pills as plain text', async () => {
             renderEditor({value: 'just plain text'});
 

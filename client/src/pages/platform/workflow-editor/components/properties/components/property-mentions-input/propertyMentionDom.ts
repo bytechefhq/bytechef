@@ -7,6 +7,12 @@ import sanitizeHtml from 'sanitize-html';
  * Root keeps data-type / data-id for parse and serialization; chip carries pill visuals so unavailable styling
  * can target the chip without fighting classes on the root.
  */
+/**
+ * Matches one ${nodeName.path} data pill; group 1 is the path. Shared by the stored-value load path and the
+ * editor's paste rule so pasted text and loaded values produce the same mention nodes.
+ */
+export const DATA_PILL_REGEX = /\$\{([^}]+)}/g;
+
 export const PROPERTY_MENTION_CHIP_CLASS = 'property-mention-chip';
 
 export const PROPERTY_MENTION_LABEL_CLASS = 'property-mention-label';
@@ -54,9 +60,7 @@ export function buildPropertyMentionsContent(value?: string, controlType?: strin
         content = paragraphedLines.join('');
     }
 
-    const dataPillRegex = /\${([^}]+)}/g;
-
-    const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
+    const matches = value.match(DATA_PILL_REGEX)?.map((match) => match.slice(2, -1));
 
     if (matches) {
         for (const match of matches) {
