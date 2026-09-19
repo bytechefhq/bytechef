@@ -279,9 +279,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     private FileEntry doStoreFileContent(
         String directory, String filename, InputStream inputStream, boolean generateFilename) {
 
-        directory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
-
-        Path directoryPath = resolveDirectoryPath(directory.toLowerCase());
+        Path directoryPath = resolveDirectoryPath(directory);
 
         Path filePath = directoryPath;
 
@@ -330,9 +328,21 @@ public class FilesystemFileStorageService implements FileStorageService {
         try {
             Path tenantDirectoryPath = baseDirPath.resolve(TenantContext.getCurrentTenantId());
 
-            return Files.createDirectories(tenantDirectoryPath.resolve(directory));
+            return Files.createDirectories(tenantDirectoryPath.resolve(normalizeDirectory(directory)));
         } catch (IOException ioe) {
             throw new FileStorageException("Could not initialize storage", ioe);
         }
+    }
+
+    /**
+     * Normalizes a directory to the on-disk form. Applied for every access — read and write alike — so a caller that
+     * stores into a directory always reads back from the same place. Previously only the store path normalized, so a
+     * directory containing characters this strips (for example a hyphen) or any uppercase silently wrote to one
+     * location and listed another, yielding empty results.
+     */
+    private static String normalizeDirectory(String directory) {
+        String normalizedDirectory = StringUtils.replace(directory.replaceAll("[^0-9a-zA-Z/_]", ""), " ", "");
+
+        return normalizedDirectory.toLowerCase();
     }
 }
