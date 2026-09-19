@@ -137,6 +137,19 @@ describe('PropertyComboBox', () => {
         expect(hoisted.mockOnValueChange).toHaveBeenCalledWith('beta');
     });
 
+    it('should not duplicate the default option as a separate list item', async () => {
+        render(<PropertyComboBox {...defaultProps} defaultValue="alpha" />);
+
+        await userEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+            'AlphaFirst option description',
+            'BetaSecond option description',
+            'Gamma',
+        ]);
+        expect(screen.queryByText('Default (Alpha)')).not.toBeInTheDocument();
+    });
+
     it('should render a label when provided', () => {
         render(<PropertyComboBox {...defaultProps} label="Test Label" />);
 
