@@ -707,7 +707,7 @@ const PropertyComboBox = ({
                                     );
                                 })}
 
-                                {!optionsLoadedDynamically && (
+                                {!optionsLoadedDynamically && !defaultOptionLabel && (
                                     <CommandItem
                                         className="cursor-pointer font-normal hover:bg-muted"
                                         key="resetOption"
@@ -720,9 +720,7 @@ const PropertyComboBox = ({
                                         }}
                                         value=""
                                     >
-                                        <span>
-                                            {defaultOptionLabel ? `Default (${defaultOptionLabel})` : 'Select...'}
-                                        </span>
+                                        <span>Select...</span>
 
                                         {value === '' && <CheckIcon className="ml-auto size-4" />}
                                     </CommandItem>
