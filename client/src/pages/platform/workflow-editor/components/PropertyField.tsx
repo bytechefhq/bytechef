@@ -39,7 +39,9 @@ const PropertyField = ({
         sampleValue = sampleOutput;
     }
 
-    valueToCopy = valueToCopy || `$\{${resolveArrayIndexTemplate(`${workflowNodeName}.${selector}`)}}`;
+    const dataPillPath = resolveArrayIndexTemplate(`${workflowNodeName}.${selector}`);
+
+    valueToCopy = valueToCopy || `$\{${dataPillPath}}`;
 
     return (
         <div className="group inline-flex w-full items-center justify-between rounded-md p-1 text-sm hover:bg-surface-neutral-primary-hover">
