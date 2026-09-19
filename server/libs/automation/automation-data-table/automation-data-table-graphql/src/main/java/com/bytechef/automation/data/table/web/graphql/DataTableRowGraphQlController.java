@@ -26,6 +26,7 @@ import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -49,6 +50,7 @@ public class DataTableRowGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#tableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public List<Row> dataTableRows(@Argument Long environmentId, @Argument Long tableId) {
         String baseName = dataTableService.getBaseNameById(tableId);
 
@@ -61,6 +63,7 @@ public class DataTableRowGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#tableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public RowPage dataTableRowsPage(
         @Argument Long environmentId, @Argument Long tableId, @Argument Integer limit, @Argument Integer offset) {
 
@@ -85,6 +88,7 @@ public class DataTableRowGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public Row insertDataTableRow(@Argument InsertRowInput input) {
         Long environmentId = input.environmentId();
         String baseName = dataTableService.getBaseNameById(input.tableId());
@@ -96,6 +100,7 @@ public class DataTableRowGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public Row updateDataTableRow(@Argument UpdateRowInput input) {
         Long environmentId = input.environmentId();
         String baseName = dataTableService.getBaseNameById(input.tableId());
@@ -107,6 +112,7 @@ public class DataTableRowGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public boolean deleteDataTableRow(@Argument DeleteRowInput input) {
         Long environmentId = input.environmentId();
         String baseName = dataTableService.getBaseNameById(input.tableId());
@@ -115,6 +121,7 @@ public class DataTableRowGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#tableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public String exportDataTableCsv(@Argument Long environmentId, @Argument Long tableId) {
         String baseName = dataTableService.getBaseNameById(tableId);
 
@@ -122,6 +129,7 @@ public class DataTableRowGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public boolean importDataTableCsv(@Argument ImportCsvInput input) {
         Long environmentId = input.environmentId();
 

@@ -91,6 +91,15 @@ describe('ColumnHeaderCell', () => {
         });
     });
 
+    describe('read-only', () => {
+        it('should hide the column menu when readOnly is true', () => {
+            render(<ColumnHeaderCell {...defaultProps} readOnly />);
+
+            expect(screen.getByText('Test Column')).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Column Test Column menu'})).not.toBeInTheDocument();
+        });
+    });
+
     describe('different column names', () => {
         it('should handle column name with special characters', () => {
             render(<ColumnHeaderCell {...defaultProps} columnName="Column with 'quotes' & symbols!" />);

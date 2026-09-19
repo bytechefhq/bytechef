@@ -9,6 +9,7 @@ import DescriptionTab from '@/pages/platform/workflow-editor/components/node-det
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import OutputTab from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {
@@ -93,6 +94,8 @@ const WorkflowNodeDetailsPanel = ({
     const panelOpenedFromIssuesSidebar = useWorkflowNodeDetailsPanelStore(
         (state) => state.panelOpenedFromIssuesSidebar
     );
+
+    const readOnly = useWorkflowEditorReadOnly();
 
     const nodeVersion = getNodeVersion(currentWorkflowNode);
 
@@ -198,33 +201,35 @@ const WorkflowNodeDetailsPanel = ({
                             )}
 
                             {currentWorkflowNodeOperations && !operationDataMissing && (
-                                <CurrentOperationSelect
-                                    clusterElementLabel={
-                                        currentNode.clusterElementType &&
-                                        getClusterElementsLabel(currentNode.clusterElementType)
-                                    }
-                                    description={getNodeOperationDescription({
-                                        actionDescription: currentActionDefinition?.description,
-                                        clusterElementOperations: filteredClusterElementOperations,
-                                        currentNode,
-                                        currentOperationName,
-                                        rootClusterElementWorkflowNodeName:
-                                            rootClusterElementNodeData?.workflowNodeName,
-                                        triggerDescription: currentTriggerDefinition?.description,
-                                    })}
-                                    handleValueChange={handleOperationSelectChange}
-                                    operations={
-                                        (currentNode?.trigger
-                                            ? currentComponentDefinition?.triggers
-                                            : !!currentNode?.clusterElementType &&
-                                                currentNode?.workflowNodeName !==
-                                                    rootClusterElementNodeData?.workflowNodeName
-                                              ? filteredClusterElementOperations
-                                              : currentComponentDefinition?.actions)!
-                                    }
-                                    triggerSelect={currentNode?.trigger}
-                                    value={currentOperationName}
-                                />
+                                <fieldset className="m-0 min-w-0 border-0 p-0" disabled={readOnly}>
+                                    <CurrentOperationSelect
+                                        clusterElementLabel={
+                                            currentNode.clusterElementType &&
+                                            getClusterElementsLabel(currentNode.clusterElementType)
+                                        }
+                                        description={getNodeOperationDescription({
+                                            actionDescription: currentActionDefinition?.description,
+                                            clusterElementOperations: filteredClusterElementOperations,
+                                            currentNode,
+                                            currentOperationName,
+                                            rootClusterElementWorkflowNodeName:
+                                                rootClusterElementNodeData?.workflowNodeName,
+                                            triggerDescription: currentTriggerDefinition?.description,
+                                        })}
+                                        handleValueChange={handleOperationSelectChange}
+                                        operations={
+                                            (currentNode?.trigger
+                                                ? currentComponentDefinition?.triggers
+                                                : !!currentNode?.clusterElementType &&
+                                                    currentNode?.workflowNodeName !==
+                                                        rootClusterElementNodeData?.workflowNodeName
+                                                  ? filteredClusterElementOperations
+                                                  : currentComponentDefinition?.actions)!
+                                        }
+                                        triggerSelect={currentNode?.trigger}
+                                        value={currentOperationName}
+                                    />
+                                </fieldset>
                             )}
 
                             {errors.length > 0 && (
@@ -315,49 +320,53 @@ const WorkflowNodeDetailsPanel = ({
 
                             <ScrollArea className="h-full max-w-workflow-node-details-panel-width bg-surface-main [&_[data-radix-scroll-area-viewport]>div]:block! [&>div]:relative">
                                 <div className="size-full max-w-workflow-node-details-panel-width">
-                                    {activeTab === 'description' &&
-                                        (nodeDefinition ? (
-                                            <DescriptionTab
-                                                key={`${currentNode?.componentName}-${currentNode?.type}_description`}
-                                                nodeDefinition={nodeDefinition}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                            />
-                                        ) : (
-                                            <DescriptionTabSkeleton />
-                                        ))}
+                                    {activeTab !== 'output' && (
+                                        <fieldset className="m-0 size-full min-w-0 border-0 p-0" disabled={readOnly}>
+                                            {activeTab === 'description' &&
+                                                (nodeDefinition ? (
+                                                    <DescriptionTab
+                                                        key={`${currentNode?.componentName}-${currentNode?.type}_description`}
+                                                        nodeDefinition={nodeDefinition}
+                                                        updateWorkflowMutation={updateWorkflowMutation}
+                                                    />
+                                                ) : (
+                                                    <DescriptionTabSkeleton />
+                                                ))}
 
-                                    {activeTab === 'connection' &&
-                                        (currentWorkflowNodeConnections.length > 0 ||
-                                            currentComponentDefinition?.connection !== undefined) &&
-                                        currentNode &&
-                                        currentComponentDefinition && (
-                                            <ConnectionTab
-                                                componentConnections={currentWorkflowNodeConnections}
-                                                currentComponentDefinition={currentComponentDefinition}
-                                                key={`${currentNode?.workflowNodeName}_connection`}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                                workflowId={workflow.id!}
-                                                workflowNodeName={currentNode?.workflowNodeName}
-                                                workflowTestConfigurationConnections={
-                                                    workflowTestConfigurationConnections
-                                                }
-                                            />
-                                        )}
+                                            {activeTab === 'connection' &&
+                                                (currentWorkflowNodeConnections.length > 0 ||
+                                                    currentComponentDefinition?.connection !== undefined) &&
+                                                currentNode &&
+                                                currentComponentDefinition && (
+                                                    <ConnectionTab
+                                                        componentConnections={currentWorkflowNodeConnections}
+                                                        currentComponentDefinition={currentComponentDefinition}
+                                                        key={`${currentNode?.workflowNodeName}_connection`}
+                                                        updateWorkflowMutation={updateWorkflowMutation}
+                                                        workflowId={workflow.id!}
+                                                        workflowNodeName={currentNode?.workflowNodeName}
+                                                        workflowTestConfigurationConnections={
+                                                            workflowTestConfigurationConnections
+                                                        }
+                                                    />
+                                                )}
 
-                                    {activeTab === 'properties' &&
-                                        (!operationDataMissing &&
-                                        currentOperationProperties?.length &&
-                                        !awaitingFirstSave ? (
-                                            <Properties
-                                                customClassName="p-4"
-                                                displayConditionsQuery={activeDisplayConditionsQuery}
-                                                key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
-                                                operationName={currentOperationName}
-                                                properties={currentOperationProperties}
-                                            />
-                                        ) : (
-                                            <PropertiesTabSkeleton />
-                                        ))}
+                                            {activeTab === 'properties' &&
+                                                (!operationDataMissing &&
+                                                currentOperationProperties?.length &&
+                                                !awaitingFirstSave ? (
+                                                    <Properties
+                                                        customClassName="p-4"
+                                                        displayConditionsQuery={activeDisplayConditionsQuery}
+                                                        key={`${currentNode?.componentName}-${currentNode?.type}_${currentOperationName}_properties`}
+                                                        operationName={currentOperationName}
+                                                        properties={currentOperationProperties}
+                                                    />
+                                                ) : (
+                                                    <PropertiesTabSkeleton />
+                                                ))}
+                                        </fieldset>
+                                    )}
 
                                     {activeTab === 'output' && (
                                         <OutputTab
@@ -387,7 +396,7 @@ const WorkflowNodeDetailsPanel = ({
                         </main>
 
                         <footer className="z-50 mt-auto flex items-center justify-between bg-background px-4 py-2">
-                            <Select onValueChange={handleVersionSelectChange} value={nodeVersion}>
+                            <Select disabled={readOnly} onValueChange={handleVersionSelectChange} value={nodeVersion}>
                                 <SelectTrigger
                                     aria-label="Component version"
                                     className="w-auto border-none shadow-none"

@@ -4,6 +4,7 @@ import {LayoutDirectionType} from '@/shared/constants';
 import {EdgeLabelRenderer} from '@xyflow/react';
 import {CheckIcon, PenIcon, PlusIcon, TrashIcon} from 'lucide-react';
 
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useBranchCaseLabel from './useBranchCaseLabel';
 
 interface BranchCaseLabelProps {
@@ -51,6 +52,7 @@ export default function BranchCaseLabel({
         targetX,
         targetY,
     });
+    const readOnly = useWorkflowEditorReadOnly();
 
     return (
         <EdgeLabelRenderer key={`${edgeId}-case-label`}>
@@ -79,19 +81,25 @@ export default function BranchCaseLabel({
                             value={caseKeyValue}
                         />
 
-                        <Button
-                            className="absolute top-1/2 right-2 size-4 -translate-y-1/2 cursor-pointer text-content-neutral-primary/50 hover:bg-transparent hover:text-content-neutral-primary [&_svg]:size-3"
-                            icon={
-                                isCaseKeyEditable ? <CheckIcon className="text-content-brand-primary" /> : <PenIcon />
-                            }
-                            onClick={isCaseKeyEditable ? handleSaveCaseClick : handleEditCaseClick}
-                            size="icon"
-                            variant="ghost"
-                        />
+                        {!readOnly && (
+                            <Button
+                                className="absolute top-1/2 right-2 size-4 -translate-y-1/2 cursor-pointer text-content-neutral-primary/50 hover:bg-transparent hover:text-content-neutral-primary [&_svg]:size-3"
+                                icon={
+                                    isCaseKeyEditable ? (
+                                        <CheckIcon className="text-content-brand-primary" />
+                                    ) : (
+                                        <PenIcon />
+                                    )
+                                }
+                                onClick={isCaseKeyEditable ? handleSaveCaseClick : handleEditCaseClick}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        )}
                     </div>
                 )}
 
-                {!isDefaultCase && branchCases?.length > 1 && (
+                {!readOnly && !isDefaultCase && branchCases?.length > 1 && (
                     <Button
                         className="ml-1 size-auto cursor-pointer p-1 text-content-destructive/50 hover:bg-surface-destructive-secondary hover:text-content-destructive [&_svg]:size-4"
                         icon={isDeleteConfirmationVisible ? <CheckIcon /> : <TrashIcon />}
@@ -101,7 +109,7 @@ export default function BranchCaseLabel({
                     />
                 )}
 
-                {isLastCase && (
+                {!readOnly && isLastCase && (
                     <Button
                         className="ml-1 size-auto cursor-pointer p-1 text-content-neutral-primary/50 hover:bg-surface-neutral-primary-hover hover:text-content-neutral-primary [&_svg]:size-4"
                         icon={<PlusIcon />}

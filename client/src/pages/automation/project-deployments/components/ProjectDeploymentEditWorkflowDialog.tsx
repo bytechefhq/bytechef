@@ -15,6 +15,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     ProjectDeployment,
     ProjectDeploymentWorkflow,
@@ -47,6 +48,8 @@ const ProjectDeploymentEditWorkflowDialog = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const canViewConnections = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_VIEW');
+
     const componentConnections = getWorkflowComponentConnections(workflow);
 
     const {data: connections} = useGetWorkspaceConnectionsQuery(
@@ -54,7 +57,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
             environmentId: currentEnvironmentId,
             id: currentWorkspaceId!,
         },
-        !!currentWorkspaceId
+        !!currentWorkspaceId && canViewConnections
     );
 
     const form = useForm<ProjectDeployment>({

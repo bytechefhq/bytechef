@@ -12,6 +12,7 @@ import com.bytechef.ee.automation.configuration.repository.ProjectGitConfigurati
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +55,11 @@ public class ProjectGitConfigurationServiceImpl implements ProjectGitConfigurati
         return projectGitConfigurationRepository.findAllByWorkspaceId(workspaceId);
     }
 
+    // Chooses the branch a project syncs with and turns sync on or off, which decides whether publishing pushes to Git.
+    // Was unguarded. The reads above stay open: a branch name and an enabled flag are not sensitive, and the project
+    // list and the project menu load them for every member.
     @Override
+    @PreAuthorize("hasPermission(#projectGitConfiguration.projectId, 'Project', 'WORKSPACE_MANAGE')")
     public void save(ProjectGitConfiguration projectGitConfiguration) {
         projectGitConfigurationRepository.findByProjectId(projectGitConfiguration.getProjectId())
             .ifPresentOrElse(curProjectGitConfiguration -> {

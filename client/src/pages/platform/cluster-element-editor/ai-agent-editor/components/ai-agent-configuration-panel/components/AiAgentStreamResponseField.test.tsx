@@ -1,3 +1,4 @@
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -70,5 +71,23 @@ describe('AiAgentStreamResponseField', () => {
         await userEvent.click(screen.getByRole('switch', {name: /stream response/i}));
 
         expect(updateStreamingMock).toHaveBeenCalledWith(true);
+    });
+
+    it('disables the switch in read-only mode', async () => {
+        mockHook(false, true);
+
+        render(
+            <WorkflowEditorReadOnlyContext.Provider value={true}>
+                <AiAgentStreamResponseField />
+            </WorkflowEditorReadOnlyContext.Provider>
+        );
+
+        const switchElement = screen.getByRole('switch', {name: /stream response/i});
+
+        expect(switchElement).toBeDisabled();
+
+        await userEvent.click(switchElement);
+
+        expect(updateStreamingMock).not.toHaveBeenCalled();
     });
 });

@@ -19,6 +19,7 @@
 import {UpdateWorkflowMutationType} from '@/shared/types';
 
 import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
+import {isWorkflowEditorReadOnly} from './workflowEditorReadOnlyGuard';
 
 const mutatingWorkflows = new Set<string>();
 
@@ -120,6 +121,10 @@ export function drainPendingDefinitionMutation({
     updateWorkflowMutation,
     workflowId,
 }: DrainPendingMutationProps): void {
+    if (isWorkflowEditorReadOnly()) {
+        return;
+    }
+
     const pendingDefinition = consumePendingDefinition(workflowId);
 
     if (!pendingDefinition) {

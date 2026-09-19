@@ -21,6 +21,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.facade.UserManagementFacade;
 import com.bytechef.platform.user.facade.UserManagementFacade.UsersWithAuthorities;
+import com.bytechef.platform.user.service.WorkspaceMembershipAssigner.WorkspaceAssignment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,8 +55,10 @@ public class UserGraphQlController {
     }
 
     @MutationMapping(name = "inviteUser")
-    public Boolean inviteUser(@Argument String email, @Argument String password, @Argument String role) {
-        userManagementFacade.inviteUser(email, password, role);
+    public Boolean inviteUser(
+        @Argument String email, @Argument String role, @Argument List<WorkspaceAssignment> workspaces) {
+
+        userManagementFacade.inviteUser(email, role, workspaces == null ? List.of() : workspaces);
 
         return true;
     }

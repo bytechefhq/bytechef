@@ -1,7 +1,7 @@
 extend type Query {
     dataTables(environmentId: ID!, workspaceId: ID!): [DataTable!]!
-    dataTableTags: [Tag!]!
-    dataTableTagsByTable: [DataTableTagsEntry!]!
+    dataTableTags(environmentId: ID!, workspaceId: ID!): [Tag!]!
+    dataTableTagsByTable(environmentId: ID!, workspaceId: ID!): [DataTableTagsEntry!]!
     dataTableWebhooks(environmentId: ID!, tableId: ID!): [DataTableWebhook!]!
 }
 

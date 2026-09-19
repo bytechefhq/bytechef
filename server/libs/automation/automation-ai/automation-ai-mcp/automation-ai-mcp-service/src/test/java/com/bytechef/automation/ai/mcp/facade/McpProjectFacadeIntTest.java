@@ -17,6 +17,7 @@
 package com.bytechef.automation.ai.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfiguration;
 import com.bytechef.automation.ai.mcp.config.McpProjectIntTestConfigurationSharedMocks;
@@ -24,6 +25,8 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.repository.McpProjectWorkflowRepository;
+import com.bytechef.automation.ai.mcp.repository.WorkspaceMcpServerRepository;
+import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
@@ -46,6 +49,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * @author Ivica Cardic
@@ -80,6 +84,12 @@ public class McpProjectFacadeIntTest {
     private ProjectDeploymentWorkflowRepository projectDeploymentWorkflowRepository;
 
     @Autowired
+    private WorkspaceMcpServerRepository workspaceMcpServerRepository;
+
+    @Autowired
+    private WorkspaceMcpServerService workspaceMcpServerService;
+
+    @Autowired
     private WorkspaceRepository workspaceRepository;
 
     private Project project;
@@ -103,6 +113,8 @@ public class McpProjectFacadeIntTest {
 
         project = projectRepository.save(project);
 
+        workspaceMcpServerService.assignMcpServerToWorkspace(mcpServer.getId(), workspace.getId());
+
         projectDeployment = new ProjectDeployment();
         projectDeployment.setName("test-deployment");
         projectDeployment.setDescription("test deployment");
@@ -118,12 +130,35 @@ public class McpProjectFacadeIntTest {
     public void afterEach() {
         mcpProjectWorkflowRepository.deleteAll();
         mcpProjectRepository.deleteAll();
+        workspaceMcpServerRepository.deleteAll();
         projectDeploymentWorkflowRepository.deleteAll();
         projectDeploymentRepository.deleteAll();
         projectRepository.deleteAll();
         workspaceRepository.deleteAll();
         categoryRepository.deleteAll();
         mcpServerRepository.deleteAll();
+    }
+
+    @Test
+    public void testCreateMcpProjectRefusesAProjectFromAnotherWorkspace() {
+        Workspace otherWorkspace = workspaceRepository.save(new Workspace("other-workspace"));
+
+        Project otherProject = projectRepository.save(
+            Project.builder()
+                .categoryId(project.getCategoryId())
+                .description("other-project")
+                .name("other-project")
+                .workspaceId(otherWorkspace.getId())
+                .build());
+
+        assertThatThrownBy(() -> mcpProjectFacade.createMcpProject(
+            mcpServer.getId(), otherProject.getId(), 1, List.of("workflow1")))
+                .isInstanceOf(AccessDeniedException.class);
+
+        assertThat(mcpProjectRepository.findAll()).isEmpty();
+        assertThat(projectDeploymentRepository.findAll())
+            .extracting(ProjectDeployment::getProjectId)
+            .doesNotContain(otherProject.getId());
     }
 
     @Test

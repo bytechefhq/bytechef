@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {MoreHorizontalIcon} from 'lucide-react';
 
@@ -62,6 +63,8 @@ const OutputSchemaDisplay = ({
     variablePropertiesDefined,
     variableSampleOutput,
 }: OutputSchemaDisplayProps) => {
+    const readOnly = useWorkflowEditorReadOnly();
+
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
     const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
 
@@ -72,73 +75,75 @@ const OutputSchemaDisplay = ({
                     <div className="mb-2 flex items-center justify-between">
                         <h3 className="text-sm text-content-neutral-secondary">Output Schema</h3>
 
-                        <ButtonGroup>
-                            {!resumePerformFunctionDefined &&
-                                !variablePropertiesDefined &&
-                                (showClusterElementTestButton &&
-                                currentOperationProperties &&
-                                handleClusterElementTestSubmit ? (
-                                    <ClusterElementTestButton
-                                        clusterElementType={clusterElementType}
-                                        connectionMissing={connectionMissing}
-                                        currentNode={currentNode}
-                                        onSubmit={handleClusterElementTestSubmit}
-                                        properties={currentOperationProperties}
-                                        saving={!!saveClusterElementTestOutputMutationPending}
-                                    />
-                                ) : (
-                                    <Button
-                                        disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
-                                        label={`Test ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}
-                                        onClick={handleTestOperationClick}
-                                        variant="outline"
-                                    />
-                                ))}
+                        {!readOnly && (
+                            <ButtonGroup>
+                                {!resumePerformFunctionDefined &&
+                                    !variablePropertiesDefined &&
+                                    (showClusterElementTestButton &&
+                                    currentOperationProperties &&
+                                    handleClusterElementTestSubmit ? (
+                                        <ClusterElementTestButton
+                                            clusterElementType={clusterElementType}
+                                            connectionMissing={connectionMissing}
+                                            currentNode={currentNode}
+                                            onSubmit={handleClusterElementTestSubmit}
+                                            properties={currentOperationProperties}
+                                            saving={!!saveClusterElementTestOutputMutationPending}
+                                        />
+                                    ) : (
+                                        <Button
+                                            disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
+                                            label={`Test ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                            onClick={handleTestOperationClick}
+                                            variant="outline"
+                                        />
+                                    ))}
 
-                            {(resumePerformFunctionDefined || (outputSchema && variablePropertiesDefined)) &&
-                                !isClusterElement && (
-                                    <Button
-                                        disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                        label="Upload Sample Output"
-                                        onClick={() => setShowUploadDialog(true)}
-                                        variant="outline"
-                                    />
-                                )}
+                                {(resumePerformFunctionDefined || (outputSchema && variablePropertiesDefined)) &&
+                                    !isClusterElement && (
+                                        <Button
+                                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                            label="Upload Sample Output"
+                                            onClick={() => setShowUploadDialog(true)}
+                                            variant="outline"
+                                        />
+                                    )}
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        aria-label="More Options"
-                                        disabled={saveWorkflowNodeTestOutputMutation.isPending}
-                                        icon={<MoreHorizontalIcon />}
-                                        size="icon"
-                                        variant="outline"
-                                    />
-                                </DropdownMenuTrigger>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            aria-label="More Options"
+                                            disabled={saveWorkflowNodeTestOutputMutation.isPending}
+                                            icon={<MoreHorizontalIcon />}
+                                            size="icon"
+                                            variant="outline"
+                                        />
+                                    </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end" className="w-52">
-                                    <DropdownMenuGroup>
-                                        {!resumePerformFunctionDefined &&
-                                            !variablePropertiesDefined &&
-                                            !isClusterElement && (
-                                                <DropdownMenuItem
-                                                    className="cursor-pointer"
-                                                    onClick={() => setShowUploadDialog(true)}
-                                                >
-                                                    Upload Sample Output
-                                                </DropdownMenuItem>
-                                            )}
+                                    <DropdownMenuContent align="end" className="w-52">
+                                        <DropdownMenuGroup>
+                                            {!resumePerformFunctionDefined &&
+                                                !variablePropertiesDefined &&
+                                                !isClusterElement && (
+                                                    <DropdownMenuItem
+                                                        className="cursor-pointer"
+                                                        onClick={() => setShowUploadDialog(true)}
+                                                    >
+                                                        Upload Sample Output
+                                                    </DropdownMenuItem>
+                                                )}
 
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onClick={handlePredefinedOutputSchemaClick}
-                                        >
-                                            Reset
-                                        </DropdownMenuItem>
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </ButtonGroup>
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onClick={handlePredefinedOutputSchemaClick}
+                                            >
+                                                Reset
+                                            </DropdownMenuItem>
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
+                        )}
                     </div>
 
                     <PropertyField

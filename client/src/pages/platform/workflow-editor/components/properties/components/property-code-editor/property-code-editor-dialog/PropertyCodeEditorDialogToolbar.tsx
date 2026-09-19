@@ -4,6 +4,7 @@ import {DialogClose} from '@/components/ui/dialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
     PanelRightCloseIcon,
@@ -54,31 +55,37 @@ const PropertyCodeEditorDialogToolbar = ({
 
     const ff_2504 = useFeatureFlagsStore()('ff-2504');
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <div className="flex flex-row items-center justify-between space-y-0 border-b border-b-border/50 p-3">
             <span className="text-lg font-semibold">Edit Script</span>
 
             <div className="flex items-center gap-1">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            disabled={!dirty || saving}
-                            icon={saving ? <LoadingIcon /> : <SaveIcon />}
-                            onClick={handleSaveClick}
-                            size="icon"
-                            type="submit"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
+                {!readOnly && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                aria-label="Save script"
+                                disabled={!dirty || saving}
+                                icon={saving ? <LoadingIcon /> : <SaveIcon />}
+                                onClick={handleSaveClick}
+                                size="icon"
+                                type="submit"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
 
-                    <TooltipContent>{saving ? 'Saving...' : 'Save current workflow'}</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>{saving ? 'Saving...' : 'Save current workflow'}</TooltipContent>
+                    </Tooltip>
+                )}
 
-                {!scriptIsRunning && (
+                {!readOnly && !scriptIsRunning && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <span tabIndex={0}>
                                 <Button
+                                    aria-label="Run script"
                                     disabled={dirty}
                                     icon={<PlayIcon className="text-success" />}
                                     onClick={handleRunClick}
@@ -109,7 +116,7 @@ const PropertyCodeEditorDialogToolbar = ({
                     <TooltipContent>{rightPanelOpen ? 'Hide side panel' : 'Show side panel'}</TooltipContent>
                 </Tooltip>
 
-                {ff_2504 && copilotEnabled && (
+                {!readOnly && ff_2504 && copilotEnabled && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button

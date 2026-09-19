@@ -17,12 +17,14 @@ export function clearActiveToasts() {
 const TOAST_SAFETY_TIMEOUT_MS = 30000;
 
 /*
- * A 403 on a CSRF-protected endpoint (`/graphql`, `/internal/`) is almost always a transient CSRF
- * token race rather than a real authorization failure — genuine auth failures return 401 here. The
- * token is rotated whenever the session silently re-authenticates (e.g. remember-me kicking in after
- * a session timeout), or the XSRF-TOKEN cookie has not been established yet, so a request already in
- * flight can carry a stale/empty token and be rejected. We refresh the token and replay the request
- * once before treating it as fatal. See https://github.com/bytechefhq/bytechef/issues/5189.
+ * A 403 on a CSRF-protected endpoint (`/graphql`, `/internal/`) is either a transient CSRF token race
+ * or a permission denial. The CSRF filter answers with an empty body, while a denied permission check
+ * answers with a problem-detail body. The token is rotated whenever the session silently
+ * re-authenticates (e.g. remember-me kicking in after a session timeout), or the XSRF-TOKEN cookie has
+ * not been established yet, so a request already in flight can carry a stale/empty token and be
+ * rejected. We refresh the token and replay the request once; a replay that is still refused with a
+ * body is a permission denial and is reported, never treated as a lost session. See
+ * https://github.com/bytechefhq/bytechef/issues/5189.
  */
 function isCsrfProtectedUrl(url: string): boolean {
     return url.includes('/graphql') || url.includes('/internal/');
@@ -59,6 +61,28 @@ function resolveUrl(input: RequestInfo | URL): string {
     }
 
     return input.url;
+}
+
+async function readResponseText(response: Response): Promise<string> {
+    try {
+        return await response.clone().text();
+    } catch {
+        return '';
+    }
+}
+
+/*
+ * The REST error handler answers a permission denial with a problem detail whose `detail` is "Access denied". Any other
+ * 403 body, such as Spring's default error body for a rejected CSRF token, means the session is gone.
+ */
+function isPermissionDenialBody(responseBody: string): boolean {
+    try {
+        const problemDetail = JSON.parse(responseBody) as {detail?: unknown} | null;
+
+        return problemDetail?.detail === 'Access denied';
+    } catch {
+        return false;
+    }
 }
 
 let csrfRefreshPromise: Promise<void> | null = null;
@@ -256,6 +280,16 @@ export default function useFetchInterceptor() {
             const retriedResponse = await interceptedFetch(input, init);
 
             if (retriedResponse.status === 403) {
+                const retriedResponseBody = await readResponseText(retriedResponse);
+
+                if (isPermissionDenialBody(retriedResponseBody)) {
+                    showErrorToast('fetch-error-403', 'Access denied', {
+                        description: 'You do not have permission to perform this action.',
+                    });
+
+                    return retriedResponse;
+                }
+
                 clearAuthentication();
                 clearCurrentWorkspaceId();
 

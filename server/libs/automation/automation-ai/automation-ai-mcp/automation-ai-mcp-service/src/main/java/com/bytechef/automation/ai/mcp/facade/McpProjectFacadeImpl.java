@@ -18,6 +18,7 @@ package com.bytechef.automation.ai.mcp.facade;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
+import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
@@ -32,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,24 +48,32 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
 
     private final McpProjectService mcpProjectService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
+    private final McpProjectWorkspaceGuard mcpProjectWorkspaceGuard;
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpProjectFacadeImpl(
         McpProjectService mcpProjectService, McpProjectWorkflowService mcpProjectWorkflowService,
-        ProjectDeploymentService projectDeploymentService,
+        McpProjectWorkspaceGuard mcpProjectWorkspaceGuard, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
 
         this.mcpProjectService = mcpProjectService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
+        this.mcpProjectWorkspaceGuard = mcpProjectWorkspaceGuard;
         this.projectDeploymentService = projectDeploymentService;
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
+
+        // The guard above checks the server only. Without this, a member of two workspaces could attach a project from
+        // one to a server in the other, and MCP_VIEW in the server's workspace would then expose that project's
+        // workflows as tools. Checked before the deployment is created, so a refused link leaves nothing behind.
+        mcpProjectWorkspaceGuard.requireProjectInServerWorkspace(mcpServerId, projectId);
 
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
@@ -96,6 +106,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public void deleteMcpProject(long mcpProjectId) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));

@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation(libs.io.swagger.parser.v3.swagger.parser)
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.apache.commons:commons-lang3")
@@ -12,6 +13,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

@@ -5,6 +5,7 @@ import {
     SimpleMutationProps,
 } from '@/ee/shared/components/api-keys/providers/apiKeysProvider';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     ApiKey,
     useCreateWorkspaceApiKeyMutation,
@@ -18,6 +19,9 @@ import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react
 const WorkspaceApiKeys = () => {
     const environmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canCreateApiKey = useHasWorkspaceScope(workspaceId, 'API_KEY_CREATE');
+    const canDeleteApiKey = useHasWorkspaceScope(workspaceId, 'API_KEY_DELETE');
 
     const queryClient = useQueryClient();
 
@@ -106,6 +110,8 @@ const WorkspaceApiKeys = () => {
             }}
         >
             <ApiKeysContent
+                canCreate={canCreateApiKey}
+                canDelete={canDeleteApiKey}
                 description="Do not share your API key with others or expose it in the browser or other client-side code."
                 title="API Keys"
             />

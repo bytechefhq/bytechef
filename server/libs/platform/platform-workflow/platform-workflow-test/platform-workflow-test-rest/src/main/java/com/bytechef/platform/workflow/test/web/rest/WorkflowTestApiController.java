@@ -38,12 +38,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -100,6 +102,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      * @return an {@link SseEmitter} instance that streams events such as start, error, and result to the client
      */
     @GetMapping(value = "/workflow-tests/{jobId}/attach", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PreAuthorize("hasPermission(#jobId, 'TestJob', 'WORKFLOW_EDIT')")
     @SuppressFBWarnings(
         value = "CRLF_INJECTION_LOGS",
         justification = "jobId is Long (no CRLF), exception messages sanitized with StringUtils.sanitize")
@@ -178,8 +181,16 @@ public class WorkflowTestApiController implements WorkflowTestApi {
      */
     @Override
     @PostMapping(value = "/workflow-tests/{jobId}/stop")
+    @PreAuthorize("hasPermission(T(org.apache.commons.lang3.math.NumberUtils).toLong(#jobId, -1L), 'TestJob', "
+        + "'WORKFLOW_EDIT')")
     public ResponseEntity<Void> stopWorkflowTest(@PathVariable String jobId) {
-        if (!jobId.matches("\\d+")) {
+        // Genuinely reachable, not defense in depth: the gate above resolves a malformed or overflowing jobId to -1
+        // via NumberUtils.toLong(#jobId, -1L) and calls hasPermission with that fallback, not with the original
+        // string. For a tenant admin, hasResourceScope short-circuits on isTenantAdmin() before resolving an owner,
+        // so it permits -1 like any other id. This guard turns that permitted-but-unparseable jobId into a clean 400
+        // instead of Long.parseLong throwing below. It replaces a \d+ match, which accepted an all-digit id too large
+        // for a long and left exactly that hole.
+        if (NumberUtils.toLong(jobId, -1L) < 0) {
             return ResponseEntity.badRequest()
                 .build();
         }
@@ -217,6 +228,7 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     @PostMapping(
         value = "/workflows/{id}/tests", consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#id, 'WORKFLOW_EDIT', #environmentId)")
     public SseEmitter startWorkflowTest(
         @PathVariable String id, @RequestParam("environmentId") Long environmentId,
         @Nullable @RequestBody TestWorkflowRequest testWorkflowRequest) {

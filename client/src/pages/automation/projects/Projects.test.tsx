@@ -19,6 +19,13 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     }),
 }));
 
+const hoistedScope = vi.hoisted(() => ({canCreateProject: true}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        scope === 'PROJECT_CREATE' && hoistedScope.canCreateProject,
+}));
+
 // Mock the API queries
 vi.mock('@/shared/queries/automation/projectCategories.queries', () => ({
     useGetProjectCategoriesQuery: () => ({
@@ -95,6 +102,7 @@ let queryClient: QueryClient;
 beforeEach(() => {
     queryClient = createTestQueryClient();
     mockImportMutate.mockClear();
+    hoistedScope.canCreateProject = true;
 });
 
 afterEach(() => {
@@ -179,6 +187,15 @@ describe('Projects empty states', () => {
 
         expect(screen.getByText('No Projects')).toBeInTheDocument();
         expect(screen.getByText('Get started by creating a new project.')).toBeInTheDocument();
+    });
+
+    it('offers no create or import without PROJECT_CREATE', () => {
+        hoistedScope.canCreateProject = false;
+
+        renderProjects();
+
+        expect(screen.getByText('No Projects')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: /create project/i})).not.toBeInTheDocument();
     });
 
     // The filtered list and the unfiltered one were the same array, so a filter that matched nothing rendered

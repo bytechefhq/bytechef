@@ -19,8 +19,17 @@ package com.bytechef.platform.component.log;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.log.domain.LogEntry;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
+ * Carries its own guards rather than inheriting the delegate's: the {@link LogFileStorageImpl} it builds below is
+ * constructed with {@code new}, so Spring never proxies it and the annotations on it do not run here.
+ *
+ * <p>
+ * The guards name {@code 'TriggerExecution'}, not {@code 'Job'}, despite the parameter being called {@code jobId}
+ * throughout this family. The callers pass a trigger execution id — see {@code triggerExecutionFileLogs} and
+ * {@code triggerExecutionFileLogsExist} — so resolving it as a job id would find no job and deny every read.
+ *
  * @author Ivica Cardic
  */
 public class TriggerLogFileStorageImpl implements TriggerLogFileStorage {
@@ -44,21 +53,25 @@ public class TriggerLogFileStorageImpl implements TriggerLogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_DELETE')")
     public void deleteLogEntries(long jobId) {
         logFileStorage.deleteLogEntries(jobId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_VIEW')")
     public boolean logsExist(long jobId) {
         return logFileStorage.logsExist(jobId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         return logFileStorage.readLogEntries(jobId, taskExecutionId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'TriggerExecution', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         return logFileStorage.readLogEntriesByJobId(jobId);
     }

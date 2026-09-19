@@ -5,7 +5,9 @@ import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Dialog, DialogCloseButton, DialogContent, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {TEMPLATE_SHARING_DOCUMENTATION_URL} from '@/shared/constants';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     useDeleteSharedProjectMutation,
     useExportSharedProjectMutation,
@@ -35,6 +37,10 @@ export function ProjectShareDialog({
     const [templateUrl, setTemplateUrl] = useState<string | undefined>();
     const [isCopied, setIsCopied] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canManageProjectSettings = useHasWorkspaceScope(currentWorkspaceId, 'PROJECT_SETTINGS');
+
     const {data: {sharedProject} = {}, refetch} = useSharedProjectQuery({
         projectUuid,
     });
@@ -61,6 +67,10 @@ export function ProjectShareDialog({
     };
 
     const handleToggleCheckedChange = () => {
+        if (!canManageProjectSettings) {
+            return;
+        }
+
         if (shareState === 'disabled') {
             exportSharedProjectMutation.mutate(
                 {
@@ -168,7 +178,12 @@ export function ProjectShareDialog({
                                             <span>An older version of this project is shared as a template</span>
                                         )}
 
-                                        <Switch checked={true} onCheckedChange={handleToggleCheckedChange} />
+                                        <Switch
+                                            aria-label="Shared template"
+                                            checked={true}
+                                            disabled={!canManageProjectSettings}
+                                            onCheckedChange={handleToggleCheckedChange}
+                                        />
                                     </div>
 
                                     {sharedProject?.projectVersion === projectVersion ? (
@@ -211,7 +226,11 @@ export function ProjectShareDialog({
                                             This project is not currently shared
                                         </span>
 
-                                        <Switch onCheckedChange={handleToggleCheckedChange} />
+                                        <Switch
+                                            aria-label="Shared template"
+                                            disabled={!canManageProjectSettings}
+                                            onCheckedChange={handleToggleCheckedChange}
+                                        />
                                     </div>
 
                                     <div>
@@ -252,7 +271,7 @@ export function ProjectShareDialog({
                     {shareState === 'not-shared' && (
                         <Button
                             className="w-full"
-                            disabled={!description}
+                            disabled={!description || !canManageProjectSettings}
                             label="Export and generate template link"
                             onClick={handleExport}
                         />
@@ -261,7 +280,7 @@ export function ProjectShareDialog({
                     {shareState === 'exported' && sharedProject?.projectVersion !== projectVersion && (
                         <Button
                             className="w-full"
-                            disabled={!description}
+                            disabled={!description || !canManageProjectSettings}
                             label="Update template based on the current version"
                             onClick={handleExport}
                         />

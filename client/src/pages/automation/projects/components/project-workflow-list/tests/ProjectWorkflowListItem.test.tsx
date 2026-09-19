@@ -1,7 +1,14 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
-import {render, screen} from '@/shared/util/test-utils';
+import {render, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+const hoistedScope = vi.hoisted(() => ({grantedScopes: ['WORKFLOW_CREATE', 'WORKFLOW_DELETE'] as string[]}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
 
 const mockInvalidateQueries = vi.fn();
 
@@ -124,6 +131,53 @@ const renderProjectWorkflowListItem = () => {
 describe('ProjectWorkflowListItem', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        hoistedScope.grantedScopes = ['WORKFLOW_CREATE', 'WORKFLOW_DELETE'];
+
+        windowResizeObserver();
+    });
+
+    it('should show Duplicate and Delete when WORKFLOW_CREATE and WORKFLOW_DELETE are granted', async () => {
+        renderProjectWorkflowListItem();
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+
+        expect(screen.getByText('Duplicate')).toBeInTheDocument();
+        expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('should hide Duplicate and Delete without WORKFLOW_CREATE and WORKFLOW_DELETE', async () => {
+        hoistedScope.grantedScopes = [];
+
+        renderProjectWorkflowListItem();
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+
+        expect(screen.getByRole('menu')).toBeInTheDocument();
+        expect(screen.queryByText('Duplicate')).not.toBeInTheDocument();
+        expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+    });
+
+    it('should show Edit and Share only with WORKFLOW_EDIT', async () => {
+        hoistedScope.grantedScopes = ['WORKFLOW_EDIT'];
+
+        const {unmount} = renderProjectWorkflowListItem();
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+
+        expect(screen.getByText('Edit')).toBeInTheDocument();
+        expect(screen.getByText('Share')).toBeInTheDocument();
+
+        unmount();
+
+        hoistedScope.grantedScopes = ['WORKFLOW_CREATE', 'WORKFLOW_DELETE'];
+
+        renderProjectWorkflowListItem();
+
+        await userEvent.click(screen.getByRole('button', {name: 'More Workflow Actions'}));
+
+        expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+        expect(screen.queryByText('Share')).not.toBeInTheDocument();
     });
 
     it('should render workflow label', () => {

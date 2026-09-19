@@ -13,11 +13,22 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 vi.mock('../hooks/useDataTableListItemDropdownMenu', () => ({
     default: hoisted.mockUseDataTableListItemDropdownMenu,
 }));
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     windowResizeObserver();
     hoisted.mockUseDataTableListItemDropdownMenu.mockReturnValue({
         handleDeleteClick: hoisted.handleDeleteClick,
@@ -49,6 +60,31 @@ describe('DataTableListItemDropdownMenu', () => {
         expect(screen.getByText('Duplicate')).toBeInTheDocument();
         expect(screen.getByText('Export CSV')).toBeInTheDocument();
         expect(screen.getByText('Delete')).toBeInTheDocument();
+    });
+
+    it('should hide Rename, Duplicate and Delete without data table scopes but keep Export CSV', async () => {
+        hoistedScope.grantedScopes = [];
+
+        render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Table menu'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Export CSV'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Duplicate'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
+    });
+
+    it('should show only the items whose scope is granted', async () => {
+        hoistedScope.grantedScopes = ['DATA_TABLE_CREATE'];
+
+        render(<DataTableListItemDropdownMenu baseName="orders" dataTableId="123" />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Table menu'}));
+
+        expect(screen.getByRole('menuitem', {name: 'Duplicate'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Rename'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Delete'})).not.toBeInTheDocument();
     });
 
     it('should call handleRenameClick when clicking Rename', async () => {

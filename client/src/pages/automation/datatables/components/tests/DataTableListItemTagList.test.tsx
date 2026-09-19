@@ -10,6 +10,15 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 vi.mock('../hooks/useDataTableListItemTagList', () => ({
     default: hoisted.mockUseDataTableListItemTagList,
 }));
@@ -17,17 +26,21 @@ vi.mock('../hooks/useDataTableListItemTagList', () => ({
 vi.mock('@/shared/components/TagList', () => ({
     default: ({
         id,
+        readOnly,
         remainingTags,
         tags,
     }: {
         getRequest: unknown;
         id: number;
+        readOnly?: boolean;
         remainingTags?: {id: number; name: string}[];
         tags: {id: number; name: string}[];
         updateTagsMutation: unknown;
     }) => (
         <div data-testid="tag-list">
             <span data-testid="tag-list-id">{id}</span>
+
+            <span data-testid="tag-list-read-only">{String(readOnly)}</span>
 
             {tags.map((tag) => (
                 <span data-testid={`tag-${tag.id}`} key={tag.id}>
@@ -52,6 +65,8 @@ const mockTags = [
 const mockRemainingTags = [{id: '3', name: 'Archived'}];
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     windowResizeObserver();
     hoisted.mockUseDataTableListItemTagList.mockReturnValue({
         updateTagsMutation: hoisted.mockUpdateTagsMutation,
@@ -87,6 +102,20 @@ describe('DataTableListItemTagList', () => {
         render(<DataTableListItemTagList datatableId="123" remainingTags={mockRemainingTags} tags={mockTags} />);
 
         expect(screen.getByTestId('remaining-tag-3')).toHaveTextContent('Archived');
+    });
+
+    it('should keep tags editable with DATA_TABLE_EDIT', () => {
+        render(<DataTableListItemTagList datatableId="123" remainingTags={mockRemainingTags} tags={mockTags} />);
+
+        expect(screen.getByTestId('tag-list-read-only')).toHaveTextContent('false');
+    });
+
+    it('should render tags read-only without DATA_TABLE_EDIT', () => {
+        hoistedScope.grantedScopes = [];
+
+        render(<DataTableListItemTagList datatableId="123" remainingTags={mockRemainingTags} tags={mockTags} />);
+
+        expect(screen.getByTestId('tag-list-read-only')).toHaveTextContent('true');
     });
 
     it('should call useDataTableListItemTagList with correct tableId', () => {

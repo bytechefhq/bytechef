@@ -47,6 +47,11 @@ public class RemoteProjectDeploymentServiceClient implements ProjectDeploymentSe
     }
 
     @Override
+    public Optional<ProjectDeployment> fetchProjectDeployment(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
         throw new UnsupportedOperationException();
     }

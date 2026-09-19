@@ -30,6 +30,12 @@ public interface ProjectDeploymentService {
 
     void delete(long id);
 
+    /**
+     * The fail-soft counterpart of {@link #getProjectDeployment(long)}, for callers to whom an absent deployment is an
+     * ordinary answer — the ownership resolvers, which must fail closed rather than throw.
+     */
+    Optional<ProjectDeployment> fetchProjectDeployment(long id);
+
     Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
 
     ProjectDeployment getProjectDeployment(long id);

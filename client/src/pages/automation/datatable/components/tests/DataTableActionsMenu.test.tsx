@@ -3,6 +3,17 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import DataTableActionsMenu from '../DataTableActionsMenu';
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+// The Delete item is gated on the delete scope the server enforces. These tests cover the menu's own behaviour, so the
+// scope check is controlled here rather than through the permission and edition stores.
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 const defaultProps = {
     onDeleteTable: vi.fn(),
     onExportCsv: vi.fn(),
@@ -12,6 +23,8 @@ const defaultProps = {
 };
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     windowResizeObserver();
 });
 
@@ -60,6 +73,38 @@ describe('DataTableActionsMenu', () => {
             await user.click(screen.getByRole('button', {name: 'More actions'}));
 
             expect(screen.getByRole('separator')).toBeInTheDocument();
+        });
+    });
+
+    describe('menu items for a member without DATA_TABLE_DELETE', () => {
+        it('should hide Delete Table but keep the other items', async () => {
+            hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_EDIT'];
+
+            const user = userEvent.setup();
+
+            render(<DataTableActionsMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'More actions'}));
+
+            expect(screen.getByText('Rename Table')).toBeInTheDocument();
+            expect(screen.queryByText('Delete Table')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('menu items for a member without DATA_TABLE_EDIT', () => {
+        it('should hide Import CSV and Rename Table but keep Export CSV', async () => {
+            hoistedScope.grantedScopes = ['DATA_TABLE_DELETE'];
+
+            const user = userEvent.setup();
+
+            render(<DataTableActionsMenu {...defaultProps} />);
+
+            await user.click(screen.getByRole('button', {name: 'More actions'}));
+
+            expect(screen.getByRole('menuitem', {name: 'Export CSV'})).toBeInTheDocument();
+            expect(screen.getByRole('menuitem', {name: 'Delete Table'})).toBeInTheDocument();
+            expect(screen.queryByRole('menuitem', {name: 'Import CSV'})).not.toBeInTheDocument();
+            expect(screen.queryByRole('menuitem', {name: 'Rename Table'})).not.toBeInTheDocument();
         });
     });
 

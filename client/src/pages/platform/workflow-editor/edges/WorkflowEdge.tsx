@@ -9,6 +9,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '../providers/workflowEditorReadOnlyContext';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -44,6 +45,7 @@ export default function WorkflowEdge({
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const {updateWorkflowMutation} = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const sourceNodeId = id.split('=>')[0];
     const targetNodeId = id.split('=>')[1];
@@ -230,85 +232,87 @@ export default function WorkflowEdge({
                 />
             )}
 
-            <EdgeLabelRenderer key={id}>
-                <div
-                    className="nodrag nopan p-8"
-                    id={id}
-                    onClick={handleClick}
-                    onDragEnter={handleDragEnter}
-                    onDragLeave={handleDragLeave}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    style={{
-                        pointerEvents: 'all',
-                        position: 'absolute',
-                        transform: `translate(-50%, -50%) translate(${buttonPosition.x}px,${buttonPosition.y}px)`,
-                        zIndex: isDropzoneActive ? 40 : 'auto',
-                    }}
-                >
-                    <ContextMenu onOpenChange={handleOpenChange}>
-                        <ContextMenuTrigger asChild disabled={!canPaste}>
-                            <div>
-                                <WorkflowNodesPopoverMenu
-                                    edgeId={id}
-                                    hideClusterElementComponents
-                                    hideTriggerComponents
-                                    showPaste={canPaste}
-                                    sourceNodeId={sourceNodeId}
-                                >
-                                    <div
-                                        className={twMerge(
-                                            'flex cursor-pointer items-center justify-center rounded border-2 transition-all',
-                                            isDropzoneActive
-                                                ? 'size-16 border-surface-brand-secondary-hover bg-surface-brand-secondary-hover'
-                                                : 'size-6 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
-                                        )}
-                                        id={`${id}-button`}
+            {!readOnly && (
+                <EdgeLabelRenderer key={id}>
+                    <div
+                        className="nodrag nopan p-8"
+                        id={id}
+                        onClick={handleClick}
+                        onDragEnter={handleDragEnter}
+                        onDragLeave={handleDragLeave}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        style={{
+                            pointerEvents: 'all',
+                            position: 'absolute',
+                            transform: `translate(-50%, -50%) translate(${buttonPosition.x}px,${buttonPosition.y}px)`,
+                            zIndex: isDropzoneActive ? 40 : 'auto',
+                        }}
+                    >
+                        <ContextMenu onOpenChange={handleOpenChange}>
+                            <ContextMenuTrigger asChild disabled={!canPaste}>
+                                <div>
+                                    <WorkflowNodesPopoverMenu
+                                        edgeId={id}
+                                        hideClusterElementComponents
+                                        hideTriggerComponents
+                                        showPaste={canPaste}
+                                        sourceNodeId={sourceNodeId}
                                     >
-                                        <PlusIcon
+                                        <div
                                             className={twMerge(
-                                                'text-content-neutral-secondary',
+                                                'flex cursor-pointer items-center justify-center rounded border-2 transition-all',
                                                 isDropzoneActive
-                                                    ? 'size-14 text-content-neutral-secondary/50'
-                                                    : 'size-3.5'
+                                                    ? 'size-16 border-surface-brand-secondary-hover bg-surface-brand-secondary-hover'
+                                                    : 'size-6 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
                                             )}
-                                        />
-                                    </div>
-                                </WorkflowNodesPopoverMenu>
-                            </div>
-                        </ContextMenuTrigger>
+                                            id={`${id}-button`}
+                                        >
+                                            <PlusIcon
+                                                className={twMerge(
+                                                    'text-content-neutral-secondary',
+                                                    isDropzoneActive
+                                                        ? 'size-14 text-content-neutral-secondary/50'
+                                                        : 'size-3.5'
+                                                )}
+                                            />
+                                        </div>
+                                    </WorkflowNodesPopoverMenu>
+                                </div>
+                            </ContextMenuTrigger>
 
-                        <ContextMenuContent
-                            className={twMerge(
-                                'w-workflow-node-context-menu-width p-0',
-                                !menuReady && 'pointer-events-none'
-                            )}
-                        >
-                            <ContextMenuItem
-                                className="dropdown-menu-item flex w-full flex-col items-start gap-1"
-                                disabled={!canPaste}
-                                onClick={handlePasteClick}
+                            <ContextMenuContent
+                                className={twMerge(
+                                    'w-workflow-node-context-menu-width p-0',
+                                    !menuReady && 'pointer-events-none'
+                                )}
                             >
-                                <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
-                                    <ClipboardPlusIcon className="size-4 shrink-0" />
+                                <ContextMenuItem
+                                    className="dropdown-menu-item flex w-full flex-col items-start gap-1"
+                                    disabled={!canPaste}
+                                    onClick={handlePasteClick}
+                                >
+                                    <div className="flex w-full items-center gap-2 self-stretch text-content-neutral-primary">
+                                        <ClipboardPlusIcon className="size-4 shrink-0" />
 
-                                    <span>Paste Here</span>
-                                </div>
+                                        <span>Paste Here</span>
+                                    </div>
 
-                                <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
-                                    <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden [&>svg]:size-4">
-                                        {copiedNode?.icon ?? null}
-                                    </span>
+                                    <div className="flex w-full items-center gap-2 text-content-neutral-secondary">
+                                        <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden [&>svg]:size-4">
+                                            {copiedNode?.icon || null}
+                                        </span>
 
-                                    <span className="line-clamp-1 flex-1 text-xs font-normal" title={displayLabel}>
-                                        {displayLabel}
-                                    </span>
-                                </div>
-                            </ContextMenuItem>
-                        </ContextMenuContent>
-                    </ContextMenu>
-                </div>
-            </EdgeLabelRenderer>
+                                        <span className="line-clamp-1 flex-1 text-xs font-normal" title={displayLabel}>
+                                            {displayLabel}
+                                        </span>
+                                    </div>
+                                </ContextMenuItem>
+                            </ContextMenuContent>
+                        </ContextMenu>
+                    </div>
+                </EdgeLabelRenderer>
+            )}
         </>
     );
 }

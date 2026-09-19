@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -49,6 +50,7 @@ public class DataTableWebhookGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#tableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public List<Webhook> dataTableWebhooks(@Argument Long environmentId, @Argument Long tableId) {
         environmentService.getEnvironment(environmentId);
 

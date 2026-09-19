@@ -43,7 +43,7 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public ProjectDeployment create(ProjectDeployment projectDeployment) {
         Assert.notNull(projectDeployment, "'projectDeployment' must not be null");
         Assert.isTrue(projectDeployment.getId() == null, "'id' must be null");
@@ -63,6 +63,12 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     @Override
     public Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment) {
         return projectDeploymentRepository.findByProjectIdAndEnvironment(projectId, environment.ordinal());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ProjectDeployment> fetchProjectDeployment(long id) {
+        return projectDeploymentRepository.findById(id);
     }
 
     @Override
@@ -129,7 +135,7 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectDeployment.projectId, 'Project', 'DEPLOYMENT_CREATE')")
     public ProjectDeployment update(ProjectDeployment projectDeployment) {
         Assert.notNull(projectDeployment, "'projectDeployment' must not be null");
         Assert.notNull(projectDeployment.getProjectId(), "'projectId' must not be null");

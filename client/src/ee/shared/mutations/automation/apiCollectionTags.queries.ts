@@ -6,10 +6,11 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ApiCollectionTagKeys = {
     apiCollectionTags: ['apiCollectionTags'] as const,
+    workspaceApiCollectionTags: (workspaceId: number) => [...ApiCollectionTagKeys.apiCollectionTags, workspaceId],
 };
 
-export const useGetApiCollectionTagsQuery = () =>
+export const useGetApiCollectionTagsQuery = (workspaceId: number) =>
     useQuery<Tag[], Error>({
-        queryKey: ApiCollectionTagKeys.apiCollectionTags,
-        queryFn: () => new ApiCollectionTagApi().getApiCollectionTags(),
+        queryKey: ApiCollectionTagKeys.workspaceApiCollectionTags(workspaceId),
+        queryFn: () => new ApiCollectionTagApi().getApiCollectionTags({id: workspaceId}),
     });

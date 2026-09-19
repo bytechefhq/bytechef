@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     api(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-api"))
 
     implementation("com.github.ben-manes.caffeine:caffeine")
@@ -9,6 +10,8 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
 
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
     testImplementation(project(":server:libs:test:test-support"))
 }
