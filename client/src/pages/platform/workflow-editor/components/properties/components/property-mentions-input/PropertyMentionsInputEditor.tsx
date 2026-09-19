@@ -12,7 +12,7 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {DataPillDragPayloadType, DataPillType} from '@/shared/types';
-import {Extension, mergeAttributes} from '@tiptap/core';
+import {Extension, mergeAttributes, nodePasteRule} from '@tiptap/core';
 import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
 import {Paragraph} from '@tiptap/extension-paragraph';
@@ -38,6 +38,7 @@ import {buildToolFunctionDefinitions} from './fromAiFunctionDefinition';
 import {getDataPillIconSource} from './getDataPillIconSource';
 import {getMentionsInputPlaceholder} from './mentionsInputPlaceholder';
 import {
+    DATA_PILL_REGEX,
     PROPERTY_MENTION_CHIP_CLASS,
     PROPERTY_MENTION_LABEL_CLASS,
     PROPERTY_MENTION_ROOT_CLASS,
@@ -182,6 +183,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 Mention.extend({
                     addNodeView() {
                         return ReactNodeViewRenderer(PropertyMentionNodeView);
+                    },
+                    addPasteRules() {
+                        return [
+                            nodePasteRule({
+                                find: DATA_PILL_REGEX,
+                                getAttributes: (match) => ({id: match[1]}),
+                                type: this.type,
+                            }),
+                        ];
                     },
                 }).configure({
                     HTMLAttributes: {},
