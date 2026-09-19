@@ -28,14 +28,15 @@ import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import java.util.Map;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import java.util.Optional;
+import org.springframework.ai.session.SessionRepository;
 
 /**
  * @author Ivica Cardic
  */
 public class ChatMemoryDeleteAction {
 
-    public static ModifiableActionDefinition of(ChatMemoryRepository chatMemoryRepository) {
+    public static ModifiableActionDefinition of(SessionRepository sessionRepository) {
         return action("deleteConversation")
             .title("Delete Conversation")
             .description("Deletes all messages for a conversation.")
@@ -43,7 +44,7 @@ public class ChatMemoryDeleteAction {
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
                     .description("The unique identifier for the conversation to delete.")
-                    .options(ChatMemoryUtils.getFirstMessages(chatMemoryRepository))
+                    .options(ChatMemoryUtils.getFirstMessages(sessionRepository))
                     .required(true))
             .output(
                 outputSchema(
@@ -52,21 +53,19 @@ public class ChatMemoryDeleteAction {
                             string(CONVERSATION_ID),
                             bool("deleted"))))
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
-                inputParameters, chatMemoryRepository));
+                inputParameters, sessionRepository));
     }
 
     private ChatMemoryDeleteAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
-
+    protected static Object perform(Parameters inputParameters, SessionRepository sessionRepository) {
         String conversationId = inputParameters.getRequiredString(CONVERSATION_ID);
 
-        boolean existed = !chatMemoryRepository.findByConversationId(conversationId)
-            .isEmpty();
+        boolean existed = Optional.ofNullable(sessionRepository.findById(conversationId))
+            .isPresent();
 
-        chatMemoryRepository.deleteByConversationId(conversationId);
+        sessionRepository.delete(conversationId);
 
         return Map.of(
             CONVERSATION_ID, conversationId,

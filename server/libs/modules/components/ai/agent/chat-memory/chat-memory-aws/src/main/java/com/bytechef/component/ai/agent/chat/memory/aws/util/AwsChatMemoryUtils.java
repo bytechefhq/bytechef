@@ -26,6 +26,10 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
@@ -40,6 +44,17 @@ import software.amazon.awssdk.services.s3.S3Client;
  * @author Ivica Cardic
  */
 public class AwsChatMemoryUtils {
+
+    private static final Duration CLIENT_IDLE_TIMEOUT = Duration.ofHours(24);
+
+    private static final Cache<S3ClientKey, S3Client> S3_CLIENTS = Caffeine.newBuilder()
+        .expireAfterAccess(CLIENT_IDLE_TIMEOUT)
+        .removalListener((S3ClientKey s3ClientKey, S3Client s3Client, RemovalCause removalCause) -> {
+            if (s3Client != null) {
+                s3Client.close();
+            }
+        })
+        .build();
 
     private AwsChatMemoryUtils() {
     }
@@ -76,18 +91,39 @@ public class AwsChatMemoryUtils {
 
     public static S3ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
         return S3ChatMemoryRepository.builder()
-            .s3Client(buildS3Client(connectionParameters))
+            .s3Client(getSharedS3Client(connectionParameters))
             .bucketName(connectionParameters.getRequiredString(BUCKET))
             .keyPrefix(connectionParameters.getString(KEY_PREFIX, ""))
             .build();
     }
 
+    static S3Client getSharedS3Client(Parameters connectionParameters) {
+        return S3_CLIENTS.get(toS3ClientKey(connectionParameters), AwsChatMemoryUtils::buildS3Client);
+    }
+
     private static S3Client buildS3Client(Parameters connectionParameters) {
+        return buildS3Client(toS3ClientKey(connectionParameters));
+    }
+
+    private static S3Client buildS3Client(S3ClientKey s3ClientKey) {
         return S3Client.builder()
-            .region(Region.of(connectionParameters.getRequiredString(REGION)))
-            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
-                connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                connectionParameters.getRequiredString(SECRET_ACCESS_KEY))))
+            .region(Region.of(s3ClientKey.region()))
+            .credentialsProvider(StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(s3ClientKey.accessKeyId(), s3ClientKey.secretAccessKey())))
             .build();
+    }
+
+    private static S3ClientKey toS3ClientKey(Parameters connectionParameters) {
+        return new S3ClientKey(
+            connectionParameters.getRequiredString(REGION), connectionParameters.getRequiredString(ACCESS_KEY_ID),
+            connectionParameters.getRequiredString(SECRET_ACCESS_KEY));
+    }
+
+    private record S3ClientKey(String region, String accessKeyId, String secretAccessKey) {
+
+        @Override
+        public String toString() {
+            return "S3ClientKey{region=" + region + ", accessKeyId=" + accessKeyId + "}";
+        }
     }
 }

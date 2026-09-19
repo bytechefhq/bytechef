@@ -36,11 +36,6 @@ import org.springframework.ai.chat.memory.MessageWindowChatMemory;
  */
 public class InMemoryChatMemory {
 
-    private static final MessageWindowChatMemory inMemoryChatMemory =
-        MessageWindowChatMemory.builder()
-            .chatMemoryRepository(InMemoryChatMemoryRepositoryHolder.getInstance())
-            .build();
-
     public static final ClusterElementDefinition<ChatMemoryFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("In Memory Chat Memory")
@@ -58,9 +53,17 @@ public class InMemoryChatMemory {
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
+        MessageWindowChatMemory inMemoryChatMemory = MessageWindowChatMemory.builder()
+            .chatMemoryRepository(InMemoryChatMemoryRepositoryHolder.getInstance())
+            .build();
+
+        // In-memory chat memory safely persists the full tool request/response transcript, so its advisor runs inside
+        // the ToolCallingAdvisor loop (see ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER); the agent
+        // disables the tool advisor's own in-loop history to avoid double-writing.
         return new ChatMemoryFunction.Result(
             MessageChatMemoryAdvisor.builder(inMemoryChatMemory)
+                .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
                 .build(),
-            inMemoryChatMemory);
+            inMemoryChatMemory, true);
     }
 }
