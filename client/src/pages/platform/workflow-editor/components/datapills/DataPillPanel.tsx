@@ -91,26 +91,28 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
     const sharedClasses =
         'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
     const defaultPositionClasses = twMerge(
-        'absolute top-2 bottom-6 animate-[slideInFromRight_300ms_ease-out] rounded-md',
+        'absolute top-[9px] bottom-6 animate-[slideInFromRight_300ms_ease-out] rounded-md',
         copilotLayoutShifted ? 'right-[524px]' : 'right-[536px]'
     );
 
     return (
         <div className={twMerge(sharedClasses, className || defaultPositionClasses)}>
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
-                <header className="flex content-center items-center p-4 text-lg font-medium">
-                    <span>Data Pill Panel</span>
+                <header className="flex h-20 shrink-0 content-center items-center p-4 text-lg font-medium">
+                    <div className="flex items-center self-start">
+                        <span>Data Pill Panel</span>
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <InfoIcon className="ml-1 size-4" />
-                        </TooltipTrigger>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <InfoIcon className="ml-1 size-4" />
+                            </TooltipTrigger>
 
-                        <TooltipContent>
-                            To use data from the previous step drag its data pill into a field, or click on the data
-                            pill.
-                        </TooltipContent>
-                    </Tooltip>
+                            <TooltipContent>
+                                To use data from the previous step drag its data pill into a field, or click on the data
+                                pill.
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
 
                     <button
                         aria-label="Close the data pill panel"
