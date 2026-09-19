@@ -75,6 +75,21 @@ interface PropertyMentionsInputEditorProps {
     workflow: Workflow;
 }
 
+const PropertyMention = Mention.extend({
+    addNodeView() {
+        return ReactNodeViewRenderer(PropertyMentionNodeView);
+    },
+    addPasteRules() {
+        return [
+            nodePasteRule({
+                find: DATA_PILL_REGEX,
+                getAttributes: (match) => ({id: resolveArrayIndexTemplate(match[1])}),
+                type: this.type,
+            }),
+        ];
+    },
+});
+
 const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEditorProps>(
     (
         {
@@ -181,20 +196,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }),
                 MentionStorage,
                 ...(expressionEnabled !== false ? [FunctionSuggestion, FunctionSignature] : []),
-                Mention.extend({
-                    addNodeView() {
-                        return ReactNodeViewRenderer(PropertyMentionNodeView);
-                    },
-                    addPasteRules() {
-                        return [
-                            nodePasteRule({
-                                find: DATA_PILL_REGEX,
-                                getAttributes: (match) => ({id: resolveArrayIndexTemplate(match[1])}),
-                                type: this.type,
-                            }),
-                        ];
-                    },
-                }).configure({
+                PropertyMention.configure({
                     HTMLAttributes: {},
                     deleteTriggerWithBackspace: true,
                     renderHTML({node, options}) {
