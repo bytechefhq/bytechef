@@ -111,7 +111,7 @@ const WorkflowNodeDetailsPanel = ({
     return (
         <div
             className={twMerge(
-                'absolute top-2 bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
+                'absolute top-[9px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-md border border-stroke-neutral-secondary bg-background',
                 copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]',
                 !className && !panelOpenedFromIssuesSidebar && 'animate-[slideInFromRight_300ms_ease-out]',
                 className
@@ -124,7 +124,7 @@ const WorkflowNodeDetailsPanel = ({
             >
                 {currentNode?.workflowNodeName && currentWorkflowNode && (
                     <div className="flex h-full flex-col divide-y divide-muted bg-background">
-                        <header className="flex items-center justify-between p-4 text-lg font-medium">
+                        <header className="flex h-20 shrink-0 items-center justify-between p-4 text-lg font-medium">
                             <div className="flex min-w-0 flex-1 items-center gap-2">
                                 {currentWorkflowNode.icon && (
                                     <InlineSVG
