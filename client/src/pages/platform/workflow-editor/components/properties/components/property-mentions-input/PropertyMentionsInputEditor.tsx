@@ -4,6 +4,7 @@ import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/co
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
 import {transformValueForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {
@@ -188,7 +189,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         return [
                             nodePasteRule({
                                 find: DATA_PILL_REGEX,
-                                getAttributes: (match) => ({id: match[1]}),
+                                getAttributes: (match) => ({id: resolveArrayIndexTemplate(match[1])}),
                                 type: this.type,
                             }),
                         ];

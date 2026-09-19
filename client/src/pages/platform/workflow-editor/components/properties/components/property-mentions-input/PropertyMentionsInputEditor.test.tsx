@@ -79,6 +79,7 @@ vi.mock('use-debounce', () => {
     return {useDebouncedCallback};
 });
 
+import {TooltipProvider} from '@/components/ui/tooltip';
 import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -101,18 +102,20 @@ const microtaskTick = async (times = 1) => {
 
 const renderEditor = (props: Partial<React.ComponentProps<typeof PropertyMentionsInput>> = {}) =>
     render(
-        <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
-            <PropertyMentionsInput
-                controlType="TEXT"
-                label="Editor"
-                leadingIcon="📄"
-                path="parameters.field"
-                placeholder=""
-                type="STRING"
-                value=""
-                {...props}
-            />
-        </WorkflowEditorProvider>
+        <TooltipProvider>
+            <WorkflowEditorProvider value={workflowEditorProviderTestValue}>
+                <PropertyMentionsInput
+                    controlType="TEXT"
+                    label="Editor"
+                    leadingIcon="📄"
+                    path="parameters.field"
+                    placeholder=""
+                    type="STRING"
+                    value=""
+                    {...props}
+                />
+            </WorkflowEditorProvider>
+        </TooltipProvider>
     );
 
 beforeEach(() => {
@@ -471,9 +474,26 @@ describe('PropertyMentionsInputEditor', () => {
             const mentions = textbox.querySelectorAll('.property-mention[data-id]');
 
             expect(mentions).toHaveLength(1);
-            expect(mentions[0].getAttribute('data-id')).toBe('trigger_1.data.json.result[index].itemUrl');
+            expect(mentions[0].getAttribute('data-id')).toBe('trigger_1.data.json.result[0].itemUrl');
             expect(textbox.textContent).toContain('Link: ');
             expect(textbox.textContent).toContain(' end');
+        });
+
+        it('should resolve the [index] placeholder to index 0 in pasted data pills', async () => {
+            renderEditor();
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.paste('${trigger_1.data.json.result[index].itemUrl}');
+
+            await waitFor(() => {
+                expect(textbox.querySelector('.property-mention[data-id]')).toBeInTheDocument();
+            });
+
+            expect(textbox.querySelector('.property-mention[data-id]')?.getAttribute('data-id')).toBe(
+                'trigger_1.data.json.result[0].itemUrl'
+            );
         });
 
         it('should render plain text without data pills as plain text', async () => {

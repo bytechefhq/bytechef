@@ -4,6 +4,7 @@ import {PropertyAllType} from '@/shared/types';
 import {ClipboardCheck, ClipboardIcon, InfoIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
+import {resolveArrayIndexTemplate} from '../utils/dataPillArrayIndex';
 import getNestedObject from '../utils/getNestedObject';
 
 interface PropertyFieldProps {
@@ -38,7 +39,7 @@ const PropertyField = ({
         sampleValue = sampleOutput;
     }
 
-    valueToCopy = valueToCopy || `$\{${workflowNodeName}.${selector}}`;
+    valueToCopy = valueToCopy || `$\{${resolveArrayIndexTemplate(`${workflowNodeName}.${selector}`)}}`;
 
     return (
         <div className="group inline-flex w-full items-center justify-between rounded-md p-1 text-sm hover:bg-surface-neutral-primary-hover">
