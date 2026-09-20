@@ -32,7 +32,7 @@ const WorkflowExecutionContent = ({
     if (error !== undefined) {
         return (
             <div className="flex flex-col gap-4 overflow-hidden">
-                <span className="w-fit rounded-md border border-stroke-destructive-secondary p-2 text-sm font-semibold text-content-destructive-primary">
+                <span className="w-fit max-w-full rounded-md border border-stroke-destructive-secondary p-2 text-sm font-semibold break-words whitespace-pre-wrap text-content-destructive-primary">
                     {error.message || 'No message.'}
                 </span>
 
@@ -49,7 +49,7 @@ const WorkflowExecutionContent = ({
                         <CollapsibleContent>
                             <div className="mt-2 flex flex-col space-y-1 pl-5 text-sm">
                                 {error.stackTrace.map((line) => (
-                                    <div className="text-sm" key={line}>
+                                    <div className="text-sm break-words" key={line}>
                                         {line}
                                     </div>
                                 ))}
