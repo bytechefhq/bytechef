@@ -140,7 +140,7 @@ const LogEntryMessage = ({message}: {message: string}) => {
         );
     }
 
-    return <span className="flex-1 text-sm">{message}</span>;
+    return <span className="min-w-0 flex-1 text-sm break-words">{message}</span>;
 };
 
 const LogEntryRow = ({entry, showComponentName}: {entry: LogEntry; showComponentName: boolean}) => {
@@ -187,7 +187,7 @@ const LogEntryRow = ({entry, showComponentName}: {entry: LogEntry; showComponent
                         <div>
                             <span className="text-xs font-semibold text-muted-foreground">Message: </span>
 
-                            <span className="text-xs">{entry.exceptionMessage}</span>
+                            <span className="text-xs break-words">{entry.exceptionMessage}</span>
                         </div>
                     )}
 
