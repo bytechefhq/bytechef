@@ -1,0 +1,123 @@
+---
+title: "SSH"
+description: "SSH (Secure Shell) is a network protocol for secure access to remote hosts. It allows running shell commands on a remote host over an encrypted connection."
+---
+
+
+Categories: Developer Tools, Helpers
+
+
+Type: ssh/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Username and Password
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| host | Host | STRING | The hostname or IP address of the SSH server. | true |
+| port | Port | INTEGER | The port number of the SSH server. | false |
+| username | Username | STRING | The username used to log in to the SSH server. | true |
+| password | Password | STRING | The password of the user logging in to the SSH server. | true |
+| hostKeyFingerprint | Host Key Fingerprint | STRING | The fingerprint of the SSH server's host key, for example SHA256:l5H0Bq1qGZaBb5Tn7s0AaCnNmCHiBBKvKPhTE7hrXTI. When left empty, any host key is accepted, which leaves the connection open to man-in-the-middle attacks. | false |
+
+
+
+### Private Key
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| host | Host | STRING | The hostname or IP address of the SSH server. | true |
+| port | Port | INTEGER | The port number of the SSH server. | false |
+| username | Username | STRING | The username used to log in to the SSH server. | true |
+| privateKey | Private Key | STRING | The private key of the user logging in to the SSH server, in OpenSSH or PEM format, including the header and the footer line. | true |
+| passphrase | Passphrase | STRING | The passphrase protecting the private key, if the key is encrypted. | false |
+| hostKeyFingerprint | Host Key Fingerprint | STRING | The fingerprint of the SSH server's host key, for example SHA256:l5H0Bq1qGZaBb5Tn7s0AaCnNmCHiBBKvKPhTE7hrXTI. When left empty, any host key is accepted, which leaves the connection open to man-in-the-middle attacks. | false |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Execute Commands
+Name: execute
+
+`Executes shell commands on a remote host over SSH and returns the output of every command. Each command runs in its own session, so a working directory or an environment variable set by one command is not visible to the next one. Chain such commands instead, for example 'cd /var/log && ls -la'.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| commands | Commands | ARRAY <details> <summary> Items </summary> [STRING] </details> | The shell commands to execute on the remote host, in the order they are listed. | true |
+| continueOnError | Continue On Error | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Keep executing the remaining commands when a command exits with a non-zero exit status. When disabled, execution stops at the first failed command and the output collected so far is returned. | false |
+| timeout | Timeout | INTEGER | The number of seconds to wait for a single command to finish. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Execute Commands",
+  "name" : "execute",
+  "parameters" : {
+    "commands" : [ "" ],
+    "continueOnError" : false,
+    "timeout" : 1
+  },
+  "type" : "ssh/v1/execute"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| command | STRING | The executed command. |
+| result | STRING | The standard output of the command. |
+| error | STRING | The standard error output of the command. |
+| exitStatus | INTEGER | The exit status of the command, 0 on success. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "command" : "",
+  "result" : "",
+  "error" : "",
+  "exitStatus" : 1
+} ]
+```
+
+
+
+
+
+
