@@ -34,23 +34,20 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Skills Copilot subagent to the parent ai_hub agent.
- *
  * @author Ivica Cardic
  */
-public class SkillsAgentToolCallback implements ToolCallback {
+public class WorkflowExecutionAgentToolCallback implements ToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(SkillsAgentToolCallback.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowExecutionAgentToolCallback.class);
 
     private static final String DESCRIPTION =
         """
-            Delegate a user request about workflow Skills to a specialised Skills subagent.
-            Skills are reusable parameterised workflow templates the user can compose into projects.
-            The subagent owns the canonical behaviour for listing, explaining, creating, updating, and
-            composing Skills; prefer calling it over reasoning about skills directly. The result is a
-            synthesised markdown report or, in build mode, a summary of the mutations performed. Creates
-            a new skill when the request describes one that doesn't exist yet, or updates an existing
-            skill named in the request.""";
+            Delegate a user request about a workflow execution (a past run) to a specialised Workflow Execution
+            subagent. Use this to inspect or diagnose a run — why it failed, which task errored, what a task's
+            input/output was — and, in BUILD mode, to fix the underlying workflow. Pass the user request verbatim;
+            the subagent resolves the execution and does its own analysis. Returns the synthesised analysis (ASK) or
+            the applied fix plus rationale (BUILD). Include the workflow execution ID if known; otherwise describe
+            the run and the subagent resolves it by listing recent executions.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -68,14 +65,14 @@ public class SkillsAgentToolCallback implements ToolCallback {
     private final IntelligentToolChatClientFactory chatClientFactory;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public SkillsAgentToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
+    public WorkflowExecutionAgentToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
         this.chatClientFactory = chatClientFactory;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("authorSkill")
+            .name("debugWorkflowExecution")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -89,11 +86,10 @@ public class SkillsAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            SkillsAgentInput input = JsonUtils.read(toolInput, SkillsAgentInput.class);
+            WorkflowExecutionAgentInput input = JsonUtils.read(toolInput, WorkflowExecutionAgentInput.class);
 
-            String request = input.request();
-
-            if (request == null || request.isBlank()) {
+            if (input.request() == null || input.request()
+                .isBlank()) {
                 return toolError("request is required and must not be blank");
             }
 
@@ -102,32 +98,33 @@ public class SkillsAgentToolCallback implements ToolCallback {
 
             Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            ChatClient skillsChatClient = chatClientFactory.get();
+            ChatClient workflowExecutionChatClient = chatClientFactory.get();
 
-            String result = CurrentAgentContext.callWith(
-                CopilotAgentType.SKILLS, parentAgent,
-                () -> skillsChatClient.prompt(request)
+            String result = CurrentAgentContext.callWith(CopilotAgentType.DEBUG_WORKFLOW_EXECUTION, parentAgent,
+                () -> workflowExecutionChatClient.prompt(input.request())
                     .toolContext(parentContext)
                     .call()
                     .content());
 
             if (result == null) {
-                log.warn("skills subagent returned null for request='{}'", request);
+                log.warn(
+                    "workflow_execution subagent returned null for request='{}'",
+                    input.request());
 
-                return ToolErrors.toolError("skills subagent returned null");
+                return toolError("workflow_execution subagent returned null");
             }
 
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "authorSkill rejected malformed tool input: {} — first 200 chars of input: {}",
+                "debugWorkflowExecution rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                SkillsAgentToolCallback.class, "authorSkill", exception);
+                WorkflowExecutionAgentToolCallback.class, "debugWorkflowExecution", exception);
         }
     }
 
@@ -135,6 +132,6 @@ public class SkillsAgentToolCallback implements ToolCallback {
         return ToolErrors.toolError(message);
     }
 
-    public record SkillsAgentInput(String request) {
+    public record WorkflowExecutionAgentInput(String request) {
     }
 }
