@@ -23,13 +23,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -44,14 +42,13 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * @author Ivica Cardic
  */
-@ExtendWith(ObjectMapperSetupExtension.class)
-class WorkflowEditorAgentToolCallbackTest {
+class WorkflowExecutionAgentToolCallbackTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @Test
     void testCallReturnsResultWhenSubagentSucceeds() {
-        String synthesised = "{\"label\":\"daily report\",\"tasks\":[]}";
+        String synthesised = "The run failed because the HTTP task got a 404.";
 
         ChatClient chatClient = mock(ChatClient.class);
         ChatClientRequestSpec requestSpec = mock(ChatClientRequestSpec.class);
@@ -62,16 +59,18 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(synthesised);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> chatClient);
 
-        String result = callback.call("{\"request\":\"build a daily report workflow\"}");
+        String result = callback.call("{\"request\":\"why did the last run fail?\"}");
 
         assertThat(result).isEqualTo(synthesised);
     }
 
     @Test
     void testCallReturnsErrorWhenRequestIsBlank() {
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(mock(ChatClient.class));
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> mock(ChatClient.class));
 
         String result = callback.call("{\"request\":\"   \"}");
 
@@ -81,7 +80,8 @@ class WorkflowEditorAgentToolCallbackTest {
 
     @Test
     void testCallReturnsErrorOnInvalidJson() {
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(mock(ChatClient.class));
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> mock(ChatClient.class));
 
         String result = callback.call("not-json");
 
@@ -100,7 +100,8 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn(null);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> chatClient);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -120,9 +121,10 @@ class WorkflowEditorAgentToolCallbackTest {
         when(chatClient.prompt(anyString())).thenReturn(requestSpec);
         stubToolContext(requestSpec);
         when(requestSpec.call()).thenReturn(responseSpec);
-        when(responseSpec.content()).thenThrow(new RuntimeException("project facade unavailable"));
+        when(responseSpec.content()).thenThrow(new RuntimeException("execution facade unavailable"));
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> chatClient);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -131,9 +133,9 @@ class WorkflowEditorAgentToolCallbackTest {
         assertThat(node.get("error")
             .asText())
                 .as("payload must surface tool name")
-                .contains("workflow_editor_agent failed")
+                .contains("debugWorkflowExecution failed")
                 .as("payload must NOT leak the exception getMessage()")
-                .doesNotContain("project facade unavailable");
+                .doesNotContain("execution facade unavailable");
     }
 
     @Test
@@ -151,7 +153,8 @@ class WorkflowEditorAgentToolCallbackTest {
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> chatClient);
 
         callback.call("{\"request\":\"any\"}", parentToolContext);
 
@@ -169,7 +172,8 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> chatClient);
 
         callback.call("{\"request\":\"any\"}", null);
 
@@ -177,11 +181,12 @@ class WorkflowEditorAgentToolCallbackTest {
     }
 
     @Test
-    void testToolDefinitionExposesWorkflowEditorAgentNameAndRequestSchema() {
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(mock(ChatClient.class));
+    void testToolDefinitionExposesWorkflowExecutionAgentNameAndRequestSchema() {
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> mock(ChatClient.class));
 
         assertThat(callback.getToolDefinition()
-            .name()).isEqualTo("workflow_editor_agent");
+            .name()).isEqualTo("debugWorkflowExecution");
         assertThat(callback.getToolDefinition()
             .inputSchema()).contains("\"request\"");
     }
@@ -207,7 +212,8 @@ class WorkflowEditorAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenThrow(upstreamException);
 
-        WorkflowEditorAgentToolCallback callback = new WorkflowEditorAgentToolCallback(chatClient);
+        WorkflowExecutionAgentToolCallback callback =
+            new WorkflowExecutionAgentToolCallback(() -> chatClient);
 
         String result = callback.call("{\"request\":\"any\"}");
 
@@ -215,7 +221,7 @@ class WorkflowEditorAgentToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("workflow_editor_agent failed");
+            .asText()).contains("debugWorkflowExecution failed");
     }
 
     private static void stubToolContext(ChatClientRequestSpec requestSpec) {
