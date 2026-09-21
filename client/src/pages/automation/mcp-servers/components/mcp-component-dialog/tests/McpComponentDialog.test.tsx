@@ -15,6 +15,8 @@ const hoisted = vi.hoisted(() => ({
 
 vi.mock('../hooks/useMcpComponentDialog', () => ({
     default: () => ({
+        authoritiesLoading: false,
+        authorityOptions: [],
         currentStep: hoisted.state.currentStep,
         existingTools: [],
         handleBack: vi.fn(),
@@ -22,9 +24,11 @@ vi.mock('../hooks/useMcpComponentDialog', () => ({
         handleComponentSelect: vi.fn(),
         handleOpenChange: hoisted.handleOpenChange,
         handleSave: hoisted.handleSave,
+        requiredAuthorities: [],
         selectedComponent: undefined,
         selectedConnection: undefined,
         selectedTools: hoisted.state.selectedTools,
+        setRequiredAuthorities: vi.fn(),
         setSelectedConnection: vi.fn(),
         setSelectedTools: vi.fn(),
     }),
