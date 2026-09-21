@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.context;
+package com.bytechef.platform.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.file.storage.TempFileStorage;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
  * @author Ivica Cardic
  */
-class EditorTempFileStorage implements TempFileStorage {
+public class EditorTempFileStorageImpl implements EditorTempFileStorage {
 
     private static final String EDITOR_TEMP_DIR = "editor/temp";
 
     private final FileStorageService fileStorageService;
 
-    EditorTempFileStorage(FileStorageService fileStorageService) {
+    @SuppressFBWarnings("EI")
+    public EditorTempFileStorageImpl(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
     }
 

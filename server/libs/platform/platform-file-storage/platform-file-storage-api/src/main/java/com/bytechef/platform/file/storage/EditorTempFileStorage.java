@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-present ByteChef Inc.
+ * Copyright 2025 ByteChef
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-@NullMarked
-package com.bytechef.platform.configuration.web.rest.file.storage;
+package com.bytechef.platform.file.storage;
 
-import org.jspecify.annotations.NullMarked;
+/**
+ * @author Ivica Cardic
+ */
+public interface EditorTempFileStorage extends TempFileStorage {
+}

@@ -38,6 +38,7 @@ import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.DataStorage;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -102,6 +103,11 @@ public class ComponentTestIntConfiguration {
         return Mockito.mock(DataStorage.class);
     }
 
+    @Bean(name = "editorTempFileStorage")
+    EditorTempFileStorage editorTempFileStorage() {
+        return Mockito.mock(EditorTempFileStorage.class);
+    }
+
     @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
@@ -128,7 +134,7 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    TempFileStorage filesFileStorage() {
+    TempFileStorage tempFileStorage() {
         return new TempFileStorageImpl(new Base64FileStorageService());
     }
 

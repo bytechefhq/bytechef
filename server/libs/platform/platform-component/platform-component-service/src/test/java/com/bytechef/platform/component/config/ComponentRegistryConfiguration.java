@@ -31,6 +31,8 @@ import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
+import com.bytechef.platform.file.storage.EditorTempFileStorageImpl;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -105,12 +107,17 @@ public class ComponentRegistryConfiguration {
     }
 
     @Bean
+    EditorTempFileStorage editorTempFileStorage() {
+        return new EditorTempFileStorageImpl(new Base64FileStorageService());
+    }
+
+    @Bean
     EncryptionKey encryptionKey() {
         return () -> "tTB1/UBIbYLuCXVi4PPfzA==";
     }
 
     @Bean
-    TempFileStorage filesFileStorage() {
+    TempFileStorage tempFileStorage() {
         return FILES_FILE_STORAGE;
     }
 
