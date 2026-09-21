@@ -3,6 +3,7 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface PropertyCodeEditorStateI {
+    conversationToken: string | null;
     copilotPanelOpen: boolean;
     dirty: boolean;
     editorValue: string | undefined;
@@ -15,6 +16,7 @@ interface PropertyCodeEditorStateI {
 
 interface PropertyCodeEditorActionsI {
     reset: () => void;
+    setConversationToken: (token: string | null) => void;
     setCopilotPanelOpen: (open: boolean) => void;
     setDirty: (dirty: boolean) => void;
     setEditorValue: (value: string | undefined) => void;
@@ -28,6 +30,7 @@ interface PropertyCodeEditorActionsI {
 type PropertyCodeEditorStoreType = PropertyCodeEditorActionsI & PropertyCodeEditorStateI;
 
 const initialState: PropertyCodeEditorStateI = {
+    conversationToken: null,
     copilotPanelOpen: false,
     dirty: false,
     editorValue: undefined,
@@ -43,6 +46,7 @@ export const usePropertyCodeEditorDialogStore = create<PropertyCodeEditorStoreTy
         (set) => ({
             ...initialState,
             reset: () => set(initialState),
+            setConversationToken: (token) => set({conversationToken: token}),
             setCopilotPanelOpen: (open) => set({copilotPanelOpen: open}),
             setDirty: (dirty) => set({dirty}),
             setEditorValue: (value) => set({editorValue: value}),

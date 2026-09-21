@@ -94,14 +94,26 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
     const handleCloseClick = () => {
         if (onClose) {
             onClose();
-        } else {
+
+            return;
+        }
+
+        const {globalPanelConversationToken, restoreConversationState, setGlobalPanelConversationToken} =
+            useCopilotStore.getState();
+
+        if (globalPanelConversationToken === null) {
             setContext({
                 mode: MODE.ASK,
                 parameters: {},
                 source: Source.WORKFLOW_EDITOR,
             });
-            setCopilotPanelOpen(false);
+        } else {
+            restoreConversationState(globalPanelConversationToken);
+
+            setGlobalPanelConversationToken(null);
         }
+
+        setCopilotPanelOpen(false);
     };
 
     const previousPathnameRef = useRef(location.pathname);

@@ -1,21 +1,24 @@
 import {useAiAgentTestingChatStore} from '@/pages/platform/cluster-element-editor/ai-agent-editor/stores';
 import {useTestingModeStore} from '@/pages/platform/cluster-element-editor/ai-agent-editor/stores/useTestingModeStore';
+import {useAiAgentEvalsStore} from '@/pages/platform/cluster-element-editor/ai-agent-evals/stores/useAiAgentEvalsStore';
 import useClusterElementsDataStore from '@/pages/platform/cluster-element-editor/stores/useClusterElementsDataStore';
 import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-editor/components/stores/useClusterElementsCanvasDialogStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
+import {isDataStreamSimpleModeAvailable as computeIsDataStreamSimpleModeAvailable} from '@/pages/platform/workflow-editor/utils/isDataStreamSimpleModeAvailable';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 interface UseClusterElementsCanvasDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
 export default function useClusterElementsCanvasDialog({onOpenChange}: UseClusterElementsCanvasDialogProps) {
+    const conversationTokenRef = useRef<string | null>(null);
+
     const aiAgentSimpleEditorPreferred = useClusterElementsCanvasDialogStore(
         (state) => state.aiAgentSimpleEditorPreferred
     );
@@ -50,41 +53,11 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const isDataStreamSimpleModeAvailable = useMemo(() => {
-        if (!isDataStreamClusterRoot || !workflowNodeName) {
+        if (!isDataStreamClusterRoot) {
             return true;
         }
 
-        if (!workflow.definition) {
-            return true;
-        }
-
-        let definition;
-
-        try {
-            definition = JSON.parse(workflow.definition);
-        } catch {
-            return true;
-        }
-
-        const rootTask = getTask({tasks: definition.tasks ?? [], workflowNodeName});
-
-        if (!rootTask?.clusterElements) {
-            return true;
-        }
-
-        const processorValue = rootTask.clusterElements['processor'];
-
-        if (!processorValue) {
-            return true;
-        }
-
-        const processorElement = Array.isArray(processorValue) ? processorValue[0] : processorValue;
-
-        const typeSegments = processorElement?.type?.split('/') ?? [];
-        const componentName = typeSegments[0] ?? '';
-        const operationName = typeSegments[2] ?? '';
-
-        return componentName === 'dataStreamProcessor' && operationName === 'fieldMapper';
+        return computeIsDataStreamSimpleModeAvailable(workflow.definition, workflowNodeName);
     }, [isDataStreamClusterRoot, workflowNodeName, workflow.definition]);
 
     const handleToggleEditor = useCallback(
@@ -139,7 +112,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             saveConversationState,
         } = useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
@@ -154,7 +127,7 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
     }, [rootClusterElementNodeData?.name, setCopilotPanelOpen, setContext]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
         setCopilotPanelOpen(false);
     }, [setCopilotPanelOpen]);
 
@@ -177,10 +150,11 @@ export default function useClusterElementsCanvasDialog({onOpenChange}: UseCluste
             onOpenChange(isOpen);
 
             if (!isOpen) {
-                useCopilotStore.getState().restoreConversationState();
+                useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
                 useClusterElementsCanvasDialogStore.getState().reset();
                 useClusterElementsDataStore.getState().reset();
                 useTestingModeStore.getState().resetTestingMode();
+                useAiAgentEvalsStore.getState().setEvalsPanelOpen(false);
                 resetNodeDetailsPanel();
             }
         },
