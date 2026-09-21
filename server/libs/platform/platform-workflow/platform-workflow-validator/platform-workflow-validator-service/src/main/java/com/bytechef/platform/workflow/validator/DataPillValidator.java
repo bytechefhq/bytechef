@@ -224,11 +224,11 @@ class DataPillValidator {
                 return false;
             }
 
-            if (PropertyUtils.isNestedTaskProperty(propertyInfo)) {
+            if (isTaskContainerProperty(propertyInfo)) {
                 return true;
             }
 
-            List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
+            List<PropertyInfo> propertyInfos = getChildProperties(propertyInfo);
 
             if (propertyInfos != null) {
                 currentProperties = propertyInfos;
@@ -238,6 +238,39 @@ class DataPillValidator {
         }
 
         return false;
+    }
+
+    private static boolean isTaskContainerProperty(PropertyInfo propertyInfo) {
+        if (PropertyUtils.isNestedTaskProperty(propertyInfo)) {
+            return true;
+        }
+
+        PropertyInfo itemPropertyInfo = getArrayItemProperty(propertyInfo);
+
+        return itemPropertyInfo != null && "ARRAY".equalsIgnoreCase(itemPropertyInfo.type()) &&
+            isTaskContainerProperty(itemPropertyInfo);
+    }
+
+    @Nullable
+    private static List<PropertyInfo> getChildProperties(PropertyInfo propertyInfo) {
+        PropertyInfo itemPropertyInfo = getArrayItemProperty(propertyInfo);
+
+        if (itemPropertyInfo != null && "OBJECT".equalsIgnoreCase(itemPropertyInfo.type())) {
+            return itemPropertyInfo.nestedProperties();
+        }
+
+        return propertyInfo.nestedProperties();
+    }
+
+    @Nullable
+    private static PropertyInfo getArrayItemProperty(PropertyInfo propertyInfo) {
+        List<PropertyInfo> propertyInfos = propertyInfo.nestedProperties();
+
+        if (!"ARRAY".equalsIgnoreCase(propertyInfo.type()) || propertyInfos == null || propertyInfos.size() != 1) {
+            return null;
+        }
+
+        return propertyInfos.getFirst();
     }
 
     private static boolean isTypeCompatible(String expectedType, @Nullable String actualType) {
