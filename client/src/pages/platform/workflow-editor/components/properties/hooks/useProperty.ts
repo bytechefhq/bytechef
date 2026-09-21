@@ -1272,10 +1272,13 @@ export const useProperty = ({
 
             if (shouldUseMentionInput) {
                 setMentionInput(true);
-                setMentionInputValue(hasExpression ? propertyParameterValue.substring(1) : propertyParameterValue);
 
                 if (hasExpression) {
+                    setMentionInputValue(propertyParameterValue.substring(1));
+
                     setIsFormulaMode(true);
+                } else {
+                    dispatchValueAction({type: 'mentionInputSyncedFromValue', value: propertyParameterValue});
                 }
 
                 return;
