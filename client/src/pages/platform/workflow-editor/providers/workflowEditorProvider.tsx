@@ -59,11 +59,13 @@ export interface RequestI {
 
 export interface StartWebhookTriggerTestRequestI {
     environmentId: number;
+    triggerName?: string;
     workflowId: string;
 }
 
 export interface StopWebhookTriggerTestRequestI {
     environmentId: number;
+    triggerName?: string;
     workflowId: string;
 }
 
