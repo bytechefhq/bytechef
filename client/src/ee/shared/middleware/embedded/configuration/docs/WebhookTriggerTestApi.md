@@ -11,7 +11,7 @@ All URIs are relative to */api/embedded/internal*
 
 ## startWebhookTriggerTest
 
-> StartWebhookTriggerTest200Response startWebhookTriggerTest(workflowId, environmentId)
+> StartWebhookTriggerTest200Response startWebhookTriggerTest(workflowId, environmentId, triggerName)
 
 Test a webhook trigger
 
@@ -35,6 +35,8 @@ async function example() {
     workflowId: workflowId_example,
     // number | The id of an environment.
     environmentId: 789,
+    // string | The name of the workflow trigger to test. Defaults to the first trigger. (optional)
+    triggerName: triggerName_example,
   } satisfies StartWebhookTriggerTestRequest;
 
   try {
@@ -56,6 +58,7 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **workflowId** | `string` | The id of a workflow. | [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
+| **triggerName** | `string` | The name of the workflow trigger to test. Defaults to the first trigger. | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
@@ -81,7 +84,7 @@ No authorization required
 
 ## stopWebhookTriggerTest
 
-> stopWebhookTriggerTest(workflowId, environmentId)
+> stopWebhookTriggerTest(workflowId, environmentId, triggerName)
 
 Test a webhook trigger
 
@@ -105,6 +108,8 @@ async function example() {
     workflowId: workflowId_example,
     // number | The id of an environment.
     environmentId: 789,
+    // string | The name of the workflow trigger to test. Defaults to the first trigger. (optional)
+    triggerName: triggerName_example,
   } satisfies StopWebhookTriggerTestRequest;
 
   try {
@@ -126,6 +131,7 @@ example().catch(console.error);
 |------------- | ------------- | ------------- | -------------|
 | **workflowId** | `string` | The id of a workflow. | [Defaults to `undefined`] |
 | **environmentId** | `number` | The id of an environment. | [Defaults to `undefined`] |
+| **triggerName** | `string` | The name of the workflow trigger to test. Defaults to the first trigger. | [Optional] [Defaults to `undefined`] |
 
 ### Return type
 
