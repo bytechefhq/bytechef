@@ -1,10 +1,14 @@
+import {TriggerType} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
-import {act, renderHook} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {act, renderHook, waitFor} from '@testing-library/react';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
     onDeleteSuccess: undefined as (() => void) | undefined,
+    webhookTriggerTestApi: undefined as
+        | {startWebhookTriggerTest: ReturnType<typeof vi.fn>; stopWebhookTriggerTest: ReturnType<typeof vi.fn>}
+        | undefined,
 }));
 
 vi.mock('@tanstack/react-query', async () => ({
@@ -45,7 +49,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
-    useWorkflowEditor: () => ({webhookTriggerTestApi: undefined}),
+    useWorkflowEditor: () => ({webhookTriggerTestApi: hoisted.webhookTriggerTestApi}),
 }));
 
 vi.mock('@uidotdev/usehooks', () => ({
@@ -57,6 +61,12 @@ import useOutputTab from '../useOutputTab';
 describe('useOutputTab', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        hoisted.webhookTriggerTestApi = undefined;
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     it('re-runs the workflow validation after the node test output is reset', () => {
@@ -70,5 +80,45 @@ describe('useOutputTab', () => {
 
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['workflowNodeOutputs', 'wf-1']});
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['ValidateWorkflow']});
+    });
+
+    it('starts and stops the webhook test for the trigger being tested, not the first trigger', async () => {
+        vi.useFakeTimers({shouldAdvanceTime: true});
+
+        hoisted.webhookTriggerTestApi = {
+            startWebhookTriggerTest: vi.fn().mockResolvedValue({webhookUrl: 'https://example.org/webhook'}),
+            stopWebhookTriggerTest: vi.fn().mockResolvedValue(undefined),
+        };
+
+        const {result} = renderHook(() =>
+            useOutputTab({
+                currentNode: {name: 'trigger_2', trigger: true, triggerType: TriggerType.StaticWebhook} as NodeDataType,
+                workflowId: 'wf-1',
+            })
+        );
+
+        act(() => {
+            result.current.handleTestOperationClick();
+        });
+
+        expect(hoisted.webhookTriggerTestApi.startWebhookTriggerTest).toHaveBeenCalledWith({
+            environmentId: 2,
+            triggerName: 'trigger_2',
+            workflowId: 'wf-1',
+        });
+
+        await waitFor(() => {
+            expect(result.current.webhookTestCancelEnabled).toBe(true);
+        });
+
+        act(() => {
+            result.current.handleTestCancelClick();
+        });
+
+        expect(hoisted.webhookTriggerTestApi.stopWebhookTriggerTest).toHaveBeenCalledWith({
+            environmentId: 2,
+            triggerName: 'trigger_2',
+            workflowId: 'wf-1',
+        });
     });
 });
