@@ -22,11 +22,13 @@ import {
 export interface StartWebhookTriggerTestRequest {
     workflowId: string;
     environmentId: number;
+    triggerName?: string;
 }
 
 export interface StopWebhookTriggerTestRequest {
     workflowId: string;
     environmentId: number;
+    triggerName?: string;
 }
 
 /**
@@ -56,6 +58,10 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
 
         if (requestParameters['environmentId'] != null) {
             queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        if (requestParameters['triggerName'] != null) {
+            queryParameters['triggerName'] = requestParameters['triggerName'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -114,6 +120,10 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
 
         if (requestParameters['environmentId'] != null) {
             queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
+
+        if (requestParameters['triggerName'] != null) {
+            queryParameters['triggerName'] = requestParameters['triggerName'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
