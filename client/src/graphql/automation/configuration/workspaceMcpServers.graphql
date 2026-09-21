@@ -5,6 +5,8 @@ query workspaceMcpServers($workspaceId: ID!) {
         type
         environmentId
         enabled
+        enforceToolAuthorization
+        authenticationRequired
         url
         mcpComponents {
             id

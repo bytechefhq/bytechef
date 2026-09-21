@@ -1,0 +1,6 @@
+query workspaceMcpServerTags($workspaceId: ID!) {
+    workspaceMcpServerTags(workspaceId: $workspaceId) {
+        id
+        name
+    }
+}
