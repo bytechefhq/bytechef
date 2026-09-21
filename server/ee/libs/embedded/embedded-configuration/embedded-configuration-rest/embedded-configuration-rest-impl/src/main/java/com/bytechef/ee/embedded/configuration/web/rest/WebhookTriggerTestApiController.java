@@ -35,9 +35,10 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
     @Override
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
-        String workflowId, Long environmentId) {
+        String workflowId, Long environmentId, String triggerName) {
 
-        String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, environmentId, PlatformType.EMBEDDED);
+        String webhookUrl = webhookTriggerTestFacade.enableTrigger(
+            workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
 
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
@@ -45,8 +46,8 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
     }
 
     @Override
-    public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId) {
-        webhookTriggerTestFacade.disableTrigger(workflowId, environmentId, PlatformType.EMBEDDED);
+    public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId, String triggerName) {
+        webhookTriggerTestFacade.disableTrigger(workflowId, triggerName, environmentId, PlatformType.EMBEDDED);
 
         return ResponseEntity.noContent()
             .build();

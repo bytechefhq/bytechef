@@ -288,8 +288,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflow)
-            .getFirst();
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
 
         WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
@@ -320,7 +319,8 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             saveWorkflowNodeSampleOutput(
                 workflowId, workflowTrigger.getName(), triggerOutput.value(), environmentId);
 
-            webhookTriggerTestFacade.disableTrigger(workflowId, environmentId, workflowExecutionId.getType());
+            webhookTriggerTestFacade.disableTrigger(
+                workflowId, workflowTrigger.getName(), environmentId, workflowExecutionId.getType());
         }
     }
 
