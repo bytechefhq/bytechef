@@ -35,6 +35,7 @@ import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseBooleanProperty;
 import com.bytechef.definition.BaseProperty.BaseDateProperty;
 import com.bytechef.definition.BaseProperty.BaseDateTimeProperty;
+import com.bytechef.definition.BaseProperty.BaseFileEntryProperty;
 import com.bytechef.definition.BaseProperty.BaseIntegerProperty;
 import com.bytechef.definition.BaseProperty.BaseNullProperty;
 import com.bytechef.definition.BaseProperty.BaseNumberProperty;
@@ -48,6 +49,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -157,6 +159,122 @@ class SchemaUtilsTest {
     @Test
     void testGetOutputSchemaWithMap() {
         BaseProperty result = SchemaUtils.getOutputSchema("data", Map.of("key", "value"), SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseObjectProperty.class);
+    }
+
+    @Test
+    void testGetOutputSchemaWithFileEntryMap() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            "body", Map.of(
+                "extension", "pdf", "mimeType", "application/pdf", "name", "file.pdf", "url",
+                "file:/editor/temp/file.pdf"),
+            SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseFileEntryProperty.class);
+        assertThat(result.getName()).isEqualTo("body");
+    }
+
+    @Test
+    void testGetOutputSchemaWithNestedFileEntryMap() {
+        Map<String, Object> fileEntryMap = new HashMap<>();
+
+        fileEntryMap.put("extension", null);
+        fileEntryMap.put("mimeType", null);
+        fileEntryMap.put("name", "file");
+        fileEntryMap.put("url", "file:/editor/temp/file");
+
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            null, Map.of("method", "POST", "body", fileEntryMap), SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseObjectProperty.class);
+
+        List<? extends BaseProperty> properties = ((ModifiableObjectProperty) result).getProperties()
+            .orElseThrow();
+
+        assertThat(properties)
+            .filteredOn(property -> "body".equals(property.getName()))
+            .singleElement()
+            .isInstanceOf(BaseFileEntryProperty.class);
+    }
+
+    @Test
+    void testGetOutputSchemaWithEnum() {
+        BaseProperty result = SchemaUtils.getOutputSchema("method", TestMethod.POST, SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseStringProperty.class);
+        assertThat(result.getName()).isEqualTo("method");
+    }
+
+    @Test
+    void testGetOutputSchemaWithNestedEnum() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            null, Map.of("method", TestMethod.POST, "body", Map.of("key", "value")), SCHEMA_PROPERTY_FACTORY);
+
+        List<? extends BaseProperty> properties = ((ModifiableObjectProperty) result).getProperties()
+            .orElseThrow();
+
+        assertThat(properties)
+            .filteredOn(property -> "method".equals(property.getName()))
+            .singleElement()
+            .isInstanceOf(BaseStringProperty.class);
+    }
+
+    @Test
+    void testGetOutputSchemaWithFileEntryBean() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            "body", new TestFileEntry("file.pdf", "pdf", "application/pdf", "file:/editor/temp/file.pdf"),
+            SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseFileEntryProperty.class);
+        assertThat(result.getName()).isEqualTo("body");
+    }
+
+    @Test
+    void testGetOutputSchemaWithNestedFileEntryBean() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            null, Map.of(
+                "method", "POST", "body",
+                new TestFileEntry("file.pdf", "pdf", "application/pdf", "file:/editor/temp/file.pdf")),
+            SCHEMA_PROPERTY_FACTORY);
+
+        List<? extends BaseProperty> properties = ((ModifiableObjectProperty) result).getProperties()
+            .orElseThrow();
+
+        assertThat(properties)
+            .filteredOn(property -> "body".equals(property.getName()))
+            .singleElement()
+            .isInstanceOf(BaseFileEntryProperty.class);
+    }
+
+    @Test
+    void testGetOutputSchemaWithBeanKeepsObject() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            "data", new TestInvoice("INV-1", "Invoice"), SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseObjectProperty.class);
+        assertThat(((ModifiableObjectProperty) result).getProperties()
+            .orElseThrow())
+                .extracting(BaseProperty::getName)
+                .containsExactlyInAnyOrder("invoiceId", "name");
+    }
+
+    @Test
+    void testGetOutputSchemaWithFileEntryLikeMapHavingExtraKeys() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            "data", Map.of(
+                "extension", "pdf", "mimeType", "application/pdf", "name", "file.pdf", "url", "file:/file.pdf",
+                "size", 12),
+            SCHEMA_PROPERTY_FACTORY);
+
+        assertThat(result).isInstanceOf(BaseObjectProperty.class);
+    }
+
+    @Test
+    void testGetOutputSchemaWithFileEntryLikeMapHavingNonStringUrl() {
+        BaseProperty result = SchemaUtils.getOutputSchema(
+            "data", Map.of("extension", "pdf", "mimeType", "application/pdf", "name", "file.pdf", "url", 1),
+            SCHEMA_PROPERTY_FACTORY);
 
         assertThat(result).isInstanceOf(BaseObjectProperty.class);
     }
@@ -492,6 +610,41 @@ class SchemaUtilsTest {
         assertThat((String) result.sampleOutput()).startsWith("sample");
     }
 
+    private enum TestMethod {
+
+        GET, POST
+    }
+
+    private record TestFileEntry(String name, String extension, String mimeType, String url) {
+
+        public String getExtension() {
+            return extension;
+        }
+
+        public String getMimeType() {
+            return mimeType;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+    }
+
+    private record TestInvoice(String invoiceId, String name) {
+
+        public String getInvoiceId() {
+            return invoiceId;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
     private static class TestSchemaPropertyFactory implements SchemaUtils.SchemaPropertyFactory {
 
         @Override
@@ -511,6 +664,8 @@ class SchemaUtilsTest {
                 return ComponentDsl.date(name);
             } else if (basePropertyClass == BaseDateTimeProperty.class) {
                 return ComponentDsl.dateTime(name);
+            } else if (basePropertyClass == BaseFileEntryProperty.class) {
+                return ComponentDsl.fileEntry(name);
             } else if (basePropertyClass == BaseIntegerProperty.class) {
                 return integer(name);
             } else if (basePropertyClass == BaseNullProperty.class) {

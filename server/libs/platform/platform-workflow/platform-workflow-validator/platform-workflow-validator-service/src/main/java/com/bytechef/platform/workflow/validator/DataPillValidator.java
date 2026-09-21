@@ -257,6 +257,16 @@ class DataPillValidator {
         return expectedType.equalsIgnoreCase("string");
     }
 
+    private static boolean isOpenObject(@Nullable PropertyInfo propertyInfo) {
+        if (propertyInfo == null || !"object".equalsIgnoreCase(propertyInfo.type())) {
+            return false;
+        }
+
+        List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
+
+        return nestedPropertyInfos == null || nestedPropertyInfos.isEmpty();
+    }
+
     private static String mapTypeToString(@Nullable String propertyType) {
         if (propertyType == null) {
             return "unknown";
@@ -635,13 +645,19 @@ class DataPillValidator {
         PropertyInfo outputInfo, StringBuilder errors, String text, List<PropertyInfo> taskDefinition,
         JsonNode rootParametersJsonNode) {
 
-        String actualType = PropertyUtils.getPropertyType(outputInfo, propertyName);
+        PropertyInfo actualPropertyInfo = PropertyUtils.getProperty(outputInfo, propertyName);
+
+        String actualType = actualPropertyInfo == null ? null : actualPropertyInfo.type();
 
         // Get the expected type from task definition if available
         String expectedType = getExpectedTypeFromDefinition(fieldPath, taskDefinition, rootParametersJsonNode);
 
         if (expectedType != null && actualType != null &&
             !isTypeCompatible(expectedType, actualType)) {
+
+            if ("file_entry".equalsIgnoreCase(expectedType) && isOpenObject(actualPropertyInfo)) {
+                return;
+            }
 
             // Allow any type to be converted to string in interpolation
             if ("string".equalsIgnoreCase(expectedType) && isStringWithMultipleDataPills(text)) {
