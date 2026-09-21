@@ -16,10 +16,14 @@
 
 package com.bytechef.definition;
 
+import java.util.Set;
+
 /**
  * @author Ivica Cardic
  */
 public interface BaseFileEntry {
+
+    Set<String> FILE_ENTRY_KEYS = Set.of("extension", "mimeType", "name", "url");
 
     /**
      * @return

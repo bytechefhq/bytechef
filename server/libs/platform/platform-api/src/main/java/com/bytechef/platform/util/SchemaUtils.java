@@ -78,7 +78,7 @@ public class SchemaUtils {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseDateProperty.class);
             } else if (value instanceof LocalDateTime) {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseDateTimeProperty.class);
-            } else if (value instanceof BaseFileEntry) {
+            } else if (value instanceof BaseFileEntry || (value instanceof Map<?, ?> map && isFileEntryMap(map))) {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseFileEntryProperty.class);
             } else if (value instanceof Integer) {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseIntegerProperty.class);
@@ -86,13 +86,16 @@ public class SchemaUtils {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseNumberProperty.class);
             } else if (value instanceof Map<?, ?>) {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseObjectProperty.class);
-            } else if (value instanceof String) {
+            } else if (value instanceof String || value instanceof Enum<?>) {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseStringProperty.class);
             } else if (value instanceof LocalTime) {
                 outputProperty = schemaPropertyFactory.create(name, value, BaseTimeProperty.class);
             } else {
                 if (ConvertUtils.canConvert(value, Map.class)) {
-                    outputProperty = schemaPropertyFactory.create(name, value, BaseObjectProperty.class);
+                    Map<?, ?> map = ConvertUtils.convertValue(value, Map.class);
+
+                    outputProperty = schemaPropertyFactory.create(
+                        name, map, isFileEntryMap(map) ? BaseFileEntryProperty.class : BaseObjectProperty.class);
                 } else {
                     outputProperty = schemaPropertyFactory.create(name, value, BaseProperty.class);
                 }
@@ -100,6 +103,11 @@ public class SchemaUtils {
         }
 
         return outputProperty;
+    }
+
+    private static boolean isFileEntryMap(Map<?, ?> map) {
+        return BaseFileEntry.FILE_ENTRY_KEYS.equals(map.keySet()) && map.get("name") instanceof String &&
+            map.get("url") instanceof String;
     }
 
     public static Object getSampleOutput(BaseProperty definitionProperty) {

@@ -105,7 +105,13 @@ class PropertyUtils {
      * Gets the type of a property from the given PropertyInfo structure.
      */
     public static @Nullable String getPropertyType(PropertyInfo outputInfo, String propertyName) {
-        return getPropertyTypeRecursive(outputInfo, propertyName.split("\\."));
+        PropertyInfo propertyInfo = getProperty(outputInfo, propertyName);
+
+        return propertyInfo == null ? null : propertyInfo.type();
+    }
+
+    public static @Nullable PropertyInfo getProperty(PropertyInfo outputInfo, String propertyName) {
+        return getPropertyRecursive(outputInfo, propertyName.split("\\."));
     }
 
     private static boolean checkPropertyExistsRecursive(PropertyInfo outputInfo, String[] propertyPath) {
@@ -221,25 +227,25 @@ class PropertyUtils {
         return false;
     }
 
-    private static @Nullable String getPropertyTypeRecursive(PropertyInfo outputInfo, String[] propertyPath) {
+    private static @Nullable PropertyInfo getPropertyRecursive(PropertyInfo outputInfo, String[] propertyPath) {
         if (propertyPath.length == 0) {
-            return outputInfo.type();
+            return outputInfo;
         }
 
         String currentProperty = propertyPath[0];
 
         if (currentProperty.contains("[") && currentProperty.endsWith("]")) {
-            return getArrayPropertyType(outputInfo, currentProperty, propertyPath);
+            return getArrayProperty(outputInfo, currentProperty, propertyPath);
         }
 
         if (currentProperty.equals(outputInfo.name())) {
-            return getCurrentPropertyType(outputInfo, propertyPath);
+            return getCurrentProperty(outputInfo, propertyPath);
         }
 
-        return getNestedPropertyType(outputInfo, currentProperty, propertyPath);
+        return getNestedProperty(outputInfo, currentProperty, propertyPath);
     }
 
-    private static @Nullable String getArrayPropertyType(
+    private static @Nullable PropertyInfo getArrayProperty(
         PropertyInfo outputPropertyInfo, String currentProperty, String[] propertyPath) {
 
         String arrayName = currentProperty.substring(0, currentProperty.indexOf('['));
@@ -261,12 +267,12 @@ class PropertyUtils {
                     PropertyInfo propertyInfo = nestedPropertyInfos.getFirst();
 
                     if (propertyPath.length == 1) {
-                        return propertyInfo.type();
+                        return propertyInfo;
                     }
 
                     String[] remainingPath = createRemainingPath(propertyPath);
 
-                    return getPropertyTypeRecursive(propertyInfo, remainingPath);
+                    return getPropertyRecursive(propertyInfo, remainingPath);
                 }
             }
         }
@@ -274,16 +280,16 @@ class PropertyUtils {
         return null;
     }
 
-    private static @Nullable String getCurrentPropertyType(PropertyInfo outputPropertyInfo, String[] propertyPath) {
+    private static @Nullable PropertyInfo getCurrentProperty(PropertyInfo outputPropertyInfo, String[] propertyPath) {
         if (propertyPath.length == 1) {
-            return outputPropertyInfo.type();
+            return outputPropertyInfo;
         }
 
         if (outputPropertyInfo.nestedProperties() != null) {
             String[] remainingPath = createRemainingPath(propertyPath);
 
             for (PropertyInfo propertyInfo : outputPropertyInfo.nestedProperties()) {
-                String result = getPropertyTypeRecursive(propertyInfo, remainingPath);
+                PropertyInfo result = getPropertyRecursive(propertyInfo, remainingPath);
 
                 if (result != null) {
                     return result;
@@ -295,21 +301,21 @@ class PropertyUtils {
     }
 
     @Nullable
-    private static String getNestedPropertyType(
+    private static PropertyInfo getNestedProperty(
         PropertyInfo outputPropertyInfo, String currentProperty, String[] propertyPath) {
 
         if (outputPropertyInfo.nestedProperties() != null) {
             for (PropertyInfo propertyInfo : outputPropertyInfo.nestedProperties()) {
                 if (currentProperty.equals(propertyInfo.name())) {
                     if (propertyPath.length == 1) {
-                        return propertyInfo.type();
+                        return propertyInfo;
                     }
 
                     if (propertyInfo.nestedProperties() != null) {
                         String[] remainingPath = createRemainingPath(propertyPath);
 
                         for (PropertyInfo deepNestedProp : propertyInfo.nestedProperties()) {
-                            String result = getPropertyTypeRecursive(deepNestedProp, remainingPath);
+                            PropertyInfo result = getPropertyRecursive(deepNestedProp, remainingPath);
 
                             if (result != null) {
                                 return result;
