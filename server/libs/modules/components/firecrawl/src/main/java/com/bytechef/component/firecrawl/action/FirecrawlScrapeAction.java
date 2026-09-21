@@ -31,14 +31,18 @@ import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.FORMA
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.FORMATS_PROMPT;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.FORMATS_SCHEMA;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.HEADERS;
+import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.INCLUDE_PROFILE;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.INCLUDE_TAGS;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.LOCATION;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.MAX_AGE;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.MOBILE;
+import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.NAME;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.ONLY_MAIN_CONTENT;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.PARSERS;
+import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.PROFILE;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.PROXY;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.REMOVE_BASE64_IMAGES;
+import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.SAVE_CHANGES;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.SKIP_TLS_VERIFICATION;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.STORE_IN_CACHE;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.TIMEOUT;
@@ -212,6 +216,30 @@ public class FirecrawlScrapeAction {
                         "protection concerns.")
                 .advancedOption(true)
                 .required(false),
+            bool(INCLUDE_PROFILE)
+                .label("Include Profile")
+                .description("Enable persistent browser storage across scrape and interact sessions.")
+                .defaultValue(false)
+                .advancedOption(true),
+            object(PROFILE)
+                .label("Profile")
+                .description(
+                    "Enable persistent browser storage across scrape and interact sessions. Pass a profile when scraping to preserve cookies, localStorage, and session data. Sessions with the same profile name share browser state.")
+                .properties(
+                    string(NAME)
+                        .label("Name")
+                        .description(
+                            "A name for the profile. Scrapes with the same name share browser state (cookies, localStorage, sessions).")
+                        .required(true),
+                    bool(SAVE_CHANGES)
+                        .label("Save Changes")
+                        .description(
+                            "When true, browser state is saved back to the profile when the interact session stops. Set to false to load existing data without writing. Only one saving session is allowed at a time.")
+                        .defaultValue(true)
+                        .required(false))
+                .displayCondition("%s == true".formatted(INCLUDE_PROFILE))
+                .advancedOption(true)
+                .required(false),
             bool(ZERO_DATA_RETENTION)
                 .label("Zero Data Retention")
                 .description(
@@ -293,6 +321,7 @@ public class FirecrawlScrapeAction {
                     LOCATION, inputParameters.get(LOCATION),
                     PARSERS, inputParameters.getList(PARSERS),
                     STORE_IN_CACHE, inputParameters.getBoolean(STORE_IN_CACHE),
+                    PROFILE, inputParameters.getMap(PROFILE),
                     ZERO_DATA_RETENTION, inputParameters.getBoolean(ZERO_DATA_RETENTION)))
             .configuration(Http.responseType(ResponseType.JSON))
             .execute()
