@@ -5,6 +5,7 @@
  */
 package com.bytechef.ee.embedded.configuration.web.rest;
 
+import org.springframework.lang.Nullable;
 import com.bytechef.ee.embedded.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:16.940215+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-21T16:04:43.869597+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "webhook-trigger-test", description = "The Automation Webhook Trigger Internal API")
 public interface WebhookTriggerTestApi {
@@ -49,6 +50,7 @@ public interface WebhookTriggerTestApi {
      *
      * @param workflowId The id of a workflow. (required)
      * @param environmentId The id of an environment. (required)
+     * @param triggerName The name of the workflow trigger to test. Defaults to the first trigger. (optional)
      * @return Returns the webhook URL. (status code 200)
      */
     @Operation(
@@ -69,7 +71,8 @@ public interface WebhookTriggerTestApi {
     )
     default ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
+        @Parameter(name = "triggerName", description = "The name of the workflow trigger to test. Defaults to the first trigger.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerName", required = false) @Nullable String triggerName
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -92,6 +95,7 @@ public interface WebhookTriggerTestApi {
      *
      * @param workflowId The id of a workflow. (required)
      * @param environmentId The id of an environment. (required)
+     * @param triggerName The name of the workflow trigger to test. Defaults to the first trigger. (optional)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -109,7 +113,8 @@ public interface WebhookTriggerTestApi {
     )
     default ResponseEntity<Void> stopWebhookTriggerTest(
         @Parameter(name = "workflowId", description = "The id of a workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId,
-        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId
+        @NotNull @Parameter(name = "environmentId", description = "The id of an environment.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "environmentId", required = true) Long environmentId,
+        @Parameter(name = "triggerName", description = "The name of the workflow trigger to test. Defaults to the first trigger.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerName", required = false) @Nullable String triggerName
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
