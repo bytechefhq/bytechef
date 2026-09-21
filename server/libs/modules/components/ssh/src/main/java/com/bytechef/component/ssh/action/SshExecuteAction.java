@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Igor Beslic
@@ -111,6 +112,10 @@ public class SshExecuteAction {
             int timeout = inputParameters.getInteger(TIMEOUT, DEFAULT_TIMEOUT_SECONDS);
 
             for (String command : commands) {
+                if (StringUtils.isBlank(command)) {
+                    continue;
+                }
+
                 Map<String, Object> result = executeCommand(sshClient, command, timeout);
 
                 results.add(result);
