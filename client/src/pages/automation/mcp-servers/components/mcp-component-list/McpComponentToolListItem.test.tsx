@@ -7,12 +7,15 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpComponentToolListItem from './McpComponentToolListItem';
 
-const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogMock} = vi.hoisted(() => ({
-    deleteDialogState: {showDeleteDialog: false},
-    dropdownMenuHookMock: vi.fn(),
-    mutateMock: vi.fn(),
-    setShowDeleteDialogMock: vi.fn(),
-}));
+const {deleteDialogState, dropdownMenuHookMock, mutateMock, setShowDeleteDialogMock, sharedMutateMock} = vi.hoisted(
+    () => ({
+        deleteDialogState: {showDeleteDialog: false},
+        dropdownMenuHookMock: vi.fn(),
+        mutateMock: vi.fn(),
+        setShowDeleteDialogMock: vi.fn(),
+        sharedMutateMock: vi.fn(),
+    })
+);
 
 vi.mock('./hooks/useMcpProjectComponentToolDropdownMenu', () => ({
     default: (props: unknown) => {
@@ -38,6 +41,7 @@ vi.mock('@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopov
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/shared/middleware/graphql')>()),
     useUpdateEmbeddedMcpToolEnabledMutation: () => ({mutate: mutateMock}),
+    useUpdateMcpToolEnabledMutation: () => ({mutate: sharedMutateMock}),
 }));
 
 const mcpTool = {enabled: true, id: '42', name: 'createOpportunity', title: 'Create Opportunity'} as McpTool;
@@ -216,6 +220,43 @@ describe('McpComponentToolListItem', () => {
         mutateOptions.onSuccess();
 
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['embeddedMcpComponentsByServerId']});
+    });
+
+    it('disables an automation tool through the shared enabled switch', () => {
+        mutateMock.mockClear();
+
+        const queryClient = new QueryClient();
+
+        const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <McpActivePopoverProvider>
+                    <McpComponentToolListItem
+                        componentName="affinity"
+                        componentVersion={1}
+                        connectionId={null}
+                        enabledSwitchVisible
+                        mcpTool={mcpTool}
+                    />
+                </McpActivePopoverProvider>
+            </QueryClientProvider>
+        );
+
+        fireEvent.click(screen.getByRole('switch'));
+
+        expect(sharedMutateMock).toHaveBeenCalledWith(
+            {enabled: false, id: '42'},
+            expect.objectContaining({onSettled: expect.any(Function), onSuccess: expect.any(Function)})
+        );
+        expect(mutateMock).not.toHaveBeenCalled();
+
+        const mutateOptions = sharedMutateMock.mock.calls[0][1];
+
+        mutateOptions.onSuccess();
+
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpComponentsByServerId']});
+        expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['mcpToolsByComponentId']});
     });
 
     it('routes deletes and property updates through the embedded operations for an embedded tool', () => {

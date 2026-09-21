@@ -2,10 +2,15 @@ import Button from '@/components/Button/Button';
 import EmptyFilterResult from '@/components/EmptyFilterResult';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {McpServer} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {ServerIcon} from 'lucide-react';
+import {useEffect} from 'react';
 
 import McpServerDialog from './components/McpServerDialog';
 import McpServersFilterTitle from './components/McpServersFilterTitle';
@@ -20,6 +25,8 @@ export enum Type {
 }
 
 const McpServers = () => {
+    const registerPostTurn = useCopilotPostTurnRegistry((state) => state.register);
+
     const {
         allComponentNames,
         componentDefinitions,
@@ -36,6 +43,16 @@ const McpServers = () => {
         validMcpServers,
     } = useMcpServers();
 
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        return registerPostTurn(Source.MCP_SERVER, () => {
+            queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
+            queryClient.invalidateQueries({queryKey: ['mcpProjects']});
+            queryClient.invalidateQueries({queryKey: ['mcpProjectsByServerId']});
+        });
+    }, [queryClient, registerPostTurn]);
+
     return (
         <LayoutContainer
             header={
@@ -43,8 +60,17 @@ const McpServers = () => {
                     centerTitle={true}
                     position="main"
                     right={
-                        validMcpServers.length > 0 && (
-                            <McpServerDialog mcpServer={undefined} triggerNode={<Button label="New MCP Server" />} />
+                        (validMcpServers.length > 0 || !(mcpServersIsLoading || tagsIsLoading)) && (
+                            <div className="flex items-center gap-1">
+                                <CopilotButton source={Source.MCP_SERVER} />
+
+                                {validMcpServers.length > 0 && (
+                                    <McpServerDialog
+                                        mcpServer={undefined}
+                                        triggerNode={<Button label="New MCP Server" />}
+                                    />
+                                )}
+                            </div>
                         )
                     }
                     title={
@@ -87,7 +113,7 @@ const McpServers = () => {
                         button={
                             <McpServerDialog mcpServer={undefined} triggerNode={<Button label="Create MCP Server" />} />
                         }
-                        icon={<ServerIcon className="size-24 text-gray-300" />}
+                        icon={<ServerIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new MCP server."
                         title="No MCP Servers"
                     />

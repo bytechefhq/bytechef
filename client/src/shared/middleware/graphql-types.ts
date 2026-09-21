@@ -790,6 +790,7 @@ export type CreateMcpProjectInput = {
 };
 
 export type CreateWorkspaceMcpServerInput = {
+  authenticationRequired?: InputMaybe<Scalars['Boolean']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -1394,6 +1395,7 @@ export type McpComponent = {
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   mcpServerId: Scalars['ID']['output'];
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
+  requiredAuthorities: Array<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -1410,6 +1412,7 @@ export type McpComponentWithToolsInput = {
   componentVersion: Scalars['Int']['input'];
   connectionId?: InputMaybe<Scalars['ID']['input']>;
   mcpServerId: Scalars['ID']['input'];
+  requiredAuthorities?: InputMaybe<Array<Scalars['String']['input']>>;
   tools: Array<McpToolInputForComponent>;
   version?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -1499,40 +1502,28 @@ export type McpProjectWorkflowUpdateInput = {
 
 export type McpServer = {
   __typename?: 'McpServer';
+  authenticationRequired: Scalars['Boolean']['output'];
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   enabled: Scalars['Boolean']['output'];
+  enforceToolAuthorization: Scalars['Boolean']['output'];
   environmentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
   name: Scalars['String']['output'];
-  secretKey: Scalars['String']['output'];
+  secretKey?: Maybe<Scalars['String']['output']>;
   tags?: Maybe<Array<Maybe<Tag>>>;
   type: PlatformType;
   url: Scalars['String']['output'];
   version?: Maybe<Scalars['Int']['output']>;
 };
 
-export type McpServerInput = {
-  enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  type: PlatformType;
-};
-
-export enum McpServerOrderBy {
-  CreatedDateAsc = 'CREATED_DATE_ASC',
-  CreatedDateDesc = 'CREATED_DATE_DESC',
-  LastModifiedDateAsc = 'LAST_MODIFIED_DATE_ASC',
-  LastModifiedDateDesc = 'LAST_MODIFIED_DATE_DESC',
-  NameAsc = 'NAME_ASC',
-  NameDesc = 'NAME_DESC'
-}
-
 export type McpServerUpdateInput = {
+  authenticationRequired?: InputMaybe<Scalars['Boolean']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  enforceToolAuthorization?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1593,7 +1584,6 @@ export type Mutation = {
   createMcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
   createMcpProject?: Maybe<McpProject>;
   createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
-  createMcpServer?: Maybe<McpServer>;
   createMcpTool?: Maybe<McpTool>;
   createWorkspaceApiKey: Scalars['String']['output'];
   createWorkspaceMcpServer?: Maybe<McpServer>;
@@ -1710,6 +1700,7 @@ export type Mutation = {
   updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
   updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
   updateKnowledgeBaseTags: Scalars['Boolean']['output'];
+  updateManagementMcpServerAuthenticationRequired: Scalars['Boolean']['output'];
   updateManagementMcpServerUrl: Scalars['String']['output'];
   updateMcpComponentWithTools?: Maybe<McpComponent>;
   updateMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
@@ -1721,6 +1712,7 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
+  updateMcpToolEnabled?: Maybe<McpTool>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -1895,11 +1887,6 @@ export type MutationCreateMcpProjectArgs = {
 
 export type MutationCreateMcpProjectWorkflowArgs = {
   input: McpProjectWorkflowInput;
-};
-
-
-export type MutationCreateMcpServerArgs = {
-  input: McpServerInput;
 };
 
 
@@ -2501,6 +2488,11 @@ export type MutationUpdateKnowledgeBaseTagsArgs = {
 };
 
 
+export type MutationUpdateManagementMcpServerAuthenticationRequiredArgs = {
+  authenticationRequired: Scalars['Boolean']['input'];
+};
+
+
 export type MutationUpdateMcpComponentWithToolsArgs = {
   id: Scalars['ID']['input'];
   input: McpComponentWithToolsInput;
@@ -2557,6 +2549,12 @@ export type MutationUpdateMcpServerUrlArgs = {
 export type MutationUpdateMcpToolArgs = {
   id: Scalars['ID']['input'];
   input: McpToolInput;
+};
+
+
+export type MutationUpdateMcpToolEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2938,6 +2936,7 @@ export type Query = {
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
+  managementMcpServerAuthenticationRequired: Scalars['Boolean']['output'];
   managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
   mcpComponent?: Maybe<McpComponent>;
   mcpComponentDefinitions: Array<ComponentDefinition>;
@@ -2953,14 +2952,10 @@ export type Query = {
   mcpProject?: Maybe<McpProject>;
   mcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
   mcpProjectWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
-  mcpProjectWorkflows?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
   mcpProjectWorkflowsByMcpProjectId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
-  mcpProjectWorkflowsByProjectDeploymentWorkflowId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
   mcpProjects?: Maybe<Array<Maybe<McpProject>>>;
   mcpProjectsByServerId?: Maybe<Array<Maybe<McpProject>>>;
   mcpServer?: Maybe<McpServer>;
-  mcpServerTags?: Maybe<Array<Maybe<Tag>>>;
-  mcpServers?: Maybe<Array<Maybe<McpServer>>>;
   mcpTool?: Maybe<McpTool>;
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
   mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
@@ -2995,6 +2990,7 @@ export type Query = {
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
   workspaceChatWorkflows: Array<ChatWorkflow>;
+  workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   workspaceProjectDeployments: Array<ProjectDeployment>;
 };
@@ -3504,8 +3500,8 @@ export type QueryMcpProjectWorkflowsByMcpProjectIdArgs = {
 };
 
 
-export type QueryMcpProjectWorkflowsByProjectDeploymentWorkflowIdArgs = {
-  projectDeploymentWorkflowId?: InputMaybe<Scalars['ID']['input']>;
+export type QueryMcpProjectsArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3516,17 +3512,6 @@ export type QueryMcpProjectsByServerIdArgs = {
 
 export type QueryMcpServerArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpServerTagsArgs = {
-  type: PlatformType;
-};
-
-
-export type QueryMcpServersArgs = {
-  orderBy?: InputMaybe<McpServerOrderBy>;
-  type: PlatformType;
 };
 
 
@@ -3707,6 +3692,11 @@ export type QueryWorkspaceApiKeysArgs = {
 
 export type QueryWorkspaceChatWorkflowsArgs = {
   environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
+export type QueryWorkspaceMcpServerTagsArgs = {
   workspaceId: Scalars['ID']['input'];
 };
 

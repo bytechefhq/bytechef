@@ -10,6 +10,7 @@ const hoisted = vi.hoisted(() => ({
     tagsMutation: {mutate: vi.fn()},
     tagsMutationOptions: undefined as {onSuccess: () => void} | undefined,
     updateMutate: vi.fn(),
+    updateTagsOnSuccess: undefined as undefined | (() => void),
 }));
 
 vi.mock('@/shared/components/mcp-server/hooks/useMcpServerListItemClick', () => ({
@@ -21,6 +22,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     useUpdateEmbeddedMcpServerMutation: () => ({mutate: hoisted.updateMutate}),
     useUpdateEmbeddedMcpServerTagsMutation: (options: {onSuccess: () => void}) => {
         hoisted.tagsMutationOptions = options;
+        hoisted.updateTagsOnSuccess = options.onSuccess;
 
         return hoisted.tagsMutation;
     },
@@ -31,6 +33,8 @@ vi.mock('@tanstack/react-query', () => ({
 }));
 
 const mcpServer = {enabled: true, id: '5', name: 'Server', tags: [{id: '10', name: 'crm'}]} as unknown as McpServer;
+
+const invalidatedKeys = () => hoisted.invalidateQueries.mock.calls.map(([argument]) => argument.queryKey[0]);
 
 describe('useMcpServerListItem', () => {
     beforeEach(() => {
@@ -81,7 +85,7 @@ describe('useMcpServerListItem', () => {
 
         act(() => hoisted.tagsMutationOptions!.onSuccess());
 
-        expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['mcpServers']});
+        expect(hoisted.invalidateQueries).not.toHaveBeenCalledWith({queryKey: ['mcpServers']});
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embeddedMcpServers']});
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embeddedMcpServerTags']});
         expect(hoisted.invalidateQueries).not.toHaveBeenCalledWith({queryKey: ['mcpServerTags']});
@@ -107,5 +111,13 @@ describe('useMcpServerListItem', () => {
 
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['embeddedMcpServers']});
         expect(result.current.showDeleteDialog).toBe(false);
+    });
+
+    it('invalidates the embedded server list and tag queries after a tag update', () => {
+        renderHook(() => useMcpServerListItem({id: '1', name: 'Server', tags: []} as unknown as McpServer));
+
+        hoisted.updateTagsOnSuccess?.();
+
+        expect(invalidatedKeys()).toEqual(['embeddedMcpServers', 'embeddedMcpServerTags']);
     });
 });

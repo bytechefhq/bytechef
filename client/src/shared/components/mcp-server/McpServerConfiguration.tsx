@@ -4,8 +4,33 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
 import {InfoCircledIcon} from '@radix-ui/react-icons';
 
-const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string; onRefresh: () => void}) => {
-    const codeSnippet1 = `{
+interface McpServerConfigurationProps {
+    authenticationRequired?: boolean;
+    mcpServerUrl: string;
+    onRefresh: () => void;
+}
+
+const McpServerConfiguration = ({
+    authenticationRequired = true,
+    mcpServerUrl,
+    onRefresh,
+}: McpServerConfigurationProps) => {
+    const codeSnippet1 = authenticationRequired
+        ? `{
+  "mcpServers": {
+    "ByteChef": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "${mcpServerUrl}",
+        "--header",
+        "Authorization: Bearer YOUR_API_KEY"
+      ]
+    }
+  }
+}`
+        : `{
   "mcpServers": {
     "ByteChef": {
       "command": "npx",
@@ -18,7 +43,18 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
   }
 }`;
 
-    const codeSnippet2 = `{
+    const codeSnippet2 = authenticationRequired
+        ? `{
+  "mcpServers": {
+    "ByteChef": {
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      },
+      "url": "${mcpServerUrl}"
+    }
+  }
+}`
+        : `{
   "mcpServers": {
     "ByteChef": {
       "url": "${mcpServerUrl}"
@@ -27,6 +63,12 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 }`;
 
     const codeSnippet3 = mcpServerUrl;
+
+    const apiKeyInstruction = authenticationRequired ? (
+        <p className="text-sm text-muted-foreground">
+            Replace YOUR_API_KEY with an API key created under Settings. Requests without a valid API key are rejected.
+        </p>
+    ) : null;
 
     return (
         <Tabs defaultValue="claude">
@@ -119,6 +161,8 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                                     Paste the configuration below and save, then quit and restart Claude.
                                 </p>
 
+                                {apiKeyInstruction}
+
                                 <McpServerConfigurationCode codeSnippet={codeSnippet1} onRefresh={onRefresh} />
                             </div>
                         </div>
@@ -158,6 +202,8 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                                 </div>
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
+
+                                {apiKeyInstruction}
 
                                 <McpServerConfigurationCode codeSnippet={codeSnippet2} onRefresh={onRefresh} />
                             </div>
@@ -203,6 +249,8 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
 
+                                {apiKeyInstruction}
+
                                 <McpServerConfigurationCode codeSnippet={codeSnippet2} onRefresh={onRefresh} />
                             </div>
                         </div>
@@ -220,6 +268,17 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                             <div className="flex-1 space-y-4">
                                 <h2 className="font-semibold text-foreground">Server URL</h2>
+
+                                {authenticationRequired ? (
+                                    <p className="text-sm text-muted-foreground">
+                                        This URL requires an API key created under Settings, sent with every request as
+                                        an Authorization: Bearer header.
+                                    </p>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">
+                                        This server does not require authentication, so the URL can be used as is.
+                                    </p>
+                                )}
 
                                 {codeSnippet3 && (
                                     <McpServerConfigurationCode codeSnippet={codeSnippet3} onRefresh={onRefresh} />

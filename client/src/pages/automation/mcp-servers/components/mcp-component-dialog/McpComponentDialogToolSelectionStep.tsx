@@ -68,7 +68,7 @@ const McpComponentDialogToolSelectionStep = ({
         <div className="space-y-4 py-4">
             <div className="space-y-2">
                 <Label className="text-sm font-medium" htmlFor="connection-select">
-                    Select Connection
+                    Connection
                 </Label>
 
                 <div className="flex items-center gap-2">
@@ -152,6 +152,8 @@ const McpComponentDialogToolSelectionStep = ({
                 <div className="py-8 text-center text-muted-foreground">No tools available for this component.</div>
             ) : (
                 <>
+                    <p className="mt-6 text-sm font-medium">Tools</p>
+
                     <div className="flex items-center space-x-3">
                         <Checkbox
                             checked={allToolsSelected}
@@ -167,7 +169,10 @@ const McpComponentDialogToolSelectionStep = ({
 
                     <div className="divide-y">
                         {toolElements.map((tool) => (
-                            <div className="flex items-center space-x-3 py-3 hover:bg-gray-50" key={tool.name}>
+                            <div
+                                className="flex items-center space-x-3 py-3 hover:bg-surface-neutral-primary-hover"
+                                key={tool.name}
+                            >
                                 <Checkbox
                                     checked={selectedTools.some((selectedTool) => selectedTool.name === tool.name)}
                                     id={tool.name}

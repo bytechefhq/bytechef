@@ -4,7 +4,11 @@ import Switch from '@/components/Switch/Switch';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {McpTool, useUpdateEmbeddedMcpToolEnabledMutation} from '@/shared/middleware/graphql';
+import {
+    McpTool,
+    useUpdateEmbeddedMcpToolEnabledMutation,
+    useUpdateMcpToolEnabledMutation,
+} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {BoltIcon, Trash2Icon} from 'lucide-react';
 import {useState} from 'react';
@@ -18,6 +22,7 @@ interface McpComponentToolListItemProps {
     connectionRequired?: boolean;
     description?: string | null;
     embedded?: boolean;
+    enabledSwitchVisible?: boolean;
     mcpTool: McpTool;
 }
 
@@ -28,6 +33,7 @@ const McpComponentToolListItem = ({
     connectionRequired,
     description,
     embedded,
+    enabledSwitchVisible,
     mcpTool,
 }: McpComponentToolListItemProps) => {
     const [isEnablePending, setIsEnablePending] = useState(false);
@@ -43,6 +49,7 @@ const McpComponentToolListItem = ({
     const queryClient = useQueryClient();
 
     const updateEmbeddedMcpToolEnabledMutation = useUpdateEmbeddedMcpToolEnabledMutation();
+    const updateMcpToolEnabledMutation = useUpdateMcpToolEnabledMutation();
 
     const popoverId = `component-tool-${mcpTool.id}`;
     const toolLabel = mcpTool.title || mcpTool.name;
@@ -53,17 +60,25 @@ const McpComponentToolListItem = ({
     const handleEnabledChange = (value: boolean) => {
         setIsEnablePending(true);
 
-        updateEmbeddedMcpToolEnabledMutation.mutate(
-            {enabled: value, id: mcpTool.id},
-            {
-                onSettled: () => {
-                    setIsEnablePending(false);
-                },
-                onSuccess: () => {
+        const mutateOptions = {
+            onSettled: () => {
+                setIsEnablePending(false);
+            },
+            onSuccess: () => {
+                if (embedded) {
                     void queryClient.invalidateQueries({queryKey: ['embeddedMcpComponentsByServerId']});
-                },
-            }
-        );
+                } else {
+                    void queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
+                    void queryClient.invalidateQueries({queryKey: ['mcpToolsByComponentId']});
+                }
+            },
+        };
+
+        if (embedded) {
+            updateEmbeddedMcpToolEnabledMutation.mutate({enabled: value, id: mcpTool.id}, mutateOptions);
+        } else {
+            updateMcpToolEnabledMutation.mutate({enabled: value, id: mcpTool.id}, mutateOptions);
+        }
     };
 
     return (
@@ -77,7 +92,7 @@ const McpComponentToolListItem = ({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-0.5">
-                        {embedded && (
+                        {(embedded || enabledSwitchVisible) && (
                             <Switch
                                 aria-label={`Enable ${toolLabel}`}
                                 checked={mcpTool.enabled}
@@ -102,12 +117,12 @@ const McpComponentToolListItem = ({
 
                         <Button
                             aria-label="Delete"
-                            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            className="rounded p-1"
                             icon={<Trash2Icon className="size-4" />}
                             onClick={() => setShowDeleteDialog(true)}
                             size="iconSm"
                             title="Delete"
-                            variant="ghost"
+                            variant="destructiveGhost"
                         />
                     </div>
                 </div>

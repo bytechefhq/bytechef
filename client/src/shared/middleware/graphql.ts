@@ -527,7 +527,9 @@ export type McpProjectWorkflowPropertiesQuery = { mcpProjectWorkflowProperties: 
     | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
 
-export type McpProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+export type McpProjectsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type McpProjectsQuery = { mcpProjects: Array<{ id: string, mcpServerId: string, project: { id: string, name: string } | null } | null> | null };
@@ -663,12 +665,19 @@ export type WorkspaceChatWorkflowsQueryVariables = Exact<{
 
 export type WorkspaceChatWorkflowsQuery = { workspaceChatWorkflows: Array<{ projectDeploymentId: string, projectId: string, projectName: string, workflowExecutionId: string, workflowLabel: string }> };
 
+export type WorkspaceMcpServerTagsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
+
+
+export type WorkspaceMcpServerTagsQuery = { workspaceMcpServerTags: Array<{ id: string, name: string } | null> | null };
+
 export type WorkspaceMcpServersQueryVariables = Exact<{
   workspaceId: string | number;
 }>;
 
 
-export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, authenticationRequired: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null, mcpTools: Array<{ id: string } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type AddDataTableColumnMutationVariables = Exact<{
   input: Types.AddColumnInput;
@@ -1144,7 +1153,7 @@ export type EmbeddedMcpComponentsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type EmbeddedMcpComponentsByServerIdQuery = { embeddedMcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
+export type EmbeddedMcpComponentsByServerIdQuery = { embeddedMcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, requiredAuthorities: Array<string>, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
 
 export type EmbeddedMcpServerTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1728,6 +1737,11 @@ export type EvaluatorFunctionDefinitionsQueryVariables = Exact<{ [key: string]: 
 
 export type EvaluatorFunctionDefinitionsQuery = { evaluatorFunctionDefinitions: Array<{ name: string, title: string, description: string, category: Types.EvaluatorFunctionCategory, returnType: Types.EvaluatorFunctionType, example: string, parameters: Array<{ name: string, description: string, type: Types.EvaluatorFunctionType, required: boolean }> }> };
 
+export type ManagementMcpServerAuthenticationRequiredQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ManagementMcpServerAuthenticationRequiredQuery = { managementMcpServerAuthenticationRequired: boolean };
+
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1738,21 +1752,7 @@ export type McpComponentsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
-
-export type McpServerTagsQueryVariables = Exact<{
-  type: Types.PlatformType;
-}>;
-
-
-export type McpServerTagsQuery = { mcpServerTags: Array<{ id: string, name: string } | null> | null };
-
-export type McpServersQueryVariables = Exact<{
-  type: Types.PlatformType;
-}>;
-
-
-export type McpServersQuery = { mcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, requiredAuthorities: Array<string>, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
   mcpComponentId: string | number;
@@ -1827,6 +1827,13 @@ export type UpdateApiKeyMutationVariables = Exact<{
 
 export type UpdateApiKeyMutation = { updateApiKey: boolean };
 
+export type UpdateManagementMcpServerAuthenticationRequiredMutationVariables = Exact<{
+  authenticationRequired: boolean;
+}>;
+
+
+export type UpdateManagementMcpServerAuthenticationRequiredMutation = { updateManagementMcpServerAuthenticationRequired: boolean };
+
 export type UpdateManagementMcpServerUrlMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1854,6 +1861,14 @@ export type UpdateMcpToolMutationVariables = Exact<{
 
 
 export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
+
+export type UpdateMcpToolEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type UpdateMcpToolEnabledMutation = { updateMcpToolEnabled: { id: string, enabled: boolean } | null };
 
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
@@ -3815,8 +3830,8 @@ export const useMcpProjectWorkflowPropertiesQuery = <
     )};
 
 export const McpProjectsDocument = new TypedDocumentString(`
-    query mcpProjects {
-  mcpProjects {
+    query mcpProjects($workspaceId: ID!) {
+  mcpProjects(workspaceId: $workspaceId) {
     id
     mcpServerId
     project {
@@ -3831,13 +3846,13 @@ export const useMcpProjectsQuery = <
       TData = McpProjectsQuery,
       TError = unknown
     >(
-      variables?: McpProjectsQueryVariables,
+      variables: McpProjectsQueryVariables,
       options?: Omit<UseQueryOptions<McpProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpProjectsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<McpProjectsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['mcpProjects'] : ['mcpProjects', variables],
+    queryKey: ['mcpProjects', variables],
     queryFn: fetcher<McpProjectsQuery, McpProjectsQueryVariables>(McpProjectsDocument, variables),
     ...options
   }
@@ -4419,6 +4434,31 @@ export const useWorkspaceChatWorkflowsQuery = <
   }
     )};
 
+export const WorkspaceMcpServerTagsDocument = new TypedDocumentString(`
+    query workspaceMcpServerTags($workspaceId: ID!) {
+  workspaceMcpServerTags(workspaceId: $workspaceId) {
+    id
+    name
+  }
+}
+    `);
+
+export const useWorkspaceMcpServerTagsQuery = <
+      TData = WorkspaceMcpServerTagsQuery,
+      TError = unknown
+    >(
+      variables: WorkspaceMcpServerTagsQueryVariables,
+      options?: Omit<UseQueryOptions<WorkspaceMcpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkspaceMcpServerTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkspaceMcpServerTagsQuery, TError, TData>(
+      {
+    queryKey: ['workspaceMcpServerTags', variables],
+    queryFn: fetcher<WorkspaceMcpServerTagsQuery, WorkspaceMcpServerTagsQueryVariables>(WorkspaceMcpServerTagsDocument, variables),
+    ...options
+  }
+    )};
+
 export const WorkspaceMcpServersDocument = new TypedDocumentString(`
     query workspaceMcpServers($workspaceId: ID!) {
   workspaceMcpServers(workspaceId: $workspaceId) {
@@ -4427,6 +4467,8 @@ export const WorkspaceMcpServersDocument = new TypedDocumentString(`
     type
     environmentId
     enabled
+    enforceToolAuthorization
+    authenticationRequired
     url
     mcpComponents {
       id
@@ -6037,6 +6079,7 @@ export const EmbeddedMcpComponentsByServerIdDocument = new TypedDocumentString(`
       title
       version
     }
+    requiredAuthorities
     version
   }
 }
@@ -8550,6 +8593,28 @@ export const useEvaluatorFunctionDefinitionsQuery = <
   }
     )};
 
+export const ManagementMcpServerAuthenticationRequiredDocument = new TypedDocumentString(`
+    query managementMcpServerAuthenticationRequired {
+  managementMcpServerAuthenticationRequired
+}
+    `);
+
+export const useManagementMcpServerAuthenticationRequiredQuery = <
+      TData = ManagementMcpServerAuthenticationRequiredQuery,
+      TError = unknown
+    >(
+      variables?: ManagementMcpServerAuthenticationRequiredQueryVariables,
+      options?: Omit<UseQueryOptions<ManagementMcpServerAuthenticationRequiredQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ManagementMcpServerAuthenticationRequiredQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ManagementMcpServerAuthenticationRequiredQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['managementMcpServerAuthenticationRequired'] : ['managementMcpServerAuthenticationRequired', variables],
+    queryFn: fetcher<ManagementMcpServerAuthenticationRequiredQuery, ManagementMcpServerAuthenticationRequiredQueryVariables>(ManagementMcpServerAuthenticationRequiredDocument, variables),
+    ...options
+  }
+    )};
+
 export const ManagementMcpServerUrlDocument = new TypedDocumentString(`
     query managementMcpServerUrl {
   managementMcpServerUrl
@@ -8591,6 +8656,7 @@ export const McpComponentsByServerIdDocument = new TypedDocumentString(`
       title
       version
     }
+    requiredAuthorities
     version
   }
 }
@@ -8608,72 +8674,6 @@ export const useMcpComponentsByServerIdQuery = <
       {
     queryKey: ['mcpComponentsByServerId', variables],
     queryFn: fetcher<McpComponentsByServerIdQuery, McpComponentsByServerIdQueryVariables>(McpComponentsByServerIdDocument, variables),
-    ...options
-  }
-    )};
-
-export const McpServerTagsDocument = new TypedDocumentString(`
-    query mcpServerTags($type: PlatformType!) {
-  mcpServerTags(type: $type) {
-    id
-    name
-  }
-}
-    `);
-
-export const useMcpServerTagsQuery = <
-      TData = McpServerTagsQuery,
-      TError = unknown
-    >(
-      variables: McpServerTagsQueryVariables,
-      options?: Omit<UseQueryOptions<McpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServerTagsQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<McpServerTagsQuery, TError, TData>(
-      {
-    queryKey: ['mcpServerTags', variables],
-    queryFn: fetcher<McpServerTagsQuery, McpServerTagsQueryVariables>(McpServerTagsDocument, variables),
-    ...options
-  }
-    )};
-
-export const McpServersDocument = new TypedDocumentString(`
-    query mcpServers($type: PlatformType!) {
-  mcpServers(type: $type, orderBy: NAME_ASC) {
-    id
-    name
-    type
-    environmentId
-    enabled
-    secretKey
-    mcpComponents {
-      id
-      mcpServerId
-      componentName
-      componentVersion
-      title
-    }
-    tags {
-      id
-      name
-    }
-    lastModifiedDate
-  }
-}
-    `);
-
-export const useMcpServersQuery = <
-      TData = McpServersQuery,
-      TError = unknown
-    >(
-      variables: McpServersQueryVariables,
-      options?: Omit<UseQueryOptions<McpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<McpServersQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<McpServersQuery, TError, TData>(
-      {
-    queryKey: ['mcpServers', variables],
-    queryFn: fetcher<McpServersQuery, McpServersQueryVariables>(McpServersDocument, variables),
     ...options
   }
     )};
@@ -8871,6 +8871,27 @@ export const useUpdateApiKeyMutation = <
   }
     )};
 
+export const UpdateManagementMcpServerAuthenticationRequiredDocument = new TypedDocumentString(`
+    mutation updateManagementMcpServerAuthenticationRequired($authenticationRequired: Boolean!) {
+  updateManagementMcpServerAuthenticationRequired(
+    authenticationRequired: $authenticationRequired
+  )
+}
+    `);
+
+export const useUpdateManagementMcpServerAuthenticationRequiredMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateManagementMcpServerAuthenticationRequiredMutation, TError, UpdateManagementMcpServerAuthenticationRequiredMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateManagementMcpServerAuthenticationRequiredMutation, TError, UpdateManagementMcpServerAuthenticationRequiredMutationVariables, TContext>(
+      {
+    mutationKey: ['updateManagementMcpServerAuthenticationRequired'],
+    mutationFn: (variables?: UpdateManagementMcpServerAuthenticationRequiredMutationVariables) => fetcher<UpdateManagementMcpServerAuthenticationRequiredMutation, UpdateManagementMcpServerAuthenticationRequiredMutationVariables>(UpdateManagementMcpServerAuthenticationRequiredDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const UpdateManagementMcpServerUrlDocument = new TypedDocumentString(`
     mutation updateManagementMcpServerUrl {
   updateManagementMcpServerUrl
@@ -8961,6 +8982,28 @@ export const useUpdateMcpToolMutation = <
       {
     mutationKey: ['updateMcpTool'],
     mutationFn: (variables?: UpdateMcpToolMutationVariables) => fetcher<UpdateMcpToolMutation, UpdateMcpToolMutationVariables>(UpdateMcpToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateMcpToolEnabledDocument = new TypedDocumentString(`
+    mutation updateMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+  updateMcpToolEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+  }
+}
+    `);
+
+export const useUpdateMcpToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpToolEnabled'],
+    mutationFn: (variables?: UpdateMcpToolEnabledMutationVariables) => fetcher<UpdateMcpToolEnabledMutation, UpdateMcpToolEnabledMutationVariables>(UpdateMcpToolEnabledDocument, variables)(),
     ...options
   }
     )};
