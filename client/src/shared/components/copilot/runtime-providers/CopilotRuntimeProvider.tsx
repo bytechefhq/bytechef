@@ -69,12 +69,12 @@ export function CopilotRuntimeProvider({
         }
 
         return new HttpAgent({
-            agentId: Source[sourceKey],
+            agentId: sourceKey,
             headers: {
                 'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
             },
             threadId: conversationId,
-            url: `/api/platform/internal/ai/chat/${Source[sourceKey].toLowerCase()}`,
+            url: `/api/platform/internal/ai/chat/${sourceKey.toLowerCase()}`,
         });
     }, [conversationId, sourceKey]);
 

@@ -11,12 +11,16 @@ export enum MODE {
     BUILD = 'BUILD',
 }
 
+const MAX_CONVERSATION_STACK_DEPTH = 10;
+
 export enum Source {
     WORKFLOW_EXECUTION = 'WORKFLOW_EXECUTION',
     WORKFLOW_EDITOR = 'WORKFLOW_EDITOR',
     CODE_EDITOR = 'CODE_EDITOR',
     CLUSTER_ELEMENT = 'CLUSTER_ELEMENT',
     SKILLS = 'SKILLS',
+    WORKFLOW_CODE_EDITOR = 'WORKFLOW_CODE_EDITOR',
+    MCP_SERVER = 'MCP_SERVER',
 }
 
 export type ContextType = {
@@ -32,12 +36,22 @@ export type ContextType = {
     };
 };
 
+interface ConversationSnapshotI {
+    context: ContextType;
+    conversationId: string | undefined;
+    messages: ThreadMessageLike[];
+    selectedLlmModel: string | null;
+    selectedLlmProvider: string | null;
+    token: string;
+}
+
 interface CopilotStateI {
     conversationId: string | undefined;
     generateConversationId: () => void;
 
     context: ContextType;
     setContext: (context: ContextType | undefined) => void;
+
     setWorkflowExecutionError: (
         workflowExecutionError:
             | {
@@ -58,15 +72,12 @@ interface CopilotStateI {
     selectedLlmModel: string | null;
     setSelectedLlm: (provider: string | null, model: string | null) => void;
 
-    savedState: {
-        conversationId: string | undefined;
-        context: ContextType;
-        messages: ThreadMessageLike[];
-        selectedLlmProvider: string | null;
-        selectedLlmModel: string | null;
-    } | null;
-    saveConversationState: () => void;
-    restoreConversationState: () => void;
+    conversationStack: ConversationSnapshotI[];
+    saveConversationState: () => string;
+    restoreConversationState: (token: string | null) => void;
+
+    globalPanelConversationToken: string | null;
+    setGlobalPanelConversationToken: (token: string | null) => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
@@ -92,6 +103,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                     context,
                 };
             }),
+
         setWorkflowExecutionError: (error) =>
             set((state) => {
                 return {
@@ -163,33 +175,62 @@ export const useCopilotStore = create<CopilotStateI>()(
         selectedLlmModel: null,
         setSelectedLlm: (provider, model) => set({selectedLlmModel: model, selectedLlmProvider: provider}),
 
-        savedState: null,
-        saveConversationState: () =>
-            set((state) => ({
-                ...state,
-                savedState: {
-                    conversationId: state.conversationId,
+        conversationStack: [],
+        saveConversationState: () => {
+            const token = generateRandomId();
+
+            set((state) => {
+                const snapshot: ConversationSnapshotI = {
                     context: state.context,
+                    conversationId: state.conversationId,
                     messages: state.messages,
                     selectedLlmModel: state.selectedLlmModel,
                     selectedLlmProvider: state.selectedLlmProvider,
-                },
-            })),
-        restoreConversationState: () =>
+                    token,
+                };
+
+                const nextStack = [...state.conversationStack, snapshot];
+
+                if (nextStack.length > MAX_CONVERSATION_STACK_DEPTH) {
+                    console.warn(
+                        `Copilot conversation stack exceeded ${MAX_CONVERSATION_STACK_DEPTH} entries; dropping the oldest.`
+                    );
+
+                    nextStack.shift();
+                }
+
+                return {...state, conversationStack: nextStack};
+            });
+
+            return token;
+        },
+        restoreConversationState: (token) =>
             set((state) => {
-                if (!state.savedState) {
+                if (state.conversationStack.length === 0) {
                     return state;
                 }
 
+                const top = state.conversationStack[state.conversationStack.length - 1];
+
+                if (top?.token !== token) {
+                    return state;
+                }
+
+                const nextStack = [...state.conversationStack];
+                const snapshot = nextStack.pop() as ConversationSnapshotI;
+
                 return {
                     ...state,
-                    conversationId: state.savedState.conversationId,
-                    context: state.savedState.context,
-                    messages: state.savedState.messages,
-                    savedState: null,
-                    selectedLlmModel: state.savedState.selectedLlmModel,
-                    selectedLlmProvider: state.savedState.selectedLlmProvider,
+                    context: snapshot.context,
+                    conversationId: snapshot.conversationId,
+                    conversationStack: nextStack,
+                    messages: snapshot.messages,
+                    selectedLlmModel: snapshot.selectedLlmModel,
+                    selectedLlmProvider: snapshot.selectedLlmProvider,
                 };
             }),
+
+        globalPanelConversationToken: null,
+        setGlobalPanelConversationToken: (token) => set({globalPanelConversationToken: token}),
     }))
 );
