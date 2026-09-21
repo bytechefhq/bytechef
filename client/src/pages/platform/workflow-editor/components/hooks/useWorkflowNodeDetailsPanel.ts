@@ -83,7 +83,6 @@ import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFr
 import getParametersWithDefaultValues from '../../utils/getParametersWithDefaultValues';
 import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
 import invalidateOperationQueries from '../../utils/invalidateOperationQueries';
-import resetDisplayConditionsQueries from '../../utils/resetDisplayConditionsQueries';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
@@ -96,6 +95,7 @@ import isActionDefinitionFresh from './isActionDefinitionFresh';
 import {resolveDisplayConditionsQueryTarget} from './resolveDisplayConditionsQueryTarget';
 import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
+import useDisplayConditionsRefreshAfterOperationChange from './useDisplayConditionsRefreshAfterOperationChange';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -140,11 +140,9 @@ export default function useWorkflowNodeDetailsPanel({
     );
     const [errorsAccordionOpen, setErrorsAccordionOpen] = useState(false);
     const [errorsRefreshingAfterOperationChange, setErrorsRefreshingAfterOperationChange] = useState(false);
-    const [propertiesRefreshingAfterOperationChange, setPropertiesRefreshingAfterOperationChange] = useState(false);
 
     const errorsLoadingArmedRef = useRef(false);
     const lastErrorsDataUpdatedAtRef = useRef(0);
-    const propertiesLoadingPhaseRef = useRef<'idle' | 'refetching' | 'saving'>('idle');
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -463,7 +461,16 @@ export default function useWorkflowNodeDetailsPanel({
 
     const errorsLoading = operationChangeInProgress || errorsRefreshingAfterOperationChange;
 
-    const propertiesLoading = operationChangeInProgress || propertiesRefreshingAfterOperationChange;
+    const propertiesLoading = useDisplayConditionsRefreshAfterOperationChange({
+        activeTab,
+        displayConditionsDataUpdatedAt: activeDisplayConditionsQuery.dataUpdatedAt,
+        displayConditionsErrorUpdatedAt: activeDisplayConditionsQuery.errorUpdatedAt,
+        displayConditionsQueryTarget,
+        nodeName: currentNode?.name,
+        nodeType: currentNode?.type,
+        operationChangeInProgress,
+        workflowId: workflow.id!,
+    });
 
     const currentOperationDefinition = useMemo(() => {
         if (currentNode?.trigger) {
@@ -1250,50 +1257,6 @@ export default function useWorkflowNodeDetailsPanel({
             setErrorsRefreshingAfterOperationChange(true);
         }
     }, [operationChangeInProgress]);
-
-    // Arm the properties loading cue when an operation switch starts, so the Properties tab keeps one skeleton
-    // until the switched operation's display conditions arrive instead of flashing a second, per-property one
-    useEffect(() => {
-        if (operationChangeInProgress) {
-            propertiesLoadingPhaseRef.current = 'saving';
-
-            setPropertiesRefreshingAfterOperationChange(true);
-        }
-    }, [operationChangeInProgress]);
-
-    // Once the switch is saved, refetch the display conditions and clear the cue when they arrive. The query is keyed
-    // by node name alone, so without the reset it would keep serving the previous operation's conditions, while the
-    // save has blanked currentNode.displayConditions — hiding every conditional property until a page reload.
-    useEffect(() => {
-        if (operationChangeInProgress) {
-            return;
-        }
-
-        if (propertiesLoadingPhaseRef.current === 'saving') {
-            propertiesLoadingPhaseRef.current = 'refetching';
-
-            resetDisplayConditionsQueries(queryClient, workflow.id!);
-
-            if (displayConditionsQueryTarget !== 'none') {
-                return;
-            }
-        }
-
-        if (
-            propertiesLoadingPhaseRef.current === 'refetching' &&
-            (displayConditionsQueryTarget === 'none' || !activeDisplayConditionsQuery.isPending)
-        ) {
-            propertiesLoadingPhaseRef.current = 'idle';
-
-            setPropertiesRefreshingAfterOperationChange(false);
-        }
-    }, [
-        activeDisplayConditionsQuery.isPending,
-        displayConditionsQueryTarget,
-        operationChangeInProgress,
-        queryClient,
-        workflow.id,
-    ]);
 
     // Clear the error loading cue when the operation switch's refetch finishes
     useEffect(() => {
