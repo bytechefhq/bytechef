@@ -198,6 +198,7 @@ export default function useOutputTab({
             webhookTriggerTestApi!
                 .startWebhookTriggerTest({
                     environmentId: currentEnvironmentId,
+                    triggerName: currentNode.name,
                     workflowId,
                 })
                 .then((response) => {
@@ -261,9 +262,10 @@ export default function useOutputTab({
 
         webhookTriggerTestApi!.stopWebhookTriggerTest({
             environmentId: currentEnvironmentId,
+            triggerName: currentNode.name,
             workflowId,
         });
-    }, [currentEnvironmentId, webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
+    }, [currentEnvironmentId, currentNode.name, webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
 
     const hasClusterElementProperties = isClusterElement && !!currentOperationProperties?.length;
 
