@@ -52,15 +52,13 @@ public class SshClientUtils {
      * parameters. The caller owns the returned client and has to close it.
      */
     public static SSHClient connect(Parameters connectionParameters) {
-        String host = connectionParameters.getRequiredString(HOST);
-        int port = connectionParameters.getInteger(PORT, DEFAULT_PORT);
-        String username = connectionParameters.getRequiredString(USERNAME);
         String privateKey = connectionParameters.getString(PRIVATE_KEY);
-        String hostKeyFingerprint = connectionParameters.getString(HOST_KEY_FINGERPRINT);
 
         SSHClient sshClient = new SSHClient();
 
         try {
+            String hostKeyFingerprint = connectionParameters.getString(HOST_KEY_FINGERPRINT);
+
             if (hostKeyFingerprint == null || hostKeyFingerprint.isBlank()) {
                 sshClient.addHostKeyVerifier(new PromiscuousVerifier());
             } else {
@@ -68,7 +66,13 @@ public class SshClientUtils {
             }
 
             sshClient.setConnectTimeout(CONNECT_TIMEOUT_MILLIS);
+
+            String host = connectionParameters.getRequiredString(HOST);
+            int port = connectionParameters.getInteger(PORT, DEFAULT_PORT);
+
             sshClient.connect(host, port);
+
+            String username = connectionParameters.getRequiredString(USERNAME);
 
             if (privateKey == null || privateKey.isBlank()) {
                 sshClient.authPassword(username, connectionParameters.getRequiredString(PASSWORD));
