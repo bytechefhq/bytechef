@@ -27,28 +27,38 @@ export const usePropertyCodeEditorDialog = ({
 }: UsePropertyCodeEditorDialogProps) => {
     const [unsavedChangesAlertDialogOpen, setUnsavedChangesAlertDialogOpen] = useState(false);
 
-    const {copilotPanelOpen, dirty, editorValue, reset, setCopilotPanelOpen, setDirty, setEditorValue, setSaving} =
-        usePropertyCodeEditorDialogStore(
-            useShallow((state) => ({
-                copilotPanelOpen: state.copilotPanelOpen,
-                dirty: state.dirty,
-                editorValue: state.editorValue,
-                reset: state.reset,
-                setCopilotPanelOpen: state.setCopilotPanelOpen,
-                setDirty: state.setDirty,
-                setEditorValue: state.setEditorValue,
-                setSaving: state.setSaving,
-            }))
-        );
+    const {
+        conversationToken,
+        copilotPanelOpen,
+        dirty,
+        editorValue,
+        reset,
+        setCopilotPanelOpen,
+        setDirty,
+        setEditorValue,
+        setSaving,
+    } = usePropertyCodeEditorDialogStore(
+        useShallow((state) => ({
+            conversationToken: state.conversationToken,
+            copilotPanelOpen: state.copilotPanelOpen,
+            dirty: state.dirty,
+            editorValue: state.editorValue,
+            reset: state.reset,
+            setCopilotPanelOpen: state.setCopilotPanelOpen,
+            setDirty: state.setDirty,
+            setEditorValue: state.setEditorValue,
+            setSaving: state.setSaving,
+        }))
+    );
 
     const handleClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationToken);
         reset();
 
         if (onClose) {
             onClose();
         }
-    }, [onClose, reset]);
+    }, [conversationToken, onClose, reset]);
 
     const handleUnsavedChangesAlertDialogCancel = useCallback(() => {
         setUnsavedChangesAlertDialogOpen(false);
@@ -60,9 +70,9 @@ export const usePropertyCodeEditorDialog = ({
     }, [handleClose]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationToken);
         setCopilotPanelOpen(false);
-    }, [setCopilotPanelOpen]);
+    }, [conversationToken, setCopilotPanelOpen]);
 
     const handleOpenChange = useCallback(
         (open: boolean) => {

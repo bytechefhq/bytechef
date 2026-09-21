@@ -9,6 +9,7 @@ const hoisted = vi.hoisted(() => {
         mockResetMessages: vi.fn(),
         mockSaveConversationState: vi.fn(),
         mockSetContext: vi.fn(),
+        mockSetConversationToken: vi.fn(),
         mockSetCopilotPanelOpen: vi.fn(),
         mockSetSaving: vi.fn(),
         mockSetScriptIsRunning: vi.fn(),
@@ -34,6 +35,7 @@ vi.mock('../../stores/usePropertyCodeEditorDialogStore', () => ({
             editorValue: hoisted.storeState.editorValue,
             saving: hoisted.storeState.saving,
             scriptIsRunning: hoisted.storeState.scriptIsRunning,
+            setConversationToken: hoisted.mockSetConversationToken,
             setCopilotPanelOpen: hoisted.mockSetCopilotPanelOpen,
             setSaving: hoisted.mockSetSaving,
             setScriptIsRunning: hoisted.mockSetScriptIsRunning,
@@ -405,6 +407,19 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
             expect(hoisted.mockSaveConversationState).toHaveBeenCalledOnce();
             expect(hoisted.mockResetMessages).toHaveBeenCalledOnce();
             expect(hoisted.mockGenerateConversationId).toHaveBeenCalledOnce();
+        });
+
+        it('should store the token the save returned so the dialog can restore', async () => {
+            hoisted.mockSaveConversationState.mockReturnValue('token-1');
+
+            const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+            act(() => {
+                result.current.handleCopilotClick();
+            });
+
+            expect(hoisted.mockSetConversationToken).toHaveBeenCalledWith('token-1');
         });
 
         it('should save conversation state before resetting messages', async () => {

@@ -1,5 +1,7 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {resolveAutoApplyDefinition} from '@/shared/components/copilot/utils/resolveAutoApplyDefinition';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {useValidateWorkflowQuery} from '@/shared/middleware/graphql';
@@ -10,8 +12,7 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
-import {MarkerSeverity} from 'monaco-editor';
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useShallow} from 'zustand/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -22,6 +23,10 @@ import saveWorkflowDefinitionUpdate from '../utils/saveWorkflowDefinitionUpdate'
 import type {editor} from 'monaco-editor';
 
 const workflowTestApi = new WorkflowTestApi();
+
+const MARKER_SEVERITY_ERROR = 8;
+
+const APPLIED_TO_EDITOR_MESSAGE = '✓ Applied changes to the editor.';
 
 type UseWorkflowCodeEditorSheetReturnType = {
     copilotEnabled: boolean;
@@ -42,7 +47,7 @@ type UseWorkflowCodeEditorSheetReturnType = {
     handleValidate: (markers: editor.IMarkerData[]) => void;
     handleWorkflowTestConfigurationDialog: (open: boolean) => void;
     hasErrors: boolean;
-    projectName: string;
+    projectName: string | null;
     setErrorsAccordionOpen: (open: boolean) => void;
     setWarningsAccordionOpen: (open: boolean) => void;
     showWorkflowTestConfigurationDialog: boolean;
@@ -76,7 +81,9 @@ const useWorkflowCodeEditorSheet = ({
     const [workflowTestExecution, setWorkflowTestExecution] = useState<WorkflowTestExecution>();
     const [markers, setMarkers] = useState<editor.IMarkerData[]>([]);
 
-    const hasErrors = markers.some((marker) => marker.severity === MarkerSeverity.Error);
+    const conversationTokenRef = useRef<string | null>(null);
+
+    const hasErrors = markers.some((marker) => marker.severity === MARKER_SEVERITY_ERROR);
 
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
@@ -119,22 +126,22 @@ const useWorkflowCodeEditorSheet = ({
             saveConversationState,
         } = useCopilotStore.getState();
 
-        saveConversationState();
+        conversationTokenRef.current = saveConversationState();
         resetMessages();
         generateConversationId();
 
         setContext({
             ...currentContext,
             mode: MODE.ASK,
-            parameters: {language: 'json'},
-            source: Source.CODE_EDITOR,
+            parameters: {format: workflow.format?.toLowerCase() ?? 'json'},
+            source: Source.WORKFLOW_CODE_EDITOR,
         });
 
         setCopilotPanelOpen(true);
-    }, [setContext]);
+    }, [setContext, workflow.format]);
 
     const handleCopilotClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
         setCopilotPanelOpen(false);
     }, []);
 
@@ -147,7 +154,7 @@ const useWorkflowCodeEditorSheet = ({
             }
 
             if (!open) {
-                useCopilotStore.getState().restoreConversationState();
+                useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
                 setCopilotPanelOpen(false);
             }
 
@@ -245,11 +252,27 @@ const useWorkflowCodeEditorSheet = ({
     );
 
     const handleUnsavedChangesAlertDialogClose = useCallback(() => {
-        useCopilotStore.getState().restoreConversationState();
+        useCopilotStore.getState().restoreConversationState(conversationTokenRef.current);
         setCopilotPanelOpen(false);
         setUnsavedChangesAlertDialogOpen(false);
         onSheetOpenClose(false);
     }, [onSheetOpenClose]);
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_CODE_EDITOR, () => {
+            const {appendToLastAssistantMessage, context, messages} = useCopilotStore.getState();
+
+            const definition = resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, context?.mode, messages);
+
+            if (!definition) {
+                return;
+            }
+
+            handleDefinitionChange(definition);
+
+            appendToLastAssistantMessage(APPLIED_TO_EDITOR_MESSAGE);
+        });
+    }, [handleDefinitionChange]);
 
     useEffect(() => {
         setDefinition(workflow.definition!);
