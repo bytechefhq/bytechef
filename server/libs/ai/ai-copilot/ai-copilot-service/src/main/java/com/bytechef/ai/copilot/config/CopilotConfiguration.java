@@ -40,6 +40,7 @@ import com.bytechef.ai.copilot.tool.SelectPropertyOptionToolCallback;
 import com.bytechef.ai.copilot.tool.SelectTriggerPropertyOptionToolCallback;
 import com.bytechef.ai.copilot.tool.ToolStateVisibilityMetrics;
 import com.bytechef.ai.copilot.tool.WorkspaceCopilotConnectionLister;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -51,6 +52,7 @@ import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ReadSkillsTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.ai.tool.SkillsTools;
+import com.bytechef.automation.ai.tool.WorkflowExecutionTools;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.ai.tool.ComponentTools;
@@ -65,8 +67,6 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
-import com.bytechef.platform.configuration.context.EnvironmentContext;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -75,7 +75,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -108,6 +107,7 @@ public class CopilotConfiguration {
     private final Resource promptClusterElementBuildResource;
     private final Resource promptSkillsAskResource;
     private final Resource promptSkillsBuildResource;
+    private final Resource promptWorkflowExecutionBuildResource;
     private final WorkflowValidatorTools workflowValidatorTools;
     private final WorkflowInstructionTools workflowInstructionTools;
     private final State state = new State();
@@ -134,6 +134,7 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource,
         @Value("classpath:prompt_skills_ask.txt") Resource promptSkillsAskResource,
         @Value("classpath:prompt_skills_build.txt") Resource promptSkillsBuildResource,
+        @Value("classpath:prompt_workflow_execution_build.txt") Resource promptWorkflowExecutionBuildResource,
         WorkflowValidatorTools workflowValidatorTools, WorkflowInstructionTools workflowInstructionTools,
         ConnectionDefinitionService connectionDefinitionService, WorkspaceConnectionFacade workspaceConnectionFacade,
         ComponentDefinitionService componentDefinitionService, ActionDefinitionService actionDefinitionService,
@@ -161,6 +162,7 @@ public class CopilotConfiguration {
         this.promptClusterElementBuildResource = promptClusterElementBuildResource;
         this.promptSkillsAskResource = promptSkillsAskResource;
         this.promptSkillsBuildResource = promptSkillsBuildResource;
+        this.promptWorkflowExecutionBuildResource = promptWorkflowExecutionBuildResource;
     }
 
     @Bean
@@ -506,6 +508,13 @@ public class CopilotConfiguration {
     }
 
     @Bean
+    IntelligentToolChatClientFactory codeEditorBuildSubAgentChatClientFactory(
+        @Qualifier("codeEditorBuildSubAgentChatClient") ChatClient codeEditorBuildSubAgentChatClient) {
+
+        return () -> codeEditorBuildSubAgentChatClient;
+    }
+
+    @Bean
     ChatClient workflowEditorAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
@@ -542,6 +551,13 @@ public class CopilotConfiguration {
     }
 
     @Bean
+    IntelligentToolChatClientFactory workflowEditorBuildSubAgentChatClientFactory(
+        @Qualifier("workflowEditorBuildSubAgentChatClient") ChatClient workflowEditorBuildSubAgentChatClient) {
+
+        return () -> workflowEditorBuildSubAgentChatClient;
+    }
+
+    @Bean
     ChatClient converterBuildSubAgentChatClient(
         ChatModel chatModel, ProjectTools projectTools, ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools,
         ScriptTools scriptTools) {
@@ -554,45 +570,11 @@ public class CopilotConfiguration {
             .build();
     }
 
-    /**
-     * Per-request converter subagent {@link ChatClient} supplier: when an EE {@link OverrideChatClientResolver} can
-     * resolve the environment-default {@link ChatModel} from the AI provider catalog (honoring per-provider model
-     * overrides), the client is rebuilt around it with the converter system prompt and tools; otherwise the
-     * startup-configured bean is returned.
-     */
     @Bean
-    Supplier<ChatClient> converterBuildSubAgentChatClientSupplier(
-        @Qualifier("converterBuildSubAgentChatClient") ChatClient converterChatClient, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) {
+    IntelligentToolChatClientFactory converterBuildSubAgentChatClientFactory(
+        @Qualifier("converterBuildSubAgentChatClient") ChatClient converterBuildSubAgentChatClient) {
 
-        return () -> {
-            OverrideChatClientResolver overrideChatClientResolver =
-                overrideChatClientResolverProvider.getIfAvailable();
-
-            if (overrideChatClientResolver == null) {
-                return converterChatClient;
-            }
-
-            Environment environment = EnvironmentContext.fetchCurrentEnvironment();
-
-            if (environment == null) {
-                return converterChatClient;
-            }
-
-            ChatModel resolvedChatModel = overrideChatClientResolver.resolveDefaultChatModel(environment.ordinal());
-
-            if (resolvedChatModel == null) {
-                return converterChatClient;
-            }
-
-            return ChatClient.builder(resolvedChatModel)
-                .defaultSystem(getSystemPrompt(promptConverterBuildResource))
-                .defaultTools(
-                    projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
-                    workflowInstructionTools)
-                .build();
-        };
+        return () -> converterBuildSubAgentChatClient;
     }
 
     @Bean
@@ -629,6 +611,13 @@ public class CopilotConfiguration {
     }
 
     @Bean
+    IntelligentToolChatClientFactory clusterElementBuildSubAgentChatClientFactory(
+        @Qualifier("clusterElementBuildSubAgentChatClient") ChatClient clusterElementBuildSubAgentChatClient) {
+
+        return () -> clusterElementBuildSubAgentChatClient;
+    }
+
+    @Bean
     ChatClient skillsAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
@@ -661,6 +650,33 @@ public class CopilotConfiguration {
                 skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
                 workflowInstructionTools)
             .build();
+    }
+
+    @Bean
+    IntelligentToolChatClientFactory skillsBuildSubAgentChatClientFactory(
+        @Qualifier("skillsBuildSubAgentChatClient") ChatClient skillsBuildSubAgentChatClient) {
+
+        return () -> skillsBuildSubAgentChatClient;
+    }
+
+    @Bean
+    ChatClient workflowExecutionBuildSubAgentChatClient(
+        ChatModel chatModel, WorkflowExecutionTools workflowExecutionTools, ProjectWorkflowTools projectWorkflowTools,
+        ScriptTools scriptTools, TaskTools taskTools) {
+
+        return ChatClient.builder(chatModel)
+            .defaultSystem(getSystemPrompt(promptWorkflowExecutionBuildResource))
+            .defaultTools(
+                workflowExecutionTools, projectWorkflowTools, scriptTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools)
+            .build();
+    }
+
+    @Bean
+    IntelligentToolChatClientFactory workflowExecutionBuildSubAgentChatClientFactory(
+        @Qualifier("workflowExecutionBuildSubAgentChatClient") ChatClient workflowExecutionBuildSubAgentChatClient) {
+
+        return () -> workflowExecutionBuildSubAgentChatClient;
     }
 
     private String getSystemPrompt(Resource systemPromptResource) {

@@ -20,6 +20,8 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
+import com.bytechef.ai.copilot.tool.util.WorkflowPersistCaptureUtils;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -33,14 +35,11 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Workflow Editor Copilot subagent to the parent ai_hub
- * agent.
- *
  * @author Ivica Cardic
  */
-public class WorkflowEditorAgentToolCallback implements ToolCallback {
+public class ProjectWorkflowAgentToolCallback implements ToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkflowEditorAgentToolCallback.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowAgentToolCallback.class);
 
     private static final String DESCRIPTION =
         """
@@ -48,7 +47,10 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             this for requests that design, edit, debug, or explain a workflow (orchestration of tasks,
             triggers, conditions, loops). The subagent owns the canonical behaviour for this domain;
             prefer calling it over reasoning about workflow shape directly. ASK mode returns analysis;
-            BUILD mode returns the updated workflow JSON plus a change rationale.""";
+            BUILD mode returns the updated workflow JSON plus a change rationale. For an EXISTING workflow
+            include its workflowId in the request. For a BRAND-NEW workflow include the target projectId
+            instead — the subagent creates the workflow itself, carrying the complete definition in one
+            call. It can also create or publish the containing project when needed.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -63,17 +65,17 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient workflowEditorChatClient;
+    private final IntelligentToolChatClientFactory chatClientFactory;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public WorkflowEditorAgentToolCallback(ChatClient workflowEditorChatClient) {
-        this.workflowEditorChatClient = workflowEditorChatClient;
+    public ProjectWorkflowAgentToolCallback(IntelligentToolChatClientFactory chatClientFactory) {
+        this.chatClientFactory = chatClientFactory;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("workflow_editor_agent")
+            .name("buildWorkflow")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -87,7 +89,7 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            WorkflowEditorAgentInput input = JsonUtils.read(toolInput, WorkflowEditorAgentInput.class);
+            ProjectWorkflowAgentInput input = JsonUtils.read(toolInput, ProjectWorkflowAgentInput.class);
 
             String request = input.request();
 
@@ -98,10 +100,14 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             AgentBinding parent = CurrentAgentContext.current();
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
-            Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+            Map<String, Object> parentContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            Map<String, Object> forwardedContext = WorkflowPersistCaptureUtils.withCaptureHolder(parentContext);
+
+            ChatClient workflowEditorChatClient = chatClientFactory.get();
 
             String result = CurrentAgentContext.callWith(
-                CopilotAgentType.WORKFLOW_EDITOR, parentAgent,
+                CopilotAgentType.BUILD_WORKFLOW, parentAgent,
                 () -> workflowEditorChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
@@ -113,17 +119,19 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
                 return ToolErrors.toolError("workflow_editor subagent returned null");
             }
 
-            return result;
+            String trailer = WorkflowPersistCaptureUtils.renderTrailer(forwardedContext);
+
+            return trailer == null ? result : result + trailer;
         } catch (JacksonException exception) {
             log.warn(
-                "workflow_editor_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "buildWorkflow rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                WorkflowEditorAgentToolCallback.class, "workflow_editor_agent", exception);
+                ProjectWorkflowAgentToolCallback.class, "buildWorkflow", exception);
         }
     }
 
@@ -131,6 +139,6 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
         return ToolErrors.toolError(message);
     }
 
-    public record WorkflowEditorAgentInput(String request) {
+    public record ProjectWorkflowAgentInput(String request) {
     }
 }
