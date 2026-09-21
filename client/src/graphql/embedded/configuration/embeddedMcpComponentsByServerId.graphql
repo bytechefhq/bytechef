@@ -16,6 +16,7 @@ query embeddedMcpComponentsByServerId($mcpServerId: ID!) {
             title
             version
         }
+        requiredAuthorities
         version
     }
 }
