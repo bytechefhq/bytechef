@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,8 +35,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.domain.ActionDefinition;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -44,7 +47,9 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.cache.WorkflowCacheManager;
+import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.dto.ClusterElementOutputDTO;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -557,5 +562,69 @@ class WorkflowNodeOutputFacadeTest {
                 EvaluationException.class,
                 () -> workflowNodeOutputFacade.getWorkflowNodeOutput(WORKFLOW_ID, "action1", ENVIRONMENT_ID));
         }
+    }
+
+    @Test
+    void testGetClusterElementOutputMarksSavedTestOutputAsTestOutputResponse() {
+        ClusterElementDefinition clusterElementDefinition = mockClusterElementWorkflow();
+
+        Map<String, String> sampleOutput = Map.of("id", "contact-42");
+        WorkflowNodeTestOutput workflowNodeTestOutput = mock(WorkflowNodeTestOutput.class);
+
+        when(workflowNodeTestOutput.getOutput(any())).thenReturn(new OutputResponse(null, sampleOutput));
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "hubspot_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowNodeTestOutput));
+
+        ClusterElementOutputDTO result = workflowNodeOutputFacade.getClusterElementOutput(
+            WORKFLOW_ID, "aiAgent_1", "tools", "hubspot_1", ENVIRONMENT_ID);
+
+        assertNotNull(result);
+        assertEquals(clusterElementDefinition, result.clusterElementDefinition());
+        assertEquals(sampleOutput, result.sampleOutput());
+        assertTrue(result.testOutputResponse());
+    }
+
+    @Test
+    void testGetClusterElementOutputDoesNotMarkDefinitionOutputAsTestOutputResponse() {
+        ClusterElementDefinition clusterElementDefinition = mockClusterElementWorkflow();
+
+        Map<String, String> sampleOutput = Map.of("id", "sample id");
+
+        when(workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(WORKFLOW_ID, "hubspot_1", ENVIRONMENT_ID))
+            .thenReturn(Optional.empty());
+        when(workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
+            WORKFLOW_ID, "hubspot_1", ENVIRONMENT_ID)).thenReturn(List.of());
+        when(clusterElementDefinition.getOutputResponse()).thenReturn(new OutputResponse(null, sampleOutput));
+
+        ClusterElementOutputDTO result = workflowNodeOutputFacade.getClusterElementOutput(
+            WORKFLOW_ID, "aiAgent_1", "tools", "hubspot_1", ENVIRONMENT_ID);
+
+        assertNotNull(result);
+        assertEquals(sampleOutput, result.sampleOutput());
+        assertFalse(result.testOutputResponse());
+    }
+
+    private ClusterElementDefinition mockClusterElementWorkflow() {
+        WorkflowTask workflowTask = new WorkflowTask(
+            Map.of(
+                "name", "aiAgent_1",
+                "type", "aiAgent/v1/chat",
+                "clusterElements", Map.of(
+                    "tools", List.of(
+                        Map.of("name", "hubspot_1", "type", "hubspot/v1/createContact", "parameters", Map.of())))));
+
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow(WORKFLOW_ID)).thenReturn(workflow);
+        when(workflow.getTasks(true)).thenReturn(List.of(workflowTask));
+        when(clusterElementDefinitionService.getClusterElementType("aiAgent", 1, "tools"))
+            .thenReturn(new ClusterElementType("TOOLS", "tools", "Tools", true, false));
+
+        ClusterElementDefinition clusterElementDefinition = mock(ClusterElementDefinition.class);
+
+        when(clusterElementDefinitionService.getClusterElementDefinition("hubspot", 1, "createContact"))
+            .thenReturn(clusterElementDefinition);
+
+        return clusterElementDefinition;
     }
 }
