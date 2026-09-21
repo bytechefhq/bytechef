@@ -45,7 +45,11 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                     return (
                         <McpServerCollapsibleItem
                             connectContent={
-                                <McpServerConfiguration mcpServerUrl={mcpServer.url} onRefresh={handleRefresh} />
+                                <McpServerConfiguration
+                                    authenticationRequired={mcpServer.authenticationRequired}
+                                    mcpServerUrl={mcpServer.url}
+                                    onRefresh={handleRefresh}
+                                />
                             }
                             header={<McpServerListItemWithWorkflows mcpServer={mcpServer} tags={tags} />}
                             key={mcpServer.id}

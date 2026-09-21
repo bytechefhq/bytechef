@@ -10,6 +10,7 @@ const hoisted = vi.hoisted(() => ({
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
+    useAuthoritiesQuery: () => ({data: undefined, isLoading: false}),
     useCreateMcpComponentWithToolsMutation: ({onSuccess}: {onSuccess: () => void}) => {
         hoisted.createOnSuccess = onSuccess;
 

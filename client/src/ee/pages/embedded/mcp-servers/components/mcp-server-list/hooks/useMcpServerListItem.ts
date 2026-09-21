@@ -23,7 +23,6 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const deleteEmbeddedMcpServerMutation = useDeleteEmbeddedMcpServerMutation();
     const updateEmbeddedMcpServerTagsMutation = useUpdateEmbeddedMcpServerTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['mcpServers']});
             queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
             queryClient.invalidateQueries({queryKey: ['embeddedMcpServerTags']});
         },

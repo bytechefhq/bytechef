@@ -24,9 +24,8 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const deleteWorkspaceMcpServerMutation = useDeleteWorkspaceMcpServerMutation();
     const updateMcpServerTagsMutation = useUpdateMcpServerTagsMutation({
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['mcpServers']});
             queryClient.invalidateQueries({queryKey: ['workspaceMcpServers']});
-            queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
+            queryClient.invalidateQueries({queryKey: ['workspaceMcpServerTags']});
         },
     });
 
