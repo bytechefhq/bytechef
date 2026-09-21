@@ -25,14 +25,15 @@ import com.bytechef.platform.domain.OutputResponse;
  */
 public record ClusterElementOutputDTO(
     ClusterElementDefinition clusterElementDefinition, BaseProperty outputSchema,
-    Object placeholder, Object sampleOutput, String clusterElementName) {
+    Object placeholder, Object sampleOutput, boolean testOutputResponse, String clusterElementName) {
 
     public ClusterElementOutputDTO(
-        ClusterElementDefinition clusterElementDefinition, OutputResponse outputResponse, String clusterElementName) {
+        ClusterElementDefinition clusterElementDefinition, OutputResponse outputResponse, boolean testOutputResponse,
+        String clusterElementName) {
 
         this(
             clusterElementDefinition, outputResponse == null ? null : outputResponse.outputSchema(),
             outputResponse == null ? null : outputResponse.placeholder(),
-            outputResponse == null ? null : outputResponse.sampleOutput(), clusterElementName);
+            outputResponse == null ? null : outputResponse.sampleOutput(), testOutputResponse, clusterElementName);
     }
 }
