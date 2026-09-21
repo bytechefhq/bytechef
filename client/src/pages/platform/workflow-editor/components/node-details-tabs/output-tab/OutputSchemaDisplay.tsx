@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {
     DropdownMenu,
@@ -10,7 +11,7 @@ import {
 import PropertyField from '@/pages/platform/workflow-editor/components/PropertyField';
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
-import {MoreHorizontalIcon} from 'lucide-react';
+import {MoreHorizontalIcon, TriangleAlertIcon} from 'lucide-react';
 
 import ClusterElementTestButton from './ClusterElementTestButton';
 
@@ -34,6 +35,7 @@ interface OutputSchemaDisplayProps {
     saveWorkflowNodeTestOutputMutation: {isPending: boolean};
     setShowUploadDialog: (show: boolean) => void;
     showClusterElementTestButton?: boolean;
+    testOutputResponse?: boolean;
     variableOutputSchema?: PropertyAllType;
     variablePropertiesDefined?: boolean;
     variableSampleOutput?: object;
@@ -58,12 +60,17 @@ const OutputSchemaDisplay = ({
     saveWorkflowNodeTestOutputMutation,
     setShowUploadDialog,
     showClusterElementTestButton,
+    testOutputResponse = false,
     variableOutputSchema,
     variablePropertiesDefined,
     variableSampleOutput,
 }: OutputSchemaDisplayProps) => {
     const hasProperties = Boolean(outputSchema && 'properties' in outputSchema && outputSchema.properties);
     const hasItems = Boolean(outputSchema && 'items' in outputSchema && outputSchema.items);
+
+    const operationLabel = clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action';
+    const testable = !resumePerformFunctionDefined && !variablePropertiesDefined;
+    const showPlaceholderSampleOutputWarning = !testOutputResponse && !currentNode.taskDispatcher && !!sampleOutput;
 
     return (
         <div className="h-full">
@@ -89,7 +96,7 @@ const OutputSchemaDisplay = ({
                                 ) : (
                                     <Button
                                         disabled={connectionMissing || saveWorkflowNodeTestOutputMutation.isPending}
-                                        label={`Test ${clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action'}`}
+                                        label={`Test ${operationLabel}`}
                                         onClick={handleTestOperationClick}
                                         variant="outline"
                                     />
@@ -140,6 +147,18 @@ const OutputSchemaDisplay = ({
                             </DropdownMenu>
                         </ButtonGroup>
                     </div>
+
+                    {showPlaceholderSampleOutputWarning && (
+                        <Alert className="mb-3" variant="warning">
+                            <TriangleAlertIcon />
+
+                            <AlertTitle>Placeholder sample data</AlertTitle>
+
+                            <AlertDescription>
+                                {`These values are generated from the output schema, not returned by a real run. Nodes that use this output as input will be tested with placeholder values. ${testable ? `Click Test ${operationLabel}` : 'Upload a sample output'} to get real data first.`}
+                            </AlertDescription>
+                        </Alert>
+                    )}
 
                     <PropertyField
                         copiedValue={copiedValue}
