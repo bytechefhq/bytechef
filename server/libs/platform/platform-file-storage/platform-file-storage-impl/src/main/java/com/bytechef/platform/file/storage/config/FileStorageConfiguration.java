@@ -20,6 +20,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
+import com.bytechef.platform.file.storage.EditorTempFileStorageImpl;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorageImpl;
 import com.bytechef.platform.file.storage.TempFileStorage;
@@ -34,6 +36,16 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class FileStorageConfiguration {
+
+    @Bean
+    EditorTempFileStorage editorTempFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
+        FileStorage.Provider provider = applicationProperties.getFileStorage()
+            .getProvider();
+
+        return new EditorTempFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
+    }
 
     @Bean
     TempFileStorage tempFileStorage(

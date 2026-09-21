@@ -21,8 +21,6 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.file.storage.FileStorageServiceRegistry;
-import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.log.EditorLogFileStorage;
@@ -31,6 +29,7 @@ import com.bytechef.platform.component.log.LogFileStorageWriter;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.Tracer;
@@ -61,21 +60,15 @@ public class ContextFactoryImpl implements ContextFactory {
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
-        DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, ApplicationEventPublisher eventPublisher,
-        FileStorageServiceRegistry fileStorageServiceRegistry, LogFileStorage logFileStorage,
+        DataStorage dataStorage, EditorLogFileStorage editorLogFileStorage, EditorTempFileStorage editorTempFileStorage,
+        ApplicationEventPublisher eventPublisher, LogFileStorage logFileStorage,
         TempFileStorage tempFileStorage, Tracer tracer, TriggerLogFileStorage triggerLogFileStorage) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
         this.dataStorage = dataStorage;
-
-        FileStorageService fileStorageService = fileStorageServiceRegistry.getFileStorageService(
-            applicationProperties.getFileStorage()
-                .getProvider()
-                .name());
-
         this.editorLogFileStorage = editorLogFileStorage;
-        this.editorTempFileStorage = new EditorTempFileStorage(fileStorageService);
+        this.editorTempFileStorage = editorTempFileStorage;
         this.eventPublisher = eventPublisher;
         this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;

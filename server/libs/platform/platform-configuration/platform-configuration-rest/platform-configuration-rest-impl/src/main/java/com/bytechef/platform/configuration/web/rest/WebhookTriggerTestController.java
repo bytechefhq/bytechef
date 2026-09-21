@@ -22,7 +22,7 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
-import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorageImpl;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.rest.util.WebhookRequestUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -51,15 +51,16 @@ public class WebhookTriggerTestController {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestController.class);
 
-    private final TempFileStorage tempFileStorage = new TempFileStorageImpl();
+    private final TempFileStorage editorTempFileStorage;
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerTestController(
-        WebhookTriggerTestFacade webhookTriggerTestFacade,
+        EditorTempFileStorage editorTempFileStorage, WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
+        this.editorTempFileStorage = editorTempFileStorage;
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
@@ -89,7 +90,7 @@ public class WebhookTriggerTestController {
                 workflowExecutionId);
 
             WebhookRequest webhookRequest = WebhookRequestUtils.getWebhookRequest(
-                httpServletRequest, tempFileStorage, webhookTriggerFlags);
+                httpServletRequest, editorTempFileStorage, webhookTriggerFlags);
 
             if (log.isDebugEnabled()) {
                 log.debug(

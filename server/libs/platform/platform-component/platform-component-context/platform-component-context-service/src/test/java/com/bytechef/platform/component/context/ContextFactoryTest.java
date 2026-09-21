@@ -37,6 +37,7 @@ import com.bytechef.platform.component.log.LogFileStorage;
 import com.bytechef.platform.component.log.TriggerLogFileStorage;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import io.micrometer.tracing.Tracer;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,8 +69,8 @@ class ContextFactoryTest {
 
         contextFactory = new ContextFactoryImpl(
             mock(ApplicationContext.class), applicationProperties, mock(CacheManager.class), mock(DataStorage.class),
-            editorLogFileStorage, mock(ApplicationEventPublisher.class), fileStorageServiceRegistry, logFileStorage,
-            mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
+            editorLogFileStorage, mock(EditorTempFileStorage.class), mock(ApplicationEventPublisher.class),
+            logFileStorage, mock(TempFileStorage.class), mock(Tracer.class), triggerLogFileStorage);
     }
 
     @Test

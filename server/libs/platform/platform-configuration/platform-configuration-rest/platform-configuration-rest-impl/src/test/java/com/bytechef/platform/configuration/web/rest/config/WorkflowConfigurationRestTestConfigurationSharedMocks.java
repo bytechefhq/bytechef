@@ -39,6 +39,7 @@ import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacad
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
@@ -56,7 +57,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ActionDefinitionFacade.class, ActionDefinitionService.class, AiProviderFacade.class,
     ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
-    DateTimeMapper.class,
+    DateTimeMapper.class, EditorTempFileStorage.class,
     EnvironmentService.class, OAuth2ParametersFacade.class, OAuth2Service.class, TaskDispatcherDefinitionService.class,
     TriggerDefinitionFacade.class, TriggerDefinitionService.class, UnifiedApiDefinitionService.class,
     WorkflowNodeDescriptionFacade.class, WorkflowNodeDynamicPropertiesFacade.class, WorkflowNodeOptionFacade.class,
