@@ -58,7 +58,7 @@ public class SshExecuteAction {
     private static final int DEFAULT_TIMEOUT_SECONDS = 60;
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("execute")
-        .title("Execute Commands")
+        .title("Execute Shell Commands")
         .description(
             "Executes shell commands on a remote host over SSH and returns the output of every command. Each " +
                 "command runs in its own session, so a working directory or an environment variable set by one " +
@@ -67,9 +67,10 @@ public class SshExecuteAction {
         .properties(
             array(COMMANDS)
                 .label("Commands")
-                .description("The shell commands to execute on the remote host, in the order they are listed.")
+                .description(
+                    "The shell commands to execute on the remote host, in the order they are listed in the array.")
                 .items(string())
-                .placeholder("df -h")
+                .placeholder("shell command expression")
                 .required(true),
             bool(CONTINUE_ON_ERROR)
                 .label("Continue On Error")
@@ -91,7 +92,7 @@ public class SshExecuteAction {
                     .items(
                         object()
                             .properties(
-                                string(COMMAND).description("The executed command."),
+                                string(COMMAND).description("The executed shell command."),
                                 string(RESULT).description("The standard output of the command."),
                                 string(ERROR).description("The standard error output of the command."),
                                 integer(EXIT_STATUS).description("The exit status of the command, 0 on success.")))))
@@ -103,13 +104,12 @@ public class SshExecuteAction {
     protected static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        List<String> commands = inputParameters.getRequiredList(COMMANDS, String.class);
-        boolean continueOnError = inputParameters.getBoolean(CONTINUE_ON_ERROR, false);
-        int timeout = inputParameters.getInteger(TIMEOUT, DEFAULT_TIMEOUT_SECONDS);
-
         List<Map<String, Object>> results = new ArrayList<>();
 
         try (SSHClient sshClient = SshClientUtils.connect(connectionParameters)) {
+            List<String> commands = inputParameters.getRequiredList(COMMANDS, String.class);
+            int timeout = inputParameters.getInteger(TIMEOUT, DEFAULT_TIMEOUT_SECONDS);
+
             for (String command : commands) {
                 Map<String, Object> result = executeCommand(sshClient, command, timeout);
 
@@ -117,7 +117,9 @@ public class SshExecuteAction {
 
                 Integer exitStatus = (Integer) result.get(EXIT_STATUS);
 
-                if (!continueOnError && (exitStatus == null || exitStatus != 0)) {
+                if (((exitStatus == null) || (exitStatus != 0)) &&
+                    !inputParameters.getBoolean(CONTINUE_ON_ERROR, false)) {
+
                     break;
                 }
             }
