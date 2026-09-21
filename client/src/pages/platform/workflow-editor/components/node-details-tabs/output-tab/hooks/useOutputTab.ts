@@ -89,6 +89,7 @@ export default function useOutputTab({
     const {outputSchema, placeholder, sampleOutput} = workflowNodeOutput?.outputResponse || {};
     const {outputSchema: variableOutputSchema, sampleOutput: variableSampleOutput} =
         workflowNodeOutput?.variableOutputResponse || {};
+    const testOutputResponse = !!workflowNodeOutput?.testOutputResponse;
 
     const {refetch: workflowNodeTestOutputExistsRefetch} = useCheckWorkflowNodeTestOutputExistsQuery(
         {
@@ -302,6 +303,7 @@ export default function useOutputTab({
         saveWorkflowNodeTestOutputMutationPending: saveWorkflowNodeTestOutputMutation.isPending,
         setShowUploadDialog,
         showUploadDialog,
+        testOutputResponse,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
         variableOutputSchema,

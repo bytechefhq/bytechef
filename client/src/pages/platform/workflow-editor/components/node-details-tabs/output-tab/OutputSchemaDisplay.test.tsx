@@ -75,4 +75,29 @@ describe('OutputSchemaDisplay', () => {
 
         expect(screen.getByText('Output Schema')).toBeInTheDocument();
     });
+
+    it('should warn that the output is placeholder data when it does not come from a test run', () => {
+        renderOutputSchemaDisplay({testOutputResponse: false});
+
+        expect(screen.getByText('Placeholder sample data')).toBeInTheDocument();
+        expect(screen.getByText(/Click Test Action to get real data first/)).toBeInTheDocument();
+    });
+
+    it('should not warn when the output comes from a test run', () => {
+        renderOutputSchemaDisplay({testOutputResponse: true});
+
+        expect(screen.queryByText('Placeholder sample data')).not.toBeInTheDocument();
+    });
+
+    it('should not warn for task dispatchers', () => {
+        renderOutputSchemaDisplay({currentNode: {...currentNode, taskDispatcher: true}, testOutputResponse: false});
+
+        expect(screen.queryByText('Placeholder sample data')).not.toBeInTheDocument();
+    });
+
+    it('should suggest uploading a sample output when the operation cannot be tested', () => {
+        renderOutputSchemaDisplay({resumePerformFunctionDefined: true, testOutputResponse: false});
+
+        expect(screen.getByText(/Upload a sample output to get real data first/)).toBeInTheDocument();
+    });
 });

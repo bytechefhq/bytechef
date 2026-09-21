@@ -58,6 +58,7 @@ const OutputTab = ({
         saveWorkflowNodeTestOutputMutationPending,
         setShowUploadDialog,
         showUploadDialog,
+        testOutputResponse,
         testing,
         uploadSampleOutputRequestMutationPending,
         variableOutputSchema,
@@ -104,6 +105,7 @@ const OutputTab = ({
                         saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
                         setShowUploadDialog={setShowUploadDialog}
                         showClusterElementTestButton={hasClusterElementProperties}
+                        testOutputResponse={testOutputResponse}
                         variableOutputSchema={variableOutputSchema}
                         variablePropertiesDefined={variablePropertiesDefined}
                         variableSampleOutput={variableSampleOutput}
