@@ -21,15 +21,22 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
  */
 public interface WebhookTriggerTestFacade {
 
-    void disableTrigger(String workflowId, long environmentId, PlatformType type);
+    /**
+     * @param triggerName the trigger to disable; {@code null} falls back to the workflow's first trigger
+     */
+    void disableTrigger(String workflowId, @Nullable String triggerName, long environmentId, PlatformType type);
 
-    String enableTrigger(String workflowId, long environmentId, PlatformType type);
+    /**
+     * @param triggerName the trigger to enable; {@code null} falls back to the workflow's first trigger
+     */
+    String enableTrigger(String workflowId, @Nullable String triggerName, long environmentId, PlatformType type);
 
     WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId);
 

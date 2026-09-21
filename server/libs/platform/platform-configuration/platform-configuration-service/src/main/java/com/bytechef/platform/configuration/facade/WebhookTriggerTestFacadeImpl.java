@@ -38,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -86,21 +87,25 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     }
 
     @Override
-    public void disableTrigger(String workflowId, long environmentId, PlatformType type) {
-        executeTrigger(workflowId, false, type, environmentId);
+    public void disableTrigger(
+        String workflowId, @Nullable String triggerName, long environmentId, PlatformType type) {
+
+        executeTrigger(workflowId, triggerName, false, type, environmentId);
     }
 
     @Override
-    public String enableTrigger(String workflowId, long environmentId, PlatformType type) {
+    public String enableTrigger(
+        String workflowId, @Nullable String triggerName, long environmentId, PlatformType type) {
+
         try {
-            executeTrigger(workflowId, false, type, environmentId);
+            executeTrigger(workflowId, triggerName, false, type, environmentId);
         } catch (Exception e) {
             if (log.isTraceEnabled()) {
                 log.trace("Failed to disable trigger for workflowId={}, type={}", workflowId, type, e);
             }
         }
 
-        return executeTrigger(workflowId, true, type, environmentId);
+        return executeTrigger(workflowId, triggerName, true, type, environmentId);
     }
 
     @Override
@@ -131,7 +136,7 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         String workflowId = getLatestWorkflowId(
             workflowExecutionId.getWorkflowUuid(), workflowExecutionId.getType());
 
-        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
+        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId, workflowExecutionId.getTriggerName());
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
         Map<String, ?> triggerParameters = workflowTrigger.evaluateParameters(
@@ -150,10 +155,12 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
             workflowNodeType.operation(), triggerParameters, webhookRequest, connectionId);
     }
 
-    private String executeTrigger(String workflowId, boolean enable, PlatformType type, long environmentId) {
+    private String executeTrigger(
+        String workflowId, @Nullable String triggerName, boolean enable, PlatformType type, long environmentId) {
+
         String workflowUuid = getWorkflowUuid(workflowId, type);
 
-        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId);
+        WorkflowTrigger workflowTrigger = getWorkflowTrigger(workflowId, triggerName);
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             type, -1, workflowUuid, workflowTrigger.getName());
@@ -290,10 +297,14 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
         return jobPrincipalAccessor.getWorkflowUuid(workflowId);
     }
 
-    private WorkflowTrigger getWorkflowTrigger(String workflowId) {
+    private WorkflowTrigger getWorkflowTrigger(String workflowId, @Nullable String triggerName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        return WorkflowTrigger.of(workflow)
-            .getFirst();
+        if (triggerName == null || triggerName.isBlank()) {
+            return WorkflowTrigger.of(workflow)
+                .getFirst();
+        }
+
+        return WorkflowTrigger.of(triggerName, workflow);
     }
 }

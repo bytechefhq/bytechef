@@ -1260,6 +1260,12 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "triggerName"
+          description: "The name of the workflow trigger to test. Defaults to the first trigger."
+          required: false
+          in: "query"
+          schema:
+            type: "string"
       responses:
         "200":
           description: "Returns the webhook URL."
@@ -1292,6 +1298,12 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "triggerName"
+          description: "The name of the workflow trigger to test. Defaults to the first trigger."
+          required: false
+          in: "query"
+          schema:
+            type: "string"
       responses:
         "204":
           description: "Successful operation."
