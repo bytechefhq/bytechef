@@ -254,6 +254,50 @@ describe('useProperty value state', () => {
 
             expect(result.current.propertyParameterValue).toBe('from-definition');
         });
+
+        it('should clear a data pill seeded on mount once the definition drops the parameter', async () => {
+            const dataPill = '${firecrawl_5.data.json.result}';
+
+            hoisted.panelStoreState.currentNode = {
+                ...hoisted.panelStoreState.currentNode,
+                parameters: {type: 'OBJECT', value: dataPill},
+            };
+
+            hoisted.dataStoreState.workflow = {
+                definition: JSON.stringify({tasks: [{name: 'mailchimp_1'}]}),
+                id: 'workflow-1',
+                tasks: [{name: 'mailchimp_1', parameters: {type: 'OBJECT', value: dataPill}}],
+                triggers: [],
+            };
+
+            const {rerender, result} = await renderProperty({
+                controlType: 'OBJECT_BUILDER',
+                displayCondition: "type == 'OBJECT'",
+                name: 'value',
+                type: 'OBJECT',
+            });
+
+            expect(result.current.mentionInput).toBe(true);
+            expect(result.current.mentionInputValue).toBe(dataPill);
+
+            act(() => {
+                hoisted.panelStoreState.currentNode = {
+                    ...hoisted.panelStoreState.currentNode,
+                    parameters: {type: 'OBJECT'},
+                };
+
+                hoisted.dataStoreState.workflow = {
+                    definition: JSON.stringify({tasks: [{name: 'mailchimp_1', parameters: {type: 'OBJECT'}}]}),
+                    id: 'workflow-1',
+                    tasks: [{name: 'mailchimp_1', parameters: {type: 'OBJECT'}}],
+                    triggers: [],
+                };
+            });
+
+            rerender();
+
+            expect(result.current.mentionInputValue).toBe('');
+        });
     });
 
     describe('input editing', () => {
