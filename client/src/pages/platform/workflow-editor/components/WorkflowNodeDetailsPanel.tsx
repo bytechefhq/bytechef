@@ -77,6 +77,7 @@ const WorkflowNodeDetailsPanel = ({
         operationDataMissing,
         outputDefined,
         outputFunctionDefined,
+        propertiesLoading,
         rootClusterElementNodeData,
         setActiveTab,
         setErrorsAccordionOpen,
@@ -347,7 +348,8 @@ const WorkflowNodeDetailsPanel = ({
                                     {activeTab === 'properties' &&
                                         (!operationDataMissing &&
                                         currentOperationProperties?.length &&
-                                        !awaitingFirstSave ? (
+                                        !awaitingFirstSave &&
+                                        !propertiesLoading ? (
                                             <Properties
                                                 customClassName="p-4"
                                                 displayConditionsQuery={activeDisplayConditionsQuery}
