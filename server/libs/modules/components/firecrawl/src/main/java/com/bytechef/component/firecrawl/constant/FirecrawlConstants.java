@@ -39,6 +39,7 @@ public class FirecrawlConstants {
     public static final String IGNORE_INVALID_URLS = "ignoreInvalidURLs";
     public static final String IGNORE_QUERY_PARAMETERS = "ignoreQueryParameters";
     public static final String INCLUDE_PATHS = "includePaths";
+    public static final String INCLUDE_PROFILE = "includeProfile";
     public static final String INCLUDE_SUBDOMAINS = "includeSubdomains";
     public static final String INCLUDE_TAGS = "includeTags";
     public static final String LANGUAGES = "languages";
@@ -48,13 +49,16 @@ public class FirecrawlConstants {
     public static final String MAX_CONCURRENCY = "maxConcurrency";
     public static final String MAX_DISCOVERY_DEPTH = "maxDiscoveryDepth";
     public static final String MOBILE = "mobile";
+    public static final String NAME = "name";
     public static final String ONLY_MAIN_CONTENT = "onlyMainContent";
     public static final String PARSERS = "parsers";
+    public static final String PROFILE = "profile";
     public static final String PROMPT = "prompt";
     public static final String PROXY = "proxy";
     public static final String QUERY = "query";
     public static final String REGEX_ON_FULL_URL = "regexOnFullURL";
     public static final String REMOVE_BASE64_IMAGES = "removeBase64Images";
+    public static final String SAVE_CHANGES = "saveChanges";
     public static final String SCRAPE_OPTIONS = "scrapeOptions";
     public static final String SEARCH = "search";
     public static final String SITEMAP = "sitemap";
