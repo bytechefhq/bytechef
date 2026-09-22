@@ -586,6 +586,8 @@ include("server:ee:apps:worker-app")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 
+include("server:ee:libs:ai:ai-copilot:ai-copilot-api")
+include("server:ee:libs:ai:ai-copilot:ai-copilot-graphql")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-service")
 
@@ -734,3 +736,4 @@ include("spring-ai:spring-ai-model-chat-memory-repository-aws")
 include("spring-ai:spring-ai-session-aws")
 include("spring-ai:spring-ai-session-redis")
 include("spring-ai:spring-ai-session-store")
+include("server:libs:platform:platform-connection:platform-connection-ai-provider")
