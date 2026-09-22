@@ -18,22 +18,26 @@ package com.bytechef.automation.ai.tool;
 
 import static com.bytechef.automation.ai.tool.exception.ProjectWorkflowToolErrorType.GET_WORKFLOW;
 
+import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.exception.ProjectWorkflowToolErrorType;
 import com.bytechef.automation.ai.tool.model.ProjectWorkflowInfo;
 import com.bytechef.automation.ai.tool.model.WorkflowInfo;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
@@ -81,18 +85,21 @@ public class ProjectWorkflowTools {
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
     private final ScopedProjectGuard scopedProjectGuard;
+    private final WorkspaceConnectionFacade workspaceConnectionFacade;
     private final ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowTools(
         ComponentDefinitionService componentDefinitionService, ProjectWorkflowFacade projectWorkflowFacade,
         ProjectWorkflowService projectWorkflowService, ScopedProjectGuard scopedProjectGuard,
+        WorkspaceConnectionFacade workspaceConnectionFacade,
         ObjectProvider<WorkflowTestConfigurationFacade> workflowTestConfigurationFacadeProvider) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
         this.scopedProjectGuard = scopedProjectGuard;
+        this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.workflowTestConfigurationFacadeProvider = workflowTestConfigurationFacadeProvider;
     }
 
@@ -387,6 +394,14 @@ public class ProjectWorkflowTools {
                     ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION);
             }
 
+            if (!ScopedProjectToolContext.isConfined(toolContext)) {
+                checkConnectionAccessible(
+                    connectionId,
+                    scopedProjectGuard.resolveWorkspaceId(
+                        workspaceId, toolContext, ProjectWorkflowToolErrorType.SAVE_TEST_CONNECTION),
+                    environmentId);
+            }
+
             workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
                 workflowId, workflowNodeName, connectionKey, connectionId, environmentId);
 
@@ -425,6 +440,19 @@ public class ProjectWorkflowTools {
             throw new ExecutionException(
                 AllowedComponentNamesUtils.getNotAllowedMessage(disallowedComponentNames),
                 projectWorkflowToolErrorType);
+        }
+    }
+
+    private void checkConnectionAccessible(long connectionId, long workspaceId, long environmentId) {
+        List<ConnectionDTO> connections = workspaceConnectionFacade.getConnections(
+            workspaceId, null, null, environmentId, null);
+
+        boolean found = connections.stream()
+            .anyMatch(connection -> Objects.equals(connection.id(), connectionId));
+
+        if (!found) {
+            throw new IllegalArgumentException(
+                "Connection " + connectionId + " not found in the workflow's workspace and current environment");
         }
     }
 
