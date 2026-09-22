@@ -1,29 +1,57 @@
+import Button from '@/components/Button/Button';
 import JsonSchemaBuilder from '@/components/JsonSchemaBuilder/JsonSchemaBuilder';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Note} from '@/components/Note';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {SPACE} from '@/shared/constants';
-import {MessageCircleQuestionIcon} from 'lucide-react';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {MessageCircleQuestionIcon, SparklesIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 import {Suspense, lazy, useCallback, useEffect, useRef, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
+
+import {usePropertyJsonSchemaBuilderCopilot} from './hooks/usePropertyJsonSchemaBuilderCopilot';
 
 import type {StandaloneCodeEditorType} from '@/shared/components/MonacoTypes';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
 interface PropertyJsonSchemaBuilderSheetProps {
+    environmentId?: number;
     onChange?: (newSchema: SchemaRecordType) => void;
     onClose?: () => void;
+    propertyPath?: string;
     schema?: SchemaRecordType;
     title?: string;
+    workflowId?: string;
+    workflowNodeName?: string;
 }
 
-const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: PropertyJsonSchemaBuilderSheetProps) => {
+const PropertyJsonSchemaBuilderSheet = ({
+    environmentId,
+    onChange,
+    onClose,
+    propertyPath,
+    schema,
+    title,
+    workflowId,
+    workflowNodeName,
+}: PropertyJsonSchemaBuilderSheetProps) => {
     const [localSchema, setLocalSchema] = useState<SchemaRecordType | undefined>(schema);
 
     const editorRef = useRef<StandaloneCodeEditorType | null>(null);
+    const schemaRef = useRef(localSchema);
+
+    schemaRef.current = localSchema;
+
+    const ai = useApplicationInfoStore((state) => state.ai);
+
+    const copilotAvailable = Boolean(
+        ai.copilot.enabled && workflowId && workflowNodeName && environmentId !== undefined
+    );
 
     const handleSchemaChange = useCallback(
         (newSchema: SchemaRecordType) => {
@@ -43,84 +71,131 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
         }
     }, []);
 
+    const {copilotPanelOpen, handleCopilotClose, handleCopilotOpen} = usePropertyJsonSchemaBuilderCopilot({
+        onSchemaApply: handleSchemaChange,
+        propertyPath,
+        schemaRef,
+        title,
+        workflowId,
+        workflowNodeName,
+    });
+
+    const handleSheetOpenChange = useCallback(
+        (open: boolean) => {
+            if (!open) {
+                handleCopilotClose();
+            }
+
+            onClose?.();
+        },
+        [handleCopilotClose, onClose]
+    );
+
     useEffect(() => {
         setLocalSchema(schema);
     }, [schema]);
 
     return (
-        <Sheet onOpenChange={onClose} open>
+        <Sheet onOpenChange={handleSheetOpenChange} open>
             <VisuallyHidden.Root>
                 <SheetTitle>{title ? `${title} Builder` : 'JSON Schema Builder'}</SheetTitle>
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="top-3 right-4 bottom-4 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-(--breakpoint-lg)"
+                className={twMerge(
+                    'top-3 right-4 bottom-4 flex h-auto w-11/12 flex-row gap-0 rounded-md bg-surface-neutral-secondary p-0',
+                    copilotPanelOpen ? 'sm:max-w-(--breakpoint-xl)' : 'sm:max-w-(--breakpoint-lg)'
+                )}
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <Tabs className="flex size-full flex-col gap-0" defaultValue="designer" onValueChange={handleTabChange}>
-                    <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
-                        <div className="flex flex-col">
-                            <span className="text-lg font-semibold">
-                                {title ? `${title} Builder` : 'JSON Schema Builder'}
-                            </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <Tabs
+                        className="flex size-full flex-col gap-0"
+                        defaultValue="designer"
+                        onValueChange={handleTabChange}
+                    >
+                        <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
+                            <div className="flex flex-col">
+                                <span className="text-lg font-semibold">
+                                    {title ? `${title} Builder` : 'JSON Schema Builder'}
+                                </span>
 
-                            <span className="text-sm text-muted-foreground">{`Define desired structure for the ${title}.`}</span>
-                        </div>
+                                <span className="text-sm text-muted-foreground">{`Define desired structure for the ${title}.`}</span>
+                            </div>
 
-                        <div className="flex items-center gap-1">
-                            <TabsList>
-                                <TabsTrigger value="designer">Designer</TabsTrigger>
+                            <div className="flex items-center gap-1">
+                                <TabsList>
+                                    <TabsTrigger value="designer">Designer</TabsTrigger>
 
-                                <TabsTrigger value="editor">Code Editor</TabsTrigger>
-                            </TabsList>
+                                    <TabsTrigger value="editor">Code Editor</TabsTrigger>
+                                </TabsList>
 
-                            <SheetCloseButton />
-                        </div>
-                    </header>
+                                {copilotAvailable && (
+                                    <Button
+                                        aria-label="Copilot"
+                                        icon={<SparklesIcon className="size-4" />}
+                                        onClick={copilotPanelOpen ? handleCopilotClose : handleCopilotOpen}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                )}
 
-                    <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
-                        {title === 'Response Schema' && (
-                            <Note
-                                content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
-                                icon={<MessageCircleQuestionIcon />}
-                            />
-                        )}
+                                <SheetCloseButton />
+                            </div>
+                        </header>
 
-                        <TabsContent
-                            className="min-h-0 flex-1 overflow-y-auto rounded-lg bg-surface-neutral-primary p-3"
-                            value="designer"
-                        >
-                            <JsonSchemaBuilder onChange={handleSchemaChange} schema={localSchema} />
-                        </TabsContent>
-
-                        <TabsContent
-                            className="min-h-0 flex-1 rounded-lg bg-surface-neutral-primary py-3 data-[state=inactive]:hidden"
-                            forceMount
-                            value="editor"
-                        >
-                            <Suspense fallback={<MonacoEditorLoader />}>
-                                <MonacoEditor
-                                    className="size-full"
-                                    defaultLanguage="json"
-                                    onChange={(value) => {
-                                        if (value) {
-                                            try {
-                                                handleSchemaChange(JSON.parse(value));
-                                            } catch {
-                                                // Invalid JSON while typing — ignore until valid
-                                            }
-                                        }
-                                    }}
-                                    onMount={(editor) => {
-                                        editorRef.current = editor;
-                                    }}
-                                    value={JSON.stringify(localSchema, null, SPACE)}
+                        <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
+                            {title === 'Response Schema' && (
+                                <Note
+                                    content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
+                                    icon={<MessageCircleQuestionIcon />}
                                 />
-                            </Suspense>
-                        </TabsContent>
-                    </div>
-                </Tabs>
+                            )}
+
+                            <TabsContent
+                                className="min-h-0 flex-1 overflow-y-auto rounded-lg bg-surface-neutral-primary p-3"
+                                value="designer"
+                            >
+                                <JsonSchemaBuilder onChange={handleSchemaChange} schema={localSchema} />
+                            </TabsContent>
+
+                            <TabsContent
+                                className="min-h-0 flex-1 rounded-lg bg-surface-neutral-primary py-3 data-[state=inactive]:hidden"
+                                forceMount
+                                value="editor"
+                            >
+                                <Suspense fallback={<MonacoEditorLoader />}>
+                                    <MonacoEditor
+                                        className="size-full"
+                                        defaultLanguage="json"
+                                        onChange={(value) => {
+                                            if (value) {
+                                                try {
+                                                    handleSchemaChange(JSON.parse(value));
+                                                } catch {
+                                                    // Invalid JSON while typing — ignore until valid
+                                                }
+                                            }
+                                        }}
+                                        onMount={(editor) => {
+                                            editorRef.current = editor;
+                                        }}
+                                        value={JSON.stringify(localSchema, null, SPACE)}
+                                    />
+                                </Suspense>
+                            </TabsContent>
+                        </div>
+                    </Tabs>
+                </div>
+
+                {copilotAvailable && (
+                    <CopilotPanel
+                        className="h-full rounded-r-md border-l border-stroke-neutral-primary"
+                        onClose={handleCopilotClose}
+                        open={copilotPanelOpen}
+                    />
+                )}
             </SheetContent>
         </Sheet>
     );
