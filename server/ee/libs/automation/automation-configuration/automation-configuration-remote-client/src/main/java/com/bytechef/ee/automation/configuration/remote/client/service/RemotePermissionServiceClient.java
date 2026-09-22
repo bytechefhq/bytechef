@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
  * Design choice: fail closed rather than throw. Throwing {@link UnsupportedOperationException} from SpEL evaluation
  * surfaces as an opaque HTTP 500 with no audit trail. Returning {@code false} from every check makes Spring Security
  * translate the invocation into an {@link org.springframework.security.access.AccessDeniedException}, which the
- * {@code PermissionAuditAspect} records as a DENIED event. Each call also emits an ERROR log so operators detect the
- * misconfiguration. Cache evictions are silent no-ops (idempotent).
+ * {@code AuditAspect} records as a {@code PERMISSION_CHECK} event with result DENIED. Each call also emits an ERROR log
+ * so operators detect the misconfiguration. Cache evictions are silent no-ops (idempotent).
  *
  * @version ee
  *
