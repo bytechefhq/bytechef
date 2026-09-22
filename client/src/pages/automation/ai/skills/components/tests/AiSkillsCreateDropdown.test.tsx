@@ -63,7 +63,6 @@ describe('AiSkillsCreateDropdown', () => {
         applicationInfoStore.setState((state) => ({
             ...state,
             ai: {...state.ai, copilot: {enabled: false}},
-            featureFlags: {'ff-4554': true},
         }));
     });
 
@@ -73,7 +72,6 @@ describe('AiSkillsCreateDropdown', () => {
         applicationInfoStore.setState((state) => ({
             ...state,
             ai: {...state.ai, copilot: {enabled: false}},
-            featureFlags: {},
         }));
     });
 

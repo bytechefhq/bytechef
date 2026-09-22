@@ -20,7 +20,7 @@ import FilterBadges from '@/shared/components/filters/FilterBadges';
 import FilterMenu, {hasActiveFilters} from '@/shared/components/filters/FilterMenu';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {
     ArrowLeftIcon,
     CodeIcon,
@@ -50,11 +50,11 @@ const AiSkills = () => {
 
     const setViewMode = useAiSkillDetailToolbarStore((state) => state.setViewMode);
 
+    const copilotEnabled = useApplicationInfoStore((state) => state.ai.copilot.enabled);
+
     const {handleBack, headerTitle, isDetailView, showSearchAndCreate, showToolbar} = useAiSkills();
 
     const tagFilterGroups = useAiSkillsTagFilterGroups();
-
-    const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
     let toolbarRight: React.ReactNode = undefined;
 
@@ -116,7 +116,7 @@ const AiSkills = () => {
                     <TooltipContent>Save changes</TooltipContent>
                 </Tooltip>
 
-                {ff_4554 && (
+                {copilotEnabled && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button

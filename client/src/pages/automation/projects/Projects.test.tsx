@@ -29,6 +29,7 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: () => ({
+        ai: {copilot: {enabled: true}},
         analytics: {enabled: false, postHog: {apiKey: '', host: ''}},
         application: {edition: 'CE'},
         featureFlags: {},
@@ -146,9 +147,7 @@ describe('Projects Import Functionality', () => {
         const createButton = screen.getByRole('button', {name: /create project/i});
         expect(createButton).toBeInTheDocument();
 
-        const buttons = screen.getAllByRole('button');
-        const chevronButton = buttons.find((b) => !/create project/i.test(b.textContent || ''))!;
-        await userEvent.click(chevronButton);
+        await userEvent.click(screen.getByRole('button', {name: 'More create options'}));
 
         await waitFor(() => {
             expect(screen.getByText('From Template')).toBeInTheDocument();
@@ -161,7 +160,7 @@ describe('Projects Import Functionality', () => {
 
         // Open the dropdown using the chevron button
         const buttons = screen.getAllByRole('button');
-        const chevronButton = buttons.find((b) => /chevron-down/i.test(b.innerHTML) || b.querySelector('svg'))!;
+        const chevronButton = buttons.find((button) => /chevron-down/i.test(button.innerHTML))!;
         await userEvent.click(chevronButton);
 
         await waitFor(() => {

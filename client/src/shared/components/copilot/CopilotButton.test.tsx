@@ -1,73 +1,148 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
-import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
-import {render, screen} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import CopilotButton from './CopilotButton';
 
-const hoisted = vi.hoisted(() => ({
-    copilotEnabled: true,
-    enabledFeatureFlags: ['ff-1570'] as string[],
-    openCopilot: vi.fn(),
-}));
+const hoisted = vi.hoisted(() => {
+    return {
+        mockCopilotEnabled: {value: true},
+        mockGenerateConversationId: vi.fn(),
+        mockResetMessages: vi.fn(),
+        mockSaveConversationState: vi.fn(),
+        mockSetComposerPlaceholder: vi.fn(),
+        mockSetContext: vi.fn(),
+        mockSetCopilotPanelOpen: vi.fn(),
+        mockSetGlobalPanelConversationToken: vi.fn(),
+    };
+});
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: (selector: (state: {ai: {copilot: {enabled: boolean}}}) => unknown) =>
-        selector({ai: {copilot: {enabled: hoisted.copilotEnabled}}}),
+        selector({ai: {copilot: {enabled: hoisted.mockCopilotEnabled.value}}}),
 }));
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => (featureFlag: string) => hoisted.enabledFeatureFlags.includes(featureFlag),
-}));
-
-vi.mock('@/shared/components/copilot/hooks/useOpenCopilot', () => ({
-    default: () => hoisted.openCopilot,
-}));
-
-const renderCopilotButton = (parameters?: Record<string, unknown>) =>
-    render(
-        <TooltipProvider>
-            <CopilotButton parameters={parameters} source={Source.MCP_SERVER} />
-        </TooltipProvider>
+vi.mock('@/shared/components/copilot/stores/useCopilotStore', async () => {
+    const actual = await vi.importActual<typeof import('@/shared/components/copilot/stores/useCopilotStore')>(
+        '@/shared/components/copilot/stores/useCopilotStore'
     );
+
+    const mockUseCopilotStore = (
+        selector: (state: {
+            setComposerPlaceholder: typeof hoisted.mockSetComposerPlaceholder;
+            setContext: typeof hoisted.mockSetContext;
+        }) => unknown
+    ) =>
+        selector({
+            setComposerPlaceholder: hoisted.mockSetComposerPlaceholder,
+            setContext: hoisted.mockSetContext,
+        });
+
+    mockUseCopilotStore.getState = () => ({
+        generateConversationId: hoisted.mockGenerateConversationId,
+        resetMessages: hoisted.mockResetMessages,
+        saveConversationState: hoisted.mockSaveConversationState,
+        setGlobalPanelConversationToken: hoisted.mockSetGlobalPanelConversationToken,
+    });
+
+    return {
+        ...actual,
+        useCopilotStore: mockUseCopilotStore,
+    };
+});
+
+vi.mock('@/shared/components/copilot/stores/useCopilotPanelStore', () => ({
+    default: (
+        selector: (state: {
+            copilotPanelOpen: boolean;
+            setCopilotPanelOpen: typeof hoisted.mockSetCopilotPanelOpen;
+        }) => unknown
+    ) => selector({copilotPanelOpen: false, setCopilotPanelOpen: hoisted.mockSetCopilotPanelOpen}),
+}));
 
 describe('CopilotButton', () => {
     beforeEach(() => {
-        hoisted.copilotEnabled = true;
-        hoisted.enabledFeatureFlags = ['ff-1570'];
-        hoisted.openCopilot.mockReset();
+        hoisted.mockCopilotEnabled.value = true;
+        hoisted.mockGenerateConversationId.mockClear();
+        hoisted.mockResetMessages.mockClear();
+        hoisted.mockSaveConversationState.mockClear();
+        hoisted.mockSetComposerPlaceholder.mockClear();
+        hoisted.mockSetContext.mockClear();
+        hoisted.mockSetCopilotPanelOpen.mockClear();
+        hoisted.mockSetGlobalPanelConversationToken.mockClear();
     });
 
-    it('should open the copilot for its source and parameters when clicked', async () => {
-        renderCopilotButton({mcpServerId: 3});
+    it('should render nothing when copilot is disabled', () => {
+        hoisted.mockCopilotEnabled.value = false;
 
-        await userEvent.click(screen.getByRole('button', {name: 'Ask Copilot'}));
+        render(
+            <TooltipProvider>
+                <CopilotButton source={Source.DATA_TABLE} />
+            </TooltipProvider>
+        );
 
-        expect(hoisted.openCopilot).toHaveBeenCalledWith({parameters: {mcpServerId: 3}, source: Source.MCP_SERVER});
+        expect(screen.queryByLabelText('Ask Copilot')).not.toBeInTheDocument();
     });
 
-    it('should open the copilot with empty parameters by default', async () => {
-        renderCopilotButton();
+    it('should set an ASK context for the source and open the panel', async () => {
+        render(
+            <TooltipProvider>
+                <CopilotButton source={Source.DATA_TABLE} />
+            </TooltipProvider>
+        );
 
-        await userEvent.click(screen.getByRole('button', {name: 'Ask Copilot'}));
+        await userEvent.click(screen.getByLabelText('Ask Copilot'));
 
-        expect(hoisted.openCopilot).toHaveBeenCalledWith({parameters: {}, source: Source.MCP_SERVER});
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.DATA_TABLE,
+        });
+        expect(hoisted.mockSetCopilotPanelOpen).toHaveBeenCalledWith(true);
     });
 
-    it('should render nothing when the copilot is disabled', () => {
-        hoisted.copilotEnabled = false;
+    it('should push the covered conversation onto the stack before opening', async () => {
+        render(
+            <TooltipProvider>
+                <CopilotButton source={Source.DATA_TABLE} />
+            </TooltipProvider>
+        );
 
-        renderCopilotButton();
+        await userEvent.click(screen.getByLabelText('Ask Copilot'));
 
-        expect(screen.queryByRole('button', {name: 'Ask Copilot'})).not.toBeInTheDocument();
+        expect(hoisted.mockSaveConversationState).toHaveBeenCalledOnce();
     });
 
-    it('should render nothing when the copilot feature flag is off', () => {
-        hoisted.enabledFeatureFlags = [];
+    it('should forward parameters in ASK mode by default', async () => {
+        render(
+            <TooltipProvider>
+                <CopilotButton parameters={{intent: 'configure_mcp_server'}} source={Source.MCP_SERVER} />
+            </TooltipProvider>
+        );
 
-        renderCopilotButton();
+        await userEvent.click(screen.getByLabelText('Ask Copilot'));
 
-        expect(screen.queryByRole('button', {name: 'Ask Copilot'})).not.toBeInTheDocument();
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.ASK,
+            parameters: {intent: 'configure_mcp_server'},
+            source: Source.MCP_SERVER,
+        });
+    });
+
+    it('should forward parameters and an explicit mode', async () => {
+        render(
+            <TooltipProvider>
+                <CopilotButton mode={MODE.BUILD} parameters={{workflowId: '7'}} source={Source.DATA_TABLE} />
+            </TooltipProvider>
+        );
+
+        await userEvent.click(screen.getByLabelText('Ask Copilot'));
+
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.BUILD,
+            parameters: {workflowId: '7'},
+            source: Source.DATA_TABLE,
+        });
     });
 });

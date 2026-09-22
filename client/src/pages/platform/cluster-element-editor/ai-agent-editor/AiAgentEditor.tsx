@@ -41,7 +41,6 @@ export default function AiAgentEditor({
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
-    const ff_4572 = useFeatureFlagsStore()('ff-4572');
 
     const {handleNodeDetailsPanelClose, showNodeDetailsPanel, updateWorkflowMutation} = useAiAgentEditor({
         previousComponentDefinitions,
@@ -53,7 +52,7 @@ export default function AiAgentEditor({
         return (
             <div className={twMerge('flex h-full flex-1 flex-col rounded-lg bg-surface-neutral-primary', className)}>
                 <AiAgentHeader
-                    copilotEnabled={ff_4572 && copilotEnabled}
+                    copilotEnabled={copilotEnabled}
                     onClose={handleEvalsClose}
                     onCopilotClick={onCopilotClick}
                     title="Evals"

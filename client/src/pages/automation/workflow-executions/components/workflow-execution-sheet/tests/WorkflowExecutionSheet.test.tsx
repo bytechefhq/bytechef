@@ -6,12 +6,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import WorkflowExecutionSheet from '../WorkflowExecutionSheet';
 
 const {sheetState} = vi.hoisted(() => ({
-    sheetState: {workflowExecution: undefined as unknown, workflowExecutionLoading: false},
+    sheetState: {copilotEnabled: false, workflowExecution: undefined as unknown, workflowExecutionLoading: false},
 }));
 
 vi.mock('../hooks/useWorkflowExecutionSheet', () => ({
     default: () => ({
-        copilotEnabled: false,
+        copilotEnabled: sheetState.copilotEnabled,
         copilotPanelOpen: false,
         handleCopilotClick: vi.fn(),
         handleCopilotClose: vi.fn(),
@@ -43,8 +43,17 @@ const renderSheet = (workflowExecution: object) => {
 
 describe('WorkflowExecutionSheet', () => {
     beforeEach(() => {
+        sheetState.copilotEnabled = false;
         sheetState.workflowExecution = undefined;
         sheetState.workflowExecutionLoading = false;
+    });
+
+    it('hides the Copilot button while its feature flag is off, even when the Copilot is enabled', () => {
+        sheetState.copilotEnabled = true;
+
+        renderSheet({job: {id: '5'}, project: {name: 'Sales'}, workflow: {label: 'Order intake'}});
+
+        expect(document.querySelector('svg.lucide-sparkles')).toBeNull();
     });
 
     it('shows the project version the job ran with after the workflow in the header', () => {
