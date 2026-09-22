@@ -1,66 +1,189 @@
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {MODE, Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {act, renderHook} from '@testing-library/react';
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import useOpenCopilot from './useOpenCopilot';
+const hoisted = vi.hoisted(() => {
+    return {
+        mockCopilotPanelOpen: {value: false},
+        mockGenerateConversationId: vi.fn(),
+        mockResetMessages: vi.fn(),
+        mockSaveConversationState: vi.fn(),
+        mockSetComposerPlaceholder: vi.fn(),
+        mockSetContext: vi.fn(),
+        mockSetCopilotPanelOpen: vi.fn(),
+        mockSetGlobalPanelConversationToken: vi.fn(),
+    };
+});
+
+vi.mock('@/shared/components/copilot/stores/useCopilotStore', async () => {
+    const actual = await vi.importActual<typeof import('@/shared/components/copilot/stores/useCopilotStore')>(
+        '@/shared/components/copilot/stores/useCopilotStore'
+    );
+
+    const mockUseCopilotStore = (
+        selector: (state: {
+            setComposerPlaceholder: typeof hoisted.mockSetComposerPlaceholder;
+            setContext: typeof hoisted.mockSetContext;
+        }) => unknown
+    ) =>
+        selector({
+            setComposerPlaceholder: hoisted.mockSetComposerPlaceholder,
+            setContext: hoisted.mockSetContext,
+        });
+
+    mockUseCopilotStore.getState = () => ({
+        generateConversationId: hoisted.mockGenerateConversationId,
+        resetMessages: hoisted.mockResetMessages,
+        saveConversationState: hoisted.mockSaveConversationState,
+        setGlobalPanelConversationToken: hoisted.mockSetGlobalPanelConversationToken,
+    });
+
+    return {
+        ...actual,
+        useCopilotStore: mockUseCopilotStore,
+    };
+});
+
+vi.mock('@/shared/components/copilot/stores/useCopilotPanelStore', () => ({
+    default: (
+        selector: (state: {
+            copilotPanelOpen: boolean;
+            setCopilotPanelOpen: typeof hoisted.mockSetCopilotPanelOpen;
+        }) => unknown
+    ) =>
+        selector({
+            copilotPanelOpen: hoisted.mockCopilotPanelOpen.value,
+            setCopilotPanelOpen: hoisted.mockSetCopilotPanelOpen,
+        }),
+}));
+
+const {default: useOpenCopilot} = await import('@/shared/components/copilot/hooks/useOpenCopilot');
 
 describe('useOpenCopilot', () => {
     beforeEach(() => {
-        useCopilotPanelStore.setState({copilotPanelOpen: false});
-        useCopilotStore.setState({
-            context: {mode: MODE.BUILD, parameters: {workflowId: 'w1'}, source: Source.WORKFLOW_EDITOR},
-            conversationStack: [],
-            globalPanelConversationToken: null,
-            messages: [{content: 'previous', role: 'user'}],
-        });
+        hoisted.mockCopilotPanelOpen.value = false;
+        hoisted.mockSetComposerPlaceholder.mockClear();
+        hoisted.mockSetCopilotPanelOpen.mockClear();
+        hoisted.mockSetGlobalPanelConversationToken.mockClear();
+
+        hoisted.mockGenerateConversationId.mockReset();
+        hoisted.mockResetMessages.mockReset();
+        hoisted.mockSaveConversationState.mockReset();
+        hoisted.mockSetContext.mockReset();
     });
 
-    it('should save the current conversation, start a fresh one for the source and open the panel', () => {
-        const previousConversationId = useCopilotStore.getState().conversationId;
+    it('sets an ASK context with empty parameters by default and opens the panel', () => {
+        const {result} = renderHook(() => useOpenCopilot());
+
+        act(() => {
+            result.current({source: Source.PROJECT});
+        });
+
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.PROJECT,
+        });
+        expect(hoisted.mockSetComposerPlaceholder).toHaveBeenCalledWith(undefined);
+        expect(hoisted.mockSetCopilotPanelOpen).toHaveBeenCalledWith(true);
+    });
+
+    it('pushes the current conversation before clearing it, then installs the new context', () => {
+        const callOrder: string[] = [];
+
+        hoisted.mockSaveConversationState.mockImplementation(() => callOrder.push('save'));
+        hoisted.mockResetMessages.mockImplementation(() => callOrder.push('reset'));
+        hoisted.mockGenerateConversationId.mockImplementation(() => callOrder.push('generate'));
+        hoisted.mockSetContext.mockImplementation(() => callOrder.push('setContext'));
 
         const {result} = renderHook(() => useOpenCopilot());
 
         act(() => {
-            result.current({parameters: {mcpServerId: 7}, source: Source.MCP_SERVER});
+            result.current({source: Source.PROJECT});
         });
 
-        const state = useCopilotStore.getState();
-
-        expect(state.conversationStack).toHaveLength(1);
-        expect(state.globalPanelConversationToken).toBe(state.conversationStack[0]?.token);
-        expect(state.messages).toEqual([]);
-        expect(state.conversationId).not.toBe(previousConversationId);
-        expect(state.context).toEqual({mode: MODE.ASK, parameters: {mcpServerId: 7}, source: Source.MCP_SERVER});
-        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+        expect(callOrder).toEqual(['save', 'reset', 'generate', 'setContext']);
     });
 
-    it('should default the parameters to an empty object', () => {
-        const {result} = renderHook(() => useOpenCopilot());
-
-        act(() => {
-            result.current({source: Source.SKILLS});
-        });
-
-        expect(useCopilotStore.getState().context).toEqual({mode: MODE.ASK, parameters: {}, source: Source.SKILLS});
-    });
-
-    it('should not save another conversation when the panel is already open', () => {
-        useCopilotPanelStore.setState({copilotPanelOpen: true});
-        useCopilotStore.setState({globalPanelConversationToken: 'existing-token'});
+    it('does not push a second entry when the panel is already open', () => {
+        hoisted.mockCopilotPanelOpen.value = true;
 
         const {result} = renderHook(() => useOpenCopilot());
 
         act(() => {
-            result.current({source: Source.MCP_SERVER});
+            result.current({source: Source.PROJECT});
         });
 
-        const state = useCopilotStore.getState();
+        expect(hoisted.mockSaveConversationState).not.toHaveBeenCalled();
+        expect(hoisted.mockSetGlobalPanelConversationToken).not.toHaveBeenCalled();
 
-        expect(state.conversationStack).toHaveLength(0);
-        expect(state.globalPanelConversationToken).toBe('existing-token');
-        expect(state.messages).toEqual([]);
-        expect(state.context.source).toBe(Source.MCP_SERVER);
-        expect(useCopilotPanelStore.getState().copilotPanelOpen).toBe(true);
+        expect(hoisted.mockResetMessages).toHaveBeenCalledOnce();
+        expect(hoisted.mockGenerateConversationId).toHaveBeenCalledOnce();
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.PROJECT,
+        });
+        expect(hoisted.mockSetCopilotPanelOpen).toHaveBeenCalledWith(true);
+    });
+
+    it('forwards an explicit mode and parameters', () => {
+        const {result} = renderHook(() => useOpenCopilot());
+
+        act(() => {
+            result.current({mode: MODE.BUILD, parameters: {workflowId: '7'}, source: Source.PROJECT});
+        });
+
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.BUILD,
+            parameters: {workflowId: '7'},
+            source: Source.PROJECT,
+        });
+    });
+
+    it('forwards an explicit composer placeholder and clears it when the next open omits one', () => {
+        const {result} = renderHook(() => useOpenCopilot());
+
+        act(() => {
+            result.current({
+                composerPlaceholder: 'Describe what the workflow should do.',
+                mode: MODE.BUILD,
+                parameters: {intent: 'generate_workflow'},
+                source: Source.PROJECT,
+            });
+        });
+
+        expect(hoisted.mockSetComposerPlaceholder).toHaveBeenCalledWith('Describe what the workflow should do.');
+
+        hoisted.mockSetComposerPlaceholder.mockClear();
+
+        act(() => {
+            result.current({source: Source.WORKFLOW_EDITOR});
+        });
+
+        expect(hoisted.mockSetComposerPlaceholder).toHaveBeenCalledWith(undefined);
+    });
+
+    it('sets a fresh context rather than spreading the previous one', () => {
+        const {result} = renderHook(() => useOpenCopilot());
+
+        act(() => {
+            result.current({mode: MODE.BUILD, parameters: {intent: 'previous'}, source: Source.DATA_TABLE});
+        });
+
+        hoisted.mockSetContext.mockClear();
+
+        act(() => {
+            result.current({source: Source.PROJECT});
+        });
+
+        expect(hoisted.mockSetContext).toHaveBeenCalledWith({
+            mode: MODE.ASK,
+            parameters: {},
+            source: Source.PROJECT,
+        });
+        expect(hoisted.mockSetContext).not.toHaveBeenCalledWith(
+            expect.objectContaining({parameters: {intent: 'previous'}})
+        );
     });
 });

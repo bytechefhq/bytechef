@@ -17,6 +17,8 @@ const {FakeHttpAgent, agents} = vi.hoisted(() => {
     class FakeHttpAgent {
         messages: AgentMessageI[] = [];
 
+        abortRun = vi.fn();
+
         addMessage = (message: AgentMessageI) => {
             this.messages = [...this.messages, message];
         };
@@ -49,6 +51,10 @@ vi.mock('@assistant-ui/react', () => ({
     AuiConfig: vi.fn(),
     Suggestions: vi.fn(),
     useExternalStoreRuntime: vi.fn(() => ({})),
+}));
+
+vi.mock('@/shared/middleware/graphql', () => ({
+    useAiProviderCatalogQuery: vi.fn(() => ({data: undefined})),
 }));
 
 vi.mock('sonner', () => ({
