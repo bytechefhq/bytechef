@@ -77,6 +77,7 @@ const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-c
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
+const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
 const Billing = lazy(() => import('@/ee/pages/settings/platform/billing/Billing'));
 const IdentityProvidersPage = lazy(
     () => import('@/ee/pages/settings/platform/identity-providers/IdentityProvidersPage')
@@ -369,6 +370,18 @@ const platformSettingsRoutes = {
             ),
             path: 'admin-api-keys',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <AuditEvents />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'audit-events',
+        },
     ],
     navItems: [
         {
@@ -415,6 +428,10 @@ const platformSettingsRoutes = {
         {
             href: 'admin-api-keys',
             title: 'Admin API Keys',
+        },
+        {
+            href: 'audit-events',
+            title: 'Audit Events',
         },
     ],
 };
