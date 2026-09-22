@@ -40,10 +40,9 @@ const WorkflowRightSidebar = ({
 }: WorkflowRightSidebarProps) => {
     const ai = useApplicationInfoStore((state) => state.ai);
 
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
     const ff_1840 = useFeatureFlagsStore()('ff-1840');
 
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotEnabled = ai.copilot.enabled;
 
     const rightSidebarNavigation = useMemo(
         () =>

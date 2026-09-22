@@ -16,10 +16,6 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
         selector({ai: {copilot: {enabled: true}}}),
 }));
 
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => true,
-}));
-
 const originalContext = {mode: MODE.BUILD, parameters: {workflowId: 'w1'}, source: Source.WORKFLOW_EDITOR};
 
 const dataStreamDefinition = (processorType: string) =>

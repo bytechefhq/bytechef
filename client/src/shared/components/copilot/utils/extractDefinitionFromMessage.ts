@@ -18,5 +18,7 @@ export function extractDefinitionFromMessage(content: MessageContentType): strin
         return null;
     }
 
-    return match[1].trim();
+    const definition = match[1].trim();
+
+    return definition ? definition : null;
 }
