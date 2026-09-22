@@ -39,6 +39,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.ProjectOwnershipService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -48,6 +49,7 @@ import com.bytechef.platform.ai.tool.util.AllowedComponentNamesUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowTestConfigurationFacade;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -110,6 +112,9 @@ class ProjectWorkflowToolsTest {
 
     @Mock
     private ToolContext toolContext;
+
+    @Mock
+    private WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @Mock
     private WorkspaceScopeResolver workspaceScopeResolver;
@@ -261,6 +266,8 @@ class ProjectWorkflowToolsTest {
             when(toolContext.getContext())
                 .thenReturn(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, 2L));
 
+            mockConnections(WORKSPACE_ID, 2L, 1107L);
+
             ProjectWorkflowTools tools = newTools();
 
             String result = tools.saveWorkflowTestConnection(
@@ -278,6 +285,8 @@ class ProjectWorkflowToolsTest {
 
             when(testConfigurationFacadeProvider.getIfAvailable()).thenReturn(workflowTestConfigurationFacade);
             when(toolContext.getContext()).thenReturn(Map.of("bytechef.agentTool.environmentId", 1L));
+
+            mockConnections(WORKSPACE_ID, 1L, 1107L);
 
             ProjectWorkflowTools tools = newTools();
 
@@ -319,6 +328,29 @@ class ProjectWorkflowToolsTest {
                 () -> tools.saveWorkflowTestConnection(
                     "wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, null, toolContext))
                         .isInstanceOf(ExecutionException.class);
+        }
+
+        @Test
+        void testSaveWorkflowTestConnectionRejectsAConnectionOutsideTheWorkflowWorkspace() {
+            resolveWorkspace(WORKSPACE_ID);
+            mockWorkflow("wf-uuid-1", 7L, WORKSPACE_ID);
+
+            when(testConfigurationFacadeProvider.getIfAvailable()).thenReturn(workflowTestConfigurationFacade);
+            when(toolContext.getContext())
+                .thenReturn(Map.of(AutomationToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY, 2L));
+
+            mockConnections(WORKSPACE_ID, 2L, 5L);
+
+            ProjectWorkflowTools tools = newTools();
+
+            assertThatCode(
+                () -> tools.saveWorkflowTestConnection(
+                    "wf-uuid-1", "sendChannelMessage_1", "slack", 1107L, null, toolContext))
+                        .isInstanceOf(ExecutionException.class)
+                        .hasMessageContaining("Connection 1107 not found");
+
+            verify(workflowTestConfigurationFacade, never())
+                .saveWorkflowTestConfigurationConnection(any(), any(), any(), anyLong(), anyLong());
         }
     }
 
@@ -1008,6 +1040,15 @@ class ProjectWorkflowToolsTest {
         }
     }
 
+    private void mockConnections(long workspaceId, long environmentId, long connectionId) {
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .id(connectionId)
+            .build();
+
+        when(workspaceConnectionFacade.getConnections(workspaceId, null, null, environmentId, null))
+            .thenReturn(List.of(connectionDTO));
+    }
+
     private void mockProject(long projectId, long workspaceId) {
         Project project = Project.builder()
             .id(projectId)
@@ -1052,7 +1093,7 @@ class ProjectWorkflowToolsTest {
             new ScopedProjectGuard(
                 projectOwnershipService, projectService, projectWorkflowService, scopedConnectionGuard,
                 workspaceScopeResolver),
-            testConfigurationFacadeProvider);
+            workspaceConnectionFacade, testConfigurationFacadeProvider);
     }
 
     private static ProjectWorkflow buildProjectWorkflow(long id, long projectId, String workflowId) {
