@@ -1,0 +1,7 @@
+mutation generatePropertyValue($input: GeneratePropertyValueInput!) {
+    generatePropertyValue(input: $input) {
+        value
+        valid
+        message
+    }
+}
