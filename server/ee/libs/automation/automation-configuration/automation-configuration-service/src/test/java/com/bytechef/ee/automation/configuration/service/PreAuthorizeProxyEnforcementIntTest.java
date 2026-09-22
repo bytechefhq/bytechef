@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import java.util.List;
@@ -166,11 +165,6 @@ class PreAuthorizeProxyEnforcementIntTest {
         @Bean
         WorkspaceUserRepository workspaceUserRepository() {
             return mock(WorkspaceUserRepository.class);
-        }
-
-        @Bean
-        WorkspaceUserAuditPublisher workspaceUserAuditPublisher() {
-            return mock(WorkspaceUserAuditPublisher.class);
         }
     }
 

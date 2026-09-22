@@ -21,4 +21,6 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
 }

@@ -8,18 +8,17 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvent;
-import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditEvents;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditMapper;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.exception.WorkspaceUserErrorType;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.audit.Audited;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,20 +39,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
     private final PermissionService permissionService;
-    private final WorkspaceUserAuditPublisher workspaceUserAuditPublisher;
     private final WorkspaceUserRepository workspaceUserRepository;
 
     @SuppressFBWarnings("EI")
     public WorkspaceUserServiceImpl(
-        PermissionService permissionService, WorkspaceUserAuditPublisher workspaceUserAuditPublisher,
-        WorkspaceUserRepository workspaceUserRepository) {
+        PermissionService permissionService, WorkspaceUserRepository workspaceUserRepository) {
 
         this.permissionService = permissionService;
-        this.workspaceUserAuditPublisher = workspaceUserAuditPublisher;
         this.workspaceUserRepository = workspaceUserRepository;
     }
 
     @Override
+    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_ADDED, mapper = WorkspaceUserAuditMapper.class)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')")
     public WorkspaceUser addWorkspaceUser(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         Optional<WorkspaceUser> existing = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId);
@@ -71,14 +68,6 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
         // evict so the new member's scopes are re-resolved on the next check instead of being pinned to "no access"
         // until the TTL expires.
         permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("workspaceId", String.valueOf(workspaceId));
-        data.put("userId", String.valueOf(userId));
-        data.put("role", workspaceRole.name());
-
-        workspaceUserAuditPublisher.publish(WorkspaceUserAuditEvent.WORKSPACE_USER_ADDED, data);
 
         return savedWorkspaceUser;
     }
@@ -109,6 +98,7 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
     }
 
     @Override
+    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_REMOVED, mapper = WorkspaceUserAuditMapper.class)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')")
     public boolean removeWorkspaceUser(long userId, long workspaceId) {
         WorkspaceUser workspaceUser = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
@@ -124,17 +114,11 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
 
         permissionService.evictWorkspaceScopeCache(userId, workspaceId);
 
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("workspaceId", String.valueOf(workspaceId));
-        data.put("userId", String.valueOf(userId));
-
-        workspaceUserAuditPublisher.publish(WorkspaceUserAuditEvent.WORKSPACE_USER_REMOVED, data);
-
         return true;
     }
 
     @Override
+    @Audited(event = WorkspaceUserAuditEvents.WORKSPACE_USER_ROLE_UPDATED, mapper = WorkspaceUserAuditMapper.class)
     @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MEMBER_MANAGE')")
     public WorkspaceUser updateWorkspaceUserRole(long userId, long workspaceId, WorkspaceRole workspaceRole) {
         WorkspaceUser workspaceUser = workspaceUserRepository.findByUserIdAndWorkspaceId(userId, workspaceId)
@@ -157,14 +141,6 @@ public class WorkspaceUserServiceImpl implements WorkspaceUserService {
         // A role change alters the resolved scope set, so the cached (userId, workspaceId) scopes must be evicted or
         // the old role's scopes would be served until the TTL expires.
         permissionService.evictWorkspaceScopeCache(userId, workspaceId);
-
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("workspaceId", String.valueOf(workspaceId));
-        data.put("userId", String.valueOf(userId));
-        data.put("role", workspaceRole.name());
-
-        workspaceUserAuditPublisher.publish(WorkspaceUserAuditEvent.WORKSPACE_USER_ROLE_UPDATED, data);
 
         return savedWorkspaceUser;
     }
