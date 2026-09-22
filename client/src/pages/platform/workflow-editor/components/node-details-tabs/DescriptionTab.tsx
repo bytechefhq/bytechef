@@ -5,15 +5,17 @@ import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
+import CopilotGenerateDescriptionButton from '@/shared/components/copilot/CopilotGenerateDescriptionButton';
 import {
     ClusterElementDefinition,
     ComponentDefinition,
     TaskDispatcherDefinition,
     TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {ComponentIcon} from 'lucide-react';
-import {ChangeEvent} from 'react';
+import {ChangeEvent, useEffect, useRef} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
@@ -28,6 +30,10 @@ interface DescriptionTabProps {
 }
 
 const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTabProps) => {
+    const currentWorkflowIdRef = useRef<string | undefined>(undefined);
+    const currentWorkflowNodeNameRef = useRef<string | undefined>(undefined);
+    const notesTextareaRef = useRef<HTMLTextAreaElement>(null);
+
     const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
@@ -40,6 +46,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             workflow: state.workflow,
         }))
     );
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!currentNode) {
@@ -171,6 +178,31 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
         workflowTaskOrTrigger = currentNode as any;
     }
 
+    const generationWorkflowId = workflow.id;
+    const generationWorkflowNodeName = currentNode?.workflowNodeName;
+
+    const handleGeneratedNotesApply = (value: string) => {
+        if (
+            currentWorkflowIdRef.current !== generationWorkflowId ||
+            currentWorkflowNodeNameRef.current !== generationWorkflowNodeName
+        ) {
+            return;
+        }
+
+        if (notesTextareaRef.current) {
+            notesTextareaRef.current.value = value;
+        }
+
+        handleNotesChange({
+            target: {value},
+        } as ChangeEvent<HTMLTextAreaElement>);
+    };
+
+    useEffect(() => {
+        currentWorkflowIdRef.current = workflow.id;
+        currentWorkflowNodeNameRef.current = currentNode?.workflowNodeName;
+    }, [currentNode?.workflowNodeName, workflow.id]);
+
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
             {nodeDefinition.title && (
@@ -200,7 +232,16 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             </fieldset>
 
             <fieldset className="space-y-1">
-                <Label>Notes</Label>
+                <div className="flex items-center justify-between">
+                    <Label>Notes</Label>
+
+                    <CopilotGenerateDescriptionButton
+                        environmentId={currentEnvironmentId}
+                        onApply={handleGeneratedNotesApply}
+                        workflowId={workflow.id}
+                        workflowNodeName={currentNode?.workflowNodeName}
+                    />
+                </div>
 
                 <Textarea
                     className="bg-surface-neutral-primary shadow-none"
@@ -209,6 +250,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
+                    ref={notesTextareaRef}
                     rows={6}
                 />
             </fieldset>
