@@ -6,7 +6,6 @@ import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/
 import {useTestClusterElementScriptMutation, useTestWorkflowNodeScriptMutation} from '@/shared/middleware/graphql';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -55,9 +54,7 @@ export const usePropertyCodeEditorDialogToolbar = ({
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const rootClusterElementNodeData = useWorkflowEditorStore(useShallow((state) => state.rootClusterElementNodeData));
 
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
-
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotEnabled = ai.copilot.enabled;
 
     const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
     const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
