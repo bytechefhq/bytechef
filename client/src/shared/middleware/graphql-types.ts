@@ -1614,6 +1614,24 @@ export type GenerateFromDocumentationInput = {
   userPrompt?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type GeneratePropertyValueInput = {
+  dynamic: Scalars['Boolean']['input'];
+  environmentId: Scalars['Int']['input'];
+  mode: PropertyCopilotMode;
+  prompt: Scalars['String']['input'];
+  propertyPath: Scalars['String']['input'];
+  propertyType?: InputMaybe<Scalars['String']['input']>;
+  workflowId: Scalars['ID']['input'];
+  workflowNodeName: Scalars['String']['input'];
+};
+
+export type GeneratePropertyValuePayload = {
+  __typename?: 'GeneratePropertyValuePayload';
+  message?: Maybe<Scalars['String']['output']>;
+  valid: Scalars['Boolean']['output'];
+  value: Scalars['String']['output'];
+};
+
 export type GenerateSpecificationInput = {
   baseUrl?: InputMaybe<Scalars['String']['input']>;
   endpoints: Array<EndpointDefinitionInput>;
@@ -1623,6 +1641,17 @@ export type GenerateSpecificationInput = {
 export type GenerateSpecificationResponse = {
   __typename?: 'GenerateSpecificationResponse';
   specification?: Maybe<Scalars['String']['output']>;
+};
+
+export type GenerateWorkflowDescriptionInput = {
+  environmentId: Scalars['Int']['input'];
+  workflowId: Scalars['ID']['input'];
+  workflowNodeName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type GenerateWorkflowDescriptionPayload = {
+  __typename?: 'GenerateWorkflowDescriptionPayload';
+  value: Scalars['String']['output'];
 };
 
 export type GenerationJobStatus = {
@@ -2122,6 +2151,7 @@ export type Mutation = {
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
+  changeAutomationProjectConfigurationConnectedUserVersion: ConfigurationMoveResult;
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
@@ -2228,7 +2258,9 @@ export type Mutation = {
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
+  generatePropertyValue: GeneratePropertyValuePayload;
   generateSpecification: GenerateSpecificationResponse;
+  generateWorkflowDescription: GenerateWorkflowDescriptionPayload;
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
@@ -2347,6 +2379,14 @@ export type MutationCancelAiAgentEvalRunArgs = {
 
 export type MutationCancelGenerationJobArgs = {
   jobId: Scalars['String']['input'];
+};
+
+
+export type MutationChangeAutomationProjectConfigurationConnectedUserVersionArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  projectVersion: Scalars['Int']['input'];
+  sourceId: Scalars['ID']['input'];
+  targetId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -2915,8 +2955,18 @@ export type MutationGenerateFromDocumentationArgs = {
 };
 
 
+export type MutationGeneratePropertyValueArgs = {
+  input: GeneratePropertyValueInput;
+};
+
+
 export type MutationGenerateSpecificationArgs = {
   input: GenerateSpecificationInput;
+};
+
+
+export type MutationGenerateWorkflowDescriptionArgs = {
+  input: GenerateWorkflowDescriptionInput;
 };
 
 
@@ -3711,6 +3761,11 @@ export type Property = {
   required?: Maybe<Scalars['Boolean']['output']>;
   type: PropertyType;
 };
+
+export enum PropertyCopilotMode {
+  Formula = 'FORMULA',
+  Text = 'TEXT'
+}
 
 export enum PropertyType {
   Array = 'ARRAY',
