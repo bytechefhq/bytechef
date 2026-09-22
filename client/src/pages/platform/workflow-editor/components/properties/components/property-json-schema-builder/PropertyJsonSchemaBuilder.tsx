@@ -13,6 +13,7 @@ import {twMerge} from 'tailwind-merge';
 interface PropertyJsonSchemaBuilderProps {
     description?: string;
     dynamicSwitch?: ReactNode;
+    environmentId?: number;
     error?: boolean;
     errorMessage?: string;
     handleInputTypeSwitchButtonClick?: () => void;
@@ -20,9 +21,12 @@ interface PropertyJsonSchemaBuilderProps {
     leadingIcon?: ReactNode;
     name: string;
     onChange?: (newSchema: SchemaRecordType) => void;
+    propertyPath?: string;
     required?: boolean;
     schema?: SchemaRecordType;
     title?: string;
+    workflowId?: string;
+    workflowNodeName?: string;
 }
 
 const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSchemaBuilderProps>(
@@ -30,6 +34,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
         {
             description,
             dynamicSwitch,
+            environmentId,
             error,
             errorMessage,
             handleInputTypeSwitchButtonClick,
@@ -37,9 +42,12 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
             leadingIcon,
             name,
             onChange,
+            propertyPath,
             required,
             schema,
             title,
+            workflowId,
+            workflowNodeName,
         },
         ref
     ) => {
@@ -114,10 +122,14 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                 {showPropertyJsonSchemaBuilder && (
                     <PropertyJsonSchemaBuilderSheet
+                        environmentId={environmentId}
                         onChange={onChange}
                         onClose={() => setShowPropertyJsonSchemaBuilder(false)}
+                        propertyPath={propertyPath}
                         schema={schema}
                         title={title}
+                        workflowId={workflowId}
+                        workflowNodeName={workflowNodeName}
                     />
                 )}
             </>
