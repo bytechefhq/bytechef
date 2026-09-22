@@ -5,6 +5,7 @@ import {
     ForwardedRef,
     MutableRefObject,
     ReactNode,
+    Ref,
     Suspense,
     forwardRef,
     lazy,
@@ -45,6 +46,7 @@ interface PropertyMentionsInputProps {
     cancelPendingSaveRef?: MutableRefObject<(() => void) | null>;
     className?: string;
     controlType?: ControlType;
+    copilotAnchorRef?: Ref<HTMLDivElement>;
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
@@ -83,6 +85,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             cancelPendingSaveRef,
             className,
             controlType,
+            copilotAnchorRef,
             defaultValue,
             deletePropertyButton,
             description,
@@ -337,6 +340,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     )}
                     onDragEnter={handleDragEnter}
                     onDragOver={handleDragOver}
+                    ref={copilotAnchorRef}
                     title={controlType}
                 >
                     {leadingIcon && (
