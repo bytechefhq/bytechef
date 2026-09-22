@@ -202,7 +202,9 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
 
         addProviderSpecificParams(body);
 
-        body.put("response_format", Map.of("type", jsonResponseFormat ? "json_object" : "text"));
+        if (jsonResponseFormat) {
+            body.put("response_format", Map.of("type", "json_object"));
+        }
 
         return body;
     }
