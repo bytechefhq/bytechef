@@ -361,6 +361,39 @@ export type ArrayProperty = Property & {
   type: PropertyType;
 };
 
+export type AuditEventDataEntryType = {
+  __typename?: 'AuditEventDataEntryType';
+  key: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+};
+
+export enum AuditEventOutcome {
+  Allowed = 'ALLOWED',
+  Denied = 'DENIED',
+  Error = 'ERROR',
+  RolledBack = 'ROLLED_BACK',
+  Success = 'SUCCESS'
+}
+
+export type AuditEventPageType = {
+  __typename?: 'AuditEventPageType';
+  content: Array<AuditEventType>;
+  number: Scalars['Int']['output'];
+  size: Scalars['Int']['output'];
+  totalElements: Scalars['Long']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type AuditEventType = {
+  __typename?: 'AuditEventType';
+  data: Array<AuditEventDataEntryType>;
+  eventDate: Scalars['Long']['output'];
+  eventType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  outcome?: Maybe<AuditEventOutcome>;
+  principal: Scalars['String']['output'];
+};
+
 export type Authorization = {
   __typename?: 'Authorization';
   description?: Maybe<Scalars['String']['output']>;
@@ -2689,6 +2722,8 @@ export type Query = {
   approvalTask?: Maybe<ApprovalTask>;
   approvalTasks?: Maybe<Array<Maybe<ApprovalTask>>>;
   approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
+  auditEventTypes: Array<Scalars['String']['output']>;
+  auditEvents: AuditEventPageType;
   authorities: Array<Scalars['String']['output']>;
   automationSearch: Array<SearchResult>;
   automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
@@ -2922,6 +2957,17 @@ export type QueryApprovalTasksArgs = {
 
 export type QueryApprovalTasksByIdsArgs = {
   ids: Array<Scalars['ID']['input']>;
+};
+
+
+export type QueryAuditEventsArgs = {
+  dataSearch?: InputMaybe<Scalars['String']['input']>;
+  eventType?: InputMaybe<Scalars['String']['input']>;
+  fromDate?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  principal?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  toDate?: InputMaybe<Scalars['Long']['input']>;
 };
 
 
