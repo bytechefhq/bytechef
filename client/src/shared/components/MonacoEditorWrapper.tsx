@@ -1,8 +1,8 @@
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import Editor, {loader} from '@monaco-editor/react';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import EditorWorker from 'monaco-editor/editor/editor.worker.js?worker';
+import JsonWorker from 'monaco-editor/language/json/json.worker.js?worker';
+import TsWorker from 'monaco-editor/language/typescript/ts.worker.js?worker';
 import YamlWorker from 'monaco-yaml/yaml.worker?worker';
 import {useEffect, useState} from 'react';
 
