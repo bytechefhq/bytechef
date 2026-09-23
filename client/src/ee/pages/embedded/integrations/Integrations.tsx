@@ -26,6 +26,7 @@ export enum Type {
 
 const Integrations = () => {
     const [newlyCreatedIntegrationId, setNewlyCreatedIntegrationId] = useState<number | undefined>();
+    const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
 
     const [searchParams] = useSearchParams();
 
@@ -73,19 +74,10 @@ const Integrations = () => {
                         right={
                             integrations &&
                             integrations.length > 0 && (
-                                <IntegrationDialog
-                                    integration={undefined}
-                                    onClose={(integration) => {
-                                        if (integration) {
-                                            navigate(
-                                                `/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`
-                                            );
-                                        }
-                                    }}
-                                    onSuccess={(integrationId) =>
-                                        integrationId && setNewlyCreatedIntegrationId(integrationId)
-                                    }
-                                    triggerNode={<Button label="New Integration" />}
+                                <Button
+                                    aria-label="Create Integration"
+                                    label="New Integration"
+                                    onClick={() => setShowIntegrationDialog(true)}
                                 />
                             )
                         }
@@ -125,27 +117,34 @@ const Integrations = () => {
                 ) : (
                     <EmptyList
                         button={
-                            <IntegrationDialog
-                                integration={undefined}
-                                onClose={(integration) => {
-                                    if (integration) {
-                                        navigate(
-                                            `/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`
-                                        );
-                                    }
-                                }}
-                                onSuccess={(integrationId) =>
-                                    integrationId && setNewlyCreatedIntegrationId(integrationId)
-                                }
-                                triggerNode={<Button label="Create Integration" />}
+                            <Button
+                                aria-label="Create Integration"
+                                label="Create Integration"
+                                onClick={() => setShowIntegrationDialog(true)}
                             />
                         }
-                        icon={<SquareIcon className="size-24 text-gray-300" />}
+                        icon={<SquareIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new integrations."
                         title="No Integrations"
                     />
                 )}
             </PageLoader>
+
+            {showIntegrationDialog && (
+                <IntegrationDialog
+                    integration={undefined}
+                    onClose={(integration) => {
+                        setShowIntegrationDialog(false);
+
+                        if (integration) {
+                            navigate(
+                                `/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}`
+                            );
+                        }
+                    }}
+                    onSuccess={(integrationId) => integrationId && setNewlyCreatedIntegrationId(integrationId)}
+                />
+            )}
         </LayoutContainer>
     );
 };
