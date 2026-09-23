@@ -79,6 +79,10 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
     const deleteIntegrationMutation = useDeleteIntegrationMutation({
         onSuccess: () => {
+            queryClient.removeQueries({
+                queryKey: IntegrationKeys.integration(integration.id!),
+            });
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.integrations,
             });
@@ -136,8 +140,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
         const interactiveSelectors = [
             '[data-interactive]',
+            '[role="menuitem"]',
             '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',
@@ -159,12 +163,12 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     return (
         <>
             <div
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleIntegrationListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-h-8 items-center justify-between">
                             <div className="relative flex items-center gap-2">
                                 {integration?.integrationWorkflowIds &&
                                 integration?.integrationWorkflowIds.length > 0 ? (
@@ -176,7 +180,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                             <InlineSVG className="size-5 flex-none" src={integration.icon} />
                                         )}
 
-                                        <span className="text-base font-semibold text-gray-900">
+                                        <span className="text-base font-semibold text-content-neutral-primary">
                                             {integration?.name}
                                         </span>
                                     </Link>
@@ -187,7 +191,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                                 <InlineSVG className="size-5 flex-none" src={integration.icon} />
                                             )}
 
-                                            <span className="text-base font-semibold text-gray-900">
+                                            <span className="text-base font-semibold text-content-neutral-primary">
                                                 {integration?.name}
                                             </span>
                                         </div>
@@ -196,7 +200,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                             </div>
                         </div>
 
-                        <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="relative mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2">
                                 <CollapsibleTrigger
                                     className="group flex min-w-28 items-center text-xs font-semibold text-muted-foreground"
@@ -278,24 +282,30 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                     <div className="flex items-center justify-end gap-x-6">
                         {integration.lastIntegrationVersion && (
-                            <div className="flex flex-col items-end gap-y-4">
-                                {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
-                                    <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
-                                        <span>V{integration.lastIntegrationVersion - 1}</span>
+                            <div className="flex flex-col items-end gap-y-2">
+                                <div className="flex min-h-8 items-center">
+                                    {integration.lastPublishedDate && integration.lastIntegrationVersion ? (
+                                        <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
+                                            <span>V{integration.lastIntegrationVersion - 1}</span>
 
-                                        <span>PUBLISHED</span>
-                                    </Badge>
-                                ) : (
-                                    <Badge className="flex space-x-1" styleType="secondary-filled" weight="semibold">
-                                        <span>V{integration.lastIntegrationVersion}</span>
+                                            <span>PUBLISHED</span>
+                                        </Badge>
+                                    ) : (
+                                        <Badge
+                                            className="flex space-x-1"
+                                            styleType="secondary-filled"
+                                            weight="semibold"
+                                        >
+                                            <span>V{integration.lastIntegrationVersion}</span>
 
-                                        <span>{integration.lastStatus}</span>
-                                    </Badge>
-                                )}
+                                            <span>{integration.lastStatus}</span>
+                                        </Badge>
+                                    )}
+                                </div>
 
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <div className="flex items-center text-sm text-content-neutral-secondary sm:mt-0">
+                                        <div className="flex min-h-7 items-center text-sm text-content-neutral-secondary sm:mt-0">
                                             {integration.lastPublishedDate ? (
                                                 <span className="text-xs">
                                                     {`Published at ${integration.lastPublishedDate?.toLocaleDateString()} ${integration.lastPublishedDate?.toLocaleTimeString()}`}
