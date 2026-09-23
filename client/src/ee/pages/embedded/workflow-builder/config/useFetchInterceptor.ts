@@ -59,7 +59,7 @@ export default function useFetchInterceptor() {
                     url = apiBasePath + url;
                 }
 
-                if (url.includes('/internal/') || url.includes('/graphql')) {
+                if (url.includes('/internal/') || url.includes('/graphql') || url.includes('/api/embedded/v1/')) {
                     return [
                         url,
                         {
@@ -94,6 +94,10 @@ export default function useFetchInterceptor() {
 
                 // The Output tab renders a failed node Test / Reset in place.
                 if ((response.status < 200 || response.status > 299) && isInlineTestOutputUrl(response.url)) {
+                    return response;
+                }
+
+                if (response.status === 409 && response.url.includes('/api/embedded/v1/')) {
                     return response;
                 }
 
