@@ -1,7 +1,6 @@
 
 # Connection
 
-Contains all required information to open a connection to a service defined by componentName parameter.
 
 ## Properties
 
@@ -25,6 +24,8 @@ Name | Type
 `parameters` | { [key: string]: any; }
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `version` | number
+`shared` | boolean
+`status` | string
 
 ## Example
 
@@ -51,6 +52,8 @@ const example = {
   "parameters": null,
   "tags": null,
   "version": null,
+  "shared": null,
+  "status": null,
 } satisfies Connection
 
 console.log(example)
