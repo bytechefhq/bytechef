@@ -13,7 +13,7 @@ import ProjectDeploymentWorkflowExecutionsSheet from '../ProjectDeploymentWorkfl
 
 const {detailQueryMock, queryMock, refetchMock, sheetContentPropsMock} = vi.hoisted(() => ({
     detailQueryMock: vi.fn((_request: {id: number}, enabled: boolean) => ({
-        data: enabled ? {id: 5, job: {id: '5', metadata: {projectVersion: 2}}} : undefined,
+        data: enabled ? {id: 5, job: {id: '5'}, projectVersion: 2} : undefined,
     })),
     queryMock: vi.fn(),
     refetchMock: vi.fn(),

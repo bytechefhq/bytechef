@@ -1,4 +1,8 @@
-import {getWorkflowExecutionsFilters} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
+import {
+    getProjectDeploymentLabel,
+    getWorkflowExecutionsFilters,
+    getWorkflowsProjectVersion,
+} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
 import {describe, expect, it} from 'vitest';
 
 const findValue = (filters: Array<{label: string; value?: string}>, label: string) =>
@@ -39,7 +43,7 @@ describe('getWorkflowExecutionsFilters', () => {
         expect(findValue(filters, 'Start date')).toBe(startDate.toLocaleDateString());
         expect(findValue(filters, 'End date')).toBe(endDate.toLocaleDateString());
         expect(findValue(filters, 'Project')).toBe('AI Agent');
-        expect(findValue(filters, 'Deployment')).toBe('AI Agent V1');
+        expect(findValue(filters, 'Deployment')).toBe('AI Agent (current V1)');
         expect(findValue(filters, 'Workflow')).toBe('workflow1');
     });
 
@@ -53,5 +57,31 @@ describe('getWorkflowExecutionsFilters', () => {
         expect(findValue(filters, 'Project')).toBe('3');
         expect(findValue(filters, 'Deployment')).toBe('5');
         expect(findValue(filters, 'Workflow')).toBe('workflow-uuid');
+    });
+});
+
+describe('getProjectDeploymentLabel', () => {
+    it('marks the version as the one the deployment is on now', () => {
+        expect(getProjectDeploymentLabel({name: 'Car Dealer', projectVersion: 16})).toBe('Car Dealer (current V16)');
+    });
+
+    it('shows only the name when the version is unknown', () => {
+        expect(getProjectDeploymentLabel({name: 'Car Dealer'})).toBe('Car Dealer');
+    });
+});
+
+describe('getWorkflowsProjectVersion', () => {
+    const projects = [{id: 3, lastProjectVersion: 17}];
+
+    it("uses the selected deployment's version", () => {
+        expect(getWorkflowsProjectVersion({projectDeployment: {projectVersion: 16}, projectId: 3, projects})).toBe(16);
+    });
+
+    it("falls back to the project's latest version when no deployment is selected", () => {
+        expect(getWorkflowsProjectVersion({projectId: 3, projects})).toBe(17);
+    });
+
+    it('returns undefined when no project is selected', () => {
+        expect(getWorkflowsProjectVersion({projects})).toBeUndefined();
     });
 });

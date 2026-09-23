@@ -10,6 +10,34 @@ interface WorkflowExecutionsFiltersParamsI {
     workflows?: Array<{id?: string; label?: string}>;
 }
 
+interface ProjectDeploymentLabelPropsI {
+    name?: string;
+    projectVersion?: number;
+}
+
+export const getProjectDeploymentLabel = ({name, projectVersion}: ProjectDeploymentLabelPropsI) =>
+    projectVersion != null ? `${name} (current V${projectVersion})` : `${name}`;
+
+export const getWorkflowsProjectVersion = ({
+    projectDeployment,
+    projectId,
+    projects,
+}: {
+    projectDeployment?: {projectVersion?: number};
+    projectId?: number;
+    projects?: Array<{id?: number; lastProjectVersion?: number}>;
+}): number | undefined => {
+    if (projectDeployment) {
+        return projectDeployment.projectVersion;
+    }
+
+    if (projectId == null) {
+        return undefined;
+    }
+
+    return projects?.find((project) => project.id === projectId)?.lastProjectVersion;
+};
+
 export const getWorkflowExecutionsFilters = ({
     endDate,
     projectDeploymentId,
@@ -35,7 +63,7 @@ export const getWorkflowExecutionsFilters = ({
         );
 
         projectDeploymentLabel = projectDeployment
-            ? `${projectDeployment.name} V${projectDeployment.projectVersion}`
+            ? getProjectDeploymentLabel(projectDeployment)
             : String(projectDeploymentId);
     }
 

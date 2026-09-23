@@ -10,6 +10,7 @@ Name | Type
 `id` | number
 `project` | [ProjectBasic](ProjectBasic.md)
 `projectDeployment` | [ProjectDeploymentBasic](ProjectDeploymentBasic.md)
+`projectVersion` | number
 `job` | [JobBasic](JobBasic.md)
 `triggerExecution` | [TriggerExecution](TriggerExecution.md)
 `workflow` | [WorkflowBasic](WorkflowBasic.md)
@@ -24,6 +25,7 @@ const example = {
   "id": null,
   "project": null,
   "projectDeployment": null,
+  "projectVersion": null,
   "job": null,
   "triggerExecution": null,
   "workflow": null,

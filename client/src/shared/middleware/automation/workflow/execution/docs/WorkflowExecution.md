@@ -11,6 +11,7 @@ Name | Type
 `job` | [Job](Job.md)
 `project` | [ProjectBasic](ProjectBasic.md)
 `projectDeployment` | [ProjectDeploymentBasic](ProjectDeploymentBasic.md)
+`projectVersion` | number
 `triggerExecution` | [TriggerExecution](TriggerExecution.md)
 `workflow` | [WorkflowBasic](WorkflowBasic.md)
 
@@ -25,6 +26,7 @@ const example = {
   "job": null,
   "project": null,
   "projectDeployment": null,
+  "projectVersion": null,
   "triggerExecution": null,
   "workflow": null,
 } satisfies WorkflowExecution

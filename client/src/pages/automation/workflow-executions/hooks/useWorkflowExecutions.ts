@@ -1,5 +1,6 @@
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {getWorkflowsProjectVersion} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
 import {useOnEnvironmentChange} from '@/shared/hooks/useOnEnvironmentChange';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
@@ -86,12 +87,17 @@ export const useWorkflowExecutions = () => {
         workflowId: filterWorkflowId,
     });
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+    const workflowsProjectVersion = getWorkflowsProjectVersion({
+        projectDeployment,
+        projectId: filterProjectId,
+        projects,
+    });
+
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(
         filterProjectId!,
-        projectDeployment?.projectVersion!,
+        workflowsProjectVersion!,
         false,
-        !!projectDeployment
+        filterProjectId != null && workflowsProjectVersion != null
     );
 
     const emptyListMessage =

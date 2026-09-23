@@ -4,21 +4,15 @@ export const MAX_SUBFLOW_DEPTH = 10;
 
 export const formatDateTime = (date: Date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
 
-export const getProjectVersion = (execution: WorkflowExecution): number | undefined => {
-    const metadataProjectVersion = execution.job?.metadata?.projectVersion;
-
-    if (metadataProjectVersion != null) {
-        return Number(metadataProjectVersion);
-    }
-
-    return execution.projectDeployment?.projectVersion;
-};
+export const getProjectVersion = (execution: WorkflowExecution): number | undefined =>
+    execution.projectVersion ?? execution.projectDeployment?.projectVersion;
 
 export const wrapChildJob = (childJob: Job, parentExecution: WorkflowExecution): WorkflowExecution => ({
     id: childJob.id != null ? Number(childJob.id) : parentExecution.id,
     job: childJob,
     project: parentExecution.project,
     projectDeployment: parentExecution.projectDeployment,
+    projectVersion: parentExecution.projectVersion,
     workflow: parentExecution.workflow,
 });
 
