@@ -48,7 +48,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
 
     return (
         <li
-            className="flex h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground"
+            className="flex h-12 items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
             <div className="text-sm font-semibold">{workflow.label}</div>
