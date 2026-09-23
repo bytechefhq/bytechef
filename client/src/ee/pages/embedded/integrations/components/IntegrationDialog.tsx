@@ -11,6 +11,7 @@ import {
     DialogTrigger,
 } from '@/components/Dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
+import {Textarea} from '@/components/ui/textarea';
 import {Integration, Tag} from '@/ee/shared/middleware/embedded/configuration';
 import {
     useCreateIntegrationMutation,
@@ -40,12 +41,14 @@ interface IntegrationDialogProps {
     triggerNode?: ReactNode;
 }
 
+type IntegrationFormValuesType = Integration & {permissionExpression?: string | null};
+
 const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: IntegrationDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const {captureIntegrationCreated} = useAnalytics();
 
-    const form = useForm<Integration>({
+    const form = useForm<IntegrationFormValuesType>({
         defaultValues: {
             category: integration?.category
                 ? {
@@ -57,12 +60,13 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
             description: integration?.description || '',
             multipleInstances: false,
             name: integration?.name || '',
+            permissionExpression: integration?.permissionExpression ?? '',
             tags:
                 integration?.tags?.map((tag: Tag) => ({
                     ...tag,
                     label: tag.name,
                 })) || [],
-        } as Integration,
+        } as IntegrationFormValuesType,
     });
 
     const {control, getValues, handleSubmit, reset, setValue} = form;
@@ -78,13 +82,11 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
     const onSuccessHandler = (integrationId: number | void) => {
         captureIntegrationCreated();
 
-        if (!integrationId && integration) {
-            integrationId = integration.id!;
-        }
+        const id = integrationId || integration?.id;
 
-        if (integrationId) {
+        if (id) {
             queryClient.invalidateQueries({
-                queryKey: IntegrationKeys.integration(integrationId),
+                queryKey: IntegrationKeys.integration(id),
             });
         }
 
@@ -140,16 +142,20 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
 
         const category = formData?.category?.name ? formData?.category : undefined;
 
+        const permissionExpression = formData.permissionExpression?.trim() || undefined;
+
         if (integration?.id) {
             updateIntegrationMutation.mutate({
                 ...integration,
                 ...formData,
                 category,
+                permissionExpression,
             } as Integration);
         } else {
             createIntegrationMutation.mutate({
                 ...formData,
                 category,
+                permissionExpression,
                 tags: tagValues,
             } as Integration);
         }
@@ -232,6 +238,27 @@ const IntegrationDialog = ({integration, onClose, onSuccess, triggerNode}: Integ
                             <CategoryFormField categories={categories} categoriesLoading={categoriesLoading} />
 
                             <DescriptionFormField placeholder="Cute description of your integration" />
+
+                            <FormField
+                                control={control}
+                                name="permissionExpression"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Permission Expression</FormLabel>
+
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="e.g. metadata['plan'] == 'pro'"
+                                                rows={3}
+                                                {...field}
+                                                value={field.value ?? ''}
+                                            />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
                             <TagsFormField remainingTags={remainingTags} />
                         </DialogBody>
