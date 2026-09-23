@@ -72,8 +72,8 @@ describe('WorkflowExecutionsTable', () => {
     it('shows the project version the job ran with', () => {
         const row = {
             ...jobRow,
-            job: {...jobRow.job, metadata: {projectVersion: 2}},
             projectDeployment: {name: 'Production', projectVersion: 3},
+            projectVersion: 2,
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

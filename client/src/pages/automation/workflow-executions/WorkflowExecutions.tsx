@@ -7,7 +7,10 @@ import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
-import {getWorkflowExecutionsFilters} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
+import {
+    getProjectDeploymentLabel,
+    getWorkflowExecutionsFilters,
+} from '@/pages/automation/workflow-executions/utils/workflowExecutionsFilters';
 import FilterTitle from '@/shared/components/filters/FilterTitle';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
@@ -212,9 +215,7 @@ export const WorkflowExecutions = () => {
                                 ...(projectDeployments?.map((projectDeployment) => ({
                                     label: (
                                         <span className="flex items-center">
-                                            <span className="mr-1">
-                                                {projectDeployment.name} V{projectDeployment.projectVersion}
-                                            </span>
+                                            <span className="mr-1">{getProjectDeploymentLabel(projectDeployment)}</span>
 
                                             <span className="text-xs text-content-neutral-secondary">
                                                 {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}

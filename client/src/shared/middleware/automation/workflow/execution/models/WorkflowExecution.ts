@@ -80,6 +80,12 @@ export interface WorkflowExecution {
      */
     projectDeployment: ProjectDeploymentBasic;
     /**
+     * The version of the project the workflow execution ran.
+     * @type {number}
+     * @memberof WorkflowExecution
+     */
+    readonly projectVersion?: number;
+    /**
      * 
      * @type {TriggerExecution}
      * @memberof WorkflowExecution
@@ -118,6 +124,7 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
         'job': json['job'] == null ? undefined : JobFromJSON(json['job']),
         'project': ProjectBasicFromJSON(json['project']),
         'projectDeployment': ProjectDeploymentBasicFromJSON(json['projectDeployment']),
+        'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
         'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionFromJSON(json['triggerExecution']),
         'workflow': WorkflowBasicFromJSON(json['workflow']),
     };
@@ -127,7 +134,7 @@ export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
     return WorkflowExecutionToJSONTyped(json, false);
 }
 
-export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'|'projectVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

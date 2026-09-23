@@ -49,9 +49,10 @@ describe('WorkflowExecutionSheet', () => {
 
     it('shows the project version the job ran with after the workflow in the header', () => {
         renderSheet({
-            job: {id: '5', metadata: {projectVersion: 2}},
+            job: {id: '5'},
             project: {name: 'Sales'},
             projectDeployment: {projectVersion: 3},
+            projectVersion: 2,
             workflow: {label: 'Order intake'},
         });
 
