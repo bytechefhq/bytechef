@@ -1,6 +1,8 @@
 'use client';
 
-import {useEffect, useRef} from 'react';
+import {useRef} from 'react';
+
+import useEmbedInit from '../../shared/useEmbedInit';
 
 /**
  * Props for the EmbeddedWorkflowBuilder component.
@@ -19,8 +21,8 @@ interface EmbeddedWorkflowBuilderProps {
      * Whether to allow the connection dialog to be shown in the workflow builder.
      * When true, users can create and manage connections directly in the workflow builder.
      * When false, users can only use existing connections. Those existing connections can be
-     * either shared connections created inside ByteChef and defined by `sharedConnectionIds`
-     * or integration connections created via `ConnectDialog`.
+     * either connections a tenant admin marked as shared inside ByteChef's '/embedded/connections'
+     * page or integration connections created via `ConnectDialog`.
      */
     connectionDialogAllowed: boolean;
 
@@ -45,13 +47,6 @@ interface EmbeddedWorkflowBuilderProps {
     jwtToken: string;
 
     /**
-     * Array of connection IDs that should be shared with this workflow builder.
-     * These connections will be available for use in the workflow being built.
-     * Shared connections can be created via the ByteChef's '/embedded/connections' page.
-     */
-    sharedConnectionIds: number[];
-
-    /**
      * The uuid for the workflow being edited.
      * This is used to load the correct workflow in the builder.
      */
@@ -63,7 +58,8 @@ interface EmbeddedWorkflowBuilderProps {
  *
  * This component creates an iframe that loads the ByteChef Workflow Builder UI and
  * initializes it with the provided configuration. When the iframe signals it is ready
- * via a postMessage, the parent sends the initialization parameters back.
+ * via a postMessage, the parent sends the initialization parameters back, and sends them
+ * again whenever they change afterwards, such as when the JWT token is refreshed.
  *
  * @param props - The configuration options for the embedded workflow builder
  * @returns A React component that renders the embedded workflow builder
@@ -74,47 +70,21 @@ const EmbeddedWorkflowBuilder = ({
     environment = 'PRODUCTION',
     includeComponents,
     jwtToken,
-    sharedConnectionIds,
     workflowUuid,
 }: EmbeddedWorkflowBuilderProps) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
-    const propsRef = useRef({connectionDialogAllowed, environment, includeComponents, jwtToken, sharedConnectionIds});
 
-    propsRef.current = {connectionDialogAllowed, environment, includeComponents, jwtToken, sharedConnectionIds};
-
-    useEffect(() => {
-        const targetOrigin = new URL(baseUrl).origin;
-
-        const sendInitMessage = () => {
-            if (iframeRef.current && iframeRef.current.contentWindow) {
-                iframeRef.current.contentWindow.postMessage(
-                    {
-                        type: 'EMBED_INIT',
-                        params: propsRef.current,
-                    },
-                    targetOrigin
-                );
-            }
-        };
-
-        const handleMessage = (event: MessageEvent) => {
-            if (event.origin === targetOrigin && event.data.type === 'EMBED_READY') {
-                sendInitMessage();
-            }
-        };
-
-        window.addEventListener('message', handleMessage);
-
-        return () => {
-            window.removeEventListener('message', handleMessage);
-        };
-    }, [baseUrl]);
+    useEmbedInit({
+        baseUrl,
+        iframeRef,
+        params: {connectionDialogAllowed, environment, includeComponents, jwtToken},
+    });
 
     return (
         <div className="absolute inset-0 lg:pl-72">
             <iframe
                 ref={iframeRef}
-                src={`${baseUrl}/embedded/workflow-builder/${workflowUuid}`}
+                src={`${baseUrl}/workflow-builder.html#/embedded/builder/${workflowUuid}`}
                 width="100%"
                 height="100%"
                 style={{border: 'none'}}
