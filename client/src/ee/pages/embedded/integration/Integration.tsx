@@ -2,6 +2,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import IntegrationHeader from '@/ee/pages/embedded/integration/components/integration-header/IntegrationHeader';
 import IntegrationsLeftSidebar from '@/ee/pages/embedded/integration/components/integrations-sidebar/IntegrationsLeftSidebar';
 import {useIntegration} from '@/ee/pages/embedded/integration/hooks/useIntegration';
+import {WebhookTriggerTestApi} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateConnectionMutation} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/ee/shared/queries/embedded/connections.queries';
@@ -13,7 +14,6 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
-import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {PlatformType} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {twMerge} from 'tailwind-merge';
@@ -48,6 +48,7 @@ const Integration = () => {
         updateWorkflowNodeParameterMutation,
         useGetConnectionsQuery,
     } = useIntegration();
+
     const {runDisabled} = useRun();
 
     const copilotLayoutShifted = useCopilotLayoutShifted();
@@ -111,6 +112,7 @@ const Integration = () => {
                             >
                                 {integrationId && (
                                     <WorkflowEditorLayout
+                                        internalOnlyVisible={true}
                                         leftSidebarOpen={leftSidebarOpen}
                                         runDisabled={runDisabled}
                                         showWorkflowInputs={true}
