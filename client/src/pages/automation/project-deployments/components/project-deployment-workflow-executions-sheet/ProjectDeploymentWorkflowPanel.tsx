@@ -41,7 +41,7 @@ const ProjectDeploymentWorkflowPanel = ({workflow}: ProjectDeploymentWorkflowPan
 
     return (
         <div className="flex min-h-0 flex-1 p-3">
-            <div className="flex size-full flex-col overflow-hidden rounded-md" ref={rootDivRef}>
+            <div className="flex size-full flex-col overflow-hidden rounded-lg" ref={rootDivRef}>
                 {ready && (
                     <ReactFlowProvider>
                         <PageLoader

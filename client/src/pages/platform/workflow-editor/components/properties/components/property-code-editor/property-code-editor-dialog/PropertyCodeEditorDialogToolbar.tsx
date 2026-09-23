@@ -55,7 +55,7 @@ const PropertyCodeEditorDialogToolbar = ({
     const ff_2504 = useFeatureFlagsStore()('ff-2504');
 
     return (
-        <div className="flex flex-row items-center justify-between space-y-0 border-b border-b-border/50 p-3">
+        <div className="flex flex-row items-center justify-between space-y-0 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
             <span className="text-lg font-semibold">Edit Script</span>
 
             <div className="flex items-center gap-1">

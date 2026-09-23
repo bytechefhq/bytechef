@@ -46,7 +46,7 @@ const WorkflowInputsSheetContent = ({
                 </div>
             </header>
 
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2">
+            <div className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary px-2">
                 {isEditDialogOpen && (
                     <WorkflowInputsEditDialog
                         closeDialog={() => closeEditDialog()}

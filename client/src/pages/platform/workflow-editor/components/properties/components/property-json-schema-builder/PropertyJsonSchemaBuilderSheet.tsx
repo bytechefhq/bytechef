@@ -58,8 +58,8 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <Tabs className="flex size-full flex-col" defaultValue="designer" onValueChange={handleTabChange}>
-                    <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
+                <Tabs className="flex size-full flex-col gap-0" defaultValue="designer" onValueChange={handleTabChange}>
+                    <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
                         <div className="flex flex-col">
                             <span className="text-lg font-semibold">
                                 {title ? `${title} Builder` : 'JSON Schema Builder'}
@@ -79,7 +79,7 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                         </div>
                     </header>
 
-                    <div className="flex-1 space-y-4 overflow-y-auto p-3">
+                    <div className="flex min-h-0 flex-1 flex-col gap-3 p-3">
                         {title === 'Response Schema' && (
                             <Note
                                 content="Define how you'd like the LLM to structure its responses — essentially a template for its output."
@@ -87,11 +87,18 @@ const PropertyJsonSchemaBuilderSheet = ({onChange, onClose, schema, title}: Prop
                             />
                         )}
 
-                        <TabsContent value="designer">
+                        <TabsContent
+                            className="min-h-0 flex-1 overflow-y-auto rounded-lg bg-surface-neutral-primary p-3"
+                            value="designer"
+                        >
                             <JsonSchemaBuilder onChange={handleSchemaChange} schema={localSchema} />
                         </TabsContent>
 
-                        <TabsContent className="h-full data-[state=inactive]:hidden" forceMount value="editor">
+                        <TabsContent
+                            className="min-h-0 flex-1 rounded-lg bg-surface-neutral-primary py-3 data-[state=inactive]:hidden"
+                            forceMount
+                            value="editor"
+                        >
                             <Suspense fallback={<MonacoEditorLoader />}>
                                 <MonacoEditor
                                     className="size-full"

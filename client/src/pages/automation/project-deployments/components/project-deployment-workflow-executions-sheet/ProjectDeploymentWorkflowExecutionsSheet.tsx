@@ -175,7 +175,7 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
                 )}
             >
                 <div
-                    className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-b-md bg-surface-neutral-primary"
+                    className="m-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg bg-surface-neutral-primary"
                     data-testid="workflow-executions-island"
                 >
                     <div className="flex min-h-0 flex-1 overflow-y-auto">

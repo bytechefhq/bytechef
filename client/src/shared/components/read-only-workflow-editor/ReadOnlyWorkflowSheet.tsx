@@ -42,23 +42,25 @@ const ReadOnlyWorkflowSheet = () => {
                     <SheetCloseButton />
                 </header>
 
-                <ReactFlowProvider>
-                    <PageLoader
-                        errors={[componentsError, taskDispatcherDefinitionsError]}
-                        loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
-                    >
-                        {componentDefinitions && taskDispatcherDefinitions && workflow && (
-                            <Suspense>
-                                <WorkflowEditor
-                                    componentDefinitions={componentDefinitions}
-                                    customCanvasWidth={WIDTHS.WORKFLOW_READ_ONLY_SHEET_WIDTH}
-                                    readOnlyWorkflow={workflow}
-                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                />
-                            </Suspense>
-                        )}
-                    </PageLoader>
-                </ReactFlowProvider>
+                <div className="m-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg">
+                    <ReactFlowProvider>
+                        <PageLoader
+                            errors={[componentsError, taskDispatcherDefinitionsError]}
+                            loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
+                        >
+                            {componentDefinitions && taskDispatcherDefinitions && workflow && (
+                                <Suspense>
+                                    <WorkflowEditor
+                                        componentDefinitions={componentDefinitions}
+                                        customCanvasWidth={WIDTHS.WORKFLOW_READ_ONLY_SHEET_CANVAS_WIDTH}
+                                        readOnlyWorkflow={workflow}
+                                        taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                    />
+                                </Suspense>
+                            )}
+                        </PageLoader>
+                    </ReactFlowProvider>
+                </div>
             </SheetContent>
         </Sheet>
     );
