@@ -34,6 +34,12 @@ export interface UpdateConnectionRequest {
      */
     name: string;
     /**
+     * Whether every connected user in the same environment may use this connection.
+     * @type {boolean}
+     * @memberof UpdateConnectionRequest
+     */
+    shared?: boolean;
+    /**
      * 
      * @type {Array<Tag>}
      * @memberof UpdateConnectionRequest
@@ -67,6 +73,7 @@ export function UpdateConnectionRequestFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'name': json['name'],
+        'shared': json['shared'] == null ? undefined : json['shared'],
         'tags': ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
@@ -84,6 +91,7 @@ export function UpdateConnectionRequestToJSONTyped(value?: UpdateConnectionReque
     return {
         
         'name': value['name'],
+        'shared': value['shared'],
         'tags': ((value['tags'] as Array<any>).map(TagToJSON)),
         '__version': value['version'],
     };
