@@ -1,6 +1,7 @@
 query mcpToolsByComponentId($mcpComponentId: ID!) {
     mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
         id
+        enabled
         name
         title
         mcpComponentId
