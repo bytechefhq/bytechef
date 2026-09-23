@@ -4,10 +4,13 @@
   "description": "Integrations, workflows, connections, and the component kit.",
   "pages": [
     "integrations",
+    "integration-marketplace",
     "workflows",
     "automations",
+    "automation-hub",
     "connections",
     "app-events",
+    "request-triggers",
     "component-kit",
     "headless-embedding",
     "theming-and-localization",

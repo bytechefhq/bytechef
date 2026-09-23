@@ -50,9 +50,9 @@ Automation code workflows are invoked through the existing embedded public endpo
 new invocation surface:
 
 - **Sync** - `POST /api/embedded/v1/workflows/{workflowUuid}`, addressed by the workflow's catalog
-  uuid. Requires a **`request` trigger** and an action that writes the response payload - exactly the
-  contract [integration workflows](/platform/embedded/build/app-events) already follow: a workflow without both will
-  acknowledge the call but never return a payload.
+  uuid. Requires a **Request** trigger, the same contract integration workflows follow - see
+  [Request Triggers](/platform/embedded/build/request-triggers) for the trigger operations, the
+  response and the errors.
 - **Async** - `POST /api/embedded/v1/app-events`. Requires the **App Event** trigger. Every enabled,
   non-dangling reference whose workflow declares that trigger fires when the connected user's app
   event is posted, alongside their integration workflows.
@@ -63,63 +63,49 @@ deploys, but the server logs a warning that it will never be reachable from eith
 Both endpoints resolve the whole bridge, not just code-workflow references: the async endpoint's
 fan-out iterates every `ConnectedUserProjectWorkflow` row for the connected user, firing both
 reference-mode rows (code workflows) and copy-mode rows (visual bridge copies, addressed by the
-copy's own workflow uuid, not the template's). The sync endpoint resolves the same three shapes
-against a single `workflowUuid`: a connected user's own copy uuid dispatches directly; a catalog uuid
-for a code workflow (`kind: "REFERENCE"`) goes through the existing reference resolution; a catalog
-uuid for a visual template (`kind: "COPY"`) provisions a per-user copy on first call, sync-only - see
-[Implicit provisioning on first call](#implicit-provisioning-on-first-call) below.
+copy's own workflow uuid, not the template's). The sync endpoint resolves the same shapes against a
+single `workflowUuid`: a connected user's own copy uuid dispatches directly; a catalog uuid the user
+holds a reference to runs that reference; a catalog template uuid the user has already copied runs
+their copy. Anything else returns `404` - see
+[No provisioning on first call](#no-provisioning-on-first-call) below.
 
-## Implicit provisioning on first call
+## No provisioning on first call
 
-A backend doesn't have to provision a reference ahead of time. Calling either invocation endpoint
-with a catalog workflow uuid the connected user has never used before **provisions the reference as
-part of the call**:
-
-1. ByteChef auto-wires the workflow's node connections from the connected user's existing connections,
-   matched by component - the same mechanism the visual copy flow uses.
-2. If every required component resolves to a connection, the reference is created enabled and the
-   call runs.
-3. If a component has no matching connection, the reference is still created - left **disabled** -
-   and the call fails with **HTTP 409**:
-
-   ```json
-   {"missingConnectionComponentName": "slack"}
-   ```
-
-   The disabled reference row is **not** self-healing on repeat calls: once it exists, any later call
-   - the invocation endpoint, or the explicit provision endpoint below - finds the existing row and
-   returns it unchanged rather than re-attempting connection resolution. Concretely, invoking again
-   after fixing the connection still gets the invocation endpoint's ordinary "not found" response (a
-   disabled reference is invisible to invocation, indistinguishable from a nonexistent one), and
-   calling provision again reports success (`204`) without actually resolving anything. To pick up a
-   connection created after the fact, de-provision and provision again (next section) - that deletes
-   the row outright, so the follow-up provision call creates a fresh one and reruns auto-wiring from
-   scratch.
-
-The steps above describe reference-mode (code workflow) provisioning, reachable from either
-invocation endpoint. **Visual-template provisioning is sync-only** and behaves a little differently:
-calling `POST /workflows/{workflowUuid}` with a visual template's catalog uuid the connected user has
-never copied before performs the same copy the explicit
-`POST /automation/workflow-templates/{uuid}/copy` endpoint performs - including its best-effort
-connection auto-wiring - and dispatches the new copy. A component with no matching connection is
-silently left unwired rather than producing the 409 the reference path returns; the copy still runs,
-just without that connection configured. Calling the same template uuid again resolves the copy
-already provisioned for that connected user instead of creating a duplicate - the copy is
-subsequently addressable by its own uuid, same as an explicitly-provisioned one. The async endpoint
-has no implicit-provisioning case for either kind: there is nothing to iterate before a row exists.
+Neither invocation endpoint creates anything. A catalog workflow uuid the connected user has no
+reference to and no copy of returns `404` from the sync endpoint, and the async endpoint only
+iterates rows that already exist. Provision the reference (below), or copy the template with
+`POST /automation/workflow-templates/{workflowUuid}/copy`, before the first call.
 
 ## Explicit provisioning
 
-To pre-wire connections before the first real call - so the first invocation doesn't pay the 409
-round-trip - provision the reference explicitly:
+Provision a reference before the connected user's first call:
 
 ```http
 POST /api/embedded/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision
 X-Environment: PRODUCTION
 ```
 
-This runs the identical auto-wiring and returns the same `409` /
-`{"missingConnectionComponentName": ...}` shape on an unresolvable connection.
+ByteChef wires each of the workflow's connections from the connected user's existing connections,
+matched by component. To choose connections instead, send them keyed by component name in an
+optional body: `{"connections": {"slack": 42}}`. Components you leave out are auto-matched.
+
+The same body can carry the workflow's input values, keyed by input name:
+`{"connections": {"slack": 42}, "inputs": {"channel": "#alerts"}}`. They are stored before the
+reference is enabled, so a workflow with required inputs comes out enabled in one call. When you send
+`inputs`, they replace the values already stored for the reference.
+
+- If every required component resolves to a connection, the reference is created enabled.
+- If a component has no matching connection, the reference is still created - left **disabled** -
+  and the call returns **HTTP 409** with `{"missingConnectionComponentName": "slack"}`.
+- If a required workflow input has no value yet (neither sent in `inputs` nor stored), the reference
+  is created disabled and the call returns `204`. Store the value, then enable the reference (next
+  section).
+- A requested connection that isn't one of the connected user's connections returns `400`. A catalog
+  workflow the connected user can't see returns `404`.
+
+Calling provision again for an existing reference doesn't re-run auto-wiring. It only catches the
+reference up to the last published version and, if the body names connections or inputs, applies
+them. It keeps the reference's enabled state.
 
 De-provisioning removes the reference (and its per-node connection wiring) outright:
 
@@ -127,23 +113,41 @@ De-provisioning removes the reference (and its per-node connection wiring) outri
 DELETE /api/embedded/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision
 ```
 
-There is no separate public disable-without-deleting call for a reference - de-provision, then
-provision again when you want the connected user back on the workflow.
+## Enabling, disabling and inputs
+
+A reference is addressed by its catalog workflow uuid on the same workflow endpoints a copy uses:
+
+- `DELETE /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable` disables the
+  reference and keeps it, with its connections and input values.
+- `POST /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable` enables it. The
+  reference first catches up to the catalog project's last published version, then its connections
+  are resolved again against the connected user's current connections - so a connection created
+  after provisioning is picked up here. A missing connection returns `409`
+  `{"missingConnectionComponentName": ...}`, a required input without a value returns `409`
+  `{"missingInputName": ...}`, and the reference stays disabled.
+- `PUT /api/embedded/v1/{externalUserId}/automation/workflows/{workflowUuid}/inputs` stores the
+  connected user's input values, with an `inputs` object keyed by input name. On an enabled
+  reference, a change that leaves a required input without a value is rejected with `409`
+  `{"missingInputName": ...}`.
+
+Enabling a dangling reference, or storing inputs on one, fails with an error naming the reference as
+dangling. The frontend routes (without `{externalUserId}`, with the end user's JWT) behave the same.
 
 ## Dangling references
 
-If a redeploy removes a workflow a connected user is already referencing - you renamed or deleted it
-from the artifact - their reference doesn't silently disappear and doesn't silently keep running
-against a nonexistent workflow. It flips to a **dangling** state:
+If a published version no longer contains a workflow a connected user is referencing, or the catalog
+project is deleted, their reference doesn't silently disappear and doesn't silently keep running
+against a nonexistent workflow. It flips to a **dangling** state and is disabled:
 
 - Invisible to both invocation endpoints - a dangling reference behaves exactly like a disabled one
   to a caller (same `404`, no existence leak).
-- Still listed for the connected user, carrying a reason (`"Removed from the catalog project on
-  redeploy"`).
+- Still listed for the connected user, carrying a reason: `"Removed from the catalog project on
+  publish"` when a published version drops the workflow, or `"The catalog project was deleted"`.
 - The connected user's connection configuration is preserved on the row, so nothing is lost even
   though the row itself stops being usable.
 
-Dangling is permanent for that reference row - nothing currently clears the flag. Uuid carry-forward
+Dangling is permanent for that reference row - nothing currently clears the flag, and enabling it
+fails. Disabling a dangling reference removes its deployment entry but keeps the row. Uuid carry-forward
 only spans one deploy of history: if you restore a same-named workflow in a *later* deploy (after an
 intervening deploy that dropped it), the restored workflow gets a **new** uuid, not the one the
 dangling reference still points at. Recovering means de-provisioning the dangling reference and
@@ -178,3 +182,4 @@ redeploy of one catalog project never dangles a reference into a different catal
 - [Code Workflows](/platform/automation/build/workflows/code-workflows) - the underlying `ProjectHandler`
   artifact contract, shared with standalone automation projects.
 - [App Events](/platform/embedded/build/app-events) - the async invocation endpoint and its trigger contract.
+- [Request Triggers](/platform/embedded/build/request-triggers) - the sync invocation endpoint, its response and its errors.
