@@ -81,6 +81,10 @@ Deleting an integration asks **"Are you absolutely sure?"** and warns that the a
 
 ---
 
+## Reserved names
+
+Workflow input names and node names cannot start with `__` or be exactly `vars`; ByteChef uses those names internally. Adding or saving an integration workflow that uses one fails with an error listing the offending names. Rename the input or node and save again.
+
 ## Testing a workflow
 
 Use the header action buttons on the right to run and inspect the workflow you are editing.

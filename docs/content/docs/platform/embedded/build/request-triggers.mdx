@@ -1,0 +1,105 @@
+---
+title: Request Triggers
+description: Call one of a connected user's workflows from your application over HTTP and get the workflow's result back in the same response.
+---
+
+![Request Triggers illustration](request-triggers/request-triggers-overview.png)
+
+A **Request trigger** lets your application start one specific workflow for a connected user and, if you want, wait for the workflow's answer. Where an [App Event](/platform/embedded/build/app-events) fans out to every subscribed workflow and returns nothing, a request addresses a single workflow by its uuid and returns what that workflow produces.
+
+## Key Features
+
+| Feature | Description |
+|---|---|
+| One workflow per call | The call names a single workflow uuid. |
+| Synchronous result | With the **Await Workflow and Respond** trigger, the HTTP response carries the workflow's result. |
+| Fire and forget | With the **Auto Respond with HTTP 200 Status** trigger, the call returns `200` at once and the workflow runs in the background. |
+| Frontend or backend | Call it from the browser with the end user's JWT, or from your server with your API Key. |
+| Integrations and automations | The same endpoint runs integration workflows and automation workflows the connected user has added. |
+
+---
+
+## Setting up the workflow
+
+1. Open the workflow in the editor.
+2. Add the **Request** trigger and pick one of its two operations:
+   - **Await Workflow and Respond** - the caller waits for the workflow to finish. Set **Timeout (ms)** to limit the wait.
+   - **Auto Respond with HTTP 200 Status** - the caller gets `200` with no body right away. Nothing is returned from the workflow.
+3. To control the response, end the workflow with the **Webhook** component's **Response to Webhook Request** action. It sets the **Response Type** (JSON, Raw, Binary, Redirect or No Data), the **Status Code**, the **Headers** and the **Body**.
+4. Save and publish.
+
+The trigger's output gives the workflow the incoming request: `body`, `method`, `headers` and `parameters` (the query string). The body is parsed by content type: JSON, XML, form data and multipart forms become structured data, other `application/*` types arrive as a file, and anything else arrives as text.
+
+## Calling the workflow
+
+### From your frontend
+
+`POST` with the end user's JWT. The connected user is the JWT's `sub` claim.
+
+```ts
+const response = await fetch(`${baseUrl}/api/embedded/v1/workflows/${workflowUuid}`, {
+    method: 'POST',
+    headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json',
+        'X-Environment': 'PRODUCTION',
+    },
+    body: JSON.stringify({orderId: '1234'}),
+});
+
+const result = await response.json();
+```
+
+This route accepts only a JWT. It allows cross-origin requests, so you can call it straight from the browser.
+
+### From your backend
+
+`POST` with your API Key and name the connected user in the path:
+
+```bash
+curl -X POST "https://your-bytechef-host.example.com/api/embedded/v1/$EXTERNAL_USER_ID/workflows/$WORKFLOW_UUID" \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "X-Environment: PRODUCTION" \
+  -d '{"orderId": "1234"}'
+```
+
+Both routes run the same workflow. `X-Environment` is optional and case-insensitive (`DEVELOPMENT`, `STAGING`, `PRODUCTION`). Without it, the call runs in `PRODUCTION`.
+
+## Which workflow runs
+
+The `workflowUuid` is resolved against the connected user in this order:
+
+1. **An integration workflow.** If the uuid belongs to an integration workflow, the call runs it through the connected user's instance of that integration.
+2. **The connected user's own automation copy.** A uuid of a workflow the user copied from an [automation](/platform/embedded/build/automations) template runs that copy.
+3. **A catalog reference.** A catalog workflow uuid the user holds a reference to runs the catalog project's last published version of that workflow, with the user's own connections.
+4. **A copy of a catalog template.** A catalog template uuid the user has already copied runs the user's copy.
+
+The call never adds a workflow for the user. A catalog uuid the user has no reference to and no copy of returns `404`. Add the workflow first, through the [Automation Hub](/platform/embedded/build/automation-hub) or the copy and provision endpoints described in [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows).
+
+## The response
+
+With **Await Workflow and Respond**:
+
+- If the workflow runs a **Response to Webhook Request** action, the HTTP response uses that action's status code, headers and body. A Redirect response is followed only for a relative path or the same host. Any other URL returns `400`.
+- Otherwise the response is `200` with the workflow's outputs as JSON.
+
+The wait is capped at 5 minutes. A **Timeout (ms)** above that, or no timeout at all, waits 5 minutes. If the workflow does not finish in time, the run is marked failed and the call returns an error.
+
+With **Auto Respond with HTTP 200 Status**, the response is always `200` with no body. Check the run in [Workflow Executions](/platform/embedded/monitor/workflow-executions).
+
+## Errors
+
+| Status | When |
+|---|---|
+| `200`, no body | The integration workflow is disabled for the connected user. Nothing runs. |
+| `400` | The connected user or their integration instance does not exist in this environment, or the workflow failed or timed out. The body is a problem detail with the error message. |
+| `404` | The uuid matches no integration workflow and none of the user's automation workflows, or the matching automation workflow is disabled or [dangling](/platform/embedded/build/automations/automation-code-workflows#dangling-references). |
+
+## Related
+
+- [App Events](/platform/embedded/build/app-events) - start every subscribed workflow at once, without waiting for a result.
+- [Automations](/platform/embedded/build/automations) - authoring the catalog templates connected users copy or reference.
+- [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows) - provisioning, enabling and dangling references.
+- [Workflow Executions](/platform/embedded/monitor/workflow-executions) - inspecting runs.
+- API reference: [frontend](/openapi/frontend/embedded-webhook-request-trigger) and [backend](/openapi/backend/embedded-webhook-request-trigger).

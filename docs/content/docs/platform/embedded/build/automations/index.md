@@ -42,6 +42,7 @@ Each project row displays:
 - **Create-template button group** -- a primary "Workflow" button (new from scratch) with a chevron menu containing **Import Workflow**.
 - **Tags** -- inline editable; add or remove tags directly from the row.
 - **Status badge** -- `DRAFT` while unpublished, `V<n> PUBLISHED` once a version has been cut.
+- **Hidden from hub badge** -- shown when the project's **Show in Automation Hub** switch is off.
 - **Actions menu** (⋮) -- Publish, New Workflow, Import Workflow, Edit, Delete.
 
 ### Template row
@@ -64,7 +65,9 @@ Clicking a template row opens it in the embedded workflow editor.
 
 1. Click **New Project** in the page header (top right).
 2. In the dialog, enter a **Name**, optional **Description**, an optional **Category**, and any **Tags**.
-3. Submit. The new project appears in the list as a `DRAFT`.
+3. Optionally enter a **Permission Expression** to limit which connected users see the project. See [Permission Expressions](/platform/embedded/build/permission-expressions).
+4. Leave **Show in Automation Hub** on to list the project in the [Automation Hub](/platform/embedded/build/automation-hub). Turn it off for flows you only activate through the API. The switch is on by default.
+5. Submit. The new project appears in the list as a `DRAFT`.
 
 If no projects exist yet, the empty state shows a **Create Project** button that opens the same dialog.
 
@@ -80,9 +83,19 @@ From any project row you can:
 
 Open the project's ⋮ menu and pick **Edit** (reopens the project dialog with current values) or **Delete** (confirms via dialog, then removes the project and its templates).
 
+Deleting a project marks every connected user's reference to its workflows as dangling and disabled, with the reason "The catalog project was deleted". See [Dangling references](/platform/embedded/build/automations/automation-code-workflows#dangling-references).
+
 ### Publishing
 
 Open the project's ⋮ menu and pick **Publish**. The badge updates from `DRAFT` to `V<n> PUBLISHED` and that version becomes the release available to connected users.
+
+What publishing does to connected users who already use the project:
+
+- **References** move to the new version. The roll-out runs in the background after the publish is saved, so it can finish a moment after the badge changes. Each reference keeps the user's connections and input values. If the new version needs a connection or an input value the user hasn't supplied, the reference is disabled. Enable it again once they have.
+- **References to removed workflows** - a workflow that is no longer in the published version - become dangling and disabled, with the reason "Removed from the catalog project on publish".
+- **Copies** are not changed. A connected user's copy keeps running the version they copied.
+
+If the background roll-out fails for a user, their reference catches up the next time it is enabled or provisioned, or on the next publish.
 
 ### Filtering
 
@@ -96,3 +109,10 @@ Selecting an entry sets `?categoryId=` or `?tagId=` in the URL so the view is sh
 ### Environment selection
 
 Projects are scoped to the current environment. Switch environments from the selector in the left sidebar (next to the user menu) to see projects in **Development**, **Staging**, or **Production**.
+
+## Related
+
+- [Automation Hub](/platform/embedded/build/automation-hub) - the embeddable catalog where connected users find published projects.
+- [Permission Expressions](/platform/embedded/build/permission-expressions) - limit which connected users see a project or workflow.
+- [Automation Code Workflows](/platform/embedded/build/automations/automation-code-workflows) - references, provisioning and dangling references.
+- [Request Triggers](/platform/embedded/build/request-triggers) - run a connected user's workflow and get its result in the response.
