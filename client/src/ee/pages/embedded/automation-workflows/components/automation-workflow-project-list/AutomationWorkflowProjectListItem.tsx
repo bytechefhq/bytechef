@@ -75,8 +75,8 @@ const AutomationWorkflowProjectListItem = ({
 
         const interactiveSelectors = [
             '[data-interactive]',
+            '[role="menuitem"]',
             '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
         ].join(', ');
@@ -92,7 +92,7 @@ const AutomationWorkflowProjectListItem = ({
         <>
             <div
                 aria-label={`${project.name}_container`}
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
@@ -189,6 +189,10 @@ const AutomationWorkflowProjectListItem = ({
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex items-center space-x-2">
+                            {!project.automationHubVisible && (
+                                <Badge label="Hidden from hub" styleType="secondary-outline" />
+                            )}
+
                             {project.published ? (
                                 <Badge className="flex space-x-1" styleType="success-outline" weight="semibold">
                                     <span>V{project.lastPublishedVersion}</span>
