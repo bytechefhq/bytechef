@@ -1,4 +1,5 @@
-:root {
+.dialogOverlay,
+.dialogContainer {
     --bytechef-blue: #1071e5;
     --bytechef-blue-hover: #0b50a3;
     --gray-200: #f1f5f9;
@@ -6,27 +7,42 @@
     --gray-500: #6b7280;
     --bytechef-red: rgb(220, 38, 38);
     --bytechef-red-hover: rgba(220, 38, 38, 0.9);
+    --dialog-surface: #fff;
+    --dialog-surface-raised: #fff;
+    --dialog-border: #e5e7eb;
+    --dialog-text: #0a0a0a;
+    --dialog-text-muted: var(--gray-500);
+    --dialog-hover: var(--gray-200);
 }
 
-body {
-    font-family: 'Inter', sans-serif;
+.dialogOverlay.dark,
+.dialogContainer.dark {
+    --gray-200: #1f2937;
+    --gray-300: #374151;
+    --gray-500: #9ca3af;
+    --dialog-surface: #111827;
+    --dialog-surface-raised: #1f2937;
+    --dialog-border: #374151;
+    --dialog-text: #f9fafb;
+    --dialog-text-muted: #9ca3af;
+    --dialog-hover: #374151;
 }
 
-h2 {
+.dialogContainer h2 {
     font-size: 1.125rem;
     font-weight: 600;
     margin: 0;
 }
 
-p {
-    color: var(--gray-500);
+.dialogContainer p {
+    color: var(--dialog-text-muted);
 }
 
 .button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--gray-300);
+    border: 1px solid var(--dialog-border);
     border-radius: 8px;
     box-shadow: none;
     font-size: 0.875rem;
@@ -56,7 +72,7 @@ p {
 
 .buttonSecondary {
     composes: button;
-    background-color: white;
+    background-color: var(--dialog-surface-raised);
     color: inherit;
 }
 
@@ -79,7 +95,6 @@ p {
 
 /* Dialog styles */
 
-/* Dialog overlay*/
 .dialogOverlay {
     position: fixed;
     inset: 0;
@@ -89,6 +104,8 @@ p {
 
 /* Dialog Container */
 .dialogContainer {
+    font-family: Inter, sans-serif;
+    color: var(--dialog-text);
     position: fixed;
     left: 50%;
     top: 50%;
@@ -100,8 +117,8 @@ p {
     max-height: 70vh;
     transform: translate(-50%, -50%);
     gap: 1rem;
-    border: 1px solid #e5e7eb;
-    background-color: #fff;
+    border: 1px solid var(--dialog-border);
+    background-color: var(--dialog-surface);
     padding: 1rem;
     box-shadow:
         0 10px 15px -3px rgba(0, 0, 0, 0.1),
@@ -147,7 +164,7 @@ p {
 }
 
 .dialogHeader .closeButton:hover {
-    background-color: var(--gray-200);
+    background-color: var(--dialog-hover);
 }
 
 .dialogHeader .closeButton img {
@@ -228,8 +245,9 @@ p {
     box-sizing: border-box;
     display: flex;
     border-radius: 0.375rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--dialog-border);
     background-color: transparent;
+    color: inherit;
     padding: 0.5rem 0.75rem;
     line-height: 1.25rem;
     font-size: 0.875rem;
@@ -263,10 +281,6 @@ p {
     height: 1rem;
 }
 
-.dialogFooter .buttonDestructive {
-    margin-right: auto;
-}
-
 /* Powered by ByteChef styles */
 .poweredByContainer {
     position: absolute;
@@ -277,7 +291,7 @@ p {
     justify-content: center;
     padding: 0.25rem 0.5rem;
     border-radius: 0.375rem;
-    background-color: white;
+    background-color: var(--dialog-surface);
 }
 
 .poweredByContainer span {
@@ -304,7 +318,7 @@ p {
 /* Tab Container */
 .tabContainer {
     display: flex;
-    border-bottom: 1px solid var(--gray-300);
+    border-bottom: 1px solid var(--dialog-border);
     gap: 0;
 }
 
@@ -352,7 +366,7 @@ p {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    border: 1px solid var(--gray-200);
+    border: 1px solid var(--dialog-border);
     padding: 0.75rem;
     border-radius: 0.375rem;
     gap: 1rem;
