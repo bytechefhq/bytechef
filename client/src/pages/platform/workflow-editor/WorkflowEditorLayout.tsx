@@ -51,6 +51,7 @@ const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSideba
 interface WorkflowEditorLayoutProps {
     enableUndoRedo?: boolean;
     includeComponents?: string[];
+    internalOnlyVisible?: boolean;
     leftSidebarOpen?: boolean;
     onEditSubflowClick?: (workflowUuid: string) => void;
     runDisabled: boolean;
@@ -62,6 +63,7 @@ interface WorkflowEditorLayoutProps {
 const WorkflowEditorLayout = ({
     enableUndoRedo,
     includeComponents,
+    internalOnlyVisible = false,
     leftSidebarOpen,
     onEditSubflowClick,
     runDisabled,
@@ -278,6 +280,7 @@ const WorkflowEditorLayout = ({
 
             {showWorkflowInputsSheet && (
                 <WorkflowInputsSheet
+                    internalOnlyVisible={internalOnlyVisible}
                     invalidateWorkflowQueries={invalidateWorkflowQueries!}
                     onSheetOpenChange={setShowWorkflowInputsSheet}
                     sheetOpen={showWorkflowInputsSheet}
