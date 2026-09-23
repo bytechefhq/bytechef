@@ -1,0 +1,8 @@
+mutation updateIntegrationWorkflowPermissionExpression($integrationWorkflowId: ID!, $permissionExpression: String) {
+    updateIntegrationWorkflowPermissionExpression(
+        integrationWorkflowId: $integrationWorkflowId, permissionExpression: $permissionExpression
+    ) {
+        id
+        permissionExpression
+    }
+}

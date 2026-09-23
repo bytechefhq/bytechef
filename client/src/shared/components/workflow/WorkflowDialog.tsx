@@ -25,6 +25,7 @@ interface WorkflowDialogProps {
     onClose?: () => void;
     onSave?: () => void;
     parentId?: number;
+    saveDisabled?: boolean;
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
@@ -38,6 +39,7 @@ const WorkflowDialog = ({
     onClose,
     onSave,
     parentId,
+    saveDisabled = false,
     triggerNode,
     updateWorkflowMutation,
     useGetWorkflowQuery,
@@ -71,6 +73,10 @@ const WorkflowDialog = ({
     }
 
     function saveWorkflow() {
+        if (saveDisabled) {
+            return;
+        }
+
         const formData = getValues();
 
         if (workflow) {
@@ -212,7 +218,7 @@ const WorkflowDialog = ({
                             <DialogCancelButton />
 
                             <Button
-                                disabled={isPending}
+                                disabled={isPending || saveDisabled}
                                 label="Save"
                                 onClick={handleSubmit(saveWorkflow)}
                                 type="submit"

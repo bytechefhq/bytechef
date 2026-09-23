@@ -8,6 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import IntegrationWorkflowPermissionExpressionField from '@/ee/pages/embedded/integrations/components/integration-workflow-list/IntegrationWorkflowPermissionExpressionField';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/ee/shared/mutations/embedded/workflows.mutations';
 import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
@@ -16,11 +17,15 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/ee/shared/queries/embedded/wo
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {
+    useIntegrationWorkflowsByIntegrationIdQuery,
+    useUpdateIntegrationWorkflowPermissionExpressionMutation,
+} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {DownloadIcon, EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 
 const IntegrationWorkflowListItem = ({
@@ -40,12 +45,36 @@ const IntegrationWorkflowListItem = ({
         [key: string]: ComponentDefinitionBasic | undefined;
     };
 }) => {
+    const [isPermissionExpressionSeeded, setIsPermissionExpressionSeeded] = useState(false);
+    const [permissionExpression, setPermissionExpression] = useState<string | null>('');
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
+
+    const pendingPermissionExpressionRef = useRef<string | null | undefined>(undefined);
 
     const [searchParams] = useSearchParams();
 
     const queryClient = useQueryClient();
+
+    const integrationWorkflowsQueryVariables = {integrationId: String(integration.id)};
+
+    const updateIntegrationWorkflowPermissionExpressionMutation =
+        useUpdateIntegrationWorkflowPermissionExpressionMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['integrationWorkflowsByIntegrationId', integrationWorkflowsQueryVariables],
+                });
+            },
+        });
+
+    const {data: integrationWorkflowsData, isFetching: isIntegrationWorkflowsFetching} =
+        useIntegrationWorkflowsByIntegrationIdQuery(integrationWorkflowsQueryVariables, {
+            enabled: showEditDialog && integration.id != null,
+        });
+
+    const integrationWorkflowPermissionExpression = integrationWorkflowsData?.integrationWorkflowsByIntegrationId.find(
+        (integrationWorkflow) => integrationWorkflow.integrationWorkflowId === String(workflow.integrationWorkflowId)
+    )?.permissionExpression;
 
     const deleteWorkflowMutation = useDeleteWorkflowMutation({
         onSuccess: () => {
@@ -57,11 +86,22 @@ const IntegrationWorkflowListItem = ({
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
         onSuccess: () => {
+            const pendingPermissionExpression = pendingPermissionExpressionRef.current;
+
+            pendingPermissionExpressionRef.current = undefined;
+
+            if (pendingPermissionExpression !== undefined) {
+                updateIntegrationWorkflowPermissionExpressionMutation.mutate({
+                    integrationWorkflowId: String(workflow.integrationWorkflowId),
+                    permissionExpression: pendingPermissionExpression,
+                });
+            }
+
             queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integration.id!),
             });
 
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(workflow.id!),
             });
 
@@ -73,9 +113,29 @@ const IntegrationWorkflowListItem = ({
         },
     });
 
+    useEffect(() => {
+        if (
+            !showEditDialog ||
+            isPermissionExpressionSeeded ||
+            !integrationWorkflowsData ||
+            isIntegrationWorkflowsFetching
+        ) {
+            return;
+        }
+
+        setPermissionExpression(integrationWorkflowPermissionExpression ?? '');
+        setIsPermissionExpressionSeeded(true);
+    }, [
+        integrationWorkflowPermissionExpression,
+        integrationWorkflowsData,
+        isIntegrationWorkflowsFetching,
+        isPermissionExpressionSeeded,
+        showEditDialog,
+    ]);
+
     return (
         <li
-            className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground"
+            className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
             <Link
@@ -113,6 +173,7 @@ const IntegrationWorkflowListItem = ({
                         <DropdownMenuItem
                             className="dropdown-menu-item"
                             onClick={() => {
+                                setIsPermissionExpressionSeeded(false);
                                 setShowEditDialog(true);
                             }}
                         >
@@ -159,8 +220,29 @@ const IntegrationWorkflowListItem = ({
 
             {showEditDialog && workflow && (
                 <WorkflowDialog
+                    additionalContent={
+                        workflow.integrationWorkflowId != null &&
+                        isPermissionExpressionSeeded && (
+                            <IntegrationWorkflowPermissionExpressionField
+                                onChange={setPermissionExpression}
+                                value={permissionExpression}
+                            />
+                        )
+                    }
                     onClose={() => setShowEditDialog(false)}
+                    onSave={() => {
+                        pendingPermissionExpressionRef.current =
+                            workflow.integrationWorkflowId != null ? permissionExpression?.trim() || null : undefined;
+
+                        void queryClient.invalidateQueries({
+                            queryKey: IntegrationWorkflowKeys.integrationWorkflow(
+                                integration.id!,
+                                Number.parseInt(workflow.id!, 10)
+                            ),
+                        });
+                    }}
                     parentId={integration.id}
+                    saveDisabled={workflow.integrationWorkflowId != null && !isPermissionExpressionSeeded}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

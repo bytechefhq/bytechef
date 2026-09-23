@@ -5,6 +5,7 @@ query integrationWorkflowsByIntegrationId($integrationId: ID!) {
         description
         integrationWorkflowId
         workflowUuid
+        permissionExpression
         workflowTaskComponentNames
         workflowTriggerComponentNames
         createdBy
