@@ -526,6 +526,87 @@ describe('handleDeleteTask', () => {
         expect(mockRemovePendingSaveNodeName).toHaveBeenCalledWith('task_1');
     });
 
+    it('closes the panel when the open node is nested inside the deleted task dispatcher', () => {
+        const tasks = [makeTask('map_1', {iteratee: [makeTask('activeCampaign_1')]}), makeTask('task_2')];
+        const workflow = makeWorkflow(tasks);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: {componentName: 'activeCampaign', name: 'activeCampaign_1'} as NodeDataType,
+            data: {componentName: 'map', name: 'map_1'} as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mockReset).toHaveBeenCalledOnce();
+        expect(mockSetWorkflowTestChatPanelOpen).toHaveBeenCalledWith(false);
+    });
+
+    it('closes the panel when the open cluster element belongs to a root nested inside the deleted dispatcher', () => {
+        const tasks = [makeTask('loop_1', {iteratee: [makeTask('aiAgent_1')]})];
+        const workflow = makeWorkflow(tasks);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: {
+                clusterElementType: 'model',
+                componentName: 'openAi',
+                name: 'openAi_1',
+            } as NodeDataType,
+            data: {componentName: 'loop', name: 'loop_1'} as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            rootClusterElementNodeData: {componentName: 'aiAgent', name: 'aiAgent_1'} as NodeDataType,
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mockReset).toHaveBeenCalledOnce();
+    });
+
+    it('keeps the panel open when the open node sits in a sibling dispatcher', () => {
+        const tasks = [
+            makeTask('map_1', {iteratee: [makeTask('task_a')]}),
+            makeTask('loop_1', {iteratee: [makeTask('task_b')]}),
+        ];
+        const workflow = makeWorkflow(tasks);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: {componentName: 'test', name: 'task_b'} as NodeDataType,
+            data: {componentName: 'map', name: 'map_1'} as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mockReset).not.toHaveBeenCalled();
+    });
+
+    it('keeps the panel open when the open node is a trigger', () => {
+        const tasks = [makeTask('task_1')];
+        const workflow = makeWorkflow(tasks);
+        const mutation = makeMockMutation();
+
+        handleDeleteTask({
+            cancelWorkflowQueries: vi.fn(),
+            currentNode: {componentName: 'webhook', name: 'trigger_1', trigger: true} as NodeDataType,
+            data: {componentName: 'test', name: 'task_1'} as NodeDataType,
+            invalidateWorkflowQueries: vi.fn(),
+            queryClient: makeQueryClient(),
+            updateWorkflowMutation: mutation,
+            workflow,
+        });
+
+        expect(mockReset).not.toHaveBeenCalled();
+    });
+
     it('should not close panel when deleting a different node', () => {
         const tasks = [makeTask('task_1'), makeTask('task_2')];
         const workflow = makeWorkflow(tasks);

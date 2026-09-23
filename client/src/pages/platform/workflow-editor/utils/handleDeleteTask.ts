@@ -337,13 +337,21 @@ export default function handleDeleteTask({
 
     const previousWorkflow = workflow;
 
-    // Optimistic UI: close panel and update store immediately so layout recomputes once
-    if (currentNode?.name === data.name && !currentNode?.clusterElementType) {
+    const updatedTaskParametersByName = collectAllTaskParameters(updatedTasks);
+
+    // Optimistic UI: close panel and update store immediately so layout recomputes once. Deleting a task
+    // dispatcher removes every task nested inside it, so the open node can disappear without being `data`.
+    if (currentNode && isCurrentNodeRemoved(currentNode, rootClusterElementNodeData, updatedTaskParametersByName)) {
         useWorkflowNodeDetailsPanelStore.getState().reset();
         useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
     }
 
-    const optimisticTasks = buildOptimisticTasks(workflow.tasks || [], updatedTasks!, data.name);
+    const optimisticTasks = buildOptimisticTasks(
+        workflow.tasks || [],
+        updatedTasks!,
+        data.name,
+        updatedTaskParametersByName
+    );
 
     useWorkflowDataStore.getState().setWorkflow({
         ...workflow,
@@ -414,6 +422,24 @@ function collectAllTaskParameters(
 }
 
 /**
+ * Whether the node open in the details panel no longer exists after the deletion. A cluster element is judged by
+ * its root task, since cluster elements never appear in the task tree; a trigger is never removed by a task deletion.
+ */
+function isCurrentNodeRemoved(
+    currentNode: NodeDataType,
+    rootClusterElementNodeData: NodeDataType | undefined,
+    updatedTaskParametersByName: Map<string, Record<string, object> | undefined>
+): boolean {
+    if (currentNode.trigger) {
+        return false;
+    }
+
+    const currentTaskName = currentNode.clusterElementType ? rootClusterElementNodeData?.name : currentNode.name;
+
+    return currentTaskName !== undefined && !updatedTaskParametersByName.has(currentTaskName);
+}
+
+/**
  * Builds optimistic tasks by removing the deleted task and applying parameter changes
  * from definition-parsed tasks onto the rich workflow task objects (which carry componentName, icon, etc.).
  * Handles both top-level deletion (filter) and nested deletion (parent parameter update).
@@ -421,10 +447,9 @@ function collectAllTaskParameters(
 export function buildOptimisticTasks(
     workflowTasks: WorkflowTask[],
     updatedTasks: Array<WorkflowTaskType>,
-    deletedTaskName: string
+    deletedTaskName: string,
+    updatedParametersByName = collectAllTaskParameters(updatedTasks)
 ): WorkflowTask[] {
-    const updatedParametersByName = collectAllTaskParameters(updatedTasks);
-
     return workflowTasks
         .filter((task) => task.name !== deletedTaskName && updatedParametersByName.has(task.name))
         .map((task) => {
