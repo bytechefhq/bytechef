@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-04T22:06:08.943670+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T14:13:01.269252+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -32,6 +32,8 @@ public class WorkflowExecutionModel {
   private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
+
+  private @Nullable Integer projectVersion;
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
@@ -135,6 +137,27 @@ public class WorkflowExecutionModel {
     this.projectDeployment = projectDeployment;
   }
 
+  public WorkflowExecutionModel projectVersion(@Nullable Integer projectVersion) {
+    this.projectVersion = projectVersion;
+    return this;
+  }
+
+  /**
+   * The version of the project the workflow execution ran.
+   * @return projectVersion
+   */
+  
+  @Schema(name = "projectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of the project the workflow execution ran.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectVersion")
+  public @Nullable Integer getProjectVersion() {
+    return projectVersion;
+  }
+
+  @JsonProperty("projectVersion")
+  public void setProjectVersion(@Nullable Integer projectVersion) {
+    this.projectVersion = projectVersion;
+  }
+
   public WorkflowExecutionModel triggerExecution(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
     this.triggerExecution = triggerExecution;
     return this;
@@ -190,13 +213,14 @@ public class WorkflowExecutionModel {
         Objects.equals(this.job, workflowExecution.job) &&
         Objects.equals(this.project, workflowExecution.project) &&
         Objects.equals(this.projectDeployment, workflowExecution.projectDeployment) &&
+        Objects.equals(this.projectVersion, workflowExecution.projectVersion) &&
         Objects.equals(this.triggerExecution, workflowExecution.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, job, project, projectDeployment, triggerExecution, workflow);
+    return Objects.hash(id, job, project, projectDeployment, projectVersion, triggerExecution, workflow);
   }
 
   @Override
@@ -207,6 +231,7 @@ public class WorkflowExecutionModel {
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
+    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");

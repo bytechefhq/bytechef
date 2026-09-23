@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -84,8 +85,10 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
     private static final long PROJECT_ID = 3L;
     private static final long TRIGGER_EXECUTION_ID = 77L;
     private static final UUID WORKFLOW_UUID = UUID.randomUUID();
+    private static final String PREVIOUS_VERSION_WORKFLOW_ID = "workflow-0";
     private static final String WORKFLOW_ID = "workflow-1";
 
+    private final JobService jobService = mock(JobService.class);
     private final ProjectDeploymentService projectDeploymentService = mock(ProjectDeploymentService.class);
     private final ProjectService projectService = mock(ProjectService.class);
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
@@ -113,7 +116,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService, mock(ContextService.class), mock(Evaluator.class),
-            mock(EnvironmentService.class), workflowExecutionRowService, mock(JobService.class),
+            mock(EnvironmentService.class), workflowExecutionRowService, jobService,
             mock(PrincipalJobService.class), mock(ProjectFacade.class), projectDeploymentService, projectService,
             projectWorkflowService, mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class),
             mock(TaskFileStorage.class), triggerExecutionService, mock(TriggerFileStorage.class), workflowService);
@@ -199,6 +202,7 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
             .getId());
         assertEquals(DEPLOYMENT_ID, row.projectDeployment()
             .getId());
+        assertEquals(1, row.projectVersion());
         assertNotNull(row.triggerExecution());
         assertEquals(TriggerExecution.Status.FAILED, row.triggerExecution()
             .status());
@@ -223,6 +227,119 @@ class ProjectWorkflowExecutionFacadeTriggerRowsTest {
                 WorkflowExecutionId.of(PlatformType.AUTOMATION, DEPLOYMENT_ID, WORKFLOW_UUID.toString(), "trigger_1")
                     .toString()),
             idsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testAWorkflowFilterMatchesTheRunsOfEveryVersionOfThatWorkflow() {
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(WORKFLOW_ID)))
+            .thenReturn(List.of(new ProjectWorkflow(PROJECT_ID, 2, WORKFLOW_ID, WORKFLOW_UUID)));
+        when(projectWorkflowService.getProjectWorkflows(PROJECT_ID, WORKFLOW_UUID.toString()))
+            .thenReturn(
+                List.of(
+                    new ProjectWorkflow(PROJECT_ID, 1, PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_UUID),
+                    new ProjectWorkflow(PROJECT_ID, 2, WORKFLOW_ID, WORKFLOW_UUID)));
+        when(workflowExecutionRowService.getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
+                .thenReturn(Page.empty());
+
+        facade.getWorkflowExecutions(
+            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+
+        verify(workflowExecutionRowService).getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), eq(List.of(PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_ID)),
+            anyBoolean(), anyList(), anyInt());
+    }
+
+    @Test
+    void testAJobRowCarriesTheProjectVersionItRanNotTheDeploymentVersion() {
+        long jobId = 101L;
+
+        Job job = new Job(jobId);
+
+        job.setWorkflowId(PREVIOUS_VERSION_WORKFLOW_ID);
+
+        when(workflowExecutionRowService.getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
+                .thenReturn(new PageImpl<>(
+                    List.of(new WorkflowExecutionRowDTO(WorkflowExecutionRowDTO.Kind.JOB, jobId)),
+                    PageRequest.of(0, 20), 1));
+        when(projectWorkflowService.getProjectWorkflowIds(PROJECT_ID))
+            .thenReturn(List.of(PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_ID));
+        when(jobService.getJobs(List.of(jobId)))
+            .thenReturn(List.of(job));
+        when(projectWorkflowService.getProjectWorkflows(List.of(PROJECT_ID)))
+            .thenReturn(
+                List.of(
+                    new ProjectWorkflow(PROJECT_ID, 1, PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_UUID),
+                    new ProjectWorkflow(PROJECT_ID, 2, WORKFLOW_ID, WORKFLOW_UUID)));
+
+        Workflow previousVersionWorkflow = mock(Workflow.class);
+
+        when(previousVersionWorkflow.getId())
+            .thenReturn(PREVIOUS_VERSION_WORKFLOW_ID);
+        when(workflowService.getWorkflows(List.of(PREVIOUS_VERSION_WORKFLOW_ID)))
+            .thenReturn(List.of(previousVersionWorkflow));
+
+        Page<WorkflowExecutionDTO> page = facade.getWorkflowExecutions(
+            false, null, null, null, null, PROJECT_ID, DEPLOYMENT_ID, null, 1L, 0);
+
+        WorkflowExecutionDTO row = page.getContent()
+            .get(0);
+
+        assertEquals(jobId, row.id());
+        assertEquals(1, row.projectVersion());
+    }
+
+    @Test
+    void testTheDetailOfAJobCarriesTheProjectVersionItRanNotTheDeploymentVersion() {
+        long jobId = 101L;
+
+        Job job = new Job(jobId);
+
+        job.setWorkflowId(PREVIOUS_VERSION_WORKFLOW_ID);
+
+        when(jobService.getJob(jobId))
+            .thenReturn(job);
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(PREVIOUS_VERSION_WORKFLOW_ID)))
+            .thenReturn(List.of(new ProjectWorkflow(PROJECT_ID, 1, PREVIOUS_VERSION_WORKFLOW_ID, WORKFLOW_UUID)));
+
+        WorkflowExecutionDTO detail = facade.getWorkflowExecution(jobId);
+
+        assertEquals(jobId, detail.id());
+        assertEquals(1, detail.projectVersion());
+    }
+
+    @Test
+    void testTheDetailOfAJobWhoseWorkflowIsNotAProjectWorkflowHasNoProjectVersion() {
+        long jobId = 101L;
+
+        Job job = new Job(jobId);
+
+        job.setWorkflowId(PREVIOUS_VERSION_WORKFLOW_ID);
+
+        when(jobService.getJob(jobId))
+            .thenReturn(job);
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(PREVIOUS_VERSION_WORKFLOW_ID)))
+            .thenReturn(List.of());
+
+        WorkflowExecutionDTO detail = facade.getWorkflowExecution(jobId);
+
+        assertNull(detail.projectVersion());
+    }
+
+    @Test
+    void testAWorkflowFilterOnAnIdThatIsNotAProjectWorkflowMatchesOnlyThatId() {
+        when(projectWorkflowService.getWorkflowProjectWorkflows(List.of(WORKFLOW_ID)))
+            .thenReturn(List.of());
+        when(workflowExecutionRowService.getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyList(), anyInt()))
+                .thenReturn(Page.empty());
+
+        facade.getWorkflowExecutions(
+            false, null, Status.COMPLETED, null, null, null, DEPLOYMENT_ID, WORKFLOW_ID, 1L, 0);
+
+        verify(workflowExecutionRowService).getWorkflowExecutionRows(
+            any(), any(), any(), anyList(), any(), eq(List.of(WORKFLOW_ID)), anyBoolean(), anyList(), anyInt());
     }
 
     @Test

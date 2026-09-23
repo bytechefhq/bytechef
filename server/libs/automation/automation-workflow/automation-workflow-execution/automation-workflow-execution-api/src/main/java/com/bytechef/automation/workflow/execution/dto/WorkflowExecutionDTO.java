@@ -29,8 +29,8 @@ import org.jspecify.annotations.Nullable;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecutionDTO(
-    long id, Project project, ProjectDeployment projectDeployment, @Nullable JobDTO job, Workflow workflow,
-    @Nullable TriggerExecutionDTO triggerExecution) {
+    long id, Project project, ProjectDeployment projectDeployment, @Nullable Integer projectVersion,
+    @Nullable JobDTO job, Workflow workflow, @Nullable TriggerExecutionDTO triggerExecution) {
 
     public boolean isTriggerOnly() {
         return job == null;

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-04T22:06:08.943670+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T14:13:01.269252+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class WorkflowExecutionBasicModel {
 
   private Long id;
@@ -30,6 +30,8 @@ public class WorkflowExecutionBasicModel {
   private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
+
+  private @Nullable Integer projectVersion;
 
   private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job;
 
@@ -114,6 +116,27 @@ public class WorkflowExecutionBasicModel {
     this.projectDeployment = projectDeployment;
   }
 
+  public WorkflowExecutionBasicModel projectVersion(@Nullable Integer projectVersion) {
+    this.projectVersion = projectVersion;
+    return this;
+  }
+
+  /**
+   * The version of the project the workflow execution ran.
+   * @return projectVersion
+   */
+  
+  @Schema(name = "projectVersion", accessMode = Schema.AccessMode.READ_ONLY, description = "The version of the project the workflow execution ran.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectVersion")
+  public @Nullable Integer getProjectVersion() {
+    return projectVersion;
+  }
+
+  @JsonProperty("projectVersion")
+  public void setProjectVersion(@Nullable Integer projectVersion) {
+    this.projectVersion = projectVersion;
+  }
+
   public WorkflowExecutionBasicModel job(@Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job) {
     this.job = job;
     return this;
@@ -189,6 +212,7 @@ public class WorkflowExecutionBasicModel {
     return Objects.equals(this.id, workflowExecutionBasic.id) &&
         Objects.equals(this.project, workflowExecutionBasic.project) &&
         Objects.equals(this.projectDeployment, workflowExecutionBasic.projectDeployment) &&
+        Objects.equals(this.projectVersion, workflowExecutionBasic.projectVersion) &&
         Objects.equals(this.job, workflowExecutionBasic.job) &&
         Objects.equals(this.triggerExecution, workflowExecutionBasic.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecutionBasic.workflow);
@@ -196,7 +220,7 @@ public class WorkflowExecutionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, project, projectDeployment, job, triggerExecution, workflow);
+    return Objects.hash(id, project, projectDeployment, projectVersion, job, triggerExecution, workflow);
   }
 
   @Override
@@ -206,6 +230,7 @@ public class WorkflowExecutionBasicModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
+    sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
     sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");

@@ -158,7 +158,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             projectDeploymentIdOptional
                 .map(projectDeploymentService::getProjectDeployment)
                 .orElse(null),
-            jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
+            getProjectVersion(jobDTO.workflowId()), jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
                 projectDeploymentIdOptional.orElse(null),
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
@@ -220,7 +220,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         List<String> workflowIds = new ArrayList<>();
 
         if (workflowId != null) {
-            workflowIds.add(workflowId);
+            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId));
         } else if (projectId != null) {
             workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
         } else {
@@ -284,11 +284,17 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     .map(project -> Validate.notNull(project.getId(), "id"))
                     .toList();
 
-                Map<Long, List<String>> projectWorkflowIdsMap = projectWorkflowService.getProjectWorkflows(projectIds)
-                    .stream()
+                List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds);
+
+                Map<Long, List<String>> projectWorkflowIdsMap = projectWorkflows.stream()
                     .collect(Collectors.groupingBy(
                         ProjectWorkflow::getProjectId,
                         Collectors.mapping(ProjectWorkflow::getWorkflowId, Collectors.toList())));
+
+                Map<String, Integer> workflowProjectVersionMap = projectWorkflows.stream()
+                    .collect(Collectors.toMap(
+                        ProjectWorkflow::getWorkflowId, ProjectWorkflow::getProjectVersion,
+                        (projectVersion, otherProjectVersion) -> projectVersion));
 
                 List<PrincipalJob> principalJobs =
                     principalJobService.getPrincipalJobs(jobIds, PlatformType.AUTOMATION);
@@ -319,8 +325,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 }
 
                 Map<Long, WorkflowExecutionDTO> jobWorkflowExecutionDTOMap = buildWorkflowExecutionDTOs(
-                    jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, jobToPrincipalMap, deploymentMap,
-                    triggerExecutionByJobIdMap)
+                    jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, workflowProjectVersionMap,
+                    jobToPrincipalMap, deploymentMap, triggerExecutionByJobIdMap)
                         .stream()
                         .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
 
@@ -350,8 +356,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
     private List<WorkflowExecutionDTO> buildWorkflowExecutionDTOs(
         List<Long> jobIds, Map<Long, Job> jobMap, List<Workflow> workflows, List<Project> projects,
-        Map<Long, List<String>> projectWorkflowIdsMap, Map<Long, Long> jobToPrincipalMap,
-        Map<Long, ProjectDeployment> deploymentMap, Map<Long, TriggerExecution> triggerExecutionByJobIdMap) {
+        Map<Long, List<String>> projectWorkflowIdsMap, Map<String, Integer> workflowProjectVersionMap,
+        Map<Long, Long> jobToPrincipalMap, Map<Long, ProjectDeployment> deploymentMap,
+        Map<Long, TriggerExecution> triggerExecutionByJobIdMap) {
 
         List<WorkflowExecutionDTO> workflowExecutionDTOs = new ArrayList<>();
 
@@ -410,6 +417,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 Validate.notNull(job.getId(), "id"),
                 projectOptional.get(),
                 jobProjectDeployment,
+                workflowProjectVersionMap.get(job.getWorkflowId()),
                 new JobDTO(job, outputs, getSubflowJobTaskExecutions(job.getId())),
                 workflowOptional.get(),
                 getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
@@ -507,11 +515,35 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 Validate.notNull(triggerExecution.getId(), "id"),
                 new WorkflowExecutionDTO(
                     triggerExecution.getId(), projectService.getProject(projectDeployment.getProjectId()),
-                    projectDeployment, null, workflowService.getWorkflow(workflowIdOptional.get()),
+                    projectDeployment, projectDeployment.getProjectVersion(), null,
+                    workflowService.getWorkflow(workflowIdOptional.get()),
                     getTriggerExecutionDTO(projectDeploymentId, triggerExecution, null)));
         }
 
         return workflowExecutionDTOMap;
+    }
+
+    private @Nullable Integer getProjectVersion(String workflowId) {
+        return projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId))
+            .stream()
+            .findFirst()
+            .map(ProjectWorkflow::getProjectVersion)
+            .orElse(null);
+    }
+
+    /**
+     * Publishing a project version gives each workflow a new id, and a job records the id of the version it ran, so a
+     * deployment upgraded in place has runs under several ids. They all share the project workflow's uuid.
+     */
+    private List<String> getWorkflowVersionWorkflowIds(String workflowId) {
+        return projectWorkflowService.getWorkflowProjectWorkflows(List.of(workflowId))
+            .stream()
+            .findFirst()
+            .map(projectWorkflow -> CollectionUtils.map(
+                projectWorkflowService.getProjectWorkflows(
+                    projectWorkflow.getProjectId(), projectWorkflow.getUuidAsString()),
+                ProjectWorkflow::getWorkflowId))
+            .orElseGet(() -> List.of(workflowId));
     }
 
     private DefinitionResult getDefinition(String type, Map<String, DefinitionResult> definitionResultCache) {
