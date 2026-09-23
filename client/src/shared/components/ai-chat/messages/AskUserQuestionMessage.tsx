@@ -3,7 +3,7 @@ import ComboBox from '@/components/ComboBox/ComboBox';
 import {Input} from '@/components/Input/Input';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {useAiChatAskedQuestionsStore} from '@/shared/components/ai-chat/stores/useAiChatAskedQuestionsStore';
-import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
+import {DataMessagePartProps, useAui} from '@assistant-ui/react';
 import {ArrowLeftIcon, CheckIcon, XIcon} from 'lucide-react';
 import {useMemo, useState} from 'react';
 
@@ -50,7 +50,7 @@ const AskUserQuestionMessage = ({data}: DataMessagePartProps<AskUserQuestionData
     const [stepIndex, setStepIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
 
-    const threadRuntime = useThreadRuntime();
+    const aui = useAui();
 
     if (questions.length === 0) {
         return null;
@@ -80,7 +80,7 @@ const AskUserQuestionMessage = ({data}: DataMessagePartProps<AskUserQuestionData
 
         markAnswered(fingerprint, summary);
 
-        threadRuntime.append({
+        aui.thread.append({
             content: [{text: messageText, type: 'text'}],
             role: 'user',
         });

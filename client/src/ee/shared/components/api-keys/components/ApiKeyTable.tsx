@@ -2,13 +2,14 @@ import Button from '@/components/Button/Button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
 import {ApiKey} from '@/shared/middleware/graphql';
-import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
+import {coreTableFeatures} from '@/shared/util/table-features';
+import {createColumnHelper, flexRender, useTable} from '@tanstack/react-table';
 import {EditIcon, Trash2Icon} from 'lucide-react';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-const columnHelper = createColumnHelper<ApiKey>();
+const columnHelper = createColumnHelper<typeof coreTableFeatures, ApiKey>();
 
 interface ApiKeyTableProps {
     apiKeys: ApiKey[];
@@ -24,64 +25,65 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
     );
 
     const columns = useMemo(
-        () => [
-            columnHelper.accessor('name', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Name',
-            }),
-            columnHelper.accessor('secretKey', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Secret Key',
-            }),
-            columnHelper.accessor('createdDate', {
-                cell: (info) =>
-                    `${new Date(info.getValue()).toLocaleDateString()} ${new Date(info.getValue()).toLocaleTimeString()}`,
-                header: 'Created Date',
-            }),
-            columnHelper.accessor('lastUsedDate', {
-                cell: (info) =>
-                    `${new Date(info.getValue()).toLocaleDateString() ?? ''} ${new Date(info.getValue()).toLocaleTimeString() ?? ''}`,
-                header: 'Last Used Date',
-            }),
-            columnHelper.accessor('createdBy', {
-                cell: (info) => `${info.getValue()}`,
-                header: 'Created By',
-            }),
-            columnHelper.display({
-                cell: (info) => (
-                    <>
-                        <Button
-                            icon={<EditIcon className="size-4" />}
-                            onClick={() => {
-                                setCurrentApiKey(info.row.original);
-                                setShowEditDialog(true);
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        />
+        () =>
+            columnHelper.columns([
+                columnHelper.accessor('name', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Name',
+                }),
+                columnHelper.accessor('secretKey', {
+                    cell: (info) => info.getValue() ?? '',
+                    header: 'Secret Key',
+                }),
+                columnHelper.accessor('createdDate', {
+                    cell: (info) =>
+                        `${new Date(info.getValue()).toLocaleDateString()} ${new Date(info.getValue()).toLocaleTimeString()}`,
+                    header: 'Created Date',
+                }),
+                columnHelper.accessor('lastUsedDate', {
+                    cell: (info) =>
+                        `${new Date(info.getValue()).toLocaleDateString() ?? ''} ${new Date(info.getValue()).toLocaleTimeString() ?? ''}`,
+                    header: 'Last Used Date',
+                }),
+                columnHelper.accessor('createdBy', {
+                    cell: (info) => `${info.getValue()}`,
+                    header: 'Created By',
+                }),
+                columnHelper.display({
+                    cell: (info) => (
+                        <>
+                            <Button
+                                icon={<EditIcon className="size-4" />}
+                                onClick={() => {
+                                    setCurrentApiKey(info.row.original);
+                                    setShowEditDialog(true);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
 
-                        <Button
-                            icon={<Trash2Icon className="h-4 text-destructive" />}
-                            onClick={() => {
-                                setCurrentApiKey(info.row.original);
-                                setShowDeleteDialog(true);
-                            }}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </>
-                ),
-                header: '',
-                id: 'actions',
-            }),
-        ],
+                            <Button
+                                icon={<Trash2Icon className="h-4 text-destructive" />}
+                                onClick={() => {
+                                    setCurrentApiKey(info.row.original);
+                                    setShowDeleteDialog(true);
+                                }}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </>
+                    ),
+                    header: '',
+                    id: 'actions',
+                }),
+            ]),
         [setCurrentApiKey, setShowDeleteDialog, setShowEditDialog]
     );
 
-    const reactTable = useReactTable<ApiKey>({
+    const reactTable = useTable({
         columns,
         data: apiKeys,
-        getCoreRowModel: getCoreRowModel(),
+        features: coreTableFeatures,
     });
 
     const headerGroups = reactTable.getHeaderGroups();
@@ -109,7 +111,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer border-b-border/50" key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
+                            {row.getAllCells().map((cell) => (
                                 <TableCell
                                     className={twMerge(
                                         'whitespace-nowrap',
