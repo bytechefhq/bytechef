@@ -25,7 +25,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['mcpServers']});
             queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
-            queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
+            queryClient.invalidateQueries({queryKey: ['embeddedMcpServerTags']});
         },
     });
 
