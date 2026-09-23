@@ -1,6 +1,6 @@
 {
     "name": "@bytechef/embedded",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "ByteChef Embedded React SDK.",
     "type": "module",
     "scripts": {
