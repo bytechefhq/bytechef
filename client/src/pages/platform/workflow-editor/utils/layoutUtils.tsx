@@ -1185,8 +1185,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
                     context: {
                         conditionCase:
                             ((taskDispatcherNode?.data as NodeDataType).conditionData?.conditionCase as
-                                | 'caseTrue'
-                                | 'caseFalse') || CONDITION_CASE_TRUE,
+                                'caseTrue' | 'caseFalse') || CONDITION_CASE_TRUE,
                         taskDispatcherId: parentTaskDispatcher.name,
                     },
                     task: parentTaskDispatcher,
@@ -1198,8 +1197,7 @@ export const createEdgeFromTaskDispatcherBottomGhostNode = ({
                     context: {
                         onErrorCase:
                             ((taskDispatcherNode?.data as NodeDataType).onErrorData?.onErrorCase as
-                                | typeof ON_ERROR_MAIN_BRANCH
-                                | typeof ON_ERROR_ERROR_BRANCH) || ON_ERROR_MAIN_BRANCH,
+                                typeof ON_ERROR_MAIN_BRANCH | typeof ON_ERROR_ERROR_BRANCH) || ON_ERROR_MAIN_BRANCH,
                         taskDispatcherId: parentTaskDispatcher.name,
                     },
                     task: parentTaskDispatcher,

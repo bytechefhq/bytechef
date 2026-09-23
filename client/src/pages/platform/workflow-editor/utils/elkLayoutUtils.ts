@@ -467,8 +467,7 @@ function getOwningDispatcherId(node: Node): string | undefined {
 // just a caseKey — the ordinal is not recoverable from the flat node list.
 function getBranchCaseOrdinals(branchNode: Node): string[] {
     const parameters = (branchNode.data as NodeDataType).parameters as
-        | {cases?: Array<{key?: string | number}>}
-        | undefined;
+        {cases?: Array<{key?: string | number}>} | undefined;
 
     return ['default', ...(parameters?.cases || []).map((caseItem) => String(caseItem.key))];
 }

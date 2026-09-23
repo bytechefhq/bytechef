@@ -13,8 +13,7 @@ export interface ArrayIndexSegmentI {
 }
 
 export type ArrayIndexPartType =
-    | {text: string; type: 'literal'}
-    | {arrayIndex: number; occurrence: number; type: 'arrayIndex'};
+    {text: string; type: 'literal'} | {arrayIndex: number; occurrence: number; type: 'arrayIndex'};
 
 export interface SetArrayIndexProps {
     arrayIndex: number;

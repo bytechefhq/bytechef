@@ -46,21 +46,18 @@ const ApiCollectionEndpointList = ({
                                 key={apiCollectionEndpoint.id}
                             >
                                 {apiCollectionEndpoint &&
-                                    projectDeployment &&
-                                    projectDeployment.projectDeploymentWorkflows &&
+                                    projectDeployment?.projectDeploymentWorkflows &&
                                     workflows && (
                                         <ApiCollectionEndpointListItem
                                             apiCollectionEndpoint={apiCollectionEndpoint}
                                             collectionVersion={collectionVersion}
                                             contextPath={contextPath}
                                             projectDeploymentId={projectDeploymentId}
-                                            projectDeploymentWorkflow={
-                                                projectDeployment.projectDeploymentWorkflows.find(
-                                                    (projectDeploymentWorkflow) =>
-                                                        projectDeploymentWorkflow.workflowUuid ===
-                                                        apiCollectionEndpoint.workflowUuid
-                                                )!
-                                            }
+                                            projectDeploymentWorkflow={projectDeployment.projectDeploymentWorkflows.find(
+                                                (projectDeploymentWorkflow) =>
+                                                    projectDeploymentWorkflow.workflowUuid ===
+                                                    apiCollectionEndpoint.workflowUuid
+                                            )!}
                                             projectId={projectId}
                                             projectVersion={projectVersion}
                                             workflows={workflows}
