@@ -14,6 +14,7 @@ interface AutomationWorkflowProjectListProps {
     onDeleteProject: (projectId: string) => void;
     onDeleteWorkflow: (workflowUuid: string) => void;
     onEditProject: (project: AutomationWorkflowProjectType) => void;
+    onEditWorkflow: (workflow: AutomationWorkflowProjectType['workflowTemplates'][number]) => void;
     onImportWorkflow: (projectId: string) => void;
     onPublishProject: (projectId: string) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
@@ -28,6 +29,7 @@ const AutomationWorkflowProjectList = ({
     onDeleteProject,
     onDeleteWorkflow,
     onEditProject,
+    onEditWorkflow,
     onImportWorkflow,
     onPublishProject,
     onSelectWorkflow,
@@ -86,6 +88,7 @@ const AutomationWorkflowProjectList = ({
                         <AutomationWorkflowProjectWorkflowList
                             onCreateWorkflow={onCreateWorkflow}
                             onDeleteWorkflow={onDeleteWorkflow}
+                            onEditWorkflow={onEditWorkflow}
                             onSelectWorkflow={onSelectWorkflow}
                             project={project}
                         />

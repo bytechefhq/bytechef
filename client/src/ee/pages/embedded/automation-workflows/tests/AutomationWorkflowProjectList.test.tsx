@@ -25,9 +25,11 @@ type EmbeddedTagType = AutomationWorkflowProjectTagsQuery['automationWorkflowPro
 const makeProject = (
     overrides: Partial<AutomationWorkflowProjectType> & Pick<AutomationWorkflowProjectType, 'id' | 'name'>
 ): AutomationWorkflowProjectType => ({
+    automationHubVisible: true,
     categoryId: null,
     description: null,
     lastPublishedVersion: null,
+    permissionExpression: null,
     published: false,
     tagIds: [],
     version: 1,
@@ -40,6 +42,7 @@ describe('AutomationWorkflowProjectList', () => {
     const onDeleteProject = vi.fn();
     const onDeleteWorkflow = vi.fn();
     const onEditProject = vi.fn();
+    const onEditWorkflow = vi.fn();
     const onImportWorkflow = vi.fn();
     const onPublishProject = vi.fn();
     const onSelectWorkflow = vi.fn();
@@ -52,6 +55,7 @@ describe('AutomationWorkflowProjectList', () => {
         onDeleteProject,
         onDeleteWorkflow,
         onEditProject,
+        onEditWorkflow,
         onImportWorkflow,
         onPublishProject,
         onSelectWorkflow,
@@ -64,6 +68,7 @@ describe('AutomationWorkflowProjectList', () => {
         onDeleteProject.mockReset();
         onDeleteWorkflow.mockReset();
         onEditProject.mockReset();
+        onEditWorkflow.mockReset();
         onImportWorkflow.mockReset();
         onPublishProject.mockReset();
         onSelectWorkflow.mockReset();
@@ -86,6 +91,23 @@ describe('AutomationWorkflowProjectList', () => {
 
         expect(screen.getByText('V3')).toBeInTheDocument();
         expect(screen.getByText('PUBLISHED')).toBeInTheDocument();
+    });
+
+    it('renders a hidden from hub badge when the project is not visible in the automation hub', () => {
+        const projects = [makeProject({automationHubVisible: false, id: 'p1', name: 'Hidden Project'})];
+
+        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getByText('Hidden from hub')).toBeInTheDocument();
+    });
+
+    it('does not render a hidden from hub badge when the project is visible in the automation hub', () => {
+        const projects = [makeProject({automationHubVisible: true, id: 'p1', name: 'Visible Project'})];
+
+        renderWithProviders(<AutomationWorkflowProjectList {...defaultProps} projects={projects} />);
+
+        expect(screen.getByText('Visible Project')).toBeInTheDocument();
+        expect(screen.queryByText('Hidden from hub')).not.toBeInTheDocument();
     });
 
     it('renders the project tags as interactive chips', () => {
@@ -201,7 +223,9 @@ describe('AutomationWorkflowProjectList', () => {
                         description: null,
                         label: 'Sync Contacts',
                         lastModifiedDate: null,
+                        permissionExpression: null,
                         triggers: [],
+                        workflowId: 'draft-wf-uuid-5',
                         workflowUuid: 'wf-uuid-5',
                     },
                 ],
