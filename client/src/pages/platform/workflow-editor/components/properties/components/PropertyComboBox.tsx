@@ -246,34 +246,22 @@ const PropertyComboBox = ({
         Boolean(queryEnabled && currentNode?.clusterElementType)
     );
 
-    const clusterElementInputParameters = useMemo(() => {
-        if (!clusterElementContext?.inputParameters) {
-            return undefined;
-        }
+    const clusterElementInputParameters = clusterElementContext?.inputParameters
+        ? Object.fromEntries(
+              Object.entries(clusterElementContext.inputParameters).filter(
+                  ([, parameterValue]) =>
+                      !(
+                          typeof parameterValue === 'string' &&
+                          (parameterValue.startsWith('=') || parameterValue.includes('${'))
+                      )
+              )
+          )
+        : undefined;
 
-        const filteredParameters: Record<string, unknown> = {};
-
-        for (const [parameterKey, parameterValue] of Object.entries(clusterElementContext.inputParameters)) {
-            if (
-                typeof parameterValue === 'string' &&
-                (parameterValue.startsWith('=') || parameterValue.includes('${'))
-            ) {
-                continue;
-            }
-
-            filteredParameters[parameterKey] = parameterValue;
-        }
-
-        return filteredParameters;
-    }, [clusterElementContext?.inputParameters]);
-
-    const clusterElementLookupDependsOnValues = useMemo(() => {
-        if (!clusterElementInputParameters || !lookupDependsOnPaths?.length) {
-            return undefined;
-        }
-
-        return lookupDependsOnPaths.map((dependencyPath) => clusterElementInputParameters[dependencyPath]);
-    }, [clusterElementInputParameters, lookupDependsOnPaths]);
+    const clusterElementLookupDependsOnValues =
+        clusterElementInputParameters && lookupDependsOnPaths?.length
+            ? lookupDependsOnPaths.map((dependencyPath) => clusterElementInputParameters[dependencyPath])
+            : undefined;
 
     const clusterElementContextQueryEnabled = useMemo(() => {
         if (

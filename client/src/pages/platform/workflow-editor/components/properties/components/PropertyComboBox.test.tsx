@@ -375,6 +375,44 @@ describe('PropertyComboBox', () => {
             expect(queryOptions.enabled).toBe(true);
         });
 
+        it('should re-key the options query when a dependency value is mutated in place', () => {
+            const inputParameters: Record<string, unknown> = {serverId: 'srv-1'};
+
+            hoisted.mockClusterElementContext.mockReturnValue({...clusterElementContext, inputParameters});
+
+            hoisted.mockClusterElementOptionsQuery.mockReturnValue({
+                data: undefined,
+                isLoading: false,
+            });
+
+            const {rerender} = render(
+                <PropertyComboBox
+                    {...defaultProps}
+                    lookupDependsOnPaths={['serverId']}
+                    options={[]}
+                    optionsDataSource={optionsDataSource}
+                    propertyName="toolName"
+                />
+            );
+
+            inputParameters.serverId = 'srv-2';
+
+            rerender(
+                <PropertyComboBox
+                    {...defaultProps}
+                    lookupDependsOnPaths={['serverId']}
+                    options={[]}
+                    optionsDataSource={optionsDataSource}
+                    propertyName="toolName"
+                />
+            );
+
+            const lastCall = hoisted.mockClusterElementOptionsQuery.mock.calls.at(-1);
+
+            expect(lastCall?.[0].inputParameters).toEqual({serverId: 'srv-2'});
+            expect(lastCall?.[1].queryKey[1].lookupDependsOnValues).toEqual(['srv-2']);
+        });
+
         it('should fall back to initialOptions when no query data is available', async () => {
             hoisted.mockClusterElementOptionsQuery.mockReturnValue({
                 data: undefined,
