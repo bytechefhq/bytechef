@@ -43,6 +43,8 @@ const hoisted = vi.hoisted(() => {
         publishProjectMutate: vi.fn(),
         tags: [] as Array<{id: string; name: string}>,
         updateProjectMutate: vi.fn(),
+        updateWorkflowMutate: vi.fn(),
+        updateWorkflowPermissionExpressionMutate: vi.fn(),
     };
 });
 
@@ -86,6 +88,14 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.updateProjectMutate,
     }),
+    useUpdateAutomationWorkflowProjectWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateWorkflowMutate,
+    }),
+    useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateWorkflowPermissionExpressionMutate,
+    }),
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -118,6 +128,8 @@ beforeEach(() => {
     hoisted.publishProjectMutate.mockReset();
     hoisted.tags = [];
     hoisted.updateProjectMutate.mockReset();
+    hoisted.updateWorkflowMutate.mockReset();
+    hoisted.updateWorkflowPermissionExpressionMutate.mockReset();
 });
 
 describe('AutomationWorkflows', () => {
@@ -361,5 +373,61 @@ describe('AutomationWorkflows', () => {
         const parsed = JSON.parse(definition);
 
         expect(parsed.label).toBe('My New Workflow');
+    });
+
+    it('updates the workflow and then its permission expression when the edit dialog is saved', async () => {
+        const user = userEvent.setup();
+
+        hoisted.projects = [
+            {
+                categoryId: null,
+                description: null,
+                id: 'project-12',
+                lastPublishedVersion: null,
+                name: 'My Project',
+                published: false,
+                tagIds: [],
+                workflowTemplates: [
+                    {
+                        components: [],
+                        description: 'Keeps contacts in sync',
+                        label: 'Sync Contacts',
+                        lastModifiedDate: null,
+                        permissionExpression: null,
+                        triggers: [],
+                        workflowUuid: 'wf-uuid-12',
+                    } as unknown as {description: string | null; label: string | null; workflowUuid: string},
+                ],
+            },
+        ];
+
+        hoisted.updateWorkflowMutate.mockImplementation((_variables, options) => options?.onSuccess?.());
+        hoisted.updateWorkflowPermissionExpressionMutate.mockImplementation((_variables, options) =>
+            options?.onSuccess?.()
+        );
+
+        renderWithProviders(<AutomationWorkflows />);
+
+        await user.click(screen.getByText('1 workflow'));
+        await user.click(await screen.findByRole('button', {name: 'Workflow Actions'}));
+        await user.click(await screen.findByRole('menuitem', {name: 'Edit Workflow'}));
+
+        const labelInput = await screen.findByRole('textbox', {name: /label/i});
+
+        await user.clear(labelInput);
+        await user.type(labelInput, 'Sync All Contacts');
+
+        await user.click(screen.getByRole('button', {name: /^save$/i}));
+
+        expect(hoisted.createWorkflowMutate).not.toHaveBeenCalled();
+        expect(hoisted.updateWorkflowMutate).toHaveBeenCalledWith(
+            expect.objectContaining({label: 'Sync All Contacts', workflowUuid: 'wf-uuid-12'}),
+            expect.anything()
+        );
+        expect(hoisted.updateWorkflowPermissionExpressionMutate).toHaveBeenCalledWith(
+            expect.objectContaining({workflowUuid: 'wf-uuid-12'}),
+            expect.anything()
+        );
+        expect(screen.queryByRole('textbox', {name: /label/i})).not.toBeInTheDocument();
     });
 });
