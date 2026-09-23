@@ -22,7 +22,7 @@ const ConnectedUserSheetPanelIntegrationWorkflowList = ({
             <h3 className="flex justify-start px-3 text-sm font-semibold text-muted-foreground uppercase">Workflows</h3>
 
             {workflows.length > 0 ? (
-                <ul className="divide-y divide-gray-100">
+                <ul className="divide-y divide-stroke-neutral-primary">
                     {workflows.map((workflow) => {
                         const integrationInstanceWorkflow = integrationInstance?.integrationInstanceWorkflows?.find(
                             (integrationInstanceWorkflow) => integrationInstanceWorkflow.workflowId === workflow.id
