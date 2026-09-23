@@ -165,4 +165,54 @@ describe('ConnectionDialog', () => {
             'https://docs.example.com/slack'
         );
     });
+
+    describe('editing a connection whose credentials were rejected', () => {
+        const invalidConnection = {
+            componentName: 'slack',
+            credentialStatus: 'INVALID',
+            id: 7,
+            name: 'Slack',
+            tags: [],
+            version: 1,
+        };
+
+        const renderEditDialog = (withCredentialsMutation: boolean) => {
+            const updateConnectionMutate = vi.fn();
+
+            render(
+                <ConnectionDialog
+                    componentDefinitions={COMPONENT_DEFINITIONS as never}
+                    connection={invalidConnection as never}
+                    connectionTagsQueryKey={['connectionTags']}
+                    connectionsQueryKey={['connections']}
+                    useGetConnectionTagsQuery={(() => ({data: [], error: null, isLoading: false})) as never}
+                    useUpdateConnectionCredentialsMutation={
+                        withCredentialsMutation
+                            ? ((() => ({isPending: false, mutateAsync: vi.fn(), reset: vi.fn()})) as never)
+                            : undefined
+                    }
+                    useUpdateConnectionMutation={
+                        (() => ({isPending: false, mutate: updateConnectionMutate, reset: vi.fn()})) as never
+                    }
+                />
+            );
+
+            return {updateConnectionMutate};
+        };
+
+        it('stays in name and tags mode when the page cannot update credentials', () => {
+            renderEditDialog(false);
+
+            expect(screen.queryByText('These credentials were rejected')).not.toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Save'})).toBeInTheDocument();
+            expect(screen.queryByRole('button', {name: 'Update credentials'})).not.toBeInTheDocument();
+        });
+
+        it('switches into credentials mode when the page can update credentials', async () => {
+            renderEditDialog(true);
+
+            expect(await screen.findByText('These credentials were rejected')).toBeInTheDocument();
+            expect(screen.getByRole('button', {name: 'Update credentials'})).toBeInTheDocument();
+        });
+    });
 });

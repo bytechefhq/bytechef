@@ -88,6 +88,7 @@ export const Connections = () => {
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                 connectionsQueryKey={ConnectionKeys.connections}
+                                showSharedOption
                                 triggerNode={<Button label="New Connection" />}
                                 useCreateConnectionMutation={useCreateConnectionMutation}
                                 useGetConnectionTagsQuery={useGetConnectionTagsQuery}
@@ -143,13 +144,14 @@ export const Connections = () => {
                                     }
                                     connectionTagsQueryKey={ConnectionKeys.connectionTags}
                                     connectionsQueryKey={ConnectionKeys.connections}
+                                    showSharedOption
                                     triggerNode={<Button label="Create Connection" />}
                                     useCreateConnectionMutation={useCreateConnectionMutation}
                                     useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                                 />
                             )
                         }
-                        icon={<Link2Icon className="size-24 text-gray-300" />}
+                        icon={<Link2Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message="You do not have any Connections created yet."
                         title="No Connections"
                     />
