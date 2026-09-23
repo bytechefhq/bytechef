@@ -20,8 +20,6 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => {
     };
 });
 
-// We don't need to mock EnvironmentApi because we'll stub QueryClient.fetchQuery directly
-
 const authModule = await import('@/shared/stores/useAuthenticationStore');
 const envStoreModule = await import('@/shared/stores/useEnvironmentStore');
 
@@ -41,7 +39,7 @@ describe('loadEnvironmentsIfAuthenticated', () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (authModule.authenticationStore.getState as any).mockReturnValue({authenticated: false});
 
-        const fetchSpy = vi.spyOn(queryClient, 'fetchQuery');
+        const fetchSpy = vi.spyOn(queryClient, 'query');
 
         const setEnvironmentsSpy = vi.fn();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,7 +63,7 @@ describe('loadEnvironmentsIfAuthenticated', () => {
             {id: 2, name: 'Prod'},
         ];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fetchSpy = vi.spyOn(queryClient, 'fetchQuery').mockResolvedValue(environments as any);
+        const fetchSpy = vi.spyOn(queryClient, 'query').mockResolvedValue(environments as any);
 
         const setEnvironmentsSpy = vi.fn();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

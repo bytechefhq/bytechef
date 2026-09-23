@@ -8,7 +8,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {CopyIcon, DownloadIcon, EditIcon, HistoryIcon, SettingsIcon, Trash2Icon} from 'lucide-react';
+import {
+    CopyIcon,
+    DownloadIcon,
+    EditIcon,
+    HistoryIcon,
+    PlusIcon,
+    SettingsIcon,
+    Trash2Icon,
+    UploadIcon,
+} from 'lucide-react';
 import {useState} from 'react';
 
 interface AutomationWorkflowEditorSettingsMenuProps {
@@ -20,6 +29,8 @@ interface AutomationWorkflowEditorSettingsMenuProps {
     onEditWorkflowClick: () => void;
     onExportProjectClick: () => void;
     onExportWorkflowClick: () => void;
+    onImportWorkflowClick: () => void;
+    onNewWorkflowClick: () => void;
     onProjectHistoryClick: () => void;
 }
 
@@ -32,6 +43,8 @@ const AutomationWorkflowEditorSettingsMenu = ({
     onEditWorkflowClick,
     onExportProjectClick,
     onExportWorkflowClick,
+    onImportWorkflowClick,
+    onNewWorkflowClick,
     onProjectHistoryClick,
 }: AutomationWorkflowEditorSettingsMenuProps) => {
     const [open, setOpen] = useState(false);
@@ -51,7 +64,7 @@ const AutomationWorkflowEditorSettingsMenu = ({
                 <TooltipContent>Project and workflow settings</TooltipContent>
             </Tooltip>
 
-            <DropdownMenuContent className="p-0">
+            <DropdownMenuContent align="end" className="p-0">
                 <Tabs aria-label="Settings menu" defaultValue="workflow">
                     <TabsList className="rounded-none">
                         <TabsTrigger
@@ -153,6 +166,32 @@ const AutomationWorkflowEditorSettingsMenu = ({
                             <DownloadIcon className="mr-2 size-4" />
                             Export
                         </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                            className="dropdown-menu-item"
+                            onClick={() => {
+                                setOpen(false);
+                                onNewWorkflowClick();
+                            }}
+                        >
+                            <PlusIcon className="mr-2 size-4" />
+                            New Workflow
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                            className="dropdown-menu-item"
+                            onClick={() => {
+                                setOpen(false);
+                                onImportWorkflowClick();
+                            }}
+                        >
+                            <UploadIcon className="mr-2 size-4" />
+                            Import Workflow
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
 
                         <DropdownMenuItem
                             className="dropdown-menu-item"

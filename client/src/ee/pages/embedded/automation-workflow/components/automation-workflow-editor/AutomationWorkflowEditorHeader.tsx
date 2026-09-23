@@ -1,7 +1,6 @@
-import {Separator} from '@/components/ui/separator';
-import {Skeleton} from '@/components/ui/skeleton';
 import AutomationWorkflowEditorBreadcrumb from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorBreadcrumb';
 import AutomationWorkflowEditorSettingsMenu from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorSettingsMenu';
+import AutomationWorkflowEditorWorkflowSelect from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowSelect';
 import AutomationWorkflowProjectVersionHistorySheet from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowProjectVersionHistorySheet';
 import LeftSidebarButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/LeftSidebarButton';
 import OutputButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/OutputButton';
@@ -9,12 +8,14 @@ import PublishPopover from '@/ee/pages/embedded/automation-workflow/components/a
 import WorkflowActionsButton from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/WorkflowActionsButton';
 import {useAutomationWorkflowEditorHeader} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/hooks/useAutomationWorkflowEditorHeader';
 import {useAutomationWorkflowEditorSidebarStore} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/stores/useAutomationWorkflowEditorSidebarStore';
+import {useCreateAutomationWorkflowProjectWorkflow} from '@/ee/pages/embedded/automation-workflow/hooks/useCreateAutomationWorkflowProjectWorkflow';
 import AutomationWorkflowDialog, {
     AutomationWorkflowFormValuesI,
 } from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-dialog/AutomationWorkflowDialog';
 import AutomationWorkflowProjectDialog, {
     AutomationWorkflowProjectFormValuesI,
 } from '@/ee/pages/embedded/automation-workflows/components/automation-workflow-project-dialog/AutomationWorkflowProjectDialog';
+import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import DeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/components/settings-menu/components/DeleteProjectAlertDialog';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -24,21 +25,25 @@ import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilo
 import {
     useAutomationWorkflowProjectCategoriesQuery,
     useAutomationWorkflowProjectTagsQuery,
-    useAutomationWorkflowProjectsQuery,
     useDeleteAutomationWorkflowProjectMutation,
     useDeleteAutomationWorkflowProjectWorkflowMutation,
     useDuplicateAutomationWorkflowProjectMutation,
     useDuplicateAutomationWorkflowProjectWorkflowMutation,
     useUpdateAutomationWorkflowProjectMutation,
+    useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation,
 } from '@/shared/middleware/graphql';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
-import {RefObject, useState} from 'react';
+import {onlineManager, useIsMutating, useQueryClient} from '@tanstack/react-query';
+import {RefObject, useState, useSyncExternalStore} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
+
+const getOnlineStatus = () => onlineManager.isOnline();
+
+const subscribeToOnlineStatus = (onOnlineStatusChange: () => void) => onlineManager.subscribe(onOnlineStatusChange);
 
 interface AutomationWorkflowEditorHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
@@ -57,13 +62,13 @@ const AutomationWorkflowEditorHeader = ({
     runDisabled,
     updateWorkflowMutation,
 }: AutomationWorkflowEditorHeaderProps) => {
+    const [showCreateWorkflowDialog, setShowCreateWorkflowDialog] = useState(false);
     const [showProjectDeleteAlert, setShowProjectDeleteAlert] = useState(false);
     const [showProjectEditDialog, setShowProjectEditDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
     const [showWorkflowDeleteAlert, setShowWorkflowDeleteAlert] = useState(false);
     const [showWorkflowEditDialog, setShowWorkflowEditDialog] = useState(false);
 
-    const copilotLayoutShifted = useCopilotLayoutShifted();
     const {leftSidebarOpen, setLeftSidebarOpen} = useAutomationWorkflowEditorSidebarStore(
         useShallow((state) => ({
             leftSidebarOpen: state.leftSidebarOpen,
@@ -77,7 +82,9 @@ const AutomationWorkflowEditorHeader = ({
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const isFetching = useIsFetching();
+    const copilotLayoutShifted = useCopilotLayoutShifted();
+    const isOnline = useSyncExternalStore(subscribeToOnlineStatus, getOnlineStatus);
+    const isSaving = useIsMutating();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -94,7 +101,12 @@ const AutomationWorkflowEditorHeader = ({
         projectId,
     });
 
-    useAutomationWorkflowProjectsQuery();
+    const {createWorkflow, handleWorkflowFileChange, workflowFileInputRef} = useCreateAutomationWorkflowProjectWorkflow(
+        {
+            bottomResizablePanelRef,
+            projectId: project?.id,
+        }
+    );
 
     const {data: categoriesData} = useAutomationWorkflowProjectCategoriesQuery();
     const {data: tagsData} = useAutomationWorkflowProjectTagsQuery();
@@ -107,8 +119,20 @@ const AutomationWorkflowEditorHeader = ({
     const duplicateWorkflowMutation = useDuplicateAutomationWorkflowProjectWorkflowMutation();
     const duplicateProjectMutation = useDuplicateAutomationWorkflowProjectMutation();
     const updateProjectMutation = useUpdateAutomationWorkflowProjectMutation();
+    const updateWorkflowPermissionExpressionMutation =
+        useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation();
 
-    const isOnline = onlineManager.isOnline();
+    const currentWorkflowTemplate = project?.workflowTemplates.find(
+        (workflowTemplate) => workflowTemplate.workflowUuid === currentWorkflowId
+    );
+
+    const loadingIndicator = (isSaving > 0 || !isOnline) && (
+        <LoadingIndicator
+            className="absolute -top-1 -right-1 size-5 rounded-full"
+            isFetching={isSaving}
+            isOnline={isOnline}
+        />
+    );
 
     const handleDuplicateWorkflowClick = () => {
         duplicateWorkflowMutation.mutate(
@@ -140,6 +164,12 @@ const AutomationWorkflowEditorHeader = ({
                 },
             }
         );
+    };
+
+    const handleCreateWorkflowSubmit = (values: AutomationWorkflowFormValuesI) => {
+        createWorkflow(values);
+
+        setShowCreateWorkflowDialog(false);
     };
 
     const handleProjectHistoryClick = () => {
@@ -179,10 +209,18 @@ const AutomationWorkflowEditorHeader = ({
             },
             {
                 onSuccess: () => {
-                    queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
                     queryClient.invalidateQueries({queryKey: WorkflowKeys.workflow(workflow.id!)});
 
-                    setShowWorkflowEditDialog(false);
+                    updateWorkflowPermissionExpressionMutation.mutate(
+                        {permissionExpression: values.permissionExpression, workflowUuid: currentWorkflowId},
+                        {
+                            onSuccess: () => {
+                                queryClient.invalidateQueries({queryKey: ['automationWorkflowProjects']});
+
+                                setShowWorkflowEditDialog(false);
+                            },
+                        }
+                    );
                 },
             }
         );
@@ -220,10 +258,12 @@ const AutomationWorkflowEditorHeader = ({
 
         updateProjectMutation.mutate(
             {
+                automationHubVisible: values.automationHubVisible,
                 category: values.category || undefined,
                 description: values.description || undefined,
                 id: project.id,
                 name: values.name,
+                permissionExpression: values.permissionExpression,
                 tags: values.tags,
             },
             {
@@ -264,27 +304,7 @@ const AutomationWorkflowEditorHeader = ({
     };
 
     if (!project) {
-        return (
-            <header className="flex items-center justify-between bg-surface-main px-3 py-2.5">
-                <div className="flex items-center gap-5">
-                    <Skeleton className="h-6 w-80" />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Skeleton className="size-6" />
-
-                    <Skeleton className="size-4 rounded-full" />
-
-                    <Skeleton className="size-6" />
-
-                    <div className="flex gap-2">
-                        <Skeleton className="h-9 w-28" />
-
-                        <Skeleton className="h-9 w-20" />
-                    </div>
-                </div>
-            </header>
-        );
+        return <ProjectSkeleton />;
     }
 
     return (
@@ -295,35 +315,22 @@ const AutomationWorkflowEditorHeader = ({
                 copilotLayoutShifted && 'pr-0'
             )}
         >
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)} />
 
-                <Separator className="mr-4 ml-2 h-4" orientation="vertical" />
-
                 <AutomationWorkflowEditorBreadcrumb
-                    currentWorkflowId={currentWorkflowId}
-                    onWorkflowValueChange={handleWorkflowValueChange}
+                    itemSelect={
+                        <AutomationWorkflowEditorWorkflowSelect
+                            currentWorkflowId={currentWorkflowId}
+                            onValueChange={handleWorkflowValueChange}
+                            workflows={project.workflowTemplates}
+                        />
+                    }
                     project={project}
                 />
             </div>
 
-            <div className="flex items-center">
-                <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
-
-                <AutomationWorkflowEditorSettingsMenu
-                    onDeleteProjectClick={handleDeleteProjectClick}
-                    onDeleteWorkflowClick={handleDeleteWorkflowClick}
-                    onDuplicateProjectClick={handleDuplicateProjectClick}
-                    onDuplicateWorkflowClick={handleDuplicateWorkflowClick}
-                    onEditProjectClick={handleEditProjectClick}
-                    onEditWorkflowClick={handleEditWorkflowClick}
-                    onExportProjectClick={handleExportProjectClick}
-                    onExportWorkflowClick={handleExportWorkflowClick}
-                    onProjectHistoryClick={handleProjectHistoryClick}
-                />
-
-                <OutputButton onShowOutputClick={handleShowOutputClick} />
-
+            <div className="flex items-center gap-1">
                 <WorkflowActionsButton
                     chatTrigger={chatTrigger ?? false}
                     onRunClick={handleRunClick}
@@ -336,13 +343,53 @@ const AutomationWorkflowEditorHeader = ({
                     isPending={publishProjectMutationIsPending}
                     onPublishProjectSubmit={handlePublishProjectSubmit}
                 />
+
+                <OutputButton onShowOutputClick={handleShowOutputClick} />
+
+                <div className="relative">
+                    <AutomationWorkflowEditorSettingsMenu
+                        onDeleteProjectClick={handleDeleteProjectClick}
+                        onDeleteWorkflowClick={handleDeleteWorkflowClick}
+                        onDuplicateProjectClick={handleDuplicateProjectClick}
+                        onDuplicateWorkflowClick={handleDuplicateWorkflowClick}
+                        onEditProjectClick={handleEditProjectClick}
+                        onEditWorkflowClick={handleEditWorkflowClick}
+                        onExportProjectClick={handleExportProjectClick}
+                        onExportWorkflowClick={handleExportWorkflowClick}
+                        onImportWorkflowClick={() => workflowFileInputRef.current?.click()}
+                        onNewWorkflowClick={() => setShowCreateWorkflowDialog(true)}
+                        onProjectHistoryClick={handleProjectHistoryClick}
+                    />
+
+                    {loadingIndicator}
+                </div>
             </div>
+
+            <input
+                accept=".json,.yaml,.yml"
+                aria-label="Import workflow file"
+                className="hidden"
+                onChange={handleWorkflowFileChange}
+                ref={workflowFileInputRef}
+                type="file"
+            />
+
+            {showCreateWorkflowDialog && (
+                <AutomationWorkflowDialog
+                    onClose={() => setShowCreateWorkflowDialog(false)}
+                    onSubmit={handleCreateWorkflowSubmit}
+                />
+            )}
 
             {showWorkflowEditDialog && (
                 <AutomationWorkflowDialog
                     onClose={() => setShowWorkflowEditDialog(false)}
                     onSubmit={handleEditWorkflowSubmit}
-                    workflow={workflow}
+                    workflow={{
+                        description: workflow.description,
+                        label: workflow.label,
+                        permissionExpression: currentWorkflowTemplate?.permissionExpression,
+                    }}
                 />
             )}
 
