@@ -36,7 +36,7 @@ import {
 } from './AuthorizationType';
 
 /**
- * Contains all required information to open a connection to a service defined by componentName parameter.
+ * 
  * @export
  * @interface Connection
  */
@@ -149,8 +149,30 @@ export interface Connection {
      * @memberof Connection
      */
     version?: number;
+    /**
+     * When true, every connected user in the same environment may use this connection. Always forced to false when a connected user creates a connection for themselves.
+     * @type {boolean}
+     * @memberof Connection
+     */
+    shared?: boolean;
+    /**
+     * Lifecycle state of the connection. ACTIVE is the normal operating state.
+     * @type {ConnectionStatusEnum}
+     * @memberof Connection
+     */
+    readonly status?: ConnectionStatusEnum;
 }
 
+
+/**
+ * @export
+ */
+export const ConnectionStatusEnum = {
+    Active: 'ACTIVE',
+    PendingReassignment: 'PENDING_REASSIGNMENT',
+    Revoked: 'REVOKED'
+} as const;
+export type ConnectionStatusEnum = typeof ConnectionStatusEnum[keyof typeof ConnectionStatusEnum];
 
 
 /**
@@ -192,6 +214,8 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'parameters': json['parameters'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
+        'shared': json['shared'] == null ? undefined : json['shared'],
+        'status': json['status'] == null ? undefined : json['status'],
     };
 }
 
@@ -199,7 +223,7 @@ export function ConnectionToJSON(json: any): Connection {
     return ConnectionToJSONTyped(json, false);
 }
 
-export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'status'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -216,6 +240,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'parameters': value['parameters'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
         '__version': value['version'],
+        'shared': value['shared'],
     };
 }
 

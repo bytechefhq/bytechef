@@ -385,6 +385,7 @@ export enum AuthorizationType {
 
 export type AutomationWorkflowProject = {
   __typename?: 'AutomationWorkflowProject';
+  automationHubVisible: Scalars['Boolean']['output'];
   categoryId?: Maybe<Scalars['ID']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -431,6 +432,7 @@ export type AutomationWorkflowProjectWorkflowTemplate = {
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   permissionExpression?: Maybe<Scalars['String']['output']>;
   triggers: Array<AutomationWorkflowProjectComponent>;
+  workflowId: Scalars['ID']['output'];
   workflowUuid: Scalars['ID']['output'];
 };
 
@@ -568,6 +570,16 @@ export type ConnectedUser = {
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ConnectedUserCodeWorkflowReference = {
+  __typename?: 'ConnectedUserCodeWorkflowReference';
+  automationWorkflowUuid: Scalars['ID']['output'];
+  dangling: Scalars['Boolean']['output'];
+  danglingReason?: Maybe<Scalars['String']['output']>;
+  enabled: Scalars['Boolean']['output'];
+  environment: Scalars['String']['output'];
+  externalUserId: Scalars['String']['output'];
 };
 
 export type ConnectedUserMcpServer = {
@@ -1474,6 +1486,7 @@ export type McpTool = {
   __typename?: 'McpTool';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
@@ -1629,6 +1642,7 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
+  updateMcpToolEnabled?: Maybe<McpTool>;
   updateUser: AdminUser;
   updateWorkspaceApiKey: Scalars['Boolean']['output'];
 };
@@ -1733,6 +1747,7 @@ export type MutationCreateApprovalTaskArgs = {
 
 
 export type MutationCreateAutomationWorkflowProjectArgs = {
+  automationHubVisible?: InputMaybe<Scalars['Boolean']['input']>;
   category?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
@@ -2278,6 +2293,7 @@ export type MutationUpdateApprovalTaskArgs = {
 
 
 export type MutationUpdateAutomationWorkflowProjectArgs = {
+  automationHubVisible?: InputMaybe<Scalars['Boolean']['input']>;
   category?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
@@ -2400,6 +2416,12 @@ export type MutationUpdateMcpServerUrlArgs = {
 export type MutationUpdateMcpToolArgs = {
   id: Scalars['ID']['input'];
   input: McpToolInput;
+};
+
+
+export type MutationUpdateMcpToolEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2708,6 +2730,7 @@ export type Query = {
   componentDefinitions: Array<ComponentDefinition>;
   componentPropertyDisplayConditions: Scalars['Map']['output'];
   connectedUser?: Maybe<ConnectedUser>;
+  connectedUserCodeWorkflowReferences: Array<ConnectedUserCodeWorkflowReference>;
   connectedUserMcpServers: Array<ConnectedUserMcpServer>;
   connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
@@ -2726,6 +2749,7 @@ export type Query = {
   editorJobFileLogs: LogPage;
   editorJobFileLogsExist: Scalars['Boolean']['output'];
   editorTaskExecutionFileLogs: Array<LogEntry>;
+  embeddedMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
   endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
   environments?: Maybe<Array<Maybe<Environment>>>;
@@ -3036,6 +3060,11 @@ export type QueryComponentPropertyDisplayConditionsArgs = {
 
 export type QueryConnectedUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryConnectedUserCodeWorkflowReferencesArgs = {
+  automationWorkflowUuids: Array<Scalars['ID']['input']>;
 };
 
 
