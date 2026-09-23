@@ -24,9 +24,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 /**
- * Publishes workspace-user audit events through Spring Boot's actuator audit bus. Mirrors {@code AiHubAuditPublisher} —
- * the Spring Boot listener already wired in EE picks the {@link AuditApplicationEvent} up and persists it via
- * {@code CustomAuditEventRepository} into {@code persistent_audit_event}.
+ * Publishes workspace-user audit events through Spring Boot's actuator audit bus, the route every audit publisher in
+ * this codebase takes: the Spring Boot listener already wired in EE picks the {@link AuditApplicationEvent} up and
+ * persists it via {@code CustomAuditEventRepository} into {@code persistent_audit_event}.
  *
  * <p>
  * Failures absorb silently into {@code bytechef_workspace_user_audit_failed} + an error log; emission must never break

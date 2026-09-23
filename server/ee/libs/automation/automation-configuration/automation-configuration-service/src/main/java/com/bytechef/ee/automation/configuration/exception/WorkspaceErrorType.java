@@ -19,6 +19,7 @@ public class WorkspaceErrorType extends AbstractErrorType {
 
     public static final WorkspaceErrorType DEFAULT_WORKSPACE_NOT_DELETABLE = new WorkspaceErrorType(100);
     public static final WorkspaceErrorType DEFAULT_WORKSPACE_NOT_CHANGEABLE = new WorkspaceErrorType(101);
+    public static final WorkspaceErrorType WORKSPACE_NOT_FOUND = new WorkspaceErrorType(102);
 
     private WorkspaceErrorType(int errorKey) {
         super(Workspace.class, errorKey);

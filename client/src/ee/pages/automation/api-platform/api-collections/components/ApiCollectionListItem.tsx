@@ -13,7 +13,9 @@ import {ApiCollectionTagKeys} from '@/ee/shared/mutations/automation/apiCollecti
 import {useDeleteApiCollectionMutation} from '@/ee/shared/mutations/automation/apiCollections.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -31,11 +33,15 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
     const [showApiEndpointDialog, setShowApiEndpointDialog] = useState(false);
     const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
 
+    const endpointsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+
     const setApiCollectionEnabled = useApiCollectionsEnabledStore(
         ({setApiCollectionEnabled}) => setApiCollectionEnabled
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const endpointsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
+    const canEditApiCollection = useHasWorkspaceScope(currentWorkspaceId, 'API_PLATFORM_EDIT');
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
     const apiCollectionTagIds = apiCollection.tags?.map((tag) => tag.id);
 
@@ -172,6 +178,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                                                 },
                                             })}
                                             id={apiCollection.id!}
+                                            readOnly={!canEditApiCollection}
                                             remainingTags={tags?.filter(
                                                 (tag) => !apiCollectionTagIds?.includes(tag.id)
                                             )}
@@ -199,7 +206,12 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                         </Tooltip>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />
+                            <Switch
+                                aria-label="Enable API Collection"
+                                checked={apiCollection.enabled}
+                                disabled={!canEditDeployment}
+                                onCheckedChange={handleOnCheckedChange}
+                            />
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">

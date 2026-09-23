@@ -136,8 +136,8 @@ describe('UsersTable', () => {
         it('should render user roles', () => {
             renderUsersTable();
 
-            expect(screen.getByText('ROLE_ADMIN')).toBeInTheDocument();
-            expect(screen.getByText('ROLE_USER')).toBeInTheDocument();
+            expect(screen.getByText('Admin')).toBeInTheDocument();
+            expect(screen.getByText('User')).toBeInTheDocument();
         });
 
         it('should render Active status for activated users', () => {

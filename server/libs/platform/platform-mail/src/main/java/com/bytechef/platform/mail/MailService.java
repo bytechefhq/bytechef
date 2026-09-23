@@ -51,7 +51,7 @@ public class MailService {
 
     private static final String USER = "user";
     private static final String BASE_URL = "baseUrl";
-    private static final String PASSWORD = "password";
+    private static final String WORKSPACE_NAME = "workspaceName";
 
     private final JavaMailSender javaMailSender;
     private final Mail mail;
@@ -73,6 +73,14 @@ public class MailService {
         }
     }
 
+    /**
+     * Whether a mail server is configured. Without one every mail is dropped with only a log line, so a caller whose
+     * result depends on a mail arriving must check this first.
+     */
+    public boolean isMailConfigured() {
+        return StringUtils.isNotBlank(mail.getHost());
+    }
+
     @Async
     public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         this.sendEmailSync(to, subject, content, isMultipart, isHtml);
@@ -90,16 +98,26 @@ public class MailService {
         this.sendEmailFromTemplateSync(user, "mail/activationEmail", "email.activation.title");
     }
 
+    /**
+     * Mails the claim link on which an admin-provisioned user sets their own password. This is the only invitation
+     * path: the superseded one mailed a temporary password in the message body, which left a working credential in the
+     * recipient's mailbox indefinitely and known to whoever sent it.
+     */
     @Async
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
 
-        this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.activation.title");
+        this.sendEmailFromTemplateSync(user, "mail/creationEmail", "email.invitation.title");
     }
 
+    /**
+     * Tells an existing account holder they were added to a workspace. Distinct from the claim link: this recipient
+     * already has a password, so mailing them a reset link would be both useless and alarming. Without this they are
+     * added silently and only discover the workspace by chance.
+     */
     @Async
-    public void sendInvitationEmail(User user, String password) {
-        log.debug("Sending invitation email to '{}'", user.getEmail());
+    public void sendWorkspaceMembershipEmail(User user, String workspaceName) {
+        log.debug("Sending workspace membership email to '{}'", user.getEmail());
 
         if (Objects.isNull(user.getEmail())) {
             log.warn("Email misses for user '{}'", user.getLogin());
@@ -113,10 +131,10 @@ public class MailService {
 
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, mail.getBaseUrl());
-        context.setVariable(PASSWORD, password);
+        context.setVariable(WORKSPACE_NAME, workspaceName);
 
-        String content = templateEngine.process("mail/invitationEmail", context);
-        String subject = messageSource.getMessage("email.invitation.title", null, locale);
+        String content = templateEngine.process("mail/workspaceMembershipEmail", context);
+        String subject = messageSource.getMessage("email.workspace.membership.title", null, locale);
 
         this.sendEmailSync(user.getEmail(), subject, content, false, true);
     }
@@ -150,9 +168,12 @@ public class MailService {
     }
 
     private void sendEmailSync(String recipient, String subject, String content, boolean isMultipart, boolean isHtml) {
+        // Deliberately without the body. The creation mail's template renders a single-use claim link built from the
+        // recipient's reset_key, so logging the content at DEBUG hands anyone who can read the logs an account
+        // takeover. The subject and recipient are enough to trace a delivery.
         log.debug(
-            "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
-            isMultipart, isHtml, recipient, subject, content);
+            "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}'",
+            isMultipart, isHtml, recipient, subject);
 
         // Prepare message using a Spring helper
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();

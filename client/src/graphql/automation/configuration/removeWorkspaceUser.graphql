@@ -1,0 +1,3 @@
+mutation RemoveWorkspaceUser($workspaceId: ID!, $userId: ID!) {
+    removeWorkspaceUser(workspaceId: $workspaceId, userId: $userId)
+}

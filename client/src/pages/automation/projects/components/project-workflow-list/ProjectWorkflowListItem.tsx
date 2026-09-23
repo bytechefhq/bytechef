@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
@@ -24,6 +25,7 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 
 import '@/shared/styles/dropdownMenu.css';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
@@ -52,9 +54,14 @@ const ProjectWorkflowListItem = ({
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showWorkflowShareDialog, setShowWorkflowShareDialog] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const templatesSubmissionForm = useApplicationInfoStore((state) => state.templatesSubmissionForm.workflows);
 
     const [searchParams] = useSearchParams();
+
+    const canCreateWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_CREATE');
+    const canDeleteWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_DELETE');
+    const canEditWorkflow = useHasWorkspaceScope(currentWorkspaceId, 'WORKFLOW_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -156,20 +163,27 @@ const ProjectWorkflowListItem = ({
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                        <Button
+                            aria-label="More Workflow Actions"
+                            icon={<EllipsisVerticalIcon />}
+                            size="icon"
+                            variant="ghost"
+                        />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="p-0">
-                        <DropdownMenuItem
-                            className="dropdown-menu-item"
-                            onClick={() => {
-                                setShowEditDialog(true);
-                            }}
-                        >
-                            <EditIcon /> Edit
-                        </DropdownMenuItem>
+                        {canEditWorkflow && (
+                            <DropdownMenuItem
+                                className="dropdown-menu-item"
+                                onClick={() => {
+                                    setShowEditDialog(true);
+                                }}
+                            >
+                                <EditIcon /> Edit
+                            </DropdownMenuItem>
+                        )}
 
-                        {project && workflow && (
+                        {canCreateWorkflow && project && workflow && (
                             <DropdownMenuItem
                                 className="dropdown-menu-item"
                                 onClick={() =>
@@ -183,12 +197,14 @@ const ProjectWorkflowListItem = ({
                             </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem
-                            className="dropdown-menu-item"
-                            onClick={() => setShowWorkflowShareDialog(true)}
-                        >
-                            <Share2Icon /> Share
-                        </DropdownMenuItem>
+                        {canEditWorkflow && (
+                            <DropdownMenuItem
+                                className="dropdown-menu-item"
+                                onClick={() => setShowWorkflowShareDialog(true)}
+                            >
+                                <Share2Icon /> Share
+                            </DropdownMenuItem>
+                        )}
 
                         {templatesSubmissionForm && (
                             <DropdownMenuItem
@@ -208,17 +224,21 @@ const ProjectWorkflowListItem = ({
                             <DownloadIcon /> Export
                         </DropdownMenuItem>
 
-                        <DropdownMenuSeparator className="m-0" />
+                        {canDeleteWorkflow && (
+                            <>
+                                <DropdownMenuSeparator className="m-0" />
 
-                        <DropdownMenuItem
-                            className="dropdown-menu-item-destructive"
-                            onClick={() => {
-                                setShowDeleteDialog(true);
-                            }}
-                            variant="destructive"
-                        >
-                            <Trash2Icon /> Delete
-                        </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="dropdown-menu-item-destructive"
+                                    onClick={() => {
+                                        setShowDeleteDialog(true);
+                                    }}
+                                    variant="destructive"
+                                >
+                                    <Trash2Icon /> Delete
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>

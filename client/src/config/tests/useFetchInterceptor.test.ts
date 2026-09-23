@@ -642,6 +642,63 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.navigate).toHaveBeenCalledWith('/login');
         });
 
+        it('reports a permission denial instead of logging out when the replay returns a 403 with a body', async () => {
+            const deniedResponse = {
+                clone: () => ({
+                    text: () => Promise.resolve('{"detail":"Access denied","status":403,"title":"Forbidden"}'),
+                }),
+                status: 403,
+                url: 'http://localhost/internal/api/test',
+            };
+
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/internal/api/test'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce(deniedResponse);
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/internal/api/test', {method: 'GET'});
+
+            expect((result as Response).status).toBe(403);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+            expect(hoisted.toastError).toHaveBeenCalledWith('Access denied', expect.anything());
+        });
+
+        it('logs out when the replay returns a 403 whose body is not a permission denial', async () => {
+            // Spring's default error body, which a rejected CSRF token or a lost session produces, is not the handler's
+            // "Access denied" problem detail.
+            const rejectedResponse = {
+                clone: () => ({
+                    text: () =>
+                        Promise.resolve('{"error":"Forbidden","path":"/internal/api/test","status":403,"timestamp":1}'),
+                }),
+                status: 403,
+                url: 'http://localhost/internal/api/test',
+            };
+
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/internal/api/test'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce(rejectedResponse);
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            await window.fetch('/internal/api/test', {method: 'GET'});
+
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
+            expect(hoisted.toastError).not.toHaveBeenCalledWith('Access denied', expect.anything());
+        });
+
         it('does not retry or escalate a 403 on a non-csrf-protected url', async () => {
             const innerFetch = vi.fn().mockResolvedValueOnce({status: 403, url: 'http://localhost/api/public/test'});
 

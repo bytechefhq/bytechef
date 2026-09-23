@@ -17,10 +17,9 @@
 package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.model.TagModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateTagsRequestModel;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -37,19 +36,21 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ConnectionTagApiController implements ConnectionTagApi {
 
-    private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
+    private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        this.connectionFacade = connectionFacade;
+    public ConnectionTagApiController(
+        ConversionService conversionService, WorkspaceConnectionFacade workspaceConnectionFacade) {
+
         this.conversionService = conversionService;
+        this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getConnectionTags() {
+    public ResponseEntity<List<TagModel>> getConnectionTags(Long id, Long environmentId) {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(PlatformType.AUTOMATION)
+            workspaceConnectionFacade.getConnectionTags(id, environmentId)
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
@@ -62,7 +63,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionFacade.update(id, tags);
+        workspaceConnectionFacade.updateTags(id, tags);
 
         return ResponseEntity.noContent()
             .build();

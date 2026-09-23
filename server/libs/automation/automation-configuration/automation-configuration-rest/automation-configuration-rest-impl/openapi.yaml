@@ -99,13 +99,28 @@ paths:
               schema:
                 type: integer
                 format: int64
-  /connections/tags:
+  /workspaces/{id}/connection-tags:
     get:
-      description: "Get connection tags."
+      description: "Get connection tags for a workspace."
       summary: "Get connection tags"
       tags:
         - "connection-tag"
       operationId: "getConnectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "environmentId"
+          description: "The id of an environment."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of connection tags."
@@ -223,13 +238,28 @@ paths:
               schema:
                 type: integer
                 format: int64
-  /project-deployments/tags:
+  /workspaces/{id}/project-deployment-tags:
     get:
-      description: "Get project deployment tags."
+      description: "Get project deployment tags for a workspace."
       summary: "Get project deployment tags"
       tags:
       - "project-deployment-tag"
       operationId: "getProjectDeploymentTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "environmentId"
+          description: "The id of an environment."
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of project deployment tags."
@@ -490,13 +520,21 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Category"
-  /projects/tags:
+  /workspaces/{id}/project-tags:
     get:
-      description: "Get project tags."
+      description: "Get project tags for a workspace."
       summary: "Get project tags."
       tags:
       - "project-tag"
       operationId: "getProjectTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of project tags."

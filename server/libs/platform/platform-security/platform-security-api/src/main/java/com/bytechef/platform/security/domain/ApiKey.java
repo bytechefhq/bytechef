@@ -21,6 +21,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import java.time.Instant;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -138,8 +139,14 @@ public class ApiKey {
         return Environment.values()[environment];
     }
 
+    /**
+     * The user this key authenticates as. Null-safe because ownership is read inside authorization decisions, where an
+     * NPE would turn "who owns this?" into a 500 rather than a denial: a row with no owner is answered as unowned, and
+     * an unowned key belongs to nobody but the tenant admin.
+     */
+    @Nullable
     public Long getUserId() {
-        return userId.getId();
+        return userId == null ? null : userId.getId();
     }
 
     public void setCreatedBy(String createdBy) {

@@ -19,6 +19,7 @@ package com.bytechef.platform.security.service;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ApiKey;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,9 +37,20 @@ public interface ApiKeyService {
 
     ApiKey getApiKey(String secretKey, long environmentId);
 
+    /**
+     * The fail-soft counterpart of {@link #getApiKey(long)}, for callers to whom an absent key is an ordinary answer
+     * rather than an error — the ownership resolver above all, which must fail closed rather than throw.
+     */
+    Optional<ApiKey> fetchApiKey(long id);
+
     ApiKey getApiKey(long id);
 
     List<ApiKey> getApiKeys(long environmentId, @Nullable PlatformType type);
+
+    /**
+     * Every key a user owns, across environments and types.
+     */
+    List<ApiKey> getUserApiKeys(long userId);
 
     ApiKey update(ApiKey apiKey);
 

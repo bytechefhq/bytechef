@@ -16,12 +16,22 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.exception.AbstractException;
+import com.bytechef.exception.ConfigurationException;
 
 /**
+ * Raised when a login is already taken in the tenant.
+ *
+ * <p>
+ * A {@link ConfigurationException} rather than a plain {@code AbstractException}, because the collision is caused by
+ * caller input and the caller can correct it by choosing another address: the invite path derives the login from the
+ * local part of the email, so inviting {@code john@partner.com} into a tenant that already holds {@code john@acme.com}
+ * lands here. {@code GlobalDataFetcherExceptionResolver} classifies only {@code ConfigurationException} as
+ * {@code BAD_REQUEST}, so anything else surfaced this as {@code INTERNAL_ERROR} and read as a server bug. The REST
+ * handler maps every {@code AbstractException} to 400, so its behaviour is unchanged.
+ *
  * @author Ivica Cardic
  */
-public class LoginAlreadyUsedException extends AbstractException {
+public class LoginAlreadyUsedException extends ConfigurationException {
 
     public LoginAlreadyUsedException() {
         super("Login name already used!", UserErrorType.LOGIN_ALREADY_USED);

@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {SheetCloseButton} from '@/components/ui/sheet';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {PlusIcon, SlidersIcon} from 'lucide-react';
 
@@ -32,13 +33,15 @@ const WorkflowInputsSheetContent = ({
         workflow,
     } = useWorkflowInputs({invalidateWorkflowQueries, workflowTestConfiguration});
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <>
             <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                 <span className="text-lg font-semibold">Workflow Inputs</span>
 
                 <div className="flex items-center gap-1">
-                    {!!workflow.inputs?.length && (
+                    {!readOnly && !!workflow.inputs?.length && (
                         <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} size="sm" />
                     )}
 
@@ -70,7 +73,9 @@ const WorkflowInputsSheetContent = ({
                                 Get started by creating a new input.
                             </p>
 
-                            <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} />
+                            {!readOnly && (
+                                <Button icon={<PlusIcon />} label="New Input" onClick={() => openEditDialog()} />
+                            )}
                         </div>
                     </div>
                 )}

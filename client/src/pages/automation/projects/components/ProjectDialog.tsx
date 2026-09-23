@@ -66,7 +66,7 @@ const ProjectDialog = ({onClose, onSuccess, project, triggerNode}: ProjectDialog
         isLoading: categoriesLoading,
     } = useGetProjectCategoriesQuery(currentWorkspaceId!);
 
-    const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetProjectTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetProjectTagsQuery(currentWorkspaceId!);
 
     const queryClient = useQueryClient();
 

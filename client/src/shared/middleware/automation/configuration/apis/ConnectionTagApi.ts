@@ -24,6 +24,11 @@ import {
     UpdateTagsRequestToJSON,
 } from '../models/UpdateTagsRequest';
 
+export interface GetConnectionTagsRequest {
+    id: number;
+    environmentId?: number;
+}
+
 export interface UpdateConnectionTagsRequest {
     id: number;
     updateTagsRequest: UpdateTagsRequest;
@@ -37,13 +42,25 @@ export class ConnectionTagApi extends runtime.BaseAPI {
     /**
      * Creates request options for getConnectionTags without sending the request
      */
-    async getConnectionTagsRequestOpts(): Promise<runtime.RequestOpts> {
+    async getConnectionTagsRequestOpts(requestParameters: GetConnectionTagsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getConnectionTags().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['environmentId'] != null) {
+            queryParameters['environmentId'] = requestParameters['environmentId'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
 
-        let urlPath = `/connections/tags`;
+        let urlPath = `/workspaces/{id}/connection-tags`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -54,22 +71,22 @@ export class ConnectionTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get connection tags.
+     * Get connection tags for a workspace.
      * Get connection tags
      */
-    async getConnectionTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
-        const requestOptions = await this.getConnectionTagsRequestOpts();
+    async getConnectionTagsRaw(requestParameters: GetConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getConnectionTagsRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
 
     /**
-     * Get connection tags.
+     * Get connection tags for a workspace.
      * Get connection tags
      */
-    async getConnectionTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
-        const response = await this.getConnectionTagsRaw(initOverrides);
+    async getConnectionTags(requestParameters: GetConnectionTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
+        const response = await this.getConnectionTagsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

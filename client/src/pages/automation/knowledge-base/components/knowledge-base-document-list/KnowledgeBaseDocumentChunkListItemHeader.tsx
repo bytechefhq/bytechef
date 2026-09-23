@@ -1,5 +1,7 @@
 import {Checkbox} from '@/components/ui/checkbox';
 import useKnowledgeBaseDocumentChunkListItemHeader from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/hooks/useKnowledgeBaseDocumentChunkListItemHeader';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 
 interface KnowledgeBaseDocumentChunkListItemHeaderProps {
     chunkId: string;
@@ -12,11 +14,20 @@ const KnowledgeBaseDocumentChunkListItemHeader = ({
     chunkIndex,
     documentName,
 }: KnowledgeBaseDocumentChunkListItemHeaderProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const {handleSelectionChange, isSelected} = useKnowledgeBaseDocumentChunkListItemHeader({chunkId});
+
+    const canEditKnowledgeBase = useHasWorkspaceScope(currentWorkspaceId, 'KNOWLEDGE_BASE_EDIT');
 
     return (
         <div className="flex items-center space-x-3">
-            <Checkbox checked={isSelected} onCheckedChange={handleSelectionChange} />
+            <Checkbox
+                aria-label={`Select chunk ${chunkIndex + 1}`}
+                checked={isSelected}
+                disabled={!canEditKnowledgeBase}
+                onCheckedChange={handleSelectionChange}
+            />
 
             <div className="flex items-center space-x-2 text-sm text-content-neutral-secondary">
                 <span className="font-medium">{documentName}</span>

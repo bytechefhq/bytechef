@@ -15,6 +15,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
@@ -71,6 +72,7 @@ const WorkflowTestConfigurationDialog = ({
         useGetConnectionTagsQuery,
         useGetConnectionsQuery,
     } = useWorkflowEditor();
+    const readOnly = useWorkflowEditorReadOnly();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
@@ -270,7 +272,11 @@ const WorkflowTestConfigurationDialog = ({
                         <TooltipTrigger asChild>
                             <div>
                                 <Button
-                                    disabled={!formState.isDirty || saveWorkflowTestConfigurationMutation.isPending}
+                                    disabled={
+                                        readOnly ||
+                                        !formState.isDirty ||
+                                        saveWorkflowTestConfigurationMutation.isPending
+                                    }
                                     form="workflow-test-configuration-form"
                                     label="Save"
                                     type="submit"

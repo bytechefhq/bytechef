@@ -50,7 +50,7 @@ public final class MultiTenantAuthenticationSuccessHandler implements Authentica
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        List<String> tenantIds = tenantService.getTenantIdsByUserEmail(userDetails.getUsername());
+        List<String> tenantIds = tenantService.getTenantIdsByUserLogin(userDetails.getUsername());
 
         HttpSession session = request.getSession();
 

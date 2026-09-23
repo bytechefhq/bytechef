@@ -28,6 +28,7 @@ import com.bytechef.platform.configuration.web.rest.model.UpdateWorkflowNodePara
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +52,8 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#id, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> deleteClusterElementParameter(
         String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         Long environmentId,
@@ -66,6 +69,8 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#id, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> deleteWorkflowNodeParameter(
         String id, String workflowNodeName, Long environmentId,
         DeleteClusterElementParameterRequestModel deleteWorkflowNodeParameterRequestModel) {
@@ -107,6 +112,8 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#id, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> updateClusterElementParameter(
         String id, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         Long environmentId, UpdateClusterElementParameterRequestModel updateWorkflowNodeParameterRequestModel) {
@@ -123,6 +130,8 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
+    @PreAuthorize("hasWorkflowScopeIfProjectWorkflowInEnvironment(#id, 'WORKFLOW_EDIT', "
+        + "T(com.bytechef.platform.configuration.domain.Environment).DEVELOPMENT)")
     public ResponseEntity<DeleteClusterElementParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, String workflowNodeName, Long environmentId,
         UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {

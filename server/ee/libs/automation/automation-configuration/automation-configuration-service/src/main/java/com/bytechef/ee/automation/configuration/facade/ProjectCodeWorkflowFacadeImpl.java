@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.cache.CacheManager;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +61,8 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE') and "
+        + "hasPermission(#workspaceId, 'Workspace', 'PROJECT_PUBLISH')")
     public void save(long workspaceId, byte[] bytes, Language language) {
         ProjectDefinition projectDefinition;
 
@@ -69,7 +72,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
             throw new RuntimeException(e);
         }
 
-        Project project = projectService.fetchProject(projectDefinition.getName())
+        Project project = projectService.fetchProject(projectDefinition.getName(), workspaceId)
             .map(curProject -> updateProject(curProject, projectDefinition))
             .orElseGet(() -> createProject(workspaceId, projectDefinition));
 

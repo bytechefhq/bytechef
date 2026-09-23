@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+      Every membership that exists before roles is backfilled as ADMIN (0): until now every member could do everything
+      in their workspace, so any lower role would take access away on upgrade and leave workspaces without an admin.
+      The column has no default, so new memberships always name their role.
+    -->
+    <changeSet id="202604061200010" author="Ivica Cardic">
+        <addColumn tableName="workspace_user">
+            <column name="workspace_role" type="INT" valueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -6,8 +6,10 @@ import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-depl
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {ProjectDeploymentApi, ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
@@ -53,12 +55,15 @@ const ProjectDeploymentWorkflowListItem = ({
 }: ProjectDeploymentWorkflowListItemProps) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const openProjectDeploymentWorkflowSheet = useProjectDeploymentWorkflowSheetStore(
         (state) => state.openProjectDeploymentWorkflowSheet
     );
     const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
     );
+
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -219,22 +224,24 @@ const ProjectDeploymentWorkflowListItem = ({
 
                 <div className="flex items-center gap-x-6">
                     <div className="min-w-[36px]">
-                        {(!workflow.triggers?.length ||
-                            workflow.triggers?.some((trigger) => trigger.type.includes('manual'))) && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        disabled={!projectDeploymentEnabled || !enabled}
-                                        icon={<PlayIcon className="text-success" />}
-                                        onClick={handleRunWorkflowClick}
-                                        size="icon"
-                                        variant="ghost"
-                                    />
-                                </TooltipTrigger>
+                        {canEditDeployment &&
+                            (!workflow.triggers?.length ||
+                                workflow.triggers?.some((trigger) => trigger.type.includes('manual'))) && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            aria-label="Run Workflow"
+                                            disabled={!projectDeploymentEnabled || !enabled}
+                                            icon={<PlayIcon className="text-success" />}
+                                            onClick={handleRunWorkflowClick}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </TooltipTrigger>
 
-                                <TooltipContent>Run workflow manually</TooltipContent>
-                            </Tooltip>
-                        )}
+                                    <TooltipContent>Run workflow manually</TooltipContent>
+                                </Tooltip>
+                            )}
 
                         {!hostedChatTrigger && !formTrigger && staticWebhookUrl && (
                             <Tooltip>
@@ -295,9 +302,10 @@ const ProjectDeploymentWorkflowListItem = ({
                         )}
 
                         <Switch
+                            aria-label="Enable Deployment Workflow"
                             checked={enabled}
                             className="mr-2"
-                            disabled={enableProjectDeploymentWorkflowMutation.isPending}
+                            disabled={!canEditDeployment || enableProjectDeploymentWorkflowMutation.isPending}
                             onCheckedChange={(value) =>
                                 handleEnableProjectDeploymentWorkflow({
                                     projectDeploymentId,

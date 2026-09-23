@@ -7,7 +7,9 @@ import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/
 import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServerDialog';
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {McpServer, Tag} from '@/shared/middleware/graphql';
 import {ChevronDown, ServerIcon} from 'lucide-react';
 
@@ -21,6 +23,10 @@ interface McpServerListItemProps {
 }
 
 const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerListItemProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
+
     const {
         handleDeleteClick,
         handleMcpServerListItemClick,
@@ -87,6 +93,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                                             tags: tags || [],
                                         })}
                                         id={parseInt(mcpServer.id!)}
+                                        readOnly={!canEditMcpServer}
                                         remainingTags={tags
                                             ?.filter((tag) => !mcpServerTagIds?.includes(tag.id))
                                             .map((tag) => {
@@ -109,7 +116,7 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
 
                                 <Switch
                                     checked={mcpServer.enabled}
-                                    disabled={isEnablePending}
+                                    disabled={isEnablePending || !canEditMcpServer}
                                     onCheckedChange={handleOnCheckedChange}
                                 />
                             </div>

@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {McpComponent, useDeleteMcpComponentMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
@@ -13,6 +15,10 @@ interface McpComponentListItemDropDownProps {
 
 const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpComponentListItemDropDownProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditMcpServer = useHasWorkspaceScope(currentWorkspaceId, 'MCP_EDIT');
 
     const queryClient = useQueryClient();
 
@@ -31,11 +37,20 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
         });
     };
 
+    if (!canEditMcpServer) {
+        return null;
+    }
+
     return (
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button icon={<EllipsisVerticalIcon />} size="iconSm" variant="ghost" />
+                    <Button
+                        aria-label="MCP Component Actions"
+                        icon={<EllipsisVerticalIcon />}
+                        size="iconSm"
+                        variant="ghost"
+                    />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end">

@@ -1,6 +1,8 @@
 import Button from '@/components/Button/Button';
 import PageLoader from '@/components/PageLoader';
 import CreateDataTableDialog from '@/pages/automation/datatables/components/CreateDataTableDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Plus} from 'lucide-react';
@@ -25,6 +27,7 @@ import {useSelectedRowsStore} from './stores/useSelectedRowsStore';
 const DataTable = () => {
     const {id} = useParams<{id: string}>();
     const {selectedRows} = useSelectedRowsStore();
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
     const {
         gridColumns,
@@ -37,6 +40,7 @@ const DataTable = () => {
         tablesError,
         tablesLoading,
     } = useDataTable({tableId: id});
+    const canCreateDataTable = useHasWorkspaceScope(currentWorkspaceId, 'DATA_TABLE_CREATE');
 
     return (
         <LayoutContainer
@@ -46,16 +50,18 @@ const DataTable = () => {
                 <Header
                     position="sidebar"
                     right={
-                        <CreateDataTableDialog
-                            trigger={
-                                <Button
-                                    aria-label="Create table"
-                                    icon={<Plus className="h-4 w-4" />}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            }
-                        />
+                        canCreateDataTable && (
+                            <CreateDataTableDialog
+                                trigger={
+                                    <Button
+                                        aria-label="Create table"
+                                        icon={<Plus className="h-4 w-4" />}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                }
+                            />
+                        )
                     }
                     title="Data Tables"
                 />

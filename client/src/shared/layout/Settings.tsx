@@ -18,6 +18,16 @@ interface SettingsProps {
     title?: string;
 }
 
+// Matched on whole path segments rather than a bare substring: `users` is a substring of
+// `workspace-users`, so on the workspace page both the workspace and the organization entry lit up
+// at once. A nested route still counts as inside its nav item, which is what the substring match
+// was giving us by accident.
+export const isNavItemCurrent = (pathname: string, href: string): boolean => {
+    const segmentPath = href.startsWith('/') ? href : `/${href}`;
+
+    return pathname === segmentPath || pathname.endsWith(segmentPath) || pathname.includes(`${segmentPath}/`);
+};
+
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
@@ -92,7 +102,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                         if (navItem.items) {
                             return (
                                 <SettingsNavGroup
-                                    isCurrent={(href) => location.pathname.includes(href)}
+                                    isCurrent={(href) => isNavItemCurrent(location.pathname, href)}
                                     items={navItem.items as SettingsNavGroupItemI[]}
                                     key={navItem.title}
                                     title={navItem.title}
@@ -104,7 +114,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                             return (
                                 <LeftSidebarNavItem
                                     item={{
-                                        current: location.pathname.includes(navItem.href),
+                                        current: isNavItemCurrent(location.pathname, navItem.href),
                                         name: navItem.title,
                                     }}
                                     key={navItem.href}

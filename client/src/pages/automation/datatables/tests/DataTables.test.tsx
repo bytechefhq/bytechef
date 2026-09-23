@@ -9,6 +9,15 @@ const hoisted = vi.hoisted(() => {
     };
 });
 
+const hoistedScope = vi.hoisted(() => ({
+    grantedScopes: ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'] as string[],
+}));
+
+vi.mock('@/shared/hooks/useHasWorkspaceScope', () => ({
+    useHasWorkspaceScope: (_workspaceId: number | undefined, scope: string) =>
+        hoistedScope.grantedScopes.includes(scope),
+}));
+
 vi.mock('@/pages/automation/datatables/components/hooks/useDataTables', () => ({
     default: hoisted.mockUseDataTables,
 }));
@@ -52,6 +61,8 @@ const defaultMockReturn = {
 };
 
 beforeEach(() => {
+    hoistedScope.grantedScopes = ['DATA_TABLE_CREATE', 'DATA_TABLE_DELETE', 'DATA_TABLE_EDIT'];
+
     windowResizeObserver();
     hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn});
 });
@@ -116,6 +127,14 @@ describe('DataTables', () => {
             expect(screen.getByTestId('create-dialog-trigger')).toBeInTheDocument();
         });
 
+        it('should hide the New Table button without DATA_TABLE_CREATE', () => {
+            hoistedScope.grantedScopes = [];
+
+            render(<DataTables />);
+
+            expect(screen.queryByTestId('create-dialog-trigger')).not.toBeInTheDocument();
+        });
+
         it('should render left sidebar nav', () => {
             render(<DataTables />);
 
@@ -131,6 +150,17 @@ describe('DataTables', () => {
 
             expect(screen.getByText('No Data Tables')).toBeInTheDocument();
             expect(screen.getByText('Get started by creating a new data table.')).toBeInTheDocument();
+            expect(screen.getByTestId('create-dialog-trigger')).toBeInTheDocument();
+        });
+
+        it('should hide the Create Table button in the empty state without DATA_TABLE_CREATE', () => {
+            hoistedScope.grantedScopes = [];
+            hoisted.mockUseDataTables.mockReturnValue({...defaultMockReturn, filteredTables: [], tables: []});
+
+            render(<DataTables />);
+
+            expect(screen.getByText('No Data Tables')).toBeInTheDocument();
+            expect(screen.queryByTestId('create-dialog-trigger')).not.toBeInTheDocument();
         });
 
         it('should render empty state with tag filter message', () => {

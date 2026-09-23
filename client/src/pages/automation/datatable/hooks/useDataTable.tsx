@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {
     DataTable,
     useDataTablesQuery,
@@ -53,11 +54,13 @@ interface BuildUserColumnParamsI {
     onBooleanToggle: (rowId: string, columnName: string, value: boolean) => void;
     onDeleteColumn: (columnId: string, columnName: string) => void;
     onRenameColumn: (columnId: string, columnName: string) => void;
+    readOnly: boolean;
     setLocalRows: Dispatch<SetStateAction<GridRowType[]>>;
     totalColumns: number;
 }
 
 interface BuildTrailingColumnParamsI {
+    readOnly: boolean;
     setAddColumnDialogOpen: (open: boolean) => void;
 }
 
@@ -70,6 +73,7 @@ interface BuildGridColumnsParamsI {
     isFetchingNextPage: boolean;
     localRowCount: number;
     onBooleanToggle: (rowId: string, columnName: string, value: boolean) => void;
+    readOnly: boolean;
     selectedRows: ReadonlySet<string>;
     setAddColumnDialogOpen: (open: boolean) => void;
     setColumnToDelete: (columnId: string, columnName: string) => void;
@@ -84,12 +88,13 @@ function buildUserColumn({
     onBooleanToggle,
     onDeleteColumn,
     onRenameColumn,
+    readOnly,
     setLocalRows,
     totalColumns,
 }: BuildUserColumnParamsI): Column<GridRowType, SummaryRowType> {
     const baseColumnConfig = {
         cellClass: 'datatable-cell',
-        editable: (row: GridRowType) => row.id !== '-1',
+        editable: (row: GridRowType) => !readOnly && row.id !== '-1',
         headerCellClass: 'datatable-cell',
         key: column.name,
         name: column.name,
@@ -99,6 +104,7 @@ function buildUserColumn({
                 columnName={column.name}
                 onDelete={onDeleteColumn}
                 onRename={onRenameColumn}
+                readOnly={readOnly}
             />
         ),
         resizable: true,
@@ -125,6 +131,7 @@ function buildUserColumn({
         const BooleanRenderer = createBooleanCellRenderer({
             columnName: column.name,
             onToggle: onBooleanToggle,
+            readOnly,
             setLocalRows,
         });
 
@@ -169,6 +176,7 @@ function buildUserColumn({
 }
 
 function buildTrailingColumn({
+    readOnly,
     setAddColumnDialogOpen,
 }: BuildTrailingColumnParamsI): Column<GridRowType, SummaryRowType> {
     return {
@@ -176,13 +184,16 @@ function buildTrailingColumn({
         name: '',
         renderHeaderCell: () => (
             <div className="flex items-center justify-center">
-                <Button
-                    icon={<Plus className="h-4 w-4" />}
-                    onClick={() => setAddColumnDialogOpen(true)}
-                    size="icon"
-                    title="Add column"
-                    variant="ghost"
-                ></Button>
+                {!readOnly && (
+                    <Button
+                        aria-label="Add column"
+                        icon={<Plus className="h-4 w-4" />}
+                        onClick={() => setAddColumnDialogOpen(true)}
+                        size="icon"
+                        title="Add column"
+                        variant="ghost"
+                    ></Button>
+                )}
             </div>
         ),
         resizable: false,
@@ -199,6 +210,7 @@ function buildGridColumns({
     isFetchingNextPage,
     localRowCount,
     onBooleanToggle,
+    readOnly,
     selectedRows,
     setAddColumnDialogOpen,
     setColumnToDelete,
@@ -221,6 +233,7 @@ function buildGridColumns({
                 hoveredRowId={hoveredRowId}
                 onAddRow={handleAddRow}
                 onSelectedRowsChange={handleSelectedRowsChange}
+                readOnly={readOnly}
                 row={row as GridRowType}
                 rowIdx={rowIdx}
                 selectedRows={selectedRows}
@@ -250,6 +263,7 @@ function buildGridColumns({
             onBooleanToggle,
             onDeleteColumn: setColumnToDelete,
             onRenameColumn: setColumnToRename,
+            readOnly,
             setLocalRows,
             totalColumns: totalColumnCount,
         });
@@ -262,7 +276,7 @@ function buildGridColumns({
     });
 
     // Trailing column with + in the header to add a column
-    columns.push(buildTrailingColumn({setAddColumnDialogOpen}));
+    columns.push(buildTrailingColumn({readOnly, setAddColumnDialogOpen}));
 
     return columns;
 }
@@ -278,6 +292,8 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
     const {setColumnToRename} = useRenameDataTableColumnDialogStore();
     const {selectedRows, setSelectedRows} = useSelectedRowsStore();
     const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditDataTable = useHasWorkspaceScope(workspaceId, 'DATA_TABLE_EDIT');
 
     const {
         data: pagesData,
@@ -441,6 +457,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
                 isFetchingNextPage,
                 localRowCount,
                 onBooleanToggle: handleBooleanToggle,
+                readOnly: !canEditDataTable,
                 selectedRows,
                 setAddColumnDialogOpen,
                 setColumnToDelete,
@@ -449,6 +466,7 @@ export const useDataTable = ({tableId}: UseDataTableParamsI) => {
                 setLocalRows,
             }),
         [
+            canEditDataTable,
             dataTable,
             handleAddRow,
             handleBooleanToggle,

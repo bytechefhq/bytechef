@@ -20,7 +20,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {Connection, Tag} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useUpdateConnectionTagsMutation} from '@/shared/mutations/automation/connectionTags.mutations';
@@ -48,6 +51,12 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEdit = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_EDIT');
+    const canDelete = useHasWorkspaceScope(currentWorkspaceId, 'CONNECTION_DELETE');
+    const isTenantAdmin = useIsTenantAdmin();
 
     const queryClient = useQueryClient();
 
@@ -115,6 +124,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         );
     }, [componentDefinitions, connection.componentName]);
 
+    const canDisconnect = isTenantAdmin && connection.active === true;
+
+    const hasSecondaryActions = canDisconnect || canDelete;
+
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
             deleteConnectionMutation.mutate(connection.id);
@@ -160,6 +173,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                                 },
                                             })}
                                             id={connection.id!}
+                                            readOnly={!canEdit}
                                             remainingTags={remainingTags}
                                             tags={connection.tags}
                                             updateTagsMutation={updateConnectionTagsMutation}
@@ -200,52 +214,63 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                 )}
                             </div>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
-                                </DropdownMenuTrigger>
+                            {(canEdit || hasSecondaryActions) && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            aria-label="Connection actions"
+                                            icon={<EllipsisVerticalIcon />}
+                                            size="icon"
+                                            variant="ghost"
+                                        />
+                                    </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end" className="p-0">
-                                    <DropdownMenuItem
-                                        className="dropdown-menu-item"
-                                        onClick={() => setShowEditDialog(true)}
-                                    >
-                                        <EditIcon /> Edit
-                                    </DropdownMenuItem>
+                                    <DropdownMenuContent align="end" className="p-0">
+                                        {canEdit && (
+                                            <DropdownMenuItem
+                                                className="dropdown-menu-item"
+                                                onClick={() => setShowEditDialog(true)}
+                                            >
+                                                <EditIcon /> Edit
+                                            </DropdownMenuItem>
+                                        )}
 
-                                    <DropdownMenuSeparator className="m-0" />
+                                        {canEdit && hasSecondaryActions && <DropdownMenuSeparator className="m-0" />}
 
-                                    {connection.active === true && (
-                                        <DropdownMenuItem
-                                            className="dropdown-menu-item"
-                                            onClick={() => setShowDisconnectDialog(true)}
-                                        >
-                                            <Link2OffIcon /> Disconnect from all
-                                        </DropdownMenuItem>
-                                    )}
+                                        {canDisconnect && (
+                                            <DropdownMenuItem
+                                                className="dropdown-menu-item"
+                                                onClick={() => setShowDisconnectDialog(true)}
+                                            >
+                                                <Link2OffIcon /> Disconnect from all
+                                            </DropdownMenuItem>
+                                        )}
 
-                                    <div
-                                        title={
-                                            connection.active === true
-                                                ? 'Disconnect from all workflows first to enable deletion'
-                                                : 'Delete the connection'
-                                        }
-                                    >
-                                        <DropdownMenuItem
-                                            className={
-                                                connection.active === true
-                                                    ? 'dropdown-menu-item-destructive-disabled'
-                                                    : 'dropdown-menu-item-destructive'
-                                            }
-                                            disabled={connection.active}
-                                            onClick={() => setShowDeleteDialog(true)}
-                                            variant="destructive"
-                                        >
-                                            <Trash2Icon /> Delete
-                                        </DropdownMenuItem>
-                                    </div>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                        {canDelete && (
+                                            <div
+                                                title={
+                                                    connection.active === true
+                                                        ? 'Disconnect from all workflows first to enable deletion'
+                                                        : 'Delete the connection'
+                                                }
+                                            >
+                                                <DropdownMenuItem
+                                                    className={
+                                                        connection.active === true
+                                                            ? 'dropdown-menu-item-destructive-disabled'
+                                                            : 'dropdown-menu-item-destructive'
+                                                    }
+                                                    disabled={connection.active}
+                                                    onClick={() => setShowDeleteDialog(true)}
+                                                    variant="destructive"
+                                                >
+                                                    <Trash2Icon /> Delete
+                                                </DropdownMenuItem>
+                                            </div>
+                                        )}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            )}
                         </div>
                     </div>
                 </div>

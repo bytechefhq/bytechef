@@ -1,6 +1,8 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {EditIcon, EllipsisVerticalIcon} from 'lucide-react';
 
@@ -13,10 +15,23 @@ const ProjectDeploymentWorkflowListItemDropdownMenu = ({
     onEditClick,
     workflow,
 }: ProjectDeploymentWorkflowListItemDropDownProps) => {
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const canEditDeployment = useHasWorkspaceScope(currentWorkspaceId, 'DEPLOYMENT_EDIT');
+
+    if (!canEditDeployment) {
+        return null;
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button icon={<EllipsisVerticalIcon />} size="icon" variant="ghost" />
+                <Button
+                    aria-label="More Deployment Workflow Actions"
+                    icon={<EllipsisVerticalIcon />}
+                    size="icon"
+                    variant="ghost"
+                />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="p-0">

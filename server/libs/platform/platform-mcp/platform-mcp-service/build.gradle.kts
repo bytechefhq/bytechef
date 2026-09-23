@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.aspectj:aspectjweaver")

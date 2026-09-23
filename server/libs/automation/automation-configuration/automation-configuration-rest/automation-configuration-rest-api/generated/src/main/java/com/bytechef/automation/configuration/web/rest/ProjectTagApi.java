@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:17.010679+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-15T11:06:43.560003+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "project-tag", description = "The Automation Project Tag Internal API")
 public interface ProjectTagApi {
@@ -43,17 +43,18 @@ public interface ProjectTagApi {
         return Optional.empty();
     }
 
-    String PATH_GET_PROJECT_TAGS = "/projects/tags";
+    String PATH_GET_PROJECT_TAGS = "/workspaces/{id}/project-tags";
     /**
-     * GET /projects/tags : Get project tags.
-     * Get project tags.
+     * GET /workspaces/{id}/project-tags : Get project tags.
+     * Get project tags for a workspace.
      *
+     * @param id The id of a workspace. (required)
      * @return The list of project tags. (status code 200)
      */
     @Operation(
         operationId = "getProjectTags",
         summary = "Get project tags.",
-        description = "Get project tags.",
+        description = "Get project tags for a workspace.",
         tags = { "project-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of project tags.", content = {
@@ -67,7 +68,7 @@ public interface ProjectTagApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getProjectTags(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

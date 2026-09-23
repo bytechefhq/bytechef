@@ -6,6 +6,7 @@ dependencies {
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-git"))
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     implementation(project(":server:libs:config:app-config"))
@@ -17,8 +18,20 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
+    testImplementation("org.liquibase:liquibase-core")
     testImplementation("org.springframework.data:spring-data-jdbc")
     testImplementation("org.springframework.security:spring-security-config")
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
+    testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))
+    testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
+    testImplementation(project(":server:libs:platform:platform-component:platform-component-service"))
+    testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
+    testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+
+    testImplementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
 }

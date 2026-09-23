@@ -34,6 +34,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -60,6 +61,7 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#input.workspaceId, 'DATA_TABLE_CREATE', #input.environmentId)")
     public boolean createDataTable(@Argument CreateDataTableInput input) {
         Long environmentId = input.environmentId();
 
@@ -77,6 +79,7 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public boolean addDataTableColumn(@Argument AddColumnInput input) {
         Long environmentId = input.environmentId();
 
@@ -91,6 +94,7 @@ public class DataTableGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasWorkspaceScopeInEnvironmentId(#workspaceId, 'DATA_TABLE_VIEW', #environmentId)")
     public List<DataTable> dataTables(@Argument Long environmentId, @Argument Long workspaceId) {
         Environment environment = environmentService.getEnvironment(environmentId);
 
@@ -112,7 +116,11 @@ public class DataTableGraphQlController {
             .toList();
     }
 
+    // Was unguarded entirely: any authenticated caller could drop any workspace's data table, and its rows with it,
+    // by guessing a numeric id. Keyed on the table id rather than the base name the service takes, because the base
+    // name encodes an environment and is not what the relation is keyed on.
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_DELETE')")
     public boolean dropDataTable(@Argument RemoveTableInput input) {
         Long environmentId = input.environmentId();
 
@@ -125,6 +133,7 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_CREATE')")
     public boolean duplicateDataTable(@Argument DuplicateDataTableInput input) {
         Long environmentId = input.environmentId();
 
@@ -136,6 +145,7 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public boolean removeDataTableColumn(@Argument RemoveColumnInput input) {
         Long environmentId = input.environmentId();
 
@@ -149,6 +159,7 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public boolean renameDataTableColumn(@Argument RenameColumnInput input) {
         Long environmentId = input.environmentId();
 
@@ -162,6 +173,7 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#input.tableId, 'DataTable', 'DATA_TABLE_EDIT')")
     public boolean renameDataTable(@Argument RenameDataTableInput input) {
         Long environmentId = input.environmentId();
 

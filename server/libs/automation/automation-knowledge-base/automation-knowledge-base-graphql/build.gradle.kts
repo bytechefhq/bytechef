@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
@@ -12,5 +13,7 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

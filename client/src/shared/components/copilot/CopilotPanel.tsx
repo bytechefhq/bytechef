@@ -76,6 +76,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
     );
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const buildModeDisabled = useCopilotPanelStore((state) => state.buildModeDisabled);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const location = useLocation();
     const navigate = useNavigate();
@@ -159,7 +160,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                     <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
                         <Thread
                             composerActions={
-                                !source ? (
+                                !source && !buildModeDisabled ? (
                                     <ModeSwitch
                                         build={context?.mode === MODE.BUILD}
                                         onBuildChange={(build) =>

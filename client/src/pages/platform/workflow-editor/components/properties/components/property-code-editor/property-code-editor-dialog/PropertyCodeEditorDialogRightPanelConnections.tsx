@@ -4,6 +4,7 @@ import PropertyCodeEditorDialogRightPanelConnectionsLabel from '@/pages/platform
 import PropertyCodeEditorDialogRightPanelConnectionsPopover from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsPopover';
 import PropertyCodeEditorDialogRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsSelect';
 import {usePropertyCodeEditorDialogRightPanelConnections} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks/usePropertyCodeEditorDialogRightPanelConnections';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {LinkIcon, XIcon} from 'lucide-react';
@@ -34,6 +35,8 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
         workflow,
         workflowNodeName,
     });
+
+    const readOnly = useWorkflowEditorReadOnly();
 
     return (
         <Card className="gap-0 border-none py-0 shadow-none">
@@ -73,9 +76,11 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                             );
                         })}
 
-                        <div className="mt-3 flex justify-end">
-                            <PropertyCodeEditorDialogRightPanelConnectionsPopover onSubmit={handleOnSubmit} />
-                        </div>
+                        {!readOnly && (
+                            <div className="mt-3 flex justify-end">
+                                <PropertyCodeEditorDialogRightPanelConnectionsPopover onSubmit={handleOnSubmit} />
+                            </div>
+                        )}
                     </>
                 ) : (
                     <div className="flex flex-1 flex-col items-center">
@@ -91,12 +96,14 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                                     You have not defined any component and its connection to use inside this script yet.
                                 </p>
 
-                                <div className="mt-6">
-                                    <PropertyCodeEditorDialogRightPanelConnectionsPopover
-                                        onSubmit={handleOnSubmit}
-                                        triggerNode={<Button label="Add Component" />}
-                                    />
-                                </div>
+                                {!readOnly && (
+                                    <div className="mt-6">
+                                        <PropertyCodeEditorDialogRightPanelConnectionsPopover
+                                            onSubmit={handleOnSubmit}
+                                            triggerNode={<Button label="Add Component" />}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
 

@@ -1,4 +1,5 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import {Suspense, lazy} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -17,15 +18,22 @@ const PropertyCodeEditorDialogEditor = ({language}: PropertyCodeEditorDialogEdit
         }))
     );
 
+    const readOnly = useWorkflowEditorReadOnly();
+
     return (
         <Suspense fallback={<MonacoEditorLoader />}>
             <MonacoEditor
                 className="size-full"
                 defaultLanguage={language}
-                onChange={(value) => setEditorValue(value)}
+                onChange={(value) => {
+                    if (!readOnly) {
+                        setEditorValue(value);
+                    }
+                }}
                 onMount={(editor) => {
                     editor.focus();
                 }}
+                options={{readOnly}}
                 value={editorValue}
             />
         </Suspense>

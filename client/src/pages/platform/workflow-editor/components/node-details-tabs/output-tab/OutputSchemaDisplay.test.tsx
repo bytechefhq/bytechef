@@ -1,3 +1,4 @@
+import {WorkflowEditorReadOnlyContext} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {render, resetAll, screen} from '@/shared/util/test-utils';
 import {afterEach, describe, expect, it, vi} from 'vitest';
@@ -74,5 +75,36 @@ describe('OutputSchemaDisplay', () => {
         renderOutputSchemaDisplay({variableOutputSchema: undefined, variablePropertiesDefined: true});
 
         expect(screen.getByText('Output Schema')).toBeInTheDocument();
+    });
+
+    it('should offer testing and the output options when the editor is editable', () => {
+        renderOutputSchemaDisplay();
+
+        expect(screen.getByRole('button', {name: 'Test Action'})).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'More Options'})).toBeInTheDocument();
+    });
+
+    it('should hide testing, uploading and resetting the output in read-only mode', () => {
+        render(
+            <WorkflowEditorReadOnlyContext.Provider value={true}>
+                <OutputSchemaDisplay
+                    connectionMissing={false}
+                    copiedValue={null}
+                    copyToClipboard={vi.fn()}
+                    currentNode={currentNode}
+                    handlePredefinedOutputSchemaClick={vi.fn()}
+                    handleTestOperationClick={vi.fn()}
+                    outputDefined={true}
+                    outputSchema={outputSchema}
+                    sampleOutput={{message: 'sample message'}}
+                    saveWorkflowNodeTestOutputMutation={{isPending: false}}
+                    setShowUploadDialog={vi.fn()}
+                />
+            </WorkflowEditorReadOnlyContext.Provider>
+        );
+
+        expect(screen.getByText('Output Schema')).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Test Action'})).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'More Options'})).not.toBeInTheDocument();
     });
 });

@@ -35,9 +35,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import tools.jackson.core.type.TypeReference;
 
 /**
+ * Serves double duty, which decides where its guards can live: it is the {@code LogFileStorage} bean, and it is also
+ * the delegate that {@link EditorLogFileStorageImpl} and {@link TriggerLogFileStorageImpl} each build with {@code new}.
+ * Spring proxies only the bean, so the {@code @PreAuthorize} annotations below authorise the job-log surface and are
+ * inert inside the other two — which is why those classes carry their own, rather than relying on these. Do not read a
+ * guard here as covering every path into this code.
+ *
  * @author Ivica Cardic
  */
 public class LogFileStorageImpl implements LogFileStorage {
@@ -137,6 +144,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         awaitPendingWrites(jobId);
 
@@ -153,6 +161,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         awaitPendingWrites(jobId);
 
@@ -169,6 +178,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public boolean logsExist(long jobId) {
         awaitPendingWrites(jobId);
 
@@ -178,6 +188,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_DELETE')")
     public void deleteLogEntries(long jobId) {
         awaitPendingWrites(jobId);
 

@@ -22,6 +22,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,11 +42,13 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflow.mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow create(McpProjectWorkflow mcpProjectWorkflow) {
         return mcpProjectWorkflowRepository.save(mcpProjectWorkflow);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow create(Long mcpProjectId, Long projectDeploymentWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = new McpProjectWorkflow(mcpProjectId, projectDeploymentWorkflowId);
 
@@ -53,12 +56,14 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')")
     public void delete(long mcpProjectWorkflowId) {
         mcpProjectWorkflowRepository.deleteById(mcpProjectWorkflowId);
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_VIEW')")
     public Optional<McpProjectWorkflow> fetchMcpProjectWorkflow(long mcpProjectWorkflowId) {
         return mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId);
     }
@@ -82,6 +87,8 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflow.id, 'McpProjectWorkflow', 'MCP_EDIT') and " +
+        "hasPermission(#mcpProjectWorkflow.mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProjectWorkflow update(McpProjectWorkflow mcpProjectWorkflow) {
         McpProjectWorkflow currentMcpProjectWorkflow =
             OptionalUtils.get(mcpProjectWorkflowRepository.findById(mcpProjectWorkflow.getId()));
@@ -94,6 +101,8 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT') and " +
+        "(#mcpProjectId == null or hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT'))")
     public McpProjectWorkflow update(long id, Long mcpProjectId, Long projectDeploymentWorkflowId) {
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
@@ -110,6 +119,7 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')")
     public McpProjectWorkflow updateParameters(long id, Map<String, ?> parameters) {
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
