@@ -56,15 +56,8 @@ export default function saveTaskDispatcherSubtaskFieldChange(props: SaveTaskDisp
 
     let taskDispatcherContext: TaskDispatcherContextType | undefined = undefined;
     let taskDispatcherComponentName:
-        | 'branch'
-        | 'condition'
-        | 'each'
-        | 'fork-join'
-        | 'loop'
-        | 'on-error'
-        | 'parallel'
-        | 'terminate'
-        | undefined = undefined;
+        'branch' | 'condition' | 'each' | 'fork-join' | 'loop' | 'on-error' | 'parallel' | 'terminate' | undefined =
+        undefined;
 
     switch (taskDispatcherDataKey) {
         case 'branchData': {

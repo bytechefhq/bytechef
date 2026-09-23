@@ -51,8 +51,7 @@ function getContextFromTaskNodeData(
     } else if (nodeData.onErrorData) {
         context.index = (nodeData.onErrorData.index as number) + indexIncrement;
         context.onErrorCase = nodeData.onErrorData.onErrorCase as
-            | typeof ON_ERROR_MAIN_BRANCH
-            | typeof ON_ERROR_ERROR_BRANCH;
+            typeof ON_ERROR_MAIN_BRANCH | typeof ON_ERROR_ERROR_BRANCH;
         context.onErrorId = nodeData.onErrorData.onErrorId as string;
         context.taskDispatcherId = nodeData.onErrorData.onErrorId as string;
     } else if (nodeData.terminateData) {
@@ -133,8 +132,7 @@ function getContextFromPlaceholderNode(placeholderNode: Node): TaskDispatcherCon
         const onErrorId = placeholderNode.data.onErrorId as string;
 
         context.onErrorCase = placeholderNode.data?.onErrorCase as
-            | typeof ON_ERROR_MAIN_BRANCH
-            | typeof ON_ERROR_ERROR_BRANCH;
+            typeof ON_ERROR_MAIN_BRANCH | typeof ON_ERROR_ERROR_BRANCH;
         context.onErrorId = onErrorId;
         context.taskDispatcherId = onErrorId;
     } else if (isTerminatePlaceholder) {
