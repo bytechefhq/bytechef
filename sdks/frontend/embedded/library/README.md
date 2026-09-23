@@ -1,6 +1,6 @@
 # @bytechef/embedded
 
-> Previously published as `@bytechef/embedded-react`. That package is deprecated — use this one.
+> Previously published as `@bytechef/embedded-react`. That package is deprecated - use this one.
 
 ## Install
 
@@ -26,49 +26,87 @@ Requires `react` and `react-dom` >= 19.2.3 as peer dependencies.
 
 - ✅ Code quality tools with **ESLint**, **Prettier** and **Stylelint**.
 
+## Components
+
+### AutomationHub
+
+Embeds the end-user Automation Hub in an iframe: an Automations tab (the published template catalog, each card carrying the user's activation state) and a Connections tab, with the workflow builder as an internal route reached from the Automations tab.
+
+```tsx
+<AutomationHub
+    baseUrl="https://app.bytechef.io"
+    className="h-[800px] w-full"
+    environment="PRODUCTION"
+    jwtToken={jwtToken}
+    tabs={{connections: true, newWorkflow: false}}
+    theme={{mode: 'light', primaryColor: '#2563eb', borderRadius: '0.5rem'}}
+/>
+```
+
+`theme.fontFamily` must be a font the iframe can load (system/web-safe); host-page `@font-face` does not cross the iframe boundary.
+
+When `jwtToken` or any other prop changes after the iframe has loaded, the component sends the new values to the iframe, so a refreshed token takes effect without reloading it. The same applies to `EmbeddedWorkflowBuilder` and `IntegrationMarketplace`.
+
+## Upgrading to 0.4.0
+
+- `sharedConnectionIds` is removed from `AutomationHub` and `EmbeddedWorkflowBuilder`. It had no effect: the server never added the connections it named. Connected users now see their own connections plus the ones a tenant admin marks as shared. Delete the prop from your code.
+- `EmbeddedWorkflowBuilder` now loads `workflow-builder.html#/embedded/builder/:workflowUuid`. Iframes created by 0.3.0 and earlier that still point at `/embedded/workflow-builder/:workflowUuid` are redirected there.
+
 ## Development
 
-### Setting up Yalc for Local Development
+### Local Development Against a Consumer App
 
-[Yalc](https://github.com/wclr/yalc) is a tool for local package development that simulates publishing a package without actually publishing to a registry.
+The workspace (`sdks/frontend/embedded`) uses a local [Verdaccio](https://verdaccio.org/) registry
+and `npm link`.
 
-#### Prerequisites
+#### Option A: npm link (quickest)
 
-- Install Yalc globally: `npm install -g yalc`
+From the workspace root (`sdks/frontend/embedded`):
 
-#### Publishing the Library
+```bash
+npm run setup:link
+```
 
-- **One-time build and publish**:
+This builds the library, runs `npm link` in it, and links `@bytechef/embedded` into
+`test-apps`. Inside the library you can also run `npm run link:local` / `npm run unlink:local`
+directly.
 
-    ```bash
-    npm run yalc:publish
-    ```
+#### Option B: Local Verdaccio registry (closest to a real publish)
 
-    This builds the library and publishes it to the local Yalc store.
+```bash
+# from the workspace root
+npm run registry:start        # starts Verdaccio on http://localhost:4873
+npm run publish:library       # builds and publishes @bytechef/embedded to it
+npm run install:test-app      # installs the published package into test-apps
+npm run registry:stop
+```
 
-- **Update after changes:**
+Inside the library, `npm run publish:local` publishes to the running registry.
 
-    ```
-    npm run yalc:push
-    ```
+#### Watch mode
 
-    This rebuilds the library and pushes updates to all projects using it.
-
-- **Add the package to your project:**
-    ```
-    yalc add @bytechef/embedded
-    npm install
-    ```
-    This adds the package from your local Yalc store to the project.
+From the workspace root, `npm run dev` runs the library in watch mode (`npm run watch`)
+concurrently with the `test-apps` Next.js dev server.
 
 #### Suggested workflow steps
 
-1. In the Bytechef `DesktopSidebar` component initialize the dialog with `const {openDialog} = useConnectDialog({options})`
-   a. `options` are described in `UseConnectDialogProps`
-2. `cd ~/.../bytechef/sdks/frontend/embedded/library`
-3. Run `npm run dev:yalc`
-4. On change inside the `sdk/index.tsx` the Bytechef dev server needs to be restarted to see the changes
-   a. This is because of Vite's caching
+Develop against the embedded sample app in [`../test-apps`](../test-apps) -- a standalone Next.js
+consumer that calls `useConnectDialog` the same way a customer's app would. Do **not** wire the SDK
+into the ByteChef client (`client/`) itself; that is not a consumer of this package.
+
+1. Start the ByteChef server and client, since the sample app opens the connect dialog served by the
+   client (`http://127.0.0.1:5173` -- the sample app's default Base URL).
+2. `cd ~/.../bytechef/sdks/frontend/embedded`
+3. `npm run setup:link` (one time -- builds the library and links it into `test-apps`)
+4. `npm run dev` -- runs the library in watch mode plus the sample app on http://localhost:3000
+5. In the sample app, fill in Key ID / Private Key / External User ID, click **Calculate JWT Token**,
+   pick an integration, then **Connect** to open the dialog.
+6. Edit `library/src/`; Vite rebuilds and Next.js hot reloads the sample app.
+
+The sample app's `useConnectDialog({baseUrl, environment, integrationId, jwtToken})` call in
+`test-apps/app/page.tsx` is the reference usage -- all options are described in
+`UseConnectDialogProps`. See [`../test-apps/README.md`](../test-apps/README.md) for how it generates
+JWTs server-side, and [`../DEVELOPMENT.md`](../DEVELOPMENT.md) for the full development guide.
 
 #### Troubleshooting
 
@@ -91,18 +129,20 @@ npm install
 
 ## 🤖 Scripts
 
-|      Script       | Function                                                                                                                               |
-| :---------------: | -------------------------------------------------------------------------------------------------------------------------------------- |
-|      `build`      | Build the `dist`, with types declarations, after checking types with TypeScript.                                                       |
-|      `lint`       | Lint the project with **Eslint**.                                                                                                      |
-|    `lint:fix`     | Lint and fix the project with **Eslint**.                                                                                              |
-|     `format`      | Check the project format with **Prettier**.                                                                                            |
-|   `format:fix`    | Format the project code with **Prettier**.                                                                                             |
-|    `stylelint`    | Lint the styles code with **Stylelint**.                                                                                               |
-|  `stylelint:fix`  | Lint and fix the styles code with **Stylelint**.                                                                                       |
-|    `storybook`    | Start a Storybook development server.                                                                                                  |
-| `build-storybook` | Build the Storybook `dist`.                                                                                                            |
-|      `test`       | Run the tests with **Vitest** using `jsdom` and starts a **Vitest UI** dev server.                                                     |
-|    `coverage`     | Generate a coverage report, with **v8**.                                                                                               |
-|      `watch`      | Rebuilds the project and watches for file changes to trigger automatic rebuilds.                                                       |
-|    `dev:yalc`     | Rebuilds the project and watches for file changes to trigger automatic rebuilds. Also, publishes it via yalc to be consumed elsewhere. |
+|      Script       | Function                                                                                                    |
+| :---------------: | ----------------------------------------------------------------------------------------------------------- |
+|      `build`      | Build the `dist`, with types declarations, after checking types with TypeScript.                            |
+|      `lint`       | Lint the project with **Eslint**.                                                                           |
+|    `lint:fix`     | Lint and fix the project with **Eslint**.                                                                   |
+|     `format`      | Check the project format with **Prettier**.                                                                 |
+|   `format:fix`    | Format the project code with **Prettier**.                                                                  |
+|    `stylelint`    | Lint the styles code with **Stylelint**.                                                                    |
+|  `stylelint:fix`  | Lint and fix the styles code with **Stylelint**.                                                            |
+|    `storybook`    | Start a Storybook development server.                                                                       |
+| `build-storybook` | Build the Storybook `dist`.                                                                                 |
+|      `test`       | Run the tests with **Vitest** using `jsdom` and starts a **Vitest UI** dev server.                          |
+|    `coverage`     | Generate a coverage report, with **v8**.                                                                    |
+|      `watch`      | Rebuilds the project and watches for file changes to trigger automatic rebuilds.                            |
+|  `publish:local`  | Publish the built package to the local Verdaccio registry (`npm run registry:start` at the workspace root). |
+|   `link:local`    | `npm link` the library for consumption via `npm link @bytechef/embedded`.                                   |
+|  `unlink:local`   | Remove the global `npm link` registration.                                                                  |
