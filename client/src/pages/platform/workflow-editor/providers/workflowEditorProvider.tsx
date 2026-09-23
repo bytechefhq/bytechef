@@ -37,9 +37,11 @@ export interface ConnectionI {
     readonly id?: number;
     readonly lastModifiedBy?: string;
     readonly lastModifiedDate?: Date;
+    readonly managed?: boolean;
     name: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: {[key: string]: any};
+    shared?: boolean;
     tags?: Array<Tag>;
     version?: number;
     workspaceId?: number;
