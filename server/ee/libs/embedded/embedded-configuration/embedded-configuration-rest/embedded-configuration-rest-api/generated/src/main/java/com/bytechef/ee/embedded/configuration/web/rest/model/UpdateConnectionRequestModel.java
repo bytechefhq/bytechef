@@ -26,10 +26,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateConnectionRequest", description = "Contains all connection parameters that can be updated.")
 @JsonTypeName("UpdateConnectionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:16.940215+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:35.705345+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class UpdateConnectionRequestModel {
 
   private String name;
+
+  private @Nullable Boolean shared;
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
@@ -67,6 +69,27 @@ public class UpdateConnectionRequestModel {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  public UpdateConnectionRequestModel shared(@Nullable Boolean shared) {
+    this.shared = shared;
+    return this;
+  }
+
+  /**
+   * Whether every connected user in the same environment may use this connection.
+   * @return shared
+   */
+  
+  @Schema(name = "shared", description = "Whether every connected user in the same environment may use this connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("shared")
+  public @Nullable Boolean getShared() {
+    return shared;
+  }
+
+  @JsonProperty("shared")
+  public void setShared(@Nullable Boolean shared) {
+    this.shared = shared;
   }
 
   public UpdateConnectionRequestModel tags(List<@Valid TagModel> tags) {
@@ -129,13 +152,14 @@ public class UpdateConnectionRequestModel {
     }
     UpdateConnectionRequestModel updateConnectionRequest = (UpdateConnectionRequestModel) o;
     return Objects.equals(this.name, updateConnectionRequest.name) &&
+        Objects.equals(this.shared, updateConnectionRequest.shared) &&
         Objects.equals(this.tags, updateConnectionRequest.tags) &&
         Objects.equals(this.version, updateConnectionRequest.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, tags, version);
+    return Objects.hash(name, shared, tags, version);
   }
 
   @Override
@@ -143,6 +167,7 @@ public class UpdateConnectionRequestModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateConnectionRequestModel {\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    shared: ").append(toIndentedString(shared)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");

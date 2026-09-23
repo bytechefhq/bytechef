@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("TriggerFormInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-04T22:06:08.943670+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:32.315554+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class TriggerFormInputModel {
 
   private @Nullable String defaultValue;
