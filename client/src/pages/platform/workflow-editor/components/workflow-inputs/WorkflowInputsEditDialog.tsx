@@ -25,6 +25,7 @@ interface WorkflowInputsEditDialogProps {
     closeDialog: () => void;
     currentInputIndex?: number;
     form: UseFormReturn<WorkflowInputType, unknown, WorkflowInputType>;
+    internalOnlyVisible?: boolean;
     isEditDialogOpen: boolean;
     nameInputRef: RefObject<HTMLInputElement | null>;
     openEditDialog: (index?: number) => void;
@@ -35,6 +36,7 @@ const WorkflowInputsEditDialog = ({
     closeDialog,
     currentInputIndex,
     form,
+    internalOnlyVisible,
     isEditDialogOpen,
     nameInputRef,
     openEditDialog,
@@ -201,6 +203,37 @@ const WorkflowInputsEditDialog = ({
                                         </FormItem>
                                     )}
                                 />
+
+                                {internalOnlyVisible && (
+                                    <FormField
+                                        control={form.control}
+                                        name="internalOnly"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Internal only</FormLabel>
+
+                                                <FormControl>
+                                                    <Select
+                                                        onValueChange={(value) => field.onChange(value === 'true')}
+                                                        value={String(field.value ?? false)}
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+
+                                                        <SelectContent>
+                                                            <SelectItem value="true">True</SelectItem>
+
+                                                            <SelectItem value="false">False</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
 
                                 <FormField
                                     control={form.control}
