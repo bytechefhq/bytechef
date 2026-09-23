@@ -10,14 +10,14 @@ import useCopilotToolResultHandlerRegistry from '@/shared/components/copilot/sto
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
-import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
+import {AgentSubscriber, HttpAgent, contentToText} from '@ag-ui/client';
 import {
     AppendMessage,
     AssistantRuntimeProvider,
+    AuiConfig,
     type SuggestionConfig,
     Suggestions,
     ThreadMessageLike,
-    useAui,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, useMemo, useState} from 'react';
@@ -132,9 +132,11 @@ export function CopilotRuntimeProvider({
 
                 toolCallNamesById.delete(event.toolCallId);
 
-                useCopilotToolResultHandlerRegistry.getState().runFor(toolCallName ?? '', event.content);
+                const toolResultContent = contentToText(event.content);
 
-                const dataPart = toToolResultDataPart(toolCallName ?? '', event.content);
+                useCopilotToolResultHandlerRegistry.getState().runFor(toolCallName ?? '', toolResultContent);
+
+                const dataPart = toToolResultDataPart(toolCallName ?? '', toolResultContent);
 
                 if (!dataPart) {
                     return;
@@ -142,7 +144,7 @@ export function CopilotRuntimeProvider({
 
                 if (!dataPart.ok) {
                     const errorEnvelope = parseJson<{error?: unknown}>(
-                        event.content,
+                        toolResultContent,
                         'copilot tool-result error envelope'
                     );
                     const envelopeError =
@@ -282,10 +284,8 @@ export function CopilotRuntimeProvider({
         onReload,
     });
 
-    const aui = useAui({suggestions: Suggestions(suggestions ?? [])}, {parent: null});
-
     return (
-        <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+        <AssistantRuntimeProvider config={AuiConfig({suggestions: Suggestions(suggestions ?? [])})} runtime={runtime}>
             {children}
         </AssistantRuntimeProvider>
     );

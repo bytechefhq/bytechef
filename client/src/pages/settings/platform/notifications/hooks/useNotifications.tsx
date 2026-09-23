@@ -7,6 +7,7 @@ import {
 import {useGetNotificationEventsQuery} from '@/shared/queries/platform/notificationEvents.queries';
 import {NotificationKeys, useGetNotificationsQuery} from '@/shared/queries/platform/notifications.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {coreTableFeatures} from '@/shared/util/table-features';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper} from '@tanstack/react-table';
@@ -125,9 +126,9 @@ export default function useNotifications() {
         closeEditDialog();
     }
 
-    const columnHelper = createColumnHelper<Notification>();
+    const columnHelper = createColumnHelper<typeof coreTableFeatures, Notification>();
 
-    const columns = [
+    const columns = columnHelper.columns([
         columnHelper.accessor('name', {
             cell: (name) => <>{name.getValue()}</>,
             header: 'Name',
@@ -160,7 +161,7 @@ export default function useNotifications() {
             header: 'Actions',
             id: 'actions',
         }),
-    ];
+    ]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: emptyFormValues,

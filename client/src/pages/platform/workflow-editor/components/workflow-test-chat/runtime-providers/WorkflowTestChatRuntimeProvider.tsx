@@ -8,13 +8,13 @@ import {getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils
 import {
     AppendMessage,
     AssistantRuntimeProvider,
+    AuiConfig,
     CompositeAttachmentAdapter,
     SimpleImageAttachmentAdapter,
     SimpleTextAttachmentAdapter,
     type SuggestionConfig,
     Suggestions,
     ThreadMessageLike,
-    useAui,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
@@ -141,10 +141,11 @@ export function WorkflowTestChatRuntimeProvider({
         onNew,
     });
 
-    const aui = useAui({suggestions: Suggestions(WORKFLOW_TEST_CHAT_SUGGESTIONS)}, {parent: null});
-
     return (
-        <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+        <AssistantRuntimeProvider
+            config={AuiConfig({suggestions: Suggestions(WORKFLOW_TEST_CHAT_SUGGESTIONS)})}
+            runtime={runtime}
+        >
             {children}
         </AssistantRuntimeProvider>
     );

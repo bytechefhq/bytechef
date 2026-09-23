@@ -1,5 +1,5 @@
 import ComboBox from '@/components/ComboBox/ComboBox';
-import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
+import {DataMessagePartProps, useAui} from '@assistant-ui/react';
 import {CheckIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 
@@ -26,17 +26,17 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
     const [picked, setPicked] = useState<SelectPropertyOptionItemI | undefined>();
     const [superseded, setSuperseded] = useState(false);
 
-    const threadRuntime = useThreadRuntime();
+    const aui = useAui();
 
     useEffect(() => {
-        const initialCount = threadRuntime.getState().messages.length;
+        const initialCount = aui.thread.getState().messages.length;
 
-        return threadRuntime.subscribe(() => {
-            if (threadRuntime.getState().messages.length > initialCount) {
+        return aui.subscribe(() => {
+            if (aui.thread.getState().messages.length > initialCount) {
                 setSuperseded(true);
             }
         });
-    }, [threadRuntime]);
+    }, [aui]);
 
     if (picked) {
         return (
@@ -81,7 +81,7 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
 
                     setPicked(option);
 
-                    threadRuntime.append({
+                    aui.thread.append({
                         content: [{text: `User picked: ${option.label} (value: ${option.value})`, type: 'text'}],
                         role: 'system',
                     });

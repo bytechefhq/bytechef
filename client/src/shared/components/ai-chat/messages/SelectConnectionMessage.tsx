@@ -3,7 +3,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
-import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
+import {DataMessagePartProps, useAui} from '@assistant-ui/react';
 import {CheckIcon} from 'lucide-react';
 import {useEffect, useMemo, useState} from 'react';
 
@@ -25,7 +25,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
 
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const threadRuntime = useThreadRuntime();
+    const aui = useAui();
 
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery(
         {componentName: data.componentName, componentVersion: 1},
@@ -44,16 +44,16 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
     const connections = useMemo(() => existingConnections ?? [], [existingConnections]);
 
     useEffect(() => {
-        const initialMessageCount = threadRuntime.getState().messages.length;
+        const initialMessageCount = aui.thread.getState().messages.length;
 
-        return threadRuntime.subscribe(() => {
-            const currentCount = threadRuntime.getState().messages.length;
+        return aui.subscribe(() => {
+            const currentCount = aui.thread.getState().messages.length;
 
             if (currentCount > initialMessageCount) {
                 setSupersededByLaterMessage(true);
             }
         });
-    }, [threadRuntime]);
+    }, [aui]);
 
     const handleSelectChange = (value: string) => {
         const connectionId = Number(value);
@@ -65,7 +65,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
 
         setPickedConnection({id: connection.id, name: connection.name});
 
-        threadRuntime.append({
+        aui.thread.append({
             content: [{text: `User picked: ${connection.name} (ID: ${connection.id})`, type: 'text'}],
             role: 'system',
         });
