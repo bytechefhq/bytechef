@@ -64,7 +64,7 @@ const AppEvents = () => {
                                 triggerNode={!currentEnvironmentId ? <Button label="New App Event" /> : <></>}
                             />
                         }
-                        icon={<ZapIcon className="size-24 text-gray-300" />}
+                        icon={<ZapIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new app event."
                         title="No App Events"
                     />
