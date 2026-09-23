@@ -1,22 +1,17 @@
 import Badge from '@/components/Badge/Badge';
 import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator} from '@/components/ui/breadcrumb';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import AutomationWorkflowEditorWorkflowSelect from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowSelect';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
+import {ReactNode} from 'react';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
 
 interface AutomationWorkflowEditorBreadcrumbProps {
-    currentWorkflowId: string;
-    onWorkflowValueChange: (workflowUuid: string) => void;
+    itemSelect?: ReactNode;
     project: AutomationWorkflowProjectType;
 }
 
-const AutomationWorkflowEditorBreadcrumb = ({
-    currentWorkflowId,
-    onWorkflowValueChange,
-    project,
-}: AutomationWorkflowEditorBreadcrumbProps) => (
+const AutomationWorkflowEditorBreadcrumb = ({itemSelect, project}: AutomationWorkflowEditorBreadcrumbProps) => (
     <Breadcrumb>
         <BreadcrumbList>
             <BreadcrumbItem>
@@ -41,15 +36,13 @@ const AutomationWorkflowEditorBreadcrumb = ({
                 </Tooltip>
             </BreadcrumbItem>
 
-            <BreadcrumbSeparator />
+            {itemSelect && (
+                <>
+                    <BreadcrumbSeparator />
 
-            <BreadcrumbItem>
-                <AutomationWorkflowEditorWorkflowSelect
-                    currentWorkflowId={currentWorkflowId}
-                    onValueChange={onWorkflowValueChange}
-                    workflows={project.workflowTemplates}
-                />
-            </BreadcrumbItem>
+                    <BreadcrumbItem>{itemSelect}</BreadcrumbItem>
+                </>
+            )}
         </BreadcrumbList>
     </Breadcrumb>
 );

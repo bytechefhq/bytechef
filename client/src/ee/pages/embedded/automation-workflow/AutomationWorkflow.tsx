@@ -2,6 +2,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import AutomationWorkflowEditorHeader from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/AutomationWorkflowEditorHeader';
 import AutomationWorkflowEditorLeftSidebar from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/AutomationWorkflowEditorLeftSidebar';
 import {useAutomationWorkflowEditorSidebarStore} from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/stores/useAutomationWorkflowEditorSidebarStore';
+import {useGetComponentDefinitionsQuery} from '@/ee/shared/queries/embedded/componentDefinitions.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
@@ -12,6 +13,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {PlatformType, useAutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
@@ -24,7 +26,6 @@ import {
     useUpdateWorkflowNodeParameterMutation,
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {
     ConnectionKeys,
     useGetConnectionTagsQuery,
@@ -42,6 +43,9 @@ import {useShallow} from 'zustand/react/shallow';
 const AutomationWorkflow = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const connectionTagsQueryResult = useGetConnectionTagsQuery();
+
     const {setWorkflow, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             setWorkflow: state.setWorkflow,
@@ -55,14 +59,12 @@ const AutomationWorkflow = () => {
 
     const bottomResizablePanelRef = useRef<PanelImperativeHandle>(null);
 
-    const {workflowId} = useParams();
+    const {workflowUuid} = useParams();
 
     const {cancelLeave, confirmLeave, showLeaveDialog, workflowIsRunning, workflowTestExecution} =
         useWorkflowTestRunGuard(workflow.id, currentEnvironmentId);
 
     const queryClient = useQueryClient();
-
-    const {data: currentWorkflow, isLoading: isWorkflowLoading} = useGetWorkflowQuery(workflowId!, !!workflowId);
 
     const {data: projectsData} = useAutomationWorkflowProjectsQuery();
 
@@ -70,13 +72,21 @@ const AutomationWorkflow = () => {
 
     const currentProject = projects.find((automationWorkflowProject) =>
         automationWorkflowProject.workflowTemplates.some(
-            (projectWorkflow) => projectWorkflow.workflowUuid === workflowId
+            (projectWorkflow) => projectWorkflow.workflowUuid === workflowUuid
         )
     );
 
     const projectId = currentProject?.id ?? '';
 
+    const workflowId = currentProject?.workflowTemplates.find(
+        (projectWorkflow) => projectWorkflow.workflowUuid === workflowUuid
+    )?.workflowId;
+
+    const {data: currentWorkflow, isLoading: isWorkflowLoading} = useGetWorkflowQuery(workflowId!, !!workflowId);
+
     const {runDisabled} = useRun();
+
+    const copilotLayoutShifted = useCopilotLayoutShifted();
 
     const useGetConnectionsQuery = (request: RequestI, enabled?: boolean) =>
         useGetWorkspaceConnectionsQuery(
@@ -117,7 +127,7 @@ const AutomationWorkflow = () => {
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowId]);
+    }, [workflowUuid]);
 
     useEffect(() => {
         if (currentWorkflow && !isWorkflowLoading) {
@@ -146,7 +156,7 @@ const AutomationWorkflow = () => {
                         leftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
                     )}
                 >
-                    <AutomationWorkflowEditorLeftSidebar currentWorkflowId={workflowId!} />
+                    <AutomationWorkflowEditorLeftSidebar currentWorkflowId={workflowUuid!} />
                 </div>
             </div>
 
@@ -157,7 +167,7 @@ const AutomationWorkflow = () => {
                         workflow.triggers &&
                         workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
                     }
-                    currentWorkflowId={workflowId!}
+                    currentWorkflowId={workflowUuid!}
                     projectId={projectId}
                     runDisabled={runDisabled}
                     updateWorkflowMutation={updateWorkflowEditorMutation}
@@ -173,19 +183,20 @@ const AutomationWorkflow = () => {
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,
-                                    platformType: PlatformType.Automation,
+                                    platformType: PlatformType.Embedded,
                                     updateClusterElementParameterMutation,
                                     updateWorkflowMutation: updateWorkflowEditorMutation,
                                     updateWorkflowNodeParameterMutation,
                                     useCreateConnectionMutation: useCreateConnectionMutation,
                                     useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                    useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                                    useGetConnectionTagsQuery: () => connectionTagsQueryResult,
                                     useGetConnectionsQuery,
                                     webhookTriggerTestApi: new WebhookTriggerTestApi(),
                                 }}
                             >
                                 {workflow.id && (
                                     <WorkflowEditorLayout
+                                        internalOnlyVisible={true}
                                         leftSidebarOpen={leftSidebarOpen}
                                         runDisabled={runDisabled}
                                         showWorkflowInputs={true}
@@ -194,9 +205,17 @@ const AutomationWorkflow = () => {
                             </WorkflowEditorProvider>
                         </ResizablePanel>
 
-                        <ResizableHandle className="bg-muted" />
+                        <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:-top-1.5 aria-[orientation=horizontal]:h-0" />
 
-                        <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
+                        <ResizablePanel
+                            className={twMerge(
+                                'bg-surface-main px-3 pb-3',
+                                leftSidebarOpen && 'pl-0',
+                                copilotLayoutShifted && 'pr-0'
+                            )}
+                            defaultSize={0}
+                            panelRef={bottomResizablePanelRef}
+                        >
                             <WorkflowExecutionsTestOutput
                                 onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
                                 workflowIsRunning={workflowIsRunning}
