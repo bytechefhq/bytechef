@@ -58,60 +58,61 @@ const IntegrationInstanceConfigurationWorkflowList = ({
         </div>
     ) : (
         <div className="pt-3">
-            <h3 className="flex justify-start px-3 text-sm font-semibold text-gray-400 uppercase">Workflows</h3>
+            <h3 className="flex justify-start px-3 text-sm font-semibold text-content-neutral-tertiary uppercase">
+                Workflows
+            </h3>
 
-            <ul className="divide-y divide-gray-100">
-                {workflows &&
-                    workflows
-                        .sort((a, b) => a.label!.localeCompare(b.label!))
-                        .map((workflow) => {
-                            const componentNames = [
-                                ...(workflow.workflowTriggerComponentNames ?? []),
-                                ...(workflow.workflowTaskComponentNames ?? []),
-                            ];
+            <ul className="divide-y divide-stroke-neutral-primary">
+                {workflows
+                    ?.sort((a, b) => a.label!.localeCompare(b.label!))
+                    .map((workflow) => {
+                        const componentNames = [
+                            ...(workflow.workflowTriggerComponentNames ?? []),
+                            ...(workflow.workflowTaskComponentNames ?? []),
+                        ];
 
-                            componentNames?.forEach((componentName) => {
-                                if (!workflowComponentDefinitions[componentName]) {
-                                    workflowComponentDefinitions[componentName] = componentDefinitions?.find(
-                                        (componentDefinition) => componentDefinition.name === componentName
-                                    );
-                                }
-
-                                if (!workflowTaskDispatcherDefinitions[componentName]) {
-                                    workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
-                                        (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
-                                    );
-                                }
-                            });
-
-                            const filteredComponentNames = componentNames?.filter(
-                                (item, index) => componentNames?.indexOf(item) === index
-                            );
-
-                            const integrationInstanceConfigurationWorkflow =
-                                integrationInstanceConfigurationWorkflows?.find(
-                                    (integrationInstanceConfigurationWorkflow) =>
-                                        integrationInstanceConfigurationWorkflow.workflowId === workflow?.id
+                        componentNames?.forEach((componentName) => {
+                            if (!workflowComponentDefinitions[componentName]) {
+                                workflowComponentDefinitions[componentName] = componentDefinitions?.find(
+                                    (componentDefinition) => componentDefinition.name === componentName
                                 );
-
-                            if (!integrationInstanceConfigurationWorkflow) {
-                                return <></>;
                             }
 
-                            return (
-                                <IntegrationInstanceConfigurationWorkflowListItem
-                                    componentName={componentName}
-                                    filteredComponentNames={filteredComponentNames}
-                                    integrationInstanceConfigurationId={integrationInstanceConfigurationId}
-                                    integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
-                                    isMcpWorkflow={mcpWorkflowIds?.has(workflow.id!) ?? false}
-                                    key={workflow.id}
-                                    workflow={workflow}
-                                    workflowComponentDefinitions={workflowComponentDefinitions}
-                                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                                />
+                            if (!workflowTaskDispatcherDefinitions[componentName]) {
+                                workflowTaskDispatcherDefinitions[componentName] = taskDispatcherDefinitions?.find(
+                                    (taskDispatcherDefinition) => taskDispatcherDefinition.name === componentName
+                                );
+                            }
+                        });
+
+                        const filteredComponentNames = componentNames?.filter(
+                            (item, index) => componentNames?.indexOf(item) === index
+                        );
+
+                        const integrationInstanceConfigurationWorkflow =
+                            integrationInstanceConfigurationWorkflows?.find(
+                                (integrationInstanceConfigurationWorkflow) =>
+                                    integrationInstanceConfigurationWorkflow.workflowId === workflow?.id
                             );
-                        })}
+
+                        if (!integrationInstanceConfigurationWorkflow) {
+                            return <></>;
+                        }
+
+                        return (
+                            <IntegrationInstanceConfigurationWorkflowListItem
+                                componentName={componentName}
+                                filteredComponentNames={filteredComponentNames}
+                                integrationInstanceConfigurationId={integrationInstanceConfigurationId}
+                                integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
+                                isMcpWorkflow={mcpWorkflowIds?.has(workflow.id!) ?? false}
+                                key={workflow.id}
+                                workflow={workflow}
+                                workflowComponentDefinitions={workflowComponentDefinitions}
+                                workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                            />
+                        );
+                    })}
             </ul>
         </div>
     );
