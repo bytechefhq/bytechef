@@ -7,8 +7,7 @@
  */
 
 export type ToolResultDataPartType =
-    | {data: Record<string, unknown>; ok: true; type: string}
-    | {errorMessage: string; ok: false; toolName: string};
+    {data: Record<string, unknown>; ok: true; type: string} | {errorMessage: string; ok: false; toolName: string};
 
 export const parseJson = <T>(content: string, contextLabel: string): T | null => {
     try {
