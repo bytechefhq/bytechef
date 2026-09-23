@@ -1,23 +1,18 @@
 'use client';
 
 import {useConnectDialog} from '@bytechef/embedded';
-import {useState, useEffect} from 'react';
+import Link from 'next/link';
+import {useEffect, useState} from 'react';
+import TokenForm, {type Environment} from './components/TokenForm';
 
 interface Integration {
     id: number;
     name: string;
 }
 
-type Environment = 'DEVELOPMENT' | 'STAGE' | 'PRODUCTION';
-
 export default function Home() {
-    const [kid, setKid] = useState('');
-    const [privateKey, setPrivateKey] = useState('');
-    const [name, setName] = useState('John Doe');
-    const [externalUserId, setExternalUserId] = useState('1234567890');
     const [integrationId, setIntegrationId] = useState('');
     const [jwtToken, setJwtToken] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [integrations, setIntegrations] = useState<Integration[]>([]);
     const [integrationsLoading, setIntegrationsLoading] = useState(false);
@@ -61,47 +56,6 @@ export default function Home() {
         }
     };
 
-    // Function to calculate JWT token using server-side API
-    const calculateJwtToken = async () => {
-        if (!kid || !privateKey || !externalUserId || !name) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        setIsLoading(true);
-        setError('');
-
-        try {
-            const response = await fetch('/api/generate-jwt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    kid,
-                    privateKey,
-                    externalUserId,
-                    name,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to generate JWT token');
-            }
-
-            setJwtToken(data.token);
-            alert('JWT Token calculated! You can now fetch integrations.');
-        } catch (error) {
-            console.error('Error calculating JWT token:', error);
-            setError(error instanceof Error ? error.message : 'Unknown error occurred');
-            alert('Error calculating JWT token. Check console for details.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     // Effect to fetch integrations when JWT token changes
     useEffect(() => {
         if (jwtToken) {
@@ -128,84 +82,20 @@ export default function Home() {
         <main style={{maxWidth: 'var(--max-width)', margin: '0 auto'}}>
             <h1>ByteChef Connection</h1>
 
-            <div className="form-group">
-                <label>
-                    Base URL:
-                    <input
-                        type="text"
-                        value={baseUrl}
-                        onChange={(e) => setBaseUrl(e.target.value)}
-                        placeholder="Enter Base URL"
-                    />
-                </label>
-            </div>
+            <p>
+                <Link href="/hub">Open the Automation Hub demo &rarr;</Link>
+            </p>
 
-            <div className="form-group">
-                <label>
-                    Environment:
-                    <select
-                        value={environment}
-                        onChange={(e) => {
-                            const environment = e.target.value as Environment;
-
-                            setEnvironment(environment);
-
-                            fetchIntegrations(environment);
-                        }}
-                    >
-                        <option value="DEVELOPMENT">DEVELOPMENT</option>
-                        <option value="STAGE">STAGE</option>
-                        <option value="PRODUCTION">PRODUCTION</option>
-                    </select>
-                </label>
-            </div>
-
-            <div className="form-group">
-                <label>
-                    Private Key:
-                    <textarea
-                        value={privateKey}
-                        onChange={(e) => setPrivateKey(e.target.value)}
-                        placeholder="Enter Private Key (PEM format)"
-                    />
-                </label>
-            </div>
-
-            <div className="form-group">
-                <label>
-                    Key ID (kid):
-                    <input
-                        type="text"
-                        value={kid}
-                        onChange={(e) => setKid(e.target.value)}
-                        placeholder="Enter Key ID"
-                    />
-                </label>
-            </div>
-
-            <div className="form-group">
-                <label>
-                    External User ID:
-                    <input
-                        type="text"
-                        value={externalUserId}
-                        onChange={(e) => setExternalUserId(e.target.value)}
-                        placeholder="Enter External User ID"
-                    />
-                </label>
-            </div>
-
-            <div className="form-group">
-                <label>
-                    Name:
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter Name"
-                    />
-                </label>
-            </div>
+            <TokenForm
+                defaultBaseUrl={baseUrl}
+                defaultEnvironment={environment}
+                onBaseUrlChange={setBaseUrl}
+                onEnvironmentChange={(environment) => {
+                    setEnvironment(environment);
+                    fetchIntegrations(environment);
+                }}
+                onTokenGenerated={setJwtToken}
+            />
 
             <div className="form-group">
                 <label>
@@ -231,25 +121,16 @@ export default function Home() {
             </div>
 
             <div className="button-group">
-                <button onClick={calculateJwtToken} className="success" disabled={isLoading}>
-                    {isLoading ? 'Calculating...' : 'Calculate JWT Token'}
-                </button>
-
                 <button
                     onClick={handleConnect}
                     className="primary"
-                    disabled={!jwtToken || isLoading || integrationsLoading || !integrationId}
+                    disabled={!jwtToken || integrationsLoading || !integrationId}
                 >
                     Connect
                 </button>
             </div>
 
             {error && <div style={{color: 'red', marginBottom: '20px'}}>Error: {error}</div>}
-
-            <div className="token-display">
-                <h3>Generated JWT Token:</h3>
-                <pre>{jwtToken}</pre>
-            </div>
         </main>
     );
 }
