@@ -197,7 +197,7 @@ describe('useConnectDialog - Dialog State Management', () => {
             json: vi.fn().mockResolvedValue({id: 'integration'}),
         });
 
-        vi.mocked(useOAuth2).mockReturnValue({getAuth: vi.fn()});
+        vi.mocked(useOAuth2).mockReturnValue({error: null, getAuth: vi.fn(), loading: false});
 
         const renderMock = vi.fn();
 
@@ -722,5 +722,44 @@ describe('useConnectDialog - group-member persistence', () => {
                 body: JSON.stringify({inputs: {channel: {channelId: 'C1'}}}),
             })
         );
+    });
+});
+
+describe('useConnectDialog - onClose', () => {
+    beforeEach(() => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('does not call onClose when the dialog has never been opened', () => {
+        const onClose = vi.fn();
+
+        renderHook(() => useConnectDialog({...defaultConnectDialogProps, onClose}));
+
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('calls onClose when the dialog is closed', async () => {
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: vi.fn().mockResolvedValue({
+                name: 'Test Integration',
+                workflows: [],
+                integrationInstances: [],
+            }),
+        });
+
+        const onClose = vi.fn();
+
+        const {result} = renderHook(() => useConnectDialog({...defaultConnectDialogProps, onClose}));
+
+        await act(async () => result.current.openDialog());
+
+        act(() => result.current.closeDialog());
+
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 });

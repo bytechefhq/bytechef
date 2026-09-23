@@ -109,6 +109,7 @@ interface UseConnectDialogProps {
     integrationInstanceId?: string;
     jwtToken: string;
     mapObjectFields?: MapObjectFieldsType;
+    mode?: 'dark' | 'light';
     onClose?: () => void;
 }
 
@@ -119,10 +120,10 @@ export default function useConnectDialog({
     integrationInstanceId,
     jwtToken,
     mapObjectFields,
+    mode,
     onClose,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
-    const [isOAuth2, setIsOAuth2] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
@@ -448,6 +449,8 @@ export default function useConnectDialog({
         [integration]
     );
 
+    const isOAuth2 = !!isOAuth2AuthorizationType;
+
     const handleOnCodeSuccess = useCallback(
         (payload: CodePayloadI) => {
             if (payload.code) {
@@ -686,17 +689,12 @@ export default function useConnectDialog({
         [closeDialog, isOAuth2, handleDisconnect, getAuth, handleSubmit]
     );
 
-    const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>({});
+    const debouncedFetchesRef = useRef<Record<string, (...args: unknown[]) => void>>(undefined);
 
     const currentIntegrationInstanceIdRef = useRef(currentIntegrationInstanceId);
     const inputOverridesRef = useRef(inputOverrides);
     const integrationRef = useRef(integration);
     const mcpWorkflowInputOverridesRef = useRef(mcpWorkflowInputOverrides);
-
-    currentIntegrationInstanceIdRef.current = currentIntegrationInstanceId;
-    inputOverridesRef.current = inputOverrides;
-    integrationRef.current = integration;
-    mcpWorkflowInputOverridesRef.current = mcpWorkflowInputOverrides;
 
     const scheduleWorkflowInputsSave = useCallback(
         (workflowUuid: string) => {
@@ -708,8 +706,10 @@ export default function useConnectDialog({
 
             const debouncedFetchKey = workflowUuid;
 
-            if (!debouncedFetchesRef.current[debouncedFetchKey]) {
-                debouncedFetchesRef.current[debouncedFetchKey] = debounce(() => {
+            const debouncedFetches = (debouncedFetchesRef.current ??= {});
+
+            if (!debouncedFetches[debouncedFetchKey]) {
+                const debouncedFetch = debounce(() => {
                     const instanceId = currentIntegrationInstanceIdRef.current;
 
                     if (!instanceId) {
@@ -734,9 +734,11 @@ export default function useConnectDialog({
                         method: 'PUT',
                     }).catch((error) => console.error('Failed to save workflow inputs:', error));
                 }, 600);
+
+                debouncedFetches[debouncedFetchKey] = debouncedFetch;
             }
 
-            debouncedFetchesRef.current[debouncedFetchKey]();
+            debouncedFetches[debouncedFetchKey]();
         },
         [fetch]
     );
@@ -799,8 +801,10 @@ export default function useConnectDialog({
 
             const debouncedFetchKey = `mcp-${workflowUuid}`;
 
-            if (!debouncedFetchesRef.current[debouncedFetchKey]) {
-                debouncedFetchesRef.current[debouncedFetchKey] = debounce(() => {
+            const debouncedFetches = (debouncedFetchesRef.current ??= {});
+
+            if (!debouncedFetches[debouncedFetchKey]) {
+                const debouncedFetch = debounce(() => {
                     const instanceId = currentIntegrationInstanceIdRef.current;
 
                     if (!instanceId) {
@@ -828,9 +832,11 @@ export default function useConnectDialog({
                         method: 'PUT',
                     }).catch((error) => console.error('Failed to save MCP workflow inputs:', error));
                 }, 600);
+
+                debouncedFetches[debouncedFetchKey] = debouncedFetch;
             }
 
-            debouncedFetchesRef.current[debouncedFetchKey]();
+            debouncedFetches[debouncedFetchKey]();
         },
         [fetch]
     );
@@ -955,6 +961,7 @@ export default function useConnectDialog({
                 mergedMcpTools={mergedMcpTools}
                 mergedMcpWorkflows={mergedMcpWorkflows}
                 mergedWorkflows={mergedWorkflows}
+                mode={mode}
                 properties={integration?.connectionConfig?.inputs}
                 registerFormSubmit={registerFormSubmit}
                 workflowsView={workflowsView}
@@ -983,16 +990,18 @@ export default function useConnectDialog({
         mergedMcpTools,
         mergedMcpWorkflows,
         mergedWorkflows,
+        mode,
         registerFormSubmit,
         workflowsView,
         currentIntegrationInstanceId,
     ]);
 
     useEffect(() => {
-        if (isOAuth2AuthorizationType) {
-            setIsOAuth2(true);
-        }
-    }, [isOAuth2AuthorizationType]);
+        currentIntegrationInstanceIdRef.current = currentIntegrationInstanceId;
+        inputOverridesRef.current = inputOverrides;
+        integrationRef.current = integration;
+        mcpWorkflowInputOverridesRef.current = mcpWorkflowInputOverrides;
+    });
 
     return {
         openDialog,
