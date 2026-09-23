@@ -54,6 +54,7 @@ const McpComponentToolList = ({
                     connectionId={connectionId}
                     connectionRequired={componentDefinition?.connectionRequired ?? true}
                     description={toolDescriptionsByName[tool.name]}
+                    enabledSwitchVisible
                     key={tool.name}
                     mcpTool={tool}
                 />

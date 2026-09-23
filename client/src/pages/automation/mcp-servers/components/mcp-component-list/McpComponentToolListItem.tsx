@@ -1,10 +1,13 @@
 import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
+import Switch from '@/components/Switch/Switch';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import McpComponentToolPropertiesPopover from '@/pages/platform/mcp-servers/components/McpComponentToolPropertiesPopover';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {McpTool} from '@/shared/middleware/graphql';
+import {McpTool, useUpdateMcpToolEnabledMutation} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {BoltIcon, Trash2Icon} from 'lucide-react';
+import {useState} from 'react';
 
 import useMcpProjectComponentToolDropdownMenu from './hooks/useMcpProjectComponentToolDropdownMenu';
 
@@ -14,6 +17,7 @@ interface McpComponentToolListItemProps {
     connectionId?: string | null;
     connectionRequired?: boolean;
     description?: string | null;
+    enabledSwitchVisible?: boolean;
     mcpTool: McpTool;
 }
 
@@ -23,8 +27,11 @@ const McpComponentToolListItem = ({
     connectionId,
     connectionRequired,
     description,
+    enabledSwitchVisible,
     mcpTool,
 }: McpComponentToolListItemProps) => {
+    const [isEnablePending, setIsEnablePending] = useState(false);
+
     const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpProjectComponentToolDropdownMenu({
             mcpTool,
@@ -32,10 +39,30 @@ const McpComponentToolListItem = ({
 
     const {activePopoverId, closePopover, openPopover} = useMcpActivePopover();
 
+    const queryClient = useQueryClient();
+
+    const updateMcpToolEnabledMutation = useUpdateMcpToolEnabledMutation();
+
     const popoverId = `component-tool-${mcpTool.id}`;
     const isPopoverOpen = activePopoverId === popoverId;
 
     useCloseActivePopoverOnUnmount(isPopoverOpen);
+
+    const handleEnabledChange = (value: boolean) => {
+        setIsEnablePending(true);
+
+        updateMcpToolEnabledMutation.mutate(
+            {enabled: value, id: mcpTool.id},
+            {
+                onSettled: () => {
+                    setIsEnablePending(false);
+                },
+                onSuccess: () => {
+                    void queryClient.invalidateQueries({queryKey: ['mcpComponentsByServerId']});
+                },
+            }
+        );
+    };
 
     return (
         <>
@@ -48,6 +75,15 @@ const McpComponentToolListItem = ({
                     </div>
 
                     <div className="flex shrink-0 items-center gap-0.5">
+                        {enabledSwitchVisible && (
+                            <Switch
+                                aria-label="Enable tool"
+                                checked={mcpTool.enabled}
+                                disabled={isEnablePending}
+                                onCheckedChange={handleEnabledChange}
+                            />
+                        )}
+
                         {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
 
                         <PopoverAnchor asChild>
