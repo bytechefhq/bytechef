@@ -5,7 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 import {useMemo} from 'react';
 
 type AutomationWorkflowProjectWorkflowTemplateType =
@@ -13,12 +13,14 @@ type AutomationWorkflowProjectWorkflowTemplateType =
 
 interface AutomationWorkflowProjectWorkflowListItemProps {
     onDeleteWorkflow: (workflowUuid: string) => void;
+    onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
     workflow: AutomationWorkflowProjectWorkflowTemplateType;
 }
 
 const AutomationWorkflowProjectWorkflowListItem = ({
     onDeleteWorkflow,
+    onEditWorkflow,
     onSelectWorkflow,
     workflow,
 }: AutomationWorkflowProjectWorkflowListItemProps) => {
@@ -52,7 +54,7 @@ const AutomationWorkflowProjectWorkflowListItem = ({
         : undefined;
 
     return (
-        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground">
+        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
             <div
                 className="flex flex-1 cursor-pointer items-center gap-2"
                 onClick={() => onSelectWorkflow(workflow.workflowUuid)}
@@ -106,6 +108,17 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="p-0">
+                        <DropdownMenuItem
+                            aria-label="Edit Workflow"
+                            onClick={(event) => {
+                                event.stopPropagation();
+
+                                onEditWorkflow(workflow);
+                            }}
+                        >
+                            <PencilIcon /> Edit
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem
                             aria-label="Delete Workflow"
                             className="dropdown-menu-item-destructive"
