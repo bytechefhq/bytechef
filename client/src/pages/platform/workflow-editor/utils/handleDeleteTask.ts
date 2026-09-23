@@ -339,8 +339,7 @@ export default function handleDeleteTask({
 
     const updatedTaskParametersByName = collectAllTaskParameters(updatedTasks);
 
-    // Optimistic UI: close panel and update store immediately so layout recomputes once. Deleting a task
-    // dispatcher removes every task nested inside it, so the open node can disappear without being `data`.
+    // Optimistic UI: close panel and update store immediately so layout recomputes once
     if (currentNode && isCurrentNodeRemoved(currentNode, rootClusterElementNodeData, updatedTaskParametersByName)) {
         useWorkflowNodeDetailsPanelStore.getState().reset();
         useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
@@ -421,10 +420,6 @@ function collectAllTaskParameters(
     return result;
 }
 
-/**
- * Whether the node open in the details panel no longer exists after the deletion. A cluster element is judged by
- * its root task, since cluster elements never appear in the task tree; a trigger is never removed by a task deletion.
- */
 function isCurrentNodeRemoved(
     currentNode: NodeDataType,
     rootClusterElementNodeData: NodeDataType | undefined,
