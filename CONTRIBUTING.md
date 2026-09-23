@@ -99,7 +99,7 @@ Pull requests are the best way to propose changes to the codebase (we use [Git-F
 - [Docker](https://docs.docker.com/get-docker/)
 - [Java - GraalVM for JDK 25.0.0+](https://www.graalvm.org/downloads/)
 - Gradle - V8.5+. - Comes as part of the project as [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html)
-- [Node v20+](https://nodejs.org/en/download/)
+- [Node v24+](https://nodejs.org/en/download/)
 
 ### Run from the command line
 

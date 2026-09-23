@@ -14,17 +14,15 @@ vi.mock('@/pages/home/stores/usePlatformTypeStore', async () => {
     };
 });
 
-const mockedUseNavigate = vi.fn();
+const {mockedUseNavigate} = vi.hoisted(() => ({mockedUseNavigate: vi.fn()}));
 
-const mockReactRouter = () => {
-    vi.mock('react-router-dom', async () => {
-        const mod = await import('react-router-dom');
-        return {
-            ...mod,
-            useNavigate: () => mockedUseNavigate,
-        };
-    });
-};
+vi.mock('react-router-dom', async () => {
+    const mod = await import('react-router-dom');
+    return {
+        ...mod,
+        useNavigate: () => mockedUseNavigate,
+    };
+});
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
     useFeatureFlagsStore: vi.fn(),
@@ -33,7 +31,6 @@ vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
 const mockedUseFeatureFlagsStore = useFeatureFlagsStore as Mock;
 
 beforeEach(() => {
-    mockReactRouter();
     mockPlatformTypeStore();
     mockedUseFeatureFlagsStore.mockReturnValue(() => true);
 });

@@ -6,7 +6,7 @@ import * as path from 'node:path';
 import {resolve} from 'node:path';
 import {defineConfig, loadEnv} from 'vite';
 import svgr from 'vite-plugin-svgr';
-import { lingui } from '@lingui/vite-plugin';
+import {lingui} from '@lingui/vite-plugin';
 
 // https://vitejs.dev/config/
 export default ({mode}) => {
@@ -63,7 +63,11 @@ export default ({mode}) => {
             alias: {
                 '@': path.resolve(__dirname, './src'),
                 '@bytechef/embedded': path.resolve(__dirname, '../sdks/frontend/embedded/library/src/main.ts'),
-                '@dagrejs/dagre': path.resolve(__dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs.js'),
+                '@dagrejs/dagre': path.resolve(__dirname, 'node_modules/@dagrejs/dagre/dist/dagre.cjs'),
+                'monaco-editor/esm/vs/editor/editor.worker.js': path.resolve(
+                    __dirname,
+                    'node_modules/monaco-editor/esm/vs/editor/editor.worker.js'
+                ),
             },
         },
         server: {

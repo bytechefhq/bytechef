@@ -15,7 +15,7 @@ import {
     ErrorPrimitive,
     MessagePrimitive,
     ThreadPrimitive,
-    useComposerRuntime,
+    useAui,
 } from '@assistant-ui/react';
 import {Extension, mergeAttributes} from '@tiptap/core';
 import Document from '@tiptap/extension-document';
@@ -201,7 +201,7 @@ const ThreadSuggestions: FC = () => {
 };
 
 const ComposerInput: FC<{hasAttachments: boolean}> = ({hasAttachments}) => {
-    const composerRuntime = useComposerRuntime();
+    const aui = useAui();
 
     const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -258,8 +258,8 @@ const ComposerInput: FC<{hasAttachments: boolean}> = ({hasAttachments}) => {
         [componentDefinitions, taskDispatcherDefinitions, workflow.workflowTriggerComponentNames]
     );
 
-    const composerRuntimeRef = useRef(composerRuntime);
-    composerRuntimeRef.current = composerRuntime;
+    const auiRef = useRef(aui);
+    auiRef.current = aui;
 
     const editor = useEditor({
         content: initialContent,
@@ -310,11 +310,11 @@ const ComposerInput: FC<{hasAttachments: boolean}> = ({hasAttachments}) => {
         immediatelyRender: false,
         onCreate({editor: createdEditor}) {
             if (!createdEditor.isEmpty) {
-                composerRuntimeRef.current.setText(createdEditor.getText());
+                auiRef.current.composer.setText(createdEditor.getText());
             }
         },
         onUpdate({editor: updatedEditor}) {
-            composerRuntimeRef.current.setText(updatedEditor.getText());
+            auiRef.current.composer.setText(updatedEditor.getText());
         },
     });
 
@@ -325,14 +325,14 @@ const ComposerInput: FC<{hasAttachments: boolean}> = ({hasAttachments}) => {
     }, [dataPills, editor]);
 
     useEffect(() => {
-        return composerRuntime.subscribe(() => {
-            const state = composerRuntime.getState();
+        return aui.subscribe(() => {
+            const state = aui.composer.getState();
 
             if (state.text === '' && editor && !editor.isEmpty) {
                 editor.commands.clearContent();
             }
         });
-    }, [composerRuntime, editor]);
+    }, [aui, editor]);
 
     return (
         <>

@@ -9,10 +9,12 @@ vi.mock('@assistant-ui/react', async () => {
 
     return {
         ...actual,
-        useThreadRuntime: vi.fn(() => ({
-            append: (message: unknown) => appendCalls.push(message),
-            getState: () => ({messages: []}),
+        useAui: vi.fn(() => ({
             subscribe: () => () => {},
+            thread: {
+                append: (message: unknown) => appendCalls.push(message),
+                getState: () => ({messages: []}),
+            },
         })),
     };
 });

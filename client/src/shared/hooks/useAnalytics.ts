@@ -29,6 +29,10 @@ export interface AnalyticsI {
 }
 
 export const identifyAccount = (posthog: PostHog, account: UserI, edition?: string) => {
+    if (!account.uuid) {
+        return;
+    }
+
     posthog.identify(account.uuid, {
         edition,
         email: account.email,
