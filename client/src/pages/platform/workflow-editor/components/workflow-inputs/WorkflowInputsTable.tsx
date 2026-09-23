@@ -4,6 +4,7 @@ import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/plat
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
 interface WorkflowInputsTableProps {
+    internalOnlyVisible?: boolean;
     openDeleteDialog: (index: number) => void;
     openEditDialog: (index?: number) => void;
     workflowInputs: WorkflowInput[];
@@ -11,6 +12,7 @@ interface WorkflowInputsTableProps {
 }
 
 const WorkflowInputsTable = ({
+    internalOnlyVisible,
     openDeleteDialog,
     openEditDialog,
     workflowInputs,
@@ -27,7 +29,11 @@ const WorkflowInputsTable = ({
 
                 <TableHead className="w-[12%] truncate">Required</TableHead>
 
-                <TableHead className="w-[30%] truncate">Test Value</TableHead>
+                {internalOnlyVisible && <TableHead className="w-[12%] truncate">Internal only</TableHead>}
+
+                <TableHead className={internalOnlyVisible ? 'w-[18%] truncate' : 'w-[30%] truncate'}>
+                    Test Value
+                </TableHead>
 
                 <TableHead className="w-[14%] truncate">Actions</TableHead>
             </TableRow>
@@ -52,6 +58,8 @@ const WorkflowInputsTable = ({
                         </TableCell>
 
                         <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
+
+                        {internalOnlyVisible && <TableCell>{input.internalOnly === true ? 'true' : 'false'}</TableCell>}
 
                         <TableCell className="truncate" title={testValue}>
                             {testValue}
