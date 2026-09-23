@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProject", description = "An automation workflow automation workflow project.")
 @JsonTypeName("AutomationWorkflowProject")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AutomationWorkflowProjectModel {
 
   private @Nullable Long id;
@@ -34,6 +34,8 @@ public class AutomationWorkflowProjectModel {
   private @Nullable String name;
 
   private @Nullable String description;
+
+  private @Nullable Boolean automationHubVisible;
 
   @Valid
   private List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates = new ArrayList<>();
@@ -101,6 +103,27 @@ public class AutomationWorkflowProjectModel {
     this.description = description;
   }
 
+  public AutomationWorkflowProjectModel automationHubVisible(@Nullable Boolean automationHubVisible) {
+    this.automationHubVisible = automationHubVisible;
+    return this;
+  }
+
+  /**
+   * Whether the project is listed in the Automation Hub. The API returns hidden projects too, so a custom UI can offer them.
+   * @return automationHubVisible
+   */
+  
+  @Schema(name = "automationHubVisible", description = "Whether the project is listed in the Automation Hub. The API returns hidden projects too, so a custom UI can offer them.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("automationHubVisible")
+  public @Nullable Boolean getAutomationHubVisible() {
+    return automationHubVisible;
+  }
+
+  @JsonProperty("automationHubVisible")
+  public void setAutomationHubVisible(@Nullable Boolean automationHubVisible) {
+    this.automationHubVisible = automationHubVisible;
+  }
+
   public AutomationWorkflowProjectModel workflowTemplates(List<@Valid AutomationWorkflowProjectWorkflowTemplateModel> workflowTemplates) {
     this.workflowTemplates = workflowTemplates;
     return this;
@@ -142,12 +165,13 @@ public class AutomationWorkflowProjectModel {
     return Objects.equals(this.id, automationWorkflowProject.id) &&
         Objects.equals(this.name, automationWorkflowProject.name) &&
         Objects.equals(this.description, automationWorkflowProject.description) &&
+        Objects.equals(this.automationHubVisible, automationWorkflowProject.automationHubVisible) &&
         Objects.equals(this.workflowTemplates, automationWorkflowProject.workflowTemplates);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, description, workflowTemplates);
+    return Objects.hash(id, name, description, automationHubVisible, workflowTemplates);
   }
 
   @Override
@@ -157,6 +181,7 @@ public class AutomationWorkflowProjectModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    automationHubVisible: ").append(toIndentedString(automationHubVisible)).append("\n");
     sb.append("    workflowTemplates: ").append(toIndentedString(workflowTemplates)).append("\n");
     sb.append("}");
     return sb.toString();

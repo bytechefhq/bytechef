@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BillingSubscription", description = "A billing subscription.")
 @JsonTypeName("BillingSubscription")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-04T14:19:21.409801+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.139906+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class BillingSubscriptionModel {
 
   private @Nullable String planName;

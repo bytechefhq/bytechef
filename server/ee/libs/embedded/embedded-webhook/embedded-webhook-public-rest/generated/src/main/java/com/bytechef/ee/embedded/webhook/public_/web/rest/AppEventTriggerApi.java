@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-08-24T22:46:06.977367+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-25T16:43:37.386825+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "app-event-trigger", description = "The Embedded App Event Trigger Public API")
 public interface AppEventTriggerApi {
@@ -44,10 +44,10 @@ public interface AppEventTriggerApi {
         return Optional.empty();
     }
 
-    String PATH_EXECUTE_WORKFLOWS = "/app-events";
+    String PATH_EXECUTE_FRONTEND_WORKFLOWS = "/app-events";
     /**
      * POST /app-events : Trigger all subscribed workflows
-     * Fires an App Event for the connected user, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints.
+     * Fires an App Event for the connected user, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints. The request body is read once and delivered to every matching workflow. If one or more workflows could not be started, the others still run and the response is a 500 problem detail whose failedWorkflows property lists the uuids of the workflows that were not started.
      *
      * @param xEnvironment The environment. (optional)
      * @return Successful operation. (status code 204)
@@ -62,9 +62,9 @@ public interface AppEventTriggerApi {
      *         or Not implemented (status code 501)
      */
     @Operation(
-        operationId = "executeWorkflows",
+        operationId = "executeFrontendWorkflows",
         summary = "Trigger all subscribed workflows",
-        description = "Fires an App Event for the connected user, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints.",
+        description = "Fires an App Event for the connected user, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints. The request body is read once and delivered to every matching workflow. If one or more workflows could not be started, the others still run and the response is a 500 problem detail whose failedWorkflows property lists the uuids of the workflows that were not started.",
         tags = { "app-event-trigger" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation."),
@@ -102,10 +102,130 @@ public interface AppEventTriggerApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
+        value = AppEventTriggerApi.PATH_EXECUTE_FRONTEND_WORKFLOWS,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<Void> executeFrontendWorkflows(
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"errors\" : [ { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" }, { \"code\" : \"MISSING_REQUIRED_FIELD\", \"meta\" : { \"application_name\" : \"MyCompany Production\", \"origin\" : \"remote-provider\", \"cause\" : \"{}\" }, \"problem_type\" : \"MISSING_REQUIRED_FIELD\", \"id\" : \"9366efb4-8fb1-4a28-bfb0-8d6f9cc6b5c5\", \"detail\" : \"detail\", \"title\" : \"Property values were not valid\n\", \"status\" : \"400\" } ] }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_EXECUTE_WORKFLOWS = "/{externalUserId}/app-events";
+    /**
+     * POST /{externalUserId}/app-events : Trigger all subscribed workflows
+     * Fires an App Event for the connected user identified by external user id, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints. The request body is read once and delivered to every matching workflow. If one or more workflows could not be started, the others still run and the response is a 500 problem detail whose failedWorkflows property lists the uuids of the workflows that were not started.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return Successful operation. (status code 204)
+     *         or Bad request (status code 400)
+     *         or Unauthorized (status code 401)
+     *         or Forbidden (status code 403)
+     *         or Not found (status code 404)
+     *         or Conflict (status code 409)
+     *         or Unprocessable entity (status code 422)
+     *         or Remote provider error (status code 499)
+     *         or Internal server error (status code 500)
+     *         or Not implemented (status code 501)
+     */
+    @Operation(
+        operationId = "executeWorkflows",
+        summary = "Trigger all subscribed workflows",
+        description = "Fires an App Event for the connected user identified by external user id, starting every one of their enabled workflows that has an App Event trigger. Returns no body; inspect the runs through the workflow executions endpoints. The request body is read once and delivered to every matching workflow. If one or more workflows could not be started, the others still run and the response is a 500 problem detail whose failedWorkflows property lists the uuids of the workflows that were not started.",
+        tags = { "app-event-trigger" },
+        responses = {
+            @ApiResponse(responseCode = "204", description = "Successful operation."),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Not found", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "409", description = "Conflict", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "422", description = "Unprocessable entity", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "499", description = "Remote provider error", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            }),
+            @ApiResponse(responseCode = "501", description = "Not implemented", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
         value = AppEventTriggerApi.PATH_EXECUTE_WORKFLOWS,
         produces = { "application/json" }
     )
     default ResponseEntity<Void> executeWorkflows(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.time.OffsetDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -24,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ConnectionModel {
 
   private Long id;
@@ -32,6 +34,21 @@ public class ConnectionModel {
   private String name;
 
   private @Nullable EnvironmentModel environment;
+
+  private @Nullable String componentName;
+
+  private @Nullable Integer connectionVersion;
+
+  private @Nullable String authorizationType;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime createdDate;
+
+  private @Nullable CredentialStatusModel credentialStatus;
+
+  private @Nullable Boolean shared;
+
+  private @Nullable Boolean editable;
 
   public ConnectionModel() {
     super();
@@ -108,6 +125,153 @@ public class ConnectionModel {
     this.environment = environment;
   }
 
+  public ConnectionModel componentName(@Nullable String componentName) {
+    this.componentName = componentName;
+    return this;
+  }
+
+  /**
+   * The component name.
+   * @return componentName
+   */
+  
+  @Schema(name = "componentName", description = "The component name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentName")
+  public @Nullable String getComponentName() {
+    return componentName;
+  }
+
+  @JsonProperty("componentName")
+  public void setComponentName(@Nullable String componentName) {
+    this.componentName = componentName;
+  }
+
+  public ConnectionModel connectionVersion(@Nullable Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+    return this;
+  }
+
+  /**
+   * The connection version.
+   * @return connectionVersion
+   */
+  
+  @Schema(name = "connectionVersion", description = "The connection version.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("connectionVersion")
+  public @Nullable Integer getConnectionVersion() {
+    return connectionVersion;
+  }
+
+  @JsonProperty("connectionVersion")
+  public void setConnectionVersion(@Nullable Integer connectionVersion) {
+    this.connectionVersion = connectionVersion;
+  }
+
+  public ConnectionModel authorizationType(@Nullable String authorizationType) {
+    this.authorizationType = authorizationType;
+    return this;
+  }
+
+  /**
+   * The authorization type name.
+   * @return authorizationType
+   */
+  
+  @Schema(name = "authorizationType", description = "The authorization type name.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("authorizationType")
+  public @Nullable String getAuthorizationType() {
+    return authorizationType;
+  }
+
+  @JsonProperty("authorizationType")
+  public void setAuthorizationType(@Nullable String authorizationType) {
+    this.authorizationType = authorizationType;
+  }
+
+  public ConnectionModel createdDate(@Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+    return this;
+  }
+
+  /**
+   * The created date.
+   * @return createdDate
+   */
+  @Valid 
+  @Schema(name = "createdDate", description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
+  public @Nullable OffsetDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+  @JsonProperty("createdDate")
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+  }
+
+  public ConnectionModel credentialStatus(@Nullable CredentialStatusModel credentialStatus) {
+    this.credentialStatus = credentialStatus;
+    return this;
+  }
+
+  /**
+   * Get credentialStatus
+   * @return credentialStatus
+   */
+  @Valid 
+  @Schema(name = "credentialStatus", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("credentialStatus")
+  public @Nullable CredentialStatusModel getCredentialStatus() {
+    return credentialStatus;
+  }
+
+  @JsonProperty("credentialStatus")
+  public void setCredentialStatus(@Nullable CredentialStatusModel credentialStatus) {
+    this.credentialStatus = credentialStatus;
+  }
+
+  public ConnectionModel shared(@Nullable Boolean shared) {
+    this.shared = shared;
+    return this;
+  }
+
+  /**
+   * Whether a tenant admin marked this connection shared with every connected user in the environment. Shared and owned are independent: a connected user may own a connection the admin also shared, and can still modify that one -- see `editable`.
+   * @return shared
+   */
+  
+  @Schema(name = "shared", description = "Whether a tenant admin marked this connection shared with every connected user in the environment. Shared and owned are independent: a connected user may own a connection the admin also shared, and can still modify that one -- see `editable`.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("shared")
+  public @Nullable Boolean getShared() {
+    return shared;
+  }
+
+  @JsonProperty("shared")
+  public void setShared(@Nullable Boolean shared) {
+    this.shared = shared;
+  }
+
+  public ConnectionModel editable(@Nullable Boolean editable) {
+    this.editable = editable;
+    return this;
+  }
+
+  /**
+   * Whether THIS connected user may reconnect or delete the connection, which is true only of the ones they own. A shared connection they do not own is listed and selectable but never modifiable: it belongs to the tenant admin who shared it, and changing it would act on every connected user at once.
+   * @return editable
+   */
+  
+  @Schema(name = "editable", description = "Whether THIS connected user may reconnect or delete the connection, which is true only of the ones they own. A shared connection they do not own is listed and selectable but never modifiable: it belongs to the tenant admin who shared it, and changing it would act on every connected user at once.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("editable")
+  public @Nullable Boolean getEditable() {
+    return editable;
+  }
+
+  @JsonProperty("editable")
+  public void setEditable(@Nullable Boolean editable) {
+    this.editable = editable;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -119,12 +283,19 @@ public class ConnectionModel {
     ConnectionModel connection = (ConnectionModel) o;
     return Objects.equals(this.id, connection.id) &&
         Objects.equals(this.name, connection.name) &&
-        Objects.equals(this.environment, connection.environment);
+        Objects.equals(this.environment, connection.environment) &&
+        Objects.equals(this.componentName, connection.componentName) &&
+        Objects.equals(this.connectionVersion, connection.connectionVersion) &&
+        Objects.equals(this.authorizationType, connection.authorizationType) &&
+        Objects.equals(this.createdDate, connection.createdDate) &&
+        Objects.equals(this.credentialStatus, connection.credentialStatus) &&
+        Objects.equals(this.shared, connection.shared) &&
+        Objects.equals(this.editable, connection.editable);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, environment);
+    return Objects.hash(id, name, environment, componentName, connectionVersion, authorizationType, createdDate, credentialStatus, shared, editable);
   }
 
   @Override
@@ -134,6 +305,13 @@ public class ConnectionModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
+    sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
+    sb.append("    connectionVersion: ").append(toIndentedString(connectionVersion)).append("\n");
+    sb.append("    authorizationType: ").append(toIndentedString(authorizationType)).append("\n");
+    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
+    sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");
+    sb.append("    shared: ").append(toIndentedString(shared)).append("\n");
+    sb.append("    editable: ").append(toIndentedString(editable)).append("\n");
     sb.append("}");
     return sb.toString();
   }
