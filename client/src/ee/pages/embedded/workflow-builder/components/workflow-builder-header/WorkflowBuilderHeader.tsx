@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {HubBuilderContext} from '@/ee/pages/embedded/automation-hub/hubBuilderContext';
 import OutputPanelButton from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/OutputButton';
 import PublishPopover from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/PublishPopover';
 import WorkflowActionsButton from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/components/WorkflowActionsButton';
@@ -8,11 +9,12 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching} from '@tanstack/react-query';
-import {EditIcon} from 'lucide-react';
-import {RefObject} from 'react';
+import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
+import {ArrowLeftIcon, EditIcon} from 'lucide-react';
+import {RefObject, useContext} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -42,6 +44,8 @@ const WorkflowBuilderHeader = ({
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
+    const queryClient = useQueryClient();
+
     const isFetching = useIsFetching();
     const {
         handlePublishProjectSubmit,
@@ -55,6 +59,8 @@ const WorkflowBuilderHeader = ({
         projectId,
     });
 
+    const hubBuilderContext = useContext(HubBuilderContext);
+
     const isOnline = onlineManager.isOnline();
 
     // if (!project) {
@@ -64,6 +70,17 @@ const WorkflowBuilderHeader = ({
     return (
         <header className="flex items-center justify-between bg-transparent px-3 py-2.5">
             <div className="flex items-center gap-2">
+                {hubBuilderContext?.onBack && (
+                    <Button
+                        aria-label="Back to automations"
+                        className="-ml-2.5"
+                        icon={<ArrowLeftIcon />}
+                        onClick={hubBuilderContext.onBack}
+                        size="icon"
+                        variant="ghost"
+                    />
+                )}
+
                 <div>{workflow.label}</div>
 
                 <div></div>
@@ -71,7 +88,7 @@ const WorkflowBuilderHeader = ({
                 <Badge label={`V${(workflowVersion ?? 0) + 1} DRAFT`} styleType="outline-outline" weight="semibold" />
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-1">
                 <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
                 <Button
@@ -101,6 +118,11 @@ const WorkflowBuilderHeader = ({
             {showEditWorkflowDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
+                    onSave={() =>
+                        queryClient.invalidateQueries({
+                            queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, Number.parseInt(workflow.id!, 10)),
+                        })
+                    }
                     parentId={projectId}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
