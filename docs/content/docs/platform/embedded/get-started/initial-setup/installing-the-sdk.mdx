@@ -3,7 +3,7 @@ title: Installing the SDK
 description: Install the @bytechef/embedded React SDK and authenticate your end users with signed JWTs.
 ---
 
-The `@bytechef/embedded` SDK renders ByteChef's embedded surfaces - the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) and the embedded workflow builder - inside your own product. This page covers installing the package and wiring up end-user authentication.
+The `@bytechef/embedded` SDK renders ByteChef's embedded surfaces - the [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog), the [Automation Hub](/platform/embedded/build/automation-hub), the [Integration Marketplace](/platform/embedded/build/integration-marketplace) and the embedded workflow builder - inside your own product. This page covers installing the package and wiring up end-user authentication.
 
 ## Installing from npm
 
@@ -11,12 +11,21 @@ The `@bytechef/embedded` SDK renders ByteChef's embedded surfaces - the [Connect
 npm install @bytechef/embedded
 ```
 
-The package exports two surfaces:
+The package (version `0.4.0`) exports four surfaces:
 
-- **`useConnectDialog`** - a React hook that opens the hosted Connect dialog so an end user can authorize an integration.
-- **`EmbeddedWorkflowBuilder`** - a React component that embeds the full workflow editor so end users can build their own automations.
+- **`useConnectDialog`** - a React hook that opens the hosted [Connect dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog) so an end user can authorize an integration.
+- **`AutomationHub`** - a React component that embeds the [Automation Hub](/platform/embedded/build/automation-hub), a catalog of automation templates the end user activates, with tabs, an activation wizard and a `theme` prop.
+- **`IntegrationMarketplace`** - a React component that embeds the [Integration Marketplace](/platform/embedded/build/integration-marketplace), an integration catalog that opens the Connect dialog in your page.
+- **`EmbeddedWorkflowBuilder`** - a React component that embeds the [workflow editor](/platform/embedded/build/automations/automation-workflows#the-embeddable-workflow-builder) so end users can build their own automations.
 
-Both are configured with the same three values: your ByteChef instance's `baseUrl`, an `environment` (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`), and a `jwtToken` identifying the current end user.
+The package also exports the `AutomationHubTabsConfig` and `AutomationHubTheme` types for the hub's `tabs` and `theme` props.
+
+All four are configured with the same three values: your ByteChef instance's `baseUrl`, an `environment` (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`), and a `jwtToken` identifying the current end user.
+
+### Upgrading to 0.4.0
+
+- `sharedConnectionIds` is removed from `AutomationHub` and `EmbeddedWorkflowBuilder`. It had no effect - the server never added the connections it named. Connected users see their own connections plus the ones a tenant admin marks as shared. Delete the prop from your code.
+- `EmbeddedWorkflowBuilder` now loads `workflow-builder.html#/embedded/builder/:workflowUuid`. Iframes created by 0.3.0 and earlier that still point at `/embedded/workflow-builder/:workflowUuid` are redirected there.
 
 ## Setup
 

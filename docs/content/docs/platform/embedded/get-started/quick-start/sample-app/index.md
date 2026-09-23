@@ -132,7 +132,6 @@ Against a **self-hosted** instance on the default `http://localhost:8080`, you c
 | `NEXT_PUBLIC_BYTECHEF_ENVIRONMENT` | `DEVELOPMENT` | Environment every call targets - `DEVELOPMENT`, `STAGING` or `PRODUCTION` - sent as the `X-ENVIRONMENT` header. Integrations, connections and workflows are separate per environment. |
 | `NEXT_PUBLIC_BYTECHEF_EXTERNAL_USER_ID` | `1234567890` | Your app's id for the demo end user; it becomes the JWT `sub`, so ByteChef scopes that user's connections and workflows to it. Change it to act as a different user. |
 | `NEXT_PUBLIC_BYTECHEF_MCP_SERVER_URL` | *(empty)* | URL of a ByteChef MCP Server. Only needed for the **Chat MCP** page. |
-| `NEXT_PUBLIC_SHARED_CONNECTION_IDS` | *(empty)* | Comma-separated connection ids (e.g. `12,34`) the embedded workflow builder and Automation Hub offer in addition to the user's own connections. |
 | `OPENAI_API_KEY` | *(none)* | OpenAI key for the **Chat MCP** and **Chat Component Kit** pages. |
 
 `NEXT_PUBLIC_*` values are inlined when Next.js compiles, so restart `npm run dev` after changing them.

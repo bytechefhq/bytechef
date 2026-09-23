@@ -39,7 +39,9 @@ export function ConnectGmailButton({jwtToken, integrationId}: {
 
 {/* TODO screenshot: the ByteChef Connect dialog as it renders inside a host application, showing the integration list and a Connect button */}
 
-To build an integrations catalog page (and get each `integrationId`), list the integrations available to the current user from the embedded API:
+If you do not want to build your own list, the [Integration Marketplace](/platform/embedded/build/integration-marketplace) component is a ready-made catalog that opens this dialog in your page.
+
+To build an integrations catalog page yourself (and get each `integrationId`), list the integrations available to the current user from the embedded API:
 
 ```ts
 const response = await fetch(`${baseUrl}/api/embedded/v1/integrations`, {
@@ -67,6 +69,18 @@ const {openDialog} = useConnectDialog({
     integrationId,
     jwtToken,
     onClose: () => refetchIntegrations(),
+});
+```
+
+To match a dark host page, pass `mode: 'dark'`. It switches the dialog's surfaces, borders and text to a dark palette. The default is `'light'`, and the dialog takes no other styling options:
+
+```tsx
+const {openDialog} = useConnectDialog({
+    baseUrl: 'https://your-bytechef-host.example.com',
+    environment: 'DEVELOPMENT',
+    integrationId,
+    jwtToken,
+    mode: 'dark',
 });
 ```
 

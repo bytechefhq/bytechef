@@ -181,11 +181,7 @@ See **[App Events](/platform/embedded/build/app-events)** for how to declare eve
 'use client';
 import {EmbeddedWorkflowBuilder} from '@bytechef/embedded';
 
-export function WorkflowEditor({jwtToken, workflowUuid, sharedConnectionIds}: {
-    jwtToken: string;
-    workflowUuid: string;
-    sharedConnectionIds: number[];
-}) {
+export function WorkflowEditor({jwtToken, workflowUuid}: {jwtToken: string; workflowUuid: string}) {
     return (
         <div style={{height: '100vh', position: 'relative', width: '100%'}}>
             <EmbeddedWorkflowBuilder
@@ -193,7 +189,6 @@ export function WorkflowEditor({jwtToken, workflowUuid, sharedConnectionIds}: {
                 connectionDialogAllowed
                 environment="DEVELOPMENT"
                 jwtToken={jwtToken}
-                sharedConnectionIds={sharedConnectionIds}
                 workflowUuid={workflowUuid}
             />
         </div>

@@ -28,6 +28,8 @@ Called from your own server. The connected user is named by the `{externalUserId
 - **[Connected Users](/openapi/backend/embedded-configuration-connected-user)** - update a connected user.
 - **[User Workflows](/openapi/backend/embedded-configuration-connected-user-project-workflow)** - a connected user's own workflows, including generation from a prompt.
 - **[Workflow Catalog](/openapi/backend/embedded-configuration-automation-workflow-project)** - the catalog projects available to connected users.
+- **[App Events](/openapi/backend/embedded-webhook-app-event-trigger)** - fire an App Event to start every one of a connected user's subscribed workflows.
+- **[Request Trigger](/openapi/backend/embedded-webhook-request-trigger)** - execute a connected user's workflow synchronously and return its result.
 - **Workflow Executions** - fetch a tenant's workflow executions. Served by the internal API rather than a public spec, so it has no reference page; read executions in the ByteChef admin UI.
 - **Tool Invocations** - fetch a connected user's tool and action invocation history. No public spec yet, so it has no reference page.
 
@@ -38,7 +40,7 @@ Called from the browser with a short-lived token your backend signs. The connect
 - **[Integrations](/openapi/frontend/embedded-configuration-integration)** - the integrations available to the signed-in user.
 - **[Integration Instances](/openapi/frontend/embedded-configuration-integration-instance)** - their instance of an integration.
 - **[Instance Workflows](/openapi/frontend/embedded-configuration-integration-instance-workflow)** - enable, disable and configure that instance's workflows.
-- **[Connections](/openapi/frontend/embedded-configuration-connection)** - list their connections.
+- **[Connections](/openapi/frontend/embedded-configuration-connection)** - list, create, delete and reauthorize their connections.
 - **[Connected Users](/openapi/frontend/embedded-configuration-connected-user)** - update the signed-in user.
 - **[User Workflows](/openapi/frontend/embedded-configuration-connected-user-project-workflow)** - their own workflows, including generation from a prompt.
 - **[Workflow Catalog](/openapi/frontend/embedded-configuration-automation-workflow-project)** - the catalog projects available to them.
