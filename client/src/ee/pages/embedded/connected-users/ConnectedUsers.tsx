@@ -324,7 +324,7 @@ const ConnectedUsers = () => {
                     <ConnectedUserTable connectedUsers={connectedUsers} />
                 ) : (
                     <EmptyList
-                        icon={<UsersIcon className="size-24 text-gray-300" />}
+                        icon={<UsersIcon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by connecting new integrations."
                         title="No Connected Users"
                     />

@@ -75,10 +75,10 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
     return (
         <Collapsible className="mb-2 rounded border border-border/50" key={connectedUserIntegrationInstance.id}>
             {componentDefinition && (
-                <div className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground">
+                <div className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
-                            <div className="flex flex-1 items-center gap-1">
+                            <div className="flex min-h-8 flex-1 items-center gap-1">
                                 <InlineSVG
                                     className="size-5 flex-none"
                                     key={componentDefinition.name!}
@@ -101,7 +101,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex min-h-7 items-center gap-4">
                                 <ConnectedUserCredentialStatus
                                     componentTitle={componentDefinition.title!}
                                     credentialStatus={connectedUserIntegrationInstance.credentialStatus}
@@ -137,7 +137,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             )}
 
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
-                                <div className="relative flex items-center">
+                                <div className="relative flex min-h-8 items-center">
                                     {enableIntegrationInstanceMutation.isPending && (
                                         <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                     )}
@@ -155,8 +155,8 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                                 </div>
 
                                 <Tooltip>
-                                    <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                                        {integrationInstance && integrationInstance.lastExecutionDate ? (
+                                    <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
+                                        {integrationInstance?.lastExecutionDate ? (
                                             <span className="text-xs">
                                                 {`Executed at ${integrationInstance.lastExecutionDate?.toLocaleDateString()} ${integrationInstance.lastExecutionDate?.toLocaleTimeString()}`}
                                             </span>
