@@ -14,14 +14,16 @@ import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {PlatformType} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowBuilder = () => {
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore(
+    const {showBottomPanel, workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore(
         useShallow((state) => ({
+            showBottomPanel: state.showBottomPanel,
             workflowIsRunning: state.workflowIsRunning,
             workflowTestExecution: state.workflowTestExecution,
         }))
@@ -31,6 +33,7 @@ const WorkflowBuilder = () => {
             workflow: state.workflow,
         }))
     );
+    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
 
     const {
         bottomResizablePanelRef,
@@ -43,7 +46,6 @@ const WorkflowBuilder = () => {
         initialized,
         invalidateWorkflowQueries,
         projectId,
-        sharedConnectionIds,
         updateClusterElementParameterMutation,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
@@ -97,8 +99,7 @@ const WorkflowBuilder = () => {
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,
                                 useGetConnectionsQuery: getConnectedUserConnectionsQuery(
-                                    connectedUserProjectWorkflow.connectedUserId!,
-                                    sharedConnectionIds ? sharedConnectionIds : []
+                                    connectedUserProjectWorkflow.connectedUserId!
                                 ),
                                 webhookTriggerTestApi: new WebhookTriggerTestApi(),
                             }}
@@ -116,12 +117,21 @@ const WorkflowBuilder = () => {
 
                     <ResizableHandle className="bg-muted" />
 
-                    <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
-                        <WorkflowExecutionsTestOutput
-                            onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                            workflowIsRunning={workflowIsRunning}
-                            workflowTestExecution={workflowTestExecution}
-                        />
+                    <ResizablePanel className="flex" defaultSize={0} panelRef={bottomResizablePanelRef}>
+                        {(showBottomPanel ||
+                            workflowIsRunning ||
+                            workflowTestExecution ||
+                            workflowTestChatPanelOpen) && (
+                            <div className="m-3 flex flex-1 overflow-hidden rounded-lg bg-background">
+                                {(showBottomPanel || workflowIsRunning || workflowTestExecution) && (
+                                    <WorkflowExecutionsTestOutput
+                                        onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                        workflowIsRunning={workflowIsRunning}
+                                        workflowTestExecution={workflowTestExecution}
+                                    />
+                                )}
+                            </div>
+                        )}
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </div>
