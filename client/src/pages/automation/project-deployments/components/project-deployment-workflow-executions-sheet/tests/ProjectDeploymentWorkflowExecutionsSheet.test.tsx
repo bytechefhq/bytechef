@@ -279,7 +279,7 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
 
         const island = screen.getByTestId('workflow-executions-island');
 
-        expect(island).toHaveClass('rounded-b-md', 'bg-surface-neutral-primary');
+        expect(island).toHaveClass('rounded-lg', 'bg-surface-neutral-primary');
         expect(island.parentElement?.className).not.toMatch(/(^|\s)p-\d/);
         expect(island).toContainElement(screen.getByText('COMPLETED'));
         expect(island).toContainElement(screen.getByText(/Showing 1 to 1 of 1 results/));

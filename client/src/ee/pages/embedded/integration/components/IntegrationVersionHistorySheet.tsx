@@ -31,7 +31,7 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                     <SheetCloseButton />
                 </header>
 
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
+                <div className="m-3 flex min-h-0 flex-1 flex-col overflow-y-auto rounded-lg bg-surface-neutral-primary p-3">
                     {integrationVersions && (
                         <Accordion
                             defaultValue={

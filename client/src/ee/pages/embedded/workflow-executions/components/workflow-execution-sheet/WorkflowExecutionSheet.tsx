@@ -95,7 +95,7 @@ const WorkflowExecutionSheet = () => {
                     <div className="flex min-h-0 flex-1 p-3">
                         <ResizablePanelGroup className="h-full" orientation="horizontal">
                             <ResizablePanel
-                                className="flex min-h-0 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
+                                className="flex min-h-0 flex-col overflow-hidden rounded-lg bg-surface-neutral-primary"
                                 defaultSize={65}
                                 minSize={35}
                             >
@@ -110,7 +110,7 @@ const WorkflowExecutionSheet = () => {
                             <ResizableHandle className="mx-2.5" withHandle />
 
                             <ResizablePanel
-                                className="flex min-h-0 flex-col overflow-hidden"
+                                className="flex min-h-0 flex-col overflow-hidden rounded-lg"
                                 defaultSize={35}
                                 minSize={15}
                             >

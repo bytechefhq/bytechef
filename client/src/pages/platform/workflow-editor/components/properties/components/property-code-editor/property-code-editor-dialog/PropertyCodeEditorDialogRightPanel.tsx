@@ -85,12 +85,12 @@ const PropertyCodeEditorDialogRightPanel = ({
         : (workflowNodeComponentConnectionsData?.workflowNodeComponentConnections ?? []);
 
     return (
-        <div className="flex w-96 flex-col divide-y divide-solid divide-muted border-l border-l-border/50">
-            <div className="flex-1">
+        <div className="flex w-96 flex-col gap-3">
+            <div className="min-h-0 flex-1 overflow-auto rounded-lg bg-surface-neutral-primary">
                 <PropertyCodeEditorDialogRightPanelInput input={input} />
             </div>
 
-            <div className="flex-1">
+            <div className="min-h-0 flex-1 overflow-auto rounded-lg bg-surface-neutral-primary">
                 <PropertyCodeEditorDialogRightPanelConnections
                     componentConnections={componentConnections}
                     workflow={workflow}

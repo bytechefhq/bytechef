@@ -50,13 +50,13 @@ const PropertyCodeEditorDialog = ({
 
                 <DialogContent
                     className={twMerge(
-                        'absolute top-12 bottom-4 flex h-[calc(100vh-64px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0 transition-[left,width] duration-300 ease-in-out sm:max-w-none',
+                        'absolute top-12 bottom-4 flex h-[calc(100vh-64px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden border-stroke-neutral-secondary bg-surface-neutral-secondary p-0 transition-[left,width] duration-300 ease-in-out sm:max-w-none',
                         copilotPanelOpen ? 'left-2 w-[calc(100vw-16px)]' : 'left-16 w-[calc(100vw-80px)]'
                     )}
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
-                    <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <div className="flex min-w-0 flex-1 flex-col">
                         <PropertyCodeEditorDialogToolbar
                             language={language}
                             onChange={onChange}
@@ -64,15 +64,15 @@ const PropertyCodeEditorDialog = ({
                             workflowNodeName={workflowNodeName}
                         />
 
-                        <div className="flex min-w-0 flex-1">
+                        <div className="flex min-h-0 min-w-0 flex-1 gap-3 p-3">
                             <ResizablePanelGroup className="flex-1" orientation="vertical">
-                                <ResizablePanel defaultSize={750}>
+                                <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={750}>
                                     <PropertyCodeEditorDialogEditor language={language} />
                                 </ResizablePanel>
 
-                                <ResizableHandle className="bg-muted" />
+                                <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:h-3" />
 
-                                <ResizablePanel defaultSize={250}>
+                                <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={250}>
                                     <PropertyCodeEditorDialogExecutionOutput />
                                 </ResizablePanel>
                             </ResizablePanelGroup>

@@ -20,7 +20,7 @@ const PropertyCodeEditorDialogEditor = ({language}: PropertyCodeEditorDialogEdit
     return (
         <Suspense fallback={<MonacoEditorLoader />}>
             <MonacoEditor
-                className="size-full"
+                className="size-full py-3"
                 defaultLanguage={language}
                 onChange={(value) => setEditorValue(value)}
                 onMount={(editor) => {
