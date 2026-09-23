@@ -1,0 +1,158 @@
+import {render, screen} from '@testing-library/react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+import HubConnectionDialog from '../views/components/HubConnectionDialog';
+
+const {useGetComponentDefinitionQueryMock, useGetComponentDefinitionsQueryMock} = vi.hoisted(() => ({
+    useGetComponentDefinitionQueryMock: vi.fn(),
+    useGetComponentDefinitionsQueryMock: vi.fn(),
+}));
+
+vi.mock('@/shared/queries/platform/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionQuery: useGetComponentDefinitionQueryMock,
+}));
+
+vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionsQuery: useGetComponentDefinitionsQueryMock,
+}));
+
+vi.mock('@/shared/components/connection/ConnectionDialog', () => ({
+    default: (props: Record<string, unknown>) => (
+        <div data-testid="connection-dialog">
+            <span data-testid="title">{props.title as string}</span>
+
+            <span data-testid="description">{props.description as string}</span>
+
+            <span data-testid="connection">{JSON.stringify(props.connection)}</span>
+
+            <span data-testid="has-create-mutation">{String(!!props.useCreateConnectionMutation)}</span>
+
+            <span data-testid="has-update-mutation">{String(!!props.useUpdateConnectionMutation)}</span>
+
+            <span data-testid="has-credentials-mutation">{String(!!props.useUpdateConnectionCredentialsMutation)}</span>
+
+            <span data-testid="start-in-credentials-mode">{String(!!props.startInCredentialsMode)}</span>
+        </div>
+    ),
+}));
+
+describe('HubConnectionDialog', () => {
+    beforeEach(() => {
+        useGetComponentDefinitionQueryMock.mockReset();
+        useGetComponentDefinitionsQueryMock.mockReset();
+
+        useGetComponentDefinitionQueryMock.mockReturnValue({
+            data: {icon: '<svg/>', name: 'slack', title: 'Slack'},
+            error: null,
+            isLoading: false,
+        });
+
+        useGetComponentDefinitionsQueryMock.mockReturnValue({data: [], error: null, isLoading: false});
+    });
+
+    it('titles the dialog as a reconnect and opens it straight into credential replacement, when existingConnectionId is set', () => {
+        render(<HubConnectionDialog componentName="slack" existingConnectionId={1} onClose={vi.fn()} />);
+
+        expect(screen.getByTestId('title')).toHaveTextContent('Reconnect Slack');
+        expect(screen.getByTestId('has-create-mutation')).toHaveTextContent('true');
+        expect(screen.getByTestId('has-credentials-mutation')).toHaveTextContent('true');
+        expect(screen.getByTestId('start-in-credentials-mode')).toHaveTextContent('true');
+
+        expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
+            componentName: 'slack',
+            connectionVersion: 1,
+            id: 1,
+            name: 'Slack',
+            parameters: {},
+        });
+    });
+
+    it('passes the connection credential status so the dialog can say the credentials were rejected', () => {
+        render(
+            <HubConnectionDialog
+                componentName="slack"
+                existingConnectionCredentialStatus="INVALID"
+                existingConnectionId={1}
+                onClose={vi.fn()}
+            />
+        );
+
+        expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
+            componentName: 'slack',
+            connectionVersion: 1,
+            credentialStatus: 'INVALID',
+            id: 1,
+            name: 'Slack',
+            parameters: {},
+        });
+    });
+
+    it("uses the connection's own connectionVersion when reconnecting, both for the definition lookup and the prefilled connection", () => {
+        render(
+            <HubConnectionDialog
+                componentName="slack"
+                existingConnectionId={1}
+                existingConnectionVersion={2}
+                onClose={vi.fn()}
+            />
+        );
+
+        expect(useGetComponentDefinitionQueryMock).toHaveBeenCalledWith({componentName: 'slack', componentVersion: 2});
+
+        expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
+            componentName: 'slack',
+            connectionVersion: 2,
+            id: 1,
+            name: 'Slack',
+            parameters: {},
+        });
+    });
+
+    it('falls back to version 1 when reconnecting a connection with no recorded connectionVersion', () => {
+        render(<HubConnectionDialog componentName="slack" existingConnectionId={1} onClose={vi.fn()} />);
+
+        expect(useGetComponentDefinitionQueryMock).toHaveBeenCalledWith({componentName: 'slack', componentVersion: 1});
+
+        expect(JSON.parse(screen.getByTestId('connection').textContent || 'null')).toEqual({
+            componentName: 'slack',
+            connectionVersion: 1,
+            id: 1,
+            name: 'Slack',
+            parameters: {},
+        });
+    });
+
+    it('keeps the default create title and supplies no credentials mutation hook when existingConnectionId is absent', () => {
+        render(<HubConnectionDialog componentName="slack" onClose={vi.fn()} />);
+
+        expect(screen.getByTestId('title')).toHaveTextContent('');
+        expect(screen.getByTestId('has-create-mutation')).toHaveTextContent('true');
+        expect(screen.getByTestId('has-credentials-mutation')).toHaveTextContent('false');
+        expect(screen.getByTestId('start-in-credentials-mode')).toHaveTextContent('false');
+        expect(screen.getByTestId('connection')).toHaveTextContent('');
+    });
+
+    it('waits for the component definition before mounting the dialog, so a first open never seeds it with nothing', () => {
+        useGetComponentDefinitionQueryMock.mockReturnValue({data: undefined, error: null, isLoading: true});
+
+        const {rerender} = render(<HubConnectionDialog componentName="slack" onClose={vi.fn()} />);
+
+        expect(screen.queryByTestId('connection-dialog')).not.toBeInTheDocument();
+
+        useGetComponentDefinitionQueryMock.mockReturnValue({
+            data: {icon: '<svg/>', name: 'slack', title: 'Slack'},
+            error: null,
+            isLoading: false,
+        });
+
+        rerender(<HubConnectionDialog componentName="slack" onClose={vi.fn()} />);
+
+        expect(screen.getByTestId('connection-dialog')).toBeInTheDocument();
+    });
+
+    it('filters the component picker to connection-capable components', () => {
+        render(<HubConnectionDialog componentName="slack" onClose={vi.fn()} />);
+
+        expect(useGetComponentDefinitionsQueryMock).toHaveBeenCalledWith({connectionDefinitions: true});
+    });
+});
