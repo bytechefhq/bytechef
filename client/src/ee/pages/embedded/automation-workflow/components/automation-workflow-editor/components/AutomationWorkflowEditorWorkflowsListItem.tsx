@@ -1,6 +1,7 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AutomationWorkflowEditorWorkflowsListItemDropdownMenu from '@/ee/pages/embedded/automation-workflow/components/automation-workflow-editor/components/AutomationWorkflowEditorWorkflowsListItemDropdownMenu';
 import {WorkflowComponentIconDefinitionType} from '@/pages/automation/project/components/projects-sidebar/components/WorkflowComponentsIcon';
+import {useProjectsLeftSidebar} from '@/pages/automation/project/components/projects-sidebar/hooks/useProjectsLeftSidebar';
 import WorkflowComponentsList from '@/shared/components/WorkflowComponentsList';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 import {MouseEvent, useMemo} from 'react';
@@ -22,7 +23,9 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
     project,
     workflow,
 }: AutomationWorkflowEditorWorkflowsListItemProps) => {
-    const editedDate = workflow.lastModifiedDate ? new Date(workflow.lastModifiedDate).toLocaleDateString() : undefined;
+    const {calculateTimeDifference} = useProjectsLeftSidebar();
+
+    const editedTimeAgo = workflow.lastModifiedDate ? calculateTimeDifference(workflow.lastModifiedDate) : undefined;
 
     const handleCardClick = (event: MouseEvent<HTMLLIElement>) => {
         if (!event.currentTarget.contains(event.target as Node)) {
@@ -74,11 +77,11 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
                             <div className="flex flex-col gap-1 text-start">
                                 <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
 
-                                {editedDate && (
+                                {editedTimeAgo && (
                                     <div className="flex gap-1 text-xs text-content-neutral-secondary">
                                         <span>Edited</span>
 
-                                        <span>{editedDate}</span>
+                                        <span>{editedTimeAgo}</span>
                                     </div>
                                 )}
                             </div>

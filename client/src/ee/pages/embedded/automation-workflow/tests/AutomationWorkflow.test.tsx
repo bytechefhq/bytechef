@@ -1,4 +1,5 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
+import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {fireEvent, render, screen, userEvent} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -10,6 +11,7 @@ import AutomationWorkflow from '../AutomationWorkflow';
 
 const hoisted = vi.hoisted(() => {
     return {
+        getWorkflowQueryMock: vi.fn(),
         navigateMock: vi.fn(),
         publishMutationMock: vi.fn(),
         workflow: {id: 'workflow-1', label: 'My Workflow Template'} as Record<string, unknown>,
@@ -50,6 +52,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
                             label: 'My Workflow Template',
                             lastModifiedDate: '2026-01-01T10:00:00Z',
                             triggers: [],
+                            workflowId: 'draft-workflow-1',
                             workflowUuid: 'workflow-1',
                         },
                         {
@@ -58,6 +61,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
                             label: 'Second Workflow',
                             lastModifiedDate: '2026-01-02T10:00:00Z',
                             triggers: [],
+                            workflowId: 'draft-workflow-2',
                             workflowUuid: 'workflow-2',
                         },
                     ],
@@ -66,7 +70,6 @@ vi.mock('@/shared/middleware/graphql', () => ({
         },
         isLoading: false,
     }),
-    useCreateAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
     useCreateAutomationWorkflowProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
     useDeleteAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
     useDeleteAutomationWorkflowProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
@@ -75,6 +78,7 @@ vi.mock('@/shared/middleware/graphql', () => ({
     usePublishAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: hoisted.publishMutationMock}),
     useUpdateAutomationWorkflowProjectMutation: () => ({isPending: false, mutate: vi.fn()}),
     useUpdateAutomationWorkflowProjectWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
+    useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
 vi.mock('@/shared/queries/automation/workflows.queries', () => ({
@@ -82,7 +86,7 @@ vi.mock('@/shared/queries/automation/workflows.queries', () => ({
         workflow: (id: string) => ['automationWorkflows', id],
         workflows: ['automationWorkflows'],
     },
-    useGetWorkflowQuery: () => ({data: hoisted.workflow, isLoading: false}),
+    useGetWorkflowQuery: hoisted.getWorkflowQueryMock,
 }));
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
@@ -94,7 +98,17 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
 }));
 
 vi.mock('@/pages/platform/workflow-editor/WorkflowEditorLayout', () => ({
-    default: () => <div data-testid="workflow-editor-layout" />,
+    default: function WorkflowEditorLayoutMock() {
+        const {platformType, useGetComponentDefinitionsQuery} = useWorkflowEditor();
+
+        return (
+            <div
+                data-component-definitions-source={useGetComponentDefinitionsQuery!({}).data?.[0]?.name}
+                data-platform-type={platformType}
+                data-testid="workflow-editor-layout"
+            />
+        );
+    },
 }));
 
 vi.mock('@/shared/components/LoadingIndicator', () => ({
@@ -104,7 +118,7 @@ vi.mock('@/shared/components/LoadingIndicator', () => ({
 vi.mock('react-router-dom', () => ({
     useBlocker: () => undefined,
     useNavigate: () => hoisted.navigateMock,
-    useParams: () => ({workflowId: 'workflow-1'}),
+    useParams: () => ({workflowUuid: 'workflow-1'}),
 }));
 
 vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
@@ -139,13 +153,17 @@ vi.mock('@/shared/mutations/automation/workflows.mutations', () => ({
 }));
 
 vi.mock('@/shared/queries/automation/connections.queries', () => ({
-    ConnectionKeys: {},
+    ConnectionKeys: {connectionTags: (id: number) => ['connectionTags', id]},
     useGetConnectionTagsQuery: () => ({data: []}),
     useGetWorkspaceConnectionsQuery: () => ({data: []}),
 }));
 
 vi.mock('@/shared/queries/automation/componentDefinitions.queries', () => ({
-    useGetComponentDefinitionsQuery: () => ({data: []}),
+    useGetComponentDefinitionsQuery: () => ({data: [{name: 'automation'}]}),
+}));
+
+vi.mock('@/ee/shared/queries/embedded/componentDefinitions.queries', () => ({
+    useGetComponentDefinitionsQuery: () => ({data: [{name: 'embedded'}]}),
 }));
 
 // ---------------------------------------------------------------------------
@@ -164,6 +182,8 @@ const renderAutomationWorkflow = () =>
 // ---------------------------------------------------------------------------
 
 beforeEach(() => {
+    hoisted.getWorkflowQueryMock.mockReset();
+    hoisted.getWorkflowQueryMock.mockImplementation(() => ({data: hoisted.workflow, isLoading: false}));
     hoisted.navigateMock.mockReset();
     hoisted.publishMutationMock.mockReset();
     hoisted.workflow = {id: 'workflow-1', label: 'My Workflow Template'};
@@ -175,6 +195,28 @@ describe('AutomationWorkflow', () => {
 
         expect(screen.getAllByText('My Workflow Template').length).toBeGreaterThan(0);
         expect(screen.getByTestId('workflow-editor-layout')).toBeInTheDocument();
+    });
+
+    it("loads the draft workflow through the template's workflow id, which publishing replaces", () => {
+        renderAutomationWorkflow();
+
+        expect(hoisted.getWorkflowQueryMock).toHaveBeenCalledWith('draft-workflow-1', true);
+        expect(hoisted.getWorkflowQueryMock).not.toHaveBeenCalledWith('workflow-1', true);
+    });
+
+    it('lists components through the embedded filter so the palette offers embedded triggers', () => {
+        renderAutomationWorkflow();
+
+        expect(screen.getByTestId('workflow-editor-layout')).toHaveAttribute(
+            'data-component-definitions-source',
+            'embedded'
+        );
+    });
+
+    it('searches components as the embedded platform so the search offers the same triggers as the palette', () => {
+        renderAutomationWorkflow();
+
+        expect(screen.getByTestId('workflow-editor-layout')).toHaveAttribute('data-platform-type', 'EMBEDDED');
     });
 
     it('renders the left sidebar with the project select', () => {

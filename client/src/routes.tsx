@@ -421,7 +421,7 @@ const platformSettingsRoutes = {
 
 export const loadEnvironments = async (queryClient: QueryClient) => {
     if (authenticationStore.getState().authenticated) {
-        const environments = await queryClient.fetchQuery({
+        const environments = await queryClient.query({
             queryFn: () => new EnvironmentApi().getEnvironments(),
             queryKey: EnvironmentKeys,
         });
@@ -595,12 +595,13 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
-                                        queryClient.ensureQueryData({
+                                        queryClient.query({
                                             queryFn: () =>
                                                 new ProjectApi().getProject({
                                                     id: parseInt(params.projectId!),
                                                 }),
                                             queryKey: ProjectKeys.project(parseInt(params.projectId!)),
+                                            staleTime: 'static',
                                         }),
                                     path: 'projects/:projectId/project-workflows/:projectWorkflowId',
                                 },
@@ -892,12 +893,13 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
-                                        queryClient.ensureQueryData({
+                                        queryClient.query({
                                             queryFn: () =>
                                                 new IntegrationApi().getIntegration({
                                                     id: parseInt(params.integrationId!),
                                                 }),
                                             queryKey: IntegrationKeys.integration(parseInt(params.integrationId!)),
+                                            staleTime: 'static',
                                         }),
                                     path: 'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
                                 },
@@ -935,7 +937,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             </EEVersion>
                                         </PrivateRoute>
                                     ),
-                                    path: 'automation-workflows/:workflowId/editor',
+                                    path: 'automation-workflows/:workflowUuid/editor',
                                 },
                                 {
                                     element: (
