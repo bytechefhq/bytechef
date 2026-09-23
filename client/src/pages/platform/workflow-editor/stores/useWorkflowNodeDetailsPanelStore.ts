@@ -17,9 +17,7 @@ interface WorkflowNodeDetailsPanelStoreI {
     currentNode: NodeDataType | undefined;
     setCurrentNode: (
         currentNode:
-            | NodeDataType
-            | undefined
-            | ((previousCurrentNode: NodeDataType | undefined) => NodeDataType | undefined)
+            NodeDataType | undefined | ((previousCurrentNode: NodeDataType | undefined) => NodeDataType | undefined)
     ) => void;
 
     focusedInput: Editor | null;

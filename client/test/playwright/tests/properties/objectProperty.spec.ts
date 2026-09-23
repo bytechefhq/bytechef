@@ -574,8 +574,7 @@ test.describe('ObjectProperty - Object property type (ObjectProperty.tsx)', () =
                 expect(objectPropertyParameters).toBeDefined();
 
                 const nestedObjectValue = objectPropertyParameters![nestedObjectName] as
-                    | Record<string, unknown>
-                    | undefined;
+                    Record<string, unknown> | undefined;
 
                 expect(nestedObjectValue).toBeDefined();
                 expect(nestedObjectValue![nestedSubpropertyName]).toBeDefined();

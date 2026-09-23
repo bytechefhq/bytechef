@@ -292,7 +292,7 @@ export default function useWorkflowNodeDetailsPanel({
                 componentVersion: componentVersion ?? (currentComponentDefinition?.version as number),
             };
 
-            const clusterElementDefinition = await queryClient.fetchQuery({
+            const clusterElementDefinition = await queryClient.query({
                 queryFn: () =>
                     new ClusterElementDefinitionApi().getComponentClusterElementDefinition(
                         clusterElementDefinitionRequest
@@ -327,7 +327,7 @@ export default function useWorkflowNodeDetailsPanel({
                 componentVersion: componentVersion ?? (currentComponentDefinition?.version as number),
             };
 
-            const actionDefinition = await queryClient.fetchQuery({
+            const actionDefinition = await queryClient.query({
                 queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(actionDefinitionRequest),
                 queryKey: ActionDefinitionKeys.actionDefinition(actionDefinitionRequest),
                 staleTime: DEFINITION_STALE_TIME,
@@ -358,7 +358,7 @@ export default function useWorkflowNodeDetailsPanel({
                 triggerName: operationName ?? currentOperationName ?? currentNode?.operationName,
             };
 
-            const triggerDefinition = await queryClient.fetchQuery({
+            const triggerDefinition = await queryClient.query({
                 queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
                 queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
                 staleTime: DEFINITION_STALE_TIME,
@@ -730,13 +730,11 @@ export default function useWorkflowNodeDetailsPanel({
             : [];
 
         return [
-            ...missingRequiredProperties.map(
-                (propertyName): WorkflowNodeDetailsErrorI => ({
-                    kind: 'PROPERTY',
-                    name: propertyName,
-                    severity: 'ERROR',
-                })
-            ),
+            ...missingRequiredProperties.map((propertyName): WorkflowNodeDetailsErrorI => ({
+                kind: 'PROPERTY',
+                name: propertyName,
+                severity: 'ERROR',
+            })),
             ...getMissingRequiredConnectionErrors({
                 clusterRoot: !!currentNode?.clusterRoot && !currentNode?.isNestedClusterRoot,
                 componentTitle: currentComponentDefinition?.title,

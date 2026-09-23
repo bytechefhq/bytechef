@@ -37,8 +37,7 @@ export function buildGenericNodeData(
 
     for (const [type, config] of Object.entries(TASK_DISPATCHER_CONFIG)) {
         const taskDispatcherId = taskDispatcherContext[config.contextIdentifier as keyof TaskDispatcherContextType] as
-            | string
-            | undefined;
+            string | undefined;
 
         if (taskDispatcherId) {
             if (type === 'condition') {

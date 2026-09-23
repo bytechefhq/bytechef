@@ -77,8 +77,7 @@ export default function useCreateJudgeDialog({editData, onClose, onCreate, onUpd
 
     const modelOptions = useMemo(() => {
         const modelProperty = clusterElementDefinition?.properties?.find((property) => property.name === 'model') as
-            | StringProperty
-            | undefined;
+            StringProperty | undefined;
 
         return modelProperty?.options ?? [];
     }, [clusterElementDefinition]);
