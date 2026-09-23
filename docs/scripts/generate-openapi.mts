@@ -75,6 +75,16 @@ const GROUP_META: Record<
     description: 'List the catalog projects available to connected users.',
   },
   // One entry per tag in the automation spec -- see SPLIT_BY_TAG. The keys are `automation-<tag>`.
+  'embedded-webhook-app-event-trigger': {
+    title: 'Embedded App Events',
+    navTitle: 'App Events',
+    description: "Fire an App Event for a connected user from your backend, starting every one of their subscribed workflows.",
+  },
+  'embedded-webhook-request-trigger': {
+    title: 'Embedded Request Trigger',
+    navTitle: 'Request Trigger',
+    description: "Execute a single workflow of a connected user from your backend through its Request trigger and return its result.",
+  },
   'automation-workflow-execution': {
     title: 'Automation Workflow Executions',
     navTitle: 'Workflow Executions',
@@ -115,7 +125,7 @@ const GROUP_META: Record<
   'embedded-configuration-connection-frontend': {
     title: 'Embedded Connections (Frontend)',
     navTitle: 'Connections',
-    description: "List the signed-in connected user's connections.",
+    description: "List, create, delete and reauthorize the signed-in connected user's connections.",
   },
   'embedded-configuration-connected-user-frontend': {
     title: 'Embedded Connected Users (Frontend)',
@@ -133,12 +143,12 @@ const GROUP_META: Record<
     description: "List the catalog projects available to the signed-in connected user.",
   },
   'embedded-webhook-app-event-trigger-frontend': {
-    title: 'Embedded App Events',
+    title: 'Embedded App Events (Frontend)',
     navTitle: 'App Events',
     description: "Fire an App Event to start every one of a connected user's subscribed workflows.",
   },
   'embedded-webhook-request-trigger-frontend': {
-    title: 'Embedded Request Trigger',
+    title: 'Embedded Request Trigger (Frontend)',
     navTitle: 'Request Trigger',
     description: "Execute a single workflow through its Request trigger and return its result.",
   },

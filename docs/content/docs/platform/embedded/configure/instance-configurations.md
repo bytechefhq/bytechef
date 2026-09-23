@@ -45,7 +45,14 @@ Click the **New Instance Configuration** button in the top-right corner to open 
 
 ### Internal-only workflow inputs
 
-A workflow input can carry an `internalOnly` flag, declared on the input in the workflow definition. The editor's **Edit Input** dialog has no checkbox for it, so set it by editing the workflow definition and bringing it in with **Import Workflow**.
+A workflow input can be marked internal-only. Set it in the workflow editor of an integration or an automation workflow:
+
+1. Open **Workflow Inputs** in the editor's right sidebar.
+2. Click **New Input**, or edit an existing input.
+3. In the **Create a new Input** or **Edit Input** dialog, set **Internal only** to **True**.
+4. Click **Save**.
+
+The **Workflow Inputs** table shows the setting in its **Internal only** column. In the workflow definition it is stored as the input's `internalOnly` flag.
 
 - **`internalOnly: true`** - the connect dialog filters the input out, so it is never shown to the connected user. Use it for values you set yourself (an account ID, a default that should not be end-user editable).
 - **`internalOnly` absent or `false`** *(default)* - the input is collected from the connected user in the [connect dialog](/platform/embedded/get-started/quick-start#7-render-the-connect-dialog).

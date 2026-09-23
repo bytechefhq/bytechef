@@ -135,10 +135,11 @@ The `EMBED_INIT` message carries the parameters that configure the session:
 | `jwtToken` | The connected user's signed token; stored for the session and used to authorize all requests. |
 | `environment` | The environment to run against (defaults to `PRODUCTION`). |
 | `includeComponents` | Restricts the component palette to the listed components. |
-| `sharedConnectionIds` | Connections shared into the session that the user can reuse. |
 | `connectionDialogAllowed` | Whether the user may open the connect dialog to create new connections. |
 
 Messages are only accepted from the parent window and, when `VITE_EMBEDDED_PARENT_ORIGINS` is set, only from an allowed origin.
+
+Your app can send `EMBED_INIT` again at any time, for example after refreshing the user's token. The builder replaces the stored token and environment with the new values; an `EMBED_INIT` without a `jwtToken` clears the stored token. The `@bytechef/embedded` components do this for you whenever their props change.
 
 ### What the connected user sees
 

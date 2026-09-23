@@ -1,7 +1,6 @@
 ---
 title: Field Mapping
 description: Let end users map their application's fields to a connected integration's fields inside the Connect dialog.
-comingSoon: true
 ---
 
 Field Mapping lets your end user, inside the **Connect dialog**, pick a remote **object type** (e.g. Contacts, Leads) and map your application's fields to the connected integration's fields. The result is saved as a workflow-input value and becomes referenceable as **data pills** in the embedded workflow builder.
@@ -22,7 +21,7 @@ Two halves make up the feature, joined by a single shared **object name**:
 | Object name | The input's `objectName` is the key your runtime `mapObjectFields` config must use. |
 
 <Callout title="Scope">
-    This is a deliberately reduced subset of full field mapping. **Included:** dynamic application fields, the object-type selector, flat (non-paginated) option lists, and configurable/creatable mappings. **Not included:** paginated / search-as-you-type dropdowns, and any built-in runtime transform - the stored mapping is the input *value*; your workflow reads it and applies it however you like.
+    This is a deliberately reduced subset of full field mapping. **Included:** dynamic application fields, the object-type selector, flat (non-paginated) option lists, configurable/creatable mappings, and a built-in transform - the **Field Mapping** component's `Map to Integration Object` / `Map to Application Object` actions. **Not included:** paginated / search-as-you-type dropdowns, and an automatic "apply field mapping" toggle on triggers.
 </Callout>
 
 <Callout type="warn" title="Declared in the definition, not in the input dialog">
@@ -71,6 +70,26 @@ In the workflow definition, give the input `type: field_mapping` and an `objectN
 `objectName` is the only design-time value the runtime needs: the SDK looks up your `mapObjectFields` config under exactly that key. The option lists themselves are never authored here - they are fetched at runtime by the callbacks in the next section.
 
 Import the definition with **Import Workflow** (from the integration's ⋮ menu or the editor's settings menu), then publish as usual.
+
+### The test value and `sampleMapping`
+
+The input's **test value** is a static sample of what the SDK will fetch live: the object types, integration fields and application fields, keyed by the object name. Add a `sampleMapping` - a value of the same shape the Connect dialog saves - so the Field Mapping actions can run from the editor's **Test** button, which has no connected user to read a real mapping from:
+
+```json
+{
+  "Contacts": {
+    "objectTypes": [{"label": "Contacts", "value": "contacts"}],
+    "integrationFields": [{"label": "First Name", "value": "first_name"}],
+    "applicationFields": {"fields": [{"label": "Title", "value": "title"}]},
+    "sampleMapping": {
+      "objectType": "contacts",
+      "mappings": [
+        {"applicationField": {"label": "Title", "value": "title", "custom": false}, "integrationField": "first_name"}
+      ]
+    }
+  }
+}
+```
 
 ---
 
@@ -184,12 +203,35 @@ The user's mapping is saved as the workflow input's value (through the same debo
 
 This is exported as `FieldMappingValueType` from `@bytechef/embedded`.
 
-<Callout title="You apply the mapping yourself">
-    ByteChef stores the mapping but does **not** transform any payload with it. In your workflow, read this input value and apply it however you need - for example in a Code step, or by feeding `integrationField` names into a downstream action's parameters.
-</Callout>
+## Applying the mapping in a workflow
+
+Add the **Field Mapping** component to the workflow. Its two actions take the input's **object name** and a payload, and resolve the connected user's saved mapping themselves - you never wire the mapping value into the action:
+
+| Action | Turns | Into | Use it when |
+|---|---|---|---|
+| **Map to Integration Object** | your application's object (`{title, email}`) | the integration's fields (`{first_name, hs_email}`) | writing your data into the user's CRM |
+| **Map to Application Object** | an integration record (`{first_name, hs_email}`) | your application's fields (`{title, email}`) | handing a CRM record back to your app |
+
+Both accept a single object or an array (set **Input Type**). Keys no mapping covers are dropped unless **Include Unmapped** is on; a missing source key is omitted rather than written as `null`.
+
+From a **Script** step, call the same actions through the component proxy, in JavaScript, Python, Ruby or Java:
+
+```js
+function perform(input, context) {
+    const mapped = context.component.fieldMapping.mapToApplication({
+        objectName: "Contacts",
+        inputType: "ARRAY",
+        data: input.records
+    });
+
+    return mapped.filter((record) => record.email);
+}
+```
+
+The saved mapping is also readable as a plain data pill - `${input.contactMapping}` - for a step that wants to inspect it rather than apply it.
 
 ---
 
 ## Example use case
 
-You sync your app's contacts to whatever CRM each customer connects. You expose a single `Field Mapping` input named after the `Contacts` object. At runtime, `objectTypes.get` lists the CRM's object types and `integrationFields.get` lists the fields of the chosen one - both via `executeAction` against that user's live credentials. The user maps your `Title`/`Email` fields to the CRM's fields, optionally adds a custom field, and your sync workflow reads the stored mapping to build each upsert.
+You sync your app's contacts to whatever CRM each customer connects. You expose a single `Field Mapping` input named after the `Contacts` object. At runtime, `objectTypes.get` lists the CRM's object types and `integrationFields.get` lists the fields of the chosen one - both via `executeAction` against that user's live credentials. The user maps your `Title`/`Email` fields to the CRM's fields, optionally adds a custom field, and your sync workflow's **Map to Integration Object** step turns each of your contacts into the CRM's shape before the upsert.

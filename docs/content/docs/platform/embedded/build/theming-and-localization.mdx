@@ -4,21 +4,23 @@ description: What of the embedded surfaces you can brand today, and what is stil
 comingSoon: true
 ---
 
-White-labelling has two halves. The **placement** half is available today: your product chrome wraps the embedded surfaces, and your customer never navigates to a ByteChef URL. The **appearance** half is not yet configurable, and this page is the honest inventory of which is which.
+White-labelling has two halves. The **placement** half is available today: your product chrome wraps the embedded surfaces, and your customer never navigates to a ByteChef URL. The **appearance** half is partly configurable - colors, font, corner radius and light or dark mode on some surfaces - and this page is the honest inventory of what you can change and what is fixed.
 
 ## What you control today
 
-- **Where the surfaces sit.** The Connect dialog opens from your own UI, and the workflow builder renders in an iframe you position and size. Your layout, your navigation, your typography around them.
-- **What is in the catalog.** `includeComponents` restricts the workflow builder to the components you choose, and [permission expressions](/platform/embedded/build/permission-expressions) narrow what each connected user is offered. Your customers do not see the full ByteChef catalog unless you want them to.
+- **Where the surfaces sit.** The Connect dialog opens from your own UI, and the Automation Hub, Integration Marketplace and workflow builder render in an iframe you position and size. Your layout, your navigation, your typography around them.
+- **The look of the Automation Hub and Integration Marketplace.** Both components take a `theme` prop. It sets `mode` (`'dark'` or `'light'`), `primaryColor`, `fontFamily`, `borderRadius`, the surface colors (`surfaceColor`, `cardColor`, `activeBorderColor`, `enableColor`, `disableColor`, `onAccentColor`, `segmentColor`) and `cssVariables`, a map of any CSS custom properties starting with `--`. Colors that the browser does not recognize, and a `borderRadius` that is not a `px`, `rem`, `em` or `%` length, are ignored. The hub's theme also applies to the workflow builder the hub opens. See [Theming](/platform/embedded/build/automation-hub#theming) on the Automation Hub page.
+- **Light or dark Connect dialog.** `useConnectDialog` takes `mode: 'dark' | 'light'` (default `'light'`). The Integration Marketplace passes its `theme.mode` to the dialog it opens. See [Displaying the Connect Dialog](/platform/embedded/get-started/initial-setup/displaying-the-connect-dialog).
+- **What is in the catalog.** `includeComponents` restricts the workflow builder, standalone or opened from the Automation Hub, to the components you choose, and [permission expressions](/platform/embedded/build/permission-expressions) narrow what each connected user is offered. Your customers do not see the full ByteChef catalog unless you want them to.
 - **Which workflows exist.** You author the templates; customers configure them rather than starting from a blank canvas.
 
 ## What is fixed
 
-Both SDK surfaces take only functional configuration - the host, the environment, the token, and which integration or workflow to open. Neither accepts styling, copy, or locale, so what renders inside them is ByteChef's neutral default.
+The standalone `EmbeddedWorkflowBuilder` component has no `theme` prop - it takes only the host, the environment, the token, the workflow and its connection and component options, and renders ByteChef's default light appearance. To theme the builder, open it from the Automation Hub. No surface accepts copy or a locale.
 
 | Surface | Status |
 |---|---|
-| **Colors, fonts, spacing** | Fixed. There is no theme prop and no CSS-variable contract to override. |
+| **Colors, fonts, radius** | Configurable on the Automation Hub and Integration Marketplace through `theme`, and on the Connect dialog through `mode` only. Fixed on the standalone workflow builder. |
 | **Language** | English only. No locale option, and no translation files to supply. |
 | **Copy and labels** | Fixed, including validation messages inside the Connect dialog. |
 | **Engine error messages** | Fixed and in English. Surfaced as-is in execution history. |
