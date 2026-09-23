@@ -86,8 +86,8 @@ const IntegrationInstanceConfigurationListItem = ({
 
         const interactiveSelectors = [
             '[data-interactive]',
+            '[role="menuitem"]',
             '.dropdown-menu-item',
-            '[data-radix-dropdown-menu-item]',
             '[data-radix-dropdown-menu-trigger]',
             '[data-radix-collapsible-trigger]',
             'button',
@@ -127,12 +127,12 @@ const IntegrationInstanceConfigurationListItem = ({
     return (
         <>
             <div
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-surface-neutral-primary-hover"
                 onClick={(event) => handleIntegrationInstanceConfigurationListItemClick(event)}
             >
                 <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
-                        <div className="flex items-center justify-between">
+                        <div className="flex min-h-8 items-center justify-between">
                             <div className="flex w-full items-center gap-2">
                                 <div className="flex items-center gap-1">
                                     {integrationInstanceConfiguration?.integration?.icon && (
@@ -142,14 +142,14 @@ const IntegrationInstanceConfigurationListItem = ({
                                         />
                                     )}
 
-                                    <span className="text-base font-semibold text-gray-900">
+                                    <span className="text-base font-semibold text-content-neutral-primary">
                                         {integrationInstanceConfiguration?.name}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:flex sm:items-center sm:justify-between">
+                        <div className="mt-2 min-h-7 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
                                 {integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows && (
                                     <CollapsibleTrigger
@@ -200,8 +200,8 @@ const IntegrationInstanceConfigurationListItem = ({
                             <TooltipContent>The integration version</TooltipContent>
                         </Tooltip>
 
-                        <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <div className="flex items-center">
+                        <div className="flex min-w-52 flex-col items-end gap-y-2">
+                            <div className="flex min-h-8 items-center">
                                 {enableIntegrationInstanceConfigurationMutation.isPending && <LoadingIcon />}
 
                                 <Switch
@@ -212,7 +212,7 @@ const IntegrationInstanceConfigurationListItem = ({
                             </div>
 
                             <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                                <TooltipTrigger className="flex min-h-7 items-center text-sm text-content-neutral-secondary">
                                     {integrationInstanceConfiguration.lastModifiedDate ? (
                                         <span className="text-xs">
                                             {`Modified at ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleTimeString()}`}

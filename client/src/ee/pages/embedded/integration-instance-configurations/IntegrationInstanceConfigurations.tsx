@@ -241,14 +241,12 @@ const IntegrationInstanceConfigurations = () => {
                                     tags && (
                                         <IntegrationInstanceConfigurationList
                                             componentDefinitions={actionTriggerComponentDefinitions}
-                                            integration={
-                                                integrations.find(
-                                                    (currentIntegration) => currentIntegration.id === integrationId
-                                                )!
-                                            }
-                                            integrationInstanceConfigurations={
-                                                integrationInstanceConfigurationMap.get(integrationId)!
-                                            }
+                                            integration={integrations.find(
+                                                (currentIntegration) => currentIntegration.id === integrationId
+                                            )!}
+                                            integrationInstanceConfigurations={integrationInstanceConfigurationMap.get(
+                                                integrationId
+                                            )!}
                                             key={integrationId}
                                             tags={tags}
                                             taskDispatcherDefinitions={taskDispatcherDefinitions}
@@ -271,7 +269,7 @@ const IntegrationInstanceConfigurations = () => {
                                 triggerNode={<Button label="Create Instance Configuration" />}
                             />
                         }
-                        icon={<Settings2Icon className="size-24 text-gray-300" />}
+                        icon={<Settings2Icon className="size-24 text-stroke-neutral-tertiary" />}
                         message="Get started by creating a new integration instance configuration."
                         title="No Integration Configuration Instances"
                     />
