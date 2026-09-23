@@ -20,8 +20,11 @@ export default ({mode}) => {
         build: {
             rollupOptions: {
                 input: {
+                    automationHub: resolve(__dirname, 'automation-hub.html'),
                     connect: resolve(__dirname, 'connect.html'),
+                    integrationMarketplace: resolve(__dirname, 'integration-marketplace.html'),
                     main: resolve(__dirname, 'index.html'),
+                    workflowBuilder: resolve(__dirname, 'workflow-builder.html'),
                 },
                 output: {
                     manualChunks(id) {
