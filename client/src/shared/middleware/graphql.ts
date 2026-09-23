@@ -920,13 +920,15 @@ export type AutomationWorkflowProjectVersionsQuery = { automationWorkflowProject
 export type AutomationWorkflowProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, workflowTemplates: Array<{ workflowUuid: string, label: string | null, description: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
+export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, permissionExpression: string | null, automationHubVisible: boolean, workflowTemplates: Array<{ workflowUuid: string, workflowId: string, label: string | null, description: string | null, permissionExpression: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
 
 export type CreateAutomationWorkflowProjectMutationVariables = Exact<{
   name: string;
   description?: string | null | undefined;
   category?: string | null | undefined;
   tags?: Array<string> | string | null | undefined;
+  permissionExpression?: string | null | undefined;
+  automationHubVisible?: boolean | null | undefined;
 }>;
 
 
@@ -938,6 +940,8 @@ export type UpdateAutomationWorkflowProjectMutationVariables = Exact<{
   description?: string | null | undefined;
   category?: string | null | undefined;
   tags?: Array<string> | string | null | undefined;
+  permissionExpression?: string | null | undefined;
+  automationHubVisible?: boolean | null | undefined;
 }>;
 
 
@@ -953,10 +957,28 @@ export type DeleteAutomationWorkflowProjectMutation = { deleteAutomationWorkflow
 export type CreateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
   projectId: string | number;
   definition?: string | null | undefined;
+  permissionExpression?: string | null | undefined;
 }>;
 
 
 export type CreateAutomationWorkflowProjectWorkflowMutation = { createAutomationWorkflowProjectWorkflow: string };
+
+export type UpdateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
+  workflowUuid: string | number;
+  label: string;
+  description?: string | null | undefined;
+}>;
+
+
+export type UpdateAutomationWorkflowProjectWorkflowMutation = { updateAutomationWorkflowProjectWorkflow: boolean };
+
+export type UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutationVariables = Exact<{
+  workflowUuid: string | number;
+  permissionExpression?: string | null | undefined;
+}>;
+
+
+export type UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation = { updateAutomationWorkflowProjectWorkflowPermissionExpression: boolean };
 
 export type DeleteAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
   workflowUuid: string | number;
@@ -1051,6 +1073,11 @@ export type DuplicateAutomationWorkflowProjectWorkflowMutationVariables = Exact<
 
 export type DuplicateAutomationWorkflowProjectWorkflowMutation = { duplicateAutomationWorkflowProjectWorkflow: string };
 
+export type EmbeddedMcpServerTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EmbeddedMcpServerTagsQuery = { embeddedMcpServerTags: Array<{ id: string, name: string } | null> | null };
+
 export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1091,7 +1118,7 @@ export type IntegrationWorkflowsByIntegrationIdQueryVariables = Exact<{
 }>;
 
 
-export type IntegrationWorkflowsByIntegrationIdQuery = { integrationWorkflowsByIntegrationId: Array<{ id: string, label: string, description: string | null, integrationWorkflowId: string, workflowUuid: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
+export type IntegrationWorkflowsByIntegrationIdQuery = { integrationWorkflowsByIntegrationId: Array<{ id: string, label: string, description: string | null, integrationWorkflowId: string, workflowUuid: string | null, permissionExpression: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
 
 export type McpComponentDefinitionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1145,14 +1172,13 @@ export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
 
 export type ToolEligibleIntegrationVersionWorkflowsQuery = { toolEligibleIntegrationVersionWorkflows: Array<{ id: string, integrationWorkflowId: string, label: string }> };
 
-export type UpdateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
-  workflowUuid: string | number;
-  label: string;
-  description?: string | null | undefined;
+export type UpdateIntegrationWorkflowPermissionExpressionMutationVariables = Exact<{
+  integrationWorkflowId: string | number;
+  permissionExpression?: string | null | undefined;
 }>;
 
 
-export type UpdateAutomationWorkflowProjectWorkflowMutation = { updateAutomationWorkflowProjectWorkflow: boolean };
+export type UpdateIntegrationWorkflowPermissionExpressionMutation = { updateIntegrationWorkflowPermissionExpression: { id: string, permissionExpression: string | null } | null };
 
 export type UpdateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
   id: string | number;
@@ -1501,7 +1527,7 @@ export type ComponentDefinitionSearchQueryVariables = Exact<{
 }>;
 
 
-export type ComponentDefinitionSearchQuery = { componentDefinitionSearch: Array<{ name: string, title: string | null, icon: string | null, description: string | null, version: number | null, actionsCount: number | null, triggersCount: number | null, clusterElementsCount: any, componentCategories: Array<{ name: string, label: string | null }> | null, actions: Array<{ name: string, title: string | null, description: string | null }> | null, triggers: Array<{ name: string, title: string | null, description: string | null }> | null, clusterElements: Array<{ type: { name: string | null, label: string | null } | null }> | null }> };
+export type ComponentDefinitionSearchQuery = { componentDefinitionSearch: Array<{ name: string, title: string | null, icon: string | null, description: string | null, version: number | null, actionsCount: number | null, triggersCount: number | null, clusterElementsCount: any, clusterRoot: boolean | null, componentCategories: Array<{ name: string, label: string | null }> | null, actions: Array<{ name: string, title: string | null, description: string | null }> | null, triggers: Array<{ name: string, title: string | null, description: string | null }> | null, clusterElements: Array<{ type: { name: string | null, label: string | null } | null }> | null }> };
 
 export type ComponentPropertyDisplayConditionsQueryVariables = Exact<{
   componentName: string;
@@ -1585,7 +1611,7 @@ export type McpComponentsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
+export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
 
 export type McpServerTagsQueryVariables = Exact<{
   type: Types.PlatformType;
@@ -1606,7 +1632,7 @@ export type McpToolsByComponentIdQueryVariables = Exact<{
 }>;
 
 
-export type McpToolsByComponentIdQuery = { mcpToolsByComponentId: Array<{ id: string, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
+export type McpToolsByComponentIdQuery = { mcpToolsByComponentId: Array<{ id: string, enabled: boolean, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
 
 export type SaveClusterElementTestConfigurationConnectionMutationVariables = Exact<{
   workflowId: string;
@@ -1701,6 +1727,14 @@ export type UpdateMcpToolMutationVariables = Exact<{
 
 
 export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
+
+export type UpdateMcpToolEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type UpdateMcpToolEnabledMutation = { updateMcpToolEnabled: { id: string, enabled: boolean } | null };
 
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
@@ -5129,10 +5163,14 @@ export const AutomationWorkflowProjectsDocument = new TypedDocumentString(`
     published
     version
     lastPublishedVersion
+    permissionExpression
+    automationHubVisible
     workflowTemplates {
       workflowUuid
+      workflowId
       label
       description
+      permissionExpression
       lastModifiedDate
       triggers {
         name
@@ -5166,12 +5204,14 @@ export const useAutomationWorkflowProjectsQuery = <
     )};
 
 export const CreateAutomationWorkflowProjectDocument = new TypedDocumentString(`
-    mutation createAutomationWorkflowProject($name: String!, $description: String, $category: String, $tags: [String!]) {
+    mutation createAutomationWorkflowProject($name: String!, $description: String, $category: String, $tags: [String!], $permissionExpression: String, $automationHubVisible: Boolean) {
   createAutomationWorkflowProject(
     name: $name
     description: $description
     category: $category
     tags: $tags
+    permissionExpression: $permissionExpression
+    automationHubVisible: $automationHubVisible
   )
 }
     `);
@@ -5190,13 +5230,15 @@ export const useCreateAutomationWorkflowProjectMutation = <
     )};
 
 export const UpdateAutomationWorkflowProjectDocument = new TypedDocumentString(`
-    mutation updateAutomationWorkflowProject($id: ID!, $name: String!, $description: String, $category: String, $tags: [String!]) {
+    mutation updateAutomationWorkflowProject($id: ID!, $name: String!, $description: String, $category: String, $tags: [String!], $permissionExpression: String, $automationHubVisible: Boolean) {
   updateAutomationWorkflowProject(
     id: $id
     name: $name
     description: $description
     category: $category
     tags: $tags
+    permissionExpression: $permissionExpression
+    automationHubVisible: $automationHubVisible
   )
 }
     `);
@@ -5234,10 +5276,11 @@ export const useDeleteAutomationWorkflowProjectMutation = <
     )};
 
 export const CreateAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
-    mutation createAutomationWorkflowProjectWorkflow($projectId: ID!, $definition: String) {
+    mutation createAutomationWorkflowProjectWorkflow($projectId: ID!, $definition: String, $permissionExpression: String) {
   createAutomationWorkflowProjectWorkflow(
     projectId: $projectId
     definition: $definition
+    permissionExpression: $permissionExpression
   )
 }
     `);
@@ -5251,6 +5294,51 @@ export const useCreateAutomationWorkflowProjectWorkflowMutation = <
       {
     mutationKey: ['createAutomationWorkflowProjectWorkflow'],
     mutationFn: (variables?: CreateAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<CreateAutomationWorkflowProjectWorkflowMutation, CreateAutomationWorkflowProjectWorkflowMutationVariables>(CreateAutomationWorkflowProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
+    mutation updateAutomationWorkflowProjectWorkflow($workflowUuid: ID!, $label: String!, $description: String) {
+  updateAutomationWorkflowProjectWorkflow(
+    workflowUuid: $workflowUuid
+    label: $label
+    description: $description
+  )
+}
+    `);
+
+export const useUpdateAutomationWorkflowProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectWorkflowMutation, TError, UpdateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAutomationWorkflowProjectWorkflowMutation, TError, UpdateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAutomationWorkflowProjectWorkflow'],
+    mutationFn: (variables?: UpdateAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<UpdateAutomationWorkflowProjectWorkflowMutation, UpdateAutomationWorkflowProjectWorkflowMutationVariables>(UpdateAutomationWorkflowProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAutomationWorkflowProjectWorkflowPermissionExpressionDocument = new TypedDocumentString(`
+    mutation updateAutomationWorkflowProjectWorkflowPermissionExpression($workflowUuid: ID!, $permissionExpression: String) {
+  updateAutomationWorkflowProjectWorkflowPermissionExpression(
+    workflowUuid: $workflowUuid
+    permissionExpression: $permissionExpression
+  )
+}
+    `);
+
+export const useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation, TError, UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation, TError, UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAutomationWorkflowProjectWorkflowPermissionExpression'],
+    mutationFn: (variables?: UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutationVariables) => fetcher<UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation, UpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutationVariables>(UpdateAutomationWorkflowProjectWorkflowPermissionExpressionDocument, variables)(),
     ...options
   }
     )};
@@ -5577,6 +5665,31 @@ export const useDuplicateAutomationWorkflowProjectWorkflowMutation = <
   }
     )};
 
+export const EmbeddedMcpServerTagsDocument = new TypedDocumentString(`
+    query embeddedMcpServerTags {
+  embeddedMcpServerTags {
+    id
+    name
+  }
+}
+    `);
+
+export const useEmbeddedMcpServerTagsQuery = <
+      TData = EmbeddedMcpServerTagsQuery,
+      TError = unknown
+    >(
+      variables?: EmbeddedMcpServerTagsQueryVariables,
+      options?: Omit<UseQueryOptions<EmbeddedMcpServerTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<EmbeddedMcpServerTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<EmbeddedMcpServerTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['embeddedMcpServerTags'] : ['embeddedMcpServerTags', variables],
+    queryFn: fetcher<EmbeddedMcpServerTagsQuery, EmbeddedMcpServerTagsQueryVariables>(EmbeddedMcpServerTagsDocument, variables),
+    ...options
+  }
+    )};
+
 export const EmbeddedMcpServersDocument = new TypedDocumentString(`
     query embeddedMcpServers {
   embeddedMcpServers {
@@ -5730,6 +5843,7 @@ export const IntegrationWorkflowsByIntegrationIdDocument = new TypedDocumentStri
     description
     integrationWorkflowId
     workflowUuid
+    permissionExpression
     workflowTaskComponentNames
     workflowTriggerComponentNames
     createdBy
@@ -6006,25 +6120,27 @@ export const useToolEligibleIntegrationVersionWorkflowsQuery = <
   }
     )};
 
-export const UpdateAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
-    mutation updateAutomationWorkflowProjectWorkflow($workflowUuid: ID!, $label: String!, $description: String) {
-  updateAutomationWorkflowProjectWorkflow(
-    workflowUuid: $workflowUuid
-    label: $label
-    description: $description
-  )
+export const UpdateIntegrationWorkflowPermissionExpressionDocument = new TypedDocumentString(`
+    mutation updateIntegrationWorkflowPermissionExpression($integrationWorkflowId: ID!, $permissionExpression: String) {
+  updateIntegrationWorkflowPermissionExpression(
+    integrationWorkflowId: $integrationWorkflowId
+    permissionExpression: $permissionExpression
+  ) {
+    id
+    permissionExpression
+  }
 }
     `);
 
-export const useUpdateAutomationWorkflowProjectWorkflowMutation = <
+export const useUpdateIntegrationWorkflowPermissionExpressionMutation = <
       TError = unknown,
       TContext = unknown
-    >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectWorkflowMutation, TError, UpdateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
+    >(options?: UseMutationOptions<UpdateIntegrationWorkflowPermissionExpressionMutation, TError, UpdateIntegrationWorkflowPermissionExpressionMutationVariables, TContext>) => {
     
-    return useMutation<UpdateAutomationWorkflowProjectWorkflowMutation, TError, UpdateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
+    return useMutation<UpdateIntegrationWorkflowPermissionExpressionMutation, TError, UpdateIntegrationWorkflowPermissionExpressionMutationVariables, TContext>(
       {
-    mutationKey: ['updateAutomationWorkflowProjectWorkflow'],
-    mutationFn: (variables?: UpdateAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<UpdateAutomationWorkflowProjectWorkflowMutation, UpdateAutomationWorkflowProjectWorkflowMutationVariables>(UpdateAutomationWorkflowProjectWorkflowDocument, variables)(),
+    mutationKey: ['updateIntegrationWorkflowPermissionExpression'],
+    mutationFn: (variables?: UpdateIntegrationWorkflowPermissionExpressionMutationVariables) => fetcher<UpdateIntegrationWorkflowPermissionExpressionMutation, UpdateIntegrationWorkflowPermissionExpressionMutationVariables>(UpdateIntegrationWorkflowPermissionExpressionDocument, variables)(),
     ...options
   }
     )};
@@ -7581,6 +7697,7 @@ export const ComponentDefinitionSearchDocument = new TypedDocumentString(`
     actionsCount
     triggersCount
     clusterElementsCount
+    clusterRoot
     componentCategories {
       name
       label
@@ -7900,6 +8017,7 @@ export const McpComponentsByServerIdDocument = new TypedDocumentString(`
     mcpServerId
     mcpTools {
       id
+      enabled
       mcpComponentId
       name
       parameters
@@ -7997,6 +8115,7 @@ export const McpToolsByComponentIdDocument = new TypedDocumentString(`
     query mcpToolsByComponentId($mcpComponentId: ID!) {
   mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
     id
+    enabled
     name
     title
     mcpComponentId
@@ -8275,6 +8394,28 @@ export const useUpdateMcpToolMutation = <
       {
     mutationKey: ['updateMcpTool'],
     mutationFn: (variables?: UpdateMcpToolMutationVariables) => fetcher<UpdateMcpToolMutation, UpdateMcpToolMutationVariables>(UpdateMcpToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateMcpToolEnabledDocument = new TypedDocumentString(`
+    mutation updateMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+  updateMcpToolEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+  }
+}
+    `);
+
+export const useUpdateMcpToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpToolEnabled'],
+    mutationFn: (variables?: UpdateMcpToolEnabledMutationVariables) => fetcher<UpdateMcpToolEnabledMutation, UpdateMcpToolEnabledMutationVariables>(UpdateMcpToolEnabledDocument, variables)(),
     ...options
   }
     )};

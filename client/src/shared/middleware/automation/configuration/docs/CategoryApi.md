@@ -10,7 +10,7 @@ All URIs are relative to */api/automation/internal*
 
 ## getProjectCategories
 
-> Array&lt;Category&gt; getProjectCategories(requestParameters: GetProjectCategoriesRequest)
+> Array&lt;Category&gt; getProjectCategories(id)
 
 Get project categories
 
@@ -29,13 +29,13 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new CategoryApi();
 
-  const requestParameters: GetProjectCategoriesRequest = {
-    // The id of a workspace.
+  const body = {
+    // number | The id of a workspace.
     id: 789,
-  };
+  } satisfies GetProjectCategoriesRequest;
 
   try {
-    const data = await api.getProjectCategories(requestParameters);
+    const data = await api.getProjectCategories(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -48,9 +48,10 @@ example().catch(console.error);
 
 ### Parameters
 
+
 | Name | Type | Description  | Notes |
-| ------------- | ------------- | ------------- | ------------- |
-| **id** | **number** | The id of a workspace. | defaults to undefined |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 
 ### Return type
 
