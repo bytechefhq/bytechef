@@ -67,16 +67,20 @@ const workflow = {
     description: 'Sends mail',
     label: 'Workflow One',
     lastModifiedDate: '2026-02-11T09:30:00Z',
+    permissionExpression: null,
     triggers: [],
+    workflowId: 'draft-uuid-1',
     workflowUuid: 'uuid-1',
 };
 
 const project = {
+    automationHubVisible: true,
     categoryId: null,
     description: null,
     id: 'project-1',
     lastPublishedVersion: null,
     name: 'Project One',
+    permissionExpression: null,
     published: false,
     tagIds: [],
     version: 1,
