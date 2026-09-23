@@ -218,6 +218,10 @@ components:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
         projectDeployment:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectDeploymentBasic"
+        projectVersion:
+          description: "The version of the project the workflow execution ran."
+          type: "integer"
+          readOnly: true
         triggerExecution:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
         workflow:
@@ -297,6 +301,10 @@ components:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
         projectDeployment:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectDeploymentBasic"
+        projectVersion:
+          description: "The version of the project the workflow execution ran."
+          type: "integer"
+          readOnly: true
         job:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/JobBasic"
         triggerExecution:
