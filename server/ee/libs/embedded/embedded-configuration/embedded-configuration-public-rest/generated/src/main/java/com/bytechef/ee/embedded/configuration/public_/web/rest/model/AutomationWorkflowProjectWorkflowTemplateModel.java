@@ -3,6 +3,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectComponentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectWorkflowInputModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AutomationWorkflowProjectWorkflowTemplate", description = "An automation workflow template within an automation workflow project.")
 @JsonTypeName("AutomationWorkflowProjectWorkflowTemplate")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AutomationWorkflowProjectWorkflowTemplateModel {
 
   private @Nullable String id;
@@ -37,6 +38,9 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
 
   @Valid
   private List<@Valid AutomationWorkflowProjectComponentModel> components = new ArrayList<>();
+
+  @Valid
+  private List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs = new ArrayList<>();
 
   public AutomationWorkflowProjectWorkflowTemplateModel id(@Nullable String id) {
     this.id = id;
@@ -130,6 +134,35 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     this.components = components;
   }
 
+  public AutomationWorkflowProjectWorkflowTemplateModel inputs(List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public AutomationWorkflowProjectWorkflowTemplateModel addInputsItem(AutomationWorkflowProjectWorkflowInputModel inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new ArrayList<>();
+    }
+    this.inputs.add(inputsItem);
+    return this;
+  }
+
+  /**
+   * The values the connected user is asked for before this workflow runs.
+   * @return inputs
+   */
+  @Valid 
+  @Schema(name = "inputs", description = "The values the connected user is asked for before this workflow runs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public List<@Valid AutomationWorkflowProjectWorkflowInputModel> getInputs() {
+    return inputs;
+  }
+
+  @JsonProperty("inputs")
+  public void setInputs(List<@Valid AutomationWorkflowProjectWorkflowInputModel> inputs) {
+    this.inputs = inputs;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -142,12 +175,13 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     return Objects.equals(this.id, automationWorkflowProjectWorkflowTemplate.id) &&
         Objects.equals(this.label, automationWorkflowProjectWorkflowTemplate.label) &&
         Objects.equals(this.description, automationWorkflowProjectWorkflowTemplate.description) &&
-        Objects.equals(this.components, automationWorkflowProjectWorkflowTemplate.components);
+        Objects.equals(this.components, automationWorkflowProjectWorkflowTemplate.components) &&
+        Objects.equals(this.inputs, automationWorkflowProjectWorkflowTemplate.inputs);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, label, description, components);
+    return Objects.hash(id, label, description, components, inputs);
   }
 
   @Override
@@ -158,6 +192,7 @@ public class AutomationWorkflowProjectWorkflowTemplateModel {
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    components: ").append(toIndentedString(components)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "McpTool", description = "An MCP tool definition.")
 @JsonTypeName("McpTool")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-09-23T21:34:31.743535+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class McpToolModel {
 
   private @Nullable String description;
