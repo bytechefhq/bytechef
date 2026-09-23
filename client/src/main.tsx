@@ -9,6 +9,7 @@ import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog
 import {ThemeProvider} from '@/shared/providers/theme-provider';
 import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {getLegacyEmbeddedWorkflowBuilderUrl} from '@/shared/util/legacyEmbeddedWorkflowBuilderUrl';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 import {StrictMode} from 'react';
@@ -17,7 +18,11 @@ import {RouterProvider} from 'react-router-dom';
 import {initUserGuiding} from './hooks/useUserGuiding';
 import {getRouter as getMainRouter} from './routes';
 
-if (process.env.NODE_ENV === 'mock') {
+const legacyEmbeddedWorkflowBuilderUrl = getLegacyEmbeddedWorkflowBuilderUrl(window.location);
+
+if (legacyEmbeddedWorkflowBuilderUrl) {
+    window.location.replace(legacyEmbeddedWorkflowBuilderUrl);
+} else if (process.env.NODE_ENV === 'mock') {
     import('./mocks/server').then(({worker}) => {
         worker.start().then(() => renderApp());
     });
@@ -41,36 +46,30 @@ async function renderApp() {
     const root = createRoot(container);
     const queryClient = new QueryClient();
 
-    const isEmbeddedWorkflowBuilder = window.location.pathname.includes('/embedded/workflow-builder');
-
-    const router = isEmbeddedWorkflowBuilder
-        ? (await import('@/embeddedWorkflowBuilderRoutes')).getRouter()
-        : getMainRouter(queryClient);
+    const router = getMainRouter(queryClient);
 
     await applicationInfoStore.getState().getApplicationInfo();
 
-    if (!isEmbeddedWorkflowBuilder) {
-        const {helpHub, userGuiding} = applicationInfoStore.getState();
+    const {helpHub, userGuiding} = applicationInfoStore.getState();
 
-        if (helpHub.enabled && helpHub.commandBar.orgId) {
-            const {init} = await import('commandbar');
+    if (helpHub.enabled && helpHub.commandBar.orgId) {
+        const {init} = await import('commandbar');
 
-            init(helpHub.commandBar.orgId);
-        }
+        init(helpHub.commandBar.orgId);
+    }
 
-        if (userGuiding.enabled && userGuiding.containerId) {
-            initUserGuiding(userGuiding.containerId);
-        }
+    if (userGuiding.enabled && userGuiding.containerId) {
+        initUserGuiding(userGuiding.containerId);
+    }
 
-        if (
-            !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
-            !authenticationStore.getState().sessionHasBeenFetched
-        ) {
-            const result = await authenticationStore.getState().getAccount();
+    if (
+        !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
+        !authenticationStore.getState().sessionHasBeenFetched
+    ) {
+        const result = await authenticationStore.getState().getAccount();
 
-            if (!result && window.location.pathname !== '/login') {
-                window.location.replace(buildLoginPath(window.location));
-            }
+        if (!result && window.location.pathname !== '/login') {
+            window.location.replace(buildLoginPath(window.location));
         }
     }
 
