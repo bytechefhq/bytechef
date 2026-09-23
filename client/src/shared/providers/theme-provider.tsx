@@ -5,6 +5,7 @@ type ThemeType = 'dark' | 'light' | 'system';
 interface ThemeProviderProps {
     children: ReactNode;
     defaultTheme?: ThemeType;
+    persist?: boolean;
     storageKey?: string;
 }
 
@@ -23,11 +24,12 @@ const ThemeProviderContext = createContext<ThemeProviderStateI>(initialState);
 export function ThemeProvider({
     children,
     defaultTheme = 'system',
+    persist = true,
     storageKey = 'bytechef.ui-theme',
     ...props
 }: ThemeProviderProps) {
-    const [theme, setTheme] = useState<ThemeType>(
-        () => (localStorage.getItem(storageKey) as ThemeType) || defaultTheme
+    const [theme, setTheme] = useState<ThemeType>(() =>
+        persist ? (localStorage.getItem(storageKey) as ThemeType) || defaultTheme : defaultTheme
     );
 
     useEffect(() => {
@@ -48,7 +50,10 @@ export function ThemeProvider({
 
     const value = {
         setTheme: (theme: ThemeType) => {
-            localStorage.setItem(storageKey, theme);
+            if (persist) {
+                localStorage.setItem(storageKey, theme);
+            }
+
             setTheme(theme);
         },
         theme,
