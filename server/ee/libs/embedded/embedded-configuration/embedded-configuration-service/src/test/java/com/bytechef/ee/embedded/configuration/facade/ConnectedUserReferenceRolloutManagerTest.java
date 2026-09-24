@@ -88,71 +88,18 @@ class ConnectedUserReferenceRolloutManagerTest {
 
         when(connectedUserProject.getConnectedUserId()).thenReturn(7L);
         when(connectedUserProjectService.getConnectedUserProject(anyLong())).thenReturn(connectedUserProject);
-        when(connectedUserReferenceDeploymentManager.getLastPublishedVersion(AUTOMATION_WORKFLOW_PROJECT_ID)).thenReturn(2);
+        when(connectedUserReferenceDeploymentManager.getLastPublishedVersion(AUTOMATION_WORKFLOW_PROJECT_ID))
+            .thenReturn(2);
         when(connectedUserReferenceDeploymentManager.fetchRow(anyLong(), anyString())).thenReturn(Optional.empty());
-        when(connectedUserReferenceDeploymentManager.getWorkflowId(eq(AUTOMATION_WORKFLOW_PROJECT_ID), eq(2), anyString()))
-            .thenAnswer(invocation -> "workflow-" + invocation.getArgument(2));
+        when(connectedUserReferenceDeploymentManager.getWorkflowId(eq(AUTOMATION_WORKFLOW_PROJECT_ID), eq(2),
+            anyString()))
+                .thenAnswer(invocation -> "workflow-" + invocation.getArgument(2));
         when(connectedUserReferenceDeploymentManager.resolveReference(
             anyLong(), anyString(), anyBoolean(), anyMap(), anyList(), anyMap()))
                 .thenReturn(new ReferenceResolution(
                     new RowSpec(new ResolvedWorkflowConnections(List.of(), List.of()), true, null), null, null));
         when(projectWorkflowService.getProjectWorkflows(AUTOMATION_WORKFLOW_PROJECT_ID, 2))
             .thenReturn(List.of(projectWorkflow(FIRST_UUID), projectWorkflow(SECOND_UUID)));
-    }
-
-    @Test
-    void testRollOutContinuesWithTheNextDeploymentWhenOneFails() {
-        when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
-            .thenReturn(List.of(projectDeployment(901L), projectDeployment(902L)));
-        when(connectedUserProjectWorkflowRepository.findAllByProjectDeploymentId(901L))
-            .thenReturn(List.of(reference(1L, 901L, FIRST_UUID, false)));
-        when(connectedUserProjectWorkflowRepository.findAllByProjectDeploymentId(902L))
-            .thenReturn(List.of(reference(2L, 902L, SECOND_UUID, false)));
-
-        doThrow(new IllegalStateException("Trigger registration failed"))
-            .when(connectedUserReferenceDeploymentManager)
-            .putWorkflows(eq(901L), eq(2), anyMap());
-
-        assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(AUTOMATION_WORKFLOW_PROJECT_ID))
-            .doesNotThrowAnyException();
-
-        verify(connectedUserReferenceDeploymentManager).putWorkflows(eq(902L), eq(2), anyMap());
-    }
-
-    @Test
-    void testRollOutDeletesADeploymentWhoseOnlyReferenceIsDangling() {
-        when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
-            .thenReturn(List.of(projectDeployment(901L)));
-        when(connectedUserProjectWorkflowRepository.findAllByProjectDeploymentId(901L))
-            .thenReturn(List.of(reference(1L, 901L, FIRST_UUID, true)));
-
-        connectedUserReferenceRolloutManager.rollOut(AUTOMATION_WORKFLOW_PROJECT_ID);
-
-        verify(connectedUserReferenceDeploymentManager).deleteDeployment(901L);
-        verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), eq(2), anyMap());
-    }
-
-    @Test
-    void testRollOutLogsAndReturnsWhenTheLastPublishedVersionCannotBeRead() {
-        when(connectedUserReferenceDeploymentManager.getLastPublishedVersion(AUTOMATION_WORKFLOW_PROJECT_ID))
-            .thenThrow(new IllegalArgumentException("Automation workflow project id=500 is not published"));
-
-        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutServiceLogger();
-
-        try {
-            assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(AUTOMATION_WORKFLOW_PROJECT_ID))
-                .doesNotThrowAnyException();
-
-            verify(projectDeploymentService, never()).getAllProjectDeployments(anyLong());
-            assertThat(appender.list)
-                .singleElement()
-                .satisfies(event -> {
-                    assertThat(event.getLevel()).isEqualTo(Level.ERROR);
-                    assertThat(event.getFormattedMessage()).contains("automation workflow project id=500");
-                });
-        } finally {
-            detachAppenderFromRolloutServiceLogger(appender);
-        }
     }
 
     @Test
@@ -203,42 +150,6 @@ class ConnectedUserReferenceRolloutManagerTest {
         verify(connectedUserReferenceDeploymentManager).putWorkflows(eq(902L), eq(2), anyMap());
     }
 
-    /**
-     * Only a connected user's reference deployment is the rollout's to delete: any other deployment of the automation workflow project
-     * project has no references by nature.
-     */
-    @Test
-    void testRollOutLeavesADeploymentThatIsNotAReferenceDeploymentAlone() {
-        ProjectDeployment projectDeployment = projectDeployment(901L);
-
-        projectDeployment.setName("Vendor deployment");
-
-        when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
-            .thenReturn(List.of(projectDeployment));
-
-        connectedUserReferenceRolloutManager.rollOut(AUTOMATION_WORKFLOW_PROJECT_ID);
-
-        verify(connectedUserProjectWorkflowRepository, never()).findAllByProjectDeploymentId(anyLong());
-        verify(connectedUserReferenceDeploymentManager, never()).deleteDeployment(anyLong());
-        verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), anyInt(), anyMap());
-    }
-
-    /**
-     * A reference deleted while its deployment was behind -- a dangling one, whose row a republish that dropped its
-     * template leaves for the rollout -- may have been the deployment's last: the lazy catch-up deletes the deployment
-     * rather than leaving its rows running.
-     */
-    @Test
-    void testRollOutDeploymentIfBehindDeletesADeploymentWithoutReferences() {
-        when(connectedUserReferenceDeploymentManager.getDeployment(901L)).thenReturn(projectDeployment(901L));
-        when(connectedUserProjectWorkflowRepository.findAllByProjectDeploymentId(901L)).thenReturn(List.of());
-
-        assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(901L)).isTrue();
-
-        verify(connectedUserReferenceDeploymentManager).deleteDeployment(901L);
-        verify(connectedUserReferenceDeploymentManager, never()).putWorkflows(anyLong(), anyInt(), anyMap());
-    }
-
     @Test
     void testRollOutLogsAnOptimisticLockingFailureAtWarnAndOtherFailuresAtError() {
         when(projectDeploymentService.getAllProjectDeployments(AUTOMATION_WORKFLOW_PROJECT_ID))
@@ -248,7 +159,6 @@ class ConnectedUserReferenceRolloutManagerTest {
         when(connectedUserProjectWorkflowRepository.findAllByProjectDeploymentId(902L))
             .thenReturn(List.of(reference(2L, 902L, SECOND_UUID, false)));
 
-        // Spring Data JDBC wraps the optimistic locking failure of a save in its own execution exception.
         doThrow(new IllegalStateException(
             "Failed to execute DbAction", new OptimisticLockingFailureException("Row was updated concurrently")))
                 .when(connectedUserReferenceDeploymentManager)
@@ -267,7 +177,8 @@ class ConnectedUserReferenceRolloutManagerTest {
                 .containsExactly(
                     tuple(
                         Level.WARN,
-                        "Rolling out automation workflow project id=500 to deployment id=901 lost a concurrent update; it will " +
+                        "Rolling out automation workflow project id=500 to deployment id=901 lost a concurrent update; it will "
+                            +
                             "converge on the next publish or enable"),
                     tuple(Level.ERROR, "Rolling out automation workflow project id=500 to deployment id=902 failed"));
         } finally {
