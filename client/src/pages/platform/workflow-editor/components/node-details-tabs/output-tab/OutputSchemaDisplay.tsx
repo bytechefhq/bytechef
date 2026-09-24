@@ -70,7 +70,8 @@ const OutputSchemaDisplay = ({
 
     const operationLabel = clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action';
     const testable = !resumePerformFunctionDefined && !variablePropertiesDefined;
-    const showPlaceholderSampleOutputWarning = !testOutputResponse && !currentNode.taskDispatcher && !!sampleOutput;
+    const showPlaceholderSampleOutputWarning =
+        !testOutputResponse && !currentNode.taskDispatcher && sampleOutput !== undefined && sampleOutput !== null;
 
     return (
         <div className="h-full">
