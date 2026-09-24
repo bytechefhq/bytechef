@@ -11,6 +11,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -91,6 +92,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -157,7 +159,9 @@ public class EmbeddedMcpServerConfiguration {
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpServerService mcpServerService,
-        PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
+        PrincipalJobFacade principalJobFacade,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
+        SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, @Qualifier("syncWorkerExecutor") TaskExecutor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry,
@@ -172,7 +176,8 @@ public class EmbeddedMcpServerConfiguration {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
-                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
                 contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -277,11 +282,19 @@ public class EmbeddedMcpServerConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private com.bytechef.platform.configuration.domain.Environment getEnvironment(String environment) {
