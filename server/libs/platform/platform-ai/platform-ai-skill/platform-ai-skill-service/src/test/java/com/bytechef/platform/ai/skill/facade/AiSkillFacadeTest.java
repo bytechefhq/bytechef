@@ -17,6 +17,7 @@
 package com.bytechef.platform.ai.skill.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,14 +25,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import com.bytechef.platform.tag.service.TagService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -42,22 +46,37 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
+import org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -81,6 +100,26 @@ class AiSkillFacadeTest {
 
     @InjectMocks
     private AiSkillFacadeImpl aiSkillFacade;
+
+    @Test
+    void testConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEverySkillOperation() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("alice"));
+
+        try {
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.getAiSkills());
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.getAiSkill(1L));
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.deleteAiSkill(1L));
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.updateAiSkill(1L, "renamed", null));
+            assertThrows(
+                AccessDeniedException.class,
+                () -> aiSkillFacade.createAiSkillFromInstructions("skill", null, "do it"));
+
+            verifyNoInteractions(aiSkillService, aiSkillFileStorage);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
 
     @Test
     void testGetAiSkillTagsReadsSkillsThroughFilteredProxy() {
@@ -957,14 +996,6 @@ class AiSkillFacadeTest {
         assertPreAuthorize(methodName, "isResourceOwner(#id, 'AiSkill')");
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-        "createAiSkill", "createAiSkillFromInstructions", "getAiSkillTags", "getTags"
-    })
-    void testMethodRequiresAuthentication(String methodName) {
-        assertPreAuthorize(methodName, "isAuthenticated()");
-    }
-
     @Test
     void testGetAiSkillsIsFilteredToOwnedSkills() {
         for (Method method : findMethods("getAiSkills")) {
@@ -1059,5 +1090,116 @@ class AiSkillFacadeTest {
             .isNotEmpty();
 
         return methods;
+    }
+
+    @Nested
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+
+        private final AiSkillFacade securedAiSkillFacade = secure(
+            new AiSkillFacadeImpl(
+                mock(AiSkillFacade.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                }),
+                mock(AiSkillFileStorage.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                }),
+                mock(AiSkillService.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                }),
+                mock(TagService.class, invocation -> {
+                    throw new IllegalStateException(BODY_REACHED);
+                })));
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @ParameterizedTest
+        @MethodSource("authenticatedOperations")
+        void testAuthenticatedMethodDeniesAnAnonymousCaller(GuardedOperation guardedOperation) {
+            authenticateAnonymously();
+
+            assertThatThrownBy(() -> guardedOperation.invoke(securedAiSkillFacade))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @ParameterizedTest
+        @MethodSource("authenticatedOperations")
+        void testAuthenticatedMethodAllowsAnAuthenticatedCaller(GuardedOperation guardedOperation) {
+            authenticate(new UsernamePasswordAuthenticationToken("alice", "credentials", List.of()));
+
+            assertThatThrownBy(() -> guardedOperation.invoke(securedAiSkillFacade))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testCreateAiSkillDeniesAnAnonymousCaller() {
+            authenticateAnonymously();
+
+            assertThatThrownBy(() -> securedAiSkillFacade.createAiSkill(" ", null, "skill.skill", new byte[0]))
+                .isInstanceOf(AccessDeniedException.class);
+        }
+
+        @Test
+        void testCreateAiSkillAllowsAnAuthenticatedCaller() {
+            authenticate(new UsernamePasswordAuthenticationToken("alice", "credentials", List.of()));
+
+            assertThatThrownBy(() -> securedAiSkillFacade.createAiSkill(" ", null, "skill.skill", new byte[0]))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Skill name must not be blank");
+        }
+
+        static Stream<Named<GuardedOperation>> authenticatedOperations() {
+            return Stream.of(
+                Named.of(
+                    "createAiSkillFromInstructions",
+                    (GuardedOperation) guardedFacade -> guardedFacade.createAiSkillFromInstructions(
+                        "skill", null, "Do it")),
+                Named.of(
+                    "createAiSkillFromInstructions with additional files",
+                    (GuardedOperation) guardedFacade -> guardedFacade.createAiSkillFromInstructions(
+                        "skill", null, "Do it", null)),
+                Named.of("getAiSkillTags", (GuardedOperation) AiSkillFacade::getAiSkillTags),
+                Named.of(
+                    "getTags", (GuardedOperation) guardedFacade -> guardedFacade.getTags(List.of(10L))));
+        }
+
+        private static void authenticate(Authentication authentication) {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(authentication);
+
+            SecurityContextHolder.setContext(securityContext);
+        }
+
+        private static void authenticateAnonymously() {
+            authenticate(
+                new AnonymousAuthenticationToken(
+                    "key", "anonymous", List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+        }
+
+        private static AiSkillFacade secure(AiSkillFacade targetAiSkillFacade) {
+            PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager =
+                new PreAuthorizeAuthorizationManager();
+
+            preAuthorizeAuthorizationManager.setExpressionHandler(new DefaultMethodSecurityExpressionHandler());
+
+            ProxyFactory proxyFactory = new ProxyFactory(targetAiSkillFacade);
+
+            proxyFactory.addAdvisor(
+                AuthorizationManagerBeforeMethodInterceptor.preAuthorize(preAuthorizeAuthorizationManager));
+
+            return (AiSkillFacade) proxyFactory.getProxy();
+        }
+
+        @FunctionalInterface
+        interface GuardedOperation {
+
+            void invoke(AiSkillFacade guardedFacade);
+        }
     }
 }
