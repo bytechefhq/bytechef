@@ -1,4 +1,9 @@
 dependencies {
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-impl"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
+    testImplementation(project(":server:libs:test:test-support"))
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
     implementation("org.slf4j:slf4j-api")
