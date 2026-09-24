@@ -27,6 +27,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.facade.AppEventFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
@@ -43,7 +44,6 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @ContextConfiguration(classes = EmbeddedConfigurationRestTestConfiguration.class)
 @WebMvcTest(WorkflowApiController.class)
 @EmbeddedConfigurationRestConfigurationSharedMocks
-public class WorkflowApiControllerIntTest {
+class WorkflowApiControllerIntTest {
 
     public static final String DEFINITION = """
         {
@@ -77,6 +77,9 @@ public class WorkflowApiControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private AppEventFacade appEventFacade;
 
     @MockitoBean
     private AppEventService appEventService;
@@ -124,56 +127,48 @@ public class WorkflowApiControllerIntTest {
     }
 
     @Test
-    public void testGetWorkflow() {
-        try {
-            when(integrationWorkflowFacade.getIntegrationWorkflow("1"))
-                .thenReturn(getWorkflowDTO());
+    void testGetWorkflow() {
+        when(integrationWorkflowFacade.getIntegrationWorkflow("1"))
+            .thenReturn(getWorkflowDTO());
 
-            this.webTestClient
-                .get()
-                .uri("/internal/workflows/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(WorkflowModel.class);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .get()
+            .uri("/internal/workflows/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(WorkflowModel.class);
 
         verify(integrationWorkflowFacade).getIntegrationWorkflow("1");
     }
 
     @Test
-    public void testGetIntegrationWorkflows() {
-        try {
-            IntegrationWorkflow integrationWorkflow = createTestIntegrationWorkflow(1L, "workflow1");
+    void testGetIntegrationWorkflows() {
+        IntegrationWorkflow integrationWorkflow = createTestIntegrationWorkflow(1L, "workflow1");
 
-            IntegrationWorkflowDTO workflow = new IntegrationWorkflowDTO(
-                new Workflow("workflow1", "{}", Workflow.Format.JSON), integrationWorkflow);
+        IntegrationWorkflowDTO workflow = new IntegrationWorkflowDTO(
+            new Workflow("workflow1", "{}", Workflow.Format.JSON), integrationWorkflow);
 
-            when(integrationWorkflowFacade.getIntegrationWorkflows(1L))
-                .thenReturn(List.of(workflow));
+        when(integrationWorkflowFacade.getIntegrationWorkflows(1L))
+            .thenReturn(List.of(workflow));
 
-            this.webTestClient
-                .get()
-                .uri("/internal/integrations/1/workflows")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.[0].id")
-                .isEqualTo("workflow1");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .get()
+            .uri("/internal/integrations/1/workflows")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.[0].id")
+            .isEqualTo("workflow1");
 
         verify(integrationWorkflowFacade).getIntegrationWorkflows(1L);
     }
 
     @Test
-    public void testPostIntegrationWorkflows() {
+    void testPostIntegrationWorkflows() {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
@@ -184,27 +179,23 @@ public class WorkflowApiControllerIntTest {
         when(integrationWorkflowFacade.addWorkflow(anyLong(), any()))
             .thenReturn(integrationWorkflowDTO.getIntegrationWorkflowId());
 
-        try {
-            this.webTestClient
-                .post()
-                .uri("/internal/integrations/1/workflows")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(workflowModel)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(Long.class)
-                .isEqualTo(integrationWorkflowDTO.getIntegrationWorkflowId());
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .post()
+            .uri("/internal/integrations/1/workflows")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(workflowModel)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(Long.class)
+            .isEqualTo(integrationWorkflowDTO.getIntegrationWorkflowId());
 
         verify(integrationWorkflowFacade).addWorkflow(anyLong(), eq(definition));
     }
 
     @Test
-    public void testPutWorkflow() {
+    void testPutWorkflow() {
         WorkflowModel workflowModel = new WorkflowModel()
             .definition(DEFINITION)
             .version(0);
@@ -212,20 +203,16 @@ public class WorkflowApiControllerIntTest {
         when(integrationWorkflowFacade.updateWorkflow("1", DEFINITION, 0))
             .thenReturn(getWorkflowDTO());
 
-        try {
-            this.webTestClient
-                .put()
-                .uri("/internal/workflows/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(workflowModel)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(WorkflowModel.class);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        this.webTestClient
+            .put()
+            .uri("/internal/workflows/1")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(workflowModel)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(WorkflowModel.class);
 
         verify(integrationWorkflowFacade).updateWorkflow("1", DEFINITION, 0);
     }
