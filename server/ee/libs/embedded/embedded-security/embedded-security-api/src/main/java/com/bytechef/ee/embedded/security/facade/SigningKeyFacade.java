@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.security.facade;
 
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.platform.constant.PlatformType;
+import java.util.List;
 
 /**
  * @version ee
@@ -16,6 +17,13 @@ import com.bytechef.platform.constant.PlatformType;
  * @author Ivica Cardic
  */
 public interface SigningKeyFacade {
-
     String create(SigningKey signingKey, PlatformType type);
+
+    void delete(long id);
+
+    SigningKey getSigningKey(long id);
+
+    List<SigningKey> getSigningKeys(PlatformType type, long environmentId);
+
+    SigningKey update(SigningKey signingKey);
 }
