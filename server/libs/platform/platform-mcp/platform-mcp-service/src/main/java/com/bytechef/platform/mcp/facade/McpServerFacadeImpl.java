@@ -27,6 +27,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,8 +35,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of {@link McpServerFacade}.
- *
  * @author Ivica Cardic
  */
 @Service
@@ -137,7 +136,11 @@ public class McpServerFacadeImpl implements McpServerFacade {
     public McpComponent update(McpComponent mcpComponent, List<McpTool> mcpTools) {
         McpComponent updatedComponent = mcpComponentService.update(mcpComponent);
 
+        Map<String, Boolean> enabledByToolName = new HashMap<>();
+
         for (McpTool tool : mcpToolService.getMcpComponentMcpTools(updatedComponent.getId())) {
+            enabledByToolName.put(tool.getName(), tool.isEnabled());
+
             mcpToolService.delete(tool);
         }
 
@@ -145,6 +148,8 @@ public class McpServerFacadeImpl implements McpServerFacade {
             for (McpTool mcpTool : mcpTools) {
                 McpTool toolToCreate =
                     new McpTool(mcpTool.getName(), mcpTool.getParameters(), updatedComponent.getId());
+
+                toolToCreate.setEnabled(enabledByToolName.getOrDefault(mcpTool.getName(), true));
 
                 mcpToolService.create(toolToCreate);
             }
