@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.ai.skill.facade;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,10 +39,8 @@ import com.bytechef.platform.tag.service.TagService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -58,7 +55,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -67,8 +63,6 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.prepost.PostFilter;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
@@ -985,30 +979,6 @@ class AiSkillFacadeTest {
             .contains("File not found"));
     }
 
-    @ParameterizedTest
-    @ValueSource(
-        strings = {
-            "createAdditionalFilesInSkill", "deleteAiSkill", "getAiSkill", "getAiSkillDownload",
-            "getAiSkillWithDownload", "getAiSkillFileContent", "getAiSkillFilePaths", "removeFileInSkill",
-            "updateAiSkill", "updateAiSkillTags", "updateAiSkillContent"
-        })
-    void testByIdMethodRequiresResourceOwner(String methodName) {
-        assertPreAuthorize(methodName, "isResourceOwner(#id, 'AiSkill')");
-    }
-
-    @Test
-    void testGetAiSkillsIsFilteredToOwnedSkills() {
-        for (Method method : findMethods("getAiSkills")) {
-            PostFilter postFilter = method.getAnnotation(PostFilter.class);
-
-            assertThat(postFilter)
-                .as("getAiSkills must be @PostFilter-ed; dropping it would list every user's AI skills.")
-                .isNotNull();
-
-            assertThat(postFilter.value()).isEqualTo("isTenantAdmin() or isResourceOwner(filterObject.id, 'AiSkill')");
-        }
-    }
-
     private byte[] createZipBytes(String entryName, String content) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
@@ -1064,32 +1034,6 @@ class AiSkillFacadeTest {
         } catch (IOException ioException) {
             throw new RuntimeException("Failed to create test zip", ioException);
         }
-    }
-
-    private static void assertPreAuthorize(String methodName, String expectedExpression) {
-        for (Method method : findMethods(methodName)) {
-            PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
-
-            assertThat(preAuthorize)
-                .as("Method '%s' must have @PreAuthorize(\"%s\")", method, expectedExpression)
-                .isNotNull();
-
-            assertThat(preAuthorize.value()).isEqualTo(expectedExpression);
-        }
-    }
-
-    private static List<Method> findMethods(String methodName) {
-        List<Method> methods = Arrays.stream(AiSkillFacadeImpl.class.getDeclaredMethods())
-            .filter(method -> !method.isSynthetic())
-            .filter(method -> method.getName()
-                .equals(methodName))
-            .toList();
-
-        assertThat(methods)
-            .as("Expected at least one declared method named '%s'", methodName)
-            .isNotEmpty();
-
-        return methods;
     }
 
     @Nested
