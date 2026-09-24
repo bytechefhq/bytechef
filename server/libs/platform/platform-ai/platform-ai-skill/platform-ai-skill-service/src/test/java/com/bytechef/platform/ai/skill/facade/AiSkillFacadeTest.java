@@ -26,12 +26,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.platform.ai.skill.service.AiSkillService;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import com.bytechef.platform.tag.service.TagService;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,8 +58,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -81,6 +85,26 @@ class AiSkillFacadeTest {
 
     @InjectMocks
     private AiSkillFacadeImpl aiSkillFacade;
+
+    @Test
+    void testConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEverySkillOperation() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("alice"));
+
+        try {
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.getAiSkills());
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.getAiSkill(1L));
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.deleteAiSkill(1L));
+            assertThrows(AccessDeniedException.class, () -> aiSkillFacade.updateAiSkill(1L, "renamed", null));
+            assertThrows(
+                AccessDeniedException.class,
+                () -> aiSkillFacade.createAiSkillFromInstructions("skill", null, "do it"));
+
+            verifyNoInteractions(aiSkillService, aiSkillFileStorage);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+    }
 
     @Test
     void testGetAiSkillTagsReadsSkillsThroughFilteredProxy() {
