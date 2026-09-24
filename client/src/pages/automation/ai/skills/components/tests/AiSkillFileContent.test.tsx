@@ -3,7 +3,14 @@ import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import {AiSkillFileContent} from '../AiSkillDetail';
 
-const {monacoPropsMock} = vi.hoisted(() => ({monacoPropsMock: vi.fn()}));
+const {editorMock, monacoPropsMock} = vi.hoisted(() => ({
+    editorMock: {
+        commands: {setContent: vi.fn()},
+        setEditable: vi.fn(),
+        storage: {markdown: {getMarkdown: () => ''}},
+    },
+    monacoPropsMock: vi.fn(),
+}));
 
 vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
     default: (props: {options?: {readOnly?: boolean}; value?: string}) => {
@@ -15,11 +22,7 @@ vi.mock('@/shared/components/MonacoEditorWrapper', () => ({
 
 vi.mock('@tiptap/react', () => ({
     EditorContent: () => <div data-testid="markdown-viewer" />,
-    useEditor: () => ({
-        commands: {setContent: vi.fn()},
-        setEditable: vi.fn(),
-        storage: {markdown: {getMarkdown: () => ''}},
-    }),
+    useEditor: () => editorMock,
 }));
 
 vi.mock('@tiptap/starter-kit', () => ({StarterKit: {configure: () => ({})}}));
@@ -60,6 +63,18 @@ describe('AiSkillFileContent', () => {
 
         expect(await screen.findByTestId('markdown-viewer')).toBeInTheDocument();
         expect(screen.queryByTestId('monaco-editor')).not.toBeInTheDocument();
+    });
+
+    it('clears the markdown preview when switching to an empty file', async () => {
+        const {rerender} = render(<AiSkillFileContent {...defaultProps} showMarkdownPreview />);
+
+        await screen.findByTestId('markdown-viewer');
+
+        expect(editorMock.commands.setContent).toHaveBeenLastCalledWith('# Title');
+
+        rerender(<AiSkillFileContent {...defaultProps} content="" selectedFilePath="other.md" showMarkdownPreview />);
+
+        expect(editorMock.commands.setContent).toHaveBeenLastCalledWith('');
     });
 
     it('falls back to the editor when preview is off', async () => {
