@@ -27,7 +27,6 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public interface AiSkillFacade {
-
     AiSkill createAiSkill(String name, @Nullable String description, String filename, byte[] bytes);
 
     AiSkill createAiSkillFromInstructions(
@@ -42,7 +41,6 @@ public interface AiSkillFacade {
 
     default AiSkill createAiSkillFromInstructions(
         String name, @Nullable String description, String instructions) {
-
         return createAiSkillFromInstructions(name, description, instructions, null);
     }
 
@@ -86,6 +84,8 @@ public interface AiSkillFacade {
     }
 
     List<AiSkill> getAiSkills();
+
+    List<Tag> getAiSkillTags();
 
     /** Resolves {@link Tag} entities for the given tag ids (empty list for an empty input). */
     List<Tag> getTags(List<Long> tagIds);
