@@ -30,7 +30,7 @@ The results table lists **Date**, **Principal**, and **Event Type**. Clicking a 
 
 ## What an entry contains
 
-Each row in `persistent_audit_event` carries exactly four fields, plus its data map in `persistent_audit_event_data`:
+Each entry is a row in `persistent_audit_event` plus its data map in `persistent_audit_event_data`:
 
 - **Event ID** - the entry's identifier.
 - **Principal** - the acting user's login.
@@ -72,6 +72,8 @@ The dropdown on the page is populated from the events your instance has actually
 | **Context store** | `CONTEXT_STORE_SOURCE_CREATED`, `CONTEXT_STORE_SOURCE_DELETED`, `CONTEXT_STORE_SOURCE_ENABLED`, `CONTEXT_STORE_SOURCE_DISABLED` |
 | **AI Hub** | `AI_HUB_WORKSPACE_SETTINGS_UPDATED`, `AI_HUB_CHAT_CREATED`, `AI_HUB_CHAT_DELETED` |
 | **Integrations (embedded)** | `INTEGRATION_CREATED`, `INTEGRATION_UPDATED`, `INTEGRATION_DELETED` |
+| **Jobs** | `JOB_CREATED`, `JOB_STARTED`, `JOB_COMPLETED`, `JOB_FAILED`, `JOB_STOPPED` - recorded under the `SYSTEM` principal, with the job id in the data |
+| **Access checks** | `PERMISSION_CHECK` - a guarded call that was denied or failed, or a successful call that changes something; successful reads are not recorded |
 
 ## What is not logged
 
@@ -87,4 +89,8 @@ Audit entries persist in your operational database. A scheduled job deletes entr
 | `bytechef.audit.retention-days` | `365` | Age at which an entry is purged. |
 | `bytechef.audit.retention-cron` | `0 0 2 * * *` | When the purge runs - daily at 02:00 local time. |
 
-Retention is instance-wide, not per workspace.
+A `retention-days` of zero or less disables the purge rather than deleting the whole trail. Retention is instance-wide, not per workspace.
+
+## Masking principals
+
+Set `bytechef.audit.mask-principals` to `true` to mask principals when entries are read through the API, e.g. `a***@example.com`. The stored entries are unchanged, and the **Principal** filter still matches the full, unmasked value.
