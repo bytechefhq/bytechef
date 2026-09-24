@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260921120000" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_persistent_audit_event_event_date_id"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="idx_persistent_audit_event_event_date_id" tableName="persistent_audit_event">
+            <column name="event_date" descending="true"/>
+            <column name="id" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260921120001" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_persistent_audit_event_principal_event_date"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="idx_persistent_audit_event_principal_event_date" tableName="persistent_audit_event">
+            <column name="principal"/>
+            <column name="event_date" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260921120002" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_persistent_audit_event_event_type_event_date"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="idx_persistent_audit_event_event_type_event_date" tableName="persistent_audit_event">
+            <column name="event_type"/>
+            <column name="event_date" descending="true"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
