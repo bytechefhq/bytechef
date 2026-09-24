@@ -168,9 +168,11 @@ public class TokenRefreshHandler {
                 reentrantLock.unlock();
             }
         } catch (Exception exception) {
-            markCredentialsInvalid(componentConnection.connectionId());
+            log.error(
+                "Unable to complete refresh token procedure for connection {}", componentConnection.connectionId(),
+                exception);
 
-            log.error("Unable to complete refresh token procedure", exception);
+            markCredentialsInvalid(componentConnection.connectionId());
 
             throw exception;
         }
@@ -186,6 +188,10 @@ public class TokenRefreshHandler {
      * @param connectionId the ID of the connection to mark as invalid
      */
     private void markCredentialsInvalid(long connectionId) {
-        connectionService.updateConnectionCredentialStatus(connectionId, Connection.CredentialStatus.INVALID);
+        try {
+            connectionService.updateConnectionCredentialStatus(connectionId, Connection.CredentialStatus.INVALID);
+        } catch (RuntimeException exception) {
+            log.error("Unable to mark credentials of connection {} as invalid", connectionId, exception);
+        }
     }
 }
