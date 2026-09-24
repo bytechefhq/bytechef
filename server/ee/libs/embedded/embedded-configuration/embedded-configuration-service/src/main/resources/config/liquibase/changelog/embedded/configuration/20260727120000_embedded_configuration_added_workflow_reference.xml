@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260727120000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="connected_user_project_workflow" columnName="automation_workflow_uuid"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="connected_user_project_workflow">
+            <column name="automation_workflow_uuid" type="VARCHAR(36)"/>
+            <column name="project_deployment_id" type="BIGINT"/>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dangling" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dangling_reason" type="VARCHAR(255)"/>
+        </addColumn>
+
+        <dropNotNullConstraint
+            tableName="connected_user_project_workflow" columnName="project_workflow_id" columnDataType="BIGINT"/>
+        <rollback/>
+    </changeSet>
+    <changeSet id="20260727120000-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM information_schema.table_constraints
+                WHERE LOWER(constraint_name) = 'ck_cupw_project_or_automation_workflow_not_both'
+                AND LOWER(table_schema) = LOWER(current_schema())
+            </sqlCheck>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE connected_user_project_workflow
+            ADD CONSTRAINT ck_cupw_project_or_automation_workflow_not_both
+            CHECK ((project_workflow_id IS NOT NULL) &lt;&gt; (automation_workflow_uuid IS NOT NULL))
+        </sql>
+
+        <rollback>
+            <sql>ALTER TABLE connected_user_project_workflow DROP CONSTRAINT IF EXISTS ck_cupw_project_or_automation_workflow_not_both;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260727120000-4" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="connected_user_project_workflow"
+                             indexName="uk_cupw_connected_user_project_id_automation_workflow_uuid"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="connected_user_project_workflow"
+                     indexName="uk_cupw_connected_user_project_id_automation_workflow_uuid" unique="true">
+            <column name="connected_user_project_id"/>
+            <column name="automation_workflow_uuid"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
