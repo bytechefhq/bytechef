@@ -96,4 +96,10 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
         // TODO Add query
         return CollectionUtils.toList(connectUserProjectRepository.findAll());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ConnectedUserProject> getConnectedUserProjects(List<Long> ids) {
+        return connectUserProjectRepository.findAllById(ids);
+    }
 }
