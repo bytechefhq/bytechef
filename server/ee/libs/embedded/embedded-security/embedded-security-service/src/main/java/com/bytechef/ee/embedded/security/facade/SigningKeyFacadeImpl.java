@@ -14,6 +14,8 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,7 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public String create(SigningKey signingKey, PlatformType type) {
         User user = userService.getCurrentUser();
 
@@ -44,5 +47,29 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
         signingKey.setUserId(user.getId());
 
         return signingKeyService.create(signingKey);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public void delete(long id) {
+        signingKeyService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public SigningKey getSigningKey(long id) {
+        return signingKeyService.getSigningKey(id);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public List<SigningKey> getSigningKeys(PlatformType type, long environmentId) {
+        return signingKeyService.getSigningKeys(type, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("isTenantAdmin()")
+    public SigningKey update(SigningKey signingKey) {
+        return signingKeyService.update(signingKey);
     }
 }
