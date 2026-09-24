@@ -24,6 +24,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc-test")
+    testImplementation("org.springframework.security:spring-security-core")
     testImplementation(libs.org.wiremock.wiremock)
     testImplementation(project(":server:libs:atlas:atlas-file-storage:atlas-file-storage-impl"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
