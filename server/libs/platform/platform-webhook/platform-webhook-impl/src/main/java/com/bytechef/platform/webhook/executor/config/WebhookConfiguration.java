@@ -20,6 +20,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -68,7 +69,9 @@ import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHa
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -94,7 +97,9 @@ public class WebhookConfiguration {
         Evaluator evaluator, ApplicationEventPublisher eventPublisher,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
+        SseStreamBridgeRegistry sseStreamBridgeRegistry,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
+        SubflowResolver subflowResolver,
         TaskExecutionService taskExecutionService, @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor,
         TaskHandlerRegistry taskHandlerRegistry, TriggerDefinitionService triggerDefinitionService,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
@@ -109,7 +114,8 @@ public class WebhookConfiguration {
             new JobSyncExecutor(
                 contextService, evaluator, jobService, -1, asyncMessageBroker,
                 getAdditionalApplicationEventListeners(
-                    evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                    evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                    taskExecutionService, taskFileStorage),
                 getTaskCompletionHandlerFactories(
                     contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
                 getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -175,11 +181,19 @@ public class WebhookConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private List<TaskDispatcherResolverFactory> getTaskDispatcherResolverFactories(

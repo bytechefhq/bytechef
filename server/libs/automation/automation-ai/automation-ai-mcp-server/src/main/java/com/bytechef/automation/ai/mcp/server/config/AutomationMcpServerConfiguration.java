@@ -20,6 +20,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -133,6 +134,7 @@ public class AutomationMcpServerConfiguration {
         Evaluator evaluator, JobService jobService, McpComponentService mcpComponentService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         SubflowResolver subflowResolver, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, @Qualifier("syncWorkerExecutor") TaskExecutor taskExecutor,
         TaskHandlerRegistry taskHandlerRegistry,
@@ -147,7 +149,8 @@ public class AutomationMcpServerConfiguration {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
-                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
                 contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -253,11 +256,19 @@ public class AutomationMcpServerConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private List<TaskCompletionHandlerFactory> getTaskCompletionHandlerFactories(
