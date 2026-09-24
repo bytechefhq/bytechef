@@ -24,7 +24,7 @@ import static com.bytechef.component.neon.constant.NeonConstants.OFFSET;
 import static com.bytechef.component.neon.constant.NeonConstants.ORDER;
 import static com.bytechef.component.neon.constant.NeonConstants.SELECT;
 import static com.bytechef.component.neon.constant.NeonConstants.TABLE;
-import static com.bytechef.component.neon.constant.NeonConstants.filtersProperty;
+import static com.bytechef.component.neon.constant.NeonConstants.criteriaFilterArrayProperty;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.neon.util.NeonUtils;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 public class NeonListRowsAction {
 
@@ -49,7 +50,7 @@ public class NeonListRowsAction {
                 .description("Comma-separated list of columns to return.")
                 .exampleValue("id,name,email")
                 .required(false),
-            filtersProperty(false),
+            criteriaFilterArrayProperty(false),
             string(ORDER)
                 .label("Order By")
                 .description("Column(s) to order by. Use .asc or .desc, e.g. created_at.desc.")
@@ -74,13 +75,13 @@ public class NeonListRowsAction {
 
         String select = inputParameters.getString(SELECT);
 
-        if (select != null) {
+        if (!StringUtils.isEmpty(select)) {
             queryParameters.put(SELECT, List.of(select));
         }
 
         String order = inputParameters.getString(ORDER);
 
-        if (order != null) {
+        if (!StringUtils.isEmpty(order)) {
             queryParameters.put(ORDER, List.of(order));
         }
 
