@@ -7,15 +7,18 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import {
     STICKY_NOTE_DEFAULT_HEIGHT,
     STICKY_NOTE_DEFAULT_WIDTH,
+    addStickyNote,
     buildStickyNoteNode,
     buildStickyNoteNodes,
     compensateStickyNotePosition,
     createStickyNote,
+    deleteStickyNote,
     extractStickyNotes,
     isDarkHexColor,
     normalizeHexColor,
     saveStickyNotes,
     splitStickyNoteContent,
+    updateStickyNote,
 } from './stickyNoteUtils';
 import {
     clearAllWorkflowMutations,
@@ -470,6 +473,98 @@ describe('saveStickyNotes', () => {
 
         expect(isWorkflowMutating(workflowId)).toBe(false);
         expect(queuedSave).toHaveBeenCalledTimes(1);
+    });
+
+    it('should skip the save when the definition cannot be parsed', () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        useWorkflowDataStore.setState((state) => ({workflow: {...state.workflow, definition: '{not json'}}));
+
+        saveStickyNotes({updateWorkflowMutation, updater: (stickyNotes) => [...stickyNotes, makeStickyNote()]});
+
+        expect(mutateMock).not.toHaveBeenCalled();
+        expect(consoleErrorSpy).toHaveBeenCalled();
+
+        consoleErrorSpy.mockRestore();
+    });
+
+    it('should patch, remove and append notes through the named helpers', () => {
+        useWorkflowDataStore.setState((state) => ({
+            workflow: {...state.workflow, definition: makeDefinition([makeStickyNote()])},
+        }));
+
+        const settleLastMutation = () => mutateMock.mock.calls.at(-1)![1].onSettled();
+
+        updateStickyNote({id: 'stickyNote_1', patch: {content: 'Patched'}, updateWorkflowMutation});
+
+        expect(extractStickyNotes(useWorkflowDataStore.getState().workflow.definition)[0].content).toBe('Patched');
+
+        settleLastMutation();
+
+        addStickyNote({position: {x: 10, y: 20}, updateWorkflowMutation});
+
+        const afterAdd = extractStickyNotes(useWorkflowDataStore.getState().workflow.definition);
+
+        expect(afterAdd).toHaveLength(2);
+        expect(afterAdd[1].position).toEqual({x: 10, y: 20});
+
+        settleLastMutation();
+
+        deleteStickyNote({id: 'stickyNote_1', updateWorkflowMutation});
+
+        expect(extractStickyNotes(useWorkflowDataStore.getState().workflow.definition).map((note) => note.id)).toEqual([
+            afterAdd[1].id,
+        ]);
+    });
+
+    it('should roll the definition back when the save fails', () => {
+        const definitionBeforeSave = useWorkflowDataStore.getState().workflow.definition;
+
+        saveStickyNotes({updateWorkflowMutation, updater: (stickyNotes) => [...stickyNotes, makeStickyNote()]});
+
+        mutateMock.mock.calls[0][1].onError();
+
+        expect(useWorkflowDataStore.getState().workflow.definition).toBe(definitionBeforeSave);
+    });
+
+    it('should keep a newer note edit when an earlier save fails', () => {
+        saveStickyNotes({updateWorkflowMutation, updater: (stickyNotes) => [...stickyNotes, makeStickyNote()]});
+
+        const newerDefinition = makeDefinition([makeStickyNote({content: 'Newer'})]);
+
+        useWorkflowDataStore.setState((state) => ({workflow: {...state.workflow, definition: newerDefinition}}));
+
+        mutateMock.mock.calls[0][1].onError();
+
+        expect(useWorkflowDataStore.getState().workflow.definition).toBe(newerDefinition);
+    });
+
+    it('should store the version returned by a successful save', () => {
+        saveStickyNotes({updateWorkflowMutation, updater: (stickyNotes) => [...stickyNotes, makeStickyNote()]});
+
+        mutateMock.mock.calls[0][1].onSuccess({version: 7});
+
+        expect(useWorkflowDataStore.getState().workflow.version).toBe(7);
+    });
+
+    it('should roll a failed retry back to the last definition the server confirmed', () => {
+        saveStickyNotes({updateWorkflowMutation, updater: (stickyNotes) => [...stickyNotes, makeStickyNote()]});
+
+        const confirmedDefinition = useWorkflowDataStore.getState().workflow.definition;
+
+        mutateMock.mock.calls[0][1].onSuccess({version: 7});
+
+        setPendingDefinition(workflowId, makeDefinition([makeStickyNote({position: {x: 5, y: 5}})]));
+
+        mutateMock.mock.calls[0][1].onSettled();
+
+        const retriedDefinition = mutateMock.mock.calls[1][0].workflow.definition;
+
+        useWorkflowDataStore.setState((state) => ({workflow: {...state.workflow, definition: retriedDefinition}}));
+
+        mutateMock.mock.calls[1][1].onError();
+
+        expect(useWorkflowDataStore.getState().workflow.definition).toBe(confirmedDefinition);
     });
 
     it('should send a queued position definition before draining other saves', () => {

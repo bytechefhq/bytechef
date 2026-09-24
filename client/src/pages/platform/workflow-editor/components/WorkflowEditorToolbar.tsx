@@ -193,6 +193,7 @@ const WorkflowEditorToolbar = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    aria-label="Add note"
                                     icon={<StickyNoteIcon />}
                                     onClick={onAddStickyNote}
                                     size="icon"
