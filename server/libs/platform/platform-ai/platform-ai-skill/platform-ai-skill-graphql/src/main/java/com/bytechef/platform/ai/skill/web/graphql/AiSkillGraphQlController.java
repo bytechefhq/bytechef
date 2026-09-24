@@ -17,7 +17,7 @@
 package com.bytechef.platform.ai.skill.web.graphql;
 
 import com.bytechef.platform.ai.skill.domain.AiSkill;
-import com.bytechef.platform.ai.skill.facade.AiSkillApiFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Base64;
@@ -37,30 +37,30 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiSkillGraphQlController {
 
-    private final AiSkillApiFacade aiSkillApiFacade;
+    private final AiSkillFacade aiSkillFacade;
 
-    AiSkillGraphQlController(AiSkillApiFacade aiSkillApiFacade) {
-        this.aiSkillApiFacade = aiSkillApiFacade;
+    AiSkillGraphQlController(AiSkillFacade aiSkillFacade) {
+        this.aiSkillFacade = aiSkillFacade;
     }
 
     @QueryMapping
     List<AiSkill> aiSkills() {
-        return aiSkillApiFacade.getAiSkills();
+        return aiSkillFacade.getAiSkills();
     }
 
     @QueryMapping
     AiSkill aiSkill(@Argument long id) {
-        return aiSkillApiFacade.getAiSkill(id);
+        return aiSkillFacade.getAiSkill(id);
     }
 
     @QueryMapping
     List<String> aiSkillFilePaths(@Argument long id) {
-        return aiSkillApiFacade.getAiSkillFilePaths(id);
+        return aiSkillFacade.getAiSkillFilePaths(id);
     }
 
     @QueryMapping
     String aiSkillFileContent(@Argument long id, @Argument String path) {
-        return aiSkillApiFacade.getAiSkillFileContent(id, path);
+        return aiSkillFacade.getAiSkillFileContent(id, path);
     }
 
     @MutationMapping
@@ -79,48 +79,48 @@ class AiSkillGraphQlController {
                 illegalArgumentException);
         }
 
-        return aiSkillApiFacade.createAiSkill(name, description, filename, bytes);
+        return aiSkillFacade.createAiSkill(name, description, filename, bytes);
     }
 
     @MutationMapping
     AiSkill createAiSkillFromInstructions(
         @Argument String name, @Argument @Nullable String description, @Argument String instructions) {
 
-        return aiSkillApiFacade.createAiSkillFromInstructions(name, description, instructions);
+        return aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
     }
 
     @MutationMapping
     AiSkill updateAiSkill(
         @Argument long id, @Argument String name, @Argument @Nullable String description) {
 
-        return aiSkillApiFacade.updateAiSkill(id, name, description);
+        return aiSkillFacade.updateAiSkill(id, name, description);
     }
 
     @MutationMapping
     AiSkill updateAiSkillContent(@Argument long id, @Argument @Nullable String path, @Argument String content) {
-        return aiSkillApiFacade.updateAiSkillContent(id, path, content);
+        return aiSkillFacade.updateAiSkillContent(id, path, content);
     }
 
     @MutationMapping
     AiSkill createAdditionalFilesInSkill(@Argument long id, @Argument Map<String, String> additionalFiles) {
-        return aiSkillApiFacade.createAdditionalFilesInSkill(id, additionalFiles);
+        return aiSkillFacade.createAdditionalFilesInSkill(id, additionalFiles);
     }
 
     @MutationMapping
     AiSkill removeFileInSkill(@Argument long id, @Argument String path) {
-        return aiSkillApiFacade.removeFileInSkill(id, path);
+        return aiSkillFacade.removeFileInSkill(id, path);
     }
 
     @MutationMapping
     boolean deleteAiSkill(@Argument long id) {
-        aiSkillApiFacade.deleteAiSkill(id);
+        aiSkillFacade.deleteAiSkill(id);
 
         return true;
     }
 
     @QueryMapping
     List<Tag> aiSkillTags() {
-        return aiSkillApiFacade.getAiSkillTags();
+        return aiSkillFacade.getAiSkillTags();
     }
 
     @MutationMapping
@@ -139,14 +139,14 @@ class AiSkillGraphQlController {
             })
             .toList();
 
-        return aiSkillApiFacade.updateAiSkillTags(id, resolvedTags);
+        return aiSkillFacade.updateAiSkillTags(id, resolvedTags);
     }
 
     @SchemaMapping(field = "tags", typeName = "AiSkill")
     List<Tag> tags(AiSkill aiSkill) {
         // The parent skill was already authorized by whichever query produced it; resolving its tag ids
         // needs no additional per-skill check.
-        return aiSkillApiFacade.getTags(aiSkill.getTagIds());
+        return aiSkillFacade.getTags(aiSkill.getTagIds());
     }
 
     record TagInput(@Nullable Long id, String name) {
