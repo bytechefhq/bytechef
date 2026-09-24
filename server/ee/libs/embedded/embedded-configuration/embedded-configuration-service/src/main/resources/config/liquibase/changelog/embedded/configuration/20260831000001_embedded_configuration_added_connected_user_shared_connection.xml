@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260831000001" author="Ivica Cardic">
+        <createTable tableName="connected_user_shared_connection">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="connection_id" type="bigint">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_connected_user_shared_connection_connection_id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20260831000001-1" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseColumnNames="connection_id"
+            baseTableName="connected_user_shared_connection"
+            constraintName="fk_connected_user_shared_connection_connection"
+            onDelete="CASCADE"
+            referencedColumnNames="id"
+            referencedTableName="connection"/>
+    </changeSet>
+</databaseChangeLog>
