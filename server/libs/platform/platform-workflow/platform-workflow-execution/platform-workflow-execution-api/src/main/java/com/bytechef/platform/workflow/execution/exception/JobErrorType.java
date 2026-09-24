@@ -25,6 +25,7 @@ import com.bytechef.exception.AbstractErrorType;
 public class JobErrorType extends AbstractErrorType {
 
     public static final JobErrorType JOB_FAILED = new JobErrorType(100);
+    public static final JobErrorType JOB_NOT_COMPLETED = new JobErrorType(101);
 
     private JobErrorType(int errorKey) {
         super(Job.class, errorKey);
