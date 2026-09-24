@@ -24,6 +24,8 @@ Your backend then signs short-lived JWTs (algorithm `RS256`, set the JWT header 
 | Last Used Date | When a JWT signed with this key was last verified - handy for spotting unused or rotated keys. |
 | Rotation | Create a new Signing Key, deploy the new private key in your backend, then delete the old key. |
 
+Only tenant admins can manage Signing Keys, and any tenant admin can open, edit or delete every key in the environment.
+
 ### Table Columns
 
 | Column | Description |

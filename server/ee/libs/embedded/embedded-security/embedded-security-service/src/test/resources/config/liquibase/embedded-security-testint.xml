@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Only the signing_key schema: the automation-configuration changelogs on the test classpath depend on tables
+         from modules this test does not load. -->
+    <includeAll path="classpath:config/liquibase/changelog/embedded/security/" relativeToChangelogFile="false" errorIfMissingOrEmpty="true" />
+</databaseChangeLog>
