@@ -24,9 +24,11 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
 
@@ -62,7 +64,7 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
         try {
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
-            return actionDefinitionFacade.executePerform(
+            Supplier<Object> performSupplier = () -> actionDefinitionFacade.executePerform(
                 componentName, componentVersion, actionName,
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_ID),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID),
@@ -74,6 +76,12 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
                 MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class),
                 MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
                 continueParameters, resumeData, suspendExpiresAt);
+
+            if (SecurityUtils.isAuthenticated()) {
+                return performSupplier.get();
+            }
+
+            return SecurityUtils.runAsSystem(performSupplier);
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
