@@ -26,6 +26,7 @@ import com.bytechef.exception.AbstractException;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import java.time.Instant;
@@ -38,8 +39,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -48,7 +49,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
@@ -58,13 +58,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  */
 @ContextConfiguration(classes = EmbeddedConfigurationPublicRestTestConfiguration.class)
 @Import({
-    ConnectionApiControllerFrontendIntTest.TestNoSuchElementExceptionAdvice.class,
-    ConnectionApiControllerFrontendIntTest.TestAbstractExceptionAdvice.class
+    ConnectionApiControllerIntTest.TestNoSuchElementExceptionAdvice.class,
+    ConnectionApiControllerIntTest.TestAbstractExceptionAdvice.class
 })
 @TestPropertySource(properties = "bytechef.edition=ee")
 @WebMvcTest(ConnectionApiController.class)
 @EmbeddedConfigurationPublicRestSharedMocks
-class ConnectionApiControllerFrontendIntTest {
+class ConnectionApiControllerIntTest {
 
     private static final String EXTERNAL_USER_ID = "ext-user-1";
     private static final long CONNECTED_USER_ID = 7L;
@@ -136,6 +136,38 @@ class ConnectionApiControllerFrontendIntTest {
             .isEqualTo("API_KEY")
             .jsonPath("$[0].createdDate")
             .isNotEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testGetAllFrontendConnectionsReturnsCredentialStatus() {
+        ConnectionDTO rejectedConnection = ConnectionDTO.builder()
+            .id(1L)
+            .componentName("slack")
+            .name("Slack")
+            .credentialStatus(CredentialStatus.INVALID)
+            .build();
+        ConnectionDTO validConnection = ConnectionDTO.builder()
+            .id(2L)
+            .componentName("hubspot")
+            .name("Hubspot")
+            .credentialStatus(CredentialStatus.VALID)
+            .build();
+
+        when(connectedUserConnectionFacade.getConnections(CONNECTED_USER_ID, null, List.of()))
+            .thenReturn(List.of(rejectedConnection, validConnection));
+
+        webTestClient
+            .get()
+            .uri("/v1/connections")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].credentialStatus")
+            .isEqualTo("INVALID")
+            .jsonPath("$[1].credentialStatus")
+            .isEqualTo("VALID");
     }
 
     @Test
@@ -215,14 +247,6 @@ class ConnectionApiControllerFrontendIntTest {
             .isEqualTo(404);
     }
 
-    /**
-     * Regression for a controller-local {@code @ExceptionHandler(ConfigurationException.class)} that used to intercept
-     * EVERY {@link ConfigurationException} thrown from this controller (a local handler outranks
-     * {@code @ControllerAdvice}), rethrowing anything that was not {@code CONNECTION_IS_USED} — which
-     * {@code ExceptionHandlerExceptionResolver} does not re-dispatch to the next resolver, so the rethrow degraded to a
-     * bare 500 instead of the platform-wide 400 {@code ProblemDetail}. A non-{@code CONNECTION_IS_USED}
-     * {@link ConfigurationException} must keep its 400, unmodified by anything in this controller.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testDeleteFrontendConnectionOtherConfigurationExceptionReturns400() {
@@ -255,35 +279,23 @@ class ConnectionApiControllerFrontendIntTest {
             .reauthorizeConnectedUserConnection(CONNECTED_USER_ID, 5L, Map.of("apiKey", "x"));
     }
 
-    /**
-     * This module depends on {@code rest-api} only, not {@code rest-impl}, so the production
-     * {@code GlobalResponseEntityExceptionHandler} that maps {@link NoSuchElementException} to 404 in the real running
-     * app is not reachable from this WebMvcTest slice. This test-only stand-in mirrors just that one mapping so
-     * {@link #testDeleteFrontendConnectionForeignReturns404} exercises the same HTTP contract the production advice
-     * provides, without pulling the whole rest-impl module into this module's dependencies.
-     */
     @RestControllerAdvice
     static class TestNoSuchElementExceptionAdvice {
 
         @ExceptionHandler(NoSuchElementException.class)
-        @ResponseStatus(HttpStatus.NOT_FOUND)
-        public void handleNoSuchElementException() {
+        public ResponseEntity<Void> handleNoSuchElementException() {
+            return ResponseEntity.notFound()
+                .build();
         }
     }
 
-    /**
-     * Mirrors {@code GlobalResponseEntityExceptionHandler#handleAbstractException}'s {@link AbstractException} to 400
-     * mapping (same reachability gap as {@link TestNoSuchElementExceptionAdvice} — this module doesn't depend on
-     * {@code rest-impl}), so {@link #testDeleteFrontendConnectionOtherConfigurationExceptionReturns400} can prove a
-     * non-{@code CONNECTION_IS_USED} {@link ConfigurationException} keeps its 400 instead of being caught (and
-     * potentially mis-mapped) by anything declared on {@link ConnectionApiController} itself.
-     */
     @RestControllerAdvice
     static class TestAbstractExceptionAdvice {
 
         @ExceptionHandler(AbstractException.class)
-        @ResponseStatus(HttpStatus.BAD_REQUEST)
-        public void handleAbstractException() {
+        public ResponseEntity<Void> handleAbstractException() {
+            return ResponseEntity.badRequest()
+                .build();
         }
     }
 }

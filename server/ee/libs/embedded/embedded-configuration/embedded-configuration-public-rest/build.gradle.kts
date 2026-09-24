@@ -21,8 +21,14 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
 
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 
+val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    generatorName.set("typescript-fetch")
+    inputSpec.set("$projectDir/openapi.yaml")
+    outputDir.set("$rootDir/client/src/ee/shared/middleware/embedded/public")
+}
+
 tasks.register("generateOpenAPI") {
-    dependsOn(generateOpenAPISpring)
+    dependsOn(generateOpenAPISpring, generateOpenAPITypeScriptFetch)
 }
 
 dependencies {
@@ -61,10 +67,20 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
 
+    testImplementation(libs.jjwt.api)
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-api"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     testImplementation(project(":spring-ai:spring-ag-ui:utils:json"))
+
+    testImplementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-security-web:embedded-security-web-impl"))
+
+    testRuntimeOnly(libs.jjwt.impl)
+    testRuntimeOnly(libs.jjwt.jackson)
 }

@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFaca
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
@@ -40,7 +41,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ClusterElementDefinitionService.class, ComponentDefinitionService.class, ConnectedUserConnectionFacade.class,
+    ClusterElementDefinitionService.class, ComponentDefinitionService.class,
+    ConnectedUserWorkflowReferenceFacade.class, ConnectedUserConnectionFacade.class,
     ConnectedUserIntegrationFacade.class,
     ConnectedUserIntegrationInstanceFacade.class, ConnectedUserProjectFacade.class, ConnectedUserService.class,
     IntegrationInstanceConfigurationWorkflowService.class, IntegrationInstanceWorkflowService.class,
