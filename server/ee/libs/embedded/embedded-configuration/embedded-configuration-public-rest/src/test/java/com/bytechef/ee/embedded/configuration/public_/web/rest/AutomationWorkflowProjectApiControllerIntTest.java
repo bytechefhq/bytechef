@@ -20,7 +20,6 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedCo
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @TestPropertySource(properties = "bytechef.edition=ee")
 @WebMvcTest(AutomationWorkflowProjectApiController.class)
 @EmbeddedConfigurationPublicRestSharedMocks
-public class AutomationWorkflowProjectApiControllerIntTest {
+class AutomationWorkflowProjectApiControllerIntTest {
 
     private static final String WORKFLOW_UUID = "workflow-uuid-001";
     private static final long PROJECT_ID = 42L;
@@ -72,7 +71,7 @@ public class AutomationWorkflowProjectApiControllerIntTest {
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    public void testGetFrontendProjectsReturnsPublishedProjectWithWorkflows() {
+    void testGetFrontendProjectsReturnsPublishedProjectWithWorkflows() {
         ConnectedUserWorkflowTemplateDTO.Component componentDTO =
             new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg");
 
@@ -87,63 +86,55 @@ public class AutomationWorkflowProjectApiControllerIntTest {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));
 
-        try {
-            webTestClient
-                .get()
-                .uri("/v1/automation/projects")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$[0].id")
-                .isEqualTo(PROJECT_ID)
-                .jsonPath("$[0].name")
-                .isEqualTo("Onboarding Project")
-                .jsonPath("$[0].description")
-                .isEqualTo("New user onboarding automations")
-                .jsonPath("$[0].workflowTemplates[0].id")
-                .isEqualTo(WORKFLOW_UUID)
-                .jsonPath("$[0].workflowTemplates[0].label")
-                .isEqualTo("Welcome Email Workflow")
-                .jsonPath("$[0].workflowTemplates[0].components[0].name")
-                .isEqualTo("gmail")
-                .jsonPath("$[0].workflowTemplates[0].components[0].title")
-                .isEqualTo("Gmail")
-                .jsonPath("$[0].workflowTemplates[0].components[0].icon")
-                .isEqualTo("gmail-icon-svg");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].id")
+            .isEqualTo(PROJECT_ID)
+            .jsonPath("$[0].name")
+            .isEqualTo("Onboarding Project")
+            .jsonPath("$[0].description")
+            .isEqualTo("New user onboarding automations")
+            .jsonPath("$[0].workflowTemplates[0].id")
+            .isEqualTo(WORKFLOW_UUID)
+            .jsonPath("$[0].workflowTemplates[0].label")
+            .isEqualTo("Welcome Email Workflow")
+            .jsonPath("$[0].workflowTemplates[0].components[0].name")
+            .isEqualTo("gmail")
+            .jsonPath("$[0].workflowTemplates[0].components[0].title")
+            .isEqualTo("Gmail")
+            .jsonPath("$[0].workflowTemplates[0].components[0].icon")
+            .isEqualTo("gmail-icon-svg");
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    public void testGetFrontendProjectsReturnsEmptyList() {
+    void testGetFrontendProjectsReturnsEmptyList() {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of());
 
-        try {
-            webTestClient
-                .get()
-                .uri("/v1/automation/projects")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$")
-                .isArray()
-                .jsonPath("$.length()")
-                .isEqualTo(0);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$")
+            .isArray()
+            .jsonPath("$.length()")
+            .isEqualTo(0);
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    public void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
+    void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationWorkflowProjectDTO unpublishedProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
             List.of(), null, true);
@@ -151,31 +142,27 @@ public class AutomationWorkflowProjectApiControllerIntTest {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(unpublishedProjectDTO));
 
-        try {
-            webTestClient
-                .get()
-                .uri("/v1/automation/projects")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$[0].id")
-                .isEqualTo(PROJECT_ID + 1)
-                .jsonPath("$[0].name")
-                .isEqualTo("Draft Project")
-                .jsonPath("$[0].workflowTemplates")
-                .isArray()
-                .jsonPath("$[0].workflowTemplates.length()")
-                .isEqualTo(0);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].id")
+            .isEqualTo(PROJECT_ID + 1)
+            .jsonPath("$[0].name")
+            .isEqualTo("Draft Project")
+            .jsonPath("$[0].workflowTemplates")
+            .isArray()
+            .jsonPath("$[0].workflowTemplates.length()")
+            .isEqualTo(0);
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    public void testFrontendProjectsOmitHiddenProjectsAndUseThePermissionFilter() {
+    void testFrontendProjectsKeepHiddenProjectsAndUseThePermissionFilter() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
             true);
@@ -187,31 +174,31 @@ public class AutomationWorkflowProjectApiControllerIntTest {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(visibleProjectDTO, hiddenProjectDTO));
 
-        try {
-            webTestClient
-                .get()
-                .uri("/v1/automation/projects")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.length()")
-                .isEqualTo(1)
-                .jsonPath("$[0].id")
-                .isEqualTo(PROJECT_ID)
-                .jsonPath("$[0].name")
-                .isEqualTo("Visible Project");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/v1/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(2)
+            .jsonPath("$[0].id")
+            .isEqualTo(PROJECT_ID)
+            .jsonPath("$[0].automationHubVisible")
+            .isEqualTo(true)
+            .jsonPath("$[1].id")
+            .isEqualTo(PROJECT_ID + 1)
+            .jsonPath("$[1].automationHubVisible")
+            .isEqualTo(false);
 
         verify(automationWorkflowProjectFacade, never()).getPublishedProjects();
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
-    public void testApiKeyProjectsKeepHiddenProjects() {
+    void testApiKeyProjectsKeepHiddenProjects() {
         AutomationWorkflowProjectDTO visibleProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Visible Project", "Shown in the hub", null, List.of(), true, 1, 1, List.of(), null,
             true);
@@ -223,23 +210,19 @@ public class AutomationWorkflowProjectApiControllerIntTest {
         when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(visibleProjectDTO, hiddenProjectDTO));
 
-        try {
-            webTestClient
-                .get()
-                .uri("/v1/" + EXTERNAL_USER_ID + "/automation/projects")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.length()")
-                .isEqualTo(2)
-                .jsonPath("$[0].id")
-                .isEqualTo(PROJECT_ID)
-                .jsonPath("$[1].id")
-                .isEqualTo(PROJECT_ID + 1);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/v1/" + EXTERNAL_USER_ID + "/automation/projects")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$.length()")
+            .isEqualTo(2)
+            .jsonPath("$[0].id")
+            .isEqualTo(PROJECT_ID)
+            .jsonPath("$[1].id")
+            .isEqualTo(PROJECT_ID + 1);
     }
 }

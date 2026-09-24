@@ -10,16 +10,21 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
@@ -28,24 +33,39 @@ import com.bytechef.ee.embedded.configuration.exception.ConnectionNotEntitledExc
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserCodeWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.security.service.JwtTokenService;
+import com.bytechef.ee.embedded.security.service.SigningKeyService;
+import com.bytechef.ee.embedded.security.web.configurer.EmbeddedApiKeySecurityConfigurer;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.service.ApiKeyService;
+import io.jsonwebtoken.Jwts;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -70,10 +90,10 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     private static final String WORKFLOW_UUID = "automation-workflow-uuid-1";
 
     @Autowired
-    private ConnectedUserCodeWorkflowReferenceFacade connectedUserCodeWorkflowReferenceFacade;
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @Autowired
-    private ConnectedUserProjectFacade connectedUserProjectFacade;
+    private ConnectedUserWorkflowReferenceFacade connectedUserWorkflowReferenceFacade;
 
     @MockitoBean
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
@@ -156,11 +176,6 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .isNotFound();
     }
 
-    /**
-     * A template the connected user's permission expression hides reaches the controller as the same
-     * {@link IllegalArgumentException} an unknown uuid does, and must leave the HTTP layer as the same bodyless 404 --
-     * otherwise the response itself would tell the caller which templates exist.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testCopyFrontendWorkflowTemplateHiddenTemplateIsIndistinguishableFromUnknownUuid() {
@@ -182,149 +197,158 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendProvisionUsesThePrincipalAsExternalUserId() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of())))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
                 .thenReturn(new ConnectedUserProjectWorkflow());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        verify(connectedUserCodeWorkflowReferenceFacade)
-            .getOrCreateReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()));
+        verify(connectedUserWorkflowReferenceFacade)
+            .getOrCreateReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()),
+                isNull());
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendProvisionForwardsRequestedConnectionsFromTheBody() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L))))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)), isNull()))
                 .thenReturn(new ConnectedUserProjectWorkflow());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
-                .bodyValue(Map.of("connections", Map.of("slack", 12)))
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .bodyValue(Map.of("connections", Map.of("slack", 12)))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        verify(connectedUserCodeWorkflowReferenceFacade).getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)));
+        verify(connectedUserWorkflowReferenceFacade).getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)), isNull());
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testFrontendProvisionForwardsInputsFromTheBody() {
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)),
+            eq(Map.of("channel", "#alerts", "limit", 5))))
+                .thenReturn(new ConnectedUserProjectWorkflow());
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .bodyValue(
+                Map.of("connections", Map.of("slack", 12), "inputs", Map.of("channel", "#alerts", "limit", 5)))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectedUserWorkflowReferenceFacade).getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)),
+            eq(Map.of("channel", "#alerts", "limit", 5)));
+    }
+
+    @Test
+    @WithMockUser(username = EXTERNAL_USER_ID)
+    void testFrontendProvisionTreatsEmptyInputsAsNotGiven() {
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
+                .thenReturn(new ConnectedUserProjectWorkflow());
+
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .bodyValue(Map.of("inputs", Map.of()))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+
+        verify(connectedUserWorkflowReferenceFacade).getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull());
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendProvisionMissingConnectionReturns409() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(any(), any(), any(), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(any(), any(), any(), any(), any()))
             .thenThrow(new MissingConnectionException("slack"));
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.missingConnectionComponentName")
-                .isEqualTo("slack");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.missingConnectionComponentName")
+            .isEqualTo("slack");
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendProvisionConnectionNotEntitledReturns400() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(any(), any(), any(), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(any(), any(), any(), any(), any()))
             .thenThrow(new ConnectionNotEntitledException("slack", 12L));
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
-                .bodyValue(Map.of("connections", Map.of("slack", 12)))
-                .exchange()
-                .expectStatus()
-                .isBadRequest();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .bodyValue(Map.of("connections", Map.of("slack", 12)))
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
     }
 
-    /**
-     * A template the connected user's permission expression hides and a uuid that does not exist at all both reach the
-     * controller as the same {@link AutomationWorkflowTemplateNotVisibleException} from the facade, and must leave the
-     * HTTP layer as the same bodyless 404 -- otherwise the response itself would tell the caller which templates exist.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendProvisionHiddenTemplateIsIndistinguishableFromUnknownUuid() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
                     new AutomationWorkflowTemplateNotVisibleException(HIDDEN_WORKFLOW_UUID));
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
                     new AutomationWorkflowTemplateNotVisibleException(UNKNOWN_WORKFLOW_UUID));
 
-        try {
-            expectFrontendProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
-            expectFrontendProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        expectFrontendProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
+        expectFrontendProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendDeprovisionDeletesTheReference() {
-        try {
-            webTestClient
-                .delete()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .delete()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        verify(connectedUserCodeWorkflowReferenceFacade)
+        verify(connectedUserWorkflowReferenceFacade)
             .deleteReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class));
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testFrontendProvisionConnectionWithoutIdReturns400() {
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\"connections\":{\"slack\":null}}")
-                .exchange()
-                .expectStatus()
-                .isBadRequest();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflow-templates/{workflowUuid}/provision", WORKFLOW_UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("{\"connections\":{\"slack\":null}}")
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        verify(connectedUserCodeWorkflowReferenceFacade, never())
-            .getOrCreateReference(any(), any(), any(), any());
+        verify(connectedUserWorkflowReferenceFacade, never())
+            .getOrCreateReference(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -332,85 +356,63 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
     void testExplicitProvisionCreatesAReference() {
         ConnectedUserProjectWorkflow reference = new ConnectedUserProjectWorkflow();
 
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of())))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
                 .thenReturn(reference);
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
+                WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        verify(connectedUserCodeWorkflowReferenceFacade)
-            .getOrCreateReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()));
+        verify(connectedUserWorkflowReferenceFacade)
+            .getOrCreateReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()),
+                isNull());
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testExplicitProvisionMissingConnectionReturns409() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of())))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
                 .thenThrow(new MissingConnectionException("slack"));
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.missingConnectionComponentName")
-                .isEqualTo("slack");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
+                WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.missingConnectionComponentName")
+            .isEqualTo("slack");
     }
 
-    /**
-     * The {@code {externalUserId}} admin-facing route reaches the same facade, so it must reject the same way: a
-     * template hidden by the connected user's permission expression and a uuid that does not exist both leave the HTTP
-     * layer as the same bodyless 404.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testExplicitProvisionHiddenTemplateIsIndistinguishableFromUnknownUuid() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(HIDDEN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
                     new AutomationWorkflowTemplateNotVisibleException(HIDDEN_WORKFLOW_UUID));
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(UNKNOWN_WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
                     new AutomationWorkflowTemplateNotVisibleException(UNKNOWN_WORKFLOW_UUID));
 
-        try {
-            expectProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
-            expectProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        expectProvisionNotFoundWithoutBody(HIDDEN_WORKFLOW_UUID);
+        expectProvisionNotFoundWithoutBody(UNKNOWN_WORKFLOW_UUID);
     }
 
-    /**
-     * Only the automation workflow visibility rejection is a 404. Provisioning also catches the deployment up and
-     * validates it, and an {@link IllegalArgumentException} from there is a server-side failure that must not be
-     * reported as a missing template. In this {@code @WebMvcTest} slice an unhandled exception surfaces wrapped in a
-     * {@code ServletException}.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testExplicitProvisionFailureOtherThanVisibilityIsNotReportedAsNotFound() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), any()))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), any(), any()))
                 .thenThrow(
                     new IllegalArgumentException(
                         "Automation workflow " + WORKFLOW_UUID + " is not in version 2 of project id=5"));
@@ -424,79 +426,21 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         assertThat(thrown).hasCauseInstanceOf(IllegalArgumentException.class);
     }
 
-    /**
-     * In the {@code @WebMvcTest} slice, {@link AccessDeniedException} is wrapped in a {@code ServletException} rather
-     * than translated to 403 (no full Spring Security {@code ExceptionTranslationFilter}). The important invariant is
-     * that the reference facade is NEVER invoked when the cross-user ownership check fails --
-     * {@code SecurityUtils.checkCurrentUserLogin} runs before any provisioning work.
-     */
-    @Test
-    @WithMockUser(username = "someone-else@example.com")
-    void testExplicitProvisionCrossUserIsForbidden() {
-        boolean exceptionThrown = false;
-
-        try {
-            mockMvc.perform(
-                post(
-                    "/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID));
-        } catch (Exception exception) {
-            assertThat(exception.getCause()).isInstanceOf(AccessDeniedException.class);
-            exceptionThrown = true;
-        }
-
-        assertThat(exceptionThrown).isTrue();
-
-        verify(connectedUserCodeWorkflowReferenceFacade, never())
-            .getOrCreateReference(any(), any(), any(), any());
-    }
-
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testDeprovisionDeletesTheReference() {
-        try {
-            webTestClient
-                .delete()
-                .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .delete()
+            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
+                WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        verify(connectedUserCodeWorkflowReferenceFacade)
+        verify(connectedUserWorkflowReferenceFacade)
             .deleteReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class));
     }
 
-    @Test
-    @WithMockUser(username = "someone-else@example.com")
-    void testDeprovisionCrossUserIsForbidden() {
-        boolean exceptionThrown = false;
-
-        try {
-            mockMvc.perform(
-                delete(
-                    "/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID));
-        } catch (Exception exception) {
-            assertThat(exception.getCause()).isInstanceOf(AccessDeniedException.class);
-            exceptionThrown = true;
-        }
-
-        assertThat(exceptionThrown).isTrue();
-
-        verify(connectedUserCodeWorkflowReferenceFacade, never())
-            .deleteReference(any(), any(), any());
-    }
-
-    /**
-     * The public enable/disable endpoints route to {@link ConnectedUserProjectFacade}'s String-uuid overload of
-     * {@code enableProjectWorkflow}, which (after this fix) can resolve {@code workflowUuid} to one of the caller's
-     * automation-bridge reference rows and surface the same {@link MissingConnectionException} the explicit provision
-     * endpoint above does. This test pins that the enable endpoint maps it to the same 409 shape.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testEnableReferenceMissingConnectionReturns409() {
@@ -504,19 +448,15 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .when(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.missingConnectionComponentName")
-                .isEqualTo("slack");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.missingConnectionComponentName")
+            .isEqualTo("slack");
     }
 
     @Test
@@ -526,16 +466,12 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .when(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
         verify(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
@@ -548,16 +484,12 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .when(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(false), any());
 
-        try {
-            webTestClient
-                .delete()
-                .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .delete()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
         verify(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(false), any());
@@ -570,19 +502,15 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .when(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(false), any());
 
-        try {
-            webTestClient
-                .delete()
-                .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.missingConnectionComponentName")
-                .isEqualTo("slack");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .delete()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.missingConnectionComponentName")
+            .isEqualTo("slack");
     }
 
     @Test
@@ -592,19 +520,15 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .when(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.missingInputName")
-                .isEqualTo("channel");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/automation/workflows/{workflowUuid}/enable", WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.missingInputName")
+            .isEqualTo("channel");
     }
 
     @Test
@@ -625,64 +549,52 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         when(connectedUserProjectFacade.getConnectedUserProjectWorkflows(eq(EXTERNAL_USER_ID), any()))
             .thenReturn(List.of(connectedUserProjectWorkflowDTO));
 
-        try {
-            webTestClient
-                .get()
-                .uri("/v1/automation/workflows")
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$[0].attentionReason")
-                .isEqualTo("MISSING_CONNECTION:slack");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .get()
+            .uri("/v1/automation/workflows")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody()
+            .jsonPath("$[0].attentionReason")
+            .isEqualTo("MISSING_CONNECTION:slack");
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testExplicitProvisionForwardsRequestedConnectionsFromTheBody() {
-        when(connectedUserCodeWorkflowReferenceFacade.getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L))))
+        when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)), isNull()))
                 .thenReturn(new ConnectedUserProjectWorkflow());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID)
-                .bodyValue(Map.of("connections", Map.of("slack", 12)))
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
+                WORKFLOW_UUID)
+            .bodyValue(Map.of("connections", Map.of("slack", 12)))
+            .exchange()
+            .expectStatus()
+            .isNoContent();
 
-        verify(connectedUserCodeWorkflowReferenceFacade).getOrCreateReference(
-            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)));
+        verify(connectedUserWorkflowReferenceFacade).getOrCreateReference(
+            eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of("slack", 12L)), isNull());
     }
 
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testExplicitProvisionConnectionWithoutIdReturns400() {
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
-                    WORKFLOW_UUID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("{\"connections\":{\"slack\":null}}")
-                .exchange()
-                .expectStatus()
-                .isBadRequest();
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision", EXTERNAL_USER_ID,
+                WORKFLOW_UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("{\"connections\":{\"slack\":null}}")
+            .exchange()
+            .expectStatus()
+            .isBadRequest();
 
-        verify(connectedUserCodeWorkflowReferenceFacade, never())
-            .getOrCreateReference(any(), any(), any(), any());
+        verify(connectedUserWorkflowReferenceFacade, never())
+            .getOrCreateReference(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -692,19 +604,15 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .when(connectedUserProjectFacade)
             .enableProjectWorkflow(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), eq(true), any());
 
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable", EXTERNAL_USER_ID, WORKFLOW_UUID)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.missingInputName")
-                .isEqualTo("channel");
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
+        webTestClient
+            .post()
+            .uri("/v1/{externalUserId}/automation/workflows/{workflowUuid}/enable", EXTERNAL_USER_ID, WORKFLOW_UUID)
+            .exchange()
+            .expectStatus()
+            .isEqualTo(409)
+            .expectBody()
+            .jsonPath("$.missingInputName")
+            .isEqualTo("channel");
     }
 
     @Test
@@ -722,8 +630,6 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         @SuppressWarnings("unchecked")
         ArgumentCaptor<Map<String, ?>> captor = ArgumentCaptor.forClass(Map.class);
 
-        // The externalUserId comes from the authenticated principal, never from the request: the frontend route has no
-        // place to name a user, which is what keeps one connected user out of another's workflows.
         verify(connectedUserProjectFacade).updateProjectWorkflowInputs(
             eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), captor.capture(), any());
 
@@ -733,10 +639,6 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
         assertThat((Object) inputs.get("sheetName")).isEqualTo("Leads");
     }
 
-    /**
-     * Pins the controller ruling: on an ENABLED reference, {@code updateProjectWorkflowInputs} refuses inputs that
-     * still miss a required value with {@link MissingInputException}, mapped here to 409.
-     */
     @Test
     @WithMockUser(username = EXTERNAL_USER_ID)
     void testUpdateFrontendProjectWorkflowInputsMissingInputReturns409() {
@@ -810,5 +712,147 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
             .isNotFound()
             .expectBody()
             .isEmpty();
+    }
+
+    @Nested
+    @ContextConfiguration(classes = CrossUser.EmbeddedSecurityTestConfiguration.class)
+    @TestPropertySource(properties = "openapi.openAPIDefinition.base-path.embedded=/api/embedded")
+    class CrossUser {
+
+        private static final String OTHER_EXTERNAL_USER_ID = "someone-else@example.com";
+        private static final String PROVISION_PATH =
+            "/api/embedded/v1/{externalUserId}/automation/workflow-templates/{workflowUuid}/provision";
+        private static final String TENANT_ID = "test_tenant";
+
+        @MockitoBean
+        private ApiKeyService apiKeyService;
+
+        @Autowired
+        private ConnectedUserService connectedUserService;
+
+        @MockitoBean
+        private JwtTokenService jwtTokenService;
+
+        @MockitoBean
+        private SigningKeyService signingKeyService;
+
+        private KeyPair keyPair;
+
+        @BeforeEach
+        void beforeEach() throws NoSuchAlgorithmException {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+            keyPairGenerator.initialize(2048);
+
+            keyPair = keyPairGenerator.generateKeyPair();
+
+            when(signingKeyService.getPublicKey(anyString(), anyLong())).thenReturn(keyPair.getPublic());
+
+            stubEnabledConnectedUser(EXTERNAL_USER_ID);
+            stubEnabledConnectedUser(OTHER_EXTERNAL_USER_ID);
+        }
+
+        @Test
+        void testExplicitProvisionCrossUserIsForbidden() {
+            webTestClient
+                .post()
+                .uri(PROVISION_PATH, EXTERNAL_USER_ID, WORKFLOW_UUID)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + createJwt(OTHER_EXTERNAL_USER_ID))
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+
+            verify(connectedUserWorkflowReferenceFacade, never())
+                .getOrCreateReference(any(), any(), any(), any(), any());
+        }
+
+        @Test
+        void testDeprovisionCrossUserIsForbidden() {
+            webTestClient
+                .delete()
+                .uri(PROVISION_PATH, EXTERNAL_USER_ID, WORKFLOW_UUID)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + createJwt(OTHER_EXTERNAL_USER_ID))
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+
+            verify(connectedUserWorkflowReferenceFacade, never())
+                .deleteReference(any(), any(), any());
+        }
+
+        @Test
+        void testExplicitProvisionOwnUserReachesTheFacade() {
+            when(connectedUserWorkflowReferenceFacade.getOrCreateReference(
+                eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()), isNull()))
+                    .thenReturn(new ConnectedUserProjectWorkflow());
+
+            webTestClient
+                .post()
+                .uri(PROVISION_PATH, EXTERNAL_USER_ID, WORKFLOW_UUID)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + createJwt(EXTERNAL_USER_ID))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+            verify(connectedUserWorkflowReferenceFacade)
+                .getOrCreateReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class), eq(Map.of()),
+                    isNull());
+        }
+
+        @Test
+        void testDeprovisionOwnUserReachesTheFacade() {
+            webTestClient
+                .delete()
+                .uri(PROVISION_PATH, EXTERNAL_USER_ID, WORKFLOW_UUID)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + createJwt(EXTERNAL_USER_ID))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+            verify(connectedUserWorkflowReferenceFacade)
+                .deleteReference(eq(EXTERNAL_USER_ID), eq(WORKFLOW_UUID), any(Environment.class));
+        }
+
+        private String createJwt(String subject) {
+            String keyId = EncodingUtils.base64EncodeToString(TENANT_ID + ":keyId");
+
+            return Jwts.builder()
+                .header()
+                .keyId(keyId)
+                .and()
+                .subject(subject)
+                .signWith(keyPair.getPrivate())
+                .compact();
+        }
+
+        private void stubEnabledConnectedUser(String externalUserId) {
+            ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+            when(connectedUser.getExternalId()).thenReturn(externalUserId);
+            when(connectedUser.isEnabled()).thenReturn(true);
+            when(connectedUserService.fetchConnectedUser(externalUserId, Environment.PRODUCTION.ordinal()))
+                .thenReturn(Optional.of(connectedUser));
+        }
+
+        @EnableWebSecurity
+        static class EmbeddedSecurityTestConfiguration {
+
+            @Bean
+            SecurityFilterChain securityFilterChain(
+                HttpSecurity httpSecurity, ApiKeyService apiKeyService, ConnectedUserService connectedUserService,
+                JwtTokenService jwtTokenService, SigningKeyService signingKeyService) throws Exception {
+
+                httpSecurity
+                    .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest()
+                        .authenticated())
+                    .with(
+                        new EmbeddedApiKeySecurityConfigurer(
+                            apiKeyService, connectedUserService, jwtTokenService, signingKeyService),
+                        withDefaults());
+
+                return httpSecurity.build();
+            }
+        }
     }
 }
