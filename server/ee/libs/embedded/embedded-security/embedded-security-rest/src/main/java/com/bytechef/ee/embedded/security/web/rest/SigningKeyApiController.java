@@ -11,7 +11,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.ee.embedded.security.facade.SigningKeyFacade;
-import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.rest.model.CreateSigningKey200ResponseModel;
 import com.bytechef.ee.embedded.security.web.rest.model.SigningKeyModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -35,15 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class SigningKeyApiController implements SigningKeyApi {
 
     private final SigningKeyFacade signingKeyFacade;
-    private final SigningKeyService signingKeyService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public SigningKeyApiController(
-        SigningKeyFacade signingKeyFacade, SigningKeyService signingKeyService, ConversionService conversionService) {
-
+    public SigningKeyApiController(SigningKeyFacade signingKeyFacade, ConversionService conversionService) {
         this.signingKeyFacade = signingKeyFacade;
-        this.signingKeyService = signingKeyService;
         this.conversionService = conversionService;
     }
 
@@ -57,7 +52,7 @@ public class SigningKeyApiController implements SigningKeyApi {
 
     @Override
     public ResponseEntity<Void> deleteSigningKey(Long id) {
-        signingKeyService.delete(id);
+        signingKeyFacade.delete(id);
 
         return ResponseEntity.ok()
             .build();
@@ -65,19 +60,19 @@ public class SigningKeyApiController implements SigningKeyApi {
 
     @Override
     public ResponseEntity<SigningKeyModel> getSigningKey(Long id) {
-        return ResponseEntity.ok(getSigningKeyModel(signingKeyService.getSigningKey(id)));
+        return ResponseEntity.ok(getSigningKeyModel(signingKeyFacade.getSigningKey(id)));
     }
 
     @Override
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys(Long environmentId) {
         return ResponseEntity.ok(
-            CollectionUtils.map(signingKeyService.getSigningKeys(
+            CollectionUtils.map(signingKeyFacade.getSigningKeys(
                 PlatformType.EMBEDDED, environmentId), this::getSigningKeyModel));
     }
 
     @Override
     public ResponseEntity<Void> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
-        signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class));
+        signingKeyFacade.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class));
 
         return ResponseEntity.noContent()
             .build();
