@@ -19,14 +19,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Bypasses automation RBAC for embedded requests. The embedded workflow builder/editor reuses the platform
  * {@code /api/.../internal/...} workflow-editor endpoints, whose facade methods are gated by
  * {@code @PreAuthorize("hasPermission(#workflowId, 'Workflow', ...)")}. An embedded request authenticates as an
  * {@link EmbeddedApiKeyAuthenticationToken} — an API-key/connected-user identity with no row in the {@code user} table
  * — so resolving it for a platform scope check throws {@code UserNotFoundException} (HTTP 4xx/5xx) instead of running.
  * Embedded enforces its own connected-user authorization, so for the duration of an embedded request the synchronous
  * call stack runs with {@link AutomationAuthorizationContext} skip mode enabled, mirroring the
- * {@code @SkipAutomationAuthorization} delegation used by embedded facades.
  *
  * <p>
  * Registered immediately after the embedded {@code ApiKeyAuthenticationFilter} so the {@link Authentication} is already

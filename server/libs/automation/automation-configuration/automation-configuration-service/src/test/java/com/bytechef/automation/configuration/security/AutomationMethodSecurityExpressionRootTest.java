@@ -22,11 +22,14 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 class AutomationMethodSecurityExpressionRootTest {
 
@@ -41,6 +44,11 @@ class AutomationMethodSecurityExpressionRootTest {
         MethodInvocation methodInvocation = mock(MethodInvocation.class);
 
         root = new AutomationMethodSecurityExpressionRoot(authentication, methodInvocation, permissionService);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -95,5 +103,42 @@ class AutomationMethodSecurityExpressionRootTest {
         });
 
         verifyNoInteractions(permissionService);
+    }
+
+    @Test
+    void testConnectedUserIsDeniedUnderSkipChecks() throws Throwable {
+        SecurityContextHolder.getContext()
+            .setAuthentication(mock(ConnectedUserAuthentication.class));
+
+        AutomationAuthorizationContext.callSkippingChecks(() -> {
+            assertThat(root.isConnectedUser()).isTrue();
+            assertThat(root.isCurrentUser(7L)).isFalse();
+            assertThat(root.isTenantAdmin()).isFalse();
+            assertThat(root.isResourceOwner(9L, "ApiKey")).isFalse();
+
+            return null;
+        });
+
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
+    void testConnectedUserIsDeniedWithoutConsultingPermissionService() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(mock(ConnectedUserAuthentication.class));
+
+        assertThat(root.isCurrentUser(7L)).isFalse();
+        assertThat(root.isTenantAdmin()).isFalse();
+        assertThat(root.isResourceOwner(9L, "ApiKey")).isFalse();
+
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
+    void testIsConnectedUserIsFalseForOtherPrincipals() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(mock(Authentication.class));
+
+        assertThat(root.isConnectedUser()).isFalse();
     }
 }
