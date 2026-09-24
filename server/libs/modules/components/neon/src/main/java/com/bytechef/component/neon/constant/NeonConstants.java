@@ -39,7 +39,7 @@ public class NeonConstants {
     private NeonConstants() {
     }
 
-    public static ModifiableArrayProperty filtersProperty(boolean required) {
+    public static ModifiableArrayProperty criteriaFilterArrayProperty(boolean required) {
         return array(FILTERS)
             .label("Filters")
             .description(

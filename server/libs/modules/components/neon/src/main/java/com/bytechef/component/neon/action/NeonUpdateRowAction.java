@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.neon.constant.NeonConstants.ROW_DATA;
 import static com.bytechef.component.neon.constant.NeonConstants.TABLE;
-import static com.bytechef.component.neon.constant.NeonConstants.filtersProperty;
+import static com.bytechef.component.neon.constant.NeonConstants.criteriaFilterArrayProperty;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -40,7 +40,7 @@ public class NeonUpdateRowAction {
                 .label("Table")
                 .description("Name of the table containing the row(s) to update.")
                 .required(true),
-            filtersProperty(true),
+            criteriaFilterArrayProperty(true),
             object(ROW_DATA)
                 .label("Row Data")
                 .description("Column name/value pairs to update.")

@@ -19,7 +19,7 @@ package com.bytechef.component.neon.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.neon.constant.NeonConstants.TABLE;
-import static com.bytechef.component.neon.constant.NeonConstants.filtersProperty;
+import static com.bytechef.component.neon.constant.NeonConstants.criteriaFilterArrayProperty;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -38,7 +38,7 @@ public class NeonDeleteRowAction {
                 .label("Table")
                 .description("Name of the table containing the row(s) to delete.")
                 .required(true),
-            filtersProperty(true))
+            criteriaFilterArrayProperty(true))
         .output()
         .perform(NeonDeleteRowAction::perform);
 

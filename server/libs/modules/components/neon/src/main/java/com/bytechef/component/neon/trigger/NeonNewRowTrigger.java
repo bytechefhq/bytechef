@@ -29,7 +29,7 @@ import static com.bytechef.component.neon.constant.NeonConstants.ORDER_BY_COLUMN
 import static com.bytechef.component.neon.constant.NeonConstants.ORDER_DIRECTION;
 import static com.bytechef.component.neon.constant.NeonConstants.SELECT;
 import static com.bytechef.component.neon.constant.NeonConstants.TABLE;
-import static com.bytechef.component.neon.constant.NeonConstants.filtersProperty;
+import static com.bytechef.component.neon.constant.NeonConstants.criteriaFilterArrayProperty;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -71,7 +71,7 @@ public class NeonNewRowTrigger {
                 .description("Comma-separated list of columns to return.")
                 .exampleValue("id,name,email")
                 .required(false),
-            filtersProperty(false))
+            criteriaFilterArrayProperty(false))
         .output(
             outputSchema(
                 array()
