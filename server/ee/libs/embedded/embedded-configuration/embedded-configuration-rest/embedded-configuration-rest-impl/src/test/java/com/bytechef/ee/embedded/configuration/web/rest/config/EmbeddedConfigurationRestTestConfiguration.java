@@ -18,20 +18,24 @@ package com.bytechef.ee.embedded.configuration.web.rest.config;
 
 import com.bytechef.jackson.config.JacksonConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 
 /**
  * @author Ivica Cardic
  */
-@ComponentScan(basePackages = {
-    "com.bytechef.ee.embedded.configuration.web.rest",
-    "com.bytechef.ee.embedded.configuration.web.rest.adapter",
-    "com.bytechef.ee.embedded.configuration.web.rest.mapper",
-    "com.bytechef.platform.configuration.web.rest.adapter",
-    "com.bytechef.platform.configuration.web.rest.mapper",
-    "com.bytechef.web.rest.mapper"
-})
+@ComponentScan(
+    basePackages = {
+        "com.bytechef.ee.embedded.configuration.web.rest",
+        "com.bytechef.ee.embedded.configuration.web.rest.adapter",
+        "com.bytechef.ee.embedded.configuration.web.rest.mapper",
+        "com.bytechef.platform.configuration.web.rest.adapter",
+        "com.bytechef.platform.configuration.web.rest.mapper",
+        "com.bytechef.web.rest.mapper"
+    },
+    excludeFilters = @Filter(type = FilterType.REGEX, pattern = ".*Test\\$.*"))
 @Configuration
 @Import(JacksonConfiguration.class)
 public class EmbeddedConfigurationRestTestConfiguration {
