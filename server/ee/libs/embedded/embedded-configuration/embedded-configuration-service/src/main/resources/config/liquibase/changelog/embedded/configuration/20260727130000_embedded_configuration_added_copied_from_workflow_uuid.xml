@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260727130000-1" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="connected_user_project_workflow" columnName="copied_from_workflow_uuid"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="connected_user_project_workflow">
+            <column name="copied_from_workflow_uuid" type="VARCHAR(36)"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="connected_user_project_workflow" columnName="copied_from_workflow_uuid"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260727130000-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="connected_user_project_workflow"
+                             indexName="uk_cupw_connected_user_project_id_copied_from_workflow_uuid"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="connected_user_project_workflow"
+                     indexName="uk_cupw_connected_user_project_id_copied_from_workflow_uuid" unique="true">
+            <column name="connected_user_project_id"/>
+            <column name="copied_from_workflow_uuid"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
