@@ -7,9 +7,13 @@
 
 package com.bytechef.ee.embedded.ai.mcp.server.facade;
 
+import static com.bytechef.task.dispatcher.approval.constant.WaitForApprovalTaskDispatcherConstants.WAIT_FOR_APPROVAL;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -48,6 +52,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
@@ -56,14 +61,21 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -73,7 +85,6 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
  * Tool facade for the embedded MCP server. Handles both component-level tools (direct action execution) and integration
- * workflow tools (workflow-based execution via JobSyncExecutor). Connection resolution is per-connected-user via
  * {@link IntegrationInstanceService}.
  *
  * @version ee
@@ -81,8 +92,11 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  * @author Ivica Cardic
  */
 public class EmbeddedMcpToolFacade extends AbstractToolFacade {
-
     private static final Logger log = LoggerFactory.getLogger(EmbeddedMcpToolFacade.class);
+
+    private static final String APPROVAL = "approval";
+    private static final Set<String> APPROVAL_COMPONENT_NAMES = Set.of(APPROVAL, WAIT_FOR_APPROVAL);
+    private static final Set<String> SUSPENDING_COMPONENT_NAMES = Set.of(APPROVAL, "wait", WAIT_FOR_APPROVAL);
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -93,6 +107,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
+    private final JobCompletionAwaiter jobCompletionAwaiter;
     private final JobSyncExecutor jobSyncExecutor;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
@@ -114,12 +129,13 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobSyncExecutor jobSyncExecutor, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+        JobCompletionAwaiter jobCompletionAwaiter, JobSyncExecutor jobSyncExecutor, JwtTokenService jwtTokenService,
+        McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
-        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
-
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
         super(evaluator);
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
@@ -131,6 +147,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
+        this.jobCompletionAwaiter = jobCompletionAwaiter;
         this.jobSyncExecutor = jobSyncExecutor;
         this.mcpComponentService = mcpComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
@@ -146,6 +163,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     public @Nullable FunctionToolCallback<Map<String, Object>, Object> getFunctionToolCallback(
         McpTool mcpTool, String externalUserId, Environment environment, String tenantId) {
+        if (!mcpTool.isEnabled()) {
+            return null;
+        }
 
         Long integrationInstanceId = fetchIntegrationInstanceId(
             externalUserId, mcpTool.getMcpComponentId(), environment);
@@ -162,11 +182,12 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         List<FromAiResult> fromAiResults = extractFromAiResults(mcpTool.getParameters());
 
+        String toolName = getToolName(
+            clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(), mcpTool.getParameters());
+
         FunctionToolCallback.Builder<Map<String, Object>, Object> builder = FunctionToolCallback
             .builder(
-                getToolName(
-                    clusterElementDefinition.getComponentName(), clusterElementDefinition.getName(),
-                    mcpTool.getParameters()),
+                toolName,
                 getClusterElementToolCallbackFunction(
                     externalUserId, clusterElementDefinition.getComponentName(),
                     clusterElementDefinition.getComponentVersion(),
@@ -191,13 +212,11 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     public List<ToolCallback> getFunctionToolCallbacks(
         McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration, String externalUserId,
         Environment environment, String tenantId) {
-
         List<ToolCallback> toolCallbacks = new ArrayList<>();
 
         for (McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow : mcpIntegrationInstanceConfigurationWorkflowService
             .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                 mcpIntegrationInstanceConfiguration.getId())) {
-
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                 integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                     mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
@@ -218,7 +237,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             if (integrationInstanceId != null &&
                 !isWorkflowEnabled(integrationInstanceId, mcpIntegrationInstanceConfigurationWorkflow.getId())) {
-
                 continue;
             }
 
@@ -246,7 +264,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                         externalUserId, integration.getComponentName(), integration.getId(),
                         integrationInstanceConfigurationWorkflow,
                         trigger.getName(), workflowParameters, mcpIntegrationInstanceConfiguration.getMcpServerId(),
-                        environment, tenantId))
+                        hasSuspendingTask(workflow), environment, tenantId))
                 .inputType(Map.class)
                 .inputSchema(FromAiInputSchemaUtils.generateInputSchema(fromAiResults));
 
@@ -268,7 +286,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private @Nullable Long fetchIntegrationInstanceId(
         String externalUserId, long mcpComponentId, Environment environment) {
-
         McpComponent mcpComponent = mcpComponentService.getMcpComponent(mcpComponentId);
 
         return fetchIntegrationInstanceId(externalUserId, mcpComponent.getComponentName(), environment);
@@ -285,7 +302,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private @Nullable Long fetchIntegrationInstanceId(
         String externalUserId, String componentName, Environment environment) {
-
         return connectedUserService.fetchConnectedUser(externalUserId, environment)
             .map(ConnectedUser::getId)
             .flatMap(connectedUserId -> integrationInstanceService.fetchIntegrationInstance(
@@ -297,7 +313,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private Function<Map<String, Object>, Object> getClusterElementToolCallbackFunction(
         String externalUserId, String componentName, int componentVersion, String clusterElementName,
         Map<String, ?> parameters, long mcpServerId, Environment environment, String tenantId) {
-
         return request -> {
             McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
 
@@ -309,7 +324,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             if (connectionId == null
                 && isConnectionRequired(componentDefinitionService, componentName, componentVersion)) {
-
                 long integrationId = getIntegrationId(componentName);
 
                 return getConnectionRequiredResponse(
@@ -342,7 +356,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private Function<Map<String, Object>, Object> getWorkflowToolCallbackFunction(
         String externalUserId, String componentName, long integrationId,
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, String triggerName,
-        Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
+        Map<String, ?> workflowParameters, long mcpServerId, boolean suspendable, Environment environment,
+        String tenantId) {
 
         return inputParameters -> {
             McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
@@ -369,12 +384,21 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             triggerInputs.putAll(inputParameters);
 
             inputs.put(triggerName, triggerInputs);
+            inputs.put(JobInputConstants.TRIGGER_NAME_INPUT, triggerName);
 
-            Job job = jobSyncExecutor.execute(
-                new JobParametersDTO(integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs),
-                jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, integrationInstanceId, PlatformType.EMBEDDED),
-                true, taskExecutionCompleteEvent -> {});
+            JobParametersDTO jobParametersDTO = new JobParametersDTO(
+                integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs);
+
+            Job job = suspendable
+                ? executeSuspendableJob(jobParametersDTO, integrationInstanceId)
+                : executeSyncJob(jobParametersDTO, integrationInstanceId);
+
+            if (job.getStatus() == Job.Status.STOPPED) {
+                return describeStoppedJob(job);
+            }
+
+            JobExecutionErrors.checkForError(job, taskExecutionService);
+            JobExecutionErrors.checkCompleted(job);
 
             if (job.getOutputs() == null) {
                 return null;
@@ -383,6 +407,73 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             return getCallableResponseOutput(job)
                 .orElseGet(() -> taskFileStorage.readJobOutputs(job.getOutputs()));
         };
+    }
+
+    private Job executeSyncJob(JobParametersDTO jobParametersDTO, long integrationInstanceId) {
+        return jobSyncExecutor.execute(
+            jobParametersDTO,
+            jobParameters -> principalJobFacade.createSyncJob(
+                jobParameters, integrationInstanceId, PlatformType.EMBEDDED),
+            false, taskExecutionCompleteEvent -> {});
+    }
+
+    private Job executeSuspendableJob(JobParametersDTO jobParametersDTO, long integrationInstanceId) {
+        long jobId = principalJobFacade.createJob(jobParametersDTO, integrationInstanceId, PlatformType.EMBEDDED);
+
+        Duration timeout = JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT;
+
+        CompletableFuture<Job> jobFuture = jobCompletionAwaiter.await(jobId, timeout);
+
+        try {
+            return jobFuture.join();
+        } catch (CompletionException completionException) {
+            if (completionException.getCause() instanceof TimeoutException timeoutException) {
+                throw new IllegalStateException(
+                    "Job %d did not finish within %d seconds".formatted(jobId, timeout.toSeconds()), timeoutException);
+            }
+
+            throw completionException;
+        }
+    }
+
+    private Map<String, Object> describeStoppedJob(Job job) {
+        Map<String, Object> result = new HashMap<>();
+
+        result.put("jobId", job.getId());
+
+        if (isSuspendedForApproval(job)) {
+            result.put("status", "approval_required");
+            result.put("message", "Approval required — the workflow run is paused waiting for a human decision.");
+        } else if (job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null) {
+            result.put("status", "suspended");
+            result.put("message", "The workflow run is paused and resumes later on its own.");
+        } else {
+            result.put("status", "stopped");
+            result.put("message", "The workflow run was stopped before it finished.");
+        }
+
+        return result;
+    }
+
+    private boolean isSuspendedForApproval(Job job) {
+        return findPausedTaskExecution(job)
+            .map(TaskExecution::getType)
+            .map(WorkflowNodeType::ofType)
+            .map(WorkflowNodeType::name)
+            .filter(APPROVAL_COMPONENT_NAMES::contains)
+            .isPresent();
+    }
+
+    private Optional<TaskExecution> findPausedTaskExecution(Job job) {
+        Object taskExecutionResumeId = job.getMetadata(MetadataConstants.TASK_EXECUTION_RESUME_ID);
+
+        if (job.getMetadata(MetadataConstants.JOB_RESUME_ID) != null && taskExecutionResumeId != null) {
+            return Optional.of(
+                taskExecutionService.getTaskExecution(ConvertUtils.convertValue(taskExecutionResumeId, Long.class)));
+        }
+
+        return taskExecutionService.fetchLastJobTaskExecution(Objects.requireNonNull(job.getId()))
+            .filter(taskExecution -> taskExecution.getStatus() == TaskExecution.Status.STARTED);
     }
 
     private boolean isToolEnabled(long integrationInstanceId, long mcpToolId) {
@@ -405,7 +496,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private Map<String, Object> getConnectionRequiredResponse(
         String componentName, Environment environment, String externalUserId, long integrationId, String tenantId) {
-
         String jwtToken = jwtTokenService.generateJwtToken(
             externalUserId, integrationId, environment.ordinal(), tenantId);
 
@@ -447,11 +537,20 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     static boolean isConnectionRequired(
         ComponentDefinitionService componentDefinitionService, String componentName, int componentVersion) {
-
         ComponentDefinition componentDefinition =
             componentDefinitionService.getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getConnection() != null;
+    }
+
+    private static boolean hasSuspendingTask(Workflow workflow) {
+        return workflow.getTasks(true)
+            .stream()
+            .map(WorkflowTask::getType)
+            .filter(Objects::nonNull)
+            .map(WorkflowNodeType::ofType)
+            .map(WorkflowNodeType::name)
+            .anyMatch(SUSPENDING_COMPONENT_NAMES::contains);
     }
 
     private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
@@ -463,7 +562,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             if (Objects.equals(name, WorkflowConstants.WORKFLOW) &&
                 Objects.equals(operation, WorkflowConstants.NEW_WORKFLOW_CALL)) {
-
                 return workflowTrigger;
             }
         }

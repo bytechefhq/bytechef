@@ -76,4 +76,22 @@ public final class JobExecutionErrors {
             throw new ExecutionException(message, JobErrorType.JOB_FAILED);
         }
     }
+
+    public static void checkCompleted(Job job) {
+        Job.Status status = job.getStatus();
+
+        if (status == Job.Status.COMPLETED) {
+            return;
+        }
+
+        String message;
+
+        if (status == Job.Status.STOPPED) {
+            message = "Workflow run " + job.getId() + " was stopped before it completed.";
+        } else {
+            message = "Workflow run " + job.getId() + " ended in status " + status + " without completing.";
+        }
+
+        throw new ExecutionException(message, JobErrorType.JOB_NOT_COMPLETED);
+    }
 }

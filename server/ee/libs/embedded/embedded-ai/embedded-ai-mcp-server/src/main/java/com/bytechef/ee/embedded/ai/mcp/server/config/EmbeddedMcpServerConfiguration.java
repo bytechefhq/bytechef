@@ -58,6 +58,7 @@ import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
@@ -114,7 +115,6 @@ public class EmbeddedMcpServerConfiguration {
     private static final String ENVIRONMENT = "environment";
     private static final String EXTERNAL_USER_ID = "externalUserId";
     private static final String SECRET_KEY = "secretKey";
-    private static final int TIMEOUT = 300;
 
     @Bean
     WebMvcStreamableServerTransportProvider embeddedWebMvcStreamableHttpServerTransportProvider() {
@@ -151,17 +151,17 @@ public class EmbeddedMcpServerConfiguration {
         Environment environment, Evaluator evaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        JobService jobService, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
-        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
+        IntegrationInstanceService integrationInstanceService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
+        JobCompletionAwaiter jobCompletionAwaiter, JobService jobService, JwtTokenService jwtTokenService,
+        McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
-        McpServerService mcpServerService,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, SubflowResolver subflowResolver,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, @Qualifier("syncWorkerExecutor") TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry,
-        WorkflowService workflowService) {
+        TaskExecutionService taskExecutionService,
+        @Qualifier("syncWorkerExecutor") TaskExecutor syncWorkerExecutor,
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
 
@@ -179,16 +179,17 @@ public class EmbeddedMcpServerConfiguration {
             getTaskDispatcherResolverFactories(
                 childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
                 jobService, subflowResolver, taskExecutionService, taskFileStorage),
-            taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, TIMEOUT, workflowService);
+            taskExecutionService, syncWorkerExecutor, taskHandlerRegistry, taskFileStorage,
+            JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT.toSeconds(), workflowService);
 
         return new EmbeddedMcpToolFacade(
             clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
             connectedUserService, evaluator, integrationInstanceConfigurationService,
             integrationInstanceConfigurationWorkflowService, integrationInstanceService,
-            integrationInstanceWorkflowService, integrationService, jobSyncExecutor, jwtTokenService,
-            mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService, mcpIntegrationInstanceToolService,
-            mcpServerService, principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService,
-            taskFileStorage, workflowService);
+            integrationInstanceWorkflowService, integrationService, jobCompletionAwaiter, jobSyncExecutor,
+            jwtTokenService, mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
+            mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
+            applicationProperties.getPublicUrl(), taskExecutionService, taskFileStorage, workflowService);
     }
 
     @Bean
