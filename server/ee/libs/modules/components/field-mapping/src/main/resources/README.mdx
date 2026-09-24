@@ -1,0 +1,47 @@
+# Overview
+
+Field Mapping applies a connected user's saved field mapping - the one they built in the embedded Connect dialog - to a payload, in either direction. It is available in embedded workflows only, because the mapping is supplied by the end user at connect time, not by the workflow author.
+
+Both actions take an **Object Name** rather than the mapping itself: the component finds the workflow's `field_mapping` input declared with that object name and loads the connected user's saved value for it. The author never needs to know which input holds the mapping.
+<hr/>
+
+## Map to Integration Object
+
+### Overview
+
+Renames an application object's keys to the integration fields the user chose, ready to write into their integration. Reads the mapping's application-field values and writes its integration-field values.
+
+### Property Description
+
+1. **Object Name**: The object name declared on the workflow's field mapping input, e.g. `Contacts`.
+2. **Input Type**: `Object` for one object, `Array` for a list of objects mapped one by one.
+3. **Data**: The object or array whose keys are renamed.
+4. **Include Unmapped**: Off by default, so keys no mapping covers are dropped. On, they are copied through unchanged.
+
+Missing source keys are omitted from the output rather than written as `null`, so an absent field never blanks a field in the target system. Dotted paths (`properties.firstname`) resolve nested structures on both sides.
+
+## Map to Application Object
+
+### Overview
+
+The reverse: renames an integration record's keys to your application's fields, ready to hand back to your application. Same properties as Map to Integration Object.
+
+If the user mapped two application fields to one integration field, mapping back gives both application fields that value.
+
+## From a Script step
+
+Both actions are callable from custom code through the component proxy, the same way `context.component.httpClient` is:
+
+```js
+function perform(input, context) {
+    return context.component.fieldMapping.mapToApplication({
+        objectName: "Contacts",
+        inputType: "ARRAY",
+        data: input.records
+    });
+}
+```
+
+## Testing in the editor
+
+The editor's Test button runs without a connected user. Add a `sampleMapping` - a saved-mapping value - to the field mapping input's test value so the actions can run and produce sample output for data pills.
