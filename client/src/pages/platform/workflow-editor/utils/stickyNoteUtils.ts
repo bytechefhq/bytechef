@@ -1,9 +1,9 @@
-import {SPACE} from '@/shared/constants';
 import {UpdateWorkflowMutationType, WorkflowStickyNoteType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
+import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
 import {
     consumePendingDefinition,
     drainPendingSaves,
@@ -283,7 +283,7 @@ export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNot
         }
     }
 
-    const updatedDefinition = JSON.stringify(workflowDefinition, null, SPACE);
+    const updatedDefinition = stringifyWorkflowDefinition(workflowDefinition);
 
     if (updatedDefinition === workflow.definition) {
         return;
@@ -364,6 +364,8 @@ function fireStickyNoteMutation({
 }: FireStickyNoteMutationProps) {
     setWorkflowMutating(workflowId, true);
 
+    let settledDefinition = previousDefinition;
+
     updateWorkflowMutation.mutate(
         {
             id: workflowId,
@@ -374,6 +376,10 @@ function fireStickyNoteMutation({
         },
         {
             onError: () => {
+                if (useWorkflowDataStore.getState().workflow.definition !== definition) {
+                    return;
+                }
+
                 runWithoutHistory(() => {
                     useWorkflowDataStore.setState((state) => ({
                         workflow: {
@@ -393,7 +399,7 @@ function fireStickyNoteMutation({
 
                     fireStickyNoteMutation({
                         definition: pendingDefinition,
-                        previousDefinition: currentWorkflow.definition!,
+                        previousDefinition: settledDefinition,
                         updateWorkflowMutation,
                         version: currentWorkflow.version,
                         workflowId,
@@ -403,6 +409,8 @@ function fireStickyNoteMutation({
                 }
             },
             onSuccess: (updatedWorkflow) => {
+                settledDefinition = definition;
+
                 const currentWorkflow = useWorkflowDataStore.getState().workflow;
 
                 useWorkflowDataStore.getState().setWorkflow({

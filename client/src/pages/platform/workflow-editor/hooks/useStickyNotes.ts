@@ -19,6 +19,8 @@ const POSITION_EPSILON = 0.5;
 
 const STACKING_OFFSET_STEP = 24;
 
+const STACKING_GRID_SIZE = 8;
+
 function stickyNoteNodeDiffers(currentNode: Node, targetNode: Node): boolean {
     const currentData = currentNode.data as StickyNoteNodeDataType;
     const targetData = targetNode.data as StickyNoteNodeDataType;
@@ -57,11 +59,12 @@ export default function useStickyNotes({readOnly}: {readOnly: boolean}) {
         const flowCenter = screenToFlowPosition(screenCenter);
 
         const existingStickyNotesCount = extractStickyNotes(useWorkflowDataStore.getState().workflow.definition).length;
-        const stackingOffset = (existingStickyNotesCount % 8) * STACKING_OFFSET_STEP;
+        const stackingColumn = existingStickyNotesCount % STACKING_GRID_SIZE;
+        const stackingRow = Math.floor(existingStickyNotesCount / STACKING_GRID_SIZE) % STACKING_GRID_SIZE;
 
         const position = compensateStickyNotePosition({
-            x: flowCenter.x - STICKY_NOTE_DEFAULT_WIDTH / 2 + stackingOffset,
-            y: flowCenter.y - STICKY_NOTE_DEFAULT_HEIGHT / 2 + stackingOffset,
+            x: flowCenter.x - STICKY_NOTE_DEFAULT_WIDTH / 2 + stackingColumn * STACKING_OFFSET_STEP,
+            y: flowCenter.y - STICKY_NOTE_DEFAULT_HEIGHT / 2 + stackingRow * STACKING_OFFSET_STEP,
         });
 
         addStickyNote({position, updateWorkflowMutation});

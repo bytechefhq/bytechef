@@ -1,10 +1,12 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
+import useStickyNoteColorsStore from '../stores/useStickyNoteColorsStore';
 import StickyNoteNode from './StickyNoteNode';
 
-const {deleteStickyNoteMock, updateStickyNoteMock} = vi.hoisted(() => ({
+const {deleteStickyNoteMock, resizerPropsRef, updateStickyNoteMock} = vi.hoisted(() => ({
     deleteStickyNoteMock: vi.fn(),
+    resizerPropsRef: {current: undefined as {onResizeEnd?: (event: unknown, params: unknown) => void} | undefined},
     updateStickyNoteMock: vi.fn(),
 }));
 
@@ -13,7 +15,11 @@ vi.mock('@xyflow/react', async (importOriginal) => {
 
     return {
         ...actual,
-        NodeResizer: () => null,
+        NodeResizer: (props: {onResizeEnd?: (event: unknown, params: unknown) => void}) => {
+            resizerPropsRef.current = props;
+
+            return null;
+        },
     };
 });
 
@@ -35,6 +41,8 @@ describe('StickyNoteNode', () => {
     beforeEach(() => {
         deleteStickyNoteMock.mockClear();
         updateStickyNoteMock.mockClear();
+        resizerPropsRef.current = undefined;
+        useStickyNoteColorsStore.setState({recentColors: []});
     });
 
     it('should render the note content', () => {
@@ -123,6 +131,48 @@ describe('StickyNoteNode', () => {
         for (const presetColor of ['blue', 'gray', 'green', 'orange', 'pink', 'purple', 'yellow']) {
             expect(screen.getByLabelText(`Set ${presetColor} color`)).toBeInTheDocument();
         }
+    });
+
+    it('should save the size and position after a resize', () => {
+        render(<StickyNoteNode data={{color: 'yellow', content: 'Resizable'}} id="stickyNote_1" />);
+
+        resizerPropsRef.current!.onResizeEnd!({}, {height: 320, width: 400, x: 40, y: 60});
+
+        expect(updateStickyNoteMock.mock.calls[0][0]).toMatchObject({
+            id: 'stickyNote_1',
+            patch: {size: {height: 320, width: 400}},
+        });
+    });
+
+    it('should apply an edited custom color when the picker closes', () => {
+        render(<StickyNoteNode data={{color: 'yellow', content: 'Custom'}} id="stickyNote_1" />);
+
+        fireEvent.click(screen.getByLabelText('Custom color'));
+        fireEvent.change(screen.getByLabelText('Custom color hex value'), {target: {value: '#123456'}});
+        fireEvent.keyDown(document.activeElement || document.body, {key: 'Escape'});
+
+        expect(updateStickyNoteMock.mock.calls[0][0]).toMatchObject({id: 'stickyNote_1', patch: {color: '#123456'}});
+        expect(useStickyNoteColorsStore.getState().recentColors).toEqual(['#123456']);
+    });
+
+    it('should not save when the picker closes untouched', () => {
+        render(<StickyNoteNode data={{color: 'yellow', content: 'Custom'}} id="stickyNote_1" />);
+
+        fireEvent.click(screen.getByLabelText('Custom color'));
+        fireEvent.keyDown(document.activeElement || document.body, {key: 'Escape'});
+
+        expect(updateStickyNoteMock).not.toHaveBeenCalled();
+    });
+
+    it('should reuse a recently used color', () => {
+        useStickyNoteColorsStore.setState({recentColors: ['#abcdef']});
+
+        render(<StickyNoteNode data={{color: 'yellow', content: 'Custom'}} id="stickyNote_1" />);
+
+        fireEvent.click(screen.getByLabelText('Custom color'));
+        fireEvent.click(screen.getByLabelText('Use recent color #abcdef'));
+
+        expect(updateStickyNoteMock.mock.calls[0][0]).toMatchObject({id: 'stickyNote_1', patch: {color: '#abcdef'}});
     });
 
     it('should render markdown content', () => {
