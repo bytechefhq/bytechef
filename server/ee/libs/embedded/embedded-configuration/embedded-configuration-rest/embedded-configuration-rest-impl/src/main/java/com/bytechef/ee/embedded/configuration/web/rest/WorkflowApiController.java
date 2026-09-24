@@ -62,6 +62,8 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     @GetMapping("/workflows/{id}/export")
     @ResponseBody
     public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") String id) {
+        integrationWorkflowFacade.getIntegrationWorkflow(id);
+
         return doExportWorkflow(id);
     }
 
