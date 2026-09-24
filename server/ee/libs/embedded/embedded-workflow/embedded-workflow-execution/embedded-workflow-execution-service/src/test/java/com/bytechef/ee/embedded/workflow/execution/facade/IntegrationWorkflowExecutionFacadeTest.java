@@ -66,7 +66,7 @@ import org.springframework.data.domain.PageImpl;
  *
  * @author Ivica Cardic
  */
-public class IntegrationWorkflowExecutionFacadeTest {
+class IntegrationWorkflowExecutionFacadeTest {
 
     private ContextService contextService;
     private EnvironmentService environmentService;
@@ -86,7 +86,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
 
     @BeforeEach
     @SuppressWarnings("unchecked")
-    public void setUp() {
+    void setUp() {
         ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
 
         contextService = mock(ContextService.class);
@@ -104,7 +104,8 @@ public class IntegrationWorkflowExecutionFacadeTest {
         workflowService = mock(WorkflowService.class);
 
         facade = new IntegrationWorkflowExecutionFacadeImpl(
-            componentDefinitionService, contextService, environmentService, evaluator, principalJobService,
+            componentDefinitionService, contextService, environmentService, evaluator,
+            principalJobService,
             integrationInstanceConfigurationService, integrationInstanceService,
             integrationService, integrationWorkflowFacade, integrationWorkflowService, jobService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService,
@@ -143,7 +144,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetWorkflowExecutionsIncludesJobsOfPublishedIntegrationVersion() {
+    void testGetWorkflowExecutionsIncludesJobsOfPublishedIntegrationVersion() {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setId(1051L);
@@ -213,7 +214,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetWorkflowExecutionsFiltersByInstancesOfTheConfiguration() {
+    void testGetWorkflowExecutionsFiltersByInstancesOfTheConfiguration() {
         IntegrationInstance integrationInstance = new IntegrationInstance();
 
         integrationInstance.setId(1050L);
@@ -235,7 +236,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetWorkflowExecutionsExpandsWorkflowFilterToEveryIntegrationVersion() {
+    void testGetWorkflowExecutionsExpandsWorkflowFilterToEveryIntegrationVersion() {
         IntegrationInstanceConfiguration integrationInstanceConfiguration = new IntegrationInstanceConfiguration();
 
         integrationInstanceConfiguration.setId(1051L);
@@ -270,7 +271,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetWorkflowExecutionTaskExecutionLoadsTaskData() {
+    void testGetWorkflowExecutionTaskExecutionLoadsTaskData() {
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(taskExecution);
         doReturn(Map.of("context", true))
@@ -288,7 +289,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetWorkflowExecutionTaskExecutionAcceptsTaskInDescendantJob() {
+    void testGetWorkflowExecutionTaskExecutionAcceptsTaskInDescendantJob() {
         Job childJob = new Job(10L);
 
         childJob.setParentTaskExecutionId(99L);
@@ -317,7 +318,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
+    void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(taskExecution);
         when(jobService.getJob(10L))
@@ -328,7 +329,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
-    public void testToTaskExecutionDTODoesNotLoadTaskDataForList() {
+    void testToTaskExecutionDTODoesNotLoadTaskDataForList() {
         TaskExecutionDTO taskExecutionDTO = facade.toTaskExecutionDTO(taskExecution, null, false);
 
         assertThat(taskExecutionDTO.input()).isNull();
