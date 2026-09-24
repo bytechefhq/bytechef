@@ -8,8 +8,10 @@
 package com.bytechef.ee.embedded.ai.mcp.facade;
 
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +25,24 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 class McpIntegrationInstanceToolFacadeImpl implements McpIntegrationInstanceToolFacade {
 
+    private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceToolFacadeImpl(
+        ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService) {
 
+        this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin() or isConnectedUser()")
     public void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable) {
+        connectedUserIntegrationInstanceFacade.validateCurrentPrincipalIntegrationInstanceOwnership(
+            integrationInstanceId);
+
         mcpIntegrationInstanceToolService
             .fetchMcpIntegrationInstanceTool(integrationInstanceId, mcpToolId)
             .ifPresentOrElse(
