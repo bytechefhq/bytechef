@@ -83,6 +83,18 @@ describe('OutputSchemaDisplay', () => {
         expect(screen.getByText(/Click Test Action to get real data first/)).toBeInTheDocument();
     });
 
+    it('should warn for a falsey placeholder sample output', () => {
+        renderOutputSchemaDisplay({sampleOutput: 0 as unknown as object, testOutputResponse: false});
+
+        expect(screen.getByText('Placeholder sample data')).toBeInTheDocument();
+    });
+
+    it('should not warn when there is no sample output at all', () => {
+        renderOutputSchemaDisplay({sampleOutput: undefined, testOutputResponse: false});
+
+        expect(screen.queryByText('Placeholder sample data')).not.toBeInTheDocument();
+    });
+
     it('should not warn when the output comes from a test run', () => {
         renderOutputSchemaDisplay({testOutputResponse: true});
 
