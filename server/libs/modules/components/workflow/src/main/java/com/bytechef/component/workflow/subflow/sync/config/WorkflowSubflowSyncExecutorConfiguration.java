@@ -20,6 +20,7 @@ import static com.bytechef.tenant.constant.TenantConstants.CURRENT_TENANT_ID;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
+import com.bytechef.atlas.coordinator.event.listener.SharedApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
@@ -68,12 +69,14 @@ import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHa
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import com.bytechef.tenant.TenantContext;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -92,6 +95,7 @@ public class WorkflowSubflowSyncExecutorConfiguration {
     SubflowSyncExecutor subflowSyncExecutor(
         ChildJobPrincipalFactory childJobPrincipalFactory, ContextService contextService, CounterService counterService,
         TaskFileStorage durableTaskFileStorage, Environment environment, Evaluator evaluator, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         SubflowResolver subflowResolver, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
         WorkflowService workflowService) {
@@ -107,7 +111,8 @@ public class WorkflowSubflowSyncExecutorConfiguration {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, evaluator, jobService, -1, asyncMessageBroker,
             getAdditionalApplicationEventListeners(
-                evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage),
+                evaluator, coordinatorEventPublisher, jobService, sharedApplicationEventListenerProvider,
+                taskExecutionService, taskFileStorage),
             getTaskCompletionHandlerFactories(
                 contextService, counterService, evaluator, taskExecutionService, taskFileStorage),
             getTaskDispatcherAdapterFactories(evaluator), taskDispatcherPreSendProcessors,
@@ -144,11 +149,19 @@ public class WorkflowSubflowSyncExecutorConfiguration {
 
     private static List<ApplicationEventListener> getAdditionalApplicationEventListeners(
         Evaluator evaluator, ApplicationEventPublisher coordinatorEventPublisher, JobService jobService,
+        ObjectProvider<SharedApplicationEventListener> sharedApplicationEventListenerProvider,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
-        return List.of(
+        List<ApplicationEventListener> applicationEventListeners = new ArrayList<>();
+
+        applicationEventListeners.add(
             new SubflowJobStatusEventListener(
                 evaluator, coordinatorEventPublisher, jobService, taskExecutionService, taskFileStorage));
+
+        sharedApplicationEventListenerProvider.orderedStream()
+            .forEach(applicationEventListeners::add);
+
+        return applicationEventListeners;
     }
 
     private static Optional<Object> getCallableResponseOutput(
