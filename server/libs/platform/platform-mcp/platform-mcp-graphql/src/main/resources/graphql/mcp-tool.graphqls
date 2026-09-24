@@ -8,6 +8,7 @@ extend type Mutation {
     createMcpTool(input: McpToolInput!): McpTool
     deleteMcpTool(id: ID!): Boolean
     updateMcpTool(id: ID!, input: McpToolInput!): McpTool
+    updateMcpToolEnabled(id: ID!, enabled: Boolean!): McpTool
 }
 
 input McpToolInput {
@@ -22,6 +23,7 @@ type McpTool {
     name: String!
     title: String
     parameters: Map
+    enabled: Boolean!
     mcpComponentId: ID!
     createdBy: String
     createdDate: Long

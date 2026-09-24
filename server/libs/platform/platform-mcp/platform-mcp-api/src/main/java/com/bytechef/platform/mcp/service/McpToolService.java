@@ -21,12 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Service interface for managing {@link McpTool} entities.
- *
  * @author Ivica Cardic
  */
 public interface McpToolService {
-
     /**
      * Creates a new MCP tool.
      *
@@ -42,6 +39,8 @@ public interface McpToolService {
      * @return the updated MCP tool
      */
     McpTool update(McpTool mcpTool);
+
+    void updateEnabled(long mcpToolId, boolean enabled);
 
     /**
      * Deletes an MCP tool by ID.
