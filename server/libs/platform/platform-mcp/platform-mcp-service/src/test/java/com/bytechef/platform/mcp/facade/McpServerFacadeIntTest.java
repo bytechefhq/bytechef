@@ -17,6 +17,7 @@
 package com.bytechef.platform.mcp.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -48,7 +49,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = PlatformMcpIntTestConfiguration.class)
-public class McpServerFacadeIntTest {
+class McpServerFacadeIntTest {
 
     @MockitoBean
     private MailService mailService;
@@ -82,7 +83,7 @@ public class McpServerFacadeIntTest {
     private McpServer mcpServer;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         mcpServerFacade = new McpServerFacadeImpl(mcpComponentService, mcpServerService, mcpToolService, tagService);
 
         mcpServer = mcpServerRepository.save(
@@ -90,14 +91,14 @@ public class McpServerFacadeIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpToolRepository.deleteAll();
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
     }
 
     @Test
-    public void testCreateMcpComponentWithTools() {
+    void testCreateMcpComponentWithTools() {
         McpComponent mcpComponent = getMcpComponent();
 
         List<McpTool> mcpTools = List.of(getMcpTool("tool1"), getMcpTool("tool2"));
@@ -117,7 +118,7 @@ public class McpServerFacadeIntTest {
     }
 
     @Test
-    public void testCreateMcpComponentWithEmptyTools() {
+    void testCreateMcpComponentWithEmptyTools() {
         McpComponent mcpComponent = getMcpComponent();
 
         McpComponent createdComponent = mcpServerFacade.create(mcpComponent, List.of());
@@ -132,7 +133,7 @@ public class McpServerFacadeIntTest {
     }
 
     @Test
-    public void testUpdateMcpComponentWithTools() {
+    void testUpdateMcpComponentWithTools() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 
         McpTool originalTool = getMcpTool("original-tool", mcpComponent.getId());
@@ -159,7 +160,28 @@ public class McpServerFacadeIntTest {
     }
 
     @Test
-    public void testDeleteMcpComponent() {
+    void testUpdateMcpComponentKeepsToolEnabledState() {
+        McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
+
+        McpTool disabledTool = getMcpTool("kept-tool", mcpComponent.getId());
+
+        disabledTool.setEnabled(false);
+
+        mcpToolRepository.save(disabledTool);
+
+        List<McpTool> newTools = List.of(
+            getMcpTool("kept-tool", mcpComponent.getId()), getMcpTool("added-tool", mcpComponent.getId()));
+
+        McpComponent updatedComponent = mcpServerFacade.update(mcpComponent, newTools);
+
+        List<McpTool> savedTools = mcpToolRepository.findAllByMcpComponentId(updatedComponent.getId());
+
+        assertThat(savedTools).extracting(McpTool::getName, McpTool::isEnabled)
+            .containsExactlyInAnyOrder(tuple("kept-tool", false), tuple("added-tool", true));
+    }
+
+    @Test
+    void testDeleteMcpComponent() {
         McpComponent mcpComponent = mcpComponentRepository.save(getMcpComponent());
 
         McpTool mcpTool = getMcpTool("test-tool", mcpComponent.getId());
@@ -175,7 +197,7 @@ public class McpServerFacadeIntTest {
     }
 
     @Test
-    public void testDeleteMcpServer() {
+    void testDeleteMcpServer() {
         McpComponent mcpComponent = getMcpComponent();
 
         mcpComponentRepository.save(mcpComponent);
@@ -187,7 +209,7 @@ public class McpServerFacadeIntTest {
     }
 
     @Test
-    public void testGetMcpServerMcpComponents() {
+    void testGetMcpServerMcpComponents() {
         McpComponent component1 = getMcpComponent();
 
         component1.setComponentName("component1");
@@ -224,7 +246,7 @@ public class McpServerFacadeIntTest {
     }
 
     @Test
-    public void testUpdateMcpServerTags() {
+    void testUpdateMcpServerTags() {
         List<Tag> tags = List.of(new Tag("tag1"), new Tag("tag2"));
 
         List<Tag> savedTags = mcpServerFacade.updateMcpServerTags(mcpServer.getId(), tags);

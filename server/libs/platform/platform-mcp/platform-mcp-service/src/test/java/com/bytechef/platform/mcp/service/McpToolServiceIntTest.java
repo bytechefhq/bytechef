@@ -43,7 +43,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  * @author Ivica Cardic
  */
 @SpringBootTest(classes = PlatformMcpIntTestConfiguration.class)
-public class McpToolServiceIntTest {
+class McpToolServiceIntTest {
 
     @MockitoBean
     private MailService mailService;
@@ -66,7 +66,7 @@ public class McpToolServiceIntTest {
     private McpComponent mcpComponent;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         McpServer mcpServer = mcpServerRepository.save(
             new McpServer("test-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT));
 
@@ -74,14 +74,14 @@ public class McpToolServiceIntTest {
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         mcpToolRepository.deleteAll();
         mcpComponentRepository.deleteAll();
         mcpServerRepository.deleteAll();
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         McpTool mcpTool = getMcpTool();
 
         mcpTool = mcpToolService.create(mcpTool);
@@ -94,7 +94,7 @@ public class McpToolServiceIntTest {
     }
 
     @Test
-    public void testUpdate() {
+    void testUpdate() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 
         mcpTool.setName("updated-tool");
@@ -107,7 +107,26 @@ public class McpToolServiceIntTest {
     }
 
     @Test
-    public void testDelete() {
+    void testCreateDefaultsToEnabled() {
+        McpTool mcpTool = mcpToolService.create(getMcpTool());
+
+        assertThat(mcpTool.isEnabled()).isTrue();
+    }
+
+    @Test
+    void testUpdateEnabled() {
+        McpTool mcpTool = mcpToolRepository.save(getMcpTool());
+
+        mcpToolService.updateEnabled(mcpTool.getId(), false);
+
+        assertThat(mcpToolRepository.findById(mcpTool.getId()))
+            .get()
+            .extracting(McpTool::isEnabled)
+            .isEqualTo(false);
+    }
+
+    @Test
+    void testDelete() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 
         mcpToolService.delete(Validate.notNull(mcpTool, "mcpTool"));
@@ -117,7 +136,7 @@ public class McpToolServiceIntTest {
     }
 
     @Test
-    public void testFetchMcpTool() {
+    void testFetchMcpTool() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 
         Optional<McpTool> fetchedTool = mcpToolService.fetchMcpTool(Validate.notNull(mcpTool.getId(), "id"));
@@ -127,7 +146,7 @@ public class McpToolServiceIntTest {
     }
 
     @Test
-    public void testGetMcpTools() {
+    void testGetMcpTools() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 
         assertThat(mcpToolService.getMcpTools()).hasSize(1);
@@ -136,7 +155,7 @@ public class McpToolServiceIntTest {
     }
 
     @Test
-    public void testGetMcpComponentMcpTools() {
+    void testGetMcpComponentMcpTools() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 
         assertThat(mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())).hasSize(1);

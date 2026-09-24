@@ -25,8 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the {@link McpToolService} interface.
- *
  * @author Ivica Cardic
  */
 @Service
@@ -54,6 +52,15 @@ public class McpToolServiceImpl implements McpToolService {
         currentMcpTool.setVersion(mcpTool.getVersion());
 
         return mcpToolRepository.save(currentMcpTool);
+    }
+
+    @Override
+    public void updateEnabled(long mcpToolId, boolean enabled) {
+        McpTool mcpTool = OptionalUtils.get(mcpToolRepository.findById(mcpToolId));
+
+        mcpTool.setEnabled(enabled);
+
+        mcpToolRepository.save(mcpTool);
     }
 
     @Override
