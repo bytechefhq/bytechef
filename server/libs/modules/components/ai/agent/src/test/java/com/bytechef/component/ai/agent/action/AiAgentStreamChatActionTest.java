@@ -41,12 +41,21 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Tests for {@link AiAgentStreamChatAction#createSseHandler} covering buffered-event replay, cancel-on-send-failure,
- * upstream-error propagation, and timeout-cancel wiring.
+ * upstream-error propagation, and timeout-cancel wiring, and for {@link AiAgentStreamChatAction#withCallerContext}
+ * carrying the caller's security context onto the late, off-thread subscription that runs tool calls.
  *
  * @author Ivica Cardic
  */
@@ -235,5 +244,45 @@ class AiAgentStreamChatActionTest {
         return ChatResponse.builder()
             .generations(List.of(new Generation(new AssistantMessage(text))))
             .build();
+    }
+
+    @Test
+    void testCallerSecurityContextReachesLateOffThreadSubscription() {
+        Hooks.enableAutomaticContextPropagation();
+
+        try {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "system", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+
+            Flux<Object> contentFlux = AiAgentStreamChatAction.withCallerContext(
+                Mono.fromCallable(AiAgentStreamChatActionTest::fetchCurrentLogin)
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .flux());
+
+            SecurityContextHolder.clearContext();
+
+            assertThat(contentFlux.blockFirst()).isEqualTo("system");
+        } finally {
+            SecurityContextHolder.clearContext();
+
+            Hooks.disableAutomaticContextPropagation();
+        }
+    }
+
+    @Test
+    void testWithoutCallerSecurityContextFluxIsUnchanged() {
+        Flux<Object> upstream = Flux.just("value");
+
+        assertThat(AiAgentStreamChatAction.withCallerContext(upstream)).isSameAs(upstream);
+    }
+
+    private static Object fetchCurrentLogin() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        Authentication authentication = securityContext.getAuthentication();
+
+        return authentication == null ? "anonymous" : authentication.getName();
     }
 }
