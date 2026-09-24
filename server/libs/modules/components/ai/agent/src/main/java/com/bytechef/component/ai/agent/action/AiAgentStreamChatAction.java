@@ -60,6 +60,8 @@ import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import reactor.core.publisher.Flux;
 
 /**
@@ -325,6 +327,12 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
 
         if (environment != null) {
             reactorContext = reactorContext.put(EnvironmentContextThreadLocalAccessor.KEY, environment);
+        }
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (securityContext.getAuthentication() != null) {
+            reactorContext = reactorContext.put(SecurityContext.class.getName(), securityContext);
         }
 
         return flux.contextWrite(reactorContext);
