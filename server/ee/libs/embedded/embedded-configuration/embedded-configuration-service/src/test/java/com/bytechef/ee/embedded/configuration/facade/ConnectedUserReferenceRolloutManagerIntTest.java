@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.configuration;
+package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -24,6 +24,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -34,6 +38,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -47,20 +52,11 @@ import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflo
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.MissingConnectionException;
 import com.bytechef.ee.embedded.configuration.exception.MissingInputException;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
-import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacadeIntTestConfiguration;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceDeploymentManager;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserReferenceRolloutManager;
-import com.bytechef.ee.embedded.configuration.facade.ConnectedUserWorkflowReferenceFacade;
 import com.bytechef.ee.embedded.configuration.listener.AutomationWorkflowProjectPublishedEventListener;
 import com.bytechef.ee.embedded.configuration.repository.ConnectedUserProjectWorkflowRepository;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
+import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
-import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
-import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
@@ -105,6 +101,7 @@ import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -122,7 +119,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(
     classes = {
         AutomationWorkflowProjectFacadeIntTestConfiguration.class,
-        ConnectedUserReferenceRolloutIntTest.ConnectedUserServiceConfiguration.class
+        ConnectedUserReferenceRolloutManagerIntTest.ConnectedUserServiceConfiguration.class
     },
     properties = {
         "bytechef.edition=EE",
@@ -134,8 +131,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
     ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
-    ClusterElementDefinitionService.class, CodeWorkflowContainerFacade.class, CodeWorkflowContainerService.class,
-    CodeWorkflowFileStorage.class, ComponentConnectionFacade.class, ComponentDefinitionService.class,
+    ClusterElementDefinitionService.class, ComponentConnectionFacade.class, ComponentDefinitionService.class,
     ConnectionDefinitionService.class, ConnectionFacade.class, ConnectionLifecycleFacade.class,
     ConnectionService.class, EmbeddedPermissionEvaluator.class, EnvironmentService.class, GitHubProxyClient.class,
     JobFacade.class, JobService.class, McpComponentService.class, McpIntegrationInstanceConfigurationService.class,
@@ -148,7 +144,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     WorkflowNodeTestOutputService.class, WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class,
     WorkspaceConnectionFacade.class, WorkspaceFacade.class
 })
-class ConnectedUserReferenceRolloutIntTest {
+class ConnectedUserReferenceRolloutManagerIntTest {
 
     private static final String EXTERNAL_USER_ID = "rollout-user-1";
     private static final long RUNNING_FIRST_TEMPLATE_JOB_ID = 4242L;
@@ -175,7 +171,6 @@ class ConnectedUserReferenceRolloutIntTest {
     @Autowired
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
-    // Publishing would otherwise run the rollout from the after-commit listener, racing the direct calls under test.
     @MockitoBean
     private AutomationWorkflowProjectPublishedEventListener automationWorkflowProjectPublishedEventListener;
 
@@ -222,6 +217,9 @@ class ConnectedUserReferenceRolloutIntTest {
     private PrincipalJobService principalJobService;
 
     @Autowired
+    private ProjectDeploymentFacade projectDeploymentFacade;
+
+    @Autowired
     private ProjectDeploymentService projectDeploymentService;
 
     @Autowired
@@ -249,14 +247,10 @@ class ConnectedUserReferenceRolloutIntTest {
         when(connectionService.getConnections(PlatformType.EMBEDDED))
             .thenReturn(List.of());
 
-        // The per-user deployment is enabled, so rewriting or removing an enabled row stops that row's running jobs;
-        // the mocked job service answers "none running", as an empty job table would.
         when(principalJobService.getJobIds(
             any(), any(), any(), anyList(), any(), anyList(), anyBoolean(), anyInt()))
                 .thenReturn(Page.empty());
 
-        // getOrCreateReference validates the automation workflow uuid against the permission-FILTERED automation workflows, which consults this
-        // (mocked) evaluator; the default mock answer of false would hide every template from every connected user.
         when(embeddedPermissionEvaluator.evaluate(any(), any()))
             .thenReturn(true);
     }
@@ -308,7 +302,6 @@ class ConnectedUserReferenceRolloutIntTest {
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
-        // Enabling catches the deployment up to the last published version first, so the row ends on that version.
         String versionTwoWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
 
         assertThatCode(() -> connectedUserWorkflowReferenceFacade.enableReference(
@@ -349,10 +342,6 @@ class ConnectedUserReferenceRolloutIntTest {
         assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId())).isEmpty();
     }
 
-    /**
-     * Changing one template's reference must write only that template's row: disabling a row stops its running jobs, so
-     * re-sending a sibling row would stop the sibling template's in-flight runs and re-register its triggers.
-     */
     @Test
     void testChangingOneReferenceNeverStopsAnotherTemplatesRunningJobsOrTriggers() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Sibling Rows");
@@ -393,11 +382,39 @@ class ConnectedUserReferenceRolloutIntTest {
             .executeTriggerDisable(eq(firstWorkflowId), any(), any(), any(), any());
     }
 
-    /**
-     * Provisioning through the three-argument overload is atomic: a failure after the deployment was created and the
-     * reference saved -- here the entitlement lookup failing with a non-409 exception -- leaves neither behind, so the
-     * next call cannot return an orphan.
-     */
+    @Test
+    void testDeleteAutomationWorkflowProjectRemovesTheReferenceDeploymentAndDanglesTheReference() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Automation Workflow");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_TRIGGER_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(reference.isEnabled()).isTrue();
+
+        long projectDeploymentId = reference.getProjectDeploymentId();
+        String workflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
+
+        assertThatCode(() -> automationWorkflowProjectFacade.deleteProject(automationWorkflowProjectId))
+            .doesNotThrowAnyException();
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId)).isEmpty();
+        assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId()))
+            .get()
+            .satisfies(deletedReference -> {
+                assertThat(deletedReference.isDangling()).isTrue();
+                assertThat(deletedReference.isEnabled()).isFalse();
+            });
+
+        verify(triggerLifecycleFacade).executeTriggerDisable(eq(workflowId), any(), any(), any(), any());
+    }
+
     @Test
     void testFailedProvisioningLeavesNoReferenceAndNoDeployment() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Atomic Provisioning");
@@ -421,10 +438,6 @@ class ConnectedUserReferenceRolloutIntTest {
             automationWorkflowProjectId, "__EMBEDDED__" + EXTERNAL_USER_ID + "__PRODUCTION")).isEmpty();
     }
 
-    /**
-     * Enabling refused with a 409 keeps what it wrote: the reference, enabled before, is saved disabled in the real
-     * transaction rather than rolled back to its enabled state.
-     */
     @Test
     void testEnableReferenceWithAMissingConnectionThrowsAndKeepsTheReferenceDisabled() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Missing Connection Enable");
@@ -454,11 +467,6 @@ class ConnectedUserReferenceRolloutIntTest {
         assertThat(reloadedReference.isEnabled()).isFalse();
     }
 
-    /**
-     * A connected user's input values for a reference land on the deployment row through
-     * {@link ConnectedUserProjectFacade#updateProjectWorkflowInputs} the same way copy-mode inputs do, and are reported
-     * back by {@link ConnectedUserProjectFacade#getConnectedUserProjectWorkflows}.
-     */
     @Test
     void testInputsCanBeSetOnAReferenceAndAreListed() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Inputs");
@@ -487,12 +495,6 @@ class ConnectedUserReferenceRolloutIntTest {
                 .isEqualTo(Map.of("channel", "#alerts"));
     }
 
-    /**
-     * Provisioning with a missing required input succeeds and leaves the reference disabled rather than aborting;
-     * enabling is refused with {@link MissingInputException} until the input is set, mirroring
-     * {@link #testEnableReferenceWithAMissingConnectionThrowsAndKeepsTheReferenceDisabled} for inputs instead of
-     * connections.
-     */
     @Test
     void testProvisionWithAMissingRequiredInputSucceedsDisabledAndEnableRefusesUntilItIsSet() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Required Input");
@@ -526,12 +528,6 @@ class ConnectedUserReferenceRolloutIntTest {
             .isEqualTo(true);
     }
 
-    /**
-     * Updating an ENABLED reference's inputs must not drop a required value out from under a running automation:
-     * {@link ConnectedUserReferenceDeploymentManager#updateInputs} refuses with {@link MissingInputException} before
-     * writing anything, rather than saving the incomplete inputs and then failing to re-enable the row with a raw
-     * {@code IllegalArgumentException} from {@code ProjectDeploymentFacadeImpl}'s own validation.
-     */
     @Test
     void testUpdatingInputsOnAnEnabledReferenceRefusesToDropARequiredValue() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Enabled Required Input");
@@ -555,8 +551,6 @@ class ConnectedUserReferenceRolloutIntTest {
 
         when(environmentService.getEnvironment(environmentId)).thenReturn(Environment.PRODUCTION);
 
-        // Non-empty but missing "channel": an empty map is a no-op (ProjectDeploymentWorkflow#setInputs ignores it),
-        // which would let this call through even without the fix and hide the bug entirely.
         assertThatThrownBy(() -> connectedUserProjectFacade.updateProjectWorkflowInputs(
             EXTERNAL_USER_ID, workflowUuid, Map.of("note", "no channel here"), environmentId))
                 .isInstanceOf(MissingInputException.class)
@@ -592,8 +586,6 @@ class ConnectedUserReferenceRolloutIntTest {
         connectedUserReferenceDeploymentManager.updateInputs(
             first.getProjectDeploymentId(), firstUuid, Map.of("channel", "#alerts"));
 
-        // The required input was missing at provisioning, which left the reference disabled; rollout never enables a
-        // disabled reference, so it is enabled here now that the input is set.
         connectedUserWorkflowReferenceFacade.enableReference(
             EXTERNAL_USER_ID, firstUuid, true, Environment.PRODUCTION);
 
@@ -693,7 +685,6 @@ class ConnectedUserReferenceRolloutIntTest {
     void testRepublishWithoutAnyReferencedTemplateDeletesTheDeployment() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout All Removed");
 
-        // Never referenced: it only keeps the automation workflow project publishable once the referenced template is gone.
         addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
 
         String onlyReferencedUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
@@ -740,10 +731,6 @@ class ConnectedUserReferenceRolloutIntTest {
             .getProjectVersion()).isEqualTo(2);
     }
 
-    /**
-     * The editor deletes a template by its uuid. Only the draft loses it: a published version keeps its row, because
-     * the deployments still on that version point at its workflow until the next publish rolls them forward.
-     */
     @Test
     void testDeleteProjectWorkflowRemovesTheTemplateFromTheDraftByItsUuid() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Delete By Uuid");
@@ -758,14 +745,11 @@ class ConnectedUserReferenceRolloutIntTest {
 
         automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
 
-        assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 1, removedUuid)).isPresent();
+        assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 1, removedUuid))
+            .isPresent();
         assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 2, removedUuid)).isEmpty();
     }
 
-    /**
-     * Deleting a template the draft no longer holds -- a double submit or a retried mutation -- does nothing. It must
-     * never fall through to the last PUBLISHED version, whose workflow the connected users' deployment rows still run.
-     */
     @Test
     void testDeletingATemplateTwiceNeverTouchesThePublishedVersion() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Delete Twice");
@@ -784,7 +768,8 @@ class ConnectedUserReferenceRolloutIntTest {
         automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
         automationWorkflowProjectFacade.deleteProjectWorkflow(workflowUuid);
 
-        assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 1, workflowUuid)).isPresent();
+        assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 1, workflowUuid))
+            .isPresent();
         assertThat(connectedUserReferenceDeploymentManager.fetchWorkflowRow(
             reference.getProjectDeploymentId(), publishedWorkflowId))
                 .get()
@@ -792,10 +777,6 @@ class ConnectedUserReferenceRolloutIntTest {
                 .isEqualTo(true);
     }
 
-    /**
-     * A template first published in a newer version than the connected user's deployment can only be written once the
-     * deployment has caught up: at the deployment's old version the template has no workflow to point a row at.
-     */
     @Test
     void testProvisioningATemplateNewerThanTheDeploymentCatchesTheDeploymentUp() {
         long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Newer Template");
@@ -824,7 +805,204 @@ class ConnectedUserReferenceRolloutIntTest {
         assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(projectDeploymentId))
             .extracting(ProjectDeploymentWorkflow::getWorkflowId)
             .containsExactlyInAnyOrder(
-                getWorkflowId(automationWorkflowProjectId, 2, firstUuid), getWorkflowId(automationWorkflowProjectId, 2, secondUuid));
+                getWorkflowId(automationWorkflowProjectId, 2, firstUuid),
+                getWorkflowId(automationWorkflowProjectId, 2, secondUuid));
+    }
+
+    @Test
+    void testRollOutContinuesWithTheNextDeploymentWhenOneFails() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Isolated Failure");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        String failingExternalUserId = createConnectedUser();
+        String otherExternalUserId = createConnectedUser();
+
+        ConnectedUserProjectWorkflow failingReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            failingExternalUserId, workflowUuid, Environment.PRODUCTION);
+        ConnectedUserProjectWorkflow otherReference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            otherExternalUserId, workflowUuid, Environment.PRODUCTION);
+
+        assertThat(otherReference.getProjectDeploymentId()).isNotEqualTo(failingReference.getProjectDeploymentId());
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ConnectedUser failingConnectedUser = connectedUserService.getConnectedUser(
+            failingExternalUserId, Environment.PRODUCTION);
+
+        when(connectedUserConnectionFacade.getConnections(failingConnectedUser.getId(), "slack", List.of()))
+            .thenThrow(new IllegalStateException("Connection lookup failed"));
+
+        assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId))
+            .doesNotThrowAnyException();
+
+        assertThat(projectDeploymentService.getProjectDeployment(failingReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(1);
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(
+            failingReference.getProjectDeploymentId()))
+                .singleElement()
+                .extracting(ProjectDeploymentWorkflow::getWorkflowId)
+                .isEqualTo(getWorkflowId(automationWorkflowProjectId, 1, workflowUuid));
+        assertThat(projectDeploymentService.getProjectDeployment(otherReference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(
+            otherReference.getProjectDeploymentId()))
+                .singleElement()
+                .satisfies(row -> {
+                    assertThat(row.getWorkflowId())
+                        .isEqualTo(getWorkflowId(automationWorkflowProjectId, 2, workflowUuid));
+                    assertThat(row.isEnabled()).isTrue();
+                });
+    }
+
+    @Test
+    void testRollOutDeletesADeploymentWhoseOnlyReferenceIsDangling() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Dangling Only");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        markDangling(reference);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        assertThat(projectWorkflowService.fetchProjectWorkflow(automationWorkflowProjectId, 2, workflowUuid))
+            .isPresent();
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(reference.getProjectDeploymentId())).isEmpty();
+        assertThat(connectedUserProjectWorkflowRepository.findById(reference.getId()))
+            .get()
+            .satisfies(danglingReference -> {
+                assertThat(danglingReference.isDangling()).isTrue();
+                assertThat(danglingReference.isEnabled()).isFalse();
+            });
+    }
+
+    @Test
+    void testRollOutLogsAndReturnsWhenTheLastPublishedVersionCannotBeRead() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Unpublished");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        ListAppender<ILoggingEvent> appender = attachAppenderToRolloutManagerLogger();
+
+        try {
+            assertThatCode(() -> connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId))
+                .doesNotThrowAnyException();
+
+            assertThat(appender.list)
+                .singleElement()
+                .satisfies(event -> {
+                    assertThat(event.getLevel()).isEqualTo(Level.ERROR);
+                    assertThat(event.getFormattedMessage())
+                        .contains("automation workflow project id=" + automationWorkflowProjectId);
+                });
+        } finally {
+            detachAppenderFromRolloutManagerLogger(appender);
+        }
+    }
+
+    @Test
+    void testRollOutDeletesAReferenceDeploymentWithoutReferencesAndRollsOutTheOthers() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Without References");
+
+        String workflowUuid = addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        stubEntitledSlackConnection(777L);
+
+        long emptyProjectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, "rollout-empty-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+
+        ConnectedUserProjectWorkflow reference = connectedUserWorkflowReferenceFacade.getOrCreateReference(
+            EXTERNAL_USER_ID, workflowUuid, Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(emptyProjectDeploymentId)).isEmpty();
+        assertThat(projectDeploymentService.getProjectDeployment(reference.getProjectDeploymentId())
+            .getProjectVersion()).isEqualTo(2);
+        assertThat(projectDeploymentWorkflowService.getProjectDeploymentWorkflows(reference.getProjectDeploymentId()))
+            .singleElement()
+            .extracting(ProjectDeploymentWorkflow::getWorkflowId)
+            .isEqualTo(getWorkflowId(automationWorkflowProjectId, 2, workflowUuid));
+    }
+
+    @Test
+    void testRollOutLeavesADeploymentThatIsNotAReferenceDeploymentAlone() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Vendor Deployment");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        ProjectDeployment vendorProjectDeployment = new ProjectDeployment();
+
+        vendorProjectDeployment.setEnvironment(Environment.PRODUCTION);
+        vendorProjectDeployment.setName("Vendor deployment");
+        vendorProjectDeployment.setProjectId(automationWorkflowProjectId);
+        vendorProjectDeployment.setProjectVersion(1);
+
+        long vendorProjectDeploymentId = projectDeploymentFacade.createProjectDeployment(
+            vendorProjectDeployment, List.of(), List.of());
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        connectedUserReferenceRolloutManager.rollOut(automationWorkflowProjectId);
+
+        assertThat(projectDeploymentService.fetchProjectDeployment(vendorProjectDeploymentId))
+            .get()
+            .extracting(ProjectDeployment::getProjectVersion)
+            .isEqualTo(1);
+    }
+
+    @Test
+    void testRollOutDeploymentIfBehindDeletesADeploymentWithoutReferences() {
+        long automationWorkflowProjectId = createAutomationWorkflowProject("Rollout Lazy Without References");
+
+        addWorkflow(automationWorkflowProjectId, SLACK_WORKFLOW_DEFINITION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        long projectDeploymentId = connectedUserReferenceDeploymentManager.getOrCreateDeployment(
+            automationWorkflowProjectId, "rollout-lazy-empty-user-" + UUID.randomUUID(), Environment.PRODUCTION);
+
+        automationWorkflowProjectFacade.publishProject(automationWorkflowProjectId);
+
+        assertThat(connectedUserReferenceRolloutManager.rollOutDeploymentIfBehind(projectDeploymentId)).isTrue();
+        assertThat(projectDeploymentService.fetchProjectDeployment(projectDeploymentId)).isEmpty();
+    }
+
+    private static ListAppender<ILoggingEvent> attachAppenderToRolloutManagerLogger() {
+        Logger logger = (Logger) LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);
+
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+
+        appender.start();
+        logger.addAppender(appender);
+
+        return appender;
+    }
+
+    private static void detachAppenderFromRolloutManagerLogger(ListAppender<ILoggingEvent> appender) {
+        Logger logger = (Logger) LoggerFactory.getLogger(ConnectedUserReferenceRolloutManager.class);
+
+        logger.detachAppender(appender);
     }
 
     private long createAutomationWorkflowProject(String name) {
@@ -832,12 +1010,16 @@ class ConnectedUserReferenceRolloutIntTest {
             null);
     }
 
+    private String createConnectedUser() {
+        String externalUserId = "rollout-user-" + UUID.randomUUID();
+
+        connectedUserService.createConnectedUser(externalUserId, Environment.PRODUCTION);
+
+        return externalUserId;
+    }
+
     private String addWorkflow(long automationWorkflowProjectId, String definition) {
-        String workflowId = automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
-
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
-
-        return projectWorkflow.getUuidAsString();
+        return automationWorkflowProjectFacade.createProjectWorkflow(automationWorkflowProjectId, definition, null);
     }
 
     private String getWorkflowId(long automationWorkflowProjectId, int projectVersion, String workflowUuid) {
@@ -869,5 +1051,17 @@ class ConnectedUserReferenceRolloutIntTest {
     @Configuration
     @ComponentScan("com.bytechef.ee.embedded.connected.user.service")
     static class ConnectedUserServiceConfiguration {
+    }
+
+    private void markDangling(ConnectedUserProjectWorkflow reference) {
+        ConnectedUserProjectWorkflow storedReference =
+            connectedUserProjectWorkflowRepository.findById(reference.getId())
+                .orElseThrow();
+
+        storedReference.setDangling(true);
+        storedReference.setDanglingReason("Removed from the automation workflow project on redeploy");
+        storedReference.setEnabled(false);
+
+        connectedUserProjectWorkflowRepository.save(storedReference);
     }
 }
