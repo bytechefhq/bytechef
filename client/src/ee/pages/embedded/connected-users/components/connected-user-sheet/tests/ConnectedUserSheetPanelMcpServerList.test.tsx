@@ -13,6 +13,10 @@ vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
     useConnectedUserMcpServersQuery: hoisted.connectedUserMcpServersQuery,
 }));
 
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => true,
+}));
+
 vi.mock(
     '@/ee/pages/embedded/connected-users/components/connected-user-sheet/provision-mcp-server-dialog/ProvisionMcpServerDialog',
     () => ({
@@ -45,7 +49,7 @@ describe('ConnectedUserSheetPanelMcpServerList', () => {
     it("lists the user's MCP servers under the header", () => {
         renderPanel();
 
-        expect(hoisted.connectedUserMcpServersQuery).toHaveBeenCalledWith({connectedUserId: '1050'});
+        expect(hoisted.connectedUserMcpServersQuery).toHaveBeenCalledWith({connectedUserId: '1050'}, {enabled: true});
         expect(screen.getByRole('heading', {name: 'MCP Servers'})).toBeInTheDocument();
         expect(screen.getByText('mcp server 1')).toBeInTheDocument();
         expect(screen.getByText('mcp server 2')).toBeInTheDocument();
