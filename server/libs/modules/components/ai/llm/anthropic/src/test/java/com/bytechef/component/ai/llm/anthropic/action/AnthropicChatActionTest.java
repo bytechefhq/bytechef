@@ -46,6 +46,8 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.ai.anthropic.AnthropicCacheStrategy;
@@ -213,6 +215,42 @@ class AnthropicChatActionTest {
         assertNull(anthropicChatOptions.getTopK());
         assertNull(anthropicChatOptions.getTemperature());
         assertNull(anthropicChatOptions.getTopP());
+    }
+
+    @Test
+    void testCreateChatModelDisablesThinkingWhenThinkingIsOff() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-sonnet-5", MAX_TOKENS, 1000, THINKING, false));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        ThinkingConfigParam thinking = anthropicChatOptions.getThinking();
+
+        assertTrue(thinking.isDisabled());
+    }
+
+    @Test
+    void testCreateChatModelDisablesThinkingWhenThinkingIsUnset() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-opus-5", MAX_TOKENS, 1000));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        ThinkingConfigParam thinking = anthropicChatOptions.getThinking();
+
+        assertTrue(thinking.isDisabled());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "claude-fable-5-1", "claude-fable-5", "claude-mythos-5-1", "claude-opus-5-5"
+    })
+    void testCreateChatModelOmitsThinkingForModelsThatAlwaysThink(String model) {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, model, MAX_TOKENS, 1000, THINKING, false));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
         assertNull(anthropicChatOptions.getThinking());
     }
 

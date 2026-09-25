@@ -21,6 +21,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMA
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
+import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -81,7 +82,7 @@ public interface ChatModel {
 
         ChatClient.CallResponseSpec callResponseSpec = chatClientRequestSpec
             .messages(messages)
-            .advisors(new ContextLoggerAdvisor(context))
+            .advisors(new ContextLoggerAdvisor(context), new TextGenerationFirstAdvisor())
             .call();
 
         return ModelUtils.getChatResponse(callResponseSpec, inputParameters, responseFormatRequired, context);

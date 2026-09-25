@@ -39,6 +39,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.List;
 import org.springframework.ai.anthropic.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -49,6 +50,9 @@ import org.springframework.ai.anthropic.AnthropicChatOptions;
  */
 public class AnthropicChatAction {
 
+    private static final List<String> ALWAYS_THINKING_MODEL_PREFIXES = List.of(
+        "claude-fable-", "claude-mythos-", "claude-opus-5-5");
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -58,8 +62,10 @@ public class AnthropicChatAction {
         .perform(AnthropicChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        String model = inputParameters.getRequiredString(MODEL);
+
         AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
+            .model(model)
             .maxTokens(inputParameters.getInteger(MAX_TOKENS, DEFAULT_MAX_TOKENS))
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
             .cacheOptions(
@@ -71,6 +77,10 @@ public class AnthropicChatAction {
             optionsBuilder.thinkingAdaptive()
                 .effort(OutputConfig.Effort.of(inputParameters.getString(REASONING_EFFORT, "medium")));
         } else {
+            if (!isAlwaysThinking(model)) {
+                optionsBuilder.thinkingDisabled();
+            }
+
             optionsBuilder.topK(inputParameters.getInteger(TOP_K));
 
             // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
@@ -103,6 +113,11 @@ public class AnthropicChatAction {
     };
 
     private AnthropicChatAction() {
+    }
+
+    private static boolean isAlwaysThinking(String model) {
+        return ALWAYS_THINKING_MODEL_PREFIXES.stream()
+            .anyMatch(model::startsWith);
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
