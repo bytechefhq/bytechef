@@ -11,14 +11,17 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint.HttpMethod;
+import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorGenerationJob;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiGenerator;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorAiService;
+import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorGenerationJobService;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -35,9 +38,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,20 +58,55 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
     private final ApiConnectorAiService apiConnectorAiService;
     private final ApiConnectorFileStorage apiConnectorFileStorage;
+    private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ApiConnectorService apiConnectorService;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorFacadeImpl(
         @Nullable ApiConnectorAiService apiConnectorAiService,
         ApiConnectorFileStorage apiConnectorFileStorage,
+        ApiConnectorGenerationJobService apiConnectorGenerationJobService,
         ApiConnectorService apiConnectorService) {
 
         this.apiConnectorAiService = apiConnectorAiService;
         this.apiConnectorFileStorage = apiConnectorFileStorage;
+        this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
         this.apiConnectorService = apiConnectorService;
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public boolean cancelGenerationJob(String jobId) {
+        return apiConnectorGenerationJobService.requestCancellation(jobId);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnector createApiConnector(ApiConnector apiConnector) {
+        return apiConnectorService.create(apiConnector);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void deleteApiConnector(long id) {
+        apiConnectorService.delete(id);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public void enableApiConnector(long id, boolean enable) {
+        apiConnectorService.enableApiConnector(id, enable);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @Transactional(readOnly = true)
+    public Optional<ApiConnectorGenerationJob> fetchGenerationJob(String jobId) {
+        return apiConnectorGenerationJobService.get(jobId);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector generateFromDocumentation(String name, String documentationUrl) {
         if (apiConnectorAiService == null) {
             throw new ConfigurationException(
@@ -80,6 +120,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector importOpenApiSpecification(String name, String specification) {
         name = convertComponentName(name);
 
@@ -140,11 +181,43 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @Transactional(readOnly = true)
+    public ApiConnector getApiConnector(long id) {
+        return apiConnectorService.getApiConnector(id);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    @Transactional(readOnly = true)
     public List<ApiConnectorDTO> getApiConnectors() {
         return apiConnectorService.getApiConnectors()
             .stream()
             .map(this::toApiConnectorDTO)
             .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnectorGenerationJob startGenerationJob(String documentationUrl, String userPrompt) {
+        if (apiConnectorAiService == null) {
+            throw new ConfigurationException(
+                "AI service is not configured. Please configure bytechef.ai.copilot settings.",
+                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
+
+        ApiConnectorGenerationJob apiConnectorGenerationJob = apiConnectorGenerationJobService.create(documentationUrl);
+
+        apiConnectorAiService.generateOpenApiSpecificationAsync(
+            apiConnectorGenerationJob.getId(), documentationUrl, userPrompt);
+
+        return apiConnectorGenerationJob;
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public ApiConnector updateApiConnector(ApiConnector apiConnector) {
+        return apiConnectorService.update(apiConnector);
     }
 
     private ApiConnectorDTO toApiConnectorDTO(ApiConnector apiConnector) {
