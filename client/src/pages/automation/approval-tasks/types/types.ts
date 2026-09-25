@@ -68,18 +68,6 @@ export interface ApprovalTaskTemplateI {
     checklist: string[];
 }
 
-export interface NewApprovalTaskFormI {
-    title: string;
-    description: string;
-    status: 'open' | 'in-progress' | 'completed';
-    priority: 'high' | 'medium' | 'low';
-    assignee: string;
-    assigneeId?: string;
-    dueDate: string;
-    dependencies: string[];
-    templateId?: string;
-}
-
 export interface AssigneeOptionI {
     id: string;
     name: string;
