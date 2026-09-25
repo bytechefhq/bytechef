@@ -353,13 +353,6 @@ export type ApprovalTasksQueryVariables = Exact<{
 
 export type ApprovalTasksQuery = { approvalTasks: Array<{ assigneeId: string | null, createdBy: string | null, createdDate: string | null, description: string | null, dueDate: string | null, id: string, jobResumeId: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null> | null };
 
-export type CreateApprovalTaskMutationVariables = Exact<{
-  approvalTask: Types.ApprovalTaskInput;
-}>;
-
-
-export type CreateApprovalTaskMutation = { createApprovalTask: { assigneeId: string | null, description: string | null, id: string, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus } | null };
-
 export type DeleteApprovalTaskMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -3278,32 +3271,6 @@ export const useApprovalTasksQuery = <
       {
     queryKey: variables === undefined ? ['approvalTasks'] : ['approvalTasks', variables],
     queryFn: fetcher<ApprovalTasksQuery, ApprovalTasksQueryVariables>(ApprovalTasksDocument, variables),
-    ...options
-  }
-    )};
-
-export const CreateApprovalTaskDocument = new TypedDocumentString(`
-    mutation createApprovalTask($approvalTask: ApprovalTaskInput!) {
-  createApprovalTask(approvalTask: $approvalTask) {
-    assigneeId
-    description
-    id
-    name
-    priority
-    status
-  }
-}
-    `);
-
-export const useCreateApprovalTaskMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateApprovalTaskMutation, TError, CreateApprovalTaskMutationVariables, TContext>) => {
-    
-    return useMutation<CreateApprovalTaskMutation, TError, CreateApprovalTaskMutationVariables, TContext>(
-      {
-    mutationKey: ['createApprovalTask'],
-    mutationFn: (variables?: CreateApprovalTaskMutationVariables) => fetcher<CreateApprovalTaskMutation, CreateApprovalTaskMutationVariables>(CreateApprovalTaskDocument, variables)(),
     ...options
   }
     )};
