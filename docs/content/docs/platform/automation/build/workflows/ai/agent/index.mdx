@@ -166,6 +166,7 @@ The Model slot binds a chat model to the agent. Exactly one model is required; c
 | Ollama | [ollama/v1](/reference/components/ollama_v1) |
 | OpenAI | [openAi/v1](/reference/components/open-ai_v1) |
 | OpenRouter | [openRouter/v1](/reference/components/open-router_v1) |
+| Requesty | [requesty/v1](/reference/components/requesty_v1) |
 | NanoGPT | [nanoGpt/v1](/reference/components/nano-gpt_v1) |
 | LiteLLM | [liteLlm/v1](/reference/components/lite-llm_v1) |
 | Perplexity | [perplexity/v1](/reference/components/perplexity_v1) |
@@ -176,7 +177,7 @@ Beyond the chat model used by the agent, several provider components also ship s
 
 ### Model routers
 
-**OpenRouter**, **NanoGPT**, and **LiteLLM** are *routers* (aggregators) rather than single-vendor providers: one connection fronts hundreds of models from many vendors, so you switch or A/B models by changing only the model name instead of adding a connection per vendor. Reach for a router when you want to experiment across models freely, or route all traffic through one billing and governance point; reach for a direct provider (Anthropic, OpenAI, Gemini, …) when you want a first-party connection to a single vendor.
+**OpenRouter**, **Requesty**, **NanoGPT**, and **LiteLLM** are *routers* (aggregators) rather than single-vendor providers: one connection fronts hundreds of models from many vendors, so you switch or A/B models by changing only the model name instead of adding a connection per vendor. Reach for a router when you want to experiment across models freely, or route all traffic through one billing and governance point; reach for a direct provider (Anthropic, OpenAI, Gemini, …) when you want a first-party connection to a single vendor.
 
 {/* TODO screenshot: - agent/agent-model-picker.png showing the model cluster element selector with the list of providers above. */}
 
