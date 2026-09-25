@@ -27,8 +27,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AnonymousQueue;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
@@ -65,6 +67,7 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
     private final RabbitAdmin rabbitAdmin;
     private final RabbitProperties rabbitProperties;
     private final RabbitListenerEndpointRegistry rabbitListenerEndpointRegistry;
+    private final AtomicInteger endpointSequence = new AtomicInteger();
 
     @SuppressFBWarnings("EI")
     public AmqpMessageBrokerListenerRegistrarConfiguration(
@@ -81,6 +84,8 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
         this.rabbitAdmin = rabbitAdmin;
         this.rabbitProperties = rabbitProperties;
         this.rabbitListenerEndpointRegistry = rabbitListenerEndpointRegistry;
+
+        rabbitAdmin.setRedeclareManualDeclarations(true);
     }
 
     @Override
@@ -107,7 +112,7 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
 
         if (messageRoute.isControlExchange()) {
             exchange = controlExchange;
-            queue = new Queue(messageRoute.getName(), true, true, true);
+            queue = new AnonymousQueue();
         } else {
             exchange = messageExchange;
 
@@ -119,7 +124,8 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
             queue = new Queue(messageRoute.getName(), true, false, false, args);
         }
 
-        registerListenerEndpoint(listenerEndpointRegistrar, queue, exchange, concurrency, delegate, methodName);
+        registerListenerEndpoint(
+            listenerEndpointRegistrar, messageRoute, queue, exchange, concurrency, delegate, methodName);
     }
 
     Exchange createControlExchange() {
@@ -135,14 +141,15 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
     }
 
     private void registerListenerEndpoint(
-        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, Queue queue, Exchange exchange, int concurrency,
-        Object delegate, String methodName) {
+        RabbitListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, Queue queue,
+        Exchange exchange, int concurrency, Object delegate, String methodName) {
 
+        rabbitAdmin.declareExchange(exchange);
         rabbitAdmin.declareQueue(queue);
         rabbitAdmin
             .declareBinding(BindingBuilder.bind(queue)
                 .to(exchange)
-                .with(queue.getName())
+                .with(messageRoute.getName())
                 .noargs());
 
         MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(delegate);
@@ -152,7 +159,7 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
 
         SimpleRabbitListenerEndpoint simpleRabbitListenerEndpoint = new SimpleRabbitListenerEndpoint();
 
-        simpleRabbitListenerEndpoint.setId(queue.getName() + "Endpoint");
+        simpleRabbitListenerEndpoint.setId(messageRoute.getName() + "Endpoint" + endpointSequence.incrementAndGet());
         simpleRabbitListenerEndpoint.setQueueNames(queue.getName());
         simpleRabbitListenerEndpoint.setMessageListener(messageListenerAdapter);
 

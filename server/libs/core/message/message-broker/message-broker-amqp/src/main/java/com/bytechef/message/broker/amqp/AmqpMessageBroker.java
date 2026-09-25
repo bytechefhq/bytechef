@@ -38,8 +38,10 @@ public class AmqpMessageBroker implements MessageBroker {
     public void send(MessageRoute messageRoute, Object message) {
         Assert.notNull(messageRoute, "'queueName' must not be null");
 
+        MessageRoute.Exchange exchange = messageRoute.getExchange();
+
         amqpTemplate.convertAndSend(
-            determineExchange(messageRoute.getName()), determineRoutingKey(messageRoute.getName()), message,
+            exchange.toString(), messageRoute.getName(), message,
             amqpMessage -> {
                 if (message instanceof Retryable retryable) {
                     MessageProperties messageProperties = amqpMessage.getMessageProperties();
@@ -55,22 +57,6 @@ public class AmqpMessageBroker implements MessageBroker {
 
                 return amqpMessage;
             });
-    }
-
-    private String determineExchange(String queueName) {
-        String[] routingKeyItems = queueName.split("/");
-
-        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + queueName);
-
-        return routingKeyItems.length == 2 ? routingKeyItems[0] : MessageRoute.Exchange.MESSAGE.toString();
-    }
-
-    private String determineRoutingKey(String queueName) {
-        String[] routingKeyItems = queueName.split("/");
-
-        Assert.isTrue(routingKeyItems.length <= 2, "Invalid routing key: " + queueName);
-
-        return routingKeyItems.length == 2 ? routingKeyItems[1] : queueName;
     }
 
     public void setAmqpTemplate(AmqpTemplate amqpTemplate) {

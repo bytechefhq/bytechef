@@ -36,10 +36,15 @@ public class JmsMessageBroker implements MessageBroker {
     private static final Logger log = LoggerFactory.getLogger(JmsMessageBroker.class);
 
     private final JmsTemplate jmsTemplate;
+    private final JmsTemplate topicJmsTemplate;
 
     @SuppressFBWarnings("EI")
     public JmsMessageBroker(JmsTemplate jmsTemplate) {
         this.jmsTemplate = jmsTemplate;
+        this.topicJmsTemplate = new JmsTemplate(jmsTemplate.getConnectionFactory());
+
+        topicJmsTemplate.setMessageConverter(jmsTemplate.getMessageConverter());
+        topicJmsTemplate.setPubSubDomain(true);
     }
 
     @Override
@@ -50,7 +55,11 @@ public class JmsMessageBroker implements MessageBroker {
             delay(retryable.getRetryDelayMillis());
         }
 
-        jmsTemplate.convertAndSend(messageRoute.getName(), message);
+        if (messageRoute.isControlExchange()) {
+            topicJmsTemplate.convertAndSend(messageRoute.getName(), message);
+        } else {
+            jmsTemplate.convertAndSend(messageRoute.getName(), message);
+        }
     }
 
     private void delay(long value) {
