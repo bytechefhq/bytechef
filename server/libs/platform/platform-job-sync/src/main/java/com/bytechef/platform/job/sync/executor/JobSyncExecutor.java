@@ -37,6 +37,7 @@ import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.coordinator.task.completion.DefaultTaskCompletionHandler;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerChain;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
+import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
@@ -199,7 +200,7 @@ public class JobSyncExecutor {
             CollectionUtils.concat(
                 getTaskDispatcherResolverStream(taskDispatcherResolverFactories, taskDispatcherChain),
                 Stream.of(
-                    new ControlTaskDispatcher(),
+                    new ControlTaskDispatcher(createEventPublisher(memoryMessageBroker)),
                     new DefaultTaskDispatcher(
                         createEventPublisher(memoryMessageBroker), taskDispatcherPreSendProcessors))));
 
