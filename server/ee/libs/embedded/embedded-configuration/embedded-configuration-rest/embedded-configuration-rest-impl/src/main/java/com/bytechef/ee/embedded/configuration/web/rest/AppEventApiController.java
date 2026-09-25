@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,6 +42,7 @@ public class AppEventApiController implements AppEventApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Long> createAppEvent(AppEventModel appEventModel) {
         AppEvent appEvent = appEventService.create(conversionService.convert(appEventModel, AppEvent.class));
 
@@ -48,6 +50,7 @@ public class AppEventApiController implements AppEventApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteAppEvent(Long id) {
         appEventService.delete(id);
 
@@ -56,11 +59,13 @@ public class AppEventApiController implements AppEventApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<AppEventModel> getAppEvent(Long id) {
         return ResponseEntity.ok(conversionService.convert(appEventService.getAppEvent(id), AppEventModel.class));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<AppEventModel>> getAppEvents() {
         return ResponseEntity.ok(
             CollectionUtils.map(
@@ -68,6 +73,7 @@ public class AppEventApiController implements AppEventApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateAppEvent(Long id, AppEventModel appEventModel) {
         appEventService.update(conversionService.convert(appEventModel, AppEvent.class));
 
