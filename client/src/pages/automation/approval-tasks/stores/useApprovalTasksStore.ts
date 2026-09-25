@@ -20,7 +20,6 @@ const CLEARED_FILTERS: FiltersI = {
 };
 
 interface ApprovalTasksStateI {
-    addApprovalTask: (approvalTask: ApprovalTaskI) => void;
     addAttachment: (approvalTaskId: string, attachment: ApprovalTaskAttachmentI) => void;
     addComment: (approvalTaskId: string, comment: ApprovalTaskCommentI) => void;
     approvalTasks: ApprovalTaskI[];
@@ -62,10 +61,6 @@ const cycleStatus = (currentStatus: string): 'open' | 'in-progress' | 'completed
 export const useApprovalTasksStore = create<ApprovalTasksStateI>()(
     devtools(
         (set, get) => ({
-            addApprovalTask: (approvalTask: ApprovalTaskI) => {
-                set((state) => ({approvalTasks: [approvalTask, ...state.approvalTasks]}));
-            },
-
             addAttachment: (approvalTaskId: string, attachment: ApprovalTaskAttachmentI) => {
                 set((state) => ({
                     approvalTasks: state.approvalTasks.map((approvalTask) => {
