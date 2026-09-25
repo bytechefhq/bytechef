@@ -19,6 +19,7 @@ package com.bytechef.ai.model.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -221,6 +222,8 @@ class AiModelConfigurationTest {
         ChatModel chatModel = aiModelConfiguration.resolveChatModel();
 
         assertThat(chatModel).isNotNull();
+        assertThat(chatModel.getDefaultOptions()
+            .getMaxTokens()).isEqualTo(AnthropicConstants.DEFAULT_MAX_TOKENS);
     }
 
     @Test

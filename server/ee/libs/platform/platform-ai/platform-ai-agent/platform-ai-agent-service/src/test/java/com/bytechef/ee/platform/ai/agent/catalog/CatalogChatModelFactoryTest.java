@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,16 @@ class CatalogChatModelFactoryTest {
             factory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test-key", null);
 
         assertThat(chatModel).isNotNull();
+    }
+
+    @Test
+    void testCreateChatModelForAnthropicUsesComponentDefaultMaxTokens() {
+        org.springframework.ai.chat.model.ChatModel chatModel =
+            factory.createChatModel(Provider.ANTHROPIC, "claude-sonnet-5", "sk-test-key", null);
+
+        assertThat(chatModel).isNotNull();
+        assertThat(chatModel.getDefaultOptions()
+            .getMaxTokens()).isEqualTo(AnthropicConstants.DEFAULT_MAX_TOKENS);
     }
 
     @Test
