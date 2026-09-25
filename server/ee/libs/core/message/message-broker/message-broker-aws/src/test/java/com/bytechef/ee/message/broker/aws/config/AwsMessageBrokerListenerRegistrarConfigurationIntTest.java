@@ -46,6 +46,7 @@ import org.testcontainers.utility.DockerImageName;
 })
 class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
 
+    private static final String CONTROL_QUEUE_NAME = "awsControlTest";
     private static final String QUEUE_NAME = "awsTest";
     private static final String MESSAGE = "Hello World";
 
@@ -66,6 +67,19 @@ class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
         }
     };
 
+    private static final MessageRoute CONTROL_MESSAGE_ROUTE = new MessageRoute() {
+
+        @Override
+        public Exchange getExchange() {
+            return Exchange.CONTROL;
+        }
+
+        @Override
+        public String getName() {
+            return CONTROL_QUEUE_NAME;
+        }
+    };
+
     @Autowired
     private AwsMessageBroker awsMessageBroker;
 
@@ -80,6 +94,7 @@ class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
         localStack.execInContainer("awslocal", "sqs", "create-queue", "--queue-name", QUEUE_NAME);
+        localStack.execInContainer("awslocal", "sqs", "create-queue", "--queue-name", CONTROL_QUEUE_NAME);
     }
 
     @Test
@@ -93,7 +108,41 @@ class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
             .untilAsserted(() -> assertThat(TestDelegate.message).isEqualTo(MESSAGE));
     }
 
+    @Test
+    void testEveryListenerOfAControlRouteReceivesTheMessage() {
+        awsMessageBroker.send(CONTROL_MESSAGE_ROUTE, new Event(MESSAGE));
+
+        await()
+            .pollInterval(Duration.ofSeconds(2))
+            .atMost(Duration.ofSeconds(10))
+            .ignoreExceptions()
+            .untilAsserted(() -> {
+                assertThat(FirstControlDelegate.message).isEqualTo(MESSAGE);
+                assertThat(SecondControlDelegate.message).isEqualTo(MESSAGE);
+            });
+    }
+
     record Event(String message) {
+    }
+
+    static class FirstControlDelegate {
+
+        public static String message;
+
+        @SuppressFBWarnings("ST")
+        public void onEvent(Event event) {
+            message = event.message();
+        }
+    }
+
+    static class SecondControlDelegate {
+
+        public static String message;
+
+        @SuppressFBWarnings("ST")
+        public void onEvent(Event event) {
+            message = event.message();
+        }
     }
 
     static class TestDelegate {
@@ -114,6 +163,20 @@ class AwsMessageBrokerListenerRegistrarConfigurationIntTest {
         MessageBrokerConfigurer<?> messageBrokerConfigurer() {
             return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> messageBrokerListenerRegistrar
                 .registerListenerEndpoint(listenerEndpointRegistrar, MESSAGE_ROUTE, 1, new TestDelegate(), "onEvent");
+        }
+
+        @Bean
+        MessageBrokerConfigurer<?> firstControlMessageBrokerConfigurer() {
+            return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> messageBrokerListenerRegistrar
+                .registerListenerEndpoint(
+                    listenerEndpointRegistrar, CONTROL_MESSAGE_ROUTE, 1, new FirstControlDelegate(), "onEvent");
+        }
+
+        @Bean
+        MessageBrokerConfigurer<?> secondControlMessageBrokerConfigurer() {
+            return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> messageBrokerListenerRegistrar
+                .registerListenerEndpoint(
+                    listenerEndpointRegistrar, CONTROL_MESSAGE_ROUTE, 1, new SecondControlDelegate(), "onEvent");
         }
     }
 }
