@@ -11,9 +11,9 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {PropertyAllType} from '@/shared/types';
 import {render} from '@/shared/util/test-utils';
-import {fireEvent, screen, waitFor} from '@testing-library/react';
+import {fireEvent, screen, waitFor, within} from '@testing-library/react';
 import {ReactNode} from 'react';
-import {useForm} from 'react-hook-form';
+import {FormProvider, useForm} from 'react-hook-form';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 let formValues: Record<string, unknown> = {};
@@ -51,6 +51,28 @@ const Wrapper = ({
         <TooltipProvider>
             <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>{content}</WorkflowEditorProvider>
         </TooltipProvider>
+    );
+};
+
+const ArrayWrapper = ({property, value}: {property: PropertyAllType; value: unknown[]}) => {
+    const form = useForm({defaultValues: {[property.name!]: value}});
+
+    formValues = form.watch();
+
+    return (
+        <FormProvider {...form}>
+            <TooltipProvider>
+                <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>
+                    <Property
+                        control={form.control as never}
+                        controlPath=""
+                        formState={form.formState}
+                        property={property}
+                        toolsMode
+                    />
+                </WorkflowEditorProvider>
+            </TooltipProvider>
+        </FormProvider>
     );
 };
 
@@ -118,6 +140,35 @@ describe('controlled Formula switch', () => {
         useWorkflowNodeDetailsPanelStore.setState({
             currentNode: undefined,
         } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
+    });
+
+    it('switches a controlled array item saved as a formula back to its native control', async () => {
+        const countsProperty = {
+            controlType: 'ARRAY_BUILDER',
+            expressionEnabled: true,
+            items: [countProperty],
+            label: 'Counts',
+            name: 'counts',
+            type: 'ARRAY',
+        } as PropertyAllType;
+
+        const {container} = render(<ArrayWrapper property={countsProperty} value={['=1+1']} />);
+
+        await settle();
+
+        const itemElement = screen.getByLabelText('0 property');
+
+        expect(itemElement.querySelector('.ProseMirror')).not.toBeNull();
+
+        fireEvent.click(within(itemElement).getByRole('switch', {name: 'Formula'}));
+
+        await waitFor(() => expect((formValues.counts as unknown[])[0]).toBe(''));
+
+        await settle();
+
+        expect(container.querySelector('.ProseMirror')).toBeNull();
+        expect(itemElement.querySelector('input[type=number]')).not.toBeNull();
+        expect(within(itemElement).getByRole('switch', {name: 'Formula'})).toHaveAttribute('aria-checked', 'false');
     });
 
     it('converts a constant number into a formula', async () => {
