@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.trigger.handler;
 
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.trigger.handler.AbstractTriggerHandler;
 
 /**
@@ -26,8 +27,9 @@ public class ComponentTriggerHandler extends AbstractTriggerHandler {
 
     public ComponentTriggerHandler(
         String componentName, int componentVersion, String triggerName,
-        TriggerDefinitionFacade triggerDefinitionFacade) {
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
 
-        super(componentName, componentVersion, triggerName, triggerDefinitionFacade);
+        super(componentName, componentVersion, triggerName, triggerDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

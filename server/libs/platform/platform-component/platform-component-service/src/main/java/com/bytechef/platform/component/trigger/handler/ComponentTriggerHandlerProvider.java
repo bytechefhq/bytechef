@@ -25,6 +25,7 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.util.BeanUtils;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,15 +43,18 @@ public final class ComponentTriggerHandlerProvider implements TriggerHandlerProv
     private final List<ComponentHandler> componentHandlers;
     private final Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
+    private final JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner;
 
     public ComponentTriggerHandlerProvider(
         List<ComponentHandler> componentHandlers,
         Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier,
-        TriggerDefinitionFacade triggerDefinitionFacade) {
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
 
         this.componentHandlers = componentHandlers;
         this.componentHandlerEntriesSupplier = componentHandlerEntriesSupplier;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
+        this.jobPrincipalAuthenticationRunner = jobPrincipalAuthenticationRunner;
     }
 
     @Override
@@ -80,6 +84,6 @@ public final class ComponentTriggerHandlerProvider implements TriggerHandlerProv
                         triggerDefinition.getName()),
                     triggerDefinition -> new ComponentTriggerHandler(
                         componentDefinition.getName(), componentDefinition.getVersion(),
-                        triggerDefinition.getName(), triggerDefinitionFacade)));
+                        triggerDefinition.getName(), triggerDefinitionFacade, jobPrincipalAuthenticationRunner)));
     }
 }
