@@ -143,6 +143,13 @@ public abstract class AbstractAiAgentChatAction {
             })
             .orElse(null);
 
+        // Build the chat-memory Result once here and share it with getAdvisors so the stateful SessionService backing
+        // the memory implementation is not constructed twice (the Result carries the advisor AND the recall tool
+        // callbacks, both needed downstream).
+        Optional<ChatMemoryFunction.Result> chatMemoryResult =
+            clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+                .map(clusterElement -> buildChatMemoryResult(connectionParameters, clusterElement, context));
+
         @SuppressWarnings("unchecked")
         Map<String, Map<String, String>> toolSimulations =
             (Map<String, Map<String, String>>) inputParameters.get(TOOL_SIMULATIONS);
@@ -150,15 +157,30 @@ public abstract class AbstractAiAgentChatAction {
         ChatClient chatClient = ChatClient.builder(chatModel)
             .build();
 
-        return createPrompt(chatClient, inputParameters, context)
-            .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context))
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(chatClient, inputParameters, context)
+            .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult))
             .advisors(getConversationAdvisor(conversationId))
             .messages(ModelUtils.getMessages(inputParameters, context))
             .tools(
-                getToolCallbacks(
-                    clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    toolExecutionListener, toolSimulations, chatModel, context)
+                concatToolCallbacks(
+                    getToolCallbacks(
+                        clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
+                        toolExecutionListener, toolSimulations, chatModel, context),
+                    chatMemoryResult)
                         .toArray());
+
+        // Propagate the conversation id into the @Tool ToolContext (separate from the advisor-context map set via
+        // getConversationAdvisor). The session recall tool (conversation_search / SessionEventTools) reads the session
+        // id from tool-context key SessionEventTools.SESSION_ID_CONTEXT_KEY == ChatMemory.CONVERSATION_ID. The literal
+        // mirrors that constant; kept as a literal to avoid coupling this module to spring-ai-session-management.
+        //
+        // RC1 ChatClientRequestSpec.toolContext(Map) MERGES (putAll) into the existing tool-context map rather than
+        // replacing it, so this does not clobber the ACTION_CONTEXT / SSE keys set at the other call sites.
+        if (conversationId != null) {
+            chatClientRequestSpec.toolContext(Map.of("chat_memory_conversation_id", conversationId));
+        }
+
+        return chatClientRequestSpec;
     }
 
     private ChatMemoryFunction.Result buildChatMemoryResult(
@@ -326,7 +348,7 @@ public abstract class AbstractAiAgentChatAction {
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
-        ChatModel chatModel, ActionContext context) {
+        ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -353,10 +375,6 @@ public abstract class AbstractAiAgentChatAction {
                     "Configure at most one.");
         }
 
-        Optional<ChatMemoryFunction.Result> chatMemoryResult =
-            clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-                .map(clusterElement -> buildChatMemoryResult(connectionParameters, clusterElement, context));
-
         if (!guardrailClusterElements.isEmpty()) {
             List<Message> conversationHistory = chatMemoryResult
                 .map(result -> loadConversationHistory(result.chatMemory(), clusterElementMap))
@@ -374,11 +392,28 @@ public abstract class AbstractAiAgentChatAction {
             .ifPresent(advisors::add);
 
         // tool call
+        //
+        // When the selected chat-memory type can safely persist the full tool request/response transcript, its advisor
+        // is built with an inside-the-loop order (TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER > ToolCallingAdvisor
+        // .DEFAULT_ORDER), so it records every intra-turn tool message. In that case the tool advisor's own in-loop
+        // history MUST be disabled — otherwise the same transcript is written twice (once by each history). Memory
+        // types that don't support it keep the default outside-the-loop placement and the tool advisor keeps its own
+        // in-loop history (the Spring AI RC1 default that keeps each tool-call iteration valid).
 
-        advisors.add(
-            ToolCallingAdvisor.builder()
+        boolean persistToolMessagesInLoop = chatMemoryResult
+            .map(ChatMemoryFunction.Result::supportsToolMessagePersistence)
+            .orElse(false);
+
+        ToolCallingAdvisor toolCallingAdvisor = persistToolMessagesInLoop
+            ? ToolCallingAdvisor.builder()
                 .toolCallingManager(toolCallingManager)
-                .build());
+                .disableInternalConversationHistory()
+                .build()
+            : ToolCallingAdvisor.builder()
+                .toolCallingManager(toolCallingManager)
+                .build();
+
+        advisors.add(toolCallingAdvisor);
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
@@ -401,6 +436,12 @@ public abstract class AbstractAiAgentChatAction {
         return advisor -> {
             if (conversationId != null) {
                 advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
+
+                // Session-based chat memory (SessionMemoryAdvisor) keys off its own context param; set it to the same
+                // conversation id so the message-window and session memory implementations are interchangeable. The
+                // literal mirrors SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY (spring-ai-session); kept as a literal to
+                // avoid coupling the core agent module to that dependency.
+                advisor.param("chat_memory_session_id", conversationId);
             }
         };
     }
@@ -475,6 +516,22 @@ public abstract class AbstractAiAgentChatAction {
 
             return TOOL_SIMULATION_UNAVAILABLE;
         }
+    }
+
+    private static List<ToolCallback> concatToolCallbacks(
+        List<? extends ToolCallback> toolCallbacks, Optional<ChatMemoryFunction.Result> chatMemoryResult) {
+
+        List<ToolCallback> combinedToolCallbacks = new ArrayList<>(toolCallbacks);
+
+        chatMemoryResult
+            .map(ChatMemoryFunction.Result::toolCallbacks)
+            .ifPresent(memoryToolCallbacks -> {
+                if (memoryToolCallbacks != null) {
+                    combinedToolCallbacks.addAll(Arrays.asList(memoryToolCallbacks));
+                }
+            });
+
+        return combinedToolCallbacks;
     }
 
     private List<ToolCallback> getToolCallbacks(

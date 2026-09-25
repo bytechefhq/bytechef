@@ -38,15 +38,18 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -60,14 +63,32 @@ import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
 
 /**
  * @author Ivica Cardic
  */
 @ExtendWith(MockitoExtension.class)
 class AbstractAiAgentChatActionTest {
+
+    private static final String TOOL_LOOP_CONVERSATION_ID = "tool-loop-conversation";
 
     @Mock
     private AiAgentToolFacade aiAgentToolFacade;
@@ -457,6 +478,159 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
+    void testSupportingChatMemoryAdvisorOrderedInsideToolCallingAdvisor() throws Exception {
+        // A memory type that declares supportsToolMessagePersistence=true builds its advisor with
+        // TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER (> ToolCallingAdvisor.DEFAULT_ORDER), so the memory advisor runs
+        // INSIDE the tool loop and captures the full per-iteration tool request/response transcript. This pins the
+        // inside-the-loop placement for supporting memory types (in-memory / redis / neo4j).
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+
+        Map<String, Object> chatMemoryParameters = new HashMap<>();
+        chatMemoryParameters.put("conversationId", "test-conversation");
+
+        Map<String, Object> chatMemoryElement = new HashMap<>();
+        chatMemoryElement.put("name", "chatMemory_1");
+        chatMemoryElement.put("type", "testComponent/v1/testChatMemory");
+        chatMemoryElement.put("parameters", chatMemoryParameters);
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of("clusterElements", Map.of("model", modelElement, "chatMemory", chatMemoryElement)));
+
+        stubModelLookup();
+
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
+
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+
+        // Built exactly as the supporting production components do: inside-loop order plus the capability flag.
+        MessageChatMemoryAdvisor insideLoopChatMemoryAdvisor = MessageChatMemoryAdvisor
+            .builder(mock(ChatMemory.class))
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .build();
+
+        when(chatMemoryFunction.apply(any(), any(), any(), any()))
+            .thenReturn(new ChatMemoryFunction.Result(insideLoopChatMemoryAdvisor, null, true));
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", componentConnection,
+            "chatMemory_1", componentConnection);
+
+        ActionContextAware actionContext = mock(ActionContextAware.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            ChatClient.ChatClientRequestSpec spec = action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext);
+
+            List<Advisor> advisors = ((DefaultChatClient.DefaultChatClientRequestSpec) spec).getAdvisors();
+
+            ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
+
+            Advisor chatMemoryAdvisor = advisors.stream()
+                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
+
+            assertThat(chatMemoryAdvisor.getOrder())
+                .as(
+                    "A memory type declaring supportsToolMessagePersistence must run inside the tool loop " +
+                        "(order > ToolCallingAdvisor.DEFAULT_ORDER) so it captures the full tool transcript.")
+                .isGreaterThan(toolCallAdvisor.getOrder());
+
+            // The inside-loop memory advisor now records the per-iteration transcript, so the tool advisor's own
+            // in-loop history MUST be disabled to avoid double-writing the same tool messages.
+            assertThat(readConversationHistoryEnabled(toolCallAdvisor))
+                .as(
+                    "When memory persists tool messages inside the loop, ToolCallingAdvisor.disableInternal" +
+                        "ConversationHistory() must be applied so the transcript is not written twice.")
+                .isFalse();
+        }
+    }
+
+    @Test
+    void testSupportingChatMemoryPersistsOneToolTranscriptDuringAToolLoop() throws Exception {
+        SessionService sessionService = DefaultSessionService.builder()
+            .sessionRepository(InMemorySessionRepository.builder()
+                .build())
+            .build();
+
+        SessionMemoryAdvisor sessionMemoryAdvisor = SessionMemoryAdvisor.builder(sessionService)
+            .defaultUserId("user-1")
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .build();
+
+        ToolLoopChatModel toolLoopChatModel = new ToolLoopChatModel();
+
+        ChatResponse chatResponse = runToolLoop(
+            toolLoopChatModel,
+            new ChatMemoryFunction.Result(sessionMemoryAdvisor, null, new ToolCallback[] {
+                echoToolCallback()
+            }, true));
+
+        assertThat(chatResponse.getResult()
+            .getOutput()
+            .getText()).isEqualTo("done");
+
+        List<Message> persistedMessages = sessionService.getMessages(TOOL_LOOP_CONVERSATION_ID);
+
+        assertThat(persistedMessages)
+            .as("a supporting memory must persist the tool response exactly once")
+            .filteredOn(ToolResponseMessage.class::isInstance)
+            .hasSize(1);
+        assertThat(persistedMessages)
+            .as("a supporting memory must persist the tool call exactly once")
+            .filteredOn(AbstractAiAgentChatActionTest::isToolCallMessage)
+            .hasSize(1);
+
+        assertSingleToolTranscriptSentToModel(toolLoopChatModel.getPrompts());
+    }
+
+    @Test
+    void testNonSupportingChatMemoryKeepsTheToolTranscriptOutsideMemory() throws Exception {
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+            .build();
+
+        ToolLoopChatModel toolLoopChatModel = new ToolLoopChatModel();
+
+        runToolLoop(
+            toolLoopChatModel,
+            new ChatMemoryFunction.Result(
+                MessageChatMemoryAdvisor.builder(chatMemory)
+                    .build(),
+                chatMemory, new ToolCallback[] {
+                    echoToolCallback()
+                }));
+
+        assertThat(chatMemory.get(TOOL_LOOP_CONVERSATION_ID))
+            .as("an outside-the-loop memory records only the user/assistant exchange")
+            .noneMatch(ToolResponseMessage.class::isInstance);
+
+        assertSingleToolTranscriptSentToModel(toolLoopChatModel.getPrompts());
+    }
+
+    @Test
+    void testToolMessagePersistenceAdvisorOrderIsInsideToolLoop() {
+        // The inside-loop memory order must stay strictly downstream of the tool advisor so a supporting memory
+        // advisor re-participates on every tool-loop iteration. Independent of Spring AI's memory default.
+        ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
+            .build();
+
+        assertThat(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .as("TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER must be greater than ToolCallingAdvisor.DEFAULT_ORDER")
+            .isGreaterThan(toolCallingAdvisor.getOrder());
+    }
+
+    @Test
     void testSpringAiDefaultOrdersComposeCorrectly() {
         // Safety net for Spring AI version bumps. Our chat-memory components and AbstractAiAgentChatAction
         // both rely on Spring AI's builder defaults (no explicit .order(...) / .advisorOrder(...) calls).
@@ -560,7 +734,8 @@ class AbstractAiAgentChatActionTest {
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
-        List<Advisor> advisors = action.getAdvisors(clusterElementMap, Map.of(), chatModel, actionContext);
+        List<Advisor> advisors = action.getAdvisors(
+            clusterElementMap, Map.of(), chatModel, actionContext, Optional.empty());
 
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
 
@@ -584,12 +759,10 @@ class AbstractAiAgentChatActionTest {
 
         BaseChatMemoryAdvisor chatMemoryAdvisor = mock(BaseChatMemoryAdvisor.class);
 
-        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
-
-        when(chatMemoryFunction.apply(any(), any(), any(), any()))
-            .thenReturn(new ChatMemoryFunction.Result(chatMemoryAdvisor, null));
-        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
-            eq("memoryComponent"), eq(1), eq("memoryElement"))).thenReturn(chatMemoryFunction);
+        // The memory Result is now built by the caller (getChatClientRequestSpec) and passed into getAdvisors, so the
+        // test supplies it directly instead of stubbing the chat-memory cluster-element resolution.
+        Optional<ChatMemoryFunction.Result> chatMemoryResult =
+            Optional.of(new ChatMemoryFunction.Result(chatMemoryAdvisor, null));
 
         ComponentConnection memoryConnection = new ComponentConnection(
             "memoryComponent", 1, 2L, Map.of(), null);
@@ -602,7 +775,8 @@ class AbstractAiAgentChatActionTest {
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
-        List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, chatModel, actionContext);
+        List<Advisor> advisors = action.getAdvisors(
+            clusterElementMap, connectionParameters, chatModel, actionContext, chatMemoryResult);
 
         int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
@@ -646,6 +820,97 @@ class AbstractAiAgentChatActionTest {
         return chatModel;
     }
 
+    private ChatResponse runToolLoop(ChatModel chatModel, ChatMemoryFunction.Result chatMemoryResult)
+        throws Exception {
+
+        ModelFunction modelFunction = mock(ModelFunction.class);
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
+
+        when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
+        when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenReturn(chatMemoryResult);
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "model", buildModelElement(),
+                    "chatMemory",
+                    Map.of(
+                        "name", "chatMemory_1",
+                        "type", "testComponent/v1/testChatMemory",
+                        "parameters", Map.of("conversationId", TOOL_LOOP_CONVERSATION_ID)))));
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, ToolCallingManager.builder()
+                .build());
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of(new UserMessage("run the tool")));
+
+            ChatClient.ChatClientRequestSpec chatClientRequestSpec = action.getChatClientRequestSpec(
+                MockParametersFactory.create(Map.of()),
+                Map.of("model_1", componentConnection, "chatMemory_1", componentConnection), extensions, null,
+                mock(ActionContextAware.class));
+
+            return chatClientRequestSpec.call()
+                .chatResponse();
+        }
+    }
+
+    private static void assertSingleToolTranscriptSentToModel(List<Prompt> prompts) {
+        assertThat(prompts)
+            .as("one tool call then one final answer")
+            .hasSize(2);
+
+        Prompt toolLoopPrompt = prompts.get(1);
+
+        List<Message> instructions = toolLoopPrompt.getInstructions();
+
+        assertThat(instructions)
+            .as("the second model call must carry the user turn exactly once")
+            .filteredOn(UserMessage.class::isInstance)
+            .hasSize(1);
+        assertThat(instructions)
+            .as("the second model call must carry the tool call exactly once")
+            .filteredOn(AbstractAiAgentChatActionTest::isToolCallMessage)
+            .hasSize(1);
+        assertThat(instructions)
+            .as("the second model call must carry the tool response exactly once")
+            .filteredOn(ToolResponseMessage.class::isInstance)
+            .hasSize(1);
+    }
+
+    private static boolean isToolCallMessage(Message message) {
+        return message instanceof AssistantMessage assistantMessage && assistantMessage.hasToolCalls();
+    }
+
+    private static ToolCallback echoToolCallback() {
+        return new ToolCallback() {
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return ToolDefinition.builder()
+                    .name("echo")
+                    .description("Echoes a fixed value")
+                    .inputSchema("{\"type\":\"object\"}")
+                    .build();
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return "echoed";
+            }
+        };
+    }
+
     private static ToolCallingAdvisor findToolCallAdvisor(List<Advisor> advisors) {
         return advisors.stream()
             .filter(ToolCallingAdvisor.class::isInstance)
@@ -666,6 +931,41 @@ class AbstractAiAgentChatActionTest {
                 "Unable to read conversationHistoryEnabled from ToolCallingAdvisor — "
                     + "field name changed in Spring AI?",
                 exception);
+        }
+    }
+
+    private static final class ToolLoopChatModel implements ChatModel {
+
+        private static final int MAX_MODEL_CALLS = 5;
+
+        private final List<Prompt> prompts = new ArrayList<>();
+
+        @Override
+        public ChatResponse call(Prompt prompt) {
+            prompts.add(prompt);
+
+            boolean toolAnswered = prompt.getInstructions()
+                .stream()
+                .anyMatch(ToolResponseMessage.class::isInstance);
+
+            AssistantMessage assistantMessage = toolAnswered || prompts.size() >= MAX_MODEL_CALLS
+                ? new AssistantMessage("done")
+                : AssistantMessage.builder()
+                    .content("")
+                    .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "echo", "{}")))
+                    .build();
+
+            return new ChatResponse(List.of(new Generation(assistantMessage)));
+        }
+
+        @Override
+        public ChatOptions getOptions() {
+            return ToolCallingChatOptions.builder()
+                .build();
+        }
+
+        List<Prompt> getPrompts() {
+            return prompts;
         }
     }
 

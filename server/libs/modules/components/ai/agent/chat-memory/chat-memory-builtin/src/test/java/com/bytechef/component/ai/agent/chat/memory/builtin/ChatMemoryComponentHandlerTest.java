@@ -18,12 +18,14 @@ package com.bytechef.component.ai.agent.chat.memory.builtin;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.env.MockEnvironment;
 
 public class ChatMemoryComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/chat-memory_v1.json", new ChatMemoryComponentHandler(null).getDefinition());
+            "definition/chat-memory_v1.json",
+            new ChatMemoryComponentHandler(null, new MockEnvironment()).getDefinition());
     }
 }
