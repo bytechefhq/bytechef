@@ -17,6 +17,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -41,6 +42,7 @@ public class ConnectedUserProjectGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public List<ConnectedUserProjectDTO> connectedUserProjects(
         @Argument Long connectedUserId, @Argument Long environmentId) {
 
@@ -49,6 +51,7 @@ public class ConnectedUserProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean deleteConnectedUserProjectWorkflow(@Argument long id) {
         connectedUserProjectFacade.deleteProjectWorkflow(id);
 
@@ -56,6 +59,7 @@ public class ConnectedUserProjectGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public boolean enableConnectedUserProjectWorkflow(@Argument long id, @Argument boolean enable) {
         connectedUserProjectFacade.enableProjectWorkflow(id, enable);
 
