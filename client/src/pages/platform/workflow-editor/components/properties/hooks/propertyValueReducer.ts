@@ -1,25 +1,6 @@
-export const INPUT_PROPERTY_CONTROL_TYPES = [
-    'DATE',
-    'DATE_TIME',
-    'EMAIL',
-    'INTEGER',
-    'NUMBER',
-    'PASSWORD',
-    'PHONE',
-    'TEXT',
-    'TIME',
-    'URL',
-];
+import {INPUT_PROPERTY_CONTROL_TYPES, MENTION_INPUT_PROPERTY_CONTROL_TYPES} from './propertyControlTypes';
 
-export const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
-    'EMAIL',
-    'FORMULA_MODE',
-    'PHONE',
-    'RICH_TEXT',
-    'TEXT',
-    'TEXT_AREA',
-    'URL',
-];
+export {INPUT_PROPERTY_CONTROL_TYPES, MENTION_INPUT_PROPERTY_CONTROL_TYPES};
 
 const EMPTY_MULTI_SELECT_VALUE: string[] = [];
 
