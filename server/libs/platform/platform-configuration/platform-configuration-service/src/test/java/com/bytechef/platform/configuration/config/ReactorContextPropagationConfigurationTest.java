@@ -25,6 +25,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -35,12 +40,15 @@ class ReactorContextPropagationConfigurationTest {
 
     @BeforeEach
     void setUp() {
+        Hooks.disableAutomaticContextPropagation();
+
         new ReactorContextPropagationConfiguration();
     }
 
     @AfterEach
     void tearDown() {
         EnvironmentContext.clear();
+        SecurityContextHolder.clearContext();
         TenantContext.resetCurrentTenantId();
     }
 
@@ -63,6 +71,35 @@ class ReactorContextPropagationConfigurationTest {
 
         assertThat(threadName.get()).contains("boundedElastic");
         assertThat(onScheduler.get()).isEqualTo(Environment.DEVELOPMENT);
+    }
+
+    @Test
+    void testSecurityContextPropagatesAcrossBoundedElasticHop() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new TestingAuthenticationToken("admin", "n/a", "ROLE_ADMIN"));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        AtomicReference<String> threadName = new AtomicReference<>();
+        AtomicReference<Authentication> onScheduler = new AtomicReference<>();
+
+        Mono.fromCallable(() -> {
+            SecurityContext schedulerSecurityContext = SecurityContextHolder.getContext();
+
+            threadName.set(Thread.currentThread()
+                .getName());
+            onScheduler.set(schedulerSecurityContext.getAuthentication());
+
+            return true;
+        })
+            .subscribeOn(Schedulers.boundedElastic())
+            .block();
+
+        assertThat(threadName.get()).contains("boundedElastic");
+        assertThat(onScheduler.get()).isNotNull();
+        assertThat(onScheduler.get()
+            .getName()).isEqualTo("admin");
     }
 
     @Test
