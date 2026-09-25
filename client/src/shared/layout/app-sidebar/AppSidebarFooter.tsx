@@ -16,6 +16,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
@@ -64,6 +65,7 @@ export function AppSidebarFooter() {
     );
 
     const analytics = useAnalytics();
+    const isTenantAdmin = useIsTenantAdmin();
 
     const {pathname} = useLocation();
 
@@ -230,16 +232,20 @@ export function AppSidebarFooter() {
                                         ))}
                                     </DropdownMenuRadioGroup>
 
-                                    <DropdownMenuSeparator />
+                                    {isTenantAdmin && (
+                                        <>
+                                            <DropdownMenuSeparator />
 
-                                    <DropdownMenuItem
-                                        className="pl-8"
-                                        onClick={() => navigate('/automation/settings/workspaces')}
-                                    >
-                                        <SettingsIcon className="absolute left-2 size-3.5" />
+                                            <DropdownMenuItem
+                                                className="pl-8"
+                                                onClick={() => navigate('/automation/settings/workspaces')}
+                                            >
+                                                <SettingsIcon className="absolute left-2 size-3.5" />
 
-                                        <span>Manage Workspaces</span>
-                                    </DropdownMenuItem>
+                                                <span>Manage Workspaces</span>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
                                 </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                         </DropdownMenuSub>
