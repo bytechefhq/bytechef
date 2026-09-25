@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
@@ -37,8 +38,6 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Project Workflow Copilot subagent to a parent agent.
- *
  * @author Ivica Cardic
  */
 public class ProjectWorkflowAgentToolCallback implements ToolCallback {
@@ -84,10 +83,6 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
             CopilotAgentType.BUILD_WORKFLOW);
     }
 
-    /**
-     * Variant constructor for domain-specific workflow editors (e.g. the embedded integration-workflow editor), letting
-     * the parent agent expose a distinct tool name/description and bind the correct agent type for the subagent call.
-     */
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ProjectWorkflowAgentToolCallback(
         IntelligentToolChatClientFactory chatClientFactory, @Nullable SubAgentChatModelResolver chatModelResolver,
@@ -158,6 +153,10 @@ public class ProjectWorkflowAgentToolCallback implements ToolCallback {
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
+        } catch (ChatModelUnavailableException exception) {
+            log.warn("buildWorkflow cannot run its sub-agent: {}", exception.getMessage());
+
+            throw exception;
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
                 ProjectWorkflowAgentToolCallback.class, "buildWorkflow", exception);
