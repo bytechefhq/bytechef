@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.couchbase.constant.Couchbase
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(COUCHBASE + "/v1/" + LOAD)
 public class CouchbaseLoadTaskHandler extends AbstractTaskHandler {
 
-    public CouchbaseLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(COUCHBASE, 1, LOAD, actionDefinitionFacade);
+    public CouchbaseLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(COUCHBASE, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

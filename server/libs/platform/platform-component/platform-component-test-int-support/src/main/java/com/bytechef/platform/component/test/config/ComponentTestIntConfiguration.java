@@ -42,6 +42,7 @@ import com.bytechef.platform.file.storage.EditorTempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import io.micrometer.tracing.Tracer;
 import java.util.Collections;
 import java.util.List;
@@ -146,6 +147,11 @@ public class ComponentTestIntConfiguration {
     @Bean
     JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
         return new JobPrincipalAccessorRegistry(List.of());
+    }
+
+    @Bean
+    JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner() {
+        return new JobPrincipalAuthenticationRunner(List.of());
     }
 
     @Bean
