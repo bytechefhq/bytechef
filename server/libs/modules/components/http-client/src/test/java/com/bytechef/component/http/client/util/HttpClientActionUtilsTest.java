@@ -44,6 +44,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -217,6 +218,40 @@ class HttpClientActionUtilsTest {
     }
 
     @Test
+    void testExecuteWithJsonObjectBodyBuildsMapHttpBody() {
+        Map<String, Object> bodyContent = Map.of("name", "ByteChef", "count", 2);
+
+        Body body = executeWithBody(BodyContentType.JSON, bodyContent);
+
+        assertEquals(Body.of(bodyContent, BodyContentType.JSON), body);
+    }
+
+    @Test
+    void testExecuteWithJsonArrayBodyBuildsListHttpBody() {
+        List<Map<String, Object>> bodyContent = List.of(Map.of("id", 1), Map.of("id", 2));
+
+        Body body = executeWithBody(BodyContentType.JSON, bodyContent);
+
+        assertEquals(Body.of(bodyContent, BodyContentType.JSON), body);
+    }
+
+    @Test
+    void testExecuteWithXmlArrayBodyBuildsListHttpBody() {
+        List<String> bodyContent = List.of("first", "second");
+
+        Body body = executeWithBody(BodyContentType.XML, bodyContent);
+
+        assertEquals(Body.of(bodyContent, BodyContentType.XML), body);
+    }
+
+    @Test
+    void testExecuteWithJsonBodyWithoutContentBuildsEmptyMapHttpBody() {
+        Body body = executeWithBody(BodyContentType.JSON, null);
+
+        assertEquals(Body.of(Map.of(), BodyContentType.JSON), body);
+    }
+
+    @Test
     void testToArrayMergesLists() {
         List<Property> list1 = List.of(string("a"));
         List<Property> list2 = List.of(integer("b"));
@@ -226,5 +261,38 @@ class HttpClientActionUtilsTest {
         assertEquals(2, merged.length);
         assertEquals("a", merged[0].getName());
         assertEquals("b", merged[1].getName());
+    }
+
+    private Body executeWithBody(BodyContentType bodyContentType, Object bodyContent) {
+        Map<String, Object> bodyParameters = new HashMap<>();
+
+        bodyParameters.put(BODY_CONTENT_TYPE, bodyContentType.name());
+
+        if (bodyContent != null) {
+            bodyParameters.put(BODY_CONTENT, bodyContent);
+        }
+
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(URI, "http://example.com", BODY, bodyParameters));
+
+        when(mockedContext.http(contextFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> contextFunctionArgumentCaptor.getValue()
+                .apply(mockedHttp));
+        when(mockedHttp.exchange(stringArgumentCaptor.capture(), requestMethodArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.headers(mapArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(mapArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+
+        HttpClientActionUtils.execute(mockedParameters, RequestMethod.POST, mockedContext);
+
+        return bodyArgumentCaptor.getValue();
     }
 }
