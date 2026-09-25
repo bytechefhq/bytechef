@@ -42,7 +42,8 @@ import org.springframework.security.util.SimpleMethodInvocation;
  * Evaluates the real {@code @PreAuthorize} expression on every query and mutation of the embedded admin GraphQL
  * controllers through the real {@link AutomationMethodSecurityExpressionHandler} and
  * {@link AutomationPermissionEvaluator}. These queries and mutations read and administer the tenant's automation
- * workflow catalog, so each must decide on {@link PermissionService#isTenantAdmin()} alone.
+ * workflow catalog and every connected user's workflows, so each must decide on
+ * {@link PermissionService#isTenantAdmin()} alone.
  *
  * @version ee
  *
@@ -50,12 +51,15 @@ import org.springframework.security.util.SimpleMethodInvocation;
  */
 class EmbeddedAdminGraphQlControllersAuthorizationTest {
 
-    private static final List<Class<?>> CONTROLLER_CLASSES = List.of(AutomationWorkflowProjectGraphQlController.class);
+    private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
+        AutomationWorkflowProjectGraphQlController.class, ConnectedUserProjectGraphQlController.class);
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
         "automationWorkflowProjectCategories", "automationWorkflowProjectTags", "automationWorkflowProjectVersions",
-        "automationWorkflowProjects", "createAutomationWorkflowProject", "createAutomationWorkflowProjectWorkflow",
+        "automationWorkflowProjects", "connectedUserProjects", "createAutomationWorkflowProject",
+        "createAutomationWorkflowProjectWorkflow",
         "deleteAutomationWorkflowProject", "deleteAutomationWorkflowProjectWorkflow",
+        "deleteConnectedUserProjectWorkflow", "enableConnectedUserProjectWorkflow",
         "duplicateAutomationWorkflowProject", "duplicateAutomationWorkflowProjectWorkflow",
         "publishAutomationWorkflowProject", "updateAutomationWorkflowProject",
         "updateAutomationWorkflowProjectWorkflow", "updateAutomationWorkflowProjectWorkflowPermissionExpression");
