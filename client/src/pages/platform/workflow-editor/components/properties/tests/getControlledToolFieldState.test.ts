@@ -14,31 +14,18 @@ describe('getControlledToolFieldState', () => {
         const state = getControlledToolFieldState(baseProps);
 
         expect(state.showFromAi).toBe(true);
-        expect(state.showControlledSwitch).toBe(false);
     });
 
-    it('offers the dynamic switch instead for a non string tool property', () => {
+    it('offers no from AI affordance for a non string tool property', () => {
         const state = getControlledToolFieldState({...baseProps, type: 'INTEGER'});
 
         expect(state.showFromAi).toBe(false);
-        expect(state.showControlledSwitch).toBe(true);
     });
 
-    it('offers neither outside a tool', () => {
+    it('offers no from AI affordance outside a tool', () => {
         const state = getControlledToolFieldState({...baseProps, isToolsClusterElement: false});
 
         expect(state.showFromAi).toBe(false);
-        expect(state.showControlledSwitch).toBe(false);
-    });
-
-    it('offers no dynamic switch for a non string property outside a tool', () => {
-        const state = getControlledToolFieldState({
-            ...baseProps,
-            isToolsClusterElement: false,
-            type: 'INTEGER',
-        });
-
-        expect(state.showControlledSwitch).toBe(false);
     });
 
     it('reads a stored fromAi call as from AI', () => {

@@ -2,6 +2,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ChangeEvent, ReactNode, forwardRef} from 'react';
@@ -14,12 +15,14 @@ interface PropertyTextAreaProps {
     disabled?: boolean;
     error: boolean;
     errorMessage?: string;
+    handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
     onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
     placeholder?: string;
     required?: boolean;
+    showInputTypeSwitchButton?: boolean;
     title?: string;
     trailingAction?: ReactNode;
     value?: string;
@@ -34,12 +37,14 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
             disabled,
             error,
             errorMessage,
+            handleInputTypeSwitchButtonClick,
             label,
             leadingIcon,
             name,
             onChange,
             placeholder,
             required,
+            showInputTypeSwitchButton,
             title,
             trailingAction,
             value,
@@ -68,7 +73,13 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                         )}
                     </div>
 
-                    {deletePropertyButton}
+                    <div className="flex items-center">
+                        {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
+                            <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
+                        )}
+
+                        {deletePropertyButton}
+                    </div>
                 </div>
             )}
 
