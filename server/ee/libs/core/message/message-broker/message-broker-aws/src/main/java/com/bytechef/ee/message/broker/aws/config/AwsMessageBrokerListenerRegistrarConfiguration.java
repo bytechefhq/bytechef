@@ -20,13 +20,18 @@ import io.awspring.cloud.sqs.listener.SqsMessageListenerContainer;
 import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.support.MessageHandlerMethodFactory;
+import org.springframework.messaging.handler.invocation.InvocableHandlerMethod;
 
 /**
  * @version ee
@@ -44,6 +49,8 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
     private final MessageHandlerMethodFactory messageHandlerMethodFactory;
     private final SqsMessageListenerContainerFactory<?> sqsMessageListenerContainerFactory;
     private final List<SqsMessageListenerContainer<?>> containers = new ArrayList<>();
+    private final Map<String, ControlRouteListener> controlRouteListeners = new HashMap<>();
+    private final AtomicInteger endpointSequence = new AtomicInteger();
 
     @SuppressFBWarnings("EI")
     public AwsMessageBrokerListenerRegistrarConfiguration(
@@ -80,9 +87,35 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
             log.trace("Registering AWS Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
         }
 
+        if (messageRoute.isControlExchange()) {
+            registerControlListenerEndpoint(endpointRegistrar, messageRoute, delegate, listenerMethod);
+
+            return;
+        }
+
         SqsEndpoint endpoint = createListenerEndpoint(messageRoute.getName(), delegate, listenerMethod);
 
         endpointRegistrar.registerEndpoint(endpoint);
+    }
+
+    private void registerControlListenerEndpoint(
+        EndpointRegistrar endpointRegistrar, MessageRoute messageRoute, Object delegate, Method listenerMethod) {
+
+        ControlRouteListener controlRouteListener = controlRouteListeners.get(messageRoute.getName());
+
+        if (controlRouteListener == null) {
+            controlRouteListener = new ControlRouteListener();
+
+            controlRouteListeners.put(messageRoute.getName(), controlRouteListener);
+
+            SqsEndpoint endpoint = createListenerEndpoint(
+                messageRoute.getName(), controlRouteListener, ControlRouteListener.getReceiveMethod());
+
+            endpointRegistrar.registerEndpoint(endpoint);
+        }
+
+        controlRouteListener.addInvocableHandlerMethod(
+            messageHandlerMethodFactory.createInvocableHandlerMethod(delegate, listenerMethod));
     }
 
     @Override
@@ -111,7 +144,7 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
         queueName = queueName.replace(".", "-");
 
         SqsEndpoint endpoint = new SqsEndpoint.SqsEndpointBuilder()
-            .id(queueName + "Endpoint")
+            .id(queueName + "Endpoint" + endpointSequence.incrementAndGet())
             .queueNames(List.of(queueName))
             .acknowledgementMode(AcknowledgementMode.ON_SUCCESS)
             .build();
@@ -124,5 +157,28 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
         containers.add(container);
 
         return endpoint;
+    }
+
+    public static final class ControlRouteListener {
+
+        private final List<InvocableHandlerMethod> invocableHandlerMethods = new ArrayList<>();
+
+        public void receive(Message<?> message) throws Exception {
+            for (InvocableHandlerMethod invocableHandlerMethod : invocableHandlerMethods) {
+                invocableHandlerMethod.invoke(message);
+            }
+        }
+
+        private void addInvocableHandlerMethod(InvocableHandlerMethod invocableHandlerMethod) {
+            invocableHandlerMethods.add(invocableHandlerMethod);
+        }
+
+        private static Method getReceiveMethod() {
+            try {
+                return ControlRouteListener.class.getMethod("receive", Message.class);
+            } catch (NoSuchMethodException exception) {
+                throw new IllegalStateException(exception);
+            }
+        }
     }
 }
