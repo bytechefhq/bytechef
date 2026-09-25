@@ -48,6 +48,10 @@ class ArrayPropertyValidator {
             return;
         }
 
+        if (isExpressionElement(valueJsonNode)) {
+            return;
+        }
+
         if (!valueJsonNode.isArray()) {
             String actualType = JsonNodeUtils.getJsonNodeType(valueJsonNode);
 
@@ -74,12 +78,12 @@ class ArrayPropertyValidator {
             return;
         }
 
-        if (!valueJsonNode.isEmpty()) {
-            JsonNode firstElement = valueJsonNode.get(0);
+        JsonNode firstConcreteElement = findFirstConcreteElement(valueJsonNode);
 
+        if (firstConcreteElement != null) {
             if (isFreeFormObjectArray(nestedPropertyInfos)) {
                 validateFreeFormObjectArray(valueJsonNode, propertyPath, errors);
-            } else if (firstElement.isObject()) {
+            } else if (firstConcreteElement.isObject()) {
                 validateObjectArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors, warnings);
             } else {
                 validateUnionTypeArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors);
@@ -152,6 +156,16 @@ class ArrayPropertyValidator {
         rootNode.set(propertyPath, arrayValue);
 
         return rootNode;
+    }
+
+    private static JsonNode findFirstConcreteElement(JsonNode arrayJsonNode) {
+        for (JsonNode elementJsonNode : arrayJsonNode) {
+            if (!isExpressionElement(elementJsonNode)) {
+                return elementJsonNode;
+            }
+        }
+
+        return null;
     }
 
     private static String formatValue(JsonNode jsonNode) {
