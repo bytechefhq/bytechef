@@ -19,10 +19,12 @@ package com.bytechef.component.ai.llm.gemini.action;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.gemini.constant.GeminiConstants.LOCATION;
@@ -45,6 +47,8 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
@@ -171,5 +175,31 @@ class GeminiChatActionTest {
         assertEquals(1, options.getCandidateCount());
         assertEquals(List.of("stop"), options.getStopSequences());
         assertNull(options.getResponseMimeType());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "low,1024", "medium,8192", "high,24576"
+    })
+    void testCreateChatModelWithThinkingSendsThinkingBudget(String reasoningEffort, int thinkingBudget) {
+        GoogleGenAiChatOptions options = createThinkingChatOptions(
+            Map.of(MODEL, "gemini-2.5-pro", THINKING, true, REASONING_EFFORT, reasoningEffort));
+
+        assertEquals(thinkingBudget, options.getThinkingBudget());
+    }
+
+    @Test
+    void testCreateChatModelWithoutThinkingOmitsThinkingBudget() {
+        GoogleGenAiChatOptions options = createThinkingChatOptions(
+            Map.of(MODEL, "gemini-2.5-pro", REASONING_EFFORT, "high"));
+
+        assertNull(options.getThinkingBudget());
+    }
+
+    private GoogleGenAiChatOptions createThinkingChatOptions(Map<String, Object> inputParameters) {
+        org.springframework.ai.chat.model.ChatModel chatModel = GeminiChatAction.CHAT_MODEL.createChatModel(
+            MockParametersFactory.create(inputParameters), mockedConnectionParameters, false);
+
+        return (GoogleGenAiChatOptions) chatModel.getOptions();
     }
 }

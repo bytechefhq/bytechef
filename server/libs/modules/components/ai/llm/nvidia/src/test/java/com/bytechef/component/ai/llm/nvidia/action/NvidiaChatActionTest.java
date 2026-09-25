@@ -23,11 +23,13 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STORE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY;
@@ -35,6 +37,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -116,6 +119,45 @@ class NvidiaChatActionTest {
             assertEquals(0.7, openAiChatOptions.getTemperature());
             assertEquals(0.9, openAiChatOptions.getTopP());
             assertEquals("user", openAiChatOptions.getUser());
+        }
+    }
+
+    @Test
+    void testCreateChatModelWithThinkingSendsReasoningEffort() {
+        OpenAiChatOptions options = createThinkingChatOptions(
+            Map.of(MODEL, "openai/gpt-oss-120b", THINKING, true, REASONING_EFFORT, "high"));
+
+        assertEquals("high", options.getReasoningEffort());
+    }
+
+    @Test
+    void testCreateChatModelWithoutThinkingOmitsReasoningEffort() {
+        OpenAiChatOptions options =
+            createThinkingChatOptions(Map.of(MODEL, "openai/gpt-oss-120b", REASONING_EFFORT, "high"));
+
+        assertNull(options.getReasoningEffort());
+    }
+
+    private OpenAiChatOptions createThinkingChatOptions(Map<String, Object> inputParameters) {
+        try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class)) {
+            OpenAIOkHttpClient.Builder mockedOpenAIOkHttpClientBuilder = mock(OpenAIOkHttpClient.Builder.class);
+
+            openAIOkHttpClientMockedStatic.when(OpenAIOkHttpClient::builder)
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+
+            when(mockedOpenAIOkHttpClientBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+            when(mockedOpenAIOkHttpClientBuilder.baseUrl(stringArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+            when(mockedOpenAIOkHttpClientBuilder.timeout(durationArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+            when(mockedOpenAIOkHttpClientBuilder.build())
+                .thenReturn(mock(OpenAIClient.class));
+
+            org.springframework.ai.chat.model.ChatModel chatModel = NvidiaChatAction.CHAT_MODEL.createChatModel(
+                MockParametersFactory.create(inputParameters), mockedConnectionParameters, false);
+
+            return ((OpenAiChatModel) chatModel).getOptions();
         }
     }
 }
