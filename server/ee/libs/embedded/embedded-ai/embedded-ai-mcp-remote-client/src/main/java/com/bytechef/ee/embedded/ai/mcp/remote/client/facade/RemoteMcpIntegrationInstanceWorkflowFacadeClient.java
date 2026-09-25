@@ -22,13 +22,15 @@ import org.springframework.stereotype.Component;
 public class RemoteMcpIntegrationInstanceWorkflowFacadeClient implements McpIntegrationInstanceWorkflowFacade {
 
     @Override
-    public void enableMcpIntegrationInstanceWorkflow(long integrationInstanceId, String workflowUuid, boolean enable) {
+    public void enableMcpIntegrationInstanceWorkflow(
+        String externalUserId, long integrationInstanceId, String workflowUuid, boolean enable) {
+
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void updateMcpIntegrationInstanceWorkflow(
-        long integrationInstanceId, String workflowUuid, Map<String, Object> inputs) {
+        String externalUserId, long integrationInstanceId, String workflowUuid, Map<String, Object> inputs) {
 
         throw new UnsupportedOperationException();
     }

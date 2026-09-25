@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -28,16 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstanceWorkflowFacade {
 
+    private final ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
 
     @SuppressFBWarnings("EI")
     public McpIntegrationInstanceWorkflowFacadeImpl(
+        ConnectedUserIntegrationInstanceFacade connectedUserIntegrationInstanceFacade,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationWorkflowService integrationWorkflowService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService) {
 
+        this.connectedUserIntegrationInstanceFacade = connectedUserIntegrationInstanceFacade;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
@@ -45,7 +49,9 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
 
     @Override
     public void enableMcpIntegrationInstanceWorkflow(
-        long integrationInstanceId, String workflowUuid, boolean enable) {
+        String externalUserId, long integrationInstanceId, String workflowUuid, boolean enable) {
+
+        connectedUserIntegrationInstanceFacade.checkIntegrationInstanceOwner(externalUserId, integrationInstanceId);
 
         long integrationInstanceConfigurationWorkflowId =
             getIntegrationInstanceConfigurationWorkflowId(integrationInstanceId, workflowUuid);
@@ -69,7 +75,9 @@ class McpIntegrationInstanceWorkflowFacadeImpl implements McpIntegrationInstance
 
     @Override
     public void updateMcpIntegrationInstanceWorkflow(
-        long integrationInstanceId, String workflowUuid, Map<String, Object> inputs) {
+        String externalUserId, long integrationInstanceId, String workflowUuid, Map<String, Object> inputs) {
+
+        connectedUserIntegrationInstanceFacade.checkIntegrationInstanceOwner(externalUserId, integrationInstanceId);
 
         long integrationInstanceConfigurationWorkflowId =
             getIntegrationInstanceConfigurationWorkflowId(integrationInstanceId, workflowUuid);

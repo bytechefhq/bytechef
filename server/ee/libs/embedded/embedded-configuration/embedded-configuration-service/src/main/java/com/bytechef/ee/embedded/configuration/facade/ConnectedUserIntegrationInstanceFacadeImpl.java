@@ -62,6 +62,16 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public void checkIntegrationInstanceOwner(String externalUserId, long id) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
+
+        if (!isOwnedByConnectedUser(externalUserId, id, integrationInstance)) {
+            throw new EmbeddedIntegrationNotVisibleException(id);
+        }
+    }
+
+    @Override
     public void disableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid) {
         enableIntegrationInstanceWorkflow(externalUserId, id, workflowUuid, false);
     }
