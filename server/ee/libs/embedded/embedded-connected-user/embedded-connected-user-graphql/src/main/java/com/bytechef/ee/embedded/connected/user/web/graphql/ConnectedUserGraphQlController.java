@@ -19,6 +19,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -43,11 +44,13 @@ public class ConnectedUserGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public ConnectedUser connectedUser(@Argument long id) {
         return connectedUserService.getConnectedUser(id);
     }
 
     @QueryMapping
+    @PreAuthorize("isTenantAdmin()")
     public ConnectedUserPage connectedUsers(
         @Argument Long environmentId, @Argument String name, @Argument String createDateFrom,
         @Argument String createDateTo, @Argument Long integrationId, @Argument Integer pageNumber) {
