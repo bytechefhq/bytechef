@@ -30,18 +30,6 @@ function visitTasks(
     });
 }
 
-/**
- * The tasks whose output each task can read, by task name — the same rule the previous-node-outputs query and the
- * data pill panel apply, so a reference this rules out is one the editor already draws as an unavailable pill.
- *
- * A task sees the siblings declared before it in its own list and, at every enclosing level, the dispatcher that
- * holds it plus that dispatcher's earlier siblings. It does not see a sibling branch (fork-join branches, the
- * opposite condition case, other branch cases) nor the tasks nested inside an earlier dispatcher, whose outputs stay
- * in that dispatcher.
- *
- * The server lists nested tasks both inside their dispatchers and flattened at the top level, so the top-level
- * entries that are also nested somewhere are left out of the walk rather than read as top-level siblings.
- */
 export default function getAvailableTaskNamesByTaskName(tasks: Array<WorkflowTask>): Map<string, Set<string>> {
     const nestedTaskNames = new Set<string>();
 
