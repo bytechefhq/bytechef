@@ -428,4 +428,34 @@ describe('PropertyComboBox', () => {
             expect(screen.getByText('Gamma')).toBeInTheDocument();
         });
     });
+
+    it('reports the values of the options loaded from its data source', () => {
+        const onLoadedOptionsChange = vi.fn();
+
+        hoisted.mockClusterElementOptionsQuery.mockReturnValue({
+            data: {
+                clusterElementOptions: [
+                    {label: 'Get', value: 'GET'},
+                    {label: 'Post', value: 'POST'},
+                ],
+            },
+            isLoading: false,
+        });
+
+        render(
+            <PropertyComboBox {...defaultProps} onLoadedOptionsChange={onLoadedOptionsChange} optionsDataSource={{}} />
+        );
+
+        expect(onLoadedOptionsChange).toHaveBeenLastCalledWith(['GET', 'POST']);
+    });
+
+    it('reports no loaded options while its data source has returned none', () => {
+        const onLoadedOptionsChange = vi.fn();
+
+        render(
+            <PropertyComboBox {...defaultProps} onLoadedOptionsChange={onLoadedOptionsChange} optionsDataSource={{}} />
+        );
+
+        expect(onLoadedOptionsChange).toHaveBeenLastCalledWith(undefined);
+    });
 });

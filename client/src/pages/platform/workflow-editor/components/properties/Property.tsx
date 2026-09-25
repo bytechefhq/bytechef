@@ -28,6 +28,7 @@ import getPropertyInputPlaceholder from '@/pages/platform/workflow-editor/compon
 import getPropertyKey from '@/pages/platform/workflow-editor/components/properties/getPropertyKey';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
+import {parseJsonSchema} from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
@@ -95,6 +96,8 @@ const Property = ({
         defaultValue,
         description,
         displayCondition,
+        editorFocusRequest,
+        editorPendingSaveCancelRef,
         editorRef,
         errorMessage,
         expressionEnabled,
@@ -104,17 +107,20 @@ const Property = ({
         handleControlledBlur,
         handleControlledModeSwitch,
         handleDeleteCustomPropertyClick,
+        handleFormulaSwitch,
         handleFromAiClick,
         handleFromAiToggle,
         handleInputChange,
         handleInputClear,
-        handleInputTypeSwitchButtonClick,
         handleJsonSchemaBuilderChange,
         handleMentionInputValueChange,
         handleMultiSelectChange,
+        handleNativeKeyDown,
         handleSelectChange,
+        handleSinglePillAbandoned,
         hasError,
         hidden,
+        inputMode,
         inputRef,
         inputValue,
         isFormulaMode,
@@ -143,9 +149,10 @@ const Property = ({
         required,
         selectValue,
         setIsFormulaMode,
+        setLoadedSelectOptionValues,
         setLookupDependsOnValues,
         setSelectValue,
-        showInputTypeSwitchButton,
+        showFormulaSwitch,
         type,
         typeIcon,
         validatePropertyValue,
@@ -224,6 +231,7 @@ const Property = ({
 
             {mentionInput && currentNode && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
                 <PropertyMentionsInput
+                    cancelPendingSaveRef={editorPendingSaveCancelRef}
                     controlType={controlType || 'TEXT'}
                     defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
                     deletePropertyButton={deletePropertyButton}
@@ -231,19 +239,22 @@ const Property = ({
                     error={hasError}
                     errorMessage={errorMessage}
                     expressionEnabled={expressionEnabled}
+                    focusRequest={editorFocusRequest}
                     handleFromAiClick={handleFromAiClick}
-                    handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                    handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                     isFormulaMode={isFormulaMode}
                     isFromAi={isFromAi}
                     label={label || name}
                     leadingIcon={typeIcon}
+                    onSinglePillAbandoned={handleSinglePillAbandoned}
                     onValueChange={handleMentionInputValueChange}
                     path={calculatedPath}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}
                     setIsFormulaMode={setIsFormulaMode}
-                    showInputTypeSwitchButton={showInputTypeSwitchButton}
+                    showInputTypeSwitchButton={showFormulaSwitch}
+                    singlePill={inputMode.singlePill}
                     toolProperty={isToolsClusterElement}
                     type={type}
                     validateBeforeSave={validatePropertyValue}
@@ -264,7 +275,7 @@ const Property = ({
                                     </span>
                                 )}
 
-                                {(label || description || showInputTypeSwitchButton) && (
+                                {(label || description || (showFormulaSwitch && !control)) && (
                                     <div className="flex w-full items-center justify-between">
                                         <div className="flex items-center">
                                             {label && (
@@ -295,24 +306,21 @@ const Property = ({
                                         </div>
 
                                         <div className="flex items-center gap-1">
-                                            {showInputTypeSwitchButton && (
+                                            {showFormulaSwitch && !control && (
                                                 <PropertyInputTypeSwitch
-                                                    handleClick={handleInputTypeSwitchButtonClick}
-                                                    mentionInput={mentionInput}
+                                                    handleClick={handleFormulaSwitch}
+                                                    mentionInput={isFormulaMode}
                                                 />
                                             )}
 
-                                            {!showInputTypeSwitchButton &&
-                                                control &&
-                                                isToolsClusterElement &&
-                                                expressionEnabled !== false && (
-                                                    <PropertyInputTypeSwitch
-                                                        handleClick={() =>
-                                                            handleControlledModeSwitch(!controlledDynamicMode)
-                                                        }
-                                                        mentionInput={controlledDynamicMode}
-                                                    />
-                                                )}
+                                            {control && isToolsClusterElement && expressionEnabled !== false && (
+                                                <PropertyInputTypeSwitch
+                                                    handleClick={() =>
+                                                        handleControlledModeSwitch(!controlledDynamicMode)
+                                                    }
+                                                    mentionInput={controlledDynamicMode}
+                                                />
+                                            )}
 
                                             {deletePropertyButton}
                                         </div>
@@ -871,7 +879,7 @@ const Property = ({
                             error={hasError}
                             errorMessage={errorMessage}
                             fieldsetClassName={objectName && arrayName && 'ml-2'}
-                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             label={label || name}
                             leadingIcon={typeIcon}
                             max={maxValue}
@@ -880,6 +888,7 @@ const Property = ({
                             minLength={minLength}
                             name={calculatedPath}
                             onChange={handleInputChange}
+                            onKeyDown={handleNativeKeyDown}
                             placeholder={getPropertyInputPlaceholder({
                                 defaultValue,
                                 isNumericalInput,
@@ -890,7 +899,7 @@ const Property = ({
                             })}
                             ref={inputRef}
                             required={required}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            showInputTypeSwitchButton={showFormulaSwitch}
                             title={type}
                             trailingAction={
                                 // Chrome's <input type="time"> has no native clear button.
@@ -929,12 +938,12 @@ const Property = ({
                             description={description}
                             error={hasError}
                             errorMessage={errorMessage}
-                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             label={label || name}
                             leadingIcon={typeIcon}
                             name={name!}
                             onChange={(value) => handleJsonSchemaBuilderChange(value)}
-                            schema={inputValue ? JSON.parse(inputValue) : undefined}
+                            schema={parseJsonSchema(inputValue)}
                             title={label || name}
                         />
                     )}
@@ -947,7 +956,7 @@ const Property = ({
                             description={description}
                             error={hasError}
                             errorMessage={errorMessage}
-                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             label={label || name}
                             leadingIcon={typeIcon}
                             lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
@@ -955,6 +964,7 @@ const Property = ({
                             )}
                             lookupDependsOnValues={lookupDependsOnValues}
                             name={name}
+                            onLoadedOptionsChange={setLoadedSelectOptionValues}
                             onValueChange={(value: string) => handleSelectChange(value, name!)}
                             options={(formattedOptions as Array<Option>) || []}
                             optionsDataSource={optionsDataSource}
@@ -962,7 +972,7 @@ const Property = ({
                             path={calculatedPath}
                             propertyName={name}
                             required={required}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            showInputTypeSwitchButton={showFormulaSwitch}
                             value={selectValue}
                             workflowId={workflow.id!}
                             workflowNodeName={currentNode?.name ?? ''}
@@ -974,7 +984,7 @@ const Property = ({
                             defaultValue={defaultValue?.toString()}
                             deletePropertyButton={deletePropertyButton}
                             description={description}
-                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             label={label || name}
                             leadingIcon={typeIcon}
                             name={name}
@@ -984,7 +994,7 @@ const Property = ({
                                 {label: 'False', value: 'false'},
                             ]}
                             required={required}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            showInputTypeSwitchButton={showFormulaSwitch}
                             value={selectValue}
                         />
                     )}
@@ -1008,7 +1018,7 @@ const Property = ({
                         <PropertyMultiSelect
                             defaultValue={propertyParameterValue as string[]}
                             deletePropertyButton={deletePropertyButton}
-                            handleInputTypeSwitchButtonClick={() => handleInputTypeSwitchButtonClick()}
+                            handleInputTypeSwitchButtonClick={handleFormulaSwitch}
                             leadingIcon={typeIcon}
                             lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
                                 (optionLookupDependency) => optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
@@ -1019,7 +1029,7 @@ const Property = ({
                             optionsDataSource={optionsDataSource}
                             path={calculatedPath}
                             property={property}
-                            showInputTypeSwitchButton={showInputTypeSwitchButton}
+                            showInputTypeSwitchButton={showFormulaSwitch}
                             value={multiSelectValue}
                             workflowId={workflow.id!}
                         />

@@ -59,6 +59,7 @@ interface PropertyComboBoxProps {
     leadingIcon?: ReactNode;
     name?: string;
     onBlur?: FocusEventHandler;
+    onLoadedOptionsChange?: (optionValues: Array<string> | undefined) => void;
     onValueChange?: (value: string) => void;
     options: Array<Option>;
     optionsDataSource?: OptionsDataSource;
@@ -95,6 +96,7 @@ const PropertyComboBox = ({
     lookupDependsOnValues,
     name,
     onBlur,
+    onLoadedOptionsChange,
     onValueChange,
     options: initialOptions,
     optionsDataSource,
@@ -469,6 +471,25 @@ const PropertyComboBox = ({
             setValue(initialValue.toString());
         }
     }, [initialValue]);
+
+    useEffect(() => {
+        if (!onLoadedOptionsChange) {
+            return;
+        }
+
+        const hasLoadedOptions =
+            !!optionsDataSource &&
+            !!(workflowNodeOptions || clusterElementNodeOptions || clusterElementOptions?.clusterElementOptions);
+
+        onLoadedOptionsChange(hasLoadedOptions ? options.map((option) => String(option.value)) : undefined);
+    }, [
+        clusterElementNodeOptions,
+        clusterElementOptions,
+        onLoadedOptionsChange,
+        options,
+        optionsDataSource,
+        workflowNodeOptions,
+    ]);
 
     useEffect(() => {
         if (!optionsLoadedDynamically) {

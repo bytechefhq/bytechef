@@ -14,12 +14,6 @@ import {type Mock, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {useProperty} from '../useProperty';
 
-/**
- * The input type switch restores the from-AI expression instead of clearing the field when a property the model
- * fills is switched back over to the editor. Clearing it left the editor showing the from-AI styling with no
- * content behind it.
- */
-
 const wrapper = ({children}: {children: ReactNode}) => (
     <WorkflowEditorProvider value={workflowEditorProviderTestValue as never}>{children}</WorkflowEditorProvider>
 );
@@ -48,7 +42,7 @@ const renderUriProperty = ({fromAi = false, parameterValue}: {fromAi?: boolean; 
     return renderHook(() => useProperty({parameterValue, path: PROPERTY_PATH, property: uriProperty}), {wrapper});
 };
 
-describe('handleInputTypeSwitchButtonClick from-AI restoration', () => {
+describe('Formula mode on a from-AI property', () => {
     beforeEach(() => {
         useWorkflowDataStore.setState({
             workflow: {id: 'wf-from-ai-switch', nodeNames: []},
@@ -64,65 +58,62 @@ describe('handleInputTypeSwitchButtonClick from-AI restoration', () => {
         expect(result.current.fromAiExpression).toContain("fromAi('uri', 'STRING'");
     });
 
-    describe('switching to a constant value', () => {
-        it('clears the field even for a from-AI property', () => {
+    describe('while the model fills the property', () => {
+        it('hides the Formula switch', () => {
             const {result} = renderUriProperty({fromAi: true, parameterValue: "=fromAi('uri')"});
 
-            act(() => result.current.handleInputTypeSwitchButtonClick());
+            expect(result.current.showFormulaSwitch).toBe(false);
+            expect(result.current.isFormulaMode).toBe(false);
+        });
 
-            expect(result.current.mentionInput).toBe(false);
-            expect(result.current.mentionInputValue).toBe('');
-            expect(result.current.propertyParameterValue).toBe('');
+        it('keeps the from-AI expression in the editor outside Formula mode', () => {
+            const {result} = renderUriProperty({fromAi: true});
+
+            const {fromAiExpression} = result.current;
+
+            act(() => result.current.handleFromAiClick?.(true));
+
+            expect(result.current.mentionInput).toBe(true);
+            expect(result.current.isFormulaMode).toBe(false);
+            expect(result.current.showFormulaSwitch).toBe(false);
+            expect(result.current.propertyParameterValue).toBe(fromAiExpression);
         });
     });
 
-    describe('switching back over to the editor', () => {
-        it('restores the from-AI expression as the editor content', () => {
+    describe('customizing the from-AI expression', () => {
+        it('opens the expression in Formula mode', () => {
             const {result} = renderUriProperty({fromAi: true});
 
             const {fromAiExpression} = result.current;
 
-            act(() => result.current.handleInputTypeSwitchButtonClick());
+            act(() => result.current.handleFromAiClick?.(false));
 
-            expect(result.current.mentionInput).toBe(false);
-
-            act(() => result.current.handleInputTypeSwitchButtonClick());
-
-            expect(result.current.mentionInput).toBe(true);
+            expect(result.current.isFromAi).toBe(false);
+            expect(result.current.isFormulaMode).toBe(true);
+            expect(result.current.showFormulaSwitch).toBe(true);
             expect(result.current.propertyParameterValue).toBe(fromAiExpression);
-            expect(result.current.mentionInputValue).toBe(fromAiExpression.substring(1));
-        });
-
-        it('saves the restored expression back as a from-AI parameter', () => {
-            const {result} = renderUriProperty({fromAi: true});
-
-            const {fromAiExpression} = result.current;
-
-            act(() => result.current.handleInputTypeSwitchButtonClick());
-
-            (saveProperty as unknown as Mock).mockReset();
-
-            act(() => result.current.handleInputTypeSwitchButtonClick());
-
             expect(saveProperty).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    fromAi: true,
-                    includeInMetadata: true,
+                    fromAi: false,
                     path: PROPERTY_PATH,
                     value: fromAiExpression,
                 })
             );
         });
+    });
 
+    describe('switching Formula on and off', () => {
         it('leaves the field empty for a property the model does not fill', () => {
             const {result} = renderUriProperty();
 
-            act(() => result.current.handleInputTypeSwitchButtonClick());
+            act(() => result.current.handleFormulaSwitch());
 
-            expect(result.current.mentionInput).toBe(false);
+            expect(result.current.isFormulaMode).toBe(true);
+            expect(result.current.mentionInput).toBe(true);
 
-            act(() => result.current.handleInputTypeSwitchButtonClick());
+            act(() => result.current.handleFormulaSwitch());
 
+            expect(result.current.isFormulaMode).toBe(false);
             expect(result.current.mentionInput).toBe(true);
             expect(result.current.mentionInputValue).toBe('');
             expect(result.current.propertyParameterValue).toBe('');

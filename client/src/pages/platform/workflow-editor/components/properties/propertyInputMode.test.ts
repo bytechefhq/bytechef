@@ -1,9 +1,11 @@
 import {describe, expect, it} from 'vitest';
 
 import {
+    fitsNativeControl,
     fromFormulaValue,
     getPropertyInputMode,
     isSingleDataPill,
+    parseJsonSchema,
     shouldIncludeInMetadata,
     toFormulaValue,
 } from './propertyInputMode';
@@ -39,6 +41,12 @@ describe('getPropertyInputMode', () => {
             expected: {legacyMixed: true, mode: 'text', renderer: 'mentions', singlePill: false},
             name: 'two pills on a non-string are legacy mixed',
             value: '${a.b}${c.d}',
+        },
+        {
+            controlType: 'INTEGER',
+            expected: {legacyMixed: true, mode: 'text', renderer: 'mentions', singlePill: false},
+            name: 'a legacy #{ value on a non-string is legacy mixed',
+            value: '#{trigger_1.count}',
         },
         {
             controlType: 'TEXT',
@@ -178,5 +186,53 @@ describe('helpers', () => {
         expect(shouldIncludeInMetadata('${a.b}', false)).toBe(true);
         expect(shouldIncludeInMetadata(5, false)).toBe(false);
         expect(shouldIncludeInMetadata(5, true)).toBe(true);
+    });
+});
+
+describe('fitsNativeControl', () => {
+    it.each([
+        ['JSON_SCHEMA_BUILDER', '{"type":"object"}', true],
+        ['JSON_SCHEMA_BUILDER', 'hello', false],
+        ['JSON_SCHEMA_BUILDER', '[1]', false],
+        ['OBJECT_BUILDER', 'abc', false],
+        ['OBJECT_BUILDER', '${trigger_1.settings}', true],
+        ['ARRAY_BUILDER', 'abc', false],
+        ['MULTI_SELECT', 'abc', false],
+        ['DATE', '2024-01-31', true],
+        ['DATE', 'hello', false],
+        ['DATE_TIME', '2024-01-31T10:15:30', true],
+        ['DATE_TIME', '2024-01-31', false],
+        ['TIME', '10:15', true],
+        ['TIME', 'noon', false],
+        ['TEXT', 'anything', true],
+        ['INTEGER', 7, true],
+        ['DATE', undefined, true],
+    ])('%s holding %s fits: %s', (controlType, value, expected) => {
+        expect(fitsNativeControl(controlType, value)).toBe(expected);
+    });
+});
+
+describe('fitsNativeControl with select options', () => {
+    it.each([
+        ['GET', ['GET', 'POST'], true],
+        ['PATCH', ['GET', 'POST'], false],
+        [2, ['1', '2'], true],
+        [3, ['1', '2'], false],
+        ['PATCH', undefined, true],
+        ['PATCH', [], true],
+        ['${trigger_1.method}', ['GET', 'POST'], true],
+        ['', ['GET', 'POST'], true],
+    ])('%s with options %j fits: %s', (value, optionValues, expected) => {
+        expect(fitsNativeControl('SELECT', value, optionValues)).toBe(expected);
+    });
+});
+
+describe('parseJsonSchema', () => {
+    it('parses a JSON object and ignores anything else', () => {
+        expect(parseJsonSchema('{"type":"object"}')).toEqual({type: 'object'});
+        expect(parseJsonSchema('hello')).toBeUndefined();
+        expect(parseJsonSchema('[1]')).toBeUndefined();
+        expect(parseJsonSchema('')).toBeUndefined();
+        expect(parseJsonSchema(undefined)).toBeUndefined();
     });
 });
