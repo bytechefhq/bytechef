@@ -36,8 +36,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.discord.action.DiscordSendDirectMessageAction;
+import com.bytechef.component.discord.trigger.DiscordNewMessageTrigger;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,11 @@ public class DiscordComponentHandler extends AbstractDiscordComponentHandler {
     @Override
     public List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of(tool(DiscordSendDirectMessageAction.ACTION_DEFINITION));
+    }
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(DiscordNewMessageTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
