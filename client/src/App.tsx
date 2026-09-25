@@ -218,16 +218,12 @@ function App() {
     });
 
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
-        if (currentEnvironmentId !== 0 && navItem.href === '/embedded/integrations') {
+        if (!isTenantAdmin) {
             return false;
         }
 
         if (currentEnvironmentId === DEVELOPMENT_ENVIRONMENT && navItem.href === '/embedded/configurations') {
             return false;
-        }
-
-        if (navItem.href === '/embedded/mcp-servers') {
-            return isTenantAdmin;
         }
 
         return true;
