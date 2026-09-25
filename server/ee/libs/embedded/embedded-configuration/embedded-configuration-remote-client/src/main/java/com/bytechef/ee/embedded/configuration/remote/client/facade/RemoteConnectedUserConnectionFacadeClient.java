@@ -28,6 +28,13 @@ public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserC
     }
 
     @Override
+    public List<ConnectionDTO> getConnectedUserConnections(
+        long connectedUserId, String componentName, List<Long> connectionIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds) {
         throw new UnsupportedOperationException();
     }

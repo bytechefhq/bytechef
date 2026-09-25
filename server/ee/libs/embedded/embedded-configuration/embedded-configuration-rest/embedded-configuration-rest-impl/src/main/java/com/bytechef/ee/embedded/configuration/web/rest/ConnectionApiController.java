@@ -81,7 +81,8 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectedUserConnectionFacade
-                .getConnections(connectedUserId, componentName, connectionIds == null ? List.of() : connectionIds)
+                .getConnectedUserConnections(
+                    connectedUserId, componentName, connectionIds == null ? List.of() : connectionIds)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());
