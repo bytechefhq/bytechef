@@ -32,6 +32,11 @@ public class RemoteNotificationFacadeClient implements NotificationFacade {
     }
 
     @Override
+    public void deleteNotification(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public NotificationDTO updateNotification(Notification notification) {
         throw new UnsupportedOperationException();
     }
