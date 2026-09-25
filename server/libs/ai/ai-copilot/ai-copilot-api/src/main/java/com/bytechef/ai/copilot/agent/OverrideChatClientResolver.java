@@ -34,9 +34,11 @@ public interface OverrideChatClientResolver {
     ChatClient resolve(State state);
 
     /**
-     * Resolves the environment-default {@link ChatModel} from the runtime provider catalog, honoring per-provider model
-     * overrides. Returns {@code null} when no catalog is active (CE) or nothing is resolvable — callers fall back to
-     * their startup-configured model.
+     * Resolves the environment-default {@link ChatModel} from the runtime provider catalog, honoring the configured
+     * preferred provider. Returns {@code null} only when no catalog is active (CE); callers then use their
+     * startup-configured model.
+     *
+     * @throws ChatModelUnavailableException if a catalog is active but no chat model is resolvable in the environment
      */
     default @Nullable ChatModel resolveDefaultChatModel(int environmentId) {
         return null;

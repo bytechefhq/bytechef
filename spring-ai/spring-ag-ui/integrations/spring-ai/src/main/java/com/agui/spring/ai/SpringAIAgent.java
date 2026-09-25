@@ -360,7 +360,7 @@ public class SpringAIAgent extends LocalAgent {
      * @param input the current run input (state, messages, tools, context)
      * @return the {@link ChatClient} to use for this request; must not be {@code null}
      */
-    protected ChatClient resolveChatClient(RunAgentInput input) {
+    protected ChatClient resolveChatClient(RunAgentInput input) throws AGUIException {
         return this.chatClient;
     }
 
