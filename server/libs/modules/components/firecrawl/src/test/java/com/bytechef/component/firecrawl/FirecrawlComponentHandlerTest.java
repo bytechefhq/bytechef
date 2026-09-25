@@ -16,7 +16,12 @@
 
 package com.bytechef.component.firecrawl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.bytechef.component.definition.ClusterElementDefinition;
+import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,5 +32,18 @@ class FirecrawlComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/firecrawl_v1.json", new FirecrawlComponentHandler().getDefinition());
+    }
+
+    @Test
+    void testOnlyReadOnlyActionsAreAgentTools() {
+        ComponentDefinition componentDefinition = new FirecrawlComponentHandler().getDefinition();
+
+        List<String> toolNames = componentDefinition.getClusterElements()
+            .orElseThrow()
+            .stream()
+            .map(ClusterElementDefinition::getName)
+            .toList();
+
+        assertThat(toolNames).containsExactlyInAnyOrder("crawl", "getCrawlStatus", "map", "scrape", "search");
     }
 }
