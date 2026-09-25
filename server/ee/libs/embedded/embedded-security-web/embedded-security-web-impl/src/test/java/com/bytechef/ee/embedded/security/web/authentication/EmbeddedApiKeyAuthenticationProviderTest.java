@@ -22,6 +22,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,6 +119,23 @@ class EmbeddedApiKeyAuthenticationProviderTest {
                 .isInstanceOf(BadCredentialsException.class);
 
         verify(connectedUserService, never()).fetchConnectedUser(anyString(), anyLong());
+    }
+
+    @Test
+    void testAuthenticatedTokenCarriesConnectedUserAndEnvironment() {
+        when(connectedUserService.fetchConnectedUser(EXTERNAL_USER_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(connectedUser(42L)));
+
+        Authentication authentication = provider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, "secret", "tenant"));
+
+        assertThat(authentication).isInstanceOf(ConnectedUserAuthentication.class);
+
+        ConnectedUserAuthentication connectedUserAuthentication = (ConnectedUserAuthentication) authentication;
+
+        assertThat(connectedUserAuthentication.connectedUserId()).isEqualTo(42L);
+        assertThat(connectedUserAuthentication.externalUserId()).isEqualTo(EXTERNAL_USER_ID);
+        assertThat(connectedUserAuthentication.environmentId()).isEqualTo(ENVIRONMENT_ID);
     }
 
     private static ConnectedUser connectedUser(long id) {
