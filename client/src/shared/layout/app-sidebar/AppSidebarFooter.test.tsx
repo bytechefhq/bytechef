@@ -8,8 +8,13 @@ import {AppSidebarFooter} from './AppSidebarFooter';
 const hoisted = vi.hoisted(() => ({
     currentType: 0,
     edition: 'CE',
+    isTenantAdmin: false,
     logoutMock: vi.fn(() => Promise.resolve()),
     workspaces: [] as {id: number; name: string}[],
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => hoisted.isTenantAdmin,
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
@@ -72,7 +77,40 @@ describe('AppSidebarFooter', () => {
 
         hoisted.currentType = 0;
         hoisted.edition = 'CE';
+        hoisted.isTenantAdmin = false;
         hoisted.workspaces = [];
+    });
+
+    const openWorkspaceMenu = async () => {
+        const user = userEvent.setup();
+
+        hoisted.edition = 'EE';
+        hoisted.workspaces = [{id: 1, name: 'Default'}];
+
+        render(
+            <MemoryRouter initialEntries={['/automation/projects']}>
+                <AppSidebarFooter />
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: 'User menu'}));
+        await user.click(screen.getByText(/Workspace:/));
+    };
+
+    it('offers a tenant admin the Manage Workspaces entry', async () => {
+        hoisted.isTenantAdmin = true;
+
+        await openWorkspaceMenu();
+
+        expect(await screen.findByText('Default')).toBeInTheDocument();
+        expect(screen.getByText('Manage Workspaces')).toBeInTheDocument();
+    });
+
+    it('hides the Manage Workspaces entry from a user who is not a tenant admin', async () => {
+        await openWorkspaceMenu();
+
+        expect(await screen.findByText('Default')).toBeInTheDocument();
+        expect(screen.queryByText('Manage Workspaces')).not.toBeInTheDocument();
     });
 
     it('renders the user menu trigger with the signed-in email', () => {
@@ -159,6 +197,8 @@ describe('AppSidebarFooter', () => {
     });
 
     it('links Manage Workspaces in the workspace menu to the workspaces settings page', async () => {
+        hoisted.isTenantAdmin = true;
+
         hoisted.edition = 'EE';
         hoisted.workspaces = [{id: 1, name: 'Default'}];
 
