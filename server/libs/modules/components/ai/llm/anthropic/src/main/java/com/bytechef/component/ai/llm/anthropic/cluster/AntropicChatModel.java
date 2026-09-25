@@ -20,9 +20,9 @@ import static com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
