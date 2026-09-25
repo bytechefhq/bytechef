@@ -37,6 +37,26 @@ public class RemoteTaskExecutionServiceController {
     }
 
     @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/cancel-if-unfinished/{id}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> cancelIfUnfinished(@PathVariable long id) {
+        return ResponseEntity.ok(taskExecutionService.cancelIfUnfinished(id));
+    }
+
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        value = "/complete-if-not-cancelled/{id}",
+        produces = {
+            "application/json"
+        })
+    public ResponseEntity<Boolean> completeIfNotCancelled(@PathVariable long id) {
+        return ResponseEntity.ok(taskExecutionService.completeIfNotCancelled(id));
+    }
+
+    @RequestMapping(
         method = RequestMethod.POST,
         value = "/create",
         consumes = {

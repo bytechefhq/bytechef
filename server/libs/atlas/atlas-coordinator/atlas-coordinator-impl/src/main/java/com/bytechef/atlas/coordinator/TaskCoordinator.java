@@ -234,6 +234,14 @@ public class TaskCoordinator {
 
         TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();
 
+        long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+
+        if (!taskExecutionService.completeIfNotCancelled(taskExecutionId)) {
+            log.debug("Task id={} was cancelled, dropping its completion", taskExecutionId);
+
+            return;
+        }
+
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {

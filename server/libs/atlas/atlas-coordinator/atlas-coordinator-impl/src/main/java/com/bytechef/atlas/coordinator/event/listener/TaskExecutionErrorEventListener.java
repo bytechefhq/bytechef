@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event.listener;
 
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
@@ -33,6 +34,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -149,9 +151,35 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
                 jobService.update(job);
 
+                cancelUnfinishedTaskExecutions(Validate.notNull(job.getId(), "id"));
+
                 eventPublisher.publishEvent(
                     new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
             }
+        }
+    }
+
+    private void cancelUnfinishedTaskExecutions(long jobId) {
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
+
+        Long cancelledTaskExecutionId = null;
+
+        for (TaskExecution taskExecution : taskExecutions) {
+            TaskExecution.Status status = taskExecution.getStatus();
+
+            if (status != null && status.isTerminated()) {
+                continue;
+            }
+
+            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+
+            if (taskExecutionService.cancelIfUnfinished(taskExecutionId) && cancelledTaskExecutionId == null) {
+                cancelledTaskExecutionId = taskExecutionId;
+            }
+        }
+
+        if (cancelledTaskExecutionId != null) {
+            taskDispatcher.dispatch(new CancelControlTask(jobId, cancelledTaskExecutionId));
         }
     }
 }

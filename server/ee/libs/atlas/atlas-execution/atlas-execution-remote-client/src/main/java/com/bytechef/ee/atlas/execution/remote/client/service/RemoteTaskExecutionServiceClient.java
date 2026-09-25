@@ -35,6 +35,30 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
     }
 
     @Override
+    public boolean cancelIfUnfinished(long id) {
+        Boolean cancelled = loadBalancedRestClient.put(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TASK_EXECUTION_SERVICE + "/cancel-if-unfinished/{id}")
+                .build(id),
+            null, Boolean.class);
+
+        return Boolean.TRUE.equals(cancelled);
+    }
+
+    @Override
+    public boolean completeIfNotCancelled(long id) {
+        Boolean completed = loadBalancedRestClient.put(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(TASK_EXECUTION_SERVICE + "/complete-if-not-cancelled/{id}")
+                .build(id),
+            null, Boolean.class);
+
+        return Boolean.TRUE.equals(completed);
+    }
+
+    @Override
     public TaskExecution create(TaskExecution taskExecution) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder

@@ -1,0 +1,15 @@
+---
+label: "Fork Join Failed Branch"
+tasks:
+- name: "forkJoin_1"
+  type: "fork-join/v1"
+  parameters:
+    branches:
+    - - name: "failingTask"
+        type: "fail/v1"
+    - - name: "slowTask"
+        type: "slow/v1"
+      - name: "afterSlowTask"
+        type: "var/v1/set"
+        parameters:
+          value: "after slow task"
