@@ -2,7 +2,7 @@ import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/ut
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
 import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
-import {TriggerType} from '@/shared/middleware/platform/configuration';
+import {ResponseError, TriggerType} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
@@ -19,6 +19,24 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useCallback, useEffect, useRef, useState} from 'react';
+
+export interface TestOutputErrorI {
+    message: string;
+    title: string;
+}
+
+async function resolveErrorMessage(error: unknown): Promise<string> {
+    if (error instanceof ResponseError) {
+        const problem: {detail?: string; title?: string} | null = await error.response
+            .clone()
+            .json()
+            .catch(() => null);
+
+        return problem?.detail || problem?.title || `Request failed with status ${error.response.status}`;
+    }
+
+    return (error instanceof Error && error.message) || 'Unknown error';
+}
 
 interface UseOutputTabProps {
     clusterElementType?: string;
@@ -38,6 +56,7 @@ export default function useOutputTab({
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
+    const [testOutputError, setTestOutputError] = useState<TestOutputErrorI | undefined>(undefined);
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
 
@@ -109,15 +128,22 @@ export default function useOutputTab({
         invalidateWorkflowValidation(queryClient);
     }, [queryClient, workflowId]);
 
+    const showTestOutputError = useCallback((title: string, error: unknown) => {
+        resolveErrorMessage(error).then((message) => setTestOutputError({message, title}));
+    }, []);
+
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
+        onError: (error) => showTestOutputError('Reset failed', error),
         onSuccess: invalidateNodeOutputs,
     });
 
     const saveClusterElementTestOutputMutation = useSaveClusterElementTestOutputMutation({
+        onError: (error) => showTestOutputError('Test failed', error),
         onSuccess: invalidateNodeOutputs,
     });
 
     const saveWorkflowNodeTestOutputMutation = useSaveWorkflowNodeTestOutputMutation({
+        onError: (error) => showTestOutputError('Test failed', error),
         onSuccess: invalidateNodeOutputs,
     });
 
@@ -130,6 +156,8 @@ export default function useOutputTab({
     });
 
     const handlePredefinedOutputSchemaClick = useCallback(() => {
+        setTestOutputError(undefined);
+
         deleteWorkflowNodeTestOutputMutation.mutate({
             environmentId: currentEnvironmentId,
             id: workflowId,
@@ -161,6 +189,8 @@ export default function useOutputTab({
                 return;
             }
 
+            setTestOutputError(undefined);
+
             saveClusterElementTestOutputMutation.mutate(
                 {
                     clusterElementType,
@@ -186,6 +216,8 @@ export default function useOutputTab({
     );
 
     const handleTestOperationClick = useCallback(() => {
+        setTestOutputError(undefined);
+
         if (!currentNode.trigger || currentNode.triggerType === TriggerType.Polling) {
             saveWorkflowNodeTestOutputMutation.mutate({
                 environmentId: currentEnvironmentId,
@@ -286,6 +318,10 @@ export default function useOutputTab({
         startWebhookTestRef.current = startWebhookTest;
     }, [startWebhookTest]);
 
+    useEffect(() => {
+        setTestOutputError(undefined);
+    }, [currentNode.name]);
+
     return {
         copiedValue,
         copyToClipboard,
@@ -302,7 +338,9 @@ export default function useOutputTab({
         saveWorkflowNodeTestOutputMutation,
         saveWorkflowNodeTestOutputMutationPending: saveWorkflowNodeTestOutputMutation.isPending,
         setShowUploadDialog,
+        setTestOutputError,
         showUploadDialog,
+        testOutputError,
         testOutputResponse,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,

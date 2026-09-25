@@ -1,4 +1,4 @@
-import {TriggerType} from '@/shared/middleware/platform/configuration';
+import {ResponseError, TriggerType} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
@@ -6,6 +6,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const hoisted = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
     onDeleteSuccess: undefined as (() => void) | undefined,
+    onSaveError: undefined as ((error: unknown) => void) | undefined,
     webhookTriggerTestApi: undefined as
         | {startWebhookTriggerTest: ReturnType<typeof vi.fn>; stopWebhookTriggerTest: ReturnType<typeof vi.fn>}
         | undefined,
@@ -22,7 +23,11 @@ vi.mock('@/shared/mutations/platform/workflowNodeTestOutputs.mutations', () => (
 
         return {mutate: () => onSuccess?.()};
     },
-    useSaveWorkflowNodeTestOutputMutation: () => ({mutate: vi.fn()}),
+    useSaveWorkflowNodeTestOutputMutation: ({onError}: {onError?: (error: unknown) => void}) => {
+        hoisted.onSaveError = onError;
+
+        return {mutate: vi.fn()};
+    },
     useUploadSampleOutputRequestMutation: () => ({mutate: vi.fn()}),
 }));
 
@@ -80,6 +85,33 @@ describe('useOutputTab', () => {
 
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['workflowNodeOutputs', 'wf-1']});
         expect(hoisted.invalidateQueries).toHaveBeenCalledWith({queryKey: ['ValidateWorkflow']});
+    });
+
+    it('shows the server error of a failed test inline and clears it when the test is run again', async () => {
+        const {result} = renderHook(() =>
+            useOutputTab({currentNode: {name: 'firecrawl_1'} as NodeDataType, workflowId: 'wf-1'})
+        );
+
+        const response = new Response(JSON.stringify({detail: 'All scraping engines failed', title: 'Error'}), {
+            status: 500,
+        });
+
+        act(() => {
+            hoisted.onSaveError?.(new ResponseError(response, 'Response returned an error code'));
+        });
+
+        await waitFor(() => {
+            expect(result.current.testOutputError).toEqual({
+                message: 'All scraping engines failed',
+                title: 'Test failed',
+            });
+        });
+
+        act(() => {
+            result.current.handleTestOperationClick();
+        });
+
+        expect(result.current.testOutputError).toBeUndefined();
     });
 
     it('starts and stops the webhook test for the trigger being tested, not the first trigger', async () => {
