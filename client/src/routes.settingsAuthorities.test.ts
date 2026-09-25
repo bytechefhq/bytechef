@@ -58,6 +58,17 @@ describe('settings route authorities', () => {
         authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
     });
 
+    it('lets only a tenant admin open the embedded MCP Servers page', () => {
+        const router = getRouter(new QueryClient());
+
+        const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
+
+        const routes = findRoutesByPath(embeddedRoutes, 'mcp-servers');
+
+        expect(routes).toHaveLength(1);
+        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
+    });
+
     it('lets only a tenant admin open the API Clients page', () => {
         const authorities = getRouteAuthorities('api-clients');
 
