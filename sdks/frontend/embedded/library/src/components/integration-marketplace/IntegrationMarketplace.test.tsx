@@ -3,8 +3,6 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import IntegrationMarketplace from './IntegrationMarketplace';
 
-// The connect dialog stands up its own OAuth/query graph; this suite only cares that the component
-// opens it for the integration the iframe named, so the hook is replaced with a probe.
 const {openDialogMock, connectDialogHookMock} = vi.hoisted(() => ({
     openDialogMock: vi.fn(),
     connectDialogHookMock: vi.fn(),
@@ -18,11 +16,17 @@ vi.mock('../connect-dialog', () => ({
     },
 }));
 
-const fireFromIframe = (data: unknown, origin = 'https://app.example') => {
+const fireMessage = (data: unknown, source: unknown, origin = 'https://app.example') => {
+    const messageEvent = new MessageEvent('message', {data, origin});
+
+    Object.defineProperty(messageEvent, 'source', {value: source});
+
     act(() => {
-        window.dispatchEvent(new MessageEvent('message', {data, origin}));
+        window.dispatchEvent(messageEvent);
     });
 };
+
+const getIframeWindow = (container: HTMLElement) => container.querySelector('iframe')!.contentWindow;
 
 describe('IntegrationMarketplace', () => {
     beforeEach(() => {
@@ -50,7 +54,7 @@ describe('IntegrationMarketplace', () => {
 
         Object.defineProperty(iframe, 'contentWindow', {value: {postMessage}});
 
-        fireFromIframe({type: 'EMBED_READY'});
+        fireMessage({type: 'EMBED_READY'}, iframe.contentWindow);
 
         expect(postMessage).toHaveBeenCalledWith(
             {params: {environment: 'STAGING', jwtToken: 'jwt-1', theme: {surfaceColor: '#fafafa'}}, type: 'EMBED_INIT'},
@@ -61,34 +65,31 @@ describe('IntegrationMarketplace', () => {
     it('opens the connect dialog in the host page for the integration the iframe asked for', () => {
         const mapObjectFields = {Contacts: {}} as never;
 
-        render(
+        const {container} = render(
             <IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" mapObjectFields={mapObjectFields} />
         );
 
         expect(openDialogMock).not.toHaveBeenCalled();
 
-        fireFromIframe({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'});
+        fireMessage({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'}, getIframeWindow(container));
 
-        // Rendered HERE rather than inside the iframe: `mapObjectFields` is made of functions, and
-        // a function cannot cross a postMessage boundary.
         expect(connectDialogHookMock).toHaveBeenCalledWith(
             expect.objectContaining({integrationId: '42', mapObjectFields})
         );
         expect(openDialogMock).toHaveBeenCalledTimes(1);
     });
 
-    // Connecting and disconnecting both happen in THIS page's dialog, which the catalog inside the
-    // iframe cannot observe: without the message it keeps showing a disconnected integration as
-    // "Connected" until the host page is reloaded.
     it('tells the iframe to refresh its catalog when the connect dialog closes', () => {
         const {container} = render(<IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" />);
         const postMessage = vi.fn();
 
         Object.defineProperty(container.querySelector('iframe')!, 'contentWindow', {value: {postMessage}});
 
-        fireFromIframe({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'});
+        fireMessage({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'}, getIframeWindow(container));
 
-        const {onClose} = connectDialogHookMock.mock.calls.at(-1)![0] as {onClose: () => void};
+        const {onClose} = connectDialogHookMock.mock.calls[connectDialogHookMock.mock.calls.length - 1][0] as {
+            onClose: () => void;
+        };
 
         act(() => onClose());
 
@@ -96,10 +97,23 @@ describe('IntegrationMarketplace', () => {
     });
 
     it('ignores a connect request from an origin that is not the hub', () => {
+        const {container} = render(<IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" />);
+
+        fireMessage(
+            {integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'},
+            getIframeWindow(container),
+            'https://evil.example'
+        );
+
+        expect(openDialogMock).not.toHaveBeenCalled();
+    });
+
+    it('ignores a connect request from another window on the hub origin', () => {
         render(<IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" />);
 
-        fireFromIframe({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'}, 'https://evil.example');
+        fireMessage({integrationId: '42', type: 'EMBED_OPEN_CONNECT_DIALOG'}, window);
 
+        expect(connectDialogHookMock).not.toHaveBeenCalled();
         expect(openDialogMock).not.toHaveBeenCalled();
     });
 
@@ -109,7 +123,7 @@ describe('IntegrationMarketplace', () => {
 
         Object.defineProperty(container.querySelector('iframe')!, 'contentWindow', {value: {postMessage}});
 
-        fireFromIframe({type: 'EMBED_READY'});
+        fireMessage({type: 'EMBED_READY'}, getIframeWindow(container));
 
         postMessage.mockClear();
 
@@ -123,8 +137,8 @@ describe('IntegrationMarketplace', () => {
     });
 
     it('ignores a message without data', () => {
-        render(<IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" />);
+        const {container} = render(<IntegrationMarketplace baseUrl="https://app.example" jwtToken="jwt-1" />);
 
-        expect(() => fireFromIframe(null)).not.toThrow();
+        expect(() => fireMessage(null, getIframeWindow(container))).not.toThrow();
     });
 });
