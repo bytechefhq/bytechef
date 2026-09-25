@@ -1,15 +1,10 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
-import {
-    encodePath,
-    safeResolvePath,
-    transformPathForObjectAccess,
-} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {transformPathForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {DataPillDragPayloadType, NodeDataType, PropertyAllType} from '@/shared/types';
-import {Editor} from '@tiptap/react';
+import {DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
 import {DragEvent, MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -34,25 +29,6 @@ interface DataPillProps {
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput?: any;
 }
-
-export const canInsertMentionForProperty = (
-    propertyType: string,
-    parameters: Record<string, unknown>,
-    path: string
-): boolean => {
-    if (propertyType === 'STRING') {
-        return true;
-    }
-
-    try {
-        const resolvedPath = transformPathForObjectAccess(encodePath(path));
-        const existingValue = safeResolvePath(parameters, resolvedPath);
-
-        return !existingValue || String(existingValue).startsWith('=');
-    } catch {
-        return true;
-    }
-};
 
 const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | boolean | null}) => {
     const sampleOutputString = String(sampleOutput);
@@ -99,22 +75,6 @@ const buildMentionId = ({
     return transformPathForObjectAccess(resolvedReference);
 };
 
-const canInsertDataPill = (mentionInput: Editor | null, currentNode?: NodeDataType): boolean => {
-    if (!mentionInput) {
-        return false;
-    }
-
-    const parameters = currentNode?.parameters || {};
-
-    if (!Object.keys(parameters).length) {
-        return true;
-    }
-
-    const attributes = mentionInput.view.props.attributes as {[name: string]: string};
-
-    return canInsertMentionForProperty(attributes.type, parameters, attributes.path);
-};
-
 const DataPill = ({
     componentIcon,
     parentProperty,
@@ -124,16 +84,13 @@ const DataPill = ({
     sampleOutput,
     workflowNodeName,
 }: DataPillProps) => {
-    const {currentNode, focusedInput} = useWorkflowNodeDetailsPanelStore(
+    const {pillTarget} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
-            currentNode: state.currentNode,
-            focusedInput: state.focusedInput,
+            pillTarget: state.pillTarget,
         }))
     );
 
     const setIsDraggingDataPill = useDataPillPanelStore((state) => state.setIsDraggingDataPill);
-
-    const mentionInput: Editor | null = focusedInput;
 
     const subProperties = property?.properties || property?.items;
 
@@ -147,31 +104,18 @@ const DataPill = ({
         propertyName,
         workflowNodeName,
     }: HandleDataPillClickProps) => {
-        if (!mentionInput) {
+        if (!pillTarget || !pillTarget.acceptsPill()) {
             return;
         }
 
-        if (!canInsertDataPill(mentionInput, currentNode)) {
-            return;
-        }
-
-        const mentionId = buildMentionId({
-            parentPropertyName,
-            path,
-            propertyName,
-            workflowNodeName,
-        });
-
-        mentionInput
-            .chain()
-            .focus()
-            .insertContent({
-                attrs: {
-                    id: mentionId,
-                },
-                type: 'mention',
+        pillTarget.insertPill(
+            buildMentionId({
+                parentPropertyName,
+                path,
+                propertyName,
+                workflowNodeName,
             })
-            .run();
+        );
     };
 
     const handleDragStart = (event: DragEvent<HTMLDivElement>, props: HandleDataPillClickProps) => {
@@ -215,7 +159,7 @@ const DataPill = ({
                 <div
                     className={twMerge(
                         'inline-flex cursor-pointer items-center space-x-2 rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main dark:hover:bg-surface-neutral-tertiary',
-                        !mentionInput && 'cursor-not-allowed'
+                        !pillTarget && 'cursor-not-allowed'
                     )}
                     draggable
                     onClick={() => handleDataPillClick({workflowNodeName})}
@@ -249,7 +193,7 @@ const DataPill = ({
                     <div
                         className={twMerge(
                             'mr-auto inline-flex cursor-pointer items-center rounded-full border bg-surface-neutral-secondary px-2 py-0.5 text-sm hover:bg-surface-main dark:hover:bg-surface-neutral-tertiary',
-                            !mentionInput && 'cursor-not-allowed'
+                            !pillTarget && 'cursor-not-allowed'
                         )}
                         data-name={property?.name || workflowNodeName}
                         draggable

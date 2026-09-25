@@ -57,7 +57,7 @@ describe('PropertyMentionsInput', () => {
 
         useWorkflowNodeDetailsPanelStore.setState({
             currentNode: {connectionId: undefined, workflowNodeName: 'test_1'},
-            focusedInput: null,
+            pillTarget: null,
         } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
     });
 
@@ -136,7 +136,7 @@ describe('PropertyMentionsInput', () => {
                 editor!.commands.insertContent('=');
             });
 
-            await waitFor(() => expect(useWorkflowNodeDetailsPanelStore.getState().focusedInput).toBe(editor));
+            await waitFor(() => expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.owner).toBe(editor));
         });
     });
 
