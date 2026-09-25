@@ -188,7 +188,13 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
 
             const nextState: PropertyValueStateI = {...state, propertyParameterValue: value};
 
-            if (!nextUsesMentions && controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) && value) {
+            if (
+                !nextUsesMentions &&
+                controlType &&
+                INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
+                value !== null &&
+                value !== undefined
+            ) {
                 nextState.inputValue = value as string;
             }
 

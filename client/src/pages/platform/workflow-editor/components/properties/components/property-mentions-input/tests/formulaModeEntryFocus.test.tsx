@@ -73,8 +73,6 @@ describe('entering formula mode by typing =', () => {
             editor!.commands.insertContent('=');
         });
 
-        // jsdom will not hold DOM focus on a contenteditable, so the store's focused input is what this can
-        // assert - it is also what the editor chrome and the data pill panel read.
         await waitFor(() => expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.owner).toBe(editor));
     });
 });

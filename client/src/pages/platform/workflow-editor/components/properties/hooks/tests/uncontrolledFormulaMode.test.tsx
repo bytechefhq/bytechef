@@ -73,6 +73,18 @@ describe('uncontrolled Text/Formula', () => {
         expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: 7}));
     });
 
+    it('shows 0 in the native input when a formula edited to 0 converts back to text', () => {
+        const {result} = renderCount(5);
+
+        act(() => result.current.handleFormulaSwitch());
+        act(() => result.current.handleMentionInputValueChange('0'));
+        act(() => result.current.handleFormulaSwitch());
+
+        expect(result.current.isFormulaMode).toBe(false);
+        expect(saveProperty).toHaveBeenLastCalledWith(expect.objectContaining({value: 0}));
+        expect(String(result.current.inputValue)).toBe('0');
+    });
+
     it('clears a formula that cannot convert back', () => {
         const {result} = renderCount('=concat(a, b)');
 

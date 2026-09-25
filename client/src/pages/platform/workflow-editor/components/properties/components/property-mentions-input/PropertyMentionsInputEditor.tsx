@@ -81,6 +81,9 @@ interface PropertyMentionsInputEditorProps {
     workflow: Workflow;
 }
 
+const isEditorContentMounted = (editor: Editor) =>
+    (editor as Editor & {isEditorContentInitialized?: boolean}).isEditorContentInitialized === true;
+
 const countMentionNodes = (editor: {
     state: {doc: {descendants: (callback: (node: {type: {name: string}}) => void) => void}};
 }) => {
@@ -148,7 +151,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value
         );
         const [isLocalUpdate, setIsLocalUpdate] = useState(false);
-        const [mentionOccurences, setMentionOccurences] = useState(0);
 
         const lastSavedRef = useRef<string | number | null | undefined>(undefined);
         const savingRef = useRef<Promise<void> | null>(null);
@@ -469,8 +471,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 if (onValueChange) {
                     onValueChange(value);
                 }
-
-                setMentionOccurences(countMentionNodes(editor));
             },
             [editorValue, onChange, onValueChange, saveMentionInputValue]
         );
@@ -580,7 +580,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 handleClick: (view, pos) => moveCursorToEnd(view, pos),
                 handleDrop,
                 handleKeyPress: (editorView: EditorView, event: KeyboardEvent) => {
-                    const isEditorEmpty = editorView.state.doc.textContent.length === 0 && mentionOccurences === 0;
+                    const mentionCount = countMentionNodes(editorView);
+
+                    const isEditorEmpty = editorView.state.doc.textContent.length === 0 && mentionCount === 0;
 
                     if ((event.key === '=' && isEditorEmpty && !singlePill) || isFormulaMode) {
                         return;
@@ -592,7 +594,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                     const restrictsToOnePill = singlePill || type !== 'STRING';
 
-                    if (restrictsToOnePill && (mentionOccurences || event.key !== '$')) {
+                    if (restrictsToOnePill && (mentionCount || event.key !== '$')) {
                         event.preventDefault();
                     }
                 },
@@ -601,6 +603,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             immediatelyRender: false,
             onBlur: ({editor: blurredEditor}) => {
                 isFocusedRef.current = false;
+
+                if (!isEditorContentMounted(blurredEditor)) {
+                    queueMicrotask(() => {
+                        if (!blurredEditor.isDestroyed && isEditorContentMounted(blurredEditor)) {
+                            blurredEditor.commands.focus();
+                        }
+                    });
+
+                    return;
+                }
 
                 if (singlePill && blurredEditor && countMentionNodes(blurredEditor) === 0) {
                     unsavedSuggestionValueRef.current = undefined;
@@ -699,7 +711,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
             const pendingValue = typeof value === 'string' && value.startsWith('=') ? value.substring(1) : value;
 
-            if (typeof pendingValue === 'string' && pendingValue !== editorValueRef.current) {
+            const documentIsStale = pendingValue !== editorValueRef.current || (pendingValue !== '' && editor.isEmpty);
+
+            if (typeof pendingValue === 'string' && documentIsStale) {
                 editor.commands.setContent(getContent(pendingValue) ?? '', {
                     emitUpdate: false,
                     parseOptions: {preserveWhitespace: 'full'},

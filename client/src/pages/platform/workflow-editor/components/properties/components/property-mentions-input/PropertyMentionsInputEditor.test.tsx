@@ -843,3 +843,32 @@ describe('PropertyMentionsInputEditor', () => {
         });
     });
 });
+
+describe('one-pill editor', () => {
+    it('refuses $ over a pill it was loaded with', async () => {
+        const {container} = renderEditor({
+            controlType: 'INTEGER',
+            singlePill: true,
+            type: 'INTEGER',
+            value: '${trigger_1.count}',
+        });
+
+        await waitFor(() => expect(container.querySelector('.ProseMirror [data-id="trigger_1.count"]')).not.toBeNull());
+
+        const pressKey = (key: string) => {
+            const keyPressEvent = new KeyboardEvent('keypress', {
+                bubbles: true,
+                cancelable: true,
+                charCode: key.charCodeAt(0),
+                key,
+            });
+
+            container.querySelector('.ProseMirror')!.dispatchEvent(keyPressEvent);
+
+            return keyPressEvent.defaultPrevented;
+        };
+
+        expect(pressKey('a')).toBe(true);
+        expect(pressKey('$')).toBe(true);
+    });
+});

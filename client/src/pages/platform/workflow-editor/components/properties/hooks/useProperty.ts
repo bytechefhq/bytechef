@@ -96,6 +96,7 @@ type UsePropertyReturnType = {
     handleFromAiClick: ((fromAi: boolean) => void) | undefined;
     handleFormulaSwitch: () => void;
     handleFromAiToggle: (fromAi: boolean, fieldOnChange: (value: string) => void) => void;
+    handleControlledNativeFromAiClick: (fieldOnChange: (value: string) => void) => void;
     handleInputChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => void;
     handleInputClear: () => void;
     handleJsonSchemaBuilderChange: (value?: SchemaRecordType) => void;
@@ -438,7 +439,7 @@ export const useProperty = ({
                 hasControl: !!control,
                 isFromAi: !control && isFromAi,
                 pillEntry,
-                value: propertyParameterValue,
+                value: control ? undefined : propertyParameterValue,
             }),
         [control, controlType, formulaModeState, isFromAi, pillEntry, propertyParameterValue]
     );
@@ -764,6 +765,15 @@ export const useProperty = ({
         ]
     );
 
+    const handleControlledNativeFromAiClick = useCallback(
+        (fieldOnChange: (value: string) => void) => {
+            setIsFormulaMode(true);
+
+            handleFromAiToggle(true, fieldOnChange);
+        },
+        [handleFromAiToggle, setIsFormulaMode]
+    );
+
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
         if (
             !currentNode ||
@@ -1019,6 +1029,8 @@ export const useProperty = ({
         (mentionId: string) => {
             const pillValue = `\${${mentionId}}`;
 
+            saveInputValue.cancel();
+
             setPillEntry(false);
 
             dispatchValueAction({type: 'pillValueSet', value: pillValue});
@@ -1027,7 +1039,7 @@ export const useProperty = ({
 
             requestEditorFocus();
         },
-        [requestEditorFocus, saveResolvedValue]
+        [requestEditorFocus, saveInputValue, saveResolvedValue]
     );
 
     const handleNativeKeyDown = useCallback(
@@ -1804,6 +1816,7 @@ export const useProperty = ({
         handleControlledBlur,
         handleControlledBuilderFormulaSwitch,
         handleControlledFormulaSwitch,
+        handleControlledNativeFromAiClick,
         handleControlledNativeKeyDown,
         handleDeleteCustomPropertyClick,
         handleFormulaSwitch,
