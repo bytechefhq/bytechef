@@ -1,11 +1,13 @@
-import {getRouter} from '@/routes';
-import {AUTHORITIES} from '@/shared/constants';
+import {getRouter, loadEnvironments, loadProjectWorkflowEditor} from '@/routes';
+import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT, PRODUCTION_ENVIRONMENT} from '@/shared/constants';
 import Settings, {SettingsNavItemI} from '@/shared/layout/Settings';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {render} from '@/shared/util/test-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {ReactElement, ReactNode} from 'react';
 import {MemoryRouter, Route, RouteObject, Routes, useLocation} from 'react-router-dom';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     isTenantAdmin: false,
@@ -168,6 +170,182 @@ const renderNavHrefs = (element: SettingsElementType) => {
 
     return navHrefs;
 };
+
+const findRoutesByPath = (routes: RouteObject[], path: string): RouteObject[] =>
+    routes.flatMap((route) => [
+        ...(route.path === path ? [route] : []),
+        ...(route.children ? findRoutesByPath(route.children, path) : []),
+    ]);
+
+const getRouteAuthorities = (path: string) => {
+    const router = getRouter(new QueryClient());
+
+    const routes = findRoutesByPath(router.routes as RouteObject[], path);
+
+    return routes.map((route) => (route.element as PrivateRouteElementType).props.hasAnyAuthorities);
+};
+
+const getChildRouteAuthorities = (path: string) => {
+    const router = getRouter(new QueryClient());
+
+    const routes = findRoutesByPath(router.routes as RouteObject[], path);
+
+    return routes
+        .flatMap((route) => route.children ?? [])
+        .map((route) => (route.element as PrivateRouteElementType).props.hasAnyAuthorities);
+};
+
+describe('loadEnvironmentsIfAuthenticated', () => {
+    let queryClient: QueryClient;
+
+    beforeEach(() => {
+        queryClient = new QueryClient();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('does nothing when not authenticated', async () => {
+        // Arrange
+        vi.spyOn(authenticationStore, 'getState').mockReturnValue({authenticated: false} as never);
+
+        const fetchSpy = vi.spyOn(queryClient, 'fetchQuery');
+
+        const setEnvironmentsSpy = vi.fn();
+        vi.spyOn(environmentStore, 'getState').mockReturnValue({setEnvironments: setEnvironmentsSpy} as never);
+
+        // Act
+        await loadEnvironments(queryClient);
+
+        // Assert
+        expect(fetchSpy).not.toHaveBeenCalled();
+        expect(setEnvironmentsSpy).not.toHaveBeenCalled();
+    });
+
+    it('fetches environments and sets them when authenticated', async () => {
+        // Arrange
+        vi.spyOn(authenticationStore, 'getState').mockReturnValue({authenticated: true} as never);
+
+        const environments = [
+            {id: 1, name: 'Dev'},
+            {id: 2, name: 'Prod'},
+        ];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fetchSpy = vi.spyOn(queryClient, 'fetchQuery').mockResolvedValue(environments as any);
+
+        const setEnvironmentsSpy = vi.fn();
+        vi.spyOn(environmentStore, 'getState').mockReturnValue({setEnvironments: setEnvironmentsSpy} as never);
+
+        // Act
+        await loadEnvironments(queryClient);
+
+        // Assert
+        expect(fetchSpy).toHaveBeenCalledTimes(1);
+        expect(setEnvironmentsSpy).toHaveBeenCalledWith(environments);
+    });
+});
+
+describe('loadProjectWorkflowEditor', () => {
+    let queryClient: QueryClient;
+
+    beforeEach(() => {
+        queryClient = new QueryClient();
+    });
+
+    afterEach(() => {
+        environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
+
+        vi.restoreAllMocks();
+    });
+
+    it('loads the project when Development is selected', async () => {
+        environmentStore.setState({currentEnvironmentId: DEVELOPMENT_ENVIRONMENT});
+
+        const project = {id: 7, name: 'Project'};
+
+        const ensureQueryDataSpy = vi.spyOn(queryClient, 'ensureQueryData').mockResolvedValue(project);
+
+        const result = await loadProjectWorkflowEditor(queryClient, 7);
+
+        expect(ensureQueryDataSpy).toHaveBeenCalledTimes(1);
+        expect(result).toBe(project);
+    });
+
+    it('redirects to deployments instead of opening the editor outside Development', async () => {
+        environmentStore.setState({currentEnvironmentId: PRODUCTION_ENVIRONMENT});
+
+        const ensureQueryDataSpy = vi.spyOn(queryClient, 'ensureQueryData');
+
+        const result = await loadProjectWorkflowEditor(queryClient, 7);
+
+        expect(ensureQueryDataSpy).not.toHaveBeenCalled();
+        expect(result).toBeInstanceOf(Response);
+        expect((result as Response).headers.get('Location')).toBe('/automation/deployments');
+    });
+});
+
+describe('settings route authorities', () => {
+    it('lets only a tenant admin open the Billing settings page', () => {
+        const authorities = getRouteAuthorities('billing');
+
+        expect(authorities.length).toBeGreaterThan(0);
+        authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
+    });
+
+    it('lets only a tenant admin open the MCP Server settings page', () => {
+        const authorities = getRouteAuthorities('mcp-server');
+
+        expect(authorities.length).toBeGreaterThan(0);
+        authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
+    });
+
+    it('lets only a tenant admin open the API Connectors settings pages', () => {
+        const authorities = getChildRouteAuthorities('api-connectors');
+
+        expect(authorities.length).toBe(8);
+        authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
+    });
+
+    it('lets only a tenant admin open the embedded MCP Servers page', () => {
+        const router = getRouter(new QueryClient());
+
+        const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
+
+        const routes = findRoutesByPath(embeddedRoutes, 'mcp-servers');
+
+        expect(routes).toHaveLength(1);
+        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
+    });
+
+    it.each([
+        'integrations',
+        'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
+        'configurations',
+        'automation-workflows',
+        'automation-workflows/:workflowId/editor',
+        'connected-users',
+        'app-events',
+        'executions',
+        'connections',
+    ])('lets only a tenant admin open the embedded %s page', (path) => {
+        const router = getRouter(new QueryClient());
+
+        const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
+
+        const routes = findRoutesByPath(embeddedRoutes, path);
+
+        expect(routes).toHaveLength(1);
+        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
+    });
+
+    it('lets only a tenant admin open the API Clients page', () => {
+        const authorities = getRouteAuthorities('api-clients');
+
+        expect(authorities.length).toBeGreaterThan(0);
+        authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
+    });
+});
 
 describe('settings navigation visibility', () => {
     beforeEach(() => {
