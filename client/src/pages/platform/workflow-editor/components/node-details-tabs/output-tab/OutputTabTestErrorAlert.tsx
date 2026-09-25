@@ -1,7 +1,6 @@
 import Button from '@/components/Button/Button';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {CircleXIcon, XIcon} from 'lucide-react';
-import {twMerge} from 'tailwind-merge';
 
 import {TestOutputErrorI} from './hooks/useOutputTab';
 
@@ -12,12 +11,12 @@ interface OutputTabTestErrorAlertProps {
 }
 
 const OutputTabTestErrorAlert = ({className, onDismiss, testOutputError}: OutputTabTestErrorAlertProps) => (
-    <Alert className={twMerge('pr-10', className)} variant="destructive">
+    <Alert className={className} variant="destructive">
         <CircleXIcon />
 
-        <AlertTitle>{testOutputError.title}</AlertTitle>
+        <AlertTitle className="pr-6">{testOutputError.title}</AlertTitle>
 
-        <AlertDescription className="max-h-48 min-w-0 overflow-y-auto font-mono text-xs wrap-anywhere whitespace-pre-wrap">
+        <AlertDescription className="col-span-2 col-start-1 mt-1 max-h-48 min-w-0 overflow-y-auto font-mono text-xs wrap-anywhere whitespace-pre-wrap">
             {testOutputError.message}
         </AlertDescription>
 
