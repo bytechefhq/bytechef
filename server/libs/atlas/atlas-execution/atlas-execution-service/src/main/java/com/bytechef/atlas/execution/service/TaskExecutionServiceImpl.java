@@ -19,6 +19,7 @@ package com.bytechef.atlas.execution.service;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -36,6 +37,49 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
     @SuppressFBWarnings("EI2")
     public TaskExecutionServiceImpl(TaskExecutionRepository taskExecutionRepository) {
         this.taskExecutionRepository = taskExecutionRepository;
+    }
+
+    @Override
+    public boolean cancelIfUnfinished(long id) {
+        TaskExecution taskExecution = taskExecutionRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
+
+        try {
+            TaskExecution.Status status = taskExecution.getStatus();
+
+            if (status.isTerminated()) {
+                return false;
+            }
+
+            taskExecution.setEndDate(Instant.now());
+            taskExecution.setStatus(TaskExecution.Status.CANCELLED);
+
+            taskExecutionRepository.save(taskExecution);
+
+            return true;
+        } finally {
+            taskExecutionRepository.unlockForUpdate(id);
+        }
+    }
+
+    @Override
+    public boolean completeIfNotCancelled(long id) {
+        TaskExecution taskExecution = taskExecutionRepository.findByIdForUpdate(id)
+            .orElseThrow(() -> new IllegalStateException(String.format("TaskExecution with id '%s' not found", id)));
+
+        try {
+            if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED) {
+                return false;
+            }
+
+            taskExecution.setStatus(TaskExecution.Status.COMPLETED);
+
+            taskExecutionRepository.save(taskExecution);
+
+            return true;
+        } finally {
+            taskExecutionRepository.unlockForUpdate(id);
+        }
     }
 
     @Override
@@ -107,7 +151,8 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
                 currentTaskExecution.setStartDate(taskExecution.getStartDate());
 
                 taskExecution = currentTaskExecution;
-            } else if (status.isTerminated() && currentTaskExecution.getStatus() == TaskExecution.Status.STARTED) {
+            } else if (status.isTerminated() &&
+                (currentStatus == TaskExecution.Status.STARTED || taskExecution.getStartDate() == null)) {
                 taskExecution.setStartDate(currentTaskExecution.getStartDate());
             }
 

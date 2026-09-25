@@ -25,6 +25,10 @@ import java.util.Optional;
  */
 public interface TaskExecutionService {
 
+    boolean cancelIfUnfinished(long id);
+
+    boolean completeIfNotCancelled(long id);
+
     TaskExecution create(TaskExecution taskExecution);
 
     void delete(long id);

@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -151,23 +152,58 @@ public class TaskExecutionErrorEventListenerTest {
                     forkJoinTaskExecution, erroredTaskExecution, startedSiblingTaskExecution,
                     createdSiblingTaskExecution, completedSiblingTaskExecution));
 
+        when(taskExecutionService.cancelIfUnfinished(12L))
+            .thenReturn(true);
+        when(taskExecutionService.cancelIfUnfinished(13L))
+            .thenReturn(false);
+
         taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
 
-        assertThat(startedSiblingTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.CANCELLED);
-        assertThat(startedSiblingTaskExecution.getEndDate()).isNotNull();
-        assertThat(createdSiblingTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.CANCELLED);
-        assertThat(completedSiblingTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.COMPLETED);
         assertThat(erroredTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.FAILED);
         assertThat(forkJoinTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.FAILED);
+        assertThat(startedSiblingTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.STARTED);
+        assertThat(completedSiblingTaskExecution.getStatus()).isEqualTo(TaskExecution.Status.COMPLETED);
 
+        verify(taskExecutionService, never()).cancelIfUnfinished(10L);
+        verify(taskExecutionService, never()).cancelIfUnfinished(11L);
+        verify(taskExecutionService, never()).cancelIfUnfinished(14L);
+        verify(taskExecutionService, never()).update(startedSiblingTaskExecution);
+        verify(taskExecutionService, never()).update(createdSiblingTaskExecution);
         verify(taskDispatcher, times(1)).dispatch(isA(CancelControlTask.class));
 
         InOrder inOrder = inOrder(taskExecutionService, eventPublisher);
 
         inOrder.verify(taskExecutionService)
-            .update(createdSiblingTaskExecution);
+            .cancelIfUnfinished(13L);
         inOrder.verify(eventPublisher)
             .publishEvent(isA(JobStatusApplicationEvent.class));
+    }
+
+    @Test
+    public void testFailingJobSendsNoCancelWhenNoSiblingWasCancelled() {
+        TaskExecutionErrorEventListener taskExecutionErrorEventListener = new TaskExecutionErrorEventListener(
+            eventPublisher, contextService, jobService, taskDispatcher, taskExecutionService, taskFileStorage);
+
+        TaskExecution erroredTaskExecution = createTaskExecution(
+            11L, null, "firecrawl/v1/scrape", TaskExecution.Status.STARTED);
+
+        erroredTaskExecution.setError(new ExecutionError("something bad happened", List.of()));
+
+        TaskExecution siblingTaskExecution = createTaskExecution(
+            12L, null, "firecrawl/v1/scrape", TaskExecution.Status.STARTED);
+
+        when(taskExecutionService.update(any(TaskExecution.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(jobService.getTaskExecutionJob(11L))
+            .thenReturn(new Job(4567L));
+        when(taskExecutionService.getJobTaskExecutions(4567L))
+            .thenReturn(List.of(erroredTaskExecution, siblingTaskExecution));
+        when(taskExecutionService.cancelIfUnfinished(12L))
+            .thenReturn(false);
+
+        taskExecutionErrorEventListener.onErrorEvent(new TaskExecutionErrorEvent(erroredTaskExecution));
+
+        verify(taskDispatcher, never()).dispatch(any());
     }
 
     private static TaskExecution createTaskExecution(
