@@ -29,6 +29,8 @@ public interface ConnectedUserService {
 
     void enableConnectedUser(long id, boolean enable);
 
+    Optional<ConnectedUser> fetchConnectedUser(long id);
+
     Optional<ConnectedUser> fetchConnectedUser(String externalId, long environmentId);
 
     Optional<ConnectedUser> fetchConnectedUser(String externalId, Environment environment);
