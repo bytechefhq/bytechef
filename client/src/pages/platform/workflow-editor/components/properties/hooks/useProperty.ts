@@ -9,6 +9,10 @@ import {
     propertyValueReducer,
 } from '@/pages/platform/workflow-editor/components/properties/hooks/propertyValueReducer';
 import {
+    cancelPendingSavesWithin,
+    registerPendingSave,
+} from '@/pages/platform/workflow-editor/components/properties/pendingPropertySaves';
+import {
     PropertyInputModeI,
     fitsNativeControl,
     fromFormulaValue,
@@ -164,6 +168,7 @@ interface UsePropertyProps {
     formState?: FormState<FieldValues>;
     hideFromAi?: boolean;
     objectName?: string;
+    onValueReplaced?: () => void;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     parameterValue?: any;
@@ -183,6 +188,7 @@ export const useProperty = ({
     formState,
     hideFromAi,
     objectName,
+    onValueReplaced,
     parameterValue,
     path,
     property,
@@ -225,8 +231,10 @@ export const useProperty = ({
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
     const loadedSelectOptionValuesRef = useRef<Array<string> | undefined>(undefined);
+    const onValueReplacedRef = useRef(onValueReplaced);
     const parameterValueRef = useRef(parameterValue);
 
+    onValueReplacedRef.current = onValueReplaced;
     parameterValueRef.current = parameterValue;
 
     const previousPropertyPathForParameterSyncRef = useRef<string | undefined>(undefined);
@@ -840,7 +848,13 @@ export const useProperty = ({
         handleJsonSchemaBuilderChange.cancel();
 
         editorPendingSaveCancelRef.current?.();
-    }, [handleCodeEditorChange, handleJsonSchemaBuilderChange, saveInputValue]);
+
+        if (path) {
+            cancelPendingSavesWithin(path);
+        }
+
+        onValueReplacedRef.current?.();
+    }, [handleCodeEditorChange, handleJsonSchemaBuilderChange, path, saveInputValue]);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;
@@ -1849,6 +1863,24 @@ export const useProperty = ({
             controlledFormulaOnChangeRef.current('=');
         }
     }, [isFormulaMode, resetOnModeChangeRef]);
+
+    useEffect(() => {
+        if (!path) {
+            return;
+        }
+
+        return registerPendingSave(path, {
+            cancel: () => {
+                saveInputValue.cancel();
+                handleCodeEditorChange.cancel();
+                handleJsonSchemaBuilderChange.cancel();
+            },
+            isPending: () =>
+                saveInputValue.isPending() ||
+                handleCodeEditorChange.isPending() ||
+                handleJsonSchemaBuilderChange.isPending(),
+        });
+    }, [handleCodeEditorChange, handleJsonSchemaBuilderChange, path, saveInputValue]);
 
     const isLoadingDisplayCondition = !!(
         displayCondition &&
