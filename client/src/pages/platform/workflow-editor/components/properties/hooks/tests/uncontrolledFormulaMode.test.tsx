@@ -2,6 +2,7 @@ vi.mock('@/pages/platform/workflow-editor/utils/saveProperty', () => ({
     default: vi.fn(),
 }));
 
+import {FormulaEnabledProvider} from '@/pages/platform/workflow-editor/components/properties/FormulaEnabledContext';
 import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -112,6 +113,24 @@ describe('uncontrolled Text/Formula', () => {
         expect(preventDefault).toHaveBeenCalled();
         expect(result.current.inputMode).toMatchObject({renderer: 'mentions', singlePill: true});
         expect(result.current.editorFocusRequest?.initialInput).toBe('$');
+    });
+
+    it('ignores = on an empty number field when the surface disables formulas', () => {
+        const {result} = renderHook(
+            () => useProperty({parameterValue: '', path: 'parameters.count', property: countProperty}),
+            {
+                wrapper: ({children}: {children: ReactNode}) => (
+                    <FormulaEnabledProvider value={false}>{wrapper({children})}</FormulaEnabledProvider>
+                ),
+            }
+        );
+
+        const preventDefault = vi.fn();
+
+        act(() => result.current.handleNativeKeyDown({currentTarget: {value: ''}, key: '=', preventDefault} as never));
+
+        expect(preventDefault).not.toHaveBeenCalled();
+        expect(result.current.isFormulaMode).toBe(false);
     });
 
     it('= on an empty number field enters formula mode', () => {
