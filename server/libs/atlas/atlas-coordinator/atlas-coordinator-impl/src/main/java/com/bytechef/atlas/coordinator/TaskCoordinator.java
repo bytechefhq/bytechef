@@ -234,6 +234,15 @@ public class TaskCoordinator {
 
         TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();
 
+        TaskExecution persistedTaskExecution = taskExecutionService.getTaskExecution(
+            Validate.notNull(taskExecution.getId(), "id"));
+
+        if (persistedTaskExecution.getStatus() == TaskExecution.Status.CANCELLED) {
+            log.debug("Task id={} was cancelled, dropping its completion", taskExecution.getId());
+
+            return;
+        }
+
         try {
             taskCompletionHandler.handle(taskExecution);
         } catch (Exception e) {
