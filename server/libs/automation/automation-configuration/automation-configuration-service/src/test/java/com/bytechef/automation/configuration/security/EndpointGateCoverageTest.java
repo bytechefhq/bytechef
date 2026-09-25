@@ -231,9 +231,6 @@ class EndpointGateCoverageTest {
             "ApiKeyFacadeImpl checks the caller owns the key"));
 
     private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.ofEntries(
-        Map.entry("ApprovalTaskGraphQlController#createApprovalTask", "any member writes any approval task"),
-        Map.entry("ApprovalTaskGraphQlController#deleteApprovalTask", "any member writes any approval task"),
-        Map.entry("ApprovalTaskGraphQlController#updateApprovalTask", "any member writes any approval task"),
         Map.entry("NotificationApiController#createNotification", "any member writes the tenant's notifications"),
         Map.entry("NotificationApiController#deleteNotification", "any member writes the tenant's notifications"),
         Map.entry("NotificationApiController#updateNotification", "any member writes the tenant's notifications"));
