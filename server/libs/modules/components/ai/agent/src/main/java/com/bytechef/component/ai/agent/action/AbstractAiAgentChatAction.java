@@ -35,6 +35,7 @@ import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListen
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
+import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -153,6 +154,7 @@ public abstract class AbstractAiAgentChatAction {
         return createPrompt(chatClient, inputParameters, context)
             .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context))
             .advisors(getConversationAdvisor(conversationId))
+            .advisors(new TextGenerationFirstAdvisor())
             .messages(ModelUtils.getMessages(inputParameters, context))
             .tools(
                 getToolCallbacks(
