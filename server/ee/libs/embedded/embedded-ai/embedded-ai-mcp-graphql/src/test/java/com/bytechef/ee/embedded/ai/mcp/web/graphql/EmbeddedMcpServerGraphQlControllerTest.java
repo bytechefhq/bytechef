@@ -32,51 +32,45 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expression on every mutation of the embedded MCP GraphQL controllers through
- * the real {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. These mutations
- * administer the tenant's embedded MCP servers, their integration configurations and connected users' servers, so each
- * must decide on {@link PermissionService#isTenantAdmin()} alone.
+ * Evaluates the real {@code @PreAuthorize} expression on every query and mutation of
+ * {@link EmbeddedMcpServerGraphQlController} through the real {@link AutomationMethodSecurityExpressionHandler} and
+ * {@link AutomationPermissionEvaluator}. These read and administer the tenant's embedded MCP servers, so each must
+ * decide on {@link PermissionService#isTenantAdmin()} alone.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class EmbeddedMcpGraphQlControllersAuthorizationTest {
+class EmbeddedMcpServerGraphQlControllerTest {
 
-    private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
-        ConnectedUserMcpServerGraphQlController.class, EmbeddedMcpServerGraphQlController.class,
-        McpIntegrationInstanceConfigurationGraphQlController.class,
-        McpIntegrationInstanceConfigurationWorkflowGraphQlController.class);
+    private static final List<Class<?>> CONTROLLER_CLASSES = List.of(EmbeddedMcpServerGraphQlController.class);
 
-    private static final Set<String> MUTATION_NAMES = Set.of(
-        "createEmbeddedMcpServer", "createMcpIntegrationInstanceConfiguration",
-        "createMcpIntegrationInstanceConfigurationWorkflow", "deleteConnectedUserMcpServer", "deleteEmbeddedMcpServer",
-        "deleteMcpIntegrationInstanceConfiguration", "deleteMcpIntegrationInstanceConfigurationWorkflow",
-        "enableConnectedUserMcpServer", "enableConnectedUserMcpTool", "updateMcpIntegrationInstanceConfiguration",
-        "updateMcpIntegrationInstanceConfigurationVersion", "updateMcpIntegrationInstanceConfigurationWorkflow");
+    private static final Set<String> ENDPOINT_NAMES = Set.of(
+        "createEmbeddedMcpServer", "deleteEmbeddedMcpServer", "embeddedMcpServers", "mcpComponentDefinitions");
 
-    static Stream<Arguments> mutations() {
-        return mutationMethods().flatMap(method -> Stream.of(Arguments.of(method, false), Arguments.of(method, true)));
+    static Stream<Arguments> endpoints() {
+        return endpointMethods().flatMap(method -> Stream.of(Arguments.of(method, false), Arguments.of(method, true)));
     }
 
     @Test
-    void testEveryMutationIsEvaluated() {
-        Set<String> mutationNames = mutationMethods()
+    void testEveryEndpointIsEvaluated() {
+        Set<String> endpointNames = endpointMethods()
             .map(Method::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
-        assertThat(mutationNames).isEqualTo(new TreeSet<>(MUTATION_NAMES));
+        assertThat(endpointNames).isEqualTo(new TreeSet<>(ENDPOINT_NAMES));
     }
 
     @ParameterizedTest(name = "{0} tenantAdmin={1}")
-    @MethodSource("mutations")
-    void testMutationRequiresATenantAdmin(Method method, boolean tenantAdmin) {
+    @MethodSource("endpoints")
+    void testEndpointRequiresATenantAdmin(Method method, boolean tenantAdmin) {
         assertThat(Modifier.isPublic(method.getModifiers()))
             .as("%s must be public, since a proxy only enforces a public guard", method.getName())
             .isTrue();
@@ -123,9 +117,10 @@ class EmbeddedMcpGraphQlControllersAuthorizationTest {
         return Boolean.TRUE.equals(expression.getValue(evaluationContext, Boolean.class));
     }
 
-    private static Stream<Method> mutationMethods() {
+    private static Stream<Method> endpointMethods() {
         return CONTROLLER_CLASSES.stream()
             .flatMap(controllerClass -> Arrays.stream(controllerClass.getDeclaredMethods()))
-            .filter(method -> method.isAnnotationPresent(MutationMapping.class));
+            .filter(method -> method.isAnnotationPresent(MutationMapping.class) ||
+                method.isAnnotationPresent(QueryMapping.class));
     }
 }

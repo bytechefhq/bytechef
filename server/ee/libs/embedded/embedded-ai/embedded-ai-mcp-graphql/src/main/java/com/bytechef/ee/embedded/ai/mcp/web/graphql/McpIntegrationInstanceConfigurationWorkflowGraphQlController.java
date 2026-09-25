@@ -77,18 +77,21 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow(@Argument long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow(@Argument long id) {
         return mcpIntegrationInstanceConfigurationWorkflowService.fetchMcpIntegrationInstanceConfigurationWorkflow(id)
             .orElse(null);
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfigurationWorkflow> mcpIntegrationInstanceConfigurationWorkflows() {
         return mcpIntegrationInstanceConfigurationWorkflowService.getMcpIntegrationInstanceConfigurationWorkflows();
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfigurationWorkflow>
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfigurationWorkflow>
         mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId(
             @Argument long mcpIntegrationInstanceConfigurationId) {
         return mcpIntegrationInstanceConfigurationWorkflowService
@@ -97,7 +100,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    List<IntegrationWorkflowDTO> toolEligibleIntegrationVersionWorkflows(
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationWorkflowDTO> toolEligibleIntegrationVersionWorkflows(
         @Argument long integrationId, @Argument int integrationVersion) {
 
         return integrationWorkflowService.getIntegrationWorkflows(integrationId, integrationVersion)
@@ -112,7 +116,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    List<IntegrationWorkflowDTO> toolEligibleIntegrationInstanceConfigurationWorkflows(
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationWorkflowDTO> toolEligibleIntegrationInstanceConfigurationWorkflows(
         @Argument long integrationInstanceConfigurationId) {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration =
@@ -134,7 +139,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
     @SuppressFBWarnings("BC_VACUOUS_INSTANCEOF")
     @QueryMapping
-    List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
+    @PreAuthorize("isTenantAdmin()")
+    public List<Property> mcpIntegrationInstanceConfigurationWorkflowProperties(
         @Argument long mcpIntegrationInstanceConfigurationWorkflowId) {
         McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
             mcpIntegrationInstanceConfigurationWorkflowService

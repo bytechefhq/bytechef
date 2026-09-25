@@ -94,18 +94,21 @@ class McpIntegrationInstanceConfigurationGraphQlController {
     }
 
     @QueryMapping
-    McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration(@Argument long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration(@Argument long id) {
         return mcpIntegrationInstanceConfigurationService.fetchMcpIntegrationInstanceConfiguration(id)
             .orElse(null);
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfiguration> mcpIntegrationInstanceConfigurations() {
         return mcpIntegrationInstanceConfigurationService.getMcpIntegrationInstanceConfigurations();
     }
 
     @QueryMapping
-    List<McpIntegrationInstanceConfiguration>
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpIntegrationInstanceConfiguration>
         mcpIntegrationInstanceConfigurationsByServerId(@Argument long mcpServerId) {
         return mcpIntegrationInstanceConfigurationService.getMcpServerMcpIntegrationInstanceConfigurations(mcpServerId);
     }
