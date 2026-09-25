@@ -58,6 +58,12 @@ afterEach(() => {
 });
 
 describe('OutputSchemaDisplay', () => {
+    it('renders the test error alert between the header and the schema', () => {
+        renderOutputSchemaDisplay({testErrorAlert: <div data-testid="test-error-alert">Test failed</div>});
+
+        expect(screen.getByTestId('test-error-alert')).toHaveTextContent('Test failed');
+    });
+
     it('should not render the Item Schema heading when there is no variable output schema', () => {
         renderOutputSchemaDisplay({variableOutputSchema: undefined, variablePropertiesDefined: true});
 
