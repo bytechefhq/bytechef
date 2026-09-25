@@ -16,15 +16,20 @@
 
 package com.bytechef.platform.data.table.execution.listener;
 
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.event.DataTableWebhookEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.retry.RetryException;
 import org.springframework.core.retry.RetryPolicy;
@@ -42,6 +47,11 @@ import org.springframework.web.client.RestTemplate;
  * table and webhook type, and then executes HTTP POST requests to the retrieved webhook URLs with the event payload and
  * metadata.
  *
+ * <p>
+ * Selection is by the event's ref and its event type: the ref names the table the row was written into, and
+ * {@link DataTableWebhookService#listWebhooks(DataTableRef)} answers for it. The table's current name is read from its
+ * registry row for the delivered body.
+ *
  * @author Ivica Cardic
  */
 @Component
@@ -49,23 +59,41 @@ public class DataTableWebhookEventListener {
 
     private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
+    private final DataTableService dataTableService;
     private final DataTableWebhookService dataTableWebhookService;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
+    @Autowired
     @SuppressFBWarnings("EI")
-    public DataTableWebhookEventListener(DataTableWebhookService dataTableWebhookService) {
+    public DataTableWebhookEventListener(
+        DataTableService dataTableService, DataTableWebhookService dataTableWebhookService) {
+
+        this(dataTableService, dataTableWebhookService, new RestTemplate());
+    }
+
+    /**
+     * Delivery is a data boundary, so a test has to be able to observe which URLs are actually posted to rather than
+     * only which webhooks were selected.
+     */
+    @SuppressFBWarnings("EI")
+    DataTableWebhookEventListener(
+        DataTableService dataTableService, DataTableWebhookService dataTableWebhookService,
+        RestTemplate restTemplate) {
+
+        this.dataTableService = dataTableService;
         this.dataTableWebhookService = dataTableWebhookService;
+        this.restTemplate = restTemplate;
     }
 
     @EventListener
     @Async
     public void onDataTableWebhookEvent(DataTableWebhookEvent event) {
-        String baseName = event.getBaseName();
-        long environmentId = event.getEnvironmentId();
+        DataTableRef dataTableRef = event.getDataTableRef();
+
         DataTableWebhookType type = event.getType();
         Map<String, Object> payload = event.getPayload();
 
-        List<DataTableWebhookService.Webhook> hooks = dataTableWebhookService.listWebhooks(baseName, environmentId)
+        List<DataTableWebhookService.Webhook> hooks = dataTableWebhookService.listWebhooks(dataTableRef)
             .stream()
             .filter(webhook -> webhook.type() == type)
             .toList();
@@ -74,14 +102,18 @@ public class DataTableWebhookEventListener {
             return;
         }
 
+        DataTable dataTable = dataTableService.getDataTable(dataTableRef.dataTableId());
+
+        String tableName = dataTable.getName();
+
         RetryTemplate retryTemplate = createRetryTemplate();
 
         for (DataTableWebhookService.Webhook hook : hooks) {
 
-            Map<String, Object> body = new java.util.HashMap<>();
+            Map<String, Object> body = new HashMap<>();
 
             body.put("type", type.name());
-            body.put("table", baseName);
+            body.put("table", tableName);
             body.put("timestamp", String.valueOf(Instant.now()));
             body.put("payload", payload);
 

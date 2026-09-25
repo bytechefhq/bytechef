@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,26 +64,42 @@ public class DataTableTagServiceImpl implements DataTableTagService {
     }
 
     @Override
-    public Map<String, List<Tag>> getTagsByTableName() {
-        Map<String, List<Tag>> map = new HashMap<>();
+    public List<Tag> getTags(List<Long> dataTableIds) {
+        Set<Long> ids = new HashSet<>();
 
-        List<DataTable> dataTables = new ArrayList<>();
+        for (Long dataTableId : dataTableIds) {
+            DataTable dataTable = dataTableRepository.findById(dataTableId)
+                .orElse(null);
 
-        dataTableRepository.findAll()
-            .forEach(dataTables::add);
+            if (dataTable == null) {
+                continue;
+            }
 
-        Map<String, List<Long>> idsByName = dataTables.stream()
-            .collect(Collectors.toMap(
-                DataTable::getName,
-                dataTable -> dataTable.getTagIds() == null ? List.of() : dataTable.getTagIds()));
+            List<Long> tagIds = dataTable.getTagIds();
 
-        for (Map.Entry<String, List<Long>> entry : idsByName.entrySet()) {
-            List<Long> ids = entry.getValue();
-
-            map.put(entry.getKey(), ids == null || ids.isEmpty() ? List.of() : tagService.getTags(ids));
+            if (tagIds != null) {
+                ids.addAll(tagIds);
+            }
         }
 
-        return map;
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(new ArrayList<>(ids));
+    }
+
+    @Override
+    public Map<Long, List<Tag>> getTagsByTableId() {
+        Map<Long, List<Tag>> tagsByTableId = new HashMap<>();
+
+        for (DataTable dataTable : dataTableRepository.findAll()) {
+            List<Long> tagIds = dataTable.getTagIds();
+
+            tagsByTableId.put(dataTable.getId(), tagIds.isEmpty() ? List.of() : tagService.getTags(tagIds));
+        }
+
+        return tagsByTableId;
     }
 
     @Override

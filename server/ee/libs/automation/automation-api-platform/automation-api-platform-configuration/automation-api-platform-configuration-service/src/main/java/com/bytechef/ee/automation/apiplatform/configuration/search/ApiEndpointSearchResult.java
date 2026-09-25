@@ -15,7 +15,7 @@ import com.bytechef.automation.search.SearchResult;
  *
  * @author Ivica Cardic
  */
-public record ApiEndpointSearchResult(Long id, long collectionId, String name, String path)
+public record ApiEndpointSearchResult(Long id, long collectionId, String name, String path, Long workspaceId)
     implements SearchResult<Long> {
 
     @Override

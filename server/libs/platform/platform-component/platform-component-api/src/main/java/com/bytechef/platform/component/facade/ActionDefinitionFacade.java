@@ -35,19 +35,46 @@ public interface ActionDefinitionFacade {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String workflowId,
         @Nullable Long connectionId);
 
-    List<Option> executeOptions(
+    default List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable Long connectionId);
+        @Nullable Long connectionId) {
+
+        return executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, connectionId, null);
+    }
 
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Map<String, Long> connectionIds, Map<String, ?> extensions);
+        @Nullable Long connectionId, @Nullable String workflowId);
+
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, Long> connectionIds, Map<String, ?> extensions) {
+
+        return executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, connectionIds, extensions, null);
+    }
+
+    List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, Long> connectionIds, Map<String, ?> extensions, @Nullable String workflowId);
+
+    default OutputResponse executeOutput(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, Long> connectionIds) {
+
+        return executeOutput(componentName, componentVersion, actionName, inputParameters, connectionIds, null);
+    }
 
     OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds);
+        Map<String, Long> connectionIds, @Nullable String workflowId);
 
     Object executePerform(
         String componentName, int componentVersion, String actionName, @Nullable Long jobPrincipalId,

@@ -141,8 +141,19 @@ public class ContextFactoryImpl implements ContextFactory {
         @Nullable PlatformType type, boolean editorEnvironment) {
 
         return createTriggerContext(
-            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
-            environmentId, type, editorEnvironment, null);
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, null, componentConnection,
+            environmentId, type, editorEnvironment);
+    }
+
+    @Override
+    public TriggerContext createTriggerContext(
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable String workflowId, @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment) {
+
+        return doCreateTriggerContext(
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, workflowId,
+            componentConnection, environmentId, type, editorEnvironment, null);
     }
 
     @Override
@@ -150,6 +161,17 @@ public class ContextFactoryImpl implements ContextFactory {
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
         @Nullable PlatformType type, boolean editorEnvironment, @Nullable Long triggerExecutionId) {
+
+        return doCreateTriggerContext(
+            componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, null, componentConnection,
+            environmentId, type, editorEnvironment, triggerExecutionId);
+    }
+
+    private TriggerContext doCreateTriggerContext(
+        String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
+        @Nullable String workflowUuid, @Nullable String workflowId, @Nullable ComponentConnection componentConnection,
+        @Nullable Long environmentId, @Nullable PlatformType type, boolean editorEnvironment,
+        @Nullable Long triggerExecutionId) {
 
         return TriggerContextImpl
             .builder(
@@ -161,6 +183,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .logFileStorageWriter(triggerExecutionId == null ? null : triggerLogFileStorage)
             .triggerExecutionId(triggerExecutionId)
             .type(type)
+            .workflowId(workflowId)
             .workflowUuid(workflowUuid)
             .build();
     }

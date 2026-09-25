@@ -657,7 +657,14 @@ export type DataTableRowsPageQueryVariables = Exact<{
 
 export type DataTableRowsPageQuery = { dataTableRowsPage: { hasMore: boolean, nextOffset: number | null, items: Array<{ id: string, values: any }> } };
 
-export type DataTableTagsQueryVariables = Exact<{ [key: string]: never; }>;
+export type DataTableStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataTableStorageUsageQuery = { dataTableStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
+
+export type DataTableTagsQueryVariables = Exact<{
+  workspaceId: string | number;
+}>;
 
 
 export type DataTableTagsQuery = { dataTableTags: Array<{ id: string, name: string }> };
@@ -4239,9 +4246,36 @@ export const useDataTableRowsPageQuery = <
   }
     )};
 
+export const DataTableStorageUsageDocument = new TypedDocumentString(`
+    query DataTableStorageUsage {
+  dataTableStorageUsage {
+    limitBytes
+    percentage
+    unlimited
+    usedBytes
+  }
+}
+    `);
+
+export const useDataTableStorageUsageQuery = <
+      TData = DataTableStorageUsageQuery,
+      TError = unknown
+    >(
+      variables?: DataTableStorageUsageQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableStorageUsageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableStorageUsageQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableStorageUsageQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['DataTableStorageUsage'] : ['DataTableStorageUsage', variables],
+    queryFn: fetcher<DataTableStorageUsageQuery, DataTableStorageUsageQueryVariables>(DataTableStorageUsageDocument, variables),
+    ...options
+  }
+    )};
+
 export const DataTableTagsDocument = new TypedDocumentString(`
-    query dataTableTags {
-  dataTableTags {
+    query dataTableTags($workspaceId: ID!) {
+  dataTableTags(workspaceId: $workspaceId) {
     id
     name
   }
@@ -4252,13 +4286,13 @@ export const useDataTableTagsQuery = <
       TData = DataTableTagsQuery,
       TError = unknown
     >(
-      variables?: DataTableTagsQueryVariables,
+      variables: DataTableTagsQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsQuery, TError, TData>['queryKey'] }
     ) => {
     
     return useQuery<DataTableTagsQuery, TError, TData>(
       {
-    queryKey: variables === undefined ? ['dataTableTags'] : ['dataTableTags', variables],
+    queryKey: ['dataTableTags', variables],
     queryFn: fetcher<DataTableTagsQuery, DataTableTagsQueryVariables>(DataTableTagsDocument, variables),
     ...options
   }

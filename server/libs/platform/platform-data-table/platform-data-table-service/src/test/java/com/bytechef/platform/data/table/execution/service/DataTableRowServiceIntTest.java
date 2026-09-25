@@ -26,6 +26,7 @@ import com.bytechef.platform.data.table.config.DataTableIntTestConfiguration;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.springframework.context.annotation.Import;
 class DataTableRowServiceIntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
+    private static final long WORKSPACE_ID = 1L;
 
     @Autowired
     private DataTableService dataTableService;
@@ -51,17 +53,22 @@ class DataTableRowServiceIntTest {
     @Autowired
     private DataTableRowService dataTableRowService;
 
+    private DataTableRef dataTableRef;
+
     @BeforeEach
     void beforeEach() {
-        dataTableService.dropTable("rows", DEV_ENVIRONMENT_ID);
-        dataTableService.createTable(
-            "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+        dataTableService.fetchDataTable(WORKSPACE_ID, "rows")
+            .ifPresent(dataTable -> dataTableService.dropTable(dataTable.getId(), DEV_ENVIRONMENT_ID));
+
+        long dataTableId = dataTableService.createTable(
+            WORKSPACE_ID, "rows", null, List.of(new ColumnSpec("title", ColumnType.STRING)), DEV_ENVIRONMENT_ID);
+
+        dataTableRef = new DataTableRef(dataTableId, DEV_ENVIRONMENT_ID);
     }
 
     @Test
     void testInsertRowReturnsTheStoredValues() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRow dataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
         assertNotNull(dataTableRow);
         assertEquals("first", dataTableRow.values()
@@ -70,18 +77,16 @@ class DataTableRowServiceIntTest {
 
     @Test
     void testUpdateRowReturnsTheUpdatedValues() {
-        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRow insertedDataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
         DataTableRow updatedDataTableRow = dataTableRowService.updateRow(
-            "rows", insertedDataTableRow.id(), Map.of("title", "second"), DEV_ENVIRONMENT_ID);
+            dataTableRef, insertedDataTableRow.id(), Map.of("title", "second"));
 
         assertEquals(insertedDataTableRow.id(), updatedDataTableRow.id());
         assertEquals("second", updatedDataTableRow.values()
             .get("title"));
 
-        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(
-            "rows", insertedDataTableRow.id(), DEV_ENVIRONMENT_ID);
+        DataTableRow fetchedDataTableRow = dataTableRowService.getRow(dataTableRef, insertedDataTableRow.id());
 
         assertEquals("second", fetchedDataTableRow.values()
             .get("title"));
@@ -89,19 +94,18 @@ class DataTableRowServiceIntTest {
 
     @Test
     void testDeleteRowRemovesTheRow() {
-        DataTableRow dataTableRow = dataTableRowService.insertRow(
-            "rows", Map.of("title", "first"), DEV_ENVIRONMENT_ID);
+        DataTableRow dataTableRow = dataTableRowService.insertRow(dataTableRef, Map.of("title", "first"));
 
-        assertTrue(dataTableRowService.deleteRow("rows", dataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertTrue(dataTableRowService.deleteRow(dataTableRef, dataTableRow.id()));
 
-        assertNull(dataTableRowService.getRow("rows", dataTableRow.id(), DEV_ENVIRONMENT_ID));
+        assertNull(dataTableRowService.getRow(dataTableRef, dataTableRow.id()));
 
-        assertTrue(dataTableRowService.listRows("rows", 10, 0, DEV_ENVIRONMENT_ID)
+        assertTrue(dataTableRowService.listRows(dataTableRef, 10, 0)
             .isEmpty());
     }
 
     @Test
     void testDeleteRowOfMissingRowReturnsFalse() {
-        assertFalse(dataTableRowService.deleteRow("rows", Long.MAX_VALUE, DEV_ENVIRONMENT_ID));
+        assertFalse(dataTableRowService.deleteRow(dataTableRef, Long.MAX_VALUE));
     }
 }

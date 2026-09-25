@@ -27,11 +27,13 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.datatable.util.DataTableUtils;
+import com.bytechef.component.datatable.util.DataTableUtils.ResolvedDataTable;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -49,17 +51,24 @@ public class DataTableDeleteRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableDeleteRecordsAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
-    private DataTableDeleteRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableDeleteRecordsAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -71,7 +80,7 @@ public class DataTableDeleteRecordsAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 array(IDS)
                     .label("Record IDs")
                     .description("IDs of records to delete")
@@ -95,17 +104,22 @@ public class DataTableDeleteRecordsAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
         Object[] ids = inputParameters.getRequiredArray(IDS);
         List<Long> deletedIds = new ArrayList<>();
 
+        long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
+
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
+
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, workspaceId, name, environmentId);
+
         for (Object curId : ids) {
             long id = (curId instanceof Number number) ? number.longValue() : Long.parseLong(String.valueOf(curId));
 
-            if (dataTableRowService.deleteRow(
-                baseName, id, Objects.requireNonNull(actionContextAware.getEnvironmentId()))) {
-
+            if (dataTableRowService.deleteRow(resolvedDataTable.dataTableRef(), id)) {
                 deletedIds.add(id);
             }
         }

@@ -64,33 +64,35 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
-        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId) {
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText, Long connectionId,
+        String workflowId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         return actionDefinitionService.executeOptions(
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-            searchText, componentConnection);
+            searchText, componentConnection, workflowId);
     }
 
     @Override
     public List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Map<String, Long> connectionIds, Map<String, ?> extensions) {
+        Map<String, Long> connectionIds, Map<String, ?> extensions, String workflowId) {
 
         return actionDefinitionService.executeOptions(
             componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-            searchText, getComponentConnections(connectionIds), extensions);
+            searchText, getComponentConnections(connectionIds), extensions, workflowId);
     }
 
     @Override
     public OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, Long> connectionIds) {
+        Map<String, Long> connectionIds, String workflowId) {
 
         return actionDefinitionService.executeOutput(
-            componentName, componentVersion, actionName, inputParameters, getComponentConnections(connectionIds));
+            componentName, componentVersion, actionName, inputParameters, getComponentConnections(connectionIds),
+            workflowId);
     }
 
     @Override
