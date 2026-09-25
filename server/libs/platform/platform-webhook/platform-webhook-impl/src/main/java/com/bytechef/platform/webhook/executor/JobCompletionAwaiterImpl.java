@@ -20,6 +20,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -28,11 +29,17 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
+
+    private static final Logger log = LoggerFactory.getLogger(JobCompletionAwaiterImpl.class);
+
     private final Cache<String, CompletableFuture<Job>> futures = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
         .maximumSize(10_000)
@@ -60,7 +67,12 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
             return future;
         }
 
-        return future.orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        String tenantId = TenantContext.getCurrentTenantId();
+
+        CompletableFuture.delayedExecutor(timeout.toMillis(), TimeUnit.MILLISECONDS)
+            .execute(() -> TenantContext.runWithTenantId(tenantId, () -> completeOnTimeout(jobId, timeout, future)));
+
+        return future;
     }
 
     public void onSseStreamEvent(SseStreamEvent sseStreamEvent) {
@@ -86,6 +98,29 @@ public class JobCompletionAwaiterImpl implements JobCompletionAwaiter {
                 future.completeExceptionally(exception);
             }
         }
+    }
+
+    private void completeOnTimeout(long jobId, Duration timeout, CompletableFuture<Job> future) {
+        if (future.isDone()) {
+            return;
+        }
+
+        try {
+            Optional<Job> jobOptional = jobService.fetchJob(jobId);
+
+            if (jobOptional.isPresent() && isTerminal(jobOptional.get())) {
+                future.complete(jobOptional.get());
+
+                return;
+            }
+        } catch (RuntimeException exception) {
+            log.error("Unable to read the status of job {} after waiting {}", jobId, timeout, exception);
+        }
+
+        future.completeExceptionally(
+            new TimeoutException(
+                "Job %d did not finish within %s".formatted(
+                    jobId, timeout)));
     }
 
     private static boolean isTerminal(Job job) {
