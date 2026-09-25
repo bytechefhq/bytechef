@@ -39,6 +39,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -191,7 +192,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @MutationMapping
-    McpIntegrationInstanceConfigurationWorkflow
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow
         createMcpIntegrationInstanceConfigurationWorkflow(@Argument("input") Map<String, Object> input) {
         Long mcpIntegrationInstanceConfigurationId =
             Long.valueOf(String.valueOf(input.get("mcpIntegrationInstanceConfigurationId")));
@@ -204,7 +206,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
     @SuppressWarnings("unchecked")
     @MutationMapping
-    McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
+    @PreAuthorize("isTenantAdmin()")
+    public McpIntegrationInstanceConfigurationWorkflow updateMcpIntegrationInstanceConfigurationWorkflow(
         @Argument("id") long id, @Argument("input") Map<String, Object> input) {
 
         Long mcpIntegrationInstanceConfigurationId = null;
@@ -244,7 +247,8 @@ class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
     }
 
     @MutationMapping
-    boolean deleteMcpIntegrationInstanceConfigurationWorkflow(@Argument("id") long id) {
+    @PreAuthorize("isTenantAdmin()")
+    public boolean deleteMcpIntegrationInstanceConfigurationWorkflow(@Argument("id") long id) {
         mcpIntegrationInstanceConfigurationWorkflowFacade.deleteMcpIntegrationInstanceConfigurationWorkflow(id);
 
         return true;
