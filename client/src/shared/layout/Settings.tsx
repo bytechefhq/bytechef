@@ -38,6 +38,24 @@ export const isNavItemCurrent = (pathname: string, href: string): boolean => {
     return pathname === segmentPath || pathname.endsWith(segmentPath) || pathname.includes(`${segmentPath}/`);
 };
 
+const TENANT_ADMIN_NAV_ITEM_HREFS = [
+    '/automation/settings/workspaces',
+    '/embedded/settings/api-keys',
+    '/embedded/settings/signing-keys',
+    'ai-providers',
+    'ai/memories',
+    'ai/skills',
+    'api-connectors',
+    'audit-events',
+    'billing',
+    'git-configuration',
+    'global-custom-roles',
+    'identity-providers',
+    'notifications',
+    'users',
+    'workspace-api-keys',
+];
+
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
@@ -48,8 +66,12 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const location = useLocation();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
+        if (!isTenantAdmin && navItem.href !== undefined && TENANT_ADMIN_NAV_ITEM_HREFS.includes(navItem.href)) {
+            return false;
+        }
+
         if (navItem.href === 'api-connectors') {
-            return isTenantAdmin && isFeatureFlagEnabled('ff-207');
+            return isFeatureFlagEnabled('ff-207');
         }
 
         if (navItem.href?.includes('/account/appearance')) {
@@ -75,7 +97,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         }
 
         if (navItem.href === 'mcp-server') {
-            return isTenantAdmin && isFeatureFlagEnabled('ff-2197');
+            return isFeatureFlagEnabled('ff-2197');
         }
 
         if (navItem.href === 'admin-api-keys') {

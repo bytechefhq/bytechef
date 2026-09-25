@@ -12,6 +12,7 @@ import {
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -42,6 +43,8 @@ export function AppSidebarWorkspaceSelect() {
     const {pathname} = useLocation();
 
     const navigate = useNavigate();
+
+    const isTenantAdmin = useIsTenantAdmin();
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
@@ -119,16 +122,20 @@ export function AppSidebarWorkspaceSelect() {
                         ))}
                     </DropdownMenuRadioGroup>
 
-                    <DropdownMenuSeparator />
+                    {isTenantAdmin && (
+                        <>
+                            <DropdownMenuSeparator />
 
-                    <DropdownMenuItem
-                        className="cursor-pointer pl-8"
-                        onClick={() => void navigate('/automation/settings/workspaces')}
-                    >
-                        <SettingsIcon className="absolute left-2 size-3.5" />
+                            <DropdownMenuItem
+                                className="cursor-pointer pl-8"
+                                onClick={() => void navigate('/automation/settings/workspaces')}
+                            >
+                                <SettingsIcon className="absolute left-2 size-3.5" />
 
-                        <span>Manage Workspaces</span>
-                    </DropdownMenuItem>
+                                <span>Manage Workspaces</span>
+                            </DropdownMenuItem>
+                        </>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
