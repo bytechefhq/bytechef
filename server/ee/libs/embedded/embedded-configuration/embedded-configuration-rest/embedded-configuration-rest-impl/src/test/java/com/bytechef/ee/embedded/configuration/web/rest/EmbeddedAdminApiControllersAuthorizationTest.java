@@ -49,16 +49,17 @@ import org.springframework.security.util.SimpleMethodInvocation;
 class EmbeddedAdminApiControllersAuthorizationTest {
 
     private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
-        AppEventApiController.class, CategoryApiController.class, IntegrationApiController.class,
-        IntegrationInstanceApiController.class, IntegrationInstanceConfigurationApiController.class,
-        IntegrationInstanceConfigurationTagApiController.class, IntegrationTagApiController.class,
-        WebhookTriggerTestApiController.class, WorkflowApiController.class);
+        AppEventApiController.class, CategoryApiController.class, ConnectionTagApiController.class,
+        IntegrationApiController.class, IntegrationInstanceApiController.class,
+        IntegrationInstanceConfigurationApiController.class, IntegrationInstanceConfigurationTagApiController.class,
+        IntegrationTagApiController.class, WebhookTriggerTestApiController.class, WorkflowApiController.class);
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
         "AppEventApiController#createAppEvent", "AppEventApiController#deleteAppEvent",
         "AppEventApiController#getAppEvent", "AppEventApiController#getAppEvents",
         "AppEventApiController#updateAppEvent",
         "CategoryApiController#getIntegrationCategories",
+        "ConnectionTagApiController#getConnectionTags", "ConnectionTagApiController#updateConnectionTags",
         "IntegrationApiController#createIntegration", "IntegrationApiController#createIntegrationWorkflow",
         "IntegrationApiController#deleteIntegration", "IntegrationApiController#getIntegration",
         "IntegrationApiController#getIntegrationVersions", "IntegrationApiController#getIntegrations",
