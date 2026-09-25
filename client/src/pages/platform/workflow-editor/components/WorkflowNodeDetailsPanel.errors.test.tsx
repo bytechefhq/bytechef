@@ -91,4 +91,18 @@ describe('WorkflowNodeDetailsPanel errors box', () => {
         expect(screen.getByText('Missing required connection:')).toBeInTheDocument();
         expect(screen.getAllByLabelText('Warning')).toHaveLength(1);
     });
+
+    it('names the property an issue concerns in front of its message', () => {
+        renderPanel([
+            {
+                kind: 'ISSUE',
+                name: 'References disabled node firecrawl_5',
+                propertyLabel: 'Top K',
+                severity: 'WARNING',
+            },
+        ]);
+
+        expect(screen.getByText('Top K:')).toBeInTheDocument();
+        expect(screen.getByText('References disabled node firecrawl_5')).toBeInTheDocument();
+    });
 });
