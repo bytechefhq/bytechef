@@ -24,7 +24,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.Map;
@@ -41,15 +41,18 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
     private final int componentVersion;
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final String actionName;
+    private final JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner;
 
     @SuppressFBWarnings("EI")
     protected AbstractTaskHandler(
-        String componentName, int componentVersion, String actionName, ActionDefinitionFacade actionDefinitionFacade) {
+        String componentName, int componentVersion, String actionName, ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
 
         this.componentName = componentName;
         this.componentVersion = componentVersion;
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionName = actionName;
+        this.jobPrincipalAuthenticationRunner = jobPrincipalAuthenticationRunner;
     }
 
     @Override
@@ -62,26 +65,22 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
         Instant suspendExpiresAt = extractSuspendExpiresAt(taskExecution);
 
         try {
+            Long jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
+            Long jobPrincipalId = MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_ID);
+            PlatformType type = MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class);
             WorkflowTask workflowTask = taskExecution.getWorkflowTask();
 
             Supplier<Object> performSupplier = () -> actionDefinitionFacade.executePerform(
-                componentName, componentVersion, actionName,
-                MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_ID),
+                componentName, componentVersion, actionName, jobPrincipalId,
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID),
-                Validate.notNull(taskExecution.getJobId(), "jobId"),
-                taskExecution.getId(),
+                jobId, taskExecution.getId(),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 taskExecution.getParameters(), connectIdMap, workflowTask.getExtensions(),
                 MapUtils.getLong(taskExecution.getMetadata(), MetadataConstants.ENVIRONMENT_ID),
-                MapUtils.get(taskExecution.getMetadata(), MetadataConstants.TYPE, PlatformType.class),
-                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
+                type, MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.EDITOR_ENVIRONMENT, false),
                 continueParameters, resumeData, suspendExpiresAt);
 
-            if (SecurityUtils.isAuthenticated()) {
-                return performSupplier.get();
-            }
-
-            return SecurityUtils.runAsSystem(performSupplier);
+            return jobPrincipalAuthenticationRunner.run(type, jobPrincipalId, "job " + jobId, performSupplier);
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }

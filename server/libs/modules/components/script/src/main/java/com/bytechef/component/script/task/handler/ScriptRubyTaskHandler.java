@@ -19,6 +19,7 @@ package com.bytechef.component.script.task.handler;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(SCRIPT + "/v1/ruby")
 public class ScriptRubyTaskHandler extends AbstractTaskHandler {
 
-    public ScriptRubyTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super("script", 1, "ruby", actionDefinitionFacade);
+    public ScriptRubyTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super("script", 1, "ruby", actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

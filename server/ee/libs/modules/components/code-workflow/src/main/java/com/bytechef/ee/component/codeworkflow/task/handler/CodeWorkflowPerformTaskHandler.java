@@ -11,6 +11,7 @@ import static com.bytechef.ee.component.codeworkflow.constant.CodeWorkflowConsta
 import static com.bytechef.ee.component.codeworkflow.constant.CodeWorkflowConstants.PERFORM;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,10 @@ import org.springframework.stereotype.Component;
 @Component(CODE_WORKFLOW + "/v1/" + PERFORM)
 public class CodeWorkflowPerformTaskHandler extends AbstractTaskHandler {
 
-    public CodeWorkflowPerformTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(CODE_WORKFLOW, 1, PERFORM, actionDefinitionFacade);
+    public CodeWorkflowPerformTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(CODE_WORKFLOW, 1, PERFORM, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

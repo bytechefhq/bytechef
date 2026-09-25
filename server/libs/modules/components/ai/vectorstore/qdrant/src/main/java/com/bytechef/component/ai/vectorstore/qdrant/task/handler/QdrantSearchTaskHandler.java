@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.qdrant.constant.QdrantConsta
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(QDRANT + "/v1/" + SEARCH)
 public class QdrantSearchTaskHandler extends AbstractTaskHandler {
 
-    public QdrantSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(QDRANT, 1, SEARCH, actionDefinitionFacade);
+    public QdrantSearchTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(QDRANT, 1, SEARCH, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

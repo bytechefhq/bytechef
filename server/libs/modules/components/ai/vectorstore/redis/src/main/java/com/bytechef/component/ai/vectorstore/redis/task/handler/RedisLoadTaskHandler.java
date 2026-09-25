@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstant
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(REDIS_VECTOR_STORE + "/v1/" + LOAD)
 public class RedisLoadTaskHandler extends AbstractTaskHandler {
 
-    public RedisLoadTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(REDIS_VECTOR_STORE, 1, LOAD, actionDefinitionFacade);
+    public RedisLoadTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(REDIS_VECTOR_STORE, 1, LOAD, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
