@@ -7,9 +7,14 @@ import {AppSidebarWorkspaceSelect} from './AppSidebarWorkspaceSelect';
 const hoisted = vi.hoisted(() => ({
     currentWorkspaceId: 1 as number | undefined,
     edition: 'EE',
+    isTenantAdmin: true,
     setCurrentTypeMock: vi.fn(),
     setCurrentWorkspaceIdMock: vi.fn(),
     workspaces: [] as {id: number; name: string}[],
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => hoisted.isTenantAdmin,
 }));
 
 vi.mock('@/shared/queries/automation/workspaces.queries', () => ({
@@ -70,6 +75,7 @@ describe('AppSidebarWorkspaceSelect', () => {
 
         hoisted.currentWorkspaceId = 1;
         hoisted.edition = 'EE';
+        hoisted.isTenantAdmin = true;
         hoisted.workspaces = [
             {id: 1, name: 'Default'},
             {id: 2, name: 'Marketing'},
@@ -159,6 +165,19 @@ describe('AppSidebarWorkspaceSelect', () => {
         await user.click(await screen.findByRole('menuitem', {name: 'Manage Workspaces'}));
 
         expect(await screen.findByText('Workspaces settings page')).toBeInTheDocument();
+    });
+
+    it('hides Manage Workspaces from a user who is not a tenant admin', async () => {
+        hoisted.isTenantAdmin = false;
+
+        const user = userEvent.setup();
+
+        renderWorkspaceSelect();
+
+        await user.click(screen.getByRole('button', {name: 'Workspace menu'}));
+
+        expect(await screen.findByRole('menuitemradio', {name: 'Marketing'})).toBeInTheDocument();
+        expect(screen.queryByRole('menuitem', {name: 'Manage Workspaces'})).not.toBeInTheDocument();
     });
 
     it('keeps the current workspace when it is still available', () => {
