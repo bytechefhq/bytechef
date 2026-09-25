@@ -8,11 +8,10 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.facade.ConnectionAdminFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -32,19 +31,21 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnEEVersion
 public class ConnectionTagApiController implements ConnectionTagApi {
 
-    private final ConnectionFacade connectionFacade;
+    private final ConnectionAdminFacade connectionAdminFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        this.connectionFacade = connectionFacade;
+    public ConnectionTagApiController(
+        ConnectionAdminFacade connectionAdminFacade, ConversionService conversionService) {
+
+        this.connectionAdminFacade = connectionAdminFacade;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<List<TagModel>> getConnectionTags() {
         return ResponseEntity.ok(
-            connectionFacade.getConnectionTags(PlatformType.EMBEDDED)
+            connectionAdminFacade.getConnectionTags()
                 .stream()
                 .map(tag -> conversionService.convert(tag, TagModel.class))
                 .toList());
@@ -57,7 +58,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionFacade.update(id, tags);
+        connectionAdminFacade.updateConnectionTags(id, tags);
 
         return ResponseEntity.noContent()
             .build();
