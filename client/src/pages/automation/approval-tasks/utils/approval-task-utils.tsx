@@ -12,7 +12,7 @@ export const getCurrentTimestamp = (): string => {
     return new Date().toISOString();
 };
 
-interface UserWithDisplayInfoI {
+export interface UserWithDisplayInfoI {
     activated?: boolean | null;
     email?: string | null;
     firstName?: string | null;

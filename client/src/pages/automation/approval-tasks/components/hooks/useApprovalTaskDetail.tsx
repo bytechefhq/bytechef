@@ -1,8 +1,9 @@
-import {useUpdateApprovalTaskMutation, useUsersQuery} from '@/shared/middleware/graphql';
+import {useUpdateApprovalTaskMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import {useApprovalTaskAssigneeUsers} from '../../hooks/useApprovalTaskAssigneeUsers';
 import {useApprovalTasksStore} from '../../stores/useApprovalTasksStore';
 import {ApprovalTaskI, AssigneeOptionI} from '../../types/types';
 import {
@@ -38,9 +39,9 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
         }))
     );
 
-    const {data: usersData} = useUsersQuery();
+    const assigneeUsers = useApprovalTaskAssigneeUsers();
 
-    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(usersData?.users?.content), [usersData]);
+    const availableAssigneeOptions = useMemo(() => getAvailableAssigneeOptions(assigneeUsers), [assigneeUsers]);
 
     const createdAtFormatted = useMemo(
         () => (selectedApprovalTask ? formatDate(selectedApprovalTask.createdAt) : ''),
@@ -121,7 +122,7 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
     const handleAssigneeChange = useCallback(
         (assigneeId: string) => {
             if (selectedApprovalTask) {
-                const assigneeName = getAssigneeNameById(assigneeId, usersData?.users?.content);
+                const assigneeName = getAssigneeNameById(assigneeId, assigneeUsers);
 
                 persistApprovalTask({
                     ...selectedApprovalTask,
@@ -130,7 +131,7 @@ export function useApprovalTaskDetail(): UseApprovalTaskDetailReturnI {
                 });
             }
         },
-        [selectedApprovalTask, usersData, persistApprovalTask]
+        [selectedApprovalTask, assigneeUsers, persistApprovalTask]
     );
 
     const handleDueDateChange = useCallback(
