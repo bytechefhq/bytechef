@@ -38,7 +38,8 @@ class ConnectedUserMcpServerGraphQlController {
     }
 
     @QueryMapping
-    List<ConnectedUserMcpServerDTO> connectedUserMcpServers(@Argument long connectedUserId) {
+    @PreAuthorize("isTenantAdmin()")
+    public List<ConnectedUserMcpServerDTO> connectedUserMcpServers(@Argument long connectedUserId) {
         return connectedUserMcpServerFacade.getConnectedUserMcpServers(connectedUserId);
     }
 

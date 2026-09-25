@@ -60,12 +60,14 @@ class EmbeddedMcpServerGraphQlController {
     }
 
     @QueryMapping
-    List<McpServer> embeddedMcpServers() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<McpServer> embeddedMcpServers() {
         return mcpServerService.getMcpServers(PlatformType.EMBEDDED);
     }
 
     @QueryMapping
-    List<ComponentDefinition> mcpComponentDefinitions() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<ComponentDefinition> mcpComponentDefinitions() {
         Set<Long> configuredIntegrationIds =
             Set.copyOf(integrationInstanceConfigurationService.getIntegrationIds());
 
