@@ -27,6 +27,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -37,12 +39,13 @@ import org.springframework.security.core.Authentication;
 class EmbeddedApiKeyAuthenticationConverterTest {
 
     private EmbeddedApiKeyAuthenticationConverter converter;
+    private JwtTokenService jwtTokenService;
     private HttpServletRequest request;
     private SigningKeyService signingKeyService;
 
     @BeforeEach
     void setUp() {
-        JwtTokenService jwtTokenService = mock(JwtTokenService.class);
+        jwtTokenService = mock(JwtTokenService.class);
         signingKeyService = mock(SigningKeyService.class);
 
         converter = new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService);
@@ -220,5 +223,108 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         assertThat(EmbeddedApiKeyAuthenticationConverter.EXTERNAL_USER_ID_PATTERN.matcher(invalidUri)
             .matches())
                 .isFalse();
+    }
+
+    @Test
+    void testJwtEnvironmentClaimWinsAndMismatchingHeaderIsRefused() throws NoSuchAlgorithmException {
+        String jwt = issueBuilderJwt("ext-1", 0);
+
+        MockHttpServletRequest noHeader = requestWithBearer(jwt, null);
+
+        assertThat(((EmbeddedApiKeyAuthenticationToken) converter.convert(noHeader)).getEnvironmentId())
+            .isEqualTo(0L);
+
+        MockHttpServletRequest matching = requestWithBearer(jwt, "DEVELOPMENT");
+
+        assertThat(((EmbeddedApiKeyAuthenticationToken) converter.convert(matching)).getEnvironmentId())
+            .isEqualTo(0L);
+
+        MockHttpServletRequest mismatching = requestWithBearer(jwt, "PRODUCTION");
+
+        assertThatThrownBy(() -> converter.convert(mismatching)).isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testCustomerSignedJwtWithoutClaimKeepsHeaderEnvironment() throws NoSuchAlgorithmException {
+        String jwt = issueCustomerJwt("ext-1", 1L, null);
+
+        MockHttpServletRequest staging = requestWithBearer(jwt, "STAGING");
+
+        assertThat(((EmbeddedApiKeyAuthenticationToken) converter.convert(staging)).getEnvironmentId())
+            .isEqualTo(1L);
+    }
+
+    @Test
+    void testCustomerSignedJwtClaimingAnotherEnvironmentThanItsKeyIsRefused() throws NoSuchAlgorithmException {
+        String jwt = issueCustomerJwt("ext-1", 2L, 0);
+
+        MockHttpServletRequest withoutHeader = requestWithBearer(jwt, null);
+
+        assertThatThrownBy(() -> converter.convert(withoutHeader)).isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testCustomerSignedJwtClaimingItsKeyEnvironmentIsAccepted() throws NoSuchAlgorithmException {
+        String jwt = issueCustomerJwt("ext-1", 2L, 2);
+
+        MockHttpServletRequest withoutHeader = requestWithBearer(jwt, null);
+
+        assertThat(((EmbeddedApiKeyAuthenticationToken) converter.convert(withoutHeader)).getEnvironmentId())
+            .isEqualTo(2L);
+    }
+
+    private String issueBuilderJwt(String externalUserId, int environmentIdClaim) throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+        keyPairGenerator.initialize(2048);
+
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        String keyId = EncodingUtils.base64EncodeToString("builder-tenant" + ":builder-key-id");
+
+        when(jwtTokenService.getPublicKey(keyId)).thenReturn(keyPair.getPublic());
+
+        return Jwts.builder()
+            .header()
+            .keyId(keyId)
+            .and()
+            .subject(externalUserId)
+            .claim("environmentId", environmentIdClaim)
+            .signWith(keyPair.getPrivate())
+            .compact();
+    }
+
+    private String issueCustomerJwt(String externalUserId, long keyEnvironmentId, Integer environmentIdClaim)
+        throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+
+        keyPairGenerator.initialize(2048);
+
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        String keyId = EncodingUtils.base64EncodeToString("customer-tenant" + ":keyId");
+
+        when(signingKeyService.getPublicKey(keyId, keyEnvironmentId)).thenReturn(keyPair.getPublic());
+
+        return Jwts.builder()
+            .header()
+            .keyId(keyId)
+            .and()
+            .subject(externalUserId)
+            .claim("environmentId", environmentIdClaim)
+            .signWith(keyPair.getPrivate())
+            .compact();
+    }
+
+    private static MockHttpServletRequest requestWithBearer(String jwt, String environmentHeader) {
+        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
+
+        mockHttpServletRequest.addHeader("Authorization", "Bearer " + jwt);
+
+        if (environmentHeader != null) {
+            mockHttpServletRequest.addHeader("X-ENVIRONMENT", environmentHeader);
+        }
+
+        return mockHttpServletRequest;
     }
 }

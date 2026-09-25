@@ -98,7 +98,8 @@ class EmbeddedMcpToolFacadeTest {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
         securityContext.setAuthentication(
-            new EmbeddedMcpServerApiKeyAuthenticationToken(new User("externalUserId", "", List.of())));
+            new EmbeddedMcpServerApiKeyAuthenticationToken(
+                1L, 1L, new User("externalUserId", "", List.of())));
 
         SecurityContextHolder.setContext(securityContext);
 

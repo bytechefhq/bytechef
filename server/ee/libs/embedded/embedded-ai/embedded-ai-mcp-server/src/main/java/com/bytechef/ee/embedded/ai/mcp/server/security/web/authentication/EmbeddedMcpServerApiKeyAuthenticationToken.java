@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.security.core.userdetails.User;
 
@@ -16,8 +17,10 @@ import org.springframework.security.core.userdetails.User;
  *
  * @author Ivica Cardic
  */
-public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
+public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken
+    implements ConnectedUserAuthentication {
 
+    private long connectedUserId;
     private String externalUserId;
 
     public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, String externalUserId, String tenantId) {
@@ -27,8 +30,26 @@ public class EmbeddedMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAu
     }
 
     @SuppressFBWarnings("EI")
-    public EmbeddedMcpServerApiKeyAuthenticationToken(User user) {
-        super(user);
+    public EmbeddedMcpServerApiKeyAuthenticationToken(long environmentId, long connectedUserId, User user) {
+        super(environmentId, user);
+
+        this.connectedUserId = connectedUserId;
+        this.externalUserId = user.getUsername();
+    }
+
+    @Override
+    public long connectedUserId() {
+        return connectedUserId;
+    }
+
+    @Override
+    public String externalUserId() {
+        return externalUserId;
+    }
+
+    @Override
+    public long environmentId() {
+        return getEnvironmentId();
     }
 
     public String getExternalUserId() {
