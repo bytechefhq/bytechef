@@ -102,6 +102,8 @@ public class ApplicationProperties {
      */
     private Edition edition = Edition.EE;
 
+    private Embedded embedded = new Embedded();
+
     /**
      * Optional environment override (DEVELOPMENT, STAGING, PRODUCTION)
      */
@@ -257,6 +259,10 @@ public class ApplicationProperties {
         return edition;
     }
 
+    public Embedded getEmbedded() {
+        return embedded;
+    }
+
     public Environment getEnvironment() {
         return environment;
     }
@@ -391,6 +397,10 @@ public class ApplicationProperties {
 
     public void setEdition(Edition edition) {
         this.edition = edition;
+    }
+
+    public void setEmbedded(Embedded embedded) {
+        this.embedded = embedded;
     }
 
     public void setEnvironment(Environment environment) {
@@ -3409,6 +3419,19 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+    }
+
+    public static class Embedded {
+
+        private List<String> allowedParentOrigins = List.of();
+
+        public List<String> getAllowedParentOrigins() {
+            return allowedParentOrigins;
+        }
+
+        public void setAllowedParentOrigins(List<String> allowedParentOrigins) {
+            this.allowedParentOrigins = allowedParentOrigins;
         }
     }
 
