@@ -20,6 +20,7 @@ import DevelopmentProjectDeploymentsRedirect from '@/pages/automation/project-de
 import loadProject from '@/pages/automation/project/loadProject';
 import ResumeForm from '@/pages/automation/resume-form/ResumeForm';
 import TriggerForm from '@/pages/automation/trigger-form/TriggerForm';
+import {PlatformType} from '@/pages/home/stores/usePlatformTypeStore';
 import {AccessControl} from '@/shared/auth/AccessControl';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
@@ -29,7 +30,9 @@ import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import AutomationEnvironmentAccessGuard from '@/shared/layout/AutomationEnvironmentAccessGuard';
 import Settings from '@/shared/layout/Settings';
+import SettingsIndexRedirect from '@/shared/layout/SettingsIndexRedirect';
 import SettingsLayout from '@/shared/layout/SettingsLayout';
+import {getSettingsNavItems} from '@/shared/layout/settingsNavItems';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import OrganizationSettingsRedirect from '@/shared/navigation/OrganizationSettingsRedirect';
@@ -933,10 +936,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            element: (
+                                                <SettingsIndexRedirect
+                                                    fallbackHref="/automation/account"
+                                                    sidebarNavItems={getSettingsNavItems(PlatformType.AUTOMATION)}
+                                                    tenantAdminHref="workspaces"
+                                                />
+                                            ),
                                             index: true,
-                                            loader: async () => {
-                                                return redirect('workspaces');
-                                            },
                                         },
                                         {
                                             element: (
@@ -1172,10 +1179,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            element: (
+                                                <SettingsIndexRedirect
+                                                    fallbackHref="/embedded/account"
+                                                    sidebarNavItems={getSettingsNavItems(PlatformType.EMBEDDED)}
+                                                    tenantAdminHref="signing-keys"
+                                                />
+                                            ),
                                             index: true,
-                                            loader: async () => {
-                                                return redirect('signing-keys');
-                                            },
                                         },
                                         {
                                             element: (
