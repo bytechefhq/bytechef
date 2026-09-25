@@ -27,6 +27,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentSplitterFunction;
 import java.util.List;
 import org.springframework.ai.document.DocumentTransformer;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter.Builder;
 
 /**
  * @author Monika Kušter
@@ -77,10 +78,22 @@ public class TokenTextSplitter {
         Parameters inputParameters, Parameters connectionParameters) {
 
         TextSplitter textSplitter = inputParameters.get(TOKEN_TEXT_SPLITTER, TextSplitter.class);
+        Builder textTokenSplitterBuilder = org.springframework.ai.transformer.splitter.TokenTextSplitter.builder();
 
-        return new org.springframework.ai.transformer.splitter.TokenTextSplitter(
-            textSplitter.defaultChunkSize(), textSplitter.minChunkSizeChars(), textSplitter.minChunkLengthToEmbed(),
-            textSplitter.maxNumChunks(), textSplitter.keepSeparator(), List.of('.', '?', '!', '\n'));
+        return textTokenSplitterBuilder
+            .withChunkSize(
+                textSplitter.defaultChunkSize())
+            .withMinChunkSizeChars(
+                textSplitter.minChunkSizeChars())
+            .withMinChunkLengthToEmbed(
+                textSplitter.minChunkLengthToEmbed())
+            .withMaxNumChunks(
+                textSplitter.maxNumChunks())
+            .withKeepSeparator(
+                textSplitter.keepSeparator())
+            .withPunctuationMarks(
+                List.of('.', '?', '!', '\n'))
+            .build();
     }
 
     record TextSplitter(
