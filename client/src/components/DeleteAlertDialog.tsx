@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -8,7 +9,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {Trash2Icon} from 'lucide-react';
+import {Trash2Icon, XIcon} from 'lucide-react';
 
 interface DeleteAlertDialogProps {
     open: boolean;
@@ -22,7 +23,7 @@ const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDial
 
     return (
         <AlertDialog open={open}>
-            <AlertDialogContent>
+            <AlertDialogContent onEscapeKeyDown={onCancel}>
                 <AlertDialogHeader>
                     <AlertDialogTitle>
                         {isNodeDeleteDialog ? `Delete node ${nodeName}?` : 'Are you absolutely sure?'}
@@ -33,6 +34,15 @@ const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDial
                             ? 'This action cannot be undone. This will permanently delete the node and properties it contains.'
                             : 'This action cannot be undone. This will permanently delete data.'}
                     </AlertDialogDescription>
+
+                    <Button
+                        aria-label="Close"
+                        className="absolute top-4 right-4"
+                        icon={<XIcon />}
+                        onClick={onCancel}
+                        size="icon"
+                        variant="ghost"
+                    />
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
