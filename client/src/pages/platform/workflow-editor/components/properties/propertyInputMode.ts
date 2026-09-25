@@ -61,7 +61,7 @@ export function getPropertyInputMode({
         return {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: true};
     }
 
-    if (typeof value === 'string' && value.includes('${')) {
+    if (typeof value === 'string' && (value.includes('${') || value.includes('#{'))) {
         return {legacyMixed: true, mode: 'text', renderer: 'mentions', singlePill: false};
     }
 

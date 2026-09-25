@@ -1,68 +1,144 @@
-import {describe, expect, it} from 'vitest';
+vi.mock('@/pages/platform/workflow-editor/utils/saveProperty', () => ({
+    default: vi.fn(),
+}));
+
+import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/providers/tests/workflowEditorProviderTestValue';
+import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {PropertyAllType} from '@/shared/types';
+import {act, renderHook} from '@testing-library/react';
+import {ReactNode, createElement} from 'react';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+import {useProperty} from '../useProperty';
 
 /**
  * Tests for non-string property expression mode behavior:
- * 1. Numerical input `=` detection should switch to formula mode
+ * 1. `=` typed into an empty numerical input switches to formula mode
  * 2. Array item reconstruction should preserve expressionEnabled
  * 3. Object sub-property reconstruction should preserve expressionEnabled
  */
 
+const wrapper = ({children}: {children: ReactNode}) =>
+    createElement(WorkflowEditorProvider, {children, value: workflowEditorProviderTestValue as never});
+
 describe('non-string expression mode', () => {
     describe('numerical input `=` detection', () => {
-        /**
-         * Replicates the guard at the top of handleInputChange in useProperty.ts.
-         * When a numerical input receives a value starting with `=` and
-         * expressionEnabled is true, the input should switch to mention/formula mode
-         * instead of stripping non-numeric characters.
-         */
-        const shouldSwitchToFormulaMode = (
-            value: string,
-            isNumericalInput: boolean,
-            expressionEnabled: boolean | undefined
-        ): boolean => {
-            return isNumericalInput && !!value && value.startsWith('=') && !!expressionEnabled;
+        beforeEach(() => {
+            useWorkflowDataStore.setState({
+                workflow: {id: 'wf-non-string-expression', nodeNames: []},
+            } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {name: 'math_1', parameters: {}, workflowNodeName: 'math_1'},
+                workflowNodeDetailsPanelOpen: true,
+            } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
+        });
+
+        const renderField = ({
+            controlType = 'INTEGER',
+            expressionEnabled,
+            parameterValue = '',
+            type = 'INTEGER',
+        }: {
+            controlType?: string;
+            expressionEnabled?: boolean;
+            parameterValue?: unknown;
+            type?: string;
+        }) =>
+            renderHook(
+                () =>
+                    useProperty({
+                        parameterValue,
+                        path: 'parameters.count',
+                        property: {controlType, expressionEnabled, name: 'count', type} as PropertyAllType,
+                    }),
+                {wrapper}
+            );
+
+        const pressKey = (result: ReturnType<typeof renderField>['result'], key: string, inputValue = '') => {
+            const preventDefault = vi.fn();
+
+            act(() =>
+                result.current.handleNativeKeyDown({currentTarget: {value: inputValue}, key, preventDefault} as never)
+            );
+
+            return preventDefault;
         };
 
         it('should switch to formula mode when typing `=` in a numerical input with expressionEnabled', () => {
-            expect(shouldSwitchToFormulaMode('=3+3', true, true)).toBe(true);
+            const {result} = renderField({expressionEnabled: true});
+
+            const preventDefault = pressKey(result, '=');
+
+            expect(preventDefault).toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(true);
+            expect(result.current.mentionInput).toBe(true);
         });
 
-        it('should switch when typing just `=`', () => {
-            expect(shouldSwitchToFormulaMode('=', true, true)).toBe(true);
+        it('should switch for a NUMBER input too', () => {
+            const {result} = renderField({controlType: 'NUMBER', expressionEnabled: true, type: 'NUMBER'});
+
+            pressKey(result, '=');
+
+            expect(result.current.isFormulaMode).toBe(true);
         });
 
         it('should NOT switch when expressionEnabled is false', () => {
-            expect(shouldSwitchToFormulaMode('=3+3', true, false)).toBe(false);
+            const {result} = renderField({expressionEnabled: false});
+
+            const preventDefault = pressKey(result, '=');
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(false);
+            expect(result.current.mentionInput).toBe(false);
         });
 
-        it('should NOT switch when expressionEnabled is undefined', () => {
-            expect(shouldSwitchToFormulaMode('=3+3', true, undefined)).toBe(false);
+        it('should switch when expressionEnabled is undefined', () => {
+            const {result} = renderField({expressionEnabled: undefined});
+
+            pressKey(result, '=');
+
+            expect(result.current.isFormulaMode).toBe(true);
         });
 
         it('should NOT switch for non-numerical inputs', () => {
-            expect(shouldSwitchToFormulaMode('=hello', false, true)).toBe(false);
+            const {result} = renderField({controlType: 'DATE', expressionEnabled: true, type: 'DATE'});
+
+            const preventDefault = pressKey(result, '=');
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(false);
+            expect(result.current.mentionInput).toBe(false);
         });
 
         it('should NOT switch for normal numeric input (no `=`)', () => {
-            expect(shouldSwitchToFormulaMode('42', true, true)).toBe(false);
+            const {result} = renderField({expressionEnabled: true});
+
+            const preventDefault = pressKey(result, '4');
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(false);
         });
 
-        it('should NOT switch for empty value', () => {
-            expect(shouldSwitchToFormulaMode('', true, true)).toBe(false);
+        it('should NOT switch when the field already holds a value', () => {
+            const {result} = renderField({expressionEnabled: true, parameterValue: 3});
+
+            const preventDefault = pressKey(result, '=', '3');
+
+            expect(preventDefault).not.toHaveBeenCalled();
+            expect(result.current.isFormulaMode).toBe(false);
         });
 
-        it('should extract expression content without `=` prefix', () => {
-            const value = '=3+3';
-            const expressionContent = value.substring(1);
+        it('should open the formula editor empty, without the `=` prefix', () => {
+            const {result} = renderField({expressionEnabled: true});
 
-            expect(expressionContent).toBe('3+3');
-        });
+            pressKey(result, '=');
 
-        it('should extract empty string from lone `=`', () => {
-            const value = '=';
-            const expressionContent = value.substring(1);
-
-            expect(expressionContent).toBe('');
+            expect(result.current.editorFocusRequest).toBeDefined();
+            expect(result.current.editorFocusRequest?.initialInput).toBeUndefined();
+            expect(result.current.mentionInputValue).toBe('');
         });
     });
 
@@ -268,41 +344,71 @@ describe('non-string expression mode', () => {
         });
     });
 
-    describe('showInputTypeSwitchButton initialization', () => {
-        /**
-         * Replicates the useState initializer from useProperty.ts:
-         * !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
-         */
-        const computeShowInputTypeSwitchButton = (
-            hasControl: boolean,
-            propertyType: string,
-            expressionEnabled: boolean | undefined
-        ): boolean => {
-            return !hasControl && ((propertyType !== 'STRING' && !!expressionEnabled) || false);
-        };
+    describe('showFormulaSwitch', () => {
+        beforeEach(() => {
+            useWorkflowDataStore.setState({
+                workflow: {id: 'wf-show-formula-switch', nodeNames: []},
+            } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+
+            useWorkflowNodeDetailsPanelStore.setState({
+                currentNode: {name: 'math_1', parameters: {}, workflowNodeName: 'math_1'},
+            } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
+        });
+
+        const renderShowFormulaSwitch = (property: Record<string, unknown>) =>
+            renderHook(
+                () =>
+                    useProperty({
+                        path: 'parameters.field',
+                        property: {name: 'field', ...property} as PropertyAllType,
+                    }),
+                {wrapper}
+            ).result.current.showFormulaSwitch;
 
         it('should show for non-STRING type with expressionEnabled in uncontrolled mode', () => {
-            expect(computeShowInputTypeSwitchButton(false, 'INTEGER', true)).toBe(true);
+            expect(renderShowFormulaSwitch({controlType: 'INTEGER', expressionEnabled: true, type: 'INTEGER'})).toBe(
+                true
+            );
         });
 
-        it('should NOT show for STRING type even with expressionEnabled', () => {
-            expect(computeShowInputTypeSwitchButton(false, 'STRING', true)).toBe(false);
+        it('should show for STRING type with expressionEnabled', () => {
+            expect(renderShowFormulaSwitch({controlType: 'TEXT', expressionEnabled: true, type: 'STRING'})).toBe(true);
         });
 
-        it('should NOT show when expressionEnabled is undefined', () => {
-            expect(computeShowInputTypeSwitchButton(false, 'INTEGER', undefined)).toBe(false);
+        it('should show when expressionEnabled is undefined', () => {
+            expect(renderShowFormulaSwitch({controlType: 'INTEGER', type: 'INTEGER'})).toBe(true);
         });
 
-        it('should NOT show in controlled mode', () => {
-            expect(computeShowInputTypeSwitchButton(true, 'INTEGER', true)).toBe(false);
+        it('should NOT show when expressionEnabled is false', () => {
+            expect(renderShowFormulaSwitch({controlType: 'INTEGER', expressionEnabled: false, type: 'INTEGER'})).toBe(
+                false
+            );
+        });
+
+        it('should NOT show for a STRING type with expressionEnabled false', () => {
+            expect(renderShowFormulaSwitch({controlType: 'TEXT', expressionEnabled: false, type: 'STRING'})).toBe(
+                false
+            );
         });
 
         it('should show for NUMBER type with expressionEnabled', () => {
-            expect(computeShowInputTypeSwitchButton(false, 'NUMBER', true)).toBe(true);
+            expect(renderShowFormulaSwitch({controlType: 'NUMBER', expressionEnabled: true, type: 'NUMBER'})).toBe(
+                true
+            );
         });
 
         it('should show for DATE type with expressionEnabled', () => {
-            expect(computeShowInputTypeSwitchButton(false, 'DATE', true)).toBe(true);
+            expect(renderShowFormulaSwitch({controlType: 'DATE', expressionEnabled: true, type: 'DATE'})).toBe(true);
+        });
+
+        it('should NOT show for FILE_ENTRY, NULL or CODE_EDITOR controls', () => {
+            expect(
+                renderShowFormulaSwitch({controlType: 'FILE_ENTRY', expressionEnabled: true, type: 'FILE_ENTRY'})
+            ).toBe(false);
+            expect(renderShowFormulaSwitch({controlType: 'NULL', expressionEnabled: true, type: 'NULL'})).toBe(false);
+            expect(renderShowFormulaSwitch({controlType: 'CODE_EDITOR', expressionEnabled: true, type: 'STRING'})).toBe(
+                false
+            );
         });
     });
 });

@@ -1,3 +1,5 @@
+import {getPropertyInputMode} from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
+
 import {INPUT_PROPERTY_CONTROL_TYPES, MENTION_INPUT_PROPERTY_CONTROL_TYPES} from './propertyControlTypes';
 
 export {INPUT_PROPERTY_CONTROL_TYPES, MENTION_INPUT_PROPERTY_CONTROL_TYPES};
@@ -6,7 +8,6 @@ const EMPTY_MULTI_SELECT_VALUE: string[] = [];
 
 export interface PropertyValueStateI {
     inputValue: string;
-    mentionInput: boolean;
     mentionInputSyncedValue: unknown;
     mentionInputValue: string;
     multiSelectValue: string[];
@@ -17,7 +18,9 @@ export interface PropertyValueStateI {
 
 export interface ParameterValueContextI {
     controlType?: string;
+    formulaMode: boolean;
     isNumericalInput: boolean;
+    mentionInput: boolean;
     type?: string;
 }
 
@@ -33,11 +36,11 @@ export type PropertyValueActionType =
     | {type: 'inputValueChanged'; value: string}
     | {type: 'inputValueCleared'}
     | {type: 'mentionInputValueChanged'; value: string}
-    | {mentionInput: boolean; type: 'mentionInputModeChanged'}
     | {type: 'mentionInputSyncedFromValue'; value: string}
     | {type: 'selectValueChanged'; value: string}
     | {propertyParameterValue?: unknown; type: 'multiSelectValueChanged'; value: string[]}
-    | {mentionInput: boolean; mentionInputValue: string; propertyParameterValue: unknown; type: 'inputTypeSwitched'}
+    | {type: 'pillValueSet'; value: string}
+    | {type: 'valueCleared'}
     | {defaultValue: string | string[]; type: 'valuesResetToDefault'};
 
 export function getInitialPropertyValueState({
@@ -53,7 +56,16 @@ export function getInitialPropertyValueState({
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     parameterValue: any;
 }): PropertyValueStateI {
-    const isMentionCapable = !hasControl && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(controlType!);
+    const initialValue = parameterValue !== undefined ? parameterValue : defaultValue;
+
+    const isMentionCapable =
+        getPropertyInputMode({
+            controlType,
+            formulaMode: controlType === 'FORMULA_MODE',
+            hasControl,
+            isFromAi: false,
+            value: initialValue,
+        }).renderer === 'mentions';
 
     let inputValue = '';
 
@@ -73,7 +85,6 @@ export function getInitialPropertyValueState({
 
     return {
         inputValue,
-        mentionInput: isMentionCapable,
         mentionInputSyncedValue: undefined,
         mentionInputValue: typeof initialMentionValue === 'string' ? initialMentionValue : '',
         multiSelectValue: defaultValue || EMPTY_MULTI_SELECT_VALUE,
@@ -95,10 +106,10 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
                 return {...state, propertyParameterValue: value};
             }
 
-            const {controlType, isNumericalInput, type} = context;
+            const {controlType, formulaMode, isNumericalInput, mentionInput, type} = context;
 
             if (value === '' || value === undefined) {
-                if (state.mentionInput) {
+                if (mentionInput) {
                     const userHasUnsavedInput = !state.mentionInputSyncedValue && state.mentionInputValue;
 
                     if (userHasUnsavedInput) {
@@ -158,8 +169,13 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
                 return {...state, propertyParameterValue: value};
             }
 
+            const nextUsesMentions =
+                getPropertyInputMode({controlType, formulaMode, isFromAi: false, value}).renderer === 'mentions';
+
             const shouldSyncMentionInputFromPlainStringParameter =
-                state.mentionInput && state.mentionInputSyncedValue !== value && typeof value === 'string';
+                (mentionInput || nextUsesMentions) &&
+                state.mentionInputSyncedValue !== value &&
+                typeof value === 'string';
 
             if (shouldSyncMentionInputFromPlainStringParameter) {
                 return {
@@ -172,11 +188,11 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
 
             const nextState: PropertyValueStateI = {...state, propertyParameterValue: value};
 
-            if (!state.mentionInput && controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) && value) {
+            if (!nextUsesMentions && controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) && value) {
                 nextState.inputValue = value as string;
             }
 
-            if (!state.mentionInput && controlType === 'JSON_SCHEMA_BUILDER') {
+            if (!nextUsesMentions && controlType === 'JSON_SCHEMA_BUILDER') {
                 nextState.inputValue = value as string;
             }
 
@@ -191,10 +207,10 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
             }
 
             if (controlType === 'MULTI_SELECT') {
-                nextState.multiSelectValue = value === null ? EMPTY_MULTI_SELECT_VALUE : (value as string[]);
+                nextState.multiSelectValue = Array.isArray(value) ? (value as string[]) : EMPTY_MULTI_SELECT_VALUE;
             }
 
-            if (isNumericalInput && value !== null) {
+            if (isNumericalInput && value !== null && !nextUsesMentions) {
                 nextState.inputValue = value as string;
             }
 
@@ -231,14 +247,6 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
             return {...state, mentionInputValue: action.value};
         }
 
-        case 'mentionInputModeChanged': {
-            if (state.mentionInput === action.mentionInput) {
-                return state;
-            }
-
-            return {...state, mentionInput: action.mentionInput};
-        }
-
         case 'mentionInputSyncedFromValue': {
             return {
                 ...state,
@@ -264,14 +272,24 @@ export function propertyValueReducer(state: PropertyValueStateI, action: Propert
             };
         }
 
-        case 'inputTypeSwitched': {
+        case 'pillValueSet': {
             return {
                 ...state,
-                mentionInput: action.mentionInput,
+                mentionInputSyncedValue: action.value,
+                mentionInputValue: action.value,
+                propertyParameterValue: action.value,
+            };
+        }
+
+        case 'valueCleared': {
+            return {
+                ...state,
+                inputValue: '',
                 mentionInputSyncedValue: undefined,
-                mentionInputValue: action.mentionInputValue,
+                mentionInputValue: '',
                 multiSelectValue: EMPTY_MULTI_SELECT_VALUE,
-                propertyParameterValue: action.propertyParameterValue,
+                propertyParameterValue: '',
+                selectValue: '',
             };
         }
 

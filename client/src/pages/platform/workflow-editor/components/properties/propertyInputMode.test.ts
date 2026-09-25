@@ -41,6 +41,12 @@ describe('getPropertyInputMode', () => {
             value: '${a.b}${c.d}',
         },
         {
+            controlType: 'INTEGER',
+            expected: {legacyMixed: true, mode: 'text', renderer: 'mentions', singlePill: false},
+            name: 'a legacy #{ value on a non-string is legacy mixed',
+            value: '#{trigger_1.count}',
+        },
+        {
             controlType: 'TEXT',
             expected: {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: false},
             name: 'a text-like control always mixes text and pills',
