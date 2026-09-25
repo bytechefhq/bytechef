@@ -20,17 +20,10 @@ import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Thread-local agent identity binding used by the {@code UsageObservationHandler} (and the expensive tool callbacks) to
- * attribute LLM and tool calls to the right agent — including the parent-vs-subagent split.
- *
  * @author Ivica Cardic
  */
 public final class CurrentAgentContext {
 
-    /**
-     * Immutable two-tuple of the agent and (optionally) the parent agent. {@code parentAgent} is {@code null} for
-     * top-level ai_hub calls.
-     */
     public record AgentBinding(AgentType agentName, @Nullable AgentType parentAgent) {
     }
 
