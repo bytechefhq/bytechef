@@ -29,6 +29,10 @@ import getPropertyKey from '@/pages/platform/workflow-editor/components/properti
 import usePillTarget from '@/pages/platform/workflow-editor/components/properties/hooks/usePillTarget';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
+import {isEmptyPillContainerValue} from '@/pages/platform/workflow-editor/components/properties/pillContainerValue';
+import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {encodeParameters, encodePath, safeResolvePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
@@ -39,7 +43,7 @@ import {
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
 import {CircleQuestionMarkIcon, SquareFunctionIcon, XIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+import {MouseEvent, ReactNode, useCallback, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -177,17 +181,88 @@ const Property = ({
         toolsMode,
     });
 
+    const [containerHasLocalEntries, setContainerHasLocalEntries] = useState(false);
+
+    const containerHasLocalEntriesRef = useRef(false);
+
+    const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
+        (state) => state.workflowNodeDetailsPanelOpen
+    );
+
     const clusterElementContext = useClusterElementContext();
 
     const formDisplayConditions = useFormDisplayConditionsContext();
 
+    const openDataPillPanel = useOpenDataPillPanel();
+
     const isPillContainer =
-        controlType === 'OBJECT_BUILDER' || controlType === 'ARRAY_BUILDER' || type === 'FILE_ENTRY';
+        controlType === 'OBJECT_BUILDER' ||
+        controlType === 'ARRAY_BUILDER' ||
+        controlType === 'JSON_SCHEMA_BUILDER' ||
+        type === 'FILE_ENTRY';
+
+    const isPillContainerEmpty = () => {
+        const parameters = currentNode?.parameters;
+
+        const containerValue =
+            parameters && calculatedPath
+                ? safeResolvePath(encodeParameters(parameters), encodePath(calculatedPath))
+                : undefined;
+
+        return isEmptyPillContainerValue({
+            controlType: type === 'FILE_ENTRY' ? 'FILE_ENTRY' : controlType,
+            definedPropertyNames: property.properties
+                ?.map((subProperty) => subProperty.name)
+                .filter((subPropertyName): subPropertyName is string => !!subPropertyName),
+            value: containerValue,
+        });
+    };
+
+    const acceptsNativePill = () =>
+        !control &&
+        expressionEnabled !== false &&
+        !isFromAi &&
+        (!isPillContainer || (!containerHasLocalEntriesRef.current && isPillContainerEmpty()));
 
     const nativePillTarget = usePillTarget({
-        acceptsPill: () => !control && !isPillContainer && expressionEnabled !== false && !isFromAi,
+        acceptsPill: acceptsNativePill,
         insertPill: insertPillValue,
     });
+
+    const handleContainerMouseDown = (event: MouseEvent<HTMLElement>) => {
+        const picked = nativePillTarget.onContainerMouseDown(event);
+
+        if (picked && acceptsNativePill() && workflowNodeDetailsPanelOpen) {
+            openDataPillPanel();
+        }
+    };
+
+    const handleContainerLocalEntriesChange = useCallback((hasLocalEntries: boolean) => {
+        containerHasLocalEntriesRef.current = hasLocalEntries;
+
+        setContainerHasLocalEntries(hasLocalEntries);
+    }, []);
+
+    const showContainerPillHint =
+        isPillContainer &&
+        !control &&
+        expressionEnabled !== false &&
+        !isFromAi &&
+        !isFormulaMode &&
+        !containerHasLocalEntries &&
+        isPillContainerEmpty();
+
+    const containerPillHint = showContainerPillHint ? (
+        <p
+            className={twMerge(
+                'rounded-md border border-dashed border-stroke-neutral-secondary px-3 py-2 text-xs text-muted-foreground',
+                controlType === 'JSON_SCHEMA_BUILDER' ? 'mt-2' : 'mb-2',
+                nativePillTarget.isRegistered && 'ring-2 ring-ring'
+            )}
+        >
+            Drop or click a data pill
+        </p>
+    ) : null;
 
     const requiredRule = required ? ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED : false;
 
@@ -296,7 +371,11 @@ const Property = ({
             )}
 
             {!mentionInput && (
-                <div className="contents" {...(isPillContainer ? {} : nativePillTarget.targetProps)}>
+                <div
+                    className="contents"
+                    {...nativePillTarget.targetProps}
+                    onMouseDown={isPillContainer && !control ? handleContainerMouseDown : undefined}
+                >
                     {!isFormulaMode &&
                         ((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
                             controlType === 'ARRAY_BUILDER' ||
@@ -360,9 +439,12 @@ const Property = ({
                             </div>
                         )}
 
+                    {controlType !== 'JSON_SCHEMA_BUILDER' && containerPillHint}
+
                     {!control && controlType === 'ARRAY_BUILDER' && calculatedPath && (
                         <ArrayProperty
                             onDeleteClick={handleDeleteCustomPropertyClick}
+                            onHasItemsChange={handleContainerLocalEntriesChange}
                             parentArrayItems={parentArrayItems}
                             path={calculatedPath}
                             property={property}
@@ -451,6 +533,7 @@ const Property = ({
                             arrayIndex={arrayIndex}
                             arrayName={arrayName}
                             onDeleteClick={handleDeleteCustomPropertyClick}
+                            onHasCustomEntriesChange={handleContainerLocalEntriesChange}
                             operationName={operationName}
                             path={calculatedPath}
                             property={property}
@@ -598,11 +681,7 @@ const Property = ({
                                                 }
                                                 label={label || name}
                                                 leadingIcon={
-                                                    isExpressionMode || isFieldFromAi ? (
-                                                        <SquareFunctionIcon className="size-4" />
-                                                    ) : (
-                                                        typeIcon
-                                                    )
+                                                    isFieldFromAi ? <SquareFunctionIcon className="size-4" /> : typeIcon
                                                 }
                                                 max={maxValue}
                                                 maxLength={maxLength}
@@ -981,11 +1060,19 @@ const Property = ({
                             label={label || name}
                             leadingIcon={typeIcon}
                             name={name!}
-                            onChange={(value) => handleJsonSchemaBuilderChange(value)}
+                            onChange={(value) => {
+                                handleContainerLocalEntriesChange(
+                                    !isEmptyPillContainerValue({controlType: 'JSON_SCHEMA_BUILDER', value})
+                                );
+
+                                handleJsonSchemaBuilderChange(value);
+                            }}
                             schema={inputValue ? JSON.parse(inputValue) : undefined}
                             title={label || name}
                         />
                     )}
+
+                    {controlType === 'JSON_SCHEMA_BUILDER' && containerPillHint}
 
                     {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                         <PropertyComboBox
