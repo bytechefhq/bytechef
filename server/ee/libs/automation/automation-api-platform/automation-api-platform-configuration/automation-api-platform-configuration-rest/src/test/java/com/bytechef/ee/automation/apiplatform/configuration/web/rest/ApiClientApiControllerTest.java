@@ -33,24 +33,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expressions on the {@link ApiClientApiController} writes through the real
+ * Evaluates the real {@code @PreAuthorize} expressions on the {@link ApiClientApiController} endpoints through the real
  * {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. API clients belong to
- * the tenant, not to a workspace, so each write must decide on {@link PermissionService#isTenantAdmin()} alone.
+ * the tenant, not to a workspace, so each endpoint must decide on {@link PermissionService#isTenantAdmin()} alone.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class ApiClientApiControllerAuthorizationTest {
+class ApiClientApiControllerTest {
 
-    static Stream<Arguments> apiClientWrites() {
-        return Stream.of("createApiClient", "deleteApiClient", "updateApiClient")
+    static Stream<Arguments> apiClientEndpoints() {
+        return Stream.of(
+            "createApiClient", "deleteApiClient", "getApiClient", "getApiClients", "updateApiClient")
             .flatMap(methodName -> Stream.of(Arguments.of(methodName, false), Arguments.of(methodName, true)));
     }
 
     @ParameterizedTest(name = "{0} tenantAdmin={1}")
-    @MethodSource("apiClientWrites")
-    void testApiClientWriteRequiresATenantAdmin(String methodName, boolean tenantAdmin) {
+    @MethodSource("apiClientEndpoints")
+    void testApiClientEndpointRequiresATenantAdmin(String methodName, boolean tenantAdmin) {
         PermissionService permissionService = mock(PermissionService.class);
 
         when(permissionService.isTenantAdmin()).thenReturn(tenantAdmin);

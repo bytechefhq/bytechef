@@ -71,6 +71,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<ApiClientModel> getApiClient(Long id) {
         ApiClientModel apiClientModel = Objects.requireNonNull(
             conversionService.convert(apiClientService.getApiClient(id), ApiClientModel.class), "apiClientModel");
@@ -79,6 +80,7 @@ public class ApiClientApiController implements ApiClientApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<ApiClientModel>> getApiClients() {
         return ResponseEntity.ok(
             CollectionUtils.map(
