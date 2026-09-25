@@ -2,10 +2,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework:spring-web")
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.apache.commons:commons-lang3")
     implementation("tools.jackson.core:jackson-databind")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:commons:commons-data"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
 
