@@ -5,6 +5,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
+    implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.data:spring-data-commons")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
