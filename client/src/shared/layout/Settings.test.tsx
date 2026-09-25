@@ -3,9 +3,10 @@ import {ReactNode} from 'react';
 import {MemoryRouter} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import Settings, {SettingsNavItemI} from './Settings';
+import Settings, {SettingsNavItemI, isNavItemCurrent} from './Settings';
 
 const hoisted = vi.hoisted(() => ({
+    billingEnabled: false,
     enabledFeatureFlags: [] as string[],
     isTenantAdmin: true,
 }));
@@ -23,7 +24,7 @@ vi.mock('@/shared/layout/LayoutContainer', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: () => false,
+    useApplicationInfoStore: () => hoisted.billingEnabled,
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -45,10 +46,46 @@ const aiNavGroup: SettingsNavItemI = {
     title: 'AI',
 };
 
+const tenantAdminNavItems: SettingsNavItemI[] = [
+    {href: '/automation/settings/workspaces', title: 'Workspaces'},
+    {href: 'git-configuration', title: 'Git Configuration'},
+    {href: 'workspace-api-keys', title: 'Workspace API Keys'},
+    {href: 'users', title: 'Organization Users'},
+    {href: 'global-custom-roles', title: 'Roles'},
+    {href: 'billing', title: 'Billing'},
+    {href: 'ai-providers', title: 'Providers'},
+    {href: 'notifications', title: 'Notifications'},
+    {href: 'identity-providers', title: 'Identity Providers'},
+    {href: 'audit-events', title: 'Audit Events'},
+    {href: '/embedded/settings/signing-keys', title: 'Signing Keys'},
+    {href: '/embedded/settings/api-keys', title: 'Embedded API Keys'},
+];
+
 describe('Settings', () => {
     beforeEach(() => {
+        hoisted.billingEnabled = false;
         hoisted.enabledFeatureFlags = [];
         hoisted.isTenantAdmin = true;
+    });
+
+    it('shows every tenant-admin-only entry to a tenant admin', () => {
+        hoisted.billingEnabled = true;
+        hoisted.enabledFeatureFlags = ['ff-1025', 'ff-1039', 'ff-1040'];
+
+        renderSettings(tenantAdminNavItems);
+
+        tenantAdminNavItems.forEach((navItem) => expect(screen.getByText(navItem.title)).toBeInTheDocument());
+    });
+
+    it('hides every tenant-admin-only entry from a user who is not a tenant admin', () => {
+        hoisted.billingEnabled = true;
+        hoisted.enabledFeatureFlags = ['ff-1025', 'ff-1039', 'ff-1040'];
+        hoisted.isTenantAdmin = false;
+
+        renderSettings([{href: 'workspace-users', title: 'Workspace Users'}, ...tenantAdminNavItems]);
+
+        tenantAdminNavItems.forEach((navItem) => expect(screen.queryByText(navItem.title)).not.toBeInTheDocument());
+        expect(screen.getByText('Workspace Users')).toBeInTheDocument();
     });
 
     it('shows the MCP Server entry to a tenant admin', () => {
@@ -59,16 +96,16 @@ describe('Settings', () => {
         expect(screen.getByText('MCP Server')).toBeInTheDocument();
     });
 
-    it('hides the MCP Server entry from a user who is not a tenant admin', () => {
+    it('shows the MCP Server entry to a user who is not a tenant admin, whose route admits any user', () => {
         hoisted.enabledFeatureFlags = ['ff-2197'];
         hoisted.isTenantAdmin = false;
 
         renderSettings([
-            {href: 'users', title: 'Users'},
+            {href: 'workspace-users', title: 'Users'},
             {href: 'mcp-server', title: 'MCP Server'},
         ]);
 
-        expect(screen.queryByText('MCP Server')).not.toBeInTheDocument();
+        expect(screen.getByText('MCP Server')).toBeInTheDocument();
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
@@ -85,7 +122,7 @@ describe('Settings', () => {
         hoisted.isTenantAdmin = false;
 
         renderSettings([
-            {href: 'users', title: 'Users'},
+            {href: 'workspace-users', title: 'Users'},
             {href: 'api-connectors', title: 'API Connectors'},
         ]);
 
@@ -202,5 +239,31 @@ describe('Settings', () => {
         );
 
         expect(document.title).toBe('Signing Keys');
+    });
+});
+
+describe('isNavItemCurrent', () => {
+    it('matches the item whose segment the route ends with', () => {
+        expect(isNavItemCurrent('/automation/settings/users', 'users')).toBe(true);
+    });
+
+    // The regression: `pathname.includes(href)` lit up both the workspace and the organization
+    // entry at once, because `users` is a substring of `workspace-users`.
+    it('does not match a longer segment that merely contains the item', () => {
+        expect(isNavItemCurrent('/automation/settings/workspace-users', 'users')).toBe(false);
+        expect(isNavItemCurrent('/automation/settings/global-custom-roles', 'custom-roles')).toBe(false);
+    });
+
+    it('still matches the longer item on its own route', () => {
+        expect(isNavItemCurrent('/automation/settings/workspace-users', 'workspace-users')).toBe(true);
+        expect(isNavItemCurrent('/automation/settings/global-custom-roles', 'global-custom-roles')).toBe(true);
+    });
+
+    it('treats a nested route as inside its nav item', () => {
+        expect(isNavItemCurrent('/automation/settings/ai/guardrails/detail', 'ai/guardrails')).toBe(true);
+    });
+
+    it('matches an absolute href', () => {
+        expect(isNavItemCurrent('/automation/settings/workspaces', '/automation/settings/workspaces')).toBe(true);
     });
 });
