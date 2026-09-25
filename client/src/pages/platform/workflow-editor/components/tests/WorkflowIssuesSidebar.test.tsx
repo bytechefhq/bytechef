@@ -99,4 +99,33 @@ describe('WorkflowIssuesSidebar', () => {
 
         expect(hoisted.openNodeDetails).toHaveBeenCalledWith(agentNodeData, 'properties');
     });
+
+    it('draws error and warning icons in colours meant for the neutral row background', () => {
+        useWorkflowIssuesStore.getState().setValidatorIssues([
+            {
+                kind: 'MISSING_REQUIRED',
+                message: 'Missing required property: id',
+                nodeName: 'dataTable_2',
+                propertyPath: 'id',
+                severity: 'ERROR',
+                source: 'VALIDATOR',
+            },
+            {
+                kind: 'OTHER',
+                message: 'Deprecated operation',
+                nodeName: 'dataTable_2',
+                severity: 'WARNING',
+                source: 'VALIDATOR',
+            },
+        ]);
+
+        render(<WorkflowIssuesSidebar visible />);
+
+        const errorIcon = screen.getByText('Missing required property: id').closest('button')?.querySelector('svg');
+        const warningIcon = screen.getByText('Deprecated operation').closest('button')?.querySelector('svg');
+
+        expect(errorIcon).toHaveClass('text-content-destructive');
+        expect(warningIcon).toHaveClass('text-content-warning-primary');
+        expect(warningIcon).not.toHaveClass('text-content-onwarning');
+    });
 });
