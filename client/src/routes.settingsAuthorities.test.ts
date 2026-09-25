@@ -26,6 +26,16 @@ const getRouteAuthorities = (path: string) => {
     return routes.map((route) => (route.element as PrivateRouteElementType).props.hasAnyAuthorities);
 };
 
+const getChildRouteAuthorities = (path: string) => {
+    const router = getRouter(new QueryClient());
+
+    const routes = findRoutesByPath(router.routes as RouteObject[], path);
+
+    return routes
+        .flatMap((route) => route.children ?? [])
+        .map((route) => (route.element as PrivateRouteElementType).props.hasAnyAuthorities);
+};
+
 describe('settings route authorities', () => {
     it('lets only a tenant admin open the Billing settings page', () => {
         const authorities = getRouteAuthorities('billing');
@@ -38,6 +48,13 @@ describe('settings route authorities', () => {
         const authorities = getRouteAuthorities('mcp-server');
 
         expect(authorities.length).toBeGreaterThan(0);
+        authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
+    });
+
+    it('lets only a tenant admin open the API Connectors settings pages', () => {
+        const authorities = getChildRouteAuthorities('api-connectors');
+
+        expect(authorities.length).toBe(8);
         authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
     });
 

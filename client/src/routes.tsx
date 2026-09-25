@@ -325,7 +325,7 @@ const platformSettingsRoutes = {
             children: [
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectors />
@@ -337,7 +337,7 @@ const platformSettingsRoutes = {
                 },
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectorManualPage />
@@ -349,7 +349,7 @@ const platformSettingsRoutes = {
                 },
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectorImportPage />
@@ -361,7 +361,7 @@ const platformSettingsRoutes = {
                 },
                 {
                     element: (
-                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                             <EEVersion>
                                 <LazyLoadWrapper>
                                     <ApiConnectorAiPage />

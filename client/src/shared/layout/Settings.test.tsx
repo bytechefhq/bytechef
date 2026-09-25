@@ -72,6 +72,27 @@ describe('Settings', () => {
         expect(screen.getByText('Users')).toBeInTheDocument();
     });
 
+    it('shows the API Connectors entry to a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-207'];
+
+        renderSettings([{href: 'api-connectors', title: 'API Connectors'}]);
+
+        expect(screen.getByText('API Connectors')).toBeInTheDocument();
+    });
+
+    it('hides the API Connectors entry from a user who is not a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-207'];
+        hoisted.isTenantAdmin = false;
+
+        renderSettings([
+            {href: 'users', title: 'Users'},
+            {href: 'api-connectors', title: 'API Connectors'},
+        ]);
+
+        expect(screen.queryByText('API Connectors')).not.toBeInTheDocument();
+        expect(screen.getByText('Users')).toBeInTheDocument();
+    });
+
     it('hides a section heading when every item below it is hidden by a feature flag', () => {
         renderSettings([
             {href: '/automation/settings/workspaces', title: 'Workspaces'},
