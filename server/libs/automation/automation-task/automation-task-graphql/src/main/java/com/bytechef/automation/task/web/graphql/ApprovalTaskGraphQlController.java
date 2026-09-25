@@ -27,6 +27,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
@@ -59,16 +60,20 @@ public class ApprovalTaskGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasPermission(#id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or isResourceOwner(#id, 'ApprovalTask')")
     public ApprovalTask approvalTask(@Argument long id) {
         return approvalTaskService.getApprovalTask(id);
     }
 
     @QueryMapping
+    @PostFilter("isTenantAdmin() or (filterObject.assigneeId != null and isCurrentUser(filterObject.assigneeId))")
     public List<ApprovalTask> approvalTasks(@Argument Integer environmentId) {
         return approvalTaskService.getApprovalTasks(environmentId);
     }
 
     @QueryMapping
+    @PostFilter("hasPermission(filterObject.id, 'ApprovalTask', 'DEPLOYMENT_VIEW') or " +
+        "isResourceOwner(filterObject.id, 'ApprovalTask')")
     public List<ApprovalTask> approvalTasksByIds(@Argument List<Long> ids) {
         return approvalTaskService.getApprovalTasks(ids);
     }
