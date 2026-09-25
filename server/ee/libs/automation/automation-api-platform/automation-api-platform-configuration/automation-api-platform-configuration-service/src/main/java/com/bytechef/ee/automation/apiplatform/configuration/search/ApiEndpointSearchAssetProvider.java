@@ -16,6 +16,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectio
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,10 +38,13 @@ class ApiEndpointSearchAssetProvider implements SearchAssetProvider {
     }
 
     @Override
-    public List<ApiEndpointSearchResult> search(String query, int limit) {
+    public List<ApiEndpointSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
-        List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(null, null, null, null);
+        List<ApiCollection> apiCollections = workspaceIds.stream()
+            .flatMap(workspaceId -> apiCollectionService.getApiCollections(workspaceId, null, null, null)
+                .stream())
+            .toList();
 
         if (apiCollections.isEmpty()) {
             return List.of();

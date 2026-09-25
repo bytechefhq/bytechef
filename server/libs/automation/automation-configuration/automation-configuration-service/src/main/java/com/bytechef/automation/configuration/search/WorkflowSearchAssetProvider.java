@@ -19,12 +19,14 @@ package com.bytechef.automation.configuration.search;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -35,19 +37,36 @@ import org.springframework.stereotype.Component;
 @Component
 class WorkflowSearchAssetProvider implements SearchAssetProvider {
 
+    private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
 
-    WorkflowSearchAssetProvider(ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
+    WorkflowSearchAssetProvider(
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        WorkflowService workflowService) {
+
+        this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
     }
 
     @Override
-    public List<WorkflowSearchResult> search(String query, int limit) {
+    public List<WorkflowSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getLatestProjectWorkflows();
+        Set<Long> projectIds = workspaceIds.stream()
+            .flatMap(workspaceId -> projectService.getWorkspaceProjectIds(workspaceId)
+                .stream())
+            .collect(Collectors.toSet());
+
+        if (projectIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getLatestProjectWorkflows()
+            .stream()
+            .filter(projectWorkflow -> projectIds.contains(projectWorkflow.getProjectId()))
+            .toList();
 
         if (projectWorkflows.isEmpty()) {
             return List.of();

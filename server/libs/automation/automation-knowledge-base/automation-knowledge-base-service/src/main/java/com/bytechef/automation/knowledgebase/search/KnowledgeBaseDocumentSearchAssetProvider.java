@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.search;
+package com.bytechef.automation.knowledgebase.search;
 
+import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
@@ -25,6 +27,8 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -37,19 +41,35 @@ class KnowledgeBaseDocumentSearchAssetProvider implements SearchAssetProvider {
 
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
     KnowledgeBaseDocumentSearchAssetProvider(
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService,
+        WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
 
     @Override
-    public List<KnowledgeBaseDocumentSearchResult> search(String query, int limit) {
+    public List<KnowledgeBaseDocumentSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
-        List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
+        Set<Long> knowledgeBaseIds = workspaceIds.stream()
+            .flatMap(workspaceId -> workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
+                .stream())
+            .map(WorkspaceKnowledgeBase::getKnowledgeBaseId)
+            .collect(Collectors.toSet());
+
+        if (knowledgeBaseIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases()
+            .stream()
+            .filter(knowledgeBase -> knowledgeBaseIds.contains(knowledgeBase.getId()))
+            .toList();
 
         List<KnowledgeBaseDocumentSearchResult> results = new ArrayList<>();
 

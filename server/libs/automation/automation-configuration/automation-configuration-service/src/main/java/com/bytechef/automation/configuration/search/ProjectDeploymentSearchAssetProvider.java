@@ -26,6 +26,7 @@ import com.bytechef.automation.search.SearchAssetType;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
     }
 
     @Override
-    public List<ProjectDeploymentSearchResult> search(String query, int limit) {
+    public List<ProjectDeploymentSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
         List<ProjectDeployment> deployments = projectDeploymentService.getProjectDeployments();
@@ -69,6 +70,7 @@ class ProjectDeploymentSearchAssetProvider implements SearchAssetProvider {
                 Project project = projectMap.get(deployment.getProjectId());
 
                 return project != null && !SystemProjects.isSystemProject(project) &&
+                    workspaceIds.contains(project.getWorkspaceId()) &&
                     containsIgnoreCase(project.getName(), queryLower);
             })
             .limit(limit)

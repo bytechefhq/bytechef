@@ -28,7 +28,9 @@ import com.bytechef.automation.search.SearchResult;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,7 +39,7 @@ import org.junit.jupiter.api.Test;
 class AutomationSearchFacadeTest {
 
     @Test
-    void testFiltersOutInaccessibleWorkspaceResults() {
+    void testProvidersAreScopedToCallerWorkspaces() {
         UserService userService = mock(UserService.class);
         WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
@@ -51,14 +53,15 @@ class AutomationSearchFacadeTest {
         when(accessible.getId()).thenReturn(10L);
         when(workspaceFacade.getUserWorkspaces(1L)).thenReturn(List.of(accessible));
 
+        AtomicReference<Set<Long>> passedWorkspaceIds = new AtomicReference<>();
+
         SearchAssetProvider provider = new SearchAssetProvider() {
 
             @Override
-            public List<? extends SearchResult> search(String query, int limit) {
-                return List.of(
-                    new TestResult(1L, 10L), // accessible
-                    new TestResult(2L, 99L), // not accessible
-                    new TestResult(3L, null)); // unscoped / workspace-independent
+            public List<? extends SearchResult> search(String query, int limit, Set<Long> workspaceIds) {
+                passedWorkspaceIds.set(workspaceIds);
+
+                return List.of(new TestResult(1L));
             }
 
             @Override
@@ -72,15 +75,34 @@ class AutomationSearchFacadeTest {
 
         List<SearchResult<?>> results = facade.search("q", 10);
 
-        List<Object> ids = results.stream()
-            .map(searchResult -> (Object) searchResult.id())
-            .toList();
-
-        assertThat(ids).containsExactlyInAnyOrder(1L, 3L);
+        assertThat(passedWorkspaceIds.get()).containsExactly(10L);
+        assertThat(results).hasSize(1);
     }
 
     @Test
-    void testNullTypesMeansEveryProvider() {
+    void testCallerWithoutWorkspacesGetsNoResults() {
+        UserService userService = mock(UserService.class);
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(1L);
+        when(userService.getCurrentUser()).thenReturn(user);
+        when(workspaceFacade.getUserWorkspaces(1L)).thenReturn(List.of());
+
+        AtomicBoolean providerCalled = new AtomicBoolean();
+
+        AutomationSearchFacadeImpl facade = new AutomationSearchFacadeImpl(
+            List.of(new RecordingProvider(SearchAssetType.PROJECT, providerCalled)), userService, workspaceFacade);
+
+        List<SearchResult<?>> results = facade.search("q", 10);
+
+        assertThat(results).isEmpty();
+        assertThat(providerCalled).isFalse();
+    }
+
+    @Test
+    void testEveryProviderIsQueried() {
         UserService userService = mock(UserService.class);
         WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
 
@@ -105,7 +127,7 @@ class AutomationSearchFacadeTest {
         assertThat(connectionProviderCalled).isTrue();
     }
 
-    private record TestResult(Long id, Long workspaceId) implements SearchResult<Long> {
+    private record TestResult(Long id) implements SearchResult<Long> {
 
         @Override
         public String name() {
@@ -126,7 +148,7 @@ class AutomationSearchFacadeTest {
     private record RecordingProvider(SearchAssetType assetType, AtomicBoolean called) implements SearchAssetProvider {
 
         @Override
-        public List<? extends SearchResult> search(String query, int limit) {
+        public List<? extends SearchResult> search(String query, int limit, Set<Long> workspaceIds) {
             called.set(true);
 
             return List.of();
