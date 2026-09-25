@@ -1,6 +1,7 @@
 import {WorkflowInput, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/platform/configuration';
 
 import {WorkflowIssueI} from '../stores/useWorkflowIssuesStore';
+import getAvailableTaskNamesByTaskName from './getAvailableTaskNamesByTaskName';
 import getDuplicateNodeNames from './getDuplicateNodeNames';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
 
@@ -96,6 +97,9 @@ export default function collectWorkflowIssues({
 
     collectTasks(tasks, allTasks);
 
+    const taskNames = new Set(allTasks.map((currentTask) => currentTask.name));
+    const availableTaskNamesByTaskName = getAvailableTaskNamesByTaskName(tasks);
+
     const knownNames = new Set<string>([
         ...triggers.map((currentTrigger) => currentTrigger.name),
         ...allTasks.map((currentTask) => currentTask.name),
@@ -116,6 +120,8 @@ export default function collectWorkflowIssues({
 
         collectExpressions(currentTask.parameters, expressions);
 
+        const availableTaskNames = availableTaskNamesByTaskName.get(currentTask.name);
+
         for (const expression of expressions) {
             const rootMatch = REFERENCE_ROOT_PATTERN.exec(expression);
 
@@ -125,7 +131,26 @@ export default function collectWorkflowIssues({
 
             const isFunctionCall = expression[rootMatch[0].length] === '(';
 
-            if (isFunctionCall || knownNames.has(rootMatch[1])) {
+            if (isFunctionCall) {
+                continue;
+            }
+
+            const referencedName = rootMatch[1];
+
+            if (knownNames.has(referencedName)) {
+                if (availableTaskNames && taskNames.has(referencedName) && !availableTaskNames.has(referencedName)) {
+                    reportedExpressions.add(expression);
+
+                    issues.push({
+                        kind: 'TASK_ORDER',
+                        message: `"${referencedName}" does not run before this node, so its output is not available here (referenced as ${expression})`,
+                        nodeName: currentTask.name,
+                        propertyPath: expression,
+                        severity: 'ERROR',
+                        source: 'SWEEP',
+                    });
+                }
+
                 continue;
             }
 
@@ -133,7 +158,7 @@ export default function collectWorkflowIssues({
 
             issues.push({
                 kind: 'BROKEN_REFERENCE',
-                message: `"${rootMatch[1]}" is missing from the workflow (referenced as ${expression})`,
+                message: `"${referencedName}" is missing from the workflow (referenced as ${expression})`,
                 nodeName: currentTask.name,
                 propertyPath: expression,
                 severity: 'ERROR',
