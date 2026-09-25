@@ -24,7 +24,9 @@ import com.bytechef.message.broker.redis.serializer.RedisMessageDeserializer;
 import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -57,6 +59,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     private RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisMessageDeserializer redisMessageDeserializer;
     private final StringRedisTemplate stringRedisTemplate;
+    private final Set<String> subscribedChannelNames = new HashSet<>();
     private final TaskExecutor taskExecutor;
 
     @SuppressFBWarnings("EI2")
@@ -113,11 +116,11 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
             log.trace("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
         }
 
-        if (messageRoute.isControlExchange()) {
+        listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
+
+        if (messageRoute.isControlExchange() && subscribedChannelNames.add(messageRoute.getName())) {
             redisMessageListenerContainer.addMessageListener(
                 messageListenerAdapter, new ChannelTopic(messageRoute.getName()));
-        } else {
-            listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
         }
     }
 
