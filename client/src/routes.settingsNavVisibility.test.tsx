@@ -4,7 +4,7 @@ import Settings, {SettingsNavItemI} from '@/shared/layout/Settings';
 import {render} from '@/shared/util/test-utils';
 import {QueryClient} from '@tanstack/react-query';
 import {ReactElement, ReactNode} from 'react';
-import {MemoryRouter, RouteObject} from 'react-router-dom';
+import {MemoryRouter, Route, RouteObject, Routes, useLocation} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
@@ -116,6 +116,47 @@ const getSettingsRoutes = (): SettingsRouteI[] => {
     });
 };
 
+const findSettingsIndexElements = (routes: RouteObject[], parentPath = ''): Record<string, ReactElement> =>
+    Object.fromEntries(
+        routes.flatMap((route) => {
+            const routePath = route.path ? `${parentPath}/${route.path}`.replace(/\/+/g, '/') : parentPath;
+
+            const indexRoute =
+                (route.element as ReactElement | undefined)?.type === Settings
+                    ? route.children?.find((childRoute) => childRoute.index)
+                    : undefined;
+
+            return [
+                ...(indexRoute ? [[routePath, indexRoute.element as ReactElement]] : []),
+                ...Object.entries(route.children ? findSettingsIndexElements(route.children, routePath) : {}),
+            ];
+        })
+    );
+
+const LocationPathname = () => <span data-testid="pathname">{useLocation().pathname}</span>;
+
+const resolveSettingsIndexRedirect = (settingsPath: string) => {
+    const indexElement = findSettingsIndexElements(getRouter(new QueryClient()).routes as RouteObject[])[settingsPath];
+
+    expect(indexElement, `index route for ${settingsPath}`).toBeDefined();
+
+    const {getByTestId, unmount} = render(
+        <MemoryRouter initialEntries={[settingsPath]}>
+            <Routes>
+                <Route element={indexElement} path={settingsPath} />
+
+                <Route element={<LocationPathname />} path="*" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    const pathname = getByTestId('pathname').textContent;
+
+    unmount();
+
+    return pathname;
+};
+
 const renderNavHrefs = (element: SettingsElementType) => {
     const {container, unmount} = render(<MemoryRouter>{element}</MemoryRouter>);
 
@@ -167,5 +208,17 @@ describe('settings navigation visibility', () => {
 
             navEntries.forEach(({href}) => expect(navHrefs, `entry ${href}`).toContain(href));
         });
+    });
+
+    it('sends a tenant admin from the settings index to the default settings page', () => {
+        hoisted.isTenantAdmin = true;
+
+        expect(resolveSettingsIndexRedirect('/automation/settings')).toBe('/automation/settings/workspaces');
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/signing-keys');
+    });
+
+    it('sends a non-admin from the settings index to the first settings entry they can see', () => {
+        expect(resolveSettingsIndexRedirect('/automation/settings')).toBe('/automation/settings/workspace-users');
+        expect(resolveSettingsIndexRedirect('/embedded/settings')).toBe('/embedded/settings/ai/skills');
     });
 });
