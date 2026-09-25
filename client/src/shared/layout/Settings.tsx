@@ -60,7 +60,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         const pageKey = getSettingsPageKey(navItem.href);
 
         if (pageKey === 'api-connectors') {
-            return isFeatureFlagEnabled('ff-207');
+            return isTenantAdmin && isFeatureFlagEnabled('ff-207');
         }
 
         if (pageKey === 'custom-components') {
