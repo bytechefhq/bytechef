@@ -57,10 +57,8 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const location = useLocation();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
-        const pageKey = getSettingsPageKey(navItem.href);
-
-        if (pageKey === 'api-connectors') {
-            return isFeatureFlagEnabled('ff-207');
+        if (navItem.href === 'api-connectors') {
+            return isTenantAdmin && isFeatureFlagEnabled('ff-207');
         }
 
         if (pageKey === 'custom-components') {
