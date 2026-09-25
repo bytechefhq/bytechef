@@ -34,6 +34,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
@@ -51,6 +53,7 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
+import org.springframework.ai.mistralai.api.MistralAiApi.ChatCompletionRequest.ReasoningEffort;
 import org.springframework.ai.mistralai.api.MistralAiApi.ChatCompletionRequest.ResponseFormat;
 import org.springframework.ai.retry.RetryUtils;
 
@@ -76,7 +79,8 @@ public class MistralChatAction {
             TOP_P_PROPERTY,
             STOP_PROPERTY,
             SEED_PROPERTY,
-            SAFE_PROMPT_PROPERTY)
+            SAFE_PROMPT_PROPERTY,
+            THINKING_PROPERTY)
         .output(ModelUtils::output)
         .help("", "https://docs.bytechef.io/reference/components/mistral_v1#ask")
         .perform(MistralChatAction::perform);
@@ -110,6 +114,7 @@ public class MistralChatAction {
                     .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                     .randomSeed(inputParameters.getInteger(SEED))
                     .responseFormat(responseFormat)
+                    .reasoningEffort(inputParameters.getBoolean(THINKING, false) ? ReasoningEffort.HIGH : null)
                     .build())
             .build();
     };

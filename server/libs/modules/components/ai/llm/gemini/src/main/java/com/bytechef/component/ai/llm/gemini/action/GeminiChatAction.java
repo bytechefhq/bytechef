@@ -25,6 +25,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPE
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
@@ -33,6 +34,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
@@ -51,6 +53,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.google.genai.Client;
+import java.util.Map;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
 import org.springframework.ai.google.genai.GoogleGenAiChatOptions;
 
@@ -75,10 +78,15 @@ public class GeminiChatAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
-            STOP_PROPERTY)
+            STOP_PROPERTY,
+            THINKING_PROPERTY,
+            REASONING_EFFORT_PROPERTY)
         .output(ModelUtils::output)
         .help("", "https://docs.bytechef.io/reference/components/gemini_v1#ask-gemini")
         .perform(GeminiChatAction::perform);
+
+    private static final Map<String, Integer> THINKING_BUDGET_TOKENS = Map.of(
+        "low", 1024, "medium", 8192, "high", 24576);
 
     public static final ChatModel CHAT_MODEL =
         (inputParameters, connectionParameters, responseFormatRequired) -> {
@@ -91,6 +99,13 @@ public class GeminiChatAction {
                 .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .topK(inputParameters.getInteger(TOP_K))
                 .candidateCount(inputParameters.getInteger(N));
+
+            String reasoningEffort = ModelUtils.getReasoningEffort(inputParameters);
+
+            if (reasoningEffort != null) {
+                builder.thinkingBudget(
+                    THINKING_BUDGET_TOKENS.getOrDefault(reasoningEffort, THINKING_BUDGET_TOKENS.get("medium")));
+            }
 
             if (responseFormatRequired) {
                 ResponseFormat responseFormat = inputParameters.getRequiredFromPath(

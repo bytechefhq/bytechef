@@ -20,8 +20,10 @@ import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstant
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -29,6 +31,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
+import com.anthropic.models.messages.OutputConfig;
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -58,22 +61,28 @@ public class AnthropicChatAction {
             .model(inputParameters.getRequiredString(MODEL))
             .maxTokens(inputParameters.getInteger(MAX_TOKENS))
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .topK(inputParameters.getInteger(TOP_K))
             .cacheOptions(
                 AnthropicCacheOptions.builder()
                     .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
                     .build());
 
-        // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
-        Double temperature = inputParameters.getDouble(TEMPERATURE);
-
-        if (temperature != null) {
-            optionsBuilder.temperature(temperature);
+        if (inputParameters.getBoolean(THINKING, false)) {
+            optionsBuilder.thinkingAdaptive()
+                .effort(OutputConfig.Effort.of(inputParameters.getString(REASONING_EFFORT, "medium")));
         } else {
-            Double topP = inputParameters.getDouble(TOP_P);
+            optionsBuilder.topK(inputParameters.getInteger(TOP_K));
 
-            if (topP != null) {
-                optionsBuilder.topP(topP);
+            // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
+            Double temperature = inputParameters.getDouble(TEMPERATURE);
+
+            if (temperature != null) {
+                optionsBuilder.temperature(temperature);
+            } else {
+                Double topP = inputParameters.getDouble(TOP_P);
+
+                if (topP != null) {
+                    optionsBuilder.topP(topP);
+                }
             }
         }
 

@@ -16,7 +16,10 @@
 
 package com.bytechef.component.ai.llm.util;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -110,5 +113,25 @@ class ModelUtilsTest {
             () -> ModelUtils.getChatResponse(callResponseSpec, parameters, false, context));
 
         assertEquals(message, providerException.getMessage());
+    }
+
+    @Test
+    void testGetReasoningEffortReturnsNullWhenThinkingIsOff() {
+        Parameters inputParameters = mock(Parameters.class);
+
+        when(inputParameters.getBoolean(THINKING, false)).thenReturn(false);
+        when(inputParameters.getString(REASONING_EFFORT, "medium")).thenReturn("high");
+
+        assertNull(ModelUtils.getReasoningEffort(inputParameters));
+    }
+
+    @Test
+    void testGetReasoningEffortReturnsTheEffortWhenThinkingIsOn() {
+        Parameters inputParameters = mock(Parameters.class);
+
+        when(inputParameters.getBoolean(THINKING, false)).thenReturn(true);
+        when(inputParameters.getString(REASONING_EFFORT, "medium")).thenReturn("high");
+
+        assertEquals("high", ModelUtils.getReasoningEffort(inputParameters));
     }
 }

@@ -25,6 +25,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
@@ -36,6 +37,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
@@ -101,6 +103,7 @@ import java.util.Map;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
+import org.springframework.ai.ollama.api.ThinkOption;
 
 /**
  * @author Marko Kriskovic
@@ -146,7 +149,9 @@ public class OllamaChatAction {
             MIROSTAT_TAU_PROPERTY,
             MIROSTAT_ETA_PROPERTY,
             PENALIZE_NEW_LINE_PROPERTY,
-            TRUNCATE_PROPERTY)
+            TRUNCATE_PROPERTY,
+            THINKING_PROPERTY,
+            REASONING_EFFORT_PROPERTY)
         .output(ModelUtils::output)
         .help("", "https://docs.bytechef.io/reference/components/ollama_v1#ask")
         .perform(OllamaChatAction::perform);
@@ -196,6 +201,12 @@ public class OllamaChatAction {
                 .useMLock(inputParameters.getBoolean(USE_MLOCK))
                 .useNUMA(inputParameters.getBoolean(USE_NUMA))
                 .vocabOnly(inputParameters.getBoolean(VOCAB_ONLY));
+
+            String reasoningEffort = ModelUtils.getReasoningEffort(inputParameters);
+
+            if (reasoningEffort != null) {
+                ollamaChatOptionsBuilder.thinkOption(new ThinkOption.ThinkLevel(reasoningEffort));
+            }
 
             // The response format is absent when the model is built outside the ask action (e.g. the AI Providers
             // catalog), so read it optionally rather than requiring it.

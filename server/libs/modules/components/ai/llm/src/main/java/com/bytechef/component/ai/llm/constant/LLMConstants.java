@@ -70,6 +70,7 @@ public class LLMConstants {
     public static final String PROMPT = "prompt";
     public static final String PROVIDER = "provider";
     public static final String REASONING = "reasoning";
+    public static final String REASONING_EFFORT = "reasoningEffort";
     public static final String RESPONSE = "response";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESPONSE_SCHEMA = "responseSchema";
@@ -78,6 +79,7 @@ public class LLMConstants {
     public static final String STYLE = "style";
     public static final String SYSTEM_PROMPT = "systemPrompt";
     public static final String TEMPERATURE = "temperature";
+    public static final String THINKING = "thinking";
     public static final String TOP_P = "topP";
     public static final String TOP_K = "topK";
     public static final String USER = "user";
@@ -198,6 +200,22 @@ public class LLMConstants {
         .label("Number of Chat Completion Choices")
         .description("How many chat completion choices to generate for each input message.")
         .defaultValue(1)
+        .advancedOption(true);
+
+    public static final ModifiableBooleanProperty THINKING_PROPERTY = bool(THINKING)
+        .label("Thinking")
+        .description("Let the model reason before responding.")
+        .defaultValue(false)
+        .advancedOption(true);
+
+    public static final ModifiableStringProperty REASONING_EFFORT_PROPERTY = string(REASONING_EFFORT)
+        .label("Reasoning effort")
+        .description("How much the model reasons before responding. Higher effort costs more tokens and takes longer.")
+        .options(
+            option("low", "low"),
+            option("medium", "medium"),
+            option("high", "high"))
+        .defaultValue("medium")
         .advancedOption(true);
 
     public static final ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)

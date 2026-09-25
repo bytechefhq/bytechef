@@ -711,6 +711,64 @@
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model reason before responding.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Thinking",
+      "metadata": { },
+      "name": "thinking",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": "medium",
+      "description": "How much the model reasons before responding. Higher effort costs more tokens and takes longer.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Reasoning effort",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "reasoningEffort",
+      "options": [ {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
     "resumePerform": null,
     "title": "Ask Gemini",
@@ -921,6 +979,64 @@
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model reason before responding.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Thinking",
+      "metadata": { },
+      "name": "thinking",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": "medium",
+      "description": "How much the model reasons before responding. Higher effort costs more tokens and takes longer.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Reasoning effort",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "reasoningEffort",
+      "options": [ {
+        "description": null,
+        "label": "low",
+        "value": "low"
+      }, {
+        "description": null,
+        "label": "medium",
+        "value": "medium"
+      }, {
+        "description": null,
+        "label": "high",
+        "value": "high"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
     "title": "Gemini Model",
     "type": {

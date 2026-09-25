@@ -33,6 +33,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
@@ -41,6 +42,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
@@ -85,7 +87,9 @@ public class PerplexityChatAction {
             PRESENCE_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
             STOP_PROPERTY,
-            USER_PROPERTY)
+            USER_PROPERTY,
+            THINKING_PROPERTY,
+            REASONING_EFFORT_PROPERTY)
         .output(ModelUtils::output)
         .help("", "https://docs.bytechef.io/reference/components/perplexity_v1#ask")
         .perform(PerplexityChatAction::perform);
@@ -126,6 +130,7 @@ public class PerplexityChatAction {
                     .temperature(inputParameters.getDouble(TEMPERATURE))
                     .topP(inputParameters.getDouble(TOP_P))
                     .user(inputParameters.getString(USER))
+                    .reasoningEffort(ModelUtils.getReasoningEffort(inputParameters))
                     .build())
             .build();
     };
