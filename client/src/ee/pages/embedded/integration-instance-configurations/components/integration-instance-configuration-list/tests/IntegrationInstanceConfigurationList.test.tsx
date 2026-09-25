@@ -1,17 +1,36 @@
 import IntegrationInstanceConfigurationList from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
 import {Integration, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
 import {render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
+
+const hoisted = vi.hoisted(() => ({
+    isTenantAdmin: true,
+    useMcpIntegrationInstanceConfigurationsQuery: vi.fn(),
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => hoisted.isTenantAdmin,
+}));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useMcpIntegrationInstanceConfigurationsQuery: () => ({data: undefined}),
+    useMcpIntegrationInstanceConfigurationsQuery: hoisted.useMcpIntegrationInstanceConfigurationsQuery,
 }));
 
 vi.mock(
     '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationListItem',
     () => ({
-        default: ({integrationInstanceConfiguration}: {integrationInstanceConfiguration: {name: string}}) => (
-            <div>{`${integrationInstanceConfiguration.name} header`}</div>
+        default: ({
+            integrationInstanceConfiguration,
+            mcpWorkflowIds,
+        }: {
+            integrationInstanceConfiguration: {name: string};
+            mcpWorkflowIds?: Set<string>;
+        }) => (
+            <div>
+                <div>{`${integrationInstanceConfiguration.name} header`}</div>
+
+                <div>{`${integrationInstanceConfiguration.name} MCP workflows: ${Array.from(mcpWorkflowIds || []).join(',') || 'none'}`}</div>
+            </div>
         ),
     })
 );
@@ -32,6 +51,17 @@ const integrationInstanceConfigurations = [
     {environmentId: 0, id: 12, integrationId: 1, integrationVersion: 1, name: 'Second'},
 ] as IntegrationInstanceConfiguration[];
 
+const mcpIntegrationInstanceConfigurationsData = {
+    mcpIntegrationInstanceConfigurations: [
+        {
+            integrationInstanceConfigurationId: '11',
+            mcpIntegrationInstanceConfigurationWorkflows: [
+                {integrationInstanceConfigurationWorkflow: {workflowId: 'workflow-1'}},
+            ],
+        },
+    ],
+};
+
 const renderList = (expandAll?: boolean) =>
     render(
         <IntegrationInstanceConfigurationList
@@ -43,6 +73,17 @@ const renderList = (expandAll?: boolean) =>
     );
 
 describe('IntegrationInstanceConfigurationList', () => {
+    beforeEach(() => {
+        hoisted.isTenantAdmin = true;
+
+        hoisted.useMcpIntegrationInstanceConfigurationsQuery.mockReset();
+        hoisted.useMcpIntegrationInstanceConfigurationsQuery.mockImplementation(
+            (_variables: unknown, options?: {enabled?: boolean}) => ({
+                data: options?.enabled === false ? undefined : mcpIntegrationInstanceConfigurationsData,
+            })
+        );
+    });
+
     it('keeps every instance configuration collapsed by default', () => {
         renderList();
 
@@ -55,5 +96,20 @@ describe('IntegrationInstanceConfigurationList', () => {
 
         expect(screen.getByText('Workflows of 11')).toBeInTheDocument();
         expect(screen.getByText('Workflows of 12')).toBeInTheDocument();
+    });
+
+    it('marks the MCP workflows of a configuration for a tenant admin', () => {
+        renderList();
+
+        expect(screen.getByText('First MCP workflows: workflow-1')).toBeInTheDocument();
+    });
+
+    it('does not read MCP configurations or mark MCP workflows for a user who is not a tenant admin', () => {
+        hoisted.isTenantAdmin = false;
+
+        renderList();
+
+        expect(hoisted.useMcpIntegrationInstanceConfigurationsQuery).toHaveBeenCalledWith(undefined, {enabled: false});
+        expect(screen.getByText('First MCP workflows: none')).toBeInTheDocument();
     });
 });
