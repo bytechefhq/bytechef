@@ -70,8 +70,10 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.HeaderWriter;
 import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
@@ -313,10 +315,25 @@ public class SecurityConfiguration {
         List<SpaWebFilterContributor> spaWebFilterContributors) throws Exception {
 
         List<RequestMatcher> frameableRequestMatchers = new ArrayList<>();
+        List<HeaderWriter> frameAncestorsHeaderWriters = new ArrayList<>();
 
         for (AuthorizeHttpRequestContributor authorizeHttpRequestContributor : authorizeHttpRequestContributors) {
+            List<RequestMatcher> contributorFrameableRequestMatchers = new ArrayList<>();
+
             for (String path : authorizeHttpRequestContributor.getFrameablePermitAllRequestMatcherPaths()) {
-                frameableRequestMatchers.add(mvc.matcher(path));
+                contributorFrameableRequestMatchers.add(mvc.matcher(path));
+            }
+
+            frameableRequestMatchers.addAll(contributorFrameableRequestMatchers);
+
+            List<String> frameAncestors = authorizeHttpRequestContributor.getFrameAncestors();
+
+            if (!contributorFrameableRequestMatchers.isEmpty() && !frameAncestors.isEmpty()) {
+                frameAncestorsHeaderWriters.add(
+                    new DelegatingRequestMatcherHeaderWriter(
+                        new OrRequestMatcher(contributorFrameableRequestMatchers),
+                        new StaticHeadersWriter(
+                            "Content-Security-Policy", "frame-ancestors " + String.join(" ", frameAncestors))));
             }
         }
 
@@ -324,11 +341,17 @@ public class SecurityConfiguration {
             RequestMatcher nonFrameableRequestMatcher = new NegatedRequestMatcher(
                 new OrRequestMatcher(frameableRequestMatchers));
 
-            http.headers(headers -> headers
-                .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
-                .addHeaderWriter(
-                    new DelegatingRequestMatcherHeaderWriter(
-                        nonFrameableRequestMatcher, new XFrameOptionsHeaderWriter(XFrameOptionsMode.DENY))));
+            http.headers(headers -> {
+                headers
+                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                    .addHeaderWriter(
+                        new DelegatingRequestMatcherHeaderWriter(
+                            nonFrameableRequestMatcher, new XFrameOptionsHeaderWriter(XFrameOptionsMode.DENY)));
+
+                for (HeaderWriter frameAncestorsHeaderWriter : frameAncestorsHeaderWriters) {
+                    headers.addHeaderWriter(frameAncestorsHeaderWriter);
+                }
+            });
         }
 
         http
