@@ -78,6 +78,11 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
     }
 
     @Override
+    public List<Tag> getConnectionTags() {
+        return connectionFacade.getConnectionTags(PlatformType.EMBEDDED);
+    }
+
+    @Override
     public List<ConnectionDTO> getConnections(
         @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
         @Nullable Long tagId) {
@@ -101,6 +106,14 @@ public class ConnectionAdminFacadeImpl implements ConnectionAdminFacade {
         if (shared != null) {
             connectedUserConnectionService.updateShared(id, shared);
         }
+    }
+
+    @Override
+    @Transactional
+    public void updateConnectionTags(long id, List<Tag> tags) {
+        requireEmbedded(id);
+
+        connectionFacade.update(id, tags);
     }
 
     private void requireEmbedded(long id) {

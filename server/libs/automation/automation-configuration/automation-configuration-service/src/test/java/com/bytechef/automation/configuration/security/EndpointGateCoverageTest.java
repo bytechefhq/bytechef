@@ -43,8 +43,6 @@ import org.junit.jupiter.api.Test;
  */
 class EndpointGateCoverageTest {
 
-    private static final String EMBEDDED_CONNECTION_UNSCOPED =
-        "embedded connection endpoint left open to connected users, not yet scoped to their own connections";
     private static final String EMBEDDED_INTERNAL_KEY_PREFIX = "embedded:";
     private static final String EMBEDDED_PATH_SCOPED =
         "connected-user scoped by the external user in the path, which the tenant's API key may act for";
@@ -240,7 +238,13 @@ class EndpointGateCoverageTest {
         Map.entry("WorkspaceUserGraphQlController#setWorkspaceUserEnvironmentRole",
             "WorkspaceUserServiceImpl#setEnvironmentRole"),
         Map.entry("WorkspaceUserGraphQlController#updateWorkspaceUserRole",
-            "WorkspaceUserServiceImpl#updateWorkspaceUserRole"));
+            "WorkspaceUserServiceImpl#updateWorkspaceUserRole"),
+        Map.entry("embedded:ConnectionApiController#createConnection", "ConnectionAdminFacadeImpl#createConnection"),
+        Map.entry("embedded:ConnectionApiController#deleteConnection", "ConnectionAdminFacadeImpl#deleteConnection"),
+        Map.entry("embedded:ConnectionApiController#updateConnection", "ConnectionAdminFacadeImpl#updateConnection"),
+        Map.entry(
+            "embedded:ConnectionTagApiController#updateConnectionTags",
+            "ConnectionAdminFacadeImpl#updateConnectionTags"));
 
     private static final Map<String, String> AUTHORIZED_OTHERWISE = Map.ofEntries(
         Map.entry("AccountController#changePassword", "acts on the signed-in account only"),
@@ -437,18 +441,15 @@ class EndpointGateCoverageTest {
             "embedded:ConnectionApiController#createConnectedUserConnection",
             "ConnectedUserConnectionFacadeImpl checks the caller is the connected user or a tenant admin"));
 
-    private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.of(
-        "embedded:ConnectionApiController#createConnection", EMBEDDED_CONNECTION_UNSCOPED,
-        "embedded:ConnectionApiController#deleteConnection", EMBEDDED_CONNECTION_UNSCOPED,
-        "embedded:ConnectionApiController#updateConnection", EMBEDDED_CONNECTION_UNSCOPED,
-        "embedded:ConnectionTagApiController#updateConnectionTags", EMBEDDED_CONNECTION_UNSCOPED);
+    private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.of();
 
     private static final Set<String> READ_GATED_CONTROLLERS = Set.of(
         "ApiClientApiController", "ApiConnectorGraphQlController", "ApprovalTaskGraphQlController",
         "embedded:AppEventApiController", "embedded:AutomationWorkflowProjectGraphQlController",
         "embedded:CategoryApiController", "embedded:ConnectedUserApiController",
         "embedded:ConnectedUserGraphQlController", "embedded:ConnectedUserMcpServerGraphQlController",
-        "embedded:ConnectedUserProjectGraphQlController", "embedded:EmbeddedMcpServerGraphQlController",
+        "embedded:ConnectedUserProjectGraphQlController", "embedded:ConnectionTagApiController",
+        "embedded:EmbeddedMcpServerGraphQlController",
         "embedded:IntegrationApiController", "embedded:IntegrationInstanceApiController",
         "embedded:IntegrationInstanceConfigurationApiController",
         "embedded:IntegrationInstanceConfigurationTagApiController", "embedded:IntegrationTagApiController",
