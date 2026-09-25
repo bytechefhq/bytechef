@@ -33,6 +33,7 @@ import {createBrowserRouter, redirect} from 'react-router-dom';
 
 const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
+const AiAutoMemories = lazy(() => import('@/pages/automation/ai/memories/Memories'));
 const AiSkills = lazy(() => import('@/pages/automation/ai/skills/AiSkills'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
 const AutomationConnections = lazy(() =>
@@ -264,6 +265,16 @@ const platformSettingsRoutes = {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <LazyLoadWrapper>
+                        <AiAutoMemories />
+                    </LazyLoadWrapper>
+                </PrivateRoute>
+            ),
+            path: 'ai/memories',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                    <LazyLoadWrapper>
                         <McpServer />
                     </LazyLoadWrapper>
                 </PrivateRoute>
@@ -388,6 +399,10 @@ const platformSettingsRoutes = {
                 {
                     href: 'ai/skills',
                     title: 'Skills',
+                },
+                {
+                    href: 'ai/memories',
+                    title: 'Memories',
                 },
             ],
             title: 'AI',
@@ -817,6 +832,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                     loader: async ({params}) =>
                                         redirect(`/automation/settings/ai/skills/${params.skillId}`),
                                     path: 'ai/skills/:skillId',
+                                },
+                                {
+                                    loader: async () => redirect('/automation/settings/ai/memories'),
+                                    path: 'ai/memories',
                                 },
                                 {
                                     children: [

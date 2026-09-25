@@ -1,0 +1,8 @@
+query aiAutoMemoryPrincipals($workspaceId: ID!, $environment: Int!) {
+    aiAutoMemoryPrincipals(workspaceId: $workspaceId, environment: $environment) {
+        principalType
+        principalId
+        label
+        memoryCount
+    }
+}

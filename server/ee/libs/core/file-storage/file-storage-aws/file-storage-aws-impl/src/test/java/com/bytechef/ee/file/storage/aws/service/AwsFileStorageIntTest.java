@@ -41,6 +41,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
+import software.amazon.awssdk.services.s3.S3Client;
 
 /**
  * @version ee
@@ -208,6 +209,15 @@ class AwsFileStorageIntTest {
     }
 
     @Test
+    void getFileEntriesExcludesSiblingDirectoriesSharingANamePrefix() {
+        FileEntry fileEntry = storageService.storeFileContent("PrefixDirectory/1", KEY, DATA);
+
+        storageService.storeFileContent("PrefixDirectory/10", KEY, DATA);
+
+        assertThat(storageService.getFileEntries("PrefixDirectory/1")).containsExactly(fileEntry);
+    }
+
+    @Test
     void canDeleteFile() {
         FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
 
@@ -294,9 +304,9 @@ class AwsFileStorageIntTest {
 
         @Bean
         AwsFileStorageServiceImpl awsFileStorageService(
-            S3Template s3Template, ApplicationProperties applicationProperties) {
+            S3Client s3Client, S3Template s3Template, ApplicationProperties applicationProperties) {
 
-            return new AwsFileStorageServiceImpl(s3Template, applicationProperties.getFileStorage()
+            return new AwsFileStorageServiceImpl(s3Client, s3Template, applicationProperties.getFileStorage()
                 .getAws()
                 .getBucket());
         }
