@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.llm.anthropic.action;
 
 import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.ASK_PROPERTIES;
+import static com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants.DEFAULT_MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
@@ -59,7 +60,7 @@ public class AnthropicChatAction {
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
         AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
             .model(inputParameters.getRequiredString(MODEL))
-            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS, DEFAULT_MAX_TOKENS))
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
             .cacheOptions(
                 AnthropicCacheOptions.builder()

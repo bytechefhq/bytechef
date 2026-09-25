@@ -54,10 +54,12 @@ import java.util.stream.Collectors;
  */
 public class AnthropicConstants {
 
+    public static final int DEFAULT_MAX_TOKENS = 16000;
+
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Max Tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
-        .defaultValue(16000)
+        .defaultValue(DEFAULT_MAX_TOKENS)
         .minValue(1)
         .maxValue(128000)
         .required(true);
