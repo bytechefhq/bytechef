@@ -65,6 +65,7 @@ export default function useOutputTab({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const startWebhookTestRef = useRef(false);
+    const testOutputErrorGenerationRef = useRef(0);
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
@@ -128,22 +129,31 @@ export default function useOutputTab({
         invalidateWorkflowValidation(queryClient);
     }, [queryClient, workflowId]);
 
-    const showTestOutputError = useCallback((title: string, error: unknown) => {
-        resolveErrorMessage(error).then((message) => setTestOutputError({message, title}));
+    const clearTestOutputError = useCallback(() => {
+        testOutputErrorGenerationRef.current += 1;
+
+        setTestOutputError(undefined);
+
+        return testOutputErrorGenerationRef.current;
+    }, []);
+
+    const showTestOutputError = useCallback((title: string, error: unknown, generation: number) => {
+        resolveErrorMessage(error).then((message) => {
+            if (generation === testOutputErrorGenerationRef.current) {
+                setTestOutputError({message, title});
+            }
+        });
     }, []);
 
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
-        onError: (error) => showTestOutputError('Reset failed', error),
         onSuccess: invalidateNodeOutputs,
     });
 
     const saveClusterElementTestOutputMutation = useSaveClusterElementTestOutputMutation({
-        onError: (error) => showTestOutputError('Test failed', error),
         onSuccess: invalidateNodeOutputs,
     });
 
     const saveWorkflowNodeTestOutputMutation = useSaveWorkflowNodeTestOutputMutation({
-        onError: (error) => showTestOutputError('Test failed', error),
         onSuccess: invalidateNodeOutputs,
     });
 
@@ -156,14 +166,26 @@ export default function useOutputTab({
     });
 
     const handlePredefinedOutputSchemaClick = useCallback(() => {
-        setTestOutputError(undefined);
+        const generation = clearTestOutputError();
 
-        deleteWorkflowNodeTestOutputMutation.mutate({
-            environmentId: currentEnvironmentId,
-            id: workflowId,
-            workflowNodeName: currentNode.name,
-        });
-    }, [currentEnvironmentId, currentNode.name, deleteWorkflowNodeTestOutputMutation, workflowId]);
+        deleteWorkflowNodeTestOutputMutation.mutate(
+            {
+                environmentId: currentEnvironmentId,
+                id: workflowId,
+                workflowNodeName: currentNode.name,
+            },
+            {
+                onError: (error) => showTestOutputError('Reset failed', error, generation),
+            }
+        );
+    }, [
+        clearTestOutputError,
+        currentEnvironmentId,
+        currentNode.name,
+        deleteWorkflowNodeTestOutputMutation,
+        showTestOutputError,
+        workflowId,
+    ]);
 
     const handleSampleDataDialogUpload = useCallback(
         (value: string) => {
@@ -189,7 +211,7 @@ export default function useOutputTab({
                 return;
             }
 
-            setTestOutputError(undefined);
+            const generation = clearTestOutputError();
 
             saveClusterElementTestOutputMutation.mutate(
                 {
@@ -201,29 +223,37 @@ export default function useOutputTab({
                     workflowNodeName: parentWorkflowNodeName,
                 },
                 {
+                    onError: (error) => showTestOutputError('Test failed', error, generation),
                     onSuccess,
                 }
             );
         },
         [
+            clearTestOutputError,
             clusterElementType,
             currentEnvironmentId,
             currentNode.workflowNodeName,
             parentWorkflowNodeName,
             saveClusterElementTestOutputMutation,
+            showTestOutputError,
             workflowId,
         ]
     );
 
     const handleTestOperationClick = useCallback(() => {
-        setTestOutputError(undefined);
+        const generation = clearTestOutputError();
 
         if (!currentNode.trigger || currentNode.triggerType === TriggerType.Polling) {
-            saveWorkflowNodeTestOutputMutation.mutate({
-                environmentId: currentEnvironmentId,
-                id: workflowId,
-                workflowNodeName: currentNode.name,
-            });
+            saveWorkflowNodeTestOutputMutation.mutate(
+                {
+                    environmentId: currentEnvironmentId,
+                    id: workflowId,
+                    workflowNodeName: currentNode.name,
+                },
+                {
+                    onError: (error) => showTestOutputError('Test failed', error, generation),
+                }
+            );
         } else {
             setStartWebhookTestDate(new Date());
             setStartWebhookTest(true);
@@ -275,12 +305,14 @@ export default function useOutputTab({
                 });
         }
     }, [
+        clearTestOutputError,
         currentEnvironmentId,
         currentNode.name,
         currentNode.trigger,
         currentNode?.triggerType,
         saveWorkflowNodeTestOutputMutation,
         queryClient,
+        showTestOutputError,
         webhookTriggerTestApi,
         workflowId,
         workflowNodeOutputRefetch,
@@ -319,10 +351,11 @@ export default function useOutputTab({
     }, [startWebhookTest]);
 
     useEffect(() => {
-        setTestOutputError(undefined);
-    }, [currentNode.name]);
+        clearTestOutputError();
+    }, [clearTestOutputError, currentNode.name]);
 
     return {
+        clearTestOutputError,
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
@@ -338,7 +371,6 @@ export default function useOutputTab({
         saveWorkflowNodeTestOutputMutation,
         saveWorkflowNodeTestOutputMutationPending: saveWorkflowNodeTestOutputMutation.isPending,
         setShowUploadDialog,
-        setTestOutputError,
         showUploadDialog,
         testOutputError,
         testOutputResponse,

@@ -269,6 +269,88 @@ describe('useFetchInterceptor (embedded)', () => {
         });
     });
 
+    describe('response interceptor - node test output errors', () => {
+        const flush = () =>
+            act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+        it('skips the toast for a failed node test, which the Output tab renders inline', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            hoisted.registeredHandlers!.response(
+                createMockResponse({
+                    jsonData: {detail: 'All scraping engines failed', title: 'Error'},
+                    status: 500,
+                    url: 'http://localhost/internal/workflows/wf-1/workflow-nodes/firecrawl_1/test-outputs?environmentId=0',
+                })
+            );
+
+            await flush();
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts a failed sample output upload', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            hoisted.registeredHandlers!.response(
+                createMockResponse({
+                    jsonData: {detail: 'Invalid sample output', title: 'Bad Request'},
+                    status: 400,
+                    url: 'http://localhost/internal/workflows/wf-1/workflow-nodes/firecrawl_1/test-outputs/sample-output',
+                })
+            );
+
+            await flush();
+
+            expect(hoisted.toastError).toHaveBeenCalledWith(
+                'Bad Request',
+                expect.objectContaining({description: 'Invalid sample output'})
+            );
+        });
+
+        it('skips the toast when every GraphQL error comes from the cluster element test', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            hoisted.registeredHandlers!.response(
+                createMockResponse({
+                    jsonData: {errors: [{message: 'Tool failed', path: ['saveClusterElementTestOutput']}]},
+                    status: 200,
+                    url: 'http://localhost/graphql',
+                })
+            );
+
+            await flush();
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
+        it('still toasts when a GraphQL response also carries an error from another field', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            hoisted.registeredHandlers!.response(
+                createMockResponse({
+                    jsonData: {
+                        errors: [
+                            {message: 'Tool failed', path: ['saveClusterElementTestOutput']},
+                            {message: 'Workflow not found', path: ['workflow']},
+                        ],
+                    },
+                    status: 200,
+                    url: 'http://localhost/graphql',
+                })
+            );
+
+            await flush();
+
+            expect(hoisted.toastError).toHaveBeenCalledWith(
+                'Error',
+                expect.objectContaining({description: 'Tool failed\nWorkflow not found'})
+            );
+        });
+    });
+
     describe('workflow node lookups', () => {
         const lookupUrl = 'http://localhost/internal/workflows/1052/workflow-nodes/dataTable_2/options/table';
 

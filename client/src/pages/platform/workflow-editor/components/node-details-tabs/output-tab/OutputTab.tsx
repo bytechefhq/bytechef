@@ -43,6 +43,7 @@ const OutputTab = ({
     workflowId,
 }: OutputTabProps) => {
     const {
+        clearTestOutputError,
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
@@ -58,7 +59,6 @@ const OutputTab = ({
         saveWorkflowNodeTestOutputMutation,
         saveWorkflowNodeTestOutputMutationPending,
         setShowUploadDialog,
-        setTestOutputError,
         showUploadDialog,
         testOutputError,
         testOutputResponse,
@@ -112,7 +112,7 @@ const OutputTab = ({
                             testOutputError && (
                                 <OutputTabTestErrorAlert
                                     className="mb-3"
-                                    onDismiss={() => setTestOutputError(undefined)}
+                                    onDismiss={clearTestOutputError}
                                     testOutputError={testOutputError}
                                 />
                             )
@@ -130,7 +130,7 @@ const OutputTab = ({
                     {testOutputError && (
                         <OutputTabTestErrorAlert
                             className="mt-4"
-                            onDismiss={() => setTestOutputError(undefined)}
+                            onDismiss={clearTestOutputError}
                             testOutputError={testOutputError}
                         />
                     )}
