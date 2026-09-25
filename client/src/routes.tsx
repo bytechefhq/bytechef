@@ -757,7 +757,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         {
                                             element: (
-                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                                     <EEVersion>
                                                         <LazyLoadWrapper hasLeftSidebar>
                                                             <ApiClients />
