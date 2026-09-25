@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.util.BeanUtils;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -39,13 +40,16 @@ public final class ComponentTaskHandlerProvider implements TaskHandlerProvider {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier;
+    private final JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner;
 
     public ComponentTaskHandlerProvider(
         Supplier<List<ComponentHandlerLoader.ComponentHandlerEntry>> componentHandlerEntriesSupplier,
-        ActionDefinitionFacade actionDefinitionFacade) {
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
 
         this.componentHandlerEntriesSupplier = componentHandlerEntriesSupplier;
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.jobPrincipalAuthenticationRunner = jobPrincipalAuthenticationRunner;
     }
 
     @Override
@@ -76,7 +80,7 @@ public final class ComponentTaskHandlerProvider implements TaskHandlerProvider {
                             componentHandlerEntry.componentTaskHandlerFunction();
 
                         return componentTaskHandlerFunction.apply(
-                            actionDefinition.getName(), actionDefinitionFacade);
+                            actionDefinition.getName(), actionDefinitionFacade, jobPrincipalAuthenticationRunner);
                     }));
     }
 }

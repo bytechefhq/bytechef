@@ -22,6 +22,7 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.task.handler.ComponentTaskHandler;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 
 /**
  * @author Ivica Cardic
@@ -33,11 +34,12 @@ public class OpenApiComponentTaskHandler extends ComponentTaskHandler {
 
     public OpenApiComponentTaskHandler(
         String actionName, ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner,
         OpenApiComponentHandler openApiComponentHandler) {
 
         super(
             openApiComponentHandler.getName(), openApiComponentHandler.getVersion(), actionName,
-            actionDefinitionFacade);
+            actionDefinitionFacade, jobPrincipalAuthenticationRunner);
 
         this.actionName = actionName;
         this.openApiComponentHandler = openApiComponentHandler;

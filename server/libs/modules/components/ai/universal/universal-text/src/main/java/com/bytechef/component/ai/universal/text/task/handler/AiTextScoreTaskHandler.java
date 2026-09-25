@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.universal.text.constant.AiTextConstants.
 import static com.bytechef.platform.component.definition.AiUniversalComponentDefinition.AI_TEXT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(AI_TEXT + "/v1/" + SCORE)
 public class AiTextScoreTaskHandler extends AbstractTaskHandler {
 
-    public AiTextScoreTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(AI_TEXT, 1, SCORE, actionDefinitionFacade);
+    public AiTextScoreTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(AI_TEXT, 1, SCORE, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
