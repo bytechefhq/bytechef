@@ -18,10 +18,9 @@ package com.bytechef.ai.agent.tool;
 
 /**
  * Identity of an AI agent, used by the usage-observation handling (and the expensive tool callbacks) to attribute LLM
- * and tool calls to the right agent. Implemented once per module by a domain enum (e.g. {@code AiHubAgentType},
- * {@code CopilotAgentType}) so the set of valid agent types is assembled from the modules that own them rather than
- * hardcoded in one central enum. Every implementation is contributed through {@link AgentTypeProvider} and aggregated
- * by {@link AgentTypeRegistry}.
+ * and tool calls to the right agent. Implemented once per module by a domain enum (e.g. {@code CopilotAgentType}) so
+ * the set of valid agent types is assembled from the modules that own them rather than hardcoded in one central enum.
+ * Every implementation is contributed through {@link AgentTypeProvider} and aggregated by {@link AgentTypeRegistry}.
  *
  * @author Ivica Cardic
  */
