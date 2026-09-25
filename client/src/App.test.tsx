@@ -8,6 +8,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
     analytics: {reset: vi.fn()},
+    enabledFeatureFlags: [] as string[],
     helpHub: {addRouter: vi.fn(), boot: vi.fn(), shutdown: vi.fn()},
     mockUseLoadWorkspaceScopes: vi.fn(),
     userGuiding: {identify: vi.fn(), shutdown: vi.fn()},
@@ -51,7 +52,13 @@ vi.mock('@/shared/layout/TrialBanner', () => ({
 }));
 
 vi.mock('@/shared/layout/app-sidebar/AppSidebar', () => ({
-    AppSidebar: () => null,
+    AppSidebar: ({navigation}: {navigation: {href: string; name: string}[]}) => (
+        <nav>
+            {navigation.map((navItem) => (
+                <span key={navItem.href}>{navItem.name}</span>
+            ))}
+        </nav>
+    ),
 }));
 
 vi.mock('@/shared/components/copilot/stores/useCopilotPanelStore', () => ({
@@ -59,7 +66,7 @@ vi.mock('@/shared/components/copilot/stores/useCopilotPanelStore', () => ({
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => () => false,
+    useFeatureFlagsStore: () => (featureFlag: string) => hoisted.enabledFeatureFlags.includes(featureFlag),
 }));
 
 const WORKSPACE_ID = 1234;
@@ -70,6 +77,8 @@ const renderAppAt = (path: string) =>
             <Routes>
                 <Route element={<App />} path="/">
                     <Route element={<div>Deployments page</div>} path="automation/deployments" />
+
+                    <Route element={<div>Connected users page</div>} path="embedded/connected-users" />
                 </Route>
             </Routes>
         </MemoryRouter>
@@ -77,11 +86,13 @@ const renderAppAt = (path: string) =>
 
 describe('App', () => {
     beforeEach(() => {
+        hoisted.enabledFeatureFlags = [];
+
         useWorkspaceStore.setState({currentWorkspaceId: WORKSPACE_ID});
     });
 
     afterEach(() => {
-        authenticationStore.setState({authenticated: false});
+        authenticationStore.setState({account: undefined, authenticated: false});
 
         vi.clearAllMocks();
     });
@@ -102,5 +113,26 @@ describe('App', () => {
 
         expect(hoisted.mockUseLoadWorkspaceScopes).not.toHaveBeenCalledWith(WORKSPACE_ID);
         expect(hoisted.mockUseLoadWorkspaceScopes).toHaveBeenCalledWith(undefined);
+    });
+
+    it('shows the embedded MCP Servers entry to a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-2446'];
+
+        authenticationStore.setState({account: {authorities: ['ROLE_ADMIN'], id: 1} as never, authenticated: true});
+
+        const {getByText} = renderAppAt('/embedded/connected-users');
+
+        expect(getByText('MCP Servers')).toBeInTheDocument();
+    });
+
+    it('hides the embedded MCP Servers entry from a user who is not a tenant admin', () => {
+        hoisted.enabledFeatureFlags = ['ff-2446'];
+
+        authenticationStore.setState({account: {authorities: ['ROLE_USER'], id: 1} as never, authenticated: true});
+
+        const {getByText, queryByText} = renderAppAt('/embedded/connected-users');
+
+        expect(getByText('Connected Users')).toBeInTheDocument();
+        expect(queryByText('MCP Servers')).not.toBeInTheDocument();
     });
 });
