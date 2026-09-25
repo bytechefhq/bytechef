@@ -20,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +49,7 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<CreateSigningKey200ResponseModel> createSigningKey(SigningKeyModel signingKeyModel) {
         return ResponseEntity.ok(
             new CreateSigningKey200ResponseModel().privateKey(
@@ -56,6 +58,7 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteSigningKey(Long id) {
         signingKeyService.delete(id);
 
@@ -64,11 +67,13 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<SigningKeyModel> getSigningKey(Long id) {
         return ResponseEntity.ok(getSigningKeyModel(signingKeyService.getSigningKey(id)));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys(Long environmentId) {
         return ResponseEntity.ok(
             CollectionUtils.map(signingKeyService.getSigningKeys(
@@ -76,6 +81,7 @@ public class SigningKeyApiController implements SigningKeyApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
         signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class));
 
