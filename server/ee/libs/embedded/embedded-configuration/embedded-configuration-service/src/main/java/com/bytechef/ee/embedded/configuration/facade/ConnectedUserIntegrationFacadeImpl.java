@@ -185,20 +185,24 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     public void deleteIntegrationInstance(String externalUserId, long integrationInstanceId) {
-        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
-
         IntegrationInstance integrationInstance =
             integrationInstanceService.getIntegrationInstance(integrationInstanceId);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
 
-        connectedUserService.fetchConnectedUser(externalUserId, integrationInstanceConfiguration.getEnvironment())
-            .ifPresent(connectedUser -> {
-                if (Objects.equals(connectedUser.getExternalId(), externalUserId)) {
-                    integrationInstanceService.delete(integrationInstanceId);
-                }
-            });
+        Long connectedUserId = connectedUserService
+            .fetchConnectedUser(externalUserId, integrationInstanceConfiguration.getEnvironment())
+            .map(ConnectedUser::getId)
+            .orElse(null);
+
+        if (connectedUserId == null || !Objects.equals(integrationInstance.getConnectedUserId(), connectedUserId)) {
+            throw new EmbeddedIntegrationNotVisibleException(integrationInstanceId);
+        }
+
+        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
+
+        integrationInstanceService.delete(integrationInstanceId);
     }
 
     @Override
