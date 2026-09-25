@@ -39,8 +39,8 @@ import org.springframework.security.util.SimpleMethodInvocation;
 /**
  * Evaluates the real {@code @PreAuthorize} expression on every endpoint of the embedded admin REST controllers through
  * the real {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. These endpoints
- * administer the tenant's embedded integrations, so each must decide on {@link PermissionService#isTenantAdmin()}
- * alone.
+ * administer the tenant's embedded integrations and their instance configurations, so each must decide on
+ * {@link PermissionService#isTenantAdmin()} alone.
  *
  * @version ee
  *
@@ -50,6 +50,7 @@ class EmbeddedAdminApiControllersAuthorizationTest {
 
     private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
         CategoryApiController.class, IntegrationApiController.class, IntegrationInstanceApiController.class,
+        IntegrationInstanceConfigurationApiController.class, IntegrationInstanceConfigurationTagApiController.class,
         IntegrationTagApiController.class);
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
@@ -62,6 +63,17 @@ class EmbeddedAdminApiControllersAuthorizationTest {
         "IntegrationInstanceApiController#enableIntegrationInstance",
         "IntegrationInstanceApiController#enableIntegrationInstanceWorkflow",
         "IntegrationInstanceApiController#getIntegrationInstance",
+        "IntegrationInstanceConfigurationApiController#createIntegrationInstanceConfiguration",
+        "IntegrationInstanceConfigurationApiController#createIntegrationInstanceConfigurationWorkflowJob",
+        "IntegrationInstanceConfigurationApiController#deleteIntegrationInstanceConfiguration",
+        "IntegrationInstanceConfigurationApiController#enableIntegrationInstanceConfiguration",
+        "IntegrationInstanceConfigurationApiController#enableIntegrationInstanceConfigurationWorkflow",
+        "IntegrationInstanceConfigurationApiController#getIntegrationInstanceConfiguration",
+        "IntegrationInstanceConfigurationApiController#getIntegrationInstanceConfigurations",
+        "IntegrationInstanceConfigurationApiController#updateIntegrationInstanceConfiguration",
+        "IntegrationInstanceConfigurationApiController#updateIntegrationInstanceConfigurationWorkflow",
+        "IntegrationInstanceConfigurationTagApiController#getIntegrationInstanceConfigurationTags",
+        "IntegrationInstanceConfigurationTagApiController#updateIntegrationInstanceConfigurationTags",
         "IntegrationTagApiController#getIntegrationTags", "IntegrationTagApiController#updateIntegrationTags");
 
     static Stream<Arguments> endpoints() {

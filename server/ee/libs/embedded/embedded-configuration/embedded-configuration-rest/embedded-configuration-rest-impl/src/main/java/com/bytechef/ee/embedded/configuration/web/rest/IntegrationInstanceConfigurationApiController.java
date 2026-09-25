@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,6 +49,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Long> createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel) {
 
@@ -58,6 +60,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel>
         createIntegrationInstanceConfigurationWorkflowJob(Long id, String workflowId) {
 
@@ -68,6 +71,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteIntegrationInstanceConfiguration(Long id) {
         integrationInstanceConfigurationFacade.deleteIntegrationInstanceConfiguration(id);
 
@@ -76,6 +80,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> enableIntegrationInstanceConfiguration(Long id, Boolean enable) {
         integrationInstanceConfigurationFacade.enableIntegrationInstanceConfiguration(id, enable);
 
@@ -84,6 +89,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> enableIntegrationInstanceConfigurationWorkflow(
         Long id, String workflowId, Boolean enable) {
 
@@ -94,6 +100,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<IntegrationInstanceConfigurationModel> getIntegrationInstanceConfiguration(Long id) {
         return ResponseEntity.ok(
             toIntegrationInstanceConfigurationModel(
@@ -101,6 +108,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
         Long environmentId, Long integrationId, Long tagId, Boolean includeAllFields) {
 
@@ -113,6 +121,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateIntegrationInstanceConfiguration(
         Long id, IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel) {
 
@@ -125,6 +134,7 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateIntegrationInstanceConfigurationWorkflow(
         Long id, Long integrationInstanceConfigurationWorkflowId,
         IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel) {
