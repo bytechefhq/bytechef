@@ -46,14 +46,12 @@ const TENANT_ADMIN_NAV_ITEM_HREFS = [
     'workspace-api-keys',
 ];
 
-const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
+export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]): SettingsNavItemI[] => {
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
     const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
     const isTenantAdmin = useIsTenantAdmin();
-
-    const location = useLocation();
 
     const isNavItemVisible = (navItem: SettingsNavItemI) => {
         if (!isTenantAdmin && navItem.href !== undefined && TENANT_ADMIN_NAV_ITEM_HREFS.includes(navItem.href)) {
@@ -105,23 +103,29 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         return true;
     };
 
-    sidebarNavItems = sidebarNavItems
-        .filter(isNavItemVisible)
-        .map((navItem) => (navItem.items ? {...navItem, items: navItem.items.filter(isNavItemVisible)} : navItem))
-        .filter((navItem) => !navItem.items || navItem.items.length > 0);
-
     const isHeading = (navItem: SettingsNavItemI) => navItem.href === undefined && navItem.items === undefined;
 
-    sidebarNavItems = sidebarNavItems.filter(
-        (navItem, index, visibleNavItems) =>
-            !isHeading(navItem) || (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
-    );
+    return sidebarNavItems
+        .filter(isNavItemVisible)
+        .map((navItem) => (navItem.items ? {...navItem, items: navItem.items.filter(isNavItemVisible)} : navItem))
+        .filter((navItem) => !navItem.items || navItem.items.length > 0)
+        .filter(
+            (navItem, index, visibleNavItems) =>
+                !isHeading(navItem) ||
+                (visibleNavItems[index + 1] !== undefined && !isHeading(visibleNavItems[index + 1]))
+        );
+};
+
+const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
+    const location = useLocation();
+
+    const visibleNavItems = useVisibleSettingsNavItems(sidebarNavItems);
 
     return (
         <LayoutContainer
             leftSidebarBody={
                 <LeftSidebarNav
-                    body={sidebarNavItems.map((navItem) => {
+                    body={visibleNavItems.map((navItem) => {
                         if (navItem.items) {
                             return (
                                 <SettingsNavGroup
