@@ -237,7 +237,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                             <CircleQuestionMarkIcon className="size-4 text-muted-foreground" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent className="max-w-tooltip-sm">{description}</TooltipContent>
+                                        <TooltipContent>{description}</TooltipContent>
                                     </Tooltip>
                                 )}
                             </div>
