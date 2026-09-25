@@ -17,9 +17,8 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
-import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
-import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
-import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -54,45 +53,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
  *
  * @author Ivica Cardic
  */
-class IntegrationWorkflowGraphQlControllerTest {
+class ConnectedUserProjectGraphQlControllerTest {
 
     private static final Answer<Object> BODY_REACHED = invocation -> {
         throw new IllegalStateException("body reached");
     };
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
-        "integrationWorkflows", "integrationWorkflowsByIntegrationId",
-        "updateIntegrationWorkflowPermissionExpression");
+        "connectedUserProjects", "deleteConnectedUserProjectWorkflow", "enableConnectedUserProjectWorkflow");
 
     private final PermissionService permissionService = mock(PermissionService.class);
 
     @AfterEach
     void afterEach() {
         SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    void testUpdateIntegrationWorkflowPermissionExpressionReturnsDTO() {
-        IntegrationWorkflowFacade integrationWorkflowFacade = mock(IntegrationWorkflowFacade.class);
-        IntegrationWorkflowService integrationWorkflowService = mock(IntegrationWorkflowService.class);
-
-        IntegrationWorkflowDTO integrationWorkflowDTO = mock(IntegrationWorkflowDTO.class);
-
-        when(integrationWorkflowFacade.getIntegrationWorkflow(42L)).thenReturn(integrationWorkflowDTO);
-
-        IntegrationWorkflowGraphQlController controller = new IntegrationWorkflowGraphQlController(
-            integrationWorkflowFacade, integrationWorkflowService);
-
-        IntegrationWorkflowDTO result = controller.updateIntegrationWorkflowPermissionExpression(
-            42L, "metadata['tier'] == 'pro'");
-
-        // The mutation must return the DTO (not the domain IntegrationWorkflow) so the IntegrationWorkflow type's
-        // @SchemaMapping field resolvers, which declare IntegrationWorkflowDTO as their source, can resolve the
-        // selected sub-fields. Returning the domain object triggers a Spring GraphQL source-type mismatch.
-        assertThat(result).isSameAs(integrationWorkflowDTO);
-
-        verify(integrationWorkflowService).updatePermissionExpression(42L, "metadata['tier'] == 'pro'");
-        verify(integrationWorkflowFacade).getIntegrationWorkflow(42L);
     }
 
     @Test
@@ -148,9 +122,9 @@ class IntegrationWorkflowGraphQlControllerTest {
 
     private void invokeSecured(Method method) throws Throwable {
         Object securedController = secure(
-            new IntegrationWorkflowGraphQlController(
-                mock(IntegrationWorkflowFacade.class, BODY_REACHED),
-                mock(IntegrationWorkflowService.class, BODY_REACHED)));
+            new ConnectedUserProjectGraphQlController(
+                mock(ConnectedUserProjectFacade.class, BODY_REACHED),
+                mock(EnvironmentService.class, BODY_REACHED)));
 
         try {
             method.invoke(securedController, createArguments(method));
@@ -225,7 +199,7 @@ class IntegrationWorkflowGraphQlControllerTest {
     }
 
     private static Stream<Method> endpointMethods() {
-        return Arrays.stream(IntegrationWorkflowGraphQlController.class.getDeclaredMethods())
+        return Arrays.stream(ConnectedUserProjectGraphQlController.class.getDeclaredMethods())
             .filter(method -> method.isAnnotationPresent(MutationMapping.class) ||
                 method.isAnnotationPresent(QueryMapping.class));
     }
