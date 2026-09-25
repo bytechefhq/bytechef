@@ -110,8 +110,12 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         ref: ForwardedRef<Editor>
     ) => {
         const [isFocused, setIsFocused] = useState(false);
+
+        const acceptsPillRef = useRef(false);
         const isInitialLoadRef = useRef(true);
         const localEditorRef = useRef<Editor | null>(null);
+
+        acceptsPillRef.current = expressionEnabled !== false && !isFromAi;
 
         const {componentDefinitions, dataPills, taskDispatcherDefinitions, workflow} = useWorkflowDataStore(
             useShallow((state) => ({
@@ -138,12 +142,12 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             (editor: Editor) =>
                 setPillTarget(
                     createEditorPillTarget({
-                        acceptsPill: () => expressionEnabled !== false && !isFromAi,
+                        acceptsPill: () => acceptsPillRef.current,
                         editor,
                         singlePill,
                     })
                 ),
-            [expressionEnabled, isFromAi, setPillTarget, singlePill]
+            [setPillTarget, singlePill]
         );
 
         const onFocus = (editor: Editor) => {
@@ -250,7 +254,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         }, [value, defaultValue, expressionEnabled, setIsFormulaMode]);
 
         return (
-            <fieldset className={twMerge('w-full', label && 'space-y-1')}>
+            <fieldset className={twMerge('w-full', label && 'space-y-1')} data-pill-target="">
                 {(label || description || showInputTypeSwitchButton) && (
                     <div className={twMerge('flex w-full items-center justify-between', !label && 'justify-end')}>
                         {label && (
@@ -325,7 +329,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 >
                     {leadingIcon && (
                         <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md bg-surface-neutral-secondary px-3">
-                            {isFormulaMode ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
+                            {isFormulaMode || isFromAi ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
                         </span>
                     )}
 
