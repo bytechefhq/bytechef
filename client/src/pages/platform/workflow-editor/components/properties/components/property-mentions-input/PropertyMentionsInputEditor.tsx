@@ -1,7 +1,10 @@
 import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
-import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
+import {
+    DataPillSuggestionPluginKey,
+    getSuggestionOptions,
+} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
@@ -543,6 +546,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     const isEditorEmpty = editor.state.doc.textContent.length === 0;
 
                     if ((event.key === '=' && isEditorEmpty) || isFormulaMode) {
+                        return;
+                    }
+
+                    // A non-string property holds a single data pill, so free text is refused. The query typed
+                    // after `$` is not free text: it filters the data pill suggestion and is replaced on select.
+                    if (DataPillSuggestionPluginKey.getState(editor.state)?.active) {
                         return;
                     }
 
