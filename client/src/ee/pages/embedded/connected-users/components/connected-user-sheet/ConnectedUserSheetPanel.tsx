@@ -4,6 +4,7 @@ import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-
 import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 
 // Underline tab styling that matches the workflow node details panel — brand-colored active
 // bottom border + text, no pill background — so tabs read consistently across the app.
@@ -15,6 +16,8 @@ interface ConnectedUserSheetPanelProps {
 }
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
+    const isTenantAdmin = useIsTenantAdmin();
+
     return (
         <div className="flex min-h-full w-full shrink-0 flex-col space-y-10 rounded-lg bg-background p-3">
             <div className="w-full space-y-2">
@@ -29,9 +32,11 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Integrations
                     </TabsTrigger>
 
-                    <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
-                        MCP Servers
-                    </TabsTrigger>
+                    {isTenantAdmin && (
+                        <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
+                            MCP Servers
+                        </TabsTrigger>
+                    )}
 
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
                         Automation Workflows
@@ -47,14 +52,16 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     )}
                 </TabsContent>
 
-                <TabsContent value="mcp-servers">
-                    {connectedUser.id != null && (
-                        <ConnectedUserSheetPanelMcpServerList
-                            connectedUserId={connectedUser.id}
-                            connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
-                        />
-                    )}
-                </TabsContent>
+                {isTenantAdmin && (
+                    <TabsContent value="mcp-servers">
+                        {connectedUser.id != null && (
+                            <ConnectedUserSheetPanelMcpServerList
+                                connectedUserId={connectedUser.id}
+                                connectedUserIntegrationInstances={connectedUser.integrationInstances ?? []}
+                            />
+                        )}
+                    </TabsContent>
+                )}
 
                 <TabsContent value="workflows">
                     {connectedUser.id != null && (
