@@ -19,5 +19,11 @@ public interface ConnectedUserConnectionFacade {
 
     long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO);
 
+    /**
+     * Returns the connections of the given connected user when the caller is that connected user or a tenant admin.
+     */
+    List<ConnectionDTO> getConnectedUserConnections(
+        long connectedUserId, String componentName, List<Long> connectionIds);
+
     List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds);
 }

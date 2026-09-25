@@ -16,11 +16,15 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,11 +56,22 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
 
     @Override
     public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
+        validateConnectedUserAccess(connectedUserService.getConnectedUser(connectedUserId));
+
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
         connectedUserConnectionService.create(connectedUserId, connectionId);
 
         return connectionId;
+    }
+
+    @Override
+    public List<ConnectionDTO> getConnectedUserConnections(
+        long connectedUserId, String componentName, List<Long> connectionIds) {
+
+        validateConnectedUserAccess(connectedUserService.getConnectedUser(connectedUserId));
+
+        return getConnections(connectedUserId, componentName, connectionIds);
     }
 
     @Override
@@ -81,5 +96,19 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
             .stream()
             .filter(connectionDTO -> componentName.equals(connectionDTO.componentName()))
             .toList();
+    }
+
+    private void validateConnectedUserAccess(ConnectedUser connectedUser) {
+        if (SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
+            return;
+        }
+
+        String currentUserLogin = SecurityUtils.fetchCurrentUserLogin()
+            .orElse(null);
+
+        if (!Objects.equals(connectedUser.getExternalId(), currentUserLogin)) {
+            throw new AccessDeniedException(
+                "Connected user " + connectedUser.getId() + " does not belong to the current user");
+        }
     }
 }

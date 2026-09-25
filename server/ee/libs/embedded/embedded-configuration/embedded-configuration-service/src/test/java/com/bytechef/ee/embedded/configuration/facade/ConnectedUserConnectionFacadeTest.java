@@ -8,8 +8,13 @@
 package com.bytechef.ee.embedded.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,13 +27,21 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @version ee
@@ -56,8 +69,17 @@ class ConnectedUserConnectionFacadeTest {
             connectedUserConnectionService, connectedUserService, connectionFacade, integrationInstanceService);
     }
 
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
     @Test
     void testCreateConnectedUserConnection() {
+        authenticate("external-user-1");
+
+        mockConnectedUser(1L, "external-user-1");
+
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .build();
 
@@ -68,6 +90,75 @@ class ConnectedUserConnectionFacadeTest {
         assertThat(connectionId).isEqualTo(5L);
 
         verify(connectedUserConnectionService).create(1L, 5L);
+    }
+
+    @Test
+    void testCreateConnectedUserConnectionForAnotherConnectedUserIsDenied() {
+        authenticate("external-user-2");
+
+        mockConnectedUser(1L, "external-user-1");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .build();
+
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, connectionDTO))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).create(any(), any());
+        verify(connectedUserConnectionService, never()).create(anyLong(), anyLong());
+    }
+
+    @Test
+    void testCreateConnectedUserConnectionAsTenantAdmin() {
+        authenticate("admin@localhost.com", AuthorityConstants.ADMIN);
+
+        mockConnectedUser(1L, "external-user-1");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .build();
+
+        when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(5L);
+
+        assertThat(facade.createConnectedUserConnection(1L, connectionDTO)).isEqualTo(5L);
+
+        verify(connectedUserConnectionService).create(1L, 5L);
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsOfAnotherConnectedUserIsDenied() {
+        authenticate("external-user-2");
+
+        mockConnectedUser(1L, "external-user-1");
+
+        assertThatThrownBy(() -> facade.getConnectedUserConnections(1L, "slack", List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).getConnections(any(), any());
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsWithoutAuthenticationIsDenied() {
+        mockConnectedUser(1L, "external-user-1");
+
+        assertThatThrownBy(() -> facade.getConnectedUserConnections(1L, "slack", List.of()))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).getConnections(any(), any());
+    }
+
+    @Test
+    void testGetConnectedUserConnectionsOfTheCurrentConnectedUser() {
+        authenticate("external-user-1");
+
+        ConnectedUser connectedUser = mockConnectedUser(1L, "external-user-1");
+
+        when(connectedUser.getEnvironment()).thenReturn(Environment.PRODUCTION);
+        when(connectedUserConnectionService.getConnectionIds(1L)).thenReturn(List.of(20L));
+        when(connectionFacade.getConnections(List.of(20L), PlatformType.EMBEDDED)).thenReturn(List.of());
+
+        assertThat(facade.getConnectedUserConnections(1L, "slack", List.of())).isEmpty();
+
+        verify(connectionFacade).getConnections(List.of(20L), PlatformType.EMBEDDED);
     }
 
     @Test
@@ -95,5 +186,30 @@ class ConnectedUserConnectionFacadeTest {
         verify(connectionFacade).getConnections(captor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(captor.getValue()).containsExactly(10L, 20L);
+    }
+
+    private static void authenticate(String login, String... authorities) {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                login, null, Arrays.stream(authorities)
+                    .map(SimpleGrantedAuthority::new)
+                    .toList()));
+
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    private ConnectedUser mockConnectedUser(long id, String externalId) {
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        lenient().when(connectedUser.getId())
+            .thenReturn(id);
+        lenient().when(connectedUser.getExternalId())
+            .thenReturn(externalId);
+
+        when(connectedUserService.getConnectedUser(id)).thenReturn(connectedUser);
+
+        return connectedUser;
     }
 }
