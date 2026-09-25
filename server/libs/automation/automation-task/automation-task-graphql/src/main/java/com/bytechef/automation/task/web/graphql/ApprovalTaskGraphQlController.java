@@ -27,6 +27,7 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -44,11 +45,13 @@ public class ApprovalTaskGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public ApprovalTask createApprovalTask(@Argument ApprovalTaskInput approvalTask) {
         return approvalTaskService.create(toApprovalTask(approvalTask));
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#id, 'ApprovalTask', 'DEPLOYMENT_EDIT')")
     public boolean deleteApprovalTask(@Argument long id) {
         approvalTaskService.delete(id);
 
@@ -71,6 +74,8 @@ public class ApprovalTaskGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasPermission(#approvalTask.id, 'ApprovalTask', 'DEPLOYMENT_EDIT') or " +
+        "isResourceOwner(#approvalTask.id, 'ApprovalTask')")
     public ApprovalTask updateApprovalTask(@Argument ApprovalTaskInput approvalTask) {
         return approvalTaskService.update(toApprovalTask(approvalTask));
     }

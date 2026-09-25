@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
- * The counterpart to {@link ResourceTokenResolverCoverageTest}, one level up: that one asks whether a guard's resource
+ * The counterpart to {@link ResourceOwnershipResolverTest}, one level up: that one asks whether a guard's resource
  * token can be resolved, this one asks whether a catalogued permission scope is named by any guard at all.
  * <p>
  * The {@code permissionScopeGroups} query hands the custom-role editor every name in the catalogue, and a tenant admin
@@ -55,7 +55,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Ivica Cardic
  */
-class PermissionScopeGateCoverageTest {
+class PermissionScopeTypeTest {
 
     /**
      * Catalogue scopes that today appear in <em>no</em> {@code @PreAuthorize} anywhere in the tree, pinned so the
@@ -91,6 +91,7 @@ class PermissionScopeGateCoverageTest {
         "hasWorkspaceScopeInEveryEnvironment",
         "isAuthenticated",
         "isCurrentUser",
+        "isResourceOwner",
         "isTenantAdmin");
 
     // A scope name is upper snake case, which is what separates it from a resource token ('Project', 'Connection') and
@@ -100,6 +101,8 @@ class PermissionScopeGateCoverageTest {
     private static final String SCOPE_GROUP = "'([A-Z][A-Z0-9_]*)'";
 
     private static final Pattern BEAN_CALL = Pattern.compile("@[A-Za-z_][A-Za-z0-9_.]*\\([^()]*\\)");
+
+    private static final Pattern VARIABLE_ACCESSOR_CALL = Pattern.compile("#[A-Za-z_][A-Za-z0-9_.]*\\([^()]*\\)");
 
     /**
      * Where a scope sits in each gate function that takes one:
@@ -214,9 +217,8 @@ class PermissionScopeGateCoverageTest {
     /**
      * A scope named by a gate but absent from the catalogue can be held by nobody: a custom role is composed from
      * catalogue names, and a built-in role's scopes come from the same providers. The gate would then be satisfied only
-     * by the tenant-admin short-circuit — a silent lockout of exactly the shape
-     * {@link ResourceTokenResolverCoverageTest} guards against on the resolver side. A typo in a gate expression lands
-     * here too.
+     * by the tenant-admin short-circuit — a silent lockout of exactly the shape {@link ResourceOwnershipResolverTest}
+     * guards against on the resolver side. A typo in a gate expression lands here too.
      */
     @Test
     void testEveryGateScopeIsInTheCatalogue() {
@@ -324,6 +326,20 @@ class PermissionScopeGateCoverageTest {
             .isEmpty();
     }
 
+    @Test
+    void testAVariableAccessorInAGateArgumentIsNeitherAGateFunctionNorHidesTheScope() {
+        List<ResolvedGuardExpression> guardExpressions = List.of(
+            new ResolvedGuardExpression(
+                "Example.java",
+                "hasWorkflowScopeIfProjectWorkflowInEnvironmentId(#request.workflowId(), 'WORKFLOW_EDIT', "
+                    + "#request.environmentId())"));
+
+        assertThat(collectGateFunctions(guardExpressions))
+            .containsExactly("hasWorkflowScopeIfProjectWorkflowInEnvironmentId");
+        assertThat(collectGateScopes(guardExpressions))
+            .containsOnlyKeys("WORKFLOW_EDIT");
+    }
+
     private static Set<String> catalogueScopes() {
         Set<String> scopes = new TreeSet<>();
 
@@ -341,7 +357,10 @@ class PermissionScopeGateCoverageTest {
         Map<String, Set<String>> scopesByFile = new TreeMap<>();
 
         for (ResolvedGuardExpression guardExpression : guardExpressions) {
-            String expression = BEAN_CALL.matcher(guardExpression.expression())
+            String expression = VARIABLE_ACCESSOR_CALL.matcher(guardExpression.expression())
+                .replaceAll("#accessorResult");
+
+            expression = BEAN_CALL.matcher(expression)
                 .replaceAll("#beanCallResult");
 
             for (Pattern scopePattern : SCOPE_PATTERNS) {
@@ -362,7 +381,10 @@ class PermissionScopeGateCoverageTest {
         Set<String> functions = new TreeSet<>();
 
         for (ResolvedGuardExpression guardExpression : guardExpressions) {
-            String expression = TYPE_REFERENCE_STATIC_CALL.matcher(guardExpression.expression())
+            String expression = VARIABLE_ACCESSOR_CALL.matcher(guardExpression.expression())
+                .replaceAll("#accessorResult");
+
+            expression = TYPE_REFERENCE_STATIC_CALL.matcher(expression)
                 .replaceAll("#coercedArgument");
 
             expression = TYPE_REFERENCE.matcher(expression)
