@@ -26,7 +26,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPE
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
@@ -55,6 +55,9 @@ public class AnthropicConstants {
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Max Tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
+        .defaultValue(16000)
+        .minValue(1)
+        .maxValue(128000)
         .required(true);
 
     // Anthropic models accept either Temperature or Top P, never both — leave the unused field empty.
@@ -62,7 +65,8 @@ public class AnthropicConstants {
         .label("Temperature")
         .description(
             "Controls randomness: higher values make the output more random, lower values make it more focused " +
-                "and deterministic. Set either Temperature or Top P, not both.")
+                "and deterministic. Set either Temperature or Top P, not both. Leave empty for Claude Opus 4.7, " +
+                "Sonnet 5 and later models, which reject sampling parameters.")
         .minValue(0)
         .maxValue(1)
         .advancedOption(true);
@@ -71,9 +75,18 @@ public class AnthropicConstants {
         .label("Top P")
         .description(
             "Nucleus sampling: the model considers tokens whose cumulative probability mass adds up to top_p. " +
-                "Set either Temperature or Top P, not both.")
+                "Set either Temperature or Top P, not both. Leave empty for Claude Opus 4.7, Sonnet 5 and later " +
+                "models, which reject sampling parameters.")
         .minValue(0)
         .maxValue(1)
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
+        .label("Top K")
+        .description(
+            "Only sample from the top K options for each subsequent token. Leave empty for Claude Opus 4.7, " +
+                "Sonnet 5 and later models, which reject sampling parameters.")
+        .minValue(1)
         .advancedOption(true);
 
     public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(toChatModelMap());
