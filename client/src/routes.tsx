@@ -22,6 +22,7 @@ import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import AutomationEnvironmentAccessGuard from '@/shared/layout/AutomationEnvironmentAccessGuard';
 import Settings from '@/shared/layout/Settings';
+import SettingsIndexRedirect from '@/shared/layout/SettingsIndexRedirect';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
 import {EnvironmentApi} from '@/shared/middleware/platform/configuration';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
@@ -494,6 +495,29 @@ const platformSettingsRoutes = {
     ],
 };
 
+const automationSettingsNavItems = [
+    ...currentWorkspaceSettingsRoutes.navItems,
+    organizationSettingsNavItem,
+    {
+        href: '/automation/settings/workspaces',
+        title: 'Workspaces',
+    },
+    ...platformSettingsRoutes.navItems,
+];
+
+const embeddedSettingsNavItems = [
+    {
+        href: '/embedded/settings/signing-keys',
+        title: 'Signing Keys',
+    },
+    {
+        href: '/embedded/settings/api-keys',
+        title: 'API Keys',
+    },
+    organizationSettingsNavItem,
+    ...platformSettingsRoutes.navItems,
+];
+
 export const loadEnvironments = async (queryClient: QueryClient) => {
     if (authenticationStore.getState().authenticated) {
         const environments = await queryClient.query({
@@ -916,10 +940,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            element: (
+                                                <SettingsIndexRedirect
+                                                    fallbackHref="/automation/account"
+                                                    sidebarNavItems={automationSettingsNavItems}
+                                                    tenantAdminHref="workspaces"
+                                                />
+                                            ),
                                             index: true,
-                                            loader: async () => {
-                                                return redirect('workspaces');
-                                            },
                                         },
                                         {
                                             element: (
@@ -936,19 +964,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         ...currentWorkspaceSettingsRoutes.children,
                                         ...platformSettingsRoutes.children,
                                     ],
-                                    element: (
-                                        <Settings
-                                            sidebarNavItems={[
-                                                ...currentWorkspaceSettingsRoutes.navItems,
-                                                organizationSettingsNavItem,
-                                                {
-                                                    href: '/automation/settings/workspaces',
-                                                    title: 'Workspaces',
-                                                },
-                                                ...platformSettingsRoutes.navItems,
-                                            ]}
-                                        />
-                                    ),
+                                    element: <Settings sidebarNavItems={automationSettingsNavItems} />,
                                     path: 'settings',
                                 },
                             ],
@@ -1097,10 +1113,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            element: (
+                                                <SettingsIndexRedirect
+                                                    fallbackHref="/embedded/account"
+                                                    sidebarNavItems={embeddedSettingsNavItems}
+                                                    tenantAdminHref="signing-keys"
+                                                />
+                                            ),
                                             index: true,
-                                            loader: async () => {
-                                                return redirect('signing-keys');
-                                            },
                                         },
                                         {
                                             element: (
@@ -1128,22 +1148,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         },
                                         ...platformSettingsRoutes.children,
                                     ],
-                                    element: (
-                                        <Settings
-                                            sidebarNavItems={[
-                                                {
-                                                    href: '/embedded/settings/signing-keys',
-                                                    title: 'Signing Keys',
-                                                },
-                                                {
-                                                    href: '/embedded/settings/api-keys',
-                                                    title: 'API Keys',
-                                                },
-                                                organizationSettingsNavItem,
-                                                ...platformSettingsRoutes.navItems,
-                                            ]}
-                                        />
-                                    ),
+                                    element: <Settings sidebarNavItems={embeddedSettingsNavItems} />,
                                     path: 'settings',
                                 },
                             ],
