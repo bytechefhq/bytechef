@@ -230,10 +230,7 @@ class EndpointGateCoverageTest {
         Map.entry("WorkspaceApiKeyGraphQlController#updateWorkspaceApiKey",
             "ApiKeyFacadeImpl checks the caller owns the key"));
 
-    private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.ofEntries(
-        Map.entry("NotificationApiController#createNotification", "any member writes the tenant's notifications"),
-        Map.entry("NotificationApiController#deleteNotification", "any member writes the tenant's notifications"),
-        Map.entry("NotificationApiController#updateNotification", "any member writes the tenant's notifications"));
+    private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.of();
 
     private static final Set<String> SKIPPED_DIRECTORY_NAMES =
         Set.of(".git", ".gradle", "bin", "build", "node_modules", "src");

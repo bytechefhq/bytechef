@@ -21,10 +21,12 @@ import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.facade.NotificationFacade;
 import com.bytechef.platform.notification.service.NotificationService;
 import com.bytechef.platform.notification.web.rest.model.NotificationModel;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +53,7 @@ public class NotificationApiController implements NotificationApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<NotificationModel> createNotification(NotificationModel notificationModel) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -59,6 +62,7 @@ public class NotificationApiController implements NotificationApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteNotification(Long notificationId) {
         notificationService.delete(notificationId);
 
@@ -76,6 +80,7 @@ public class NotificationApiController implements NotificationApi {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<NotificationModel> updateNotification(
         Long notificationId, NotificationModel notificationModel) {
 
