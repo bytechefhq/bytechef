@@ -297,6 +297,10 @@ function App() {
     });
 
     const filteredEmbeddedNavigation = embeddedNavigation.filter((navItem) => {
+        if (!isTenantAdmin) {
+            return false;
+        }
+
         if (navItem.href === EMBEDDED_GETTING_STARTED_PATH) {
             return showEmbeddedGettingStarted;
         }
@@ -318,10 +322,6 @@ function App() {
             navItem.href === '/embedded/automation-configurations'
         ) {
             return false;
-        }
-
-        if (navItem.href === '/embedded/mcp-servers') {
-            return isTenantAdmin;
         }
 
         return true;
