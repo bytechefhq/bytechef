@@ -67,16 +67,19 @@ public class ApiConnectorGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector apiConnector(@Argument long id) {
         return apiConnectorService.getApiConnector(id);
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public List<ApiConnectorDTO> apiConnectors() {
         return apiConnectorFacade.getApiConnectors();
     }
 
     @QueryMapping
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public GenerationJobStatusRecord generationJobStatus(@Argument String jobId) {
         return apiConnectorGenerationJobService.get(jobId)
             .map(this::toGenerationJobStatusRecord)

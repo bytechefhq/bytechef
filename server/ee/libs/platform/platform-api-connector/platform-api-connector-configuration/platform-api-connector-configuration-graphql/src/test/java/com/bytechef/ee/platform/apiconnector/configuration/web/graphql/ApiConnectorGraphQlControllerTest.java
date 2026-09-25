@@ -30,6 +30,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,38 +39,38 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@link PreAuthorize} expressions on every {@link ApiConnectorGraphQlController} mutation through
- * the real {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. API connectors
- * are tenant-wide component definitions, so each mutation must decide on the caller's {@code ROLE_ADMIN} authority
- * alone.
+ * Evaluates the real {@link PreAuthorize} expressions on every {@link ApiConnectorGraphQlController} query and mutation
+ * through the real {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. API
+ * connectors are tenant-wide component definitions, so each query and mutation must decide on the caller's
+ * {@code ROLE_ADMIN} authority alone.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class ApiConnectorGraphQlControllerAuthorizationTest {
+class ApiConnectorGraphQlControllerTest {
 
-    private static final Set<String> MUTATION_NAMES = Set.of(
-        "cancelGenerationJob", "createApiConnector", "deleteApiConnector", "enableApiConnector",
-        "generateFromDocumentation", "generateSpecification", "importOpenApiSpecification",
-        "startGenerateFromDocumentationPreview", "updateApiConnector");
+    private static final Set<String> ENDPOINT_NAMES = Set.of(
+        "apiConnector", "apiConnectors", "cancelGenerationJob", "createApiConnector", "deleteApiConnector",
+        "enableApiConnector", "generateFromDocumentation", "generateSpecification", "generationJobStatus",
+        "importOpenApiSpecification", "startGenerateFromDocumentationPreview", "updateApiConnector");
 
-    static Stream<Arguments> mutations() {
-        return mutationMethods().flatMap(method -> Stream.of(Arguments.of(method, false), Arguments.of(method, true)));
+    static Stream<Arguments> endpoints() {
+        return endpointMethods().flatMap(method -> Stream.of(Arguments.of(method, false), Arguments.of(method, true)));
     }
 
     @Test
-    void testEveryMutationIsEvaluated() {
-        Set<String> mutationNames = mutationMethods()
+    void testEveryEndpointIsEvaluated() {
+        Set<String> endpointNames = endpointMethods()
             .map(Method::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
-        assertThat(mutationNames).isEqualTo(new TreeSet<>(MUTATION_NAMES));
+        assertThat(endpointNames).isEqualTo(new TreeSet<>(ENDPOINT_NAMES));
     }
 
     @ParameterizedTest(name = "{0} admin={1}")
-    @MethodSource("mutations")
-    void testMutationRequiresTheAdminAuthority(Method method, boolean admin) {
+    @MethodSource("endpoints")
+    void testEndpointRequiresTheAdminAuthority(Method method, boolean admin) {
         PermissionService permissionService = mock(PermissionService.class);
 
         assertThat(evaluateGuard(permissionService, method, admin))
@@ -113,8 +114,9 @@ class ApiConnectorGraphQlControllerAuthorizationTest {
         return Boolean.TRUE.equals(expression.getValue(evaluationContext, Boolean.class));
     }
 
-    private static Stream<Method> mutationMethods() {
+    private static Stream<Method> endpointMethods() {
         return Arrays.stream(ApiConnectorGraphQlController.class.getDeclaredMethods())
-            .filter(method -> method.isAnnotationPresent(MutationMapping.class));
+            .filter(method -> method.isAnnotationPresent(MutationMapping.class) ||
+                method.isAnnotationPresent(QueryMapping.class));
     }
 }
