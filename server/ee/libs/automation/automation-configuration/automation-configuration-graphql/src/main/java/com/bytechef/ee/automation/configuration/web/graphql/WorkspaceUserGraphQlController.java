@@ -32,8 +32,8 @@ import org.springframework.stereotype.Controller;
 
 /**
  * GraphQL controller for workspace-user management. Authorization is enforced at the service layer
- * ({@code WorkspaceUserService} methods are {@code @PreAuthorize}-annotated) and pinned by
- * {@code PreAuthorizeAnnotationTest}. Do NOT add caching or transform logic to controller methods that could precede
+ * ({@code WorkspaceUserService} methods are {@code @PreAuthorize}-annotated) and verified by
+ * {@code WorkspaceUserServiceIntTest}. Do NOT add caching or transform logic to controller methods that could precede
  * the service call without also adding a matching {@code @PreAuthorize} here.
  *
  * @version ee

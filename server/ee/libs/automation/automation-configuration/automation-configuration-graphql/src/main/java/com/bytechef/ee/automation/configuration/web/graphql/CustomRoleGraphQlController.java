@@ -27,8 +27,8 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for custom-role management. Authorization is enforced at the service layer and pinned by
- * {@code PreAuthorizeAnnotationTest}: creating, updating and deleting a custom role is reserved for tenant admins,
+ * GraphQL controller for custom-role management. Authorization is enforced at the service layer and verified by
+ * {@code CustomRoleServiceIntTest}: creating, updating and deleting a custom role is reserved for tenant admins,
  * listing custom roles is also open to a member holding {@code WORKSPACE_MEMBER_MANAGE} on the named workspace, and the
  * built-in roles and the scope catalogue are open to any authenticated user. Do NOT add caching or transform logic to
  * controller methods that could precede the service call without also adding a matching {@code @PreAuthorize} here — an

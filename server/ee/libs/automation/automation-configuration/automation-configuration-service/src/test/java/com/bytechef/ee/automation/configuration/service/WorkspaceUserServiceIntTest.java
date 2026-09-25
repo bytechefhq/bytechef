@@ -80,7 +80,9 @@ import org.springframework.test.context.NestedTestConfiguration;
     classes = WorkspaceUserServiceIntTest.Config.class, properties = "bytechef.edition=ee")
 class WorkspaceUserServiceIntTest {
 
+    private static final String BODY_REACHED = "body reached";
     private static final long CUSTOM_ROLE_ID = 3L;
+    private static final String EMAIL = "someone@example.com";
     private static final String MEMBER_MANAGE = "WORKSPACE_MEMBER_MANAGE";
     private static final long USER_ID = 2L;
     private static final long WORKSPACE_ID = 1L;
@@ -95,6 +97,9 @@ class WorkspaceUserServiceIntTest {
     private WorkspaceUserRepository workspaceUserRepository;
 
     @Autowired
+    private WorkspaceService workspaceService;
+
+    @Autowired
     private WorkspaceUserService workspaceUserService;
 
     @BeforeEach
@@ -107,7 +112,7 @@ class WorkspaceUserServiceIntTest {
         // Reset, not just re-stub: the mocks are singletons in the cached context, so a verify() would otherwise count
         // the invocations of every test that ran before it, and a positive control's stubbing would survive into the
         // next test's denial assertion.
-        reset(permissionService, customRoleRepository, workspaceUserRepository);
+        reset(permissionService, customRoleRepository, workspaceService, workspaceUserRepository);
 
         // Only the methods the production annotations route to: hasWorkspaceScopeInEveryEnvironment for the
         // workspace-wide member writes, hasResourceScope for the 'Workspace' token, isTenantAdmin for the tenant-global
@@ -115,6 +120,7 @@ class WorkspaceUserServiceIntTest {
         when(permissionService.isTenantAdmin()).thenReturn(false);
         when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(false);
         when(permissionService.hasWorkspaceScopeInEveryEnvironment(anyLong(), anyString())).thenReturn(false);
+        when(workspaceService.workspaceExists(anyLong())).thenReturn(true);
     }
 
     @AfterEach
@@ -152,6 +158,19 @@ class WorkspaceUserServiceIntTest {
     }
 
     @Test
+    void testRealWorkspaceUserServiceImplAllowsRemoveWorkspaceUserWhenTheScopeIsGranted() {
+        grantMemberManagementInEveryEnvironment();
+
+        when(workspaceUserRepository.lockWorkspace(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(USER_ID, WORKSPACE_ID))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+    }
+
+    @Test
     void testRealWorkspaceUserServiceImplEnforcesUpdateWorkspaceUserRole() {
         assertThatThrownBy(
             () -> workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER))
@@ -159,6 +178,143 @@ class WorkspaceUserServiceIntTest {
 
         verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
         verifyNoMoreInteractions(permissionService);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplAllowsUpdateWorkspaceUserRoleWhenTheScopeIsGranted() {
+        grantMemberManagementInEveryEnvironment();
+
+        when(workspaceUserRepository.lockWorkspace(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(
+            () -> workspaceUserService.updateWorkspaceUserRole(USER_ID, WORKSPACE_ID, WorkspaceRole.VIEWER))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesAddWorkspaceUserWithACustomRole() {
+        assertThatThrownBy(
+            () -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, null, CUSTOM_ROLE_ID))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(workspaceService);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplAllowsAddWorkspaceUserWithACustomRoleWhenTheScopeIsGranted() {
+        grantMemberManagementInEveryEnvironment();
+
+        when(workspaceService.workspaceExists(WORKSPACE_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(
+            () -> workspaceUserService.addWorkspaceUser(USER_ID, WORKSPACE_ID, null, CUSTOM_ROLE_ID))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesInviteWorkspaceUser() {
+        assertThatThrownBy(() -> workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, EMAIL, WorkspaceRole.VIEWER))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(workspaceService);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplAllowsInviteWorkspaceUserWhenTheScopeIsGranted() {
+        grantMemberManagementInEveryEnvironment();
+
+        when(workspaceService.workspaceExists(WORKSPACE_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, EMAIL, WorkspaceRole.VIEWER))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesInviteWorkspaceUserWithACustomRole() {
+        assertThatThrownBy(() -> workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, EMAIL, null, CUSTOM_ROLE_ID))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(workspaceService);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplAllowsInviteWorkspaceUserWithACustomRoleWhenTheScopeIsGranted() {
+        grantMemberManagementInEveryEnvironment();
+
+        when(workspaceService.workspaceExists(WORKSPACE_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> workspaceUserService.inviteWorkspaceUser(WORKSPACE_ID, EMAIL, null, CUSTOM_ROLE_ID))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesSetEnvironmentRole() {
+        assertThatThrownBy(
+            () -> workspaceUserService.setEnvironmentRole(
+                USER_ID, WORKSPACE_ID, Environment.PRODUCTION, WorkspaceRole.VIEWER, null))
+                    .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, MEMBER_MANAGE, Environment.PRODUCTION);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(workspaceService);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplAllowsSetEnvironmentRoleWhenTheScopeIsGrantedInThatEnvironment() {
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, MEMBER_MANAGE, Environment.PRODUCTION))
+            .thenReturn(true);
+        when(workspaceService.workspaceExists(WORKSPACE_ID)).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(
+            () -> workspaceUserService.setEnvironmentRole(
+                USER_ID, WORKSPACE_ID, Environment.PRODUCTION, WorkspaceRole.VIEWER, null))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, MEMBER_MANAGE, Environment.PRODUCTION);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesRemoveEnvironmentRole() {
+        assertThatThrownBy(
+            () -> workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, MEMBER_MANAGE, Environment.PRODUCTION);
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(workspaceUserRepository);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplAllowsRemoveEnvironmentRoleWhenTheScopeIsGrantedInThatEnvironment() {
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, MEMBER_MANAGE, Environment.PRODUCTION))
+            .thenReturn(true);
+        when(workspaceUserRepository.lockWorkspace(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(
+            () -> workspaceUserService.removeEnvironmentRole(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+
+        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, MEMBER_MANAGE, Environment.PRODUCTION);
     }
 
     /**
@@ -212,6 +368,10 @@ class WorkspaceUserServiceIntTest {
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", "WORKSPACE_VIEW");
         verifyNoMoreInteractions(permissionService);
+    }
+
+    private void grantMemberManagementInEveryEnvironment() {
+        when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, MEMBER_MANAGE)).thenReturn(true);
     }
 
     /**

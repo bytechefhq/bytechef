@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.context.NestedTestConfiguration.EnclosingConfiguration.OVERRIDE;
@@ -37,6 +38,7 @@ import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
 import com.bytechef.ee.platform.audit.service.AuditEventService;
 import com.bytechef.platform.user.service.UserInvitationService;
 import com.bytechef.platform.user.service.UserService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,6 +56,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -73,10 +76,14 @@ import org.springframework.test.context.NestedTestConfiguration;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings(
+    value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
+    justification = "Guarded calls inside assertThatThrownBy are expected to throw, so their return value is irrelevant")
 @SpringBootTest(
     classes = CustomRoleServiceIntTest.Config.class, properties = "bytechef.edition=ee")
 class CustomRoleServiceIntTest {
 
+    private static final String BODY_REACHED = "body reached";
     private static final String MEMBER_MANAGE = "WORKSPACE_MEMBER_MANAGE";
     private static final long WORKSPACE_ID = 1L;
 
@@ -192,6 +199,105 @@ class CustomRoleServiceIntTest {
 
         verify(permissionService).hasResourceScope(WORKSPACE_ID, "Workspace", MEMBER_MANAGE);
         verifyNoMoreInteractions(permissionService);
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplAllowsDeleteCustomRoleForATenantAdmin() {
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(customRoleRepository.existsById(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> customRoleService.deleteCustomRole(1L))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verify(permissionService).isTenantAdmin();
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplEnforcesUpdateCustomRole() {
+        assertThatThrownBy(() -> customRoleService.updateCustomRole(1L, "r", "d", Set.of("WORKFLOW_VIEW")))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(permissionService).isTenantAdmin();
+        verifyNoMoreInteractions(permissionService);
+        verifyNoInteractions(customRoleRepository);
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplAllowsUpdateCustomRoleForATenantAdmin() {
+        when(permissionService.isTenantAdmin()).thenReturn(true);
+        when(customRoleRepository.findById(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> customRoleService.updateCustomRole(1L, "r", "d", Set.of("WORKFLOW_VIEW")))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verify(permissionService).isTenantAdmin();
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplEnforcesGetBuiltInRolesForAnAnonymousCaller(
+        @Autowired PermissionScopeRegistry permissionScopeRegistry) {
+
+        reset(permissionScopeRegistry);
+
+        authenticateAsAnonymous();
+
+        assertThatThrownBy(() -> customRoleService.getBuiltInRoles())
+            .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(permissionScopeRegistry, permissionService);
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplAllowsGetBuiltInRolesForAnyAuthenticatedCaller(
+        @Autowired PermissionScopeRegistry permissionScopeRegistry) {
+
+        reset(permissionScopeRegistry);
+
+        when(permissionScopeRegistry.getBuiltInRoles()).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> customRoleService.getBuiltInRoles())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplEnforcesGetPermissionScopeGroupsForAnAnonymousCaller(
+        @Autowired PermissionScopeRegistry permissionScopeRegistry) {
+
+        reset(permissionScopeRegistry);
+
+        authenticateAsAnonymous();
+
+        assertThatThrownBy(() -> customRoleService.getPermissionScopeGroups())
+            .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(permissionScopeRegistry, permissionService);
+    }
+
+    @Test
+    void testRealCustomRoleServiceImplAllowsGetPermissionScopeGroupsForAnyAuthenticatedCaller(
+        @Autowired PermissionScopeRegistry permissionScopeRegistry) {
+
+        reset(permissionScopeRegistry);
+
+        when(permissionScopeRegistry.getScopeGroups()).thenThrow(new IllegalStateException(BODY_REACHED));
+
+        assertThatThrownBy(() -> customRoleService.getPermissionScopeGroups())
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage(BODY_REACHED);
+
+        verifyNoInteractions(permissionService);
+    }
+
+    private static void authenticateAsAnonymous() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(
+                new AnonymousAuthenticationToken(
+                    "key", "anonymousUser", List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
     }
 
     // @SpringBootConfiguration (not @TestConfiguration) because @SpringBootTest(classes = Config.class) requires a

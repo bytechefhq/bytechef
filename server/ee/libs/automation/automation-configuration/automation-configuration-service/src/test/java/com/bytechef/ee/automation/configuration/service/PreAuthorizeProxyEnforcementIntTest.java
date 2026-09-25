@@ -365,13 +365,11 @@ class PreAuthorizeProxyEnforcementIntTest {
     }
 
     /**
-     * Mirrors the {@code 'Project'} {@code @PreAuthorize} expressions on the project facade/service impls. The
-     * evaluator routes every {@code hasPermission(id, 'Type', 'SCOPE')} form to
+     * Exercises the EE evaluator routing of the {@code hasPermission(id, 'Type', 'SCOPE')} form to
      * {@code permissionService.hasResourceScope(id, resourceType, scope)}, which the mocked {@link PermissionService}
-     * stubs. Kept in sync by {@link PreAuthorizeAnnotationTest}, which pins the expressions on the production impls. If
-     * the production annotation changes without updating this stand-in, the test still fires the proxy — it just
-     * exercises the old expression, so the reflection test in {@code PreAuthorizeAnnotationTest} is the source of truth
-     * for drift.
+     * stubs. It is not a stand-in for the production guards: the guards on {@code ProjectFacadeImpl} and
+     * {@code ProjectServiceImpl} are called through the real proxy in {@code ProjectFacadeIntTest} and
+     * {@code ProjectServiceTest}.
      */
     @Service
     static class GuardedProjectMutations {

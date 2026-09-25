@@ -22,7 +22,7 @@ public interface WorkspaceUserService {
     /**
      * Declared abstract rather than defaulted to the four-argument overload: a {@code default} method carries no
      * {@code @PreAuthorize} and would call the overload on the target rather than the proxy, handing out an unguarded
-     * way in. Pinned by {@code PreAuthorizeAnnotationTest}.
+     * way in. Enforced through the proxy in {@code WorkspaceUserServiceIntTest}.
      *
      * @param userId        the user to place into the workspace
      * @param workspaceId   the workspace to join
