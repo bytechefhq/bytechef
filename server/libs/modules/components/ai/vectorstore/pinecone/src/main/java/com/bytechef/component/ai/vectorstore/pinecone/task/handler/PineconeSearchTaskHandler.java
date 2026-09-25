@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeCo
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(PINECONE + "/v1/" + SEARCH)
 public class PineconeSearchTaskHandler extends AbstractTaskHandler {
 
-    public PineconeSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(PINECONE, 1, SEARCH, actionDefinitionFacade);
+    public PineconeSearchTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(PINECONE, 1, SEARCH, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }

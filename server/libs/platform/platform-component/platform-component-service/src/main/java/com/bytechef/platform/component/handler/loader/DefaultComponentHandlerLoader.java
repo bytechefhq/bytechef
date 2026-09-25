@@ -58,7 +58,8 @@ public class DefaultComponentHandlerLoader extends AbstractComponentHandlerLoade
 
     @Override
     protected ComponentTaskHandlerFunction getComponentTaskHandlerFunction(ComponentHandler componentHandler) {
-        return (actionName, actionDefinitionFacade) -> new ComponentTaskHandler(
-            componentHandler.getName(), componentHandler.getVersion(), actionName, actionDefinitionFacade);
+        return (actionName, actionDefinitionFacade, jobPrincipalAuthenticationRunner) -> new ComponentTaskHandler(
+            componentHandler.getName(), componentHandler.getVersion(), actionName, actionDefinitionFacade,
+            jobPrincipalAuthenticationRunner);
     }
 }
