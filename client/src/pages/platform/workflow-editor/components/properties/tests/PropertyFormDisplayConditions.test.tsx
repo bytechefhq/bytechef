@@ -12,9 +12,8 @@ vi.mock('@/pages/platform/workflow-editor/components/properties/hooks/usePropert
     default: ({controlPath, property}: {controlPath?: string; property: PropertyAllType}) => ({
         calculatedPath: `${controlPath ?? 'parameters'}.${property.name}`,
         controlType: property.controlType ?? 'TEXT',
-        controlledDynamicMode: false,
-        controlledDynamicOnChangeRef: {current: undefined},
         controlledExpressionExitRef: {current: false},
+        controlledFormulaOnChangeRef: {current: undefined},
         currentNode: undefined,
         displayCondition: property.displayCondition,
         editorRef: {current: null},

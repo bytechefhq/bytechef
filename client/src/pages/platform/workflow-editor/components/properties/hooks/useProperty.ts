@@ -1,7 +1,7 @@
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {useFormulaEnabledContext} from '@/pages/platform/workflow-editor/components/properties/FormulaEnabledContext';
-import getInitialControlledDynamicMode from '@/pages/platform/workflow-editor/components/properties/getInitialControlledDynamicMode';
+import getInitialFormulaMode from '@/pages/platform/workflow-editor/components/properties/getInitialFormulaMode';
 import {
     INPUT_PROPERTY_CONTROL_TYPES,
     ParameterValueContextI,
@@ -69,9 +69,8 @@ const isSavedFormulaValue = (value: unknown): boolean =>
 type UsePropertyReturnType = {
     calculatedPath: string | undefined;
     controlledBlurError: string | undefined;
-    controlledDynamicMode: boolean;
-    controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledExpressionExitRef: RefObject<boolean>;
+    controlledFormulaOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledFromAi: boolean | undefined;
     controlType?: ControlType;
     currentNode: NodeDataType | undefined;
@@ -86,7 +85,13 @@ type UsePropertyReturnType = {
     fromAiExpression: string;
     handleCodeEditorChange: (value?: string) => void;
     handleControlledBlur: (value: unknown) => void;
-    handleControlledModeSwitch: (toDynamic: boolean) => void;
+    handleControlledBuilderFormulaSwitch: () => void;
+    handleControlledFormulaSwitch: (fieldValue: unknown, fieldOnChange: (value: unknown) => void) => void;
+    handleControlledNativeKeyDown: (
+        event: KeyboardEvent<HTMLInputElement>,
+        fieldValue: unknown,
+        fieldOnChange: (value: unknown) => void
+    ) => void;
     handleDeleteCustomPropertyClick: (path: string) => void;
     handleFromAiClick: ((fromAi: boolean) => void) | undefined;
     handleFormulaSwitch: () => void;
@@ -180,13 +185,16 @@ export const useProperty = ({
 }: UsePropertyProps): UsePropertyReturnType => {
     const [editorFocusRequest, setEditorFocusRequest] = useState<{initialInput?: string; token: number} | undefined>();
     const [errorMessage, setErrorMessage] = useState('');
-    const [formulaModeState, setFormulaModeState] = useState(() => {
-        if (property.controlType === 'FORMULA_MODE') {
-            return true;
-        }
-
-        return isSavedFormulaValue(parameterValue);
-    });
+    const [formulaModeState, setFormulaModeState] = useState(() =>
+        getInitialFormulaMode({
+            control,
+            controlPath,
+            controlType: property.controlType,
+            parameterValue,
+            propertyName: property.name?.replace(/\s/g, '_'),
+            propertyType: property.type,
+        })
+    );
     const [hasError, setHasError] = useState(false);
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
     const [pillEntry, setPillEntry] = useState(false);
@@ -201,19 +209,10 @@ export const useProperty = ({
 
     const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
     const [controlledBlurError, setControlledBlurError] = useState<string | undefined>();
-    const [controlledDynamicMode, setControlledDynamicMode] = useState(() =>
-        getInitialControlledDynamicMode({
-            control,
-            controlPath,
-            propertyName: property.name?.replace(/\s/g, '_'),
-            propertyType: property.type,
-            toolsMode,
-        })
-    );
     const [controlledFromAi, setControlledFromAi] = useState<boolean | undefined>(undefined);
 
-    const controlledDynamicOnChangeRef = useRef<((value: string) => void) | null>(null);
     const controlledExpressionExitRef = useRef(false);
+    const controlledFormulaOnChangeRef = useRef<((value: string) => void) | null>(null);
     const editorPendingSaveCancelRef = useRef<(() => void) | null>(null);
     const editorRef = useRef<Editor>(null!);
 
@@ -437,7 +436,7 @@ export const useProperty = ({
                 controlType,
                 formulaMode: formulaModeState,
                 hasControl: !!control,
-                isFromAi,
+                isFromAi: !control && isFromAi,
                 pillEntry,
                 value: propertyParameterValue,
             }),
@@ -720,44 +719,6 @@ export const useProperty = ({
             setControlledBlurError(isInvalid ? ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE : undefined);
         },
         [validatePropertyValue]
-    );
-
-    const handleControlledModeSwitch = useCallback(
-        (toDynamic: boolean) => {
-            resetOnModeChangeRef.current = true;
-
-            const wasFromAi = controlledFromAi === true;
-
-            setControlledDynamicMode(toDynamic);
-            setControlledFromAi(undefined);
-
-            if (
-                wasFromAi &&
-                path &&
-                workflow.id &&
-                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
-            ) {
-                saveProperty({
-                    fromAi: false,
-                    includeInMetadata: custom,
-                    path,
-                    type,
-                    updateClusterElementParameterMutation,
-                    updateWorkflowNodeParameterMutation,
-                    value: toDynamic ? '=' : '',
-                    workflowId: workflow.id,
-                });
-            }
-        },
-        [
-            controlledFromAi,
-            custom,
-            path,
-            type,
-            updateClusterElementParameterMutation,
-            updateWorkflowNodeParameterMutation,
-            workflow.id,
-        ]
     );
 
     const handleFromAiToggle = useCallback(
@@ -1106,6 +1067,97 @@ export const useProperty = ({
 
         requestAnimationFrame(() => inputRef.current?.focus());
     }, []);
+
+    const handleControlledFormulaSwitch = useCallback(
+        (fieldValue: unknown, fieldOnChange: (value: unknown) => void) => {
+            const isStringToolExpression =
+                isToolsClusterElement &&
+                type === 'STRING' &&
+                typeof fieldValue === 'string' &&
+                fieldValue.startsWith('=');
+
+            const toFormula = !(isFormulaMode || isStringToolExpression);
+            const wasFromAi = controlledFromAi === true;
+
+            let convertedValue = toFormula ? toFormulaValue(fieldValue, type) : fromFormulaValue(fieldValue, type);
+
+            if (
+                !toFormula &&
+                controlType === 'SELECT' &&
+                (typeof convertedValue === 'boolean' || typeof convertedValue === 'number')
+            ) {
+                convertedValue = String(convertedValue);
+            }
+
+            setIsFormulaMode(toFormula);
+            setControlledFromAi(undefined);
+
+            fieldOnChange(convertedValue ?? (toFormula ? '=' : ''));
+
+            if (toFormula) {
+                requestEditorFocus();
+            } else {
+                controlledExpressionExitRef.current = true;
+            }
+
+            if (
+                wasFromAi &&
+                path &&
+                workflow.id &&
+                (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
+            ) {
+                saveProperty({
+                    fromAi: false,
+                    includeInMetadata: custom,
+                    path,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    value: convertedValue ?? null,
+                    workflowId: workflow.id,
+                });
+            }
+        },
+        [
+            controlType,
+            controlledFromAi,
+            custom,
+            isFormulaMode,
+            isToolsClusterElement,
+            path,
+            requestEditorFocus,
+            setIsFormulaMode,
+            type,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
+    );
+
+    const handleControlledBuilderFormulaSwitch = useCallback(() => {
+        resetOnModeChangeRef.current = true;
+
+        setIsFormulaMode(!isFormulaMode);
+    }, [isFormulaMode, setIsFormulaMode]);
+
+    const handleControlledNativeKeyDown = useCallback(
+        (event: KeyboardEvent<HTMLInputElement>, fieldValue: unknown, fieldOnChange: (value: unknown) => void) => {
+            const isEmpty = fieldValue === '' || fieldValue === null || fieldValue === undefined;
+
+            if (event.key !== '=' || !isNumericalInput || !showFormulaSwitch || !isEmpty) {
+                return;
+            }
+
+            event.preventDefault();
+
+            setIsFormulaMode(true);
+
+            fieldOnChange('=');
+
+            requestEditorFocus();
+        },
+        [isNumericalInput, requestEditorFocus, setIsFormulaMode, showFormulaSwitch]
+    );
 
     const handleSelectChange = useCallback(
         (value: string, name: string) => {
@@ -1713,11 +1765,12 @@ export const useProperty = ({
     }, [displayCondition, currentNode?.displayConditions, isDisplayConditionsSuccess]);
 
     useEffect(() => {
-        if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
+        if (isFormulaMode && resetOnModeChangeRef.current && controlledFormulaOnChangeRef.current) {
             resetOnModeChangeRef.current = false;
-            controlledDynamicOnChangeRef.current('=');
+
+            controlledFormulaOnChangeRef.current('=');
         }
-    }, [controlledDynamicMode, resetOnModeChangeRef]);
+    }, [isFormulaMode, resetOnModeChangeRef]);
 
     const isLoadingDisplayCondition = !!(
         displayCondition &&
@@ -1733,9 +1786,8 @@ export const useProperty = ({
         calculatedPath: path,
         controlType,
         controlledBlurError,
-        controlledDynamicMode,
-        controlledDynamicOnChangeRef,
         controlledExpressionExitRef,
+        controlledFormulaOnChangeRef,
         controlledFromAi,
         currentNode,
         defaultValue,
@@ -1750,7 +1802,9 @@ export const useProperty = ({
         fromAiExpression,
         handleCodeEditorChange,
         handleControlledBlur,
-        handleControlledModeSwitch,
+        handleControlledBuilderFormulaSwitch,
+        handleControlledFormulaSwitch,
+        handleControlledNativeKeyDown,
         handleDeleteCustomPropertyClick,
         handleFormulaSwitch,
         handleFromAiClick: hideFromAi ? undefined : handleFromAiClick,

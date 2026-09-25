@@ -88,9 +88,8 @@ const Property = ({
         calculatedPath,
         controlType,
         controlledBlurError,
-        controlledDynamicMode,
-        controlledDynamicOnChangeRef,
         controlledExpressionExitRef,
+        controlledFormulaOnChangeRef,
         controlledFromAi,
         currentNode,
         defaultValue,
@@ -105,7 +104,9 @@ const Property = ({
         fromAiExpression,
         handleCodeEditorChange,
         handleControlledBlur,
-        handleControlledModeSwitch,
+        handleControlledBuilderFormulaSwitch,
+        handleControlledFormulaSwitch,
+        handleControlledNativeKeyDown,
         handleDeleteCustomPropertyClick,
         handleFormulaSwitch,
         handleFromAiClick,
@@ -275,7 +276,7 @@ const Property = ({
                     onFocusCapture={nativePillTarget.onFocusCapture}
                     ref={nativePillTarget.ref}
                 >
-                    {!controlledDynamicMode &&
+                    {!isFormulaMode &&
                         ((controlType === 'OBJECT_BUILDER' && name !== '__item') ||
                             controlType === 'ARRAY_BUILDER' ||
                             controlType === 'NULL') && (
@@ -324,12 +325,10 @@ const Property = ({
                                                 />
                                             )}
 
-                                            {control && isToolsClusterElement && expressionEnabled !== false && (
+                                            {control && showFormulaSwitch && (
                                                 <PropertyFormulaSwitch
-                                                    formulaMode={controlledDynamicMode}
-                                                    handleClick={() =>
-                                                        handleControlledModeSwitch(!controlledDynamicMode)
-                                                    }
+                                                    formulaMode={isFormulaMode}
+                                                    handleClick={handleControlledBuilderFormulaSwitch}
                                                 />
                                             )}
 
@@ -349,13 +348,13 @@ const Property = ({
                         />
                     )}
 
-                    {control && controlledDynamicMode && calculatedPath && (
+                    {control && isFormulaMode && calculatedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
                             name={calculatedPath}
                             render={({field}) => {
-                                controlledDynamicOnChangeRef.current = field.onChange;
+                                controlledFormulaOnChangeRef.current = field.onChange;
 
                                 const displayValue = typeof field.value === 'string' ? field.value : '';
                                 const valueIsFromAi =
@@ -376,15 +375,15 @@ const Property = ({
                                         error={hasError}
                                         errorMessage={errorMessage}
                                         expressionEnabled={expressionEnabled}
+                                        focusRequest={editorFocusRequest}
                                         handleFromAiClick={
                                             isToolsClusterElement
                                                 ? (fromAi) => handleFromAiToggle(fromAi, fieldOnChange)
                                                 : undefined
                                         }
-                                        handleInputTypeSwitchButtonClick={() => {
-                                            fieldOnChange('');
-                                            handleControlledModeSwitch(false);
-                                        }}
+                                        handleInputTypeSwitchButtonClick={() =>
+                                            handleControlledFormulaSwitch(field.value, fieldOnChange)
+                                        }
                                         isFormulaMode
                                         isFromAi={isFieldFromAi}
                                         label={label || name}
@@ -395,8 +394,16 @@ const Property = ({
                                         path={calculatedPath}
                                         placeholder={placeholder}
                                         required={required}
-                                        setIsFormulaMode={() => {}}
-                                        showInputTypeSwitchButton
+                                        setIsFormulaMode={(formulaMode) => {
+                                            if (!formulaMode) {
+                                                controlledExpressionExitRef.current = true;
+
+                                                setIsFormulaMode(false);
+
+                                                fieldOnChange('');
+                                            }
+                                        }}
+                                        showInputTypeSwitchButton={showFormulaSwitch && !isFieldFromAi}
                                         toolProperty={isToolsClusterElement}
                                         type={type}
                                         value={displayValue}
@@ -407,7 +414,7 @@ const Property = ({
                         />
                     )}
 
-                    {control && !controlledDynamicMode && controlType === 'ARRAY_BUILDER' && calculatedPath && (
+                    {control && !isFormulaMode && controlType === 'ARRAY_BUILDER' && calculatedPath && (
                         <FormControlledArrayItems
                             control={control}
                             controlPath={calculatedPath}
@@ -430,7 +437,7 @@ const Property = ({
                     )}
 
                     {control &&
-                        !controlledDynamicMode &&
+                        !isFormulaMode &&
                         (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
                         calculatedPath &&
                         !!property.properties?.length && (
@@ -454,7 +461,7 @@ const Property = ({
                         )}
 
                     {control &&
-                        !controlledDynamicMode &&
+                        !isFormulaMode &&
                         (controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') &&
                         calculatedPath &&
                         !property.properties?.length && (
@@ -468,288 +475,276 @@ const Property = ({
                             />
                         )}
 
-                    {control &&
-                        !controlledDynamicMode &&
-                        (isValidControlType || isNumericalInput) &&
-                        calculatedPath && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                name={calculatedPath}
-                                render={({field, fieldState}) => {
-                                    const {
-                                        displayValue,
-                                        isExpressionMode,
-                                        isFieldFromAi,
-                                        showControlledSwitch,
-                                        showFromAi,
-                                        strippedDisplayValue,
-                                        strippedFromAiValue,
-                                    } = getControlledToolFieldState({
-                                        controlledFromAi,
-                                        fieldValue: field.value,
-                                        fromAiExpression,
-                                        isToolsClusterElement,
-                                        type,
+                    {control && !isFormulaMode && (isValidControlType || isNumericalInput) && calculatedPath && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            name={calculatedPath}
+                            render={({field, fieldState}) => {
+                                const {
+                                    displayValue,
+                                    isExpressionMode,
+                                    isFieldFromAi,
+                                    showFromAi,
+                                    strippedDisplayValue,
+                                    strippedFromAiValue,
+                                } = getControlledToolFieldState({
+                                    controlledFromAi,
+                                    fieldValue: field.value,
+                                    fromAiExpression,
+                                    isToolsClusterElement,
+                                    type,
+                                });
+
+                                const {onChange: fieldOnChange, ...fieldRest} = field;
+
+                                let inputPlaceholder =
+                                    placeholder || `Type ${isNumericalInput ? 'a number' : 'something'}...`;
+
+                                if (isNumericalInput && minValue && maxValue) {
+                                    inputPlaceholder = `From ${minValue} to ${maxValue}`;
+                                } else if (showFromAi) {
+                                    inputPlaceholder = getMentionsInputPlaceholder({
+                                        expressionEnabled,
+                                        placeholder,
+                                        toolProperty: true,
                                     });
+                                }
 
-                                    const {onChange: fieldOnChange, ...fieldRest} = field;
+                                return (
+                                    <>
+                                        {showFromAi && (isExpressionMode || isFieldFromAi) ? (
+                                            <PropertyMentionsInput
+                                                autoFocus={displayValue === '='}
+                                                controlType={controlType || 'TEXT'}
+                                                deletePropertyButton={deletePropertyButton}
+                                                description={description}
+                                                disableAutoSave
+                                                error={!!fieldState.error || !!controlledBlurError}
+                                                errorMessage={fieldState.error?.message || controlledBlurError}
+                                                expressionEnabled={expressionEnabled}
+                                                handleFromAiClick={(fromAi) =>
+                                                    handleFromAiToggle(fromAi, fieldOnChange)
+                                                }
+                                                handleInputTypeSwitchButtonClick={() =>
+                                                    handleControlledFormulaSwitch(field.value, fieldOnChange)
+                                                }
+                                                isFormulaMode
+                                                isFromAi={isFieldFromAi}
+                                                label={label || name}
+                                                leadingIcon={typeIcon}
+                                                onValueChange={(value) =>
+                                                    fieldOnChange(reconstructControlledExpressionValue(value))
+                                                }
+                                                path={calculatedPath}
+                                                placeholder={placeholder}
+                                                required={required}
+                                                setIsFormulaMode={(formulaMode) => {
+                                                    if (!formulaMode) {
+                                                        controlledExpressionExitRef.current = true;
 
-                                    let inputPlaceholder =
-                                        placeholder || `Type ${isNumericalInput ? 'a number' : 'something'}...`;
+                                                        fieldOnChange('');
+                                                    }
+                                                }}
+                                                showInputTypeSwitchButton={showFormulaSwitch && !isFieldFromAi}
+                                                toolProperty
+                                                type={type}
+                                                value={displayValue}
+                                            />
+                                        ) : (
+                                            <PropertyInput
+                                                {...fieldRest}
+                                                autoFocus={controlledExpressionExitRef.current}
+                                                deletePropertyButton={deletePropertyButton}
+                                                description={description}
+                                                disabled={isFieldFromAi}
+                                                error={!!fieldState.error || !!controlledBlurError}
+                                                errorMessage={fieldState.error?.message || controlledBlurError}
+                                                expressionPrefix={showFromAi}
+                                                fieldsetClassName={objectName && arrayName && 'ml-2'}
+                                                handleInputTypeSwitchButtonClick={
+                                                    showFormulaSwitch
+                                                        ? () =>
+                                                              handleControlledFormulaSwitch(field.value, fieldOnChange)
+                                                        : undefined
+                                                }
+                                                inputOverlay={
+                                                    isFieldFromAi ? (
+                                                        <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
+                                                            Automatically defined by the model
+                                                        </span>
+                                                    ) : undefined
+                                                }
+                                                label={label || name}
+                                                leadingIcon={
+                                                    isExpressionMode || isFieldFromAi ? (
+                                                        <SquareFunctionIcon className="size-4" />
+                                                    ) : (
+                                                        typeIcon
+                                                    )
+                                                }
+                                                max={maxValue}
+                                                maxLength={maxLength}
+                                                min={minValue}
+                                                minLength={minLength}
+                                                onBlur={() => {
+                                                    field.onBlur();
 
-                                    if (isNumericalInput && minValue && maxValue) {
-                                        inputPlaceholder = `From ${minValue} to ${maxValue}`;
-                                    } else if (showFromAi) {
-                                        inputPlaceholder = getMentionsInputPlaceholder({
-                                            expressionEnabled,
-                                            placeholder,
-                                            toolProperty: true,
-                                        });
+                                                    handleControlledBlur(field.value);
+                                                }}
+                                                onChange={(event) => {
+                                                    if (!showFromAi) {
+                                                        if (isNumericalInput && event.target.value !== '') {
+                                                            fieldOnChange(
+                                                                type === 'INTEGER'
+                                                                    ? parseInt(event.target.value, 10)
+                                                                    : parseFloat(event.target.value)
+                                                            );
+                                                        } else {
+                                                            fieldOnChange(event);
+                                                        }
+
+                                                        return;
+                                                    }
+
+                                                    fieldOnChange(
+                                                        resolveExpressionValue(event.target.value, field.value)
+                                                    );
+                                                }}
+                                                onKeyDown={(event) =>
+                                                    handleControlledNativeKeyDown(event, field.value, fieldOnChange)
+                                                }
+                                                placeholder={inputPlaceholder}
+                                                required={required}
+                                                showInputTypeSwitchButton={showFormulaSwitch}
+                                                title={type}
+                                                trailingAction={
+                                                    showFromAi && expressionEnabled !== false ? (
+                                                        <FromAiToggleButton
+                                                            isFromAi={!!isFieldFromAi}
+                                                            onToggle={(fromAi) =>
+                                                                handleFromAiToggle(fromAi, fieldOnChange)
+                                                            }
+                                                        />
+                                                    ) : undefined
+                                                }
+                                                type={hidden ? 'hidden' : getInputHTMLType(controlType)}
+                                                value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
+                                            />
+                                        )}
+
+                                        {!!options?.length && (
+                                            <PropertySelect
+                                                deletePropertyButton={deletePropertyButton}
+                                                description={description}
+                                                label={label || name}
+                                                leadingIcon={typeIcon}
+                                                name={name}
+                                                onValueChange={(value) => {
+                                                    field.onChange(value);
+
+                                                    setSelectValue(value);
+                                                }}
+                                                options={options as Array<SelectOptionType>}
+                                                required={required}
+                                                value={selectValue}
+                                            />
+                                        )}
+                                    </>
+                                );
+                            }}
+                            rules={{
+                                required: required ? ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED : false,
+                                validate: (value: string | number) => {
+                                    if (value === '' || value == null) {
+                                        return true;
                                     }
 
-                                    return (
-                                        <>
-                                            {showFromAi && (isExpressionMode || isFieldFromAi) ? (
-                                                <PropertyMentionsInput
-                                                    autoFocus={displayValue === '='}
-                                                    controlType={controlType || 'TEXT'}
-                                                    deletePropertyButton={deletePropertyButton}
-                                                    description={description}
-                                                    disableAutoSave
-                                                    error={!!fieldState.error || !!controlledBlurError}
-                                                    errorMessage={fieldState.error?.message || controlledBlurError}
-                                                    expressionEnabled={expressionEnabled}
-                                                    handleFromAiClick={(fromAi) =>
-                                                        handleFromAiToggle(fromAi, fieldOnChange)
-                                                    }
-                                                    isFormulaMode
-                                                    isFromAi={isFieldFromAi}
-                                                    label={label || name}
-                                                    leadingIcon={typeIcon}
-                                                    onValueChange={(value) =>
-                                                        fieldOnChange(reconstructControlledExpressionValue(value))
-                                                    }
-                                                    path={calculatedPath}
-                                                    placeholder={placeholder}
-                                                    required={required}
-                                                    setIsFormulaMode={(formulaMode) => {
-                                                        if (!formulaMode) {
-                                                            controlledExpressionExitRef.current = true;
+                                    return validatePropertyValue(value) || ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE;
+                                },
+                            }}
+                        />
+                    )}
 
-                                                            fieldOnChange('');
-                                                        }
-                                                    }}
-                                                    toolProperty
-                                                    type={type}
-                                                    value={displayValue}
-                                                />
-                                            ) : (
-                                                <PropertyInput
-                                                    {...fieldRest}
-                                                    autoFocus={controlledExpressionExitRef.current}
-                                                    deletePropertyButton={deletePropertyButton}
-                                                    description={description}
-                                                    disabled={isFieldFromAi}
-                                                    error={!!fieldState.error || !!controlledBlurError}
-                                                    errorMessage={fieldState.error?.message || controlledBlurError}
-                                                    expressionPrefix={showFromAi}
-                                                    fieldsetClassName={objectName && arrayName && 'ml-2'}
-                                                    handleInputTypeSwitchButtonClick={
-                                                        showControlledSwitch
-                                                            ? () => {
-                                                                  fieldOnChange('=');
-                                                                  handleControlledModeSwitch(true);
-                                                              }
-                                                            : undefined
-                                                    }
-                                                    inputOverlay={
-                                                        isFieldFromAi ? (
-                                                            <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
-                                                                Automatically defined by the model
-                                                            </span>
-                                                        ) : undefined
-                                                    }
-                                                    label={label || name}
-                                                    leadingIcon={
-                                                        isExpressionMode || isFieldFromAi ? (
-                                                            <SquareFunctionIcon className="size-4" />
-                                                        ) : (
-                                                            typeIcon
-                                                        )
-                                                    }
-                                                    max={maxValue}
-                                                    maxLength={maxLength}
-                                                    min={minValue}
-                                                    minLength={minLength}
-                                                    onBlur={() => {
-                                                        field.onBlur();
+                    {control && !isFormulaMode && controlType === 'SELECT' && type !== 'BOOLEAN' && calculatedPath && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            name={calculatedPath}
+                            render={({field: {name: fieldName, onBlur, onChange, value: fieldValue}, fieldState}) => (
+                                <PropertyComboBox
+                                    arrayIndex={arrayIndex}
+                                    defaultValue={defaultValue}
+                                    deletePropertyButton={deletePropertyButton}
+                                    description={description}
+                                    error={!!fieldState.error || hasError}
+                                    errorMessage={fieldState.error?.message || errorMessage}
+                                    handleInputTypeSwitchButtonClick={() =>
+                                        handleControlledFormulaSwitch(fieldValue, onChange)
+                                    }
+                                    label={label || fieldName}
+                                    leadingIcon={typeIcon}
+                                    lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
+                                        (optionLookupDependency) =>
+                                            optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                                    )}
+                                    lookupDependsOnValues={lookupDependsOnValues}
+                                    name={fieldName}
+                                    onBlur={onBlur}
+                                    onValueChange={(value) => {
+                                        onChange(value);
 
-                                                        handleControlledBlur(field.value);
-                                                    }}
-                                                    onChange={(event) => {
-                                                        if (!showFromAi) {
-                                                            if (isNumericalInput && event.target.value !== '') {
-                                                                fieldOnChange(
-                                                                    type === 'INTEGER'
-                                                                        ? parseInt(event.target.value, 10)
-                                                                        : parseFloat(event.target.value)
-                                                                );
-                                                            } else {
-                                                                fieldOnChange(event);
-                                                            }
+                                        setSelectValue(value);
+                                    }}
+                                    options={(formattedOptions as Array<Option>) || []}
+                                    optionsDataSource={optionsDataSource}
+                                    optionsLoadedDynamically={optionsLoadedDynamically}
+                                    path={calculatedPath}
+                                    propertyName={name}
+                                    required={required}
+                                    showInputTypeSwitchButton={showFormulaSwitch}
+                                    value={fieldValue !== undefined ? fieldValue : selectValue}
+                                    workflowId={workflow.id!}
+                                    workflowNodeName={currentNode?.name ?? ''}
+                                />
+                            )}
+                            rules={{required: requiredRule}}
+                        />
+                    )}
 
-                                                            return;
-                                                        }
+                    {control && !isFormulaMode && controlType === 'SELECT' && type === 'BOOLEAN' && calculatedPath && (
+                        <Controller
+                            control={control}
+                            defaultValue={defaultValue}
+                            name={calculatedPath}
+                            render={({field: {name, onChange, value: fieldValue}}) => (
+                                <PropertySelect
+                                    deletePropertyButton={deletePropertyButton}
+                                    description={description}
+                                    handleInputTypeSwitchButtonClick={() =>
+                                        handleControlledFormulaSwitch(fieldValue, onChange)
+                                    }
+                                    label={label || name}
+                                    leadingIcon={typeIcon}
+                                    name={name}
+                                    onValueChange={(value) => {
+                                        onChange(value);
 
-                                                        fieldOnChange(
-                                                            resolveExpressionValue(event.target.value, field.value)
-                                                        );
-                                                    }}
-                                                    placeholder={inputPlaceholder}
-                                                    required={required}
-                                                    showInputTypeSwitchButton={showControlledSwitch}
-                                                    title={type}
-                                                    trailingAction={
-                                                        showFromAi && expressionEnabled !== false ? (
-                                                            <FromAiToggleButton
-                                                                isFromAi={!!isFieldFromAi}
-                                                                onToggle={(fromAi) =>
-                                                                    handleFromAiToggle(fromAi, fieldOnChange)
-                                                                }
-                                                            />
-                                                        ) : undefined
-                                                    }
-                                                    type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                                                    value={isFieldFromAi ? strippedFromAiValue : strippedDisplayValue}
-                                                />
-                                            )}
+                                        setSelectValue(value);
+                                    }}
+                                    options={[
+                                        {label: 'True', value: 'true'},
+                                        {label: 'False', value: 'false'},
+                                    ]}
+                                    showInputTypeSwitchButton={showFormulaSwitch}
+                                    value={fieldValue !== undefined ? fieldValue : selectValue}
+                                />
+                            )}
+                            rules={{required: requiredRule}}
+                        />
+                    )}
 
-                                            {!!options?.length && (
-                                                <PropertySelect
-                                                    deletePropertyButton={deletePropertyButton}
-                                                    description={description}
-                                                    label={label || name}
-                                                    leadingIcon={typeIcon}
-                                                    name={name}
-                                                    onValueChange={(value) => {
-                                                        field.onChange(value);
-
-                                                        setSelectValue(value);
-                                                    }}
-                                                    options={options as Array<SelectOptionType>}
-                                                    required={required}
-                                                    value={selectValue}
-                                                />
-                                            )}
-                                        </>
-                                    );
-                                }}
-                                rules={{
-                                    required: required ? ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED : false,
-                                    validate: (value: string | number) => {
-                                        if (value === '' || value == null) {
-                                            return true;
-                                        }
-
-                                        return validatePropertyValue(value) || ERROR_MESSAGES.PROPERTY.INCORRECT_VALUE;
-                                    },
-                                }}
-                            />
-                        )}
-
-                    {control &&
-                        !controlledDynamicMode &&
-                        controlType === 'SELECT' &&
-                        type !== 'BOOLEAN' &&
-                        calculatedPath && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                name={calculatedPath}
-                                render={({
-                                    field: {name: fieldName, onBlur, onChange, value: fieldValue},
-                                    fieldState,
-                                }) => (
-                                    <PropertyComboBox
-                                        arrayIndex={arrayIndex}
-                                        defaultValue={defaultValue}
-                                        deletePropertyButton={deletePropertyButton}
-                                        description={description}
-                                        error={!!fieldState.error || hasError}
-                                        errorMessage={fieldState.error?.message || errorMessage}
-                                        handleInputTypeSwitchButtonClick={() => {
-                                            onChange('=');
-                                            handleControlledModeSwitch(true);
-                                        }}
-                                        label={label || fieldName}
-                                        leadingIcon={typeIcon}
-                                        lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
-                                            (optionLookupDependency) =>
-                                                optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
-                                        )}
-                                        lookupDependsOnValues={lookupDependsOnValues}
-                                        name={fieldName}
-                                        onBlur={onBlur}
-                                        onValueChange={(value) => {
-                                            onChange(value);
-
-                                            setSelectValue(value);
-                                        }}
-                                        options={(formattedOptions as Array<Option>) || []}
-                                        optionsDataSource={optionsDataSource}
-                                        optionsLoadedDynamically={optionsLoadedDynamically}
-                                        path={calculatedPath}
-                                        propertyName={name}
-                                        required={required}
-                                        showInputTypeSwitchButton={isToolsClusterElement && expressionEnabled !== false}
-                                        value={fieldValue !== undefined ? fieldValue : selectValue}
-                                        workflowId={workflow.id!}
-                                        workflowNodeName={currentNode?.name ?? ''}
-                                    />
-                                )}
-                                rules={{required: requiredRule}}
-                            />
-                        )}
-
-                    {control &&
-                        !controlledDynamicMode &&
-                        controlType === 'SELECT' &&
-                        type === 'BOOLEAN' &&
-                        calculatedPath && (
-                            <Controller
-                                control={control}
-                                defaultValue={defaultValue}
-                                name={calculatedPath}
-                                render={({field: {name, onChange, value: fieldValue}}) => (
-                                    <PropertySelect
-                                        deletePropertyButton={deletePropertyButton}
-                                        description={description}
-                                        handleInputTypeSwitchButtonClick={() => {
-                                            onChange('=');
-                                            handleControlledModeSwitch(true);
-                                        }}
-                                        label={label || name}
-                                        leadingIcon={typeIcon}
-                                        name={name}
-                                        onValueChange={(value) => {
-                                            onChange(value);
-
-                                            setSelectValue(value);
-                                        }}
-                                        options={[
-                                            {label: 'True', value: 'true'},
-                                            {label: 'False', value: 'false'},
-                                        ]}
-                                        showInputTypeSwitchButton={isToolsClusterElement && expressionEnabled !== false}
-                                        value={fieldValue !== undefined ? fieldValue : selectValue}
-                                    />
-                                )}
-                                rules={{required: requiredRule}}
-                            />
-                        )}
-
-                    {control && !controlledDynamicMode && controlType === 'TEXT_AREA' && calculatedPath && (
+                    {control && !isFormulaMode && controlType === 'TEXT_AREA' && calculatedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue}
@@ -783,6 +778,9 @@ const Property = ({
                                             errorMessage={fieldState.error?.message || controlledBlurError}
                                             expressionEnabled={expressionEnabled}
                                             handleFromAiClick={(fromAi) => handleFromAiToggle(fromAi, fieldOnChange)}
+                                            handleInputTypeSwitchButtonClick={() =>
+                                                handleControlledFormulaSwitch(field.value, fieldOnChange)
+                                            }
                                             isFormulaMode
                                             isFromAi={isFieldFromAi}
                                             label={label || name}
@@ -800,6 +798,7 @@ const Property = ({
                                                     fieldOnChange('');
                                                 }
                                             }}
+                                            showInputTypeSwitchButton={showFormulaSwitch && !isFieldFromAi}
                                             toolProperty
                                             type={type}
                                             value={displayValue}
@@ -851,7 +850,7 @@ const Property = ({
                         />
                     )}
 
-                    {control && !controlledDynamicMode && controlType === 'MULTI_SELECT' && calculatedPath && (
+                    {control && !isFormulaMode && controlType === 'MULTI_SELECT' && calculatedPath && (
                         <Controller
                             control={control}
                             defaultValue={defaultValue || []}
@@ -860,9 +859,9 @@ const Property = ({
                                 <PropertyMultiSelect
                                     defaultValue={(value as string[]) || []}
                                     deletePropertyButton={deletePropertyButton}
-                                    handleInputTypeSwitchButtonClick={() => {
-                                        handleControlledModeSwitch(true);
-                                    }}
+                                    handleInputTypeSwitchButtonClick={() =>
+                                        handleControlledFormulaSwitch(value, onChange)
+                                    }
                                     leadingIcon={typeIcon}
                                     lookupDependsOnPaths={optionsDataSource?.optionsLookupDependsOn?.map(
                                         (optionLookupDependency) =>
@@ -874,7 +873,7 @@ const Property = ({
                                     optionsDataSource={optionsDataSource}
                                     path={calculatedPath}
                                     property={property}
-                                    showInputTypeSwitchButton={isToolsClusterElement && expressionEnabled !== false}
+                                    showInputTypeSwitchButton={showFormulaSwitch}
                                     value={(value as string[]) || []}
                                     workflowId={workflow.id!}
                                 />
