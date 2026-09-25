@@ -49,7 +49,6 @@ const aiNavGroup: SettingsNavItemI = {
 const tenantAdminNavItems: SettingsNavItemI[] = [
     {href: '/automation/settings/workspaces', title: 'Workspaces'},
     {href: 'git-configuration', title: 'Git Configuration'},
-    {href: 'workspace-api-keys', title: 'Workspace API Keys'},
     {href: 'users', title: 'Organization Users'},
     {href: 'global-custom-roles', title: 'Roles'},
     {href: 'billing', title: 'Billing'},

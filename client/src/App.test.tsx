@@ -115,24 +115,27 @@ describe('App', () => {
         expect(hoisted.mockUseLoadWorkspaceScopes).toHaveBeenCalledWith(undefined);
     });
 
-    it('shows the embedded MCP Servers entry to a tenant admin', () => {
+    it('shows the embedded navigation entries to a tenant admin', () => {
         hoisted.enabledFeatureFlags = ['ff-2446'];
 
         authenticationStore.setState({account: {authorities: ['ROLE_ADMIN'], id: 1} as never, authenticated: true});
 
         const {getByText} = renderAppAt('/embedded/connected-users');
 
+        expect(getByText('Connected Users')).toBeInTheDocument();
         expect(getByText('MCP Servers')).toBeInTheDocument();
     });
 
-    it('hides the embedded MCP Servers entry from a user who is not a tenant admin', () => {
+    it('hides all embedded navigation entries from a user who is not a tenant admin', () => {
         hoisted.enabledFeatureFlags = ['ff-2446'];
 
         authenticationStore.setState({account: {authorities: ['ROLE_USER'], id: 1} as never, authenticated: true});
 
-        const {getByText, queryByText} = renderAppAt('/embedded/connected-users');
+        const {queryByText} = renderAppAt('/embedded/connected-users');
 
-        expect(getByText('Connected Users')).toBeInTheDocument();
+        expect(queryByText('Connected Users')).not.toBeInTheDocument();
         expect(queryByText('MCP Servers')).not.toBeInTheDocument();
+        expect(queryByText('Integrations')).not.toBeInTheDocument();
+        expect(queryByText('Connections')).not.toBeInTheDocument();
     });
 });

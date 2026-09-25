@@ -51,8 +51,8 @@ const TENANT_ADMIN_NAV_ITEM_HREFS = [
     'global-custom-roles',
     'identity-providers',
     'notifications',
+    'registered-clients',
     'users',
-    'workspace-api-keys',
 ];
 
 export const useVisibleSettingsNavItems = (sidebarNavItems: SettingsNavItemI[]): SettingsNavItemI[] => {

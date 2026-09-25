@@ -71,14 +71,14 @@ describe('SettingsIndexRedirect', () => {
             {
                 items: [
                     {href: 'ai-providers', title: 'Providers'},
-                    {href: 'ai/skills', title: 'Skills'},
+                    {href: 'custom-components', title: 'Custom Components'},
                 ],
-                title: 'AI',
+                title: 'Build',
             },
-            {href: 'custom-components', title: 'Custom Components'},
+            {href: 'mcp-server', title: 'MCP Server'},
         ]);
 
-        expect(screen.getByTestId('pathname')).toHaveTextContent('/automation/settings/ai/skills');
+        expect(screen.getByTestId('pathname')).toHaveTextContent('/automation/settings/custom-components');
     });
 
     it('sends a non-admin who can see no settings entry to the account page', () => {
