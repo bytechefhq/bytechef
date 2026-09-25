@@ -43,8 +43,19 @@ import org.junit.jupiter.api.Test;
  */
 class EndpointGateCoverageTest {
 
+    private static final String EMBEDDED_CONNECTION_UNSCOPED =
+        "embedded connection endpoint left open to connected users, not yet scoped to their own connections";
+    private static final String EMBEDDED_INTERNAL_KEY_PREFIX = "embedded:";
+    private static final String EMBEDDED_PATH_SCOPED =
+        "connected-user scoped by the external user in the path, which the tenant's API key may act for";
+    private static final String EMBEDDED_PRINCIPAL_SCOPED =
+        "connected-user scoped by principal: the connected user is resolved from the caller's login";
+    private static final String EMBEDDED_PUBLIC_KEY_PREFIX = "embedded-v1:";
+    private static final String EMBEDDED_ROOT = "ee/libs/embedded";
+
     private static final List<String> SCANNED_ROOTS = List.of(
-        "libs/ai", "libs/automation", "libs/platform", "ee/libs/ai", "ee/libs/automation", "ee/libs/platform");
+        "libs/ai", "libs/automation", "libs/platform", "ee/libs/ai", "ee/libs/automation", EMBEDDED_ROOT,
+        "ee/libs/platform");
 
     private static final Map<String, String> GATED_DELEGATES = Map.ofEntries(
         Map.entry("AiProviderApiController#deleteAiProvider", "AiProviderFacadeImpl#deleteAiProvider"),
@@ -228,15 +239,159 @@ class EndpointGateCoverageTest {
         Map.entry("WorkflowSchemaGeneratorApiController#generateSchema",
             "computes a schema from the request body only"),
         Map.entry("WorkspaceApiKeyGraphQlController#updateWorkspaceApiKey",
-            "ApiKeyFacadeImpl checks the caller owns the key"));
+            "ApiKeyFacadeImpl checks the caller owns the key"),
+        Map.entry("embedded-v1:AccountingAccountApiController#createAccount", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:AccountingAccountApiController#getAccount", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:AccountingAccountApiController#listAccounts", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:AccountingAccountApiController#updateAccount", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ActionApiController#executeAction", EMBEDDED_PATH_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserApiController#updateConnectedUser", EMBEDDED_PATH_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserApiController#updateFrontendConnectedUser", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserCopilotApiController#copilotChat", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#copyFrontendWorkflowTemplate",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#copyWorkflowTemplate", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#createFrontendProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#createFrontendProjectWorkflowFromPrompt",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#createProjectWorkflow", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#createProjectWorkflowFromPrompt",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#deleteFrontendProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#deleteProjectWorkflow", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#disableFrontendProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#disableProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#enableFrontendProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#enableProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#publishFrontendProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#publishProjectWorkflow", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateFrontendProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateFrontendProjectWorkflowFromPrompt",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateFrontendWorkflowConfigurationConnection",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ConnectedUserProjectWorkflowApiController#updateProjectWorkflow", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateProjectWorkflowFromPrompt",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:ConnectedUserProjectWorkflowApiController#updateWorkflowConfigurationConnection",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry("embedded-v1:CrmAccountApiController#createAccount", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:CrmAccountApiController#getAccount", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:CrmAccountApiController#listAccounts", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:CrmAccountApiController#updateAccount", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceApiController#createFrontendIntegrationInstance",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:IntegrationInstanceApiController#createIntegrationInstance", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceApiController#deleteFrontendIntegrationInstance",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:IntegrationInstanceApiController#deleteIntegrationInstance", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#disableFrontendIntegrationInstanceWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#disableIntegrationInstanceWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#enableFrontendIntegrationInstanceWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#enableIntegrationInstanceWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#getComponentInputOptions",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#getFrontendComponentInputOptions",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#updateFrontendIntegrationInstanceWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:IntegrationInstanceWorkflowApiController#updateIntegrationInstanceWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceToolApiController#disableFrontendMcpIntegrationInstanceTool",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceToolApiController#disableMcpIntegrationInstanceTool",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceToolApiController#enableFrontendMcpIntegrationInstanceTool",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceToolApiController#enableMcpIntegrationInstanceTool",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceWorkflowApiController#disableFrontendMcpIntegrationInstanceWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceWorkflowApiController#disableMcpIntegrationInstanceWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceWorkflowApiController#enableFrontendMcpIntegrationInstanceWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceWorkflowApiController#enableMcpIntegrationInstanceWorkflow",
+            EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded-v1:McpIntegrationInstanceWorkflowApiController#updateFrontendMcpIntegrationInstanceWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:RequestTriggerApiController#executeWorkflow", EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry("embedded-v1:ToolApiController#executeTool", EMBEDDED_PATH_SCOPED),
+        Map.entry(
+            "embedded:ConnectedUserProjectWorkflowApiController#enableConnectedUserProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded:ConnectedUserProjectWorkflowApiController#publishConnectedUserProjectWorkflow",
+            EMBEDDED_PRINCIPAL_SCOPED),
+        Map.entry(
+            "embedded:ConnectionApiController#createConnectedUserConnection",
+            "ConnectedUserConnectionFacadeImpl checks the caller is the connected user or a tenant admin"));
 
-    private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.of();
+    private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.of(
+        "embedded:ConnectionApiController#createConnection", EMBEDDED_CONNECTION_UNSCOPED,
+        "embedded:ConnectionApiController#deleteConnection", EMBEDDED_CONNECTION_UNSCOPED,
+        "embedded:ConnectionApiController#updateConnection", EMBEDDED_CONNECTION_UNSCOPED,
+        "embedded:ConnectionTagApiController#updateConnectionTags", EMBEDDED_CONNECTION_UNSCOPED);
 
     private static final Set<String> READ_GATED_CONTROLLERS = Set.of(
         "ApiClientApiController", "ApiConnectorGraphQlController", "ApprovalTaskGraphQlController",
-        "ConnectedUserMcpServerGraphQlController", "EmbeddedMcpServerGraphQlController",
-        "McpIntegrationInstanceConfigurationGraphQlController",
-        "McpIntegrationInstanceConfigurationWorkflowGraphQlController");
+        "embedded:AppEventApiController", "embedded:AutomationWorkflowProjectGraphQlController",
+        "embedded:CategoryApiController", "embedded:ConnectedUserApiController",
+        "embedded:ConnectedUserGraphQlController", "embedded:ConnectedUserMcpServerGraphQlController",
+        "embedded:ConnectedUserProjectGraphQlController", "embedded:EmbeddedMcpServerGraphQlController",
+        "embedded:IntegrationApiController", "embedded:IntegrationInstanceApiController",
+        "embedded:IntegrationInstanceConfigurationApiController",
+        "embedded:IntegrationInstanceConfigurationTagApiController", "embedded:IntegrationTagApiController",
+        "embedded:IntegrationWorkflowGraphQlController",
+        "embedded:McpIntegrationInstanceConfigurationGraphQlController",
+        "embedded:McpIntegrationInstanceConfigurationWorkflowGraphQlController", "embedded:SigningKeyApiController",
+        "embedded:WorkflowApiController", "embedded:WorkflowExecutionApiController");
 
     private static final Set<String> SKIPPED_DIRECTORY_NAMES =
         Set.of(".git", ".gradle", "bin", "build", "node_modules", "src");
@@ -287,12 +442,14 @@ class EndpointGateCoverageTest {
 
             sourceTypes.add(sourceType);
 
+            String controllerKeyName = controllerKeyName(serverRoot, sourceFile, typeName);
+
             if (isScannedController(serverRoot, sourceFile, source)) {
-                collectWriteEndpoints(sourceType, httpMethodsByOperationId);
+                collectWriteEndpoints(controllerKeyName, sourceType, httpMethodsByOperationId);
             }
 
-            if (READ_GATED_CONTROLLERS.contains(typeName)) {
-                collectReadEndpoints(sourceType, httpMethodsByOperationId);
+            if (READ_GATED_CONTROLLERS.contains(controllerKeyName)) {
+                collectReadEndpoints(controllerKeyName, sourceType, httpMethodsByOperationId);
             }
         }
     }
@@ -346,11 +503,11 @@ class EndpointGateCoverageTest {
         Set<String> ungatedReadEndpoints = new TreeSet<>();
 
         for (Map.Entry<String, List<Endpoint>> entry : readEndpointsByKey.entrySet()) {
+            String key = entry.getKey();
+
+            controllerNamesWithReads.add(key.substring(0, key.indexOf('#')));
+
             for (Endpoint endpoint : entry.getValue()) {
-                SourceType controller = endpoint.controller();
-
-                controllerNamesWithReads.add(controller.name());
-
                 if (!endpoint.gated()) {
                     ungatedReadEndpoints.add(entry.getKey() + " (" + endpoint.kind() + ")");
                 }
@@ -511,8 +668,25 @@ class EndpointGateCoverageTest {
         return false;
     }
 
+    private static String controllerKeyName(Path serverRoot, Path sourceFile, String typeName) {
+        Path relativePath = serverRoot.relativize(sourceFile);
+
+        String relativePathString = relativePath.toString()
+            .replace(File.separatorChar, '/');
+
+        if (!relativePathString.startsWith(EMBEDDED_ROOT + "/")) {
+            return typeName;
+        }
+
+        if (relativePathString.contains("/public_/") || relativePathString.contains("/unified/")) {
+            return EMBEDDED_PUBLIC_KEY_PREFIX + typeName;
+        }
+
+        return EMBEDDED_INTERNAL_KEY_PREFIX + typeName;
+    }
+
     private static void collectWriteEndpoints(
-        SourceType controller, Map<String, Set<String>> httpMethodsByOperationId) {
+        String controllerKeyName, SourceType controller, Map<String, Set<String>> httpMethodsByOperationId) {
 
         Map<String, String> classAnnotations = controller.classAnnotations();
 
@@ -536,14 +710,14 @@ class EndpointGateCoverageTest {
             boolean gated = controller.classGated() || memberAnnotations.containsKey("PreAuthorize");
 
             List<Endpoint> endpoints = writeEndpointsByKey.computeIfAbsent(
-                controller.name() + "#" + member.name(), key -> new ArrayList<>());
+                controllerKeyName + "#" + member.name(), key -> new ArrayList<>());
 
             endpoints.add(new Endpoint(controller, member.name(), kind, gated, member.body()));
         }
     }
 
     private static void collectReadEndpoints(
-        SourceType controller, Map<String, Set<String>> httpMethodsByOperationId) {
+        String controllerKeyName, SourceType controller, Map<String, Set<String>> httpMethodsByOperationId) {
 
         Set<String> classAnnotationNames = controller.classAnnotations()
             .keySet();
@@ -563,7 +737,7 @@ class EndpointGateCoverageTest {
                 memberAnnotations.containsKey("PostFilter");
 
             List<Endpoint> endpoints = readEndpointsByKey.computeIfAbsent(
-                controller.name() + "#" + member.name(), key -> new ArrayList<>());
+                controllerKeyName + "#" + member.name(), key -> new ArrayList<>());
 
             endpoints.add(new Endpoint(controller, member.name(), kind, gated, member.body()));
         }
