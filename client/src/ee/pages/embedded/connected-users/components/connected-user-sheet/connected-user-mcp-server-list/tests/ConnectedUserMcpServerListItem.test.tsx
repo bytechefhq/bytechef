@@ -23,6 +23,11 @@ const hoisted = vi.hoisted(() => ({
     enableToolOptions: {} as {onSuccess?: () => void},
     enableWorkflowMutate: vi.fn(),
     enableWorkflowOptions: {} as {onSuccess?: () => void},
+    isTenantAdmin: true,
+}));
+
+vi.mock('@/shared/hooks/useIsTenantAdmin', () => ({
+    useIsTenantAdmin: () => hoisted.isTenantAdmin,
 }));
 
 vi.mock('@/shared/middleware/graphql', async (importOriginal) => ({
@@ -182,6 +187,8 @@ const expandGroups = async () => {
 describe('ConnectedUserMcpServerListItem', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        hoisted.isTenantAdmin = true;
 
         useIntegrationInstanceConfigurationWorkflowSheetStore.setState({
             connectedUserId: undefined,
@@ -370,5 +377,19 @@ describe('ConnectedUserMcpServerListItem', () => {
 
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ['connectedUserMcpServers']});
         expect(invalidateQueriesSpy).toHaveBeenCalledWith({queryKey: ConnectedUserKeys.connectedUser(5)});
+    });
+
+    it('shows the server and its component tools read-only to a user who is not a tenant admin', async () => {
+        hoisted.isTenantAdmin = false;
+
+        renderListItem(toolsOnlyMcpServer);
+
+        await expandCard();
+        await expandGroups();
+
+        expect(screen.getByText('getEmail')).toBeInTheDocument();
+        expect(screen.getAllByRole('switch')).toHaveLength(3);
+        screen.getAllByRole('switch').forEach((switchElement) => expect(switchElement).toBeDisabled());
+        expect(screen.queryByRole('button', {name: 'More actions'})).not.toBeInTheDocument();
     });
 });

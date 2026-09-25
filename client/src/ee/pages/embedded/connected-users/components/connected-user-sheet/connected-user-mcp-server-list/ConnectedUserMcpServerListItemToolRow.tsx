@@ -1,10 +1,13 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {ConnectedUserMcpServerTool, useEnableConnectedUserMcpToolMutation} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 
 const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpServerTool}) => {
+    const isTenantAdmin = useIsTenantAdmin();
+
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
         componentName: tool.componentName,
         componentVersion: tool.componentVersion,
@@ -39,6 +42,7 @@ const ConnectedUserMcpServerListItemToolRow = ({tool}: {tool: ConnectedUserMcpSe
 
                 <Switch
                     checked={tool.enabled}
+                    disabled={!isTenantAdmin}
                     onCheckedChange={(value) => {
                         enableConnectedUserMcpToolMutation.mutate({enable: value, id: tool.id});
                     }}
