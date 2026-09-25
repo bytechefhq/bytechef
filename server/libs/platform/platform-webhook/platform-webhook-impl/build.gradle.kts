@@ -29,5 +29,10 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
 
+    testImplementation("io.lettuce:lettuce-core")
+    testImplementation("org.springframework.data:spring-data-redis")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-repository:atlas-execution-repository-memory"))
+    testImplementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
     testImplementation(project(":server:libs:test:test-support"))
 }
