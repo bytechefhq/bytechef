@@ -25,7 +25,6 @@ import org.springframework.ai.chat.client.advisor.api.CallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-import org.springframework.core.Ordered;
 
 /**
  * @author Ivica Cardic
@@ -83,7 +82,7 @@ public class TextGenerationFirstAdvisor implements CallAdvisor {
 
     @Override
     public int getOrder() {
-        return Ordered.LOWEST_PRECEDENCE - 1000;
+        return LOWEST_PRECEDENCE - 1000;
     }
 
     private static boolean isThinking(Generation generation) {
