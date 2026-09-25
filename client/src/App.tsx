@@ -13,6 +13,7 @@ import {AUTHORITIES, DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHasWorkspaceScope} from '@/shared/hooks/useHasWorkspaceScope';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
+import {useIsTenantAdmin} from '@/shared/hooks/useIsTenantAdmin';
 import {useLoadWorkspaceScopes} from '@/shared/hooks/useLoadWorkspaceScopes';
 import {useOnLogout} from '@/shared/hooks/useOnLogout';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
@@ -219,6 +220,7 @@ function App() {
 
     const analytics = useAnalytics();
     const helpHub = useHelpHub();
+    const isTenantAdmin = useIsTenantAdmin();
     const location = useLocation();
     const queryClient = useQueryClient();
     const userGuiding = useUserGuiding();
@@ -318,6 +320,10 @@ function App() {
             navItem.href === '/embedded/automation-configurations'
         ) {
             return false;
+        }
+
+        if (navItem.href === '/embedded/mcp-servers') {
+            return isTenantAdmin;
         }
 
         return true;
