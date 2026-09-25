@@ -12,6 +12,7 @@ import PropertyField from '@/pages/platform/workflow-editor/components/PropertyF
 import SchemaProperties from '@/pages/platform/workflow-editor/components/SchemaProperties';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {MoreHorizontalIcon, TriangleAlertIcon} from 'lucide-react';
+import {ReactNode} from 'react';
 
 import ClusterElementTestButton from './ClusterElementTestButton';
 
@@ -35,6 +36,7 @@ interface OutputSchemaDisplayProps {
     saveWorkflowNodeTestOutputMutation: {isPending: boolean};
     setShowUploadDialog: (show: boolean) => void;
     showClusterElementTestButton?: boolean;
+    testErrorAlert?: ReactNode;
     testOutputResponse?: boolean;
     variableOutputSchema?: PropertyAllType;
     variablePropertiesDefined?: boolean;
@@ -60,6 +62,7 @@ const OutputSchemaDisplay = ({
     saveWorkflowNodeTestOutputMutation,
     setShowUploadDialog,
     showClusterElementTestButton,
+    testErrorAlert,
     testOutputResponse = false,
     variableOutputSchema,
     variablePropertiesDefined,
@@ -148,6 +151,8 @@ const OutputSchemaDisplay = ({
                             </DropdownMenu>
                         </ButtonGroup>
                     </div>
+
+                    {testErrorAlert}
 
                     {showPlaceholderSampleOutputWarning && (
                         <Alert className="mb-3" variant="warning">

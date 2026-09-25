@@ -2,6 +2,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import recordWorkflowNodeLookupResult from '@/shared/util/recordWorkflowNodeLookupResult';
+import {isInlineTestOutputGraphQlError, isInlineTestOutputUrl} from '@/shared/util/testOutputInlineErrors';
 import fetchIntercept from 'fetch-intercept';
 import {useEffect, useRef} from 'react';
 import {toast} from 'sonner';
@@ -91,6 +92,11 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
+                // The Output tab renders a failed node Test / Reset in place.
+                if ((response.status < 200 || response.status > 299) && isInlineTestOutputUrl(response.url)) {
+                    return response;
+                }
+
                 const toastId = `fetch-error-${response.status}`;
 
                 if (response.url.includes('/graphql')) {
@@ -98,7 +104,11 @@ export default function useFetchInterceptor() {
 
                     clonedResponse
                         .json()
-                        .then((data: {errors?: Array<{message?: string}>}) => {
+                        .then((data: {errors?: Array<{message?: string; path?: Array<string | number>}>}) => {
+                            if (data.errors?.length && data.errors.every(isInlineTestOutputGraphQlError)) {
+                                return;
+                            }
+
                             if (data.errors?.length) {
                                 const errorMessage = [
                                     ...new Set(data.errors.map((error) => error.message || 'Unknown error')),
