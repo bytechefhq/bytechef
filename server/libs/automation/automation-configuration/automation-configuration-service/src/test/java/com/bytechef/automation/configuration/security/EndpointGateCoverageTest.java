@@ -231,23 +231,6 @@ class EndpointGateCoverageTest {
             "ApiKeyFacadeImpl checks the caller owns the key"));
 
     private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.ofEntries(
-        Map.entry("ApiConnectorGraphQlController#cancelGenerationJob",
-            "any member manages the tenant's API connectors"),
-        Map.entry("ApiConnectorGraphQlController#createApiConnector", "any member manages the tenant's API connectors"),
-        Map.entry("ApiConnectorGraphQlController#deleteApiConnector", "any member manages the tenant's API connectors"),
-        Map.entry("ApiConnectorGraphQlController#enableApiConnector", "any member manages the tenant's API connectors"),
-        Map.entry(
-            "ApiConnectorGraphQlController#generateFromDocumentation",
-            "any member manages the tenant's API connectors"),
-        Map.entry("ApiConnectorGraphQlController#generateSpecification",
-            "any member manages the tenant's API connectors"),
-        Map.entry(
-            "ApiConnectorGraphQlController#importOpenApiSpecification",
-            "any member manages the tenant's API connectors"),
-        Map.entry(
-            "ApiConnectorGraphQlController#startGenerateFromDocumentationPreview",
-            "any member manages the tenant's API connectors"),
-        Map.entry("ApiConnectorGraphQlController#updateApiConnector", "any member manages the tenant's API connectors"),
         Map.entry("ApprovalTaskGraphQlController#createApprovalTask", "any member writes any approval task"),
         Map.entry("ApprovalTaskGraphQlController#deleteApprovalTask", "any member writes any approval task"),
         Map.entry("ApprovalTaskGraphQlController#updateApprovalTask", "any member writes any approval task"),
