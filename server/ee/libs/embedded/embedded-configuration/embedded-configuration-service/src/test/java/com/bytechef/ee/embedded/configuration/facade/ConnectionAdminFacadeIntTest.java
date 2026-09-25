@@ -164,16 +164,20 @@ class ConnectionAdminFacadeIntTest {
 
         connectionAdminFacade.deleteConnection(7L);
         connectionAdminFacade.getConnection(7L);
+        connectionAdminFacade.getConnectionTags();
         connectionAdminFacade.getConnections("slack", 1, 2L, 3L);
         connectionAdminFacade.getSharedConnectionIds();
         connectionAdminFacade.updateConnection(7L, "name", List.of(), true, 0);
         connectionAdminFacade.updateConnectionCredentials(7L, Map.of("token", "secret"), 0);
+        connectionAdminFacade.updateConnectionTags(7L, List.of());
 
         verify(connectionFacade).updateCredentials(7L, Map.of("token", "secret"), 0);
         verify(connectionFacade).delete(7L);
         verify(connectionFacade).getConnection(7L);
+        verify(connectionFacade).getConnectionTags(PlatformType.EMBEDDED);
         verify(connectionFacade).getConnections("slack", 1, List.of(), 3L, 2L, PlatformType.EMBEDDED);
         verify(connectionFacade).update(7L, "name", List.of(), 0);
+        verify(connectionFacade).update(7L, List.of());
         verify(connectedUserConnectionService, times(2)).updateShared(7L, true);
         verify(connectedUserConnectionService).deleteByConnectionId(7L);
         verify(connectedUserConnectionService).getSharedConnectionIds();
@@ -235,11 +239,15 @@ class ConnectionAdminFacadeIntTest {
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getConnection(7L))
             .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> connectionAdminFacade.getConnectionTags())
+            .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getConnections(null, null, null, null))
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.getSharedConnectionIds())
             .isInstanceOf(AccessDeniedException.class);
         assertThatThrownBy(() -> connectionAdminFacade.updateConnection(7L, "name", List.of(), null, 0))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> connectionAdminFacade.updateConnectionTags(7L, List.of()))
             .isInstanceOf(AccessDeniedException.class);
 
         verifyNoInteractions(connectionFacade, connectionService, connectedUserConnectionService);
@@ -307,6 +315,14 @@ class ConnectionAdminFacadeIntTest {
 
             verify(connectionFacade, never()).update(anyLong(), anyString(), any(), anyInt());
             verify(connectedUserConnectionService, never()).updateShared(anyLong(), anyBoolean());
+        }
+
+        @Test
+        void testUpdateConnectionTagsRejectsAutomationConnection() {
+            assertThatThrownBy(() -> connectionAdminFacade.updateConnectionTags(AUTOMATION_CONNECTION_ID, List.of()))
+                .isInstanceOf(NoSuchElementException.class);
+
+            verify(connectionFacade, never()).update(anyLong(), anyList());
         }
 
         @Test
