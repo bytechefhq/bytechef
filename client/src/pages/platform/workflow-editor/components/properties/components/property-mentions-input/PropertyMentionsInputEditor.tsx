@@ -1,4 +1,3 @@
-import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
 import {
@@ -499,10 +498,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     return false;
                 }
 
-                const attributes = view.props.attributes as Record<string, string>;
-                const parameters = currentNode?.parameters || {};
-
-                if (!canInsertMentionForProperty(attributes.type, parameters, attributes.path)) {
+                if (expressionEnabled === false) {
                     return true;
                 }
 
@@ -524,7 +520,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 return true;
             },
-            [currentNode?.parameters, isFromAi]
+            [expressionEnabled, isFromAi]
         );
 
         const editor = useEditor({

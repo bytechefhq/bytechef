@@ -20,6 +20,7 @@ import './PropertyMentionsInput.css';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
+import {createEditorPillTarget} from '@/pages/platform/workflow-editor/components/datapills/pillTarget';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import ExpressionHelpNote from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/ExpressionHelpNote';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
@@ -112,18 +113,31 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             }))
         );
 
-        const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                focusedInput: state.focusedInput,
-                setFocusedInput: state.setFocusedInput,
-                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-            }))
-        );
+        const {clearPillTarget, pillTarget, setPillTarget, workflowNodeDetailsPanelOpen} =
+            useWorkflowNodeDetailsPanelStore(
+                useShallow((state) => ({
+                    clearPillTarget: state.clearPillTarget,
+                    pillTarget: state.pillTarget,
+                    setPillTarget: state.setPillTarget,
+                    workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+                }))
+            );
 
         const openDataPillPanel = useOpenDataPillPanel();
 
+        const registerPillTarget = useCallback(
+            (editor: Editor) =>
+                setPillTarget(
+                    createEditorPillTarget({
+                        acceptsPill: () => expressionEnabled !== false && !isFromAi,
+                        editor,
+                    })
+                ),
+            [expressionEnabled, isFromAi, setPillTarget]
+        );
+
         const onFocus = (editor: Editor) => {
-            setFocusedInput(editor);
+            registerPillTarget(editor);
 
             if (workflowNodeDetailsPanelOpen && expressionEnabled !== false) {
                 openDataPillPanel();
@@ -147,7 +161,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         localEditorRef.current?.commands?.focus('end');
 
                         if (localEditorRef.current) {
-                            setFocusedInput(localEditorRef.current);
+                            registerPillTarget(localEditorRef.current);
                         }
 
                         return false;
@@ -156,7 +170,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 return true;
             },
-            [expressionEnabled, setFocusedInput, setIsFormulaMode]
+            [expressionEnabled, registerPillTarget, setIsFormulaMode]
         );
 
         const getPropertyMentionsInputEditorRef = useCallback(
@@ -193,14 +207,24 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         }, [ref]);
 
         useEffect(() => {
-            if (!focusedInput || !localEditorRef.current) {
+            if (!pillTarget || !localEditorRef.current) {
                 setIsFocused(false);
 
                 return;
             }
 
-            setIsFocused(focusedInput === localEditorRef.current);
-        }, [focusedInput]);
+            setIsFocused(pillTarget.owner === localEditorRef.current);
+        }, [pillTarget]);
+
+        useEffect(() => {
+            const editorAtMount = localEditorRef;
+
+            return () => {
+                if (editorAtMount.current) {
+                    clearPillTarget(editorAtMount.current);
+                }
+            };
+        }, [clearPillTarget]);
 
         // Check initial value for formula mode
         useEffect(() => {

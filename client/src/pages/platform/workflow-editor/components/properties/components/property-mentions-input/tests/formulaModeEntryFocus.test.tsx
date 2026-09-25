@@ -56,7 +56,7 @@ describe('entering formula mode by typing =', () => {
 
         useWorkflowNodeDetailsPanelStore.setState({
             currentNode: {connectionId: undefined, workflowNodeName: 'test_1'},
-            focusedInput: null,
+            pillTarget: null,
         } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
     });
 
@@ -75,6 +75,6 @@ describe('entering formula mode by typing =', () => {
 
         // jsdom will not hold DOM focus on a contenteditable, so the store's focused input is what this can
         // assert - it is also what the editor chrome and the data pill panel read.
-        await waitFor(() => expect(useWorkflowNodeDetailsPanelStore.getState().focusedInput).toBe(editor));
+        await waitFor(() => expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.owner).toBe(editor));
     });
 });

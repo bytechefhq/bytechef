@@ -64,7 +64,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
         const [isFocused, setIsFocused] = useState(false);
         const [localValue, setLocalValue] = useState(value);
 
-        const setFocusedInput = useWorkflowNodeDetailsPanelStore((state) => state.setFocusedInput);
+        const setPillTarget = useWorkflowNodeDetailsPanelStore((state) => state.setPillTarget);
 
         const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
             const rawValue = event.target.value;
@@ -172,7 +172,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                 onFocus={(event) => {
                                     setIsFocused(true);
 
-                                    setFocusedInput(null);
+                                    setPillTarget(null);
 
                                     if (onFocus) {
                                         onFocus(event);

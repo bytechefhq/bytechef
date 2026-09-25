@@ -14,6 +14,7 @@ const hoisted = vi.hoisted(() => {
     const mockSaveProperty = vi.fn();
 
     const panelStoreState = {
+        clearPillTarget: vi.fn(),
         currentNode: {
             componentName: 'mailchimp',
             metadata: {ui: {}},
@@ -21,7 +22,7 @@ const hoisted = vi.hoisted(() => {
             operationName: 'addMemberToList',
             parameters: {} as Record<string, unknown>,
         } as Record<string, unknown>,
-        setFocusedInput: vi.fn(),
+        setPillTarget: vi.fn(),
         workflowNodeDetailsPanelOpen: true,
     };
 
