@@ -161,6 +161,198 @@ Type: OBJECT
 
 
 
+### Create Browser Session
+Name: createBrowserSession
+
+`Launch a cloud browser session that you can drive with code, independently of any scrape. Use the returned session ID with the Execute Code in Browser Session action.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| ttl | TTL | INTEGER | Total time-to-live of the session in seconds. Default is 300, maximum is 3600. | false |
+| activityTtl | Activity TTL | INTEGER | Time in seconds without activity after which the session is destroyed. | false |
+| streamWebView | Stream Web View | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to stream a live view of the browser. Default is true. | false |
+| includeProfile | Include Profile | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable persistent browser storage across browser sessions. | false |
+| profile | Profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), BOOLEAN\(saveChanges)&#125; </details> | Persist cookies, localStorage and session data across browser sessions. Sessions with the same profile name share browser state. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Browser Session",
+  "name" : "createBrowserSession",
+  "parameters" : {
+    "ttl" : 1,
+    "activityTtl" : 1,
+    "streamWebView" : false,
+    "includeProfile" : false,
+    "profile" : {
+      "name" : "",
+      "saveChanges" : false
+    }
+  },
+  "type" : "firecrawl/v1/createBrowserSession"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the session was created. |
+| id | STRING | The unique session identifier. |
+| cdpUrl | STRING | Chrome DevTools Protocol WebSocket URL of the browser session. |
+| liveViewUrl | STRING | Read-only live view URL of the browser session. |
+| interactiveLiveViewUrl | STRING | Live view URL that lets the viewer control the browser session. |
+| expiresAt | STRING | When the session expires based on its TTL. |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "id" : "",
+  "cdpUrl" : "",
+  "liveViewUrl" : "",
+  "interactiveLiveViewUrl" : "",
+  "expiresAt" : ""
+}
+```
+
+
+
+
+### Delete Browser Session
+Name: deleteBrowserSession
+
+`Destroy a browser session. Browser state is saved back to the session's profile when Save Changes is enabled, and billing for the session ends.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sessionId | Session ID | STRING | The ID of the browser session to destroy. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Browser Session",
+  "name" : "deleteBrowserSession",
+  "parameters" : {
+    "sessionId" : ""
+  },
+  "type" : "firecrawl/v1/deleteBrowserSession"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the session was destroyed. |
+| sessionDurationMs | INTEGER | Total duration of the session in milliseconds. |
+| creditsBilled | NUMBER | The number of credits billed for the session. |
+| error | STRING | Error message when the session could not be destroyed. |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "sessionDurationMs" : 1,
+  "creditsBilled" : 0.0,
+  "error" : ""
+}
+```
+
+
+
+
+### Execute Code in Browser Session
+Name: executeBrowserCode
+
+`Run Node.js, Python or Bash code in a browser session created by Create Browser Session.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| sessionId | Session ID | STRING | The ID of the browser session, returned by the Create Browser Session action. | true |
+| code | Code | STRING | Code to execute in the browser sandbox. In Node.js the Playwright page object is available as 'page'; in Bash, agent-browser CLI commands are available. | true |
+| language | Language | STRING <details> <summary> Options </summary> <span>node</span>, <span>python</span>, <span>bash</span> </details> | Language of the code to execute. | false |
+| timeout | Timeout | INTEGER | Maximum execution time in seconds, up to 300. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Execute Code in Browser Session",
+  "name" : "executeBrowserCode",
+  "parameters" : {
+    "sessionId" : "",
+    "code" : "",
+    "language" : "",
+    "timeout" : 1
+  },
+  "type" : "firecrawl/v1/executeBrowserCode"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the execution completed without errors. |
+| stdout | STRING | Standard output of the execution. |
+| result | STRING | Standard output of the execution (alias for stdout). |
+| stderr | STRING | Standard error output of the execution. |
+| exitCode | INTEGER | Exit code of the executed process; 0 means success. |
+| killed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the process was killed because it hit the timeout. |
+| error | STRING | Error message if the code raised an exception. |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "stdout" : "",
+  "result" : "",
+  "stderr" : "",
+  "exitCode" : 1,
+  "killed" : false,
+  "error" : ""
+}
+```
+
+
+
+
 ### Get Crawl Status
 Name: getCrawlStatus
 
@@ -231,6 +423,145 @@ Type: OBJECT
       "statusCode" : 1,
       "error" : ""
     }
+  } ]
+}
+```
+
+
+
+
+### Interact with Page
+Name: interact
+
+`Continue working with a scraped page in a live browser session: click, fill forms, navigate and extract dynamic content with a natural language prompt or code.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| scrapeId | Scrape ID | STRING | The ID of the scrape job whose browser session to interact with, returned by the Scrape URL action in data.metadata.scrapeId. | true |
+| interactionType | Interaction Type | STRING <details> <summary> Options </summary> <span>prompt</span>, <span>code</span> </details> | Describe the task in natural language for the AI agent, or run code directly in the browser sandbox. | true |
+| prompt | Prompt | STRING | Natural language task for the AI agent, e.g. 'Search for iPhone 16 Pro Max'. | true |
+| code | Code | STRING | Code to execute in the browser sandbox. In Node.js the Playwright page object is available as 'page'. | true |
+| language | Language | STRING <details> <summary> Options </summary> <span>node</span>, <span>python</span>, <span>bash</span> </details> | Language of the code to execute. | false |
+| timeout | Timeout | INTEGER | Maximum execution time in seconds. Default is 30, maximum is 300. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Interact with Page",
+  "name" : "interact",
+  "parameters" : {
+    "scrapeId" : "",
+    "interactionType" : "",
+    "prompt" : "",
+    "code" : "",
+    "language" : "",
+    "timeout" : 1
+  },
+  "type" : "firecrawl/v1/interact"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the execution completed without errors. |
+| output | STRING | The AI agent's final answer. Only present when a prompt is used. |
+| result | STRING | The value of the last evaluated expression when running code, or the final page snapshot when using a prompt. |
+| stdout | STRING | Standard output of the execution. |
+| stderr | STRING | Standard error output of the execution. |
+| exitCode | INTEGER | Exit code of the execution; 0 means success. |
+| killed | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the execution was terminated because it hit the timeout. |
+| cdpUrl | STRING | Chrome DevTools Protocol WebSocket URL of the browser session. |
+| liveViewUrl | STRING | Read-only live view URL of the browser session. |
+| interactiveLiveViewUrl | STRING | Live view URL that lets the viewer control the browser session. |
+| error | STRING | Error message when the execution failed. |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "output" : "",
+  "result" : "",
+  "stdout" : "",
+  "stderr" : "",
+  "exitCode" : 1,
+  "killed" : false,
+  "cdpUrl" : "",
+  "liveViewUrl" : "",
+  "interactiveLiveViewUrl" : "",
+  "error" : ""
+}
+```
+
+
+
+
+### List Browser Sessions
+Name: listBrowserSessions
+
+`List the browser sessions of your team, optionally filtered by status.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| status | Status | STRING <details> <summary> Options </summary> <span>active</span>, <span>destroyed</span> </details> | Only return sessions with this status. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Browser Sessions",
+  "name" : "listBrowserSessions",
+  "parameters" : {
+    "status" : ""
+  },
+  "type" : "firecrawl/v1/listBrowserSessions"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
+| sessions | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(status), STRING\(cdpUrl), STRING\(liveViewUrl), STRING\(interactiveLiveViewUrl), BOOLEAN\(streamWebView), STRING\(createdAt), STRING\(lastActivity)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "sessions" : [ {
+    "id" : "",
+    "status" : "",
+    "cdpUrl" : "",
+    "liveViewUrl" : "",
+    "interactiveLiveViewUrl" : "",
+    "streamWebView" : false,
+    "createdAt" : "",
+    "lastActivity" : ""
   } ]
 }
 ```
@@ -340,6 +671,8 @@ Name: scrape
 | location | Location | OBJECT <details> <summary> Properties </summary> &#123;STRING\(country), [STRING]\(languages)&#125; </details> | Location settings for the request. Uses appropriate proxy and emulates language/timezone. | false |
 | parsers | Parsers | ARRAY <details> <summary> Items </summary> [&#123;STRING\(type), INTEGER\(maxPages)&#125;] </details> | Controls how files are processed. When 'pdf' is included (default), PDF content is extracted and converted to markdown (1 credit per page). Empty array returns PDF in base64 (1 credit flat). | false |
 | storeInCache | Store in Cache | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If true, page will be stored in Firecrawl index and cache. Set to false for data protection concerns. | false |
+| includeProfile | Include Profile | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable persistent browser storage across scrape and interact sessions. | false |
+| profile | Profile | OBJECT <details> <summary> Properties </summary> &#123;STRING\(name), BOOLEAN\(saveChanges)&#125; </details> | Enable persistent browser storage across scrape and interact sessions. Pass a profile when scraping to preserve cookies, localStorage, and session data. Sessions with the same profile name share browser state. | false |
 | zeroDataRetention | Zero Data Retention | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Enable zero data retention for this scrape. Contact help@firecrawl.dev to enable this feature. | false |
 
 #### Example JSON Structure
@@ -373,6 +706,11 @@ Name: scrape
       "maxPages" : 1
     } ],
     "storeInCache" : false,
+    "includeProfile" : false,
+    "profile" : {
+      "name" : "",
+      "saveChanges" : false
+    },
     "zeroDataRetention" : false
   },
   "type" : "firecrawl/v1/scrape"
@@ -391,7 +729,7 @@ Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> |  |
-| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(markdown), STRING\(summary), STRING\(html), STRING\(rawHtml), STRING\(screenshot), [STRING]\(links), &#123;STRING\(title), STRING\(description), STRING\(language), STRING\(sourceURL), STRING\(keywords), INTEGER\(statusCode), STRING\(error)&#125;\(metadata), STRING\(warning)&#125; </details> |  |
+| data | OBJECT <details> <summary> Properties </summary> &#123;STRING\(markdown), STRING\(summary), STRING\(html), STRING\(rawHtml), STRING\(screenshot), [STRING]\(links), &#123;STRING\(title), STRING\(description), STRING\(language), STRING\(sourceURL), STRING\(scrapeId), STRING\(keywords), INTEGER\(statusCode), STRING\(error)&#125;\(metadata), STRING\(warning)&#125; </details> |  |
 
 
 
@@ -412,6 +750,7 @@ Type: OBJECT
       "description" : "",
       "language" : "",
       "sourceURL" : "",
+      "scrapeId" : "",
       "keywords" : "",
       "statusCode" : 1,
       "error" : ""
@@ -541,6 +880,61 @@ Type: OBJECT
   "warning" : "",
   "id" : "",
   "creditsUsed" : 1
+}
+```
+
+
+
+
+### Stop Interaction
+Name: stopInteract
+
+`Stop the browser session of a scrape job. Browser state is saved back to the scrape's profile when Save Changes is enabled, and billing for the session ends.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| scrapeId | Scrape ID | STRING | The ID of the scrape job whose browser session to stop. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Stop Interaction",
+  "name" : "stopInteract",
+  "parameters" : {
+    "scrapeId" : ""
+  },
+  "type" : "firecrawl/v1/stopInteract"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the browser session was stopped. |
+| sessionDurationMs | INTEGER | Total duration of the browser session in milliseconds. |
+| creditsBilled | NUMBER | The number of credits billed for the browser session. |
+| error | STRING | Error message when the session could not be stopped. |
+
+
+
+
+#### Output Example
+```json
+{
+  "success" : false,
+  "sessionDurationMs" : 1,
+  "creditsBilled" : 0.0,
+  "error" : ""
 }
 ```
 
