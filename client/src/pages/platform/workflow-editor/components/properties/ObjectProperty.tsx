@@ -1,6 +1,6 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {PropertyAllType, SubPropertyType} from '@/shared/types';
-import {Fragment} from 'react';
+import {Fragment, useEffect} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import Property from './Property';
@@ -13,11 +13,20 @@ interface ObjectPropertyProps {
     arrayIndex?: number;
     arrayName?: string;
     onDeleteClick?: (path: string) => void;
+    onHasCustomEntriesChange?: (hasCustomEntries: boolean) => void;
     path?: string;
     property: PropertyAllType;
 }
 
-const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, path, property}: ObjectPropertyProps) => {
+const ObjectProperty = ({
+    arrayIndex,
+    arrayName,
+    onDeleteClick,
+    onHasCustomEntriesChange,
+    operationName,
+    path,
+    property,
+}: ObjectPropertyProps) => {
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const {
@@ -44,6 +53,14 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const subPropertyPopoverVisible = !!availablePropertyTypes?.length;
 
     const lastSubPropertyIndex = (subPropertyList?.length ?? 0) - 1;
+
+    const hasCustomEntries = !!subPropertyList?.some(
+        (subProperty) => !property.properties?.some((definedProperty) => definedProperty.name === subProperty.name)
+    );
+
+    useEffect(() => {
+        onHasCustomEntriesChange?.(hasCustomEntries);
+    }, [hasCustomEntries, onHasCustomEntriesChange]);
 
     return (
         <Fragment key={name}>

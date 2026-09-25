@@ -4,6 +4,7 @@ import {
     DataPillSuggestionPluginKey,
     getSuggestionOptions,
 } from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
+import {registerPendingSave} from '@/pages/platform/workflow-editor/components/properties/pendingPropertySaves';
 import {isSingleDataPill} from '@/pages/platform/workflow-editor/components/properties/propertyInputMode';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -861,6 +862,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 cancelPendingSaveRef.current = null;
             };
         }, [cancelPendingSaveRef, saveMentionInputValue]);
+
+        useEffect(() => {
+            if (!path || disableAutoSave) {
+                return;
+            }
+
+            return registerPendingSave(path, {
+                cancel: saveMentionInputValue.cancel,
+                isPending: saveMentionInputValue.isPending,
+            });
+        }, [disableAutoSave, path, saveMentionInputValue]);
 
         // Cleanup function to save mention input value on unmount
         useEffect(() => {

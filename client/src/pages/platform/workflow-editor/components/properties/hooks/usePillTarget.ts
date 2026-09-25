@@ -1,7 +1,7 @@
 import {PillTargetI} from '@/pages/platform/workflow-editor/components/datapills/pillTarget';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {DataPillDragPayloadType} from '@/shared/types';
-import {DragEvent, FocusEvent, SyntheticEvent, useCallback, useEffect, useRef} from 'react';
+import {DragEvent, FocusEvent, MouseEvent, SyntheticEvent, useCallback, useEffect, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 interface UsePillTargetPropsI {
@@ -25,6 +25,32 @@ function originatesInOwnTarget(event: SyntheticEvent<HTMLElement>): boolean {
     return !nearestPillTarget || nearestPillTarget === currentTarget;
 }
 
+const INTERACTIVE_ELEMENT_SELECTOR = [
+    'a',
+    'button',
+    'input',
+    'select',
+    'textarea',
+    '[contenteditable="true"]',
+    '[role="button"]',
+    '[role="checkbox"]',
+    '[role="combobox"]',
+    '[role="switch"]',
+    '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+function originatesOnInteractiveElement(event: SyntheticEvent<HTMLElement>): boolean {
+    const {currentTarget, target} = event;
+
+    if (!(target instanceof Element)) {
+        return false;
+    }
+
+    const interactiveElement = target.closest(INTERACTIVE_ELEMENT_SELECTOR);
+
+    return !!interactiveElement && currentTarget.contains(interactiveElement);
+}
+
 export default function usePillTarget({acceptsPill, insertPill}: UsePillTargetPropsI) {
     const acceptsPillRef = useRef(acceptsPill);
     const insertPillRef = useRef(insertPill);
@@ -40,27 +66,48 @@ export default function usePillTarget({acceptsPill, insertPill}: UsePillTargetPr
         }))
     );
 
+    const isRegistered = useWorkflowNodeDetailsPanelStore((state) => state.pillTarget?.owner === ownerTokenRef.current);
+
+    const register = useCallback(() => {
+        const ownerToken = ownerTokenRef.current;
+
+        if (useWorkflowNodeDetailsPanelStore.getState().pillTarget?.owner === ownerToken) {
+            return;
+        }
+
+        const pillTarget: PillTargetI = {
+            acceptsPill: () => acceptsPillRef.current(),
+            insertPill: (mentionId) => {
+                if (acceptsPillRef.current()) {
+                    insertPillRef.current(mentionId);
+                }
+            },
+            owner: ownerToken,
+        };
+
+        setPillTarget(pillTarget);
+    }, [setPillTarget]);
+
     const onFocusCapture = useCallback(
         (event: FocusEvent<HTMLElement>) => {
-            if (!originatesInOwnTarget(event)) {
-                return;
+            if (originatesInOwnTarget(event)) {
+                register();
             }
-
-            const ownerToken = ownerTokenRef.current;
-
-            if (useWorkflowNodeDetailsPanelStore.getState().pillTarget?.owner === ownerToken) {
-                return;
-            }
-
-            const pillTarget: PillTargetI = {
-                acceptsPill: () => acceptsPillRef.current(),
-                insertPill: (mentionId) => insertPillRef.current(mentionId),
-                owner: ownerToken,
-            };
-
-            setPillTarget(pillTarget);
         },
-        [setPillTarget]
+        [register]
+    );
+
+    const onContainerMouseDown = useCallback(
+        (event: MouseEvent<HTMLElement>): boolean => {
+            if (!originatesInOwnTarget(event) || originatesOnInteractiveElement(event)) {
+                return false;
+            }
+
+            register();
+
+            return true;
+        },
+        [register]
     );
 
     const onDragOver = useCallback((event: DragEvent<HTMLElement>) => {
@@ -107,6 +154,8 @@ export default function usePillTarget({acceptsPill, insertPill}: UsePillTargetPr
     }, [clearPillTarget]);
 
     return {
+        isRegistered,
+        onContainerMouseDown,
         targetProps: {
             [PILL_TARGET_ATTRIBUTE]: '',
             onDragOver,
