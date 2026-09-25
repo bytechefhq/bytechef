@@ -7,6 +7,7 @@ import {forwardRef} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
+import {findDataPillMatchRange} from './dataPillSuggestionUtils';
 import {SuggestionListRefType} from './suggestionPopupRenderer';
 import {useSuggestionListNavigation} from './useSuggestionListNavigation';
 
@@ -14,10 +15,30 @@ export type PropertyMentionsInputListRefType = SuggestionListRefType;
 
 type PropertyMentionsInputListPropsType = SuggestionProps<DataPillType>;
 
+const DataPillSuggestionLabel = ({query, value}: {query: string; value: string}) => {
+    const matchRange = findDataPillMatchRange(value, query);
+
+    if (!matchRange) {
+        return <>{value}</>;
+    }
+
+    return (
+        <>
+            {value.slice(0, matchRange.start)}
+
+            <mark className="bg-transparent font-semibold text-inherit" data-testid="data-pill-suggestion-match">
+                {value.slice(matchRange.start, matchRange.end)}
+            </mark>
+
+            {value.slice(matchRange.end)}
+        </>
+    );
+};
+
 const PropertyMentionsInputEditorSuggestionList = forwardRef<
     PropertyMentionsInputListRefType,
     PropertyMentionsInputListPropsType
->(({command, items}, ref) => {
+>(({command, items, query}, ref) => {
     const selectItem = (index: number) => {
         const item: DataPillType = items[index];
 
@@ -41,7 +62,7 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
                         >
                             <InlineSVG className="mr-2 size-4 flex-none" src={item.componentIcon!} />
 
-                            {item.value}
+                            <DataPillSuggestionLabel query={query} value={item.value} />
                         </button>
                     </li>
                 ))

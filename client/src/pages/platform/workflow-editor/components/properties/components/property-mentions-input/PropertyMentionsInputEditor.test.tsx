@@ -508,6 +508,48 @@ describe('PropertyMentionsInputEditor', () => {
         });
     });
 
+    describe('non-string property typing', () => {
+        beforeEach(() => {
+            useWorkflowDataStore.setState({
+                dataPills: [
+                    {id: 'firecrawl_5', value: 'firecrawl_5'},
+                    {id: 'firecrawl_5.data', value: 'firecrawl_5.data'},
+                    {id: 'trigger_1', value: 'trigger_1'},
+                ],
+            } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+        });
+
+        it('should filter data pills by the query typed after $', async () => {
+            renderEditor({type: 'ARRAY'});
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.keyboard('$fire');
+
+            await waitFor(() => {
+                expect(textbox.textContent).toBe('$fire');
+            });
+
+            const menu = document.querySelector('.property-mentions-suggestion-menu');
+
+            expect(menu?.textContent).toContain('firecrawl_5.data');
+            expect(menu?.textContent).not.toContain('trigger_1');
+        });
+
+        it('should still reject free text outside a data pill suggestion', async () => {
+            renderEditor({type: 'ARRAY'});
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.keyboard('abc');
+            await microtaskTick(2);
+
+            expect(textbox.textContent).toBe('');
+        });
+    });
+
     describe('formula mode', () => {
         it('should strip = prefix for formula mode values', async () => {
             renderEditor({isFormulaMode: true, value: '=1 + 2'});

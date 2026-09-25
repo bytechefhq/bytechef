@@ -1,9 +1,13 @@
 import PropertyMentionsInputEditorSuggestionList from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSuggestionList';
 import {DataPillType} from '@/shared/types';
 import {MentionOptions} from '@tiptap/extension-mention';
+import {PluginKey} from '@tiptap/pm/state';
 import {Editor} from '@tiptap/react';
 
+import {filterDataPillSuggestions} from './dataPillSuggestionUtils';
 import {createSuggestionPopupRenderer} from './suggestionPopupRenderer';
+
+export const DataPillSuggestionPluginKey = new PluginKey('dataPillSuggestion');
 
 export function getSuggestionOptions(): MentionOptions['suggestion'] {
     return {
@@ -38,8 +42,9 @@ export function getSuggestionOptions(): MentionOptions['suggestion'] {
         items: ({editor, query}: {editor: Editor; query: string}): DataPillType[] => {
             const dataPills: DataPillType[] = editor.storage.MentionStorage.dataPills ?? [];
 
-            return dataPills.filter((dataPill) => dataPill.value.toLowerCase().startsWith(query.toLowerCase()));
+            return filterDataPillSuggestions(dataPills, query);
         },
+        pluginKey: DataPillSuggestionPluginKey,
         render: createSuggestionPopupRenderer<DataPillType>(PropertyMentionsInputEditorSuggestionList),
     };
 }
