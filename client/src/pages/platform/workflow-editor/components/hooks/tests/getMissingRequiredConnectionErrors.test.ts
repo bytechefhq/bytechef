@@ -1,7 +1,10 @@
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
 
-import getMissingRequiredConnectionErrors, {getWorkflowIssueErrors} from '../getMissingRequiredConnectionErrors';
+import getMissingRequiredConnectionErrors, {
+    getWorkflowIssueErrors,
+    getWorkflowNodeDetailsErrorsSummary,
+} from '../getMissingRequiredConnectionErrors';
 
 const createConnection = (
     componentName: string,
@@ -30,7 +33,7 @@ describe('getMissingRequiredConnectionErrors', () => {
                 connections: [createConnection('github', 'github', 'github_4')],
                 workflowTestConfigurationConnections: [],
             })
-        ).toEqual([{kind: 'CONNECTION', name: 'GitHub'}]);
+        ).toEqual([{kind: 'CONNECTION', name: 'GitHub', severity: 'ERROR'}]);
     });
 
     it('does not report a required connection that has a selected connection', () => {
@@ -60,7 +63,7 @@ describe('getMissingRequiredConnectionErrors', () => {
                 connections: [createConnection('googleMail', 'javascript01', 'script_1')],
                 workflowTestConfigurationConnections: [],
             })
-        ).toEqual([{kind: 'CONNECTION', name: 'JavaScript'}]);
+        ).toEqual([{kind: 'CONNECTION', name: 'JavaScript', severity: 'ERROR'}]);
     });
 
     it('reports each missing cluster element connection on a cluster root by cluster element name', () => {
@@ -76,8 +79,8 @@ describe('getMissingRequiredConnectionErrors', () => {
                 workflowTestConfigurationConnections: [createTestConfigurationConnection('openAi_1')],
             })
         ).toEqual([
-            {kind: 'CONNECTION', name: 'github_1'},
-            {kind: 'CONNECTION', name: 'github_2'},
+            {kind: 'CONNECTION', name: 'github_1', severity: 'ERROR'},
+            {kind: 'CONNECTION', name: 'github_2', severity: 'ERROR'},
         ]);
     });
 
@@ -89,7 +92,7 @@ describe('getMissingRequiredConnectionErrors', () => {
                 connections: [createConnection('pgVector', 'pgVector', 'vectorStore_1')],
                 workflowTestConfigurationConnections: [],
             })
-        ).toEqual([{kind: 'CONNECTION', name: 'Vector Store'}]);
+        ).toEqual([{kind: 'CONNECTION', name: 'Vector Store', severity: 'ERROR'}]);
     });
 
     it('reports nothing while the selected connections are not loaded', () => {
@@ -110,20 +113,25 @@ describe('getWorkflowIssueErrors', () => {
                 {
                     kind: 'BROKEN_REFERENCE',
                     message: '"approval_1" is missing from the workflow (referenced as approval_1.comment)',
+                    severity: 'ERROR',
                 },
-                {kind: 'LOOKUP_FAILED', message: 'Request failed with status 500'},
+                {kind: 'LOOKUP_FAILED', message: 'Request failed with status 500', severity: 'ERROR'},
             ])
         ).toEqual([
-            {kind: 'ISSUE', name: '"approval_1" is missing from the workflow (referenced as approval_1.comment)'},
-            {kind: 'ISSUE', name: 'Request failed with status 500'},
+            {
+                kind: 'ISSUE',
+                name: '"approval_1" is missing from the workflow (referenced as approval_1.comment)',
+                severity: 'ERROR',
+            },
+            {kind: 'ISSUE', name: 'Request failed with status 500', severity: 'ERROR'},
         ]);
     });
 
     it('skips missing required properties and connections that are listed separately', () => {
         expect(
             getWorkflowIssueErrors([
-                {kind: 'MISSING_REQUIRED', message: 'Missing required property: owner'},
-                {kind: 'MISSING_CONNECTION', message: 'Missing required connection: GitHub'},
+                {kind: 'MISSING_REQUIRED', message: 'Missing required property: owner', severity: 'ERROR'},
+                {kind: 'MISSING_CONNECTION', message: 'Missing required connection: GitHub', severity: 'ERROR'},
             ])
         ).toEqual([]);
     });
@@ -131,9 +139,51 @@ describe('getWorkflowIssueErrors', () => {
     it('lists an issue reported by several sources once', () => {
         expect(
             getWorkflowIssueErrors([
-                {kind: 'TYPE_MISMATCH', message: "Property 'count' has incorrect type."},
-                {kind: 'TYPE_MISMATCH', message: "Property 'count' has incorrect type."},
+                {kind: 'TYPE_MISMATCH', message: "Property 'count' has incorrect type.", severity: 'ERROR'},
+                {kind: 'TYPE_MISMATCH', message: "Property 'count' has incorrect type.", severity: 'ERROR'},
             ])
-        ).toEqual([{kind: 'ISSUE', name: "Property 'count' has incorrect type."}]);
+        ).toEqual([{kind: 'ISSUE', name: "Property 'count' has incorrect type.", severity: 'ERROR'}]);
+    });
+
+    it('keeps the severity of a warning', () => {
+        expect(getWorkflowIssueErrors([{kind: 'OTHER', message: 'Deprecated operation', severity: 'WARNING'}])).toEqual(
+            [{kind: 'ISSUE', name: 'Deprecated operation', severity: 'WARNING'}]
+        );
+    });
+
+    it('lists a message reported as both an error and a warning once, as an error', () => {
+        expect(
+            getWorkflowIssueErrors([
+                {kind: 'OTHER', message: 'Something is off', severity: 'WARNING'},
+                {kind: 'OTHER', message: 'Something is off', severity: 'ERROR'},
+                {kind: 'OTHER', message: 'Something is off', severity: 'WARNING'},
+            ])
+        ).toEqual([{kind: 'ISSUE', name: 'Something is off', severity: 'ERROR'}]);
+    });
+});
+
+describe('getWorkflowNodeDetailsErrorsSummary', () => {
+    it('titles a list of errors as errors', () => {
+        expect(getWorkflowNodeDetailsErrorsSummary([{severity: 'ERROR'}, {severity: 'ERROR'}])).toEqual({
+            heading: 'Errors (2)',
+            warningOnly: false,
+        });
+    });
+
+    it('titles a list of warnings as warnings and marks it warning-only', () => {
+        expect(getWorkflowNodeDetailsErrorsSummary([{severity: 'WARNING'}])).toEqual({
+            heading: 'Warnings (1)',
+            warningOnly: true,
+        });
+    });
+
+    it('counts errors and warnings separately when both are present', () => {
+        expect(
+            getWorkflowNodeDetailsErrorsSummary([{severity: 'WARNING'}, {severity: 'ERROR'}, {severity: 'WARNING'}])
+        ).toEqual({heading: 'Errors (1), Warnings (2)', warningOnly: false});
+    });
+
+    it('is not warning-only when there is nothing to show', () => {
+        expect(getWorkflowNodeDetailsErrorsSummary([])).toEqual({heading: '', warningOnly: false});
     });
 });

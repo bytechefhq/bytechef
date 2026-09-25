@@ -733,6 +733,7 @@ export default function useWorkflowNodeDetailsPanel({
                 (propertyName): WorkflowNodeDetailsErrorI => ({
                     kind: 'PROPERTY',
                     name: propertyName,
+                    severity: 'ERROR',
                 })
             ),
             ...getMissingRequiredConnectionErrors({

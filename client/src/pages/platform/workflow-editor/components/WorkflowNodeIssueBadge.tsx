@@ -27,7 +27,7 @@ const WorkflowNodeIssueBadge = ({includeClusterElementIssues, nodeName}: Workflo
             <AlertTriangleIcon
                 className={twMerge(
                     'size-4',
-                    severity === 'ERROR' ? 'text-content-destructive' : 'text-content-onwarning'
+                    severity === 'ERROR' ? 'text-content-destructive' : 'text-content-warning-primary'
                 )}
             />
         </span>

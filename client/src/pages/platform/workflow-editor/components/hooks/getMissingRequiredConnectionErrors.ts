@@ -1,10 +1,11 @@
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 
-import {WorkflowIssueI, WorkflowIssueKindType} from '../../stores/useWorkflowIssuesStore';
+import {WorkflowIssueI, WorkflowIssueKindType, WorkflowIssueSeverityType} from '../../stores/useWorkflowIssuesStore';
 
 export interface WorkflowNodeDetailsErrorI {
     kind: 'CONNECTION' | 'ISSUE' | 'PROPERTY';
     name: string;
+    severity: WorkflowIssueSeverityType;
 }
 
 interface GetMissingRequiredConnectionErrorsProps {
@@ -45,6 +46,7 @@ export default function getMissingRequiredConnectionErrors({
                 clusterRoot && connection.key !== connection.componentName
                     ? connection.key
                     : componentTitle || connection.componentName,
+            severity: 'ERROR',
         }));
 }
 
@@ -53,15 +55,39 @@ export default function getMissingRequiredConnectionErrors({
  * issue kinds (broken references, type mismatches, failed lookups, ...) are listed from the node issues.
  */
 export function getWorkflowIssueErrors(
-    nodeIssues: Array<Pick<WorkflowIssueI, 'kind' | 'message'>>
+    nodeIssues: Array<Pick<WorkflowIssueI, 'kind' | 'message' | 'severity'>>
 ): Array<WorkflowNodeDetailsErrorI> {
-    const messages = new Set<string>();
+    const severitiesByMessage = new Map<string, WorkflowIssueSeverityType>();
 
     for (const nodeIssue of nodeIssues) {
-        if (!SEPARATELY_REPORTED_ISSUE_KINDS.has(nodeIssue.kind)) {
-            messages.add(nodeIssue.message);
+        if (SEPARATELY_REPORTED_ISSUE_KINDS.has(nodeIssue.kind)) {
+            continue;
+        }
+
+        if (severitiesByMessage.get(nodeIssue.message) !== 'ERROR') {
+            severitiesByMessage.set(nodeIssue.message, nodeIssue.severity);
         }
     }
 
-    return [...messages].map((message) => ({kind: 'ISSUE', name: message}));
+    return [...severitiesByMessage.entries()].map(([message, severity]) => ({kind: 'ISSUE', name: message, severity}));
+}
+
+export function getWorkflowNodeDetailsErrorsSummary(errors: Array<Pick<WorkflowNodeDetailsErrorI, 'severity'>>): {
+    heading: string;
+    warningOnly: boolean;
+} {
+    const errorCount = errors.filter((error) => error.severity === 'ERROR').length;
+    const warningCount = errors.length - errorCount;
+
+    const headingParts: Array<string> = [];
+
+    if (errorCount > 0) {
+        headingParts.push(`Errors (${errorCount})`);
+    }
+
+    if (warningCount > 0) {
+        headingParts.push(`Warnings (${warningCount})`);
+    }
+
+    return {heading: headingParts.join(', '), warningOnly: errors.length > 0 && errorCount === 0};
 }

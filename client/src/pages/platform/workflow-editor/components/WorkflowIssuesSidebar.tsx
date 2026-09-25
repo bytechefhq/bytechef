@@ -85,7 +85,7 @@ const WorkflowIssuesSidebar = ({visible}: WorkflowIssuesSidebarProps) => {
                                         'mt-0.5 size-3.5 shrink-0',
                                         issue.severity === 'ERROR'
                                             ? 'text-content-destructive'
-                                            : 'text-content-onwarning'
+                                            : 'text-content-warning-primary'
                                     )}
                                 />
 

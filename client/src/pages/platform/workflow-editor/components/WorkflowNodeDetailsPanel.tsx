@@ -17,7 +17,7 @@ import {
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {ChevronDownIcon, ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
+import {ChevronDownIcon, ExternalLinkIcon, InfoIcon, TriangleAlertIcon, XIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -27,6 +27,7 @@ import {getClusterElementsLabel} from '../../cluster-element-editor/utils/cluste
 import getAvailableComponentVersions from '../utils/getAvailableComponentVersions';
 import getNodeOperationDescription from '../utils/getNodeOperationDescription';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
+import {getWorkflowNodeDetailsErrorsSummary} from './hooks/getMissingRequiredConnectionErrors';
 import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
 
 interface WorkflowNodeDetailsPanelProps {
@@ -100,6 +101,11 @@ const WorkflowNodeDetailsPanel = ({
     const availableVersions = useMemo(
         () => getAvailableComponentVersions({componentDefinitionVersions, nodeVersion}),
         [componentDefinitionVersions, nodeVersion]
+    );
+
+    const {heading: errorsHeading, warningOnly: errorsWarningOnly} = useMemo(
+        () => getWorkflowNodeDetailsErrorsSummary(errors),
+        [errors]
     );
 
     if (!(panelOpen ?? workflowNodeDetailsPanelOpen)) {
@@ -230,7 +236,14 @@ const WorkflowNodeDetailsPanel = ({
 
                             {errors.length > 0 && (
                                 <div className="border-b p-2">
-                                    <div className="flex shrink-0 flex-col overflow-hidden rounded-lg border border-stroke-destructive-primary bg-surface-destructive-secondary">
+                                    <div
+                                        className={twMerge(
+                                            'flex shrink-0 flex-col overflow-hidden rounded-lg border',
+                                            errorsWarningOnly
+                                                ? 'border-stroke-warning-primary bg-surface-warning-secondary'
+                                                : 'border-stroke-destructive-primary bg-surface-destructive-secondary'
+                                        )}
+                                    >
                                         <Button
                                             aria-busy={errorsLoading}
                                             aria-expanded={errorsAccordionOpen}
@@ -242,10 +255,17 @@ const WorkflowNodeDetailsPanel = ({
                                             onClick={() => setErrorsAccordionOpen(!errorsAccordionOpen)}
                                             variant="ghost"
                                         >
-                                            <InfoIcon className="size-4 shrink-0 text-content-destructive-primary" />
+                                            <InfoIcon
+                                                className={twMerge(
+                                                    'size-4 shrink-0',
+                                                    errorsWarningOnly
+                                                        ? 'text-content-warning-primary'
+                                                        : 'text-content-destructive-primary'
+                                                )}
+                                            />
 
                                             <span className="text-sm">
-                                                {errorsLoading ? 'Checking errors…' : `Errors (${errors.length})`}
+                                                {errorsLoading ? 'Checking errors…' : errorsHeading}
                                             </span>
 
                                             {!errorsLoading && (
@@ -269,6 +289,13 @@ const WorkflowNodeDetailsPanel = ({
                                                             className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
                                                             key={`${error.kind}_${error.name}_${index}`}
                                                         >
+                                                            {error.severity === 'WARNING' && (
+                                                                <TriangleAlertIcon
+                                                                    aria-label="Warning"
+                                                                    className="mb-0.5 inline size-3.5 text-content-warning-primary"
+                                                                />
+                                                            )}
+
                                                             {error.kind !== 'ISSUE' && (
                                                                 <span className="font-light">
                                                                     {error.kind === 'CONNECTION'
