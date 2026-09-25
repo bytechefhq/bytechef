@@ -55,16 +55,17 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
+    testImplementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
