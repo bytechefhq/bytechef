@@ -81,3 +81,22 @@ export default function getWorkflowIssueOwnerName(
 
     return ownerName;
 }
+
+export function getWorkflowIssueOwnerPropertyPath(
+    issue: Pick<WorkflowIssueI, 'propertyPath'>,
+    clusterElementRootNames: ReadonlyMap<string, string>
+): string | undefined {
+    if (!issue.propertyPath) {
+        return undefined;
+    }
+
+    const pathSegments = issue.propertyPath.split('.');
+
+    let ownerSegmentCount = 0;
+
+    while (ownerSegmentCount < pathSegments.length && clusterElementRootNames.has(pathSegments[ownerSegmentCount])) {
+        ownerSegmentCount++;
+    }
+
+    return pathSegments.slice(ownerSegmentCount).join('.') || undefined;
+}

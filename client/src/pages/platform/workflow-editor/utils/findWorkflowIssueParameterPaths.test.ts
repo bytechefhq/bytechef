@@ -67,4 +67,20 @@ describe('findWorkflowIssueParameterPaths', () => {
             )
         ).toEqual(new Set(['firecrawl_5', 'topK', 'userPrompt', 'stopSequences']));
     });
+
+    it('reads a validator path qualified with the cluster element names relative to the element', () => {
+        const clusterElementRootNames = new Map([['openAi_1', 'aiAgent_1']]);
+        const elementParameters = {systemPrompt: '${ghost_1.value}', temperature: 'hot'};
+
+        expect(
+            findWorkflowIssueParameterPaths(
+                {propertyPath: 'openAi_1.temperature'},
+                elementParameters,
+                clusterElementRootNames
+            )
+        ).toEqual(['temperature']);
+        expect(
+            getIssueParameterNames([{propertyPath: 'openAi_1.temperature'}], elementParameters, clusterElementRootNames)
+        ).toEqual(new Set(['temperature']));
+    });
 });

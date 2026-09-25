@@ -744,14 +744,16 @@ export default function useWorkflowNodeDetailsPanel({
                 workflowTestConfigurationConnections,
             }),
             ...getWorkflowIssueErrors(nodeIssues, (nodeIssue) =>
-                findWorkflowIssueParameterPaths(nodeIssue, currentNode?.parameters).map((parameterPath) => {
-                    const propertyName = getParameterPathRoot(parameterPath);
-                    const property = currentOperationProperties.find(
-                        (operationProperty) => operationProperty.name === propertyName
-                    );
+                findWorkflowIssueParameterPaths(nodeIssue, currentNode?.parameters, clusterElementRootNames).map(
+                    (parameterPath) => {
+                        const propertyName = getParameterPathRoot(parameterPath);
+                        const property = currentOperationProperties.find(
+                            (operationProperty) => operationProperty.name === propertyName
+                        );
 
-                    return property?.label || propertyName;
-                })
+                        return property?.label || propertyName;
+                    }
+                )
             ),
         ];
     }, [

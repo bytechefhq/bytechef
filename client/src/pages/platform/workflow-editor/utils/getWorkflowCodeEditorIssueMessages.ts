@@ -3,6 +3,10 @@ import {WorkflowInput, WorkflowTask, WorkflowTrigger} from '@/shared/middleware/
 import {WorkflowIssueI, getWorkflowIssueKey} from '../stores/useWorkflowIssuesStore';
 import collectWorkflowIssues from './collectWorkflowIssues';
 import findWorkflowIssueParameterPaths from './findWorkflowIssueParameterPaths';
+import getWorkflowIssueOwnerName, {
+    getClusterElementRootNames,
+    getWorkflowIssueOwnerPropertyPath,
+} from './getWorkflowIssueOwnerName';
 import {forEachNestedTaskGroup} from './taskTraversalUtils';
 
 type CodeEditorNodeIssueType = Pick<WorkflowIssueI, 'kind' | 'message' | 'nodeName' | 'severity'> & {
@@ -74,6 +78,25 @@ function collectTaskParameters(
     }
 }
 
+function isNamedEntry<T extends {name: string}>(value: unknown): value is T {
+    return !!value && typeof value === 'object' && typeof (value as {name?: unknown}).name === 'string';
+}
+
+function getNamedEntries<T extends {name: string}>(value: unknown): Array<T> {
+    return Array.isArray(value) ? value.filter((item): item is T => isNamedEntry<T>(item)) : [];
+}
+
+function getOwnerPathPrefix(propertyPath: string | undefined, ownerPropertyPath: string | undefined): string {
+    if (!propertyPath) {
+        return '';
+    }
+
+    const pathSegments = propertyPath.split('.');
+    const ownerSegmentCount = pathSegments.length - (ownerPropertyPath ? ownerPropertyPath.split('.').length : 0);
+
+    return pathSegments.slice(0, ownerSegmentCount).join('.');
+}
+
 function parseWorkflowDefinition(definition: string): WorkflowDefinitionI | undefined {
     try {
         const workflowDefinition = JSON.parse(definition);
@@ -103,9 +126,28 @@ export default function getWorkflowCodeEditorIssueMessages({
         return {errors, warnings};
     }
 
-    const tasks = Array.isArray(workflowDefinition.tasks) ? workflowDefinition.tasks : [];
-    const triggers = Array.isArray(workflowDefinition.triggers) ? workflowDefinition.triggers : [];
+    try {
+        return getDraftIssueMessages({errors, nodeIssues, warnings, workflowDefinition});
+    } catch {
+        return {errors, warnings};
+    }
+}
 
+function getDraftIssueMessages({
+    errors,
+    nodeIssues,
+    warnings,
+    workflowDefinition,
+}: {
+    errors: Array<string>;
+    nodeIssues: Array<Omit<CodeEditorNodeIssueType, 'propertyPath'> & {propertyPath?: string}>;
+    warnings: Array<string>;
+    workflowDefinition: WorkflowDefinitionI;
+}): {errors: Array<string>; warnings: Array<string>} {
+    const tasks = getNamedEntries<WorkflowTask>(workflowDefinition.tasks);
+    const triggers = getNamedEntries<WorkflowTrigger>(workflowDefinition.triggers);
+
+    const clusterElementRootNames = getClusterElementRootNames(tasks);
     const parametersByNodeName = new Map<string, Record<string, unknown>>();
 
     for (const trigger of triggers) {
@@ -117,7 +159,16 @@ export default function getWorkflowCodeEditorIssueMessages({
     const formatIssue = (
         issue: Pick<WorkflowIssueI, 'message' | 'nodeName' | 'propertyPath' | 'referencedNodeName'>
     ) => {
-        const parameterPaths = findWorkflowIssueParameterPaths(issue, parametersByNodeName.get(issue.nodeName));
+        const ownerPathPrefix = getOwnerPathPrefix(
+            issue.propertyPath,
+            getWorkflowIssueOwnerPropertyPath(issue, clusterElementRootNames)
+        );
+
+        const parameterPaths = findWorkflowIssueParameterPaths(
+            issue,
+            parametersByNodeName.get(getWorkflowIssueOwnerName(issue, clusterElementRootNames)),
+            clusterElementRootNames
+        ).map((parameterPath) => (ownerPathPrefix ? `${ownerPathPrefix}.${parameterPath}` : parameterPath));
 
         return `[${issue.nodeName}] ${parameterPaths.length ? `${parameterPaths.join(', ')}: ` : ''}${issue.message}`;
     };
@@ -133,7 +184,7 @@ export default function getWorkflowCodeEditorIssueMessages({
 
     const validatorIssueKeys = new Set(nodeIssues.map((nodeIssue) => getWorkflowIssueKey(nodeIssue)));
 
-    const inputs = Array.isArray(workflowDefinition.inputs) ? workflowDefinition.inputs : [];
+    const inputs = getNamedEntries<Pick<WorkflowInput, 'name'>>(workflowDefinition.inputs);
 
     for (const sweepIssue of collectWorkflowIssues({inputs, tasks, triggers})) {
         if (validatorIssueKeys.has(getWorkflowIssueKey(sweepIssue))) {
