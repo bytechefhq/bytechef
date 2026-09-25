@@ -148,8 +148,9 @@ describe('PropertyCodeEditorDialog', () => {
         it('should render resizable panels', () => {
             renderWithProviders(<PropertyCodeEditorDialog {...defaultProps} />);
 
-            expect(screen.getByTestId('resizable-panel-group')).toBeInTheDocument();
-            expect(screen.getAllByTestId('resizable-panel').length).toBeGreaterThan(0);
+            expect(screen.getAllByTestId('resizable-panel-group')).toHaveLength(2);
+            expect(screen.getAllByTestId('resizable-panel')).toHaveLength(4);
+            expect(screen.getAllByTestId('resizable-handle')).toHaveLength(2);
         });
     });
 
