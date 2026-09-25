@@ -2,7 +2,7 @@ import {convertNameToSnakeCase} from '@/pages/platform/cluster-element-editor/ut
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import invalidateWorkflowValidation from '@/pages/platform/workflow-editor/utils/invalidateWorkflowValidation';
 import {useSaveClusterElementTestOutputMutation} from '@/shared/middleware/graphql';
-import {TriggerType} from '@/shared/middleware/platform/configuration';
+import {ResponseError, TriggerType} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
@@ -19,6 +19,24 @@ import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useCallback, useEffect, useRef, useState} from 'react';
+
+export interface TestOutputErrorI {
+    message: string;
+    title: string;
+}
+
+async function resolveErrorMessage(error: unknown): Promise<string> {
+    if (error instanceof ResponseError) {
+        const problem: {detail?: string; title?: string} | null = await error.response
+            .clone()
+            .json()
+            .catch(() => null);
+
+        return problem?.detail || problem?.title || `Request failed with status ${error.response.status}`;
+    }
+
+    return (error instanceof Error && error.message) || 'Unknown error';
+}
 
 interface UseOutputTabProps {
     clusterElementType?: string;
@@ -38,6 +56,7 @@ export default function useOutputTab({
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
+    const [testOutputError, setTestOutputError] = useState<TestOutputErrorI | undefined>(undefined);
     const [webhookTestCancelEnabled, setWebhookTestCancelEnabled] = useState(false);
     const [webhookTestUrl, setWebhookTestUrl] = useState<string | undefined>(undefined);
 
@@ -46,6 +65,7 @@ export default function useOutputTab({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const startWebhookTestRef = useRef(false);
+    const testOutputErrorGenerationRef = useRef(0);
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
     const queryClient = useQueryClient();
@@ -109,6 +129,22 @@ export default function useOutputTab({
         invalidateWorkflowValidation(queryClient);
     }, [queryClient, workflowId]);
 
+    const clearTestOutputError = useCallback(() => {
+        testOutputErrorGenerationRef.current += 1;
+
+        setTestOutputError(undefined);
+
+        return testOutputErrorGenerationRef.current;
+    }, []);
+
+    const showTestOutputError = useCallback((title: string, error: unknown, generation: number) => {
+        resolveErrorMessage(error).then((message) => {
+            if (generation === testOutputErrorGenerationRef.current) {
+                setTestOutputError({message, title});
+            }
+        });
+    }, []);
+
     const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
         onSuccess: invalidateNodeOutputs,
     });
@@ -130,12 +166,26 @@ export default function useOutputTab({
     });
 
     const handlePredefinedOutputSchemaClick = useCallback(() => {
-        deleteWorkflowNodeTestOutputMutation.mutate({
-            environmentId: currentEnvironmentId,
-            id: workflowId,
-            workflowNodeName: currentNode.name,
-        });
-    }, [currentEnvironmentId, currentNode.name, deleteWorkflowNodeTestOutputMutation, workflowId]);
+        const generation = clearTestOutputError();
+
+        deleteWorkflowNodeTestOutputMutation.mutate(
+            {
+                environmentId: currentEnvironmentId,
+                id: workflowId,
+                workflowNodeName: currentNode.name,
+            },
+            {
+                onError: (error) => showTestOutputError('Reset failed', error, generation),
+            }
+        );
+    }, [
+        clearTestOutputError,
+        currentEnvironmentId,
+        currentNode.name,
+        deleteWorkflowNodeTestOutputMutation,
+        showTestOutputError,
+        workflowId,
+    ]);
 
     const handleSampleDataDialogUpload = useCallback(
         (value: string) => {
@@ -161,6 +211,8 @@ export default function useOutputTab({
                 return;
             }
 
+            const generation = clearTestOutputError();
+
             saveClusterElementTestOutputMutation.mutate(
                 {
                     clusterElementType,
@@ -171,27 +223,37 @@ export default function useOutputTab({
                     workflowNodeName: parentWorkflowNodeName,
                 },
                 {
+                    onError: (error) => showTestOutputError('Test failed', error, generation),
                     onSuccess,
                 }
             );
         },
         [
+            clearTestOutputError,
             clusterElementType,
             currentEnvironmentId,
             currentNode.workflowNodeName,
             parentWorkflowNodeName,
             saveClusterElementTestOutputMutation,
+            showTestOutputError,
             workflowId,
         ]
     );
 
     const handleTestOperationClick = useCallback(() => {
+        const generation = clearTestOutputError();
+
         if (!currentNode.trigger || currentNode.triggerType === TriggerType.Polling) {
-            saveWorkflowNodeTestOutputMutation.mutate({
-                environmentId: currentEnvironmentId,
-                id: workflowId,
-                workflowNodeName: currentNode.name,
-            });
+            saveWorkflowNodeTestOutputMutation.mutate(
+                {
+                    environmentId: currentEnvironmentId,
+                    id: workflowId,
+                    workflowNodeName: currentNode.name,
+                },
+                {
+                    onError: (error) => showTestOutputError('Test failed', error, generation),
+                }
+            );
         } else {
             setStartWebhookTestDate(new Date());
             setStartWebhookTest(true);
@@ -243,12 +305,14 @@ export default function useOutputTab({
                 });
         }
     }, [
+        clearTestOutputError,
         currentEnvironmentId,
         currentNode.name,
         currentNode.trigger,
         currentNode?.triggerType,
         saveWorkflowNodeTestOutputMutation,
         queryClient,
+        showTestOutputError,
         webhookTriggerTestApi,
         workflowId,
         workflowNodeOutputRefetch,
@@ -286,7 +350,12 @@ export default function useOutputTab({
         startWebhookTestRef.current = startWebhookTest;
     }, [startWebhookTest]);
 
+    useEffect(() => {
+        clearTestOutputError();
+    }, [clearTestOutputError, currentNode.name]);
+
     return {
+        clearTestOutputError,
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
@@ -303,6 +372,7 @@ export default function useOutputTab({
         saveWorkflowNodeTestOutputMutationPending: saveWorkflowNodeTestOutputMutation.isPending,
         setShowUploadDialog,
         showUploadDialog,
+        testOutputError,
         testOutputResponse,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
