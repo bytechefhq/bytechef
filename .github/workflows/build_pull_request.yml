@@ -30,6 +30,7 @@ jobs:
     outputs:
       cli: ${{ steps.filter.outputs.cli }}
       client: ${{ steps.filter.outputs.client }}
+      embedded-sdk: ${{ steps.filter.outputs.embedded-sdk }}
       server: ${{ steps.filter.outputs.server }}
     steps:
       # For pull requests, it's not necessary to check out the code
@@ -41,6 +42,8 @@ jobs:
             - 'cli/**'
             client:
               - 'client/**'
+            embedded-sdk:
+              - 'sdks/frontend/embedded/**'
             server:
               - 'server/**'
 
@@ -86,10 +89,10 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up Node 22
+      - name: Set up Node 24
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
           cache-dependency-path: client/package-lock.json
       - name: run npm commands
@@ -107,6 +110,28 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           projectBaseDir: client/
+
+  embedded-sdk:
+    needs: changes
+    if: ${{ needs.changes.outputs.embedded-sdk == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: sdks/frontend/embedded/package-lock.json
+      - name: Install workspace dependencies
+        working-directory: sdks/frontend/embedded
+        run: npm ci
+      - name: run npm commands
+        working-directory: sdks/frontend/embedded/library
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run test -- --run
 
   server:
     needs: changes
