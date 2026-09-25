@@ -7,18 +7,17 @@
 
 package com.bytechef.ee.ai.copilot.agent;
 
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
-import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
-import com.bytechef.commons.util.NumberUtils;
-import com.bytechef.commons.util.StringUtils;
+import com.bytechef.ai.copilot.tool.catalog.SubAgentModelRequest;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,43 +31,75 @@ public class CatalogSubAgentChatModelResolver implements SubAgentChatModelResolv
     private static final Logger log = LoggerFactory.getLogger(CatalogSubAgentChatModelResolver.class);
 
     private final CatalogChatClientResolver catalogChatClientResolver;
+    private final String defaultProvider;
 
     @SuppressFBWarnings("EI")
-    public CatalogSubAgentChatModelResolver(CatalogChatClientResolver catalogChatClientResolver) {
+    public CatalogSubAgentChatModelResolver(
+        CatalogChatClientResolver catalogChatClientResolver,
+        @Value("${bytechef.ai.copilot.provider:}") String defaultProvider) {
+
         this.catalogChatClientResolver = catalogChatClientResolver;
+        this.defaultProvider = defaultProvider;
     }
 
     @Override
-    public @Nullable ChatModel resolve(Map<String, Object> toolContext) {
-        String providerKey =
-            StringUtils.asString(toolContext.get(AgentToolInvocationContext.TOOL_CONTEXT_LLM_PROVIDER_KEY));
-        String model = StringUtils.asString(toolContext.get(AgentToolInvocationContext.TOOL_CONTEXT_LLM_MODEL_KEY));
-        Long environmentId =
-            NumberUtils.asLong(toolContext.get(AgentToolInvocationContext.TOOL_CONTEXT_ENVIRONMENT_ID_KEY));
+    public ChatModel resolve(SubAgentModelRequest request) {
+        String providerKey = request.llmProvider();
+        String model = request.llmModel();
+        Long environmentId = request.environmentId();
 
-        if (providerKey == null || model == null || environmentId == null) {
-            return null;
+        if (environmentId == null) {
+            throw new ChatModelUnavailableException(
+                "The sub-agent call carries no environment, so no AI provider can be resolved for it.");
         }
+
+        if (providerKey == null && model == null) {
+            return resolveEnvironmentDefault(environmentId);
+        }
+
+        if (providerKey == null || model == null) {
+            log.warn(
+                "Subagent user-selected LLM half-set (provider={}, model={}) in environment {}", providerKey, model,
+                environmentId);
+
+            throw new ChatModelUnavailableException(
+                "The model selection is incomplete (provider=%s, model=%s). Pick a model again.".formatted(
+                    providerKey, model));
+        }
+
+        ChatModel chatModel;
 
         try {
-            ChatModel chatModel =
-                catalogChatClientResolver.resolveChatModel(providerKey, model, environmentId.intValue());
-
-            if (chatModel == null) {
-                log.warn(
-                    "Subagent user-selected LLM (provider={}, model={}) could not be resolved in environment {}; "
-                        + "the delegate will use its default model",
-                    providerKey, model, environmentId);
-            }
-
-            return chatModel;
-        } catch (RuntimeException runtimeException) {
-            log.warn(
-                "Subagent user-selected LLM (provider={}, model={}) failed to resolve in environment {}; "
-                    + "the delegate will use its default model",
-                providerKey, model, environmentId, runtimeException);
-
-            return null;
+            chatModel = catalogChatClientResolver.resolveChatModel(providerKey, model, Math.toIntExact(environmentId));
+        } catch (RuntimeException exception) {
+            throw new SelectedChatModelUnavailableException(providerKey, model, environmentId, exception);
         }
+
+        if (chatModel == null) {
+            log.warn(
+                "Subagent user-selected LLM (provider={}, model={}) could not be resolved in environment {}",
+                providerKey, model, environmentId);
+
+            throw new SelectedChatModelUnavailableException(providerKey, model, environmentId);
+        }
+
+        return chatModel;
+    }
+
+    private ChatModel resolveEnvironmentDefault(long environmentId) {
+        ChatModel chatModel;
+
+        try {
+            chatModel = catalogChatClientResolver.resolveDefaultChatModel(
+                defaultProvider, Math.toIntExact(environmentId));
+        } catch (RuntimeException exception) {
+            throw ChatModelUnavailableException.noProviderEnabled(environmentId, exception);
+        }
+
+        if (chatModel == null) {
+            throw ChatModelUnavailableException.noProviderEnabled(environmentId);
+        }
+
+        return chatModel;
     }
 }
