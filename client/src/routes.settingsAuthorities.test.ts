@@ -40,4 +40,11 @@ describe('settings route authorities', () => {
         expect(authorities.length).toBeGreaterThan(0);
         authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
     });
+
+    it('lets only a tenant admin open the API Clients page', () => {
+        const authorities = getRouteAuthorities('api-clients');
+
+        expect(authorities.length).toBeGreaterThan(0);
+        authorities.forEach((routeAuthorities) => expect(routeAuthorities).toEqual([AUTHORITIES.ADMIN]));
+    });
 });
