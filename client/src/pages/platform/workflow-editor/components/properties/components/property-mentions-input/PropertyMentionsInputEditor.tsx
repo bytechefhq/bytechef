@@ -1,7 +1,10 @@
 import {canInsertMentionForProperty} from '@/pages/platform/workflow-editor/components/datapills/DataPill';
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
-import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
+import {
+    DataPillSuggestionPluginKey,
+    getSuggestionOptions,
+} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {resolveArrayIndexTemplate} from '@/pages/platform/workflow-editor/utils/dataPillArrayIndex';
@@ -129,6 +132,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const lastSavedRef = useRef<string | number | null | undefined>(undefined);
         const savingRef = useRef<Promise<void> | null>(null);
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
+        const unsavedSuggestionValueRef = useRef<string | undefined>(undefined);
         const editorValueRef = useRef(editorValue);
         const isFocusedRef = useRef(false);
         const autoFocusAppliedRef = useRef(false);
@@ -425,7 +429,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 if (valueChanged) {
                     setEditorValue(value);
-                    saveMentionInputValue(value);
+
+                    // The query typed after `$` only filters the suggestion and is replaced when a data pill is
+                    // picked, so saving it would store and validate text no one meant as a value. An unfinished
+                    // query is saved when the editor loses focus instead.
+                    if (DataPillSuggestionPluginKey.getState(editor.state)?.active) {
+                        unsavedSuggestionValueRef.current = value;
+                    } else {
+                        unsavedSuggestionValueRef.current = undefined;
+
+                        saveMentionInputValue(value);
+                    }
                 }
 
                 if (onChange) {
@@ -546,6 +560,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                         return;
                     }
 
+                    // A non-string property holds a single data pill, so free text is refused. The query typed
+                    // after `$` is not free text: it filters the data pill suggestion and is replaced on select.
+                    if (DataPillSuggestionPluginKey.getState(editor.state)?.active) {
+                        return;
+                    }
+
                     if (type !== 'STRING' && (mentionOccurences || event.key !== '$')) {
                         event.preventDefault();
                     }
@@ -555,6 +575,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             immediatelyRender: false,
             onBlur: () => {
                 isFocusedRef.current = false;
+
+                if (unsavedSuggestionValueRef.current !== undefined) {
+                    saveMentionInputValue(unsavedSuggestionValueRef.current);
+
+                    unsavedSuggestionValueRef.current = undefined;
+                }
             },
             onFocus: () => {
                 isFocusedRef.current = true;
