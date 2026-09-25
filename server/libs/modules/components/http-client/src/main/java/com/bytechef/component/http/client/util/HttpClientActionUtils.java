@@ -257,9 +257,16 @@ public class HttpClientActionUtils {
                     inputParameters.getFromPath(bodyContentPath, new TypeReference<Map<String, ?>>() {}, Map.of()),
                     bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
-                body = Http.Body.of(
-                    inputParameters.getFromPath(bodyContentPath, new TypeReference<Map<String, ?>>() {}, Map.of()),
-                    bodyContentType);
+                Object bodyContent = inputParameters.getFromPath(bodyContentPath, Object.class, Map.of());
+
+                if (bodyContent instanceof List<?> list) {
+                    body = Http.Body.of(list, bodyContentType);
+                } else {
+                    @SuppressWarnings("unchecked")
+                    Map<String, ?> bodyContentMap = (Map<String, ?>) bodyContent;
+
+                    body = Http.Body.of(bodyContentMap, bodyContentType);
+                }
             } else {
                 body = Http.Body.of(
                     inputParameters.getFromPath(bodyContentPath, String.class),
