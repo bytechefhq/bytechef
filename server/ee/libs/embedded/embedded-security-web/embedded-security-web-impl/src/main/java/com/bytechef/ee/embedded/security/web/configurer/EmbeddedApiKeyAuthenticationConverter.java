@@ -26,6 +26,8 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -72,8 +74,24 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
 
             TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
+            Integer claimedEnvironmentId = payload.get("environmentId", Integer.class);
+            long environmentId = environment.ordinal();
+
+            if (claimedEnvironmentId != null) {
+                boolean builderToken = jwtTokenService.getPublicKey(header.getKeyId()) != null;
+                String environmentHeader = request.getHeader("X-ENVIRONMENT");
+
+                if ((!builderToken || StringUtils.isNotBlank(environmentHeader)) &&
+                    environment.ordinal() != claimedEnvironmentId) {
+
+                    throw new BadCredentialsException("X-ENVIRONMENT does not match the token's environment");
+                }
+
+                environmentId = claimedEnvironmentId;
+            }
+
             return new EmbeddedApiKeyAuthenticationToken(
-                environment.ordinal(), externalUserId, null, tenantKey.getTenantId());
+                environmentId, externalUserId, null, tenantKey.getTenantId());
         } else {
             String externalUserId;
             Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());

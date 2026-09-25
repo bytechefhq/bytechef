@@ -22,6 +22,8 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,5 +80,24 @@ class EmbeddedApiKeyAuthenticationProviderTest {
             new EmbeddedApiKeyAuthenticationToken(ENVIRONMENT_ID, EXTERNAL_USER_ID, SECRET_KEY, "tenant"));
 
         assertThat(authentication.getName()).isEqualTo(EXTERNAL_USER_ID);
+    }
+
+    @Test
+    void testAuthenticatedTokenCarriesConnectedUserAndEnvironment() {
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), null, true, "ext-1", 42L, null, 0);
+
+        when(apiKeyService.exists("secret", 2L, PlatformType.EMBEDDED)).thenReturn(true);
+        when(connectedUserService.fetchConnectedUser("ext-1", 2L)).thenReturn(Optional.of(connectedUser));
+
+        Authentication authentication = embeddedApiKeyAuthenticationProvider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(2L, "ext-1", "secret", "public"));
+
+        assertThat(authentication).isInstanceOf(ConnectedUserAuthentication.class);
+
+        ConnectedUserAuthentication connectedUserAuthentication = (ConnectedUserAuthentication) authentication;
+
+        assertThat(connectedUserAuthentication.connectedUserId()).isEqualTo(42L);
+        assertThat(connectedUserAuthentication.externalUserId()).isEqualTo("ext-1");
+        assertThat(connectedUserAuthentication.environmentId()).isEqualTo(2L);
     }
 }
