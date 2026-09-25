@@ -3,7 +3,6 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef, useEffect, useState} from 'react';
@@ -63,8 +62,6 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
     ) => {
         const [isFocused, setIsFocused] = useState(false);
         const [localValue, setLocalValue] = useState(value);
-
-        const setPillTarget = useWorkflowNodeDetailsPanelStore((state) => state.setPillTarget);
 
         const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
             const rawValue = event.target.value;
@@ -171,8 +168,6 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                 onChange={handleInputChange}
                                 onFocus={(event) => {
                                     setIsFocused(true);
-
-                                    setPillTarget(null);
 
                                     if (onFocus) {
                                         onFocus(event);
