@@ -9,7 +9,9 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
 
@@ -25,9 +27,12 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation(project(":server:libs:core:commons:commons-util"))
     testImplementation(project(":server:libs:core:tenant:tenant-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
     testImplementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-public-rest"))
+    testImplementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     testRuntimeOnly(libs.jjwt.impl)
     testRuntimeOnly(libs.jjwt.jackson)

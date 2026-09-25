@@ -71,6 +71,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ConnectedUser> fetchConnectedUser(long id) {
+        return connectedUserRepository.findById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<ConnectedUser> fetchConnectedUser(String externalId, long environmentId) {
         return connectedUserRepository.findByExternalIdAndEnvironment(externalId, (int) environmentId);
     }
