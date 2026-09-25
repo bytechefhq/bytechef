@@ -6,10 +6,11 @@ import {workflowEditorProviderTestValue} from '@/pages/platform/workflow-editor/
 import {WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {PropertyAllType} from '@/shared/types';
 import {act, renderHook} from '@testing-library/react';
 import {ReactNode} from 'react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {type Mock, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {useProperty} from '../useProperty';
 
@@ -104,5 +105,45 @@ describe('handleInputTypeSwitchButtonClick formula mode', () => {
 
         expect(result.current.mentionInput).toBe(true);
         expect(result.current.isFormulaMode).toBe(false);
+    });
+
+    it('stays in the editor once clearing the constant value succeeds', () => {
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: {
+                name: 'dataStorage_1',
+                parameters: {scope: 'CURRENT_EXECUTION'},
+                workflowNodeName: 'dataStorage_1',
+            },
+        } as unknown as Partial<ReturnType<typeof useWorkflowNodeDetailsPanelStore.getState>>);
+
+        (saveProperty as unknown as Mock).mockReset();
+
+        const {result} = renderHook(
+            () =>
+                useProperty({
+                    parameterValue: 'CURRENT_EXECUTION',
+                    property: {
+                        controlType: 'SELECT',
+                        expressionEnabled: true,
+                        name: 'scope',
+                        options: [{label: 'Current Execution', value: 'CURRENT_EXECUTION'}],
+                        type: 'STRING',
+                    } as unknown as PropertyAllType,
+                }),
+            {wrapper}
+        );
+
+        expect(result.current.mentionInput).toBe(false);
+
+        act(() => result.current.handleInputTypeSwitchButtonClick());
+
+        expect(result.current.mentionInput).toBe(true);
+        expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({value: null}));
+
+        const {successCallback} = (saveProperty as unknown as Mock).mock.calls[0][0];
+
+        act(() => successCallback());
+
+        expect(result.current.mentionInput).toBe(true);
     });
 });
