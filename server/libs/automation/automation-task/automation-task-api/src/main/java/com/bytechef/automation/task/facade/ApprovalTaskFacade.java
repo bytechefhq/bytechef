@@ -17,6 +17,8 @@
 package com.bytechef.automation.task.facade;
 
 import com.bytechef.automation.task.domain.ApprovalTask;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for cross-service approval task operations that span the task module and other domain services.
@@ -34,4 +36,14 @@ public interface ApprovalTaskFacade {
      * @return the persisted approval task
      */
     ApprovalTask createApprovalTask(ApprovalTask approvalTask);
+
+    void deleteApprovalTask(long id);
+
+    ApprovalTask getApprovalTask(long id);
+
+    List<ApprovalTask> getApprovalTasks(@Nullable Integer environmentId);
+
+    List<ApprovalTask> getApprovalTasks(List<Long> ids);
+
+    ApprovalTask updateApprovalTask(ApprovalTask approvalTask);
 }
