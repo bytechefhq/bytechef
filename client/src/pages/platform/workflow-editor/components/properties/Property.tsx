@@ -13,7 +13,7 @@ import FormLookupValuesWatcher from '@/pages/platform/workflow-editor/components
 import FromAiToggleButton from '@/pages/platform/workflow-editor/components/properties/components/FromAiToggleButton';
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
-import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import PropertyMultiSelect from '@/pages/platform/workflow-editor/components/properties/components/PropertyMultiSelect';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyTextArea from '@/pages/platform/workflow-editor/components/properties/components/PropertyTextArea';
@@ -318,18 +318,18 @@ const Property = ({
 
                                         <div className="flex items-center gap-1">
                                             {showFormulaSwitch && !control && (
-                                                <PropertyInputTypeSwitch
+                                                <PropertyFormulaSwitch
+                                                    formulaMode={isFormulaMode}
                                                     handleClick={handleFormulaSwitch}
-                                                    mentionInput={isFormulaMode}
                                                 />
                                             )}
 
                                             {control && isToolsClusterElement && expressionEnabled !== false && (
-                                                <PropertyInputTypeSwitch
+                                                <PropertyFormulaSwitch
+                                                    formulaMode={controlledDynamicMode}
                                                     handleClick={() =>
                                                         handleControlledModeSwitch(!controlledDynamicMode)
                                                     }
-                                                    mentionInput={controlledDynamicMode}
                                                 />
                                             )}
 

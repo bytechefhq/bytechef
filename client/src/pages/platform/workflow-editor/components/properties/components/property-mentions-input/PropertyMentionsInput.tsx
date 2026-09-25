@@ -22,7 +22,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import {createEditorPillTarget} from '@/pages/platform/workflow-editor/components/datapills/pillTarget';
-import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import ExpressionHelpNote from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/ExpressionHelpNote';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
 import useOpenDataPillPanel from '@/pages/platform/workflow-editor/hooks/useOpenDataPillPanel';
@@ -299,7 +299,10 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             )}
 
                             {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                                <PropertyInputTypeSwitch handleClick={handleInputTypeSwitchButtonClick} mentionInput />
+                                <PropertyFormulaSwitch
+                                    formulaMode={!!isFormulaMode}
+                                    handleClick={handleInputTypeSwitchButtonClick}
+                                />
                             )}
 
                             {deletePropertyButton}

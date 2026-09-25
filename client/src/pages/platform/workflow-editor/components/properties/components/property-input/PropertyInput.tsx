@@ -2,7 +2,7 @@ import {Input} from '@/components/Input/Input';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef, useEffect, useState} from 'react';
@@ -19,7 +19,6 @@ interface PropertyInputProps extends InputHTMLAttributes<HTMLInputElement> {
     inputOverlay?: ReactNode;
     label?: string;
     leadingIcon?: ReactNode;
-    mentionInput?: boolean;
     name: string;
     onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
     showInputTypeSwitchButton?: boolean;
@@ -44,7 +43,6 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             inputOverlay,
             label,
             leadingIcon,
-            mentionInput = false,
             name,
             onBlur,
             onChange,
@@ -106,10 +104,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
 
                     <div className="flex items-center">
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                            <PropertyInputTypeSwitch
-                                handleClick={handleInputTypeSwitchButtonClick}
-                                mentionInput={mentionInput}
-                            />
+                            <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                         )}
 
                         {deletePropertyButton}

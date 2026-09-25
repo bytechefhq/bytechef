@@ -3,7 +3,7 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyFormulaSwitch';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilderSheet';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {CircleQuestionMarkIcon, FullscreenIcon} from 'lucide-react';
@@ -70,9 +70,9 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
                             </div>
 
                             {handleInputTypeSwitchButtonClick && (
-                                <PropertyInputTypeSwitch
+                                <PropertyFormulaSwitch
+                                    formulaMode={false}
                                     handleClick={handleInputTypeSwitchButtonClick}
-                                    mentionInput={false}
                                 />
                             )}
                         </div>
