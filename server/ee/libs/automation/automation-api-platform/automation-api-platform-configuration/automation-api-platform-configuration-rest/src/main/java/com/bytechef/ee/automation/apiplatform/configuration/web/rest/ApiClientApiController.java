@@ -20,7 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
-import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
+import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiClientFacade;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiClientModel;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.CreateApiClient200ResponseModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -41,14 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ApiClientApiController implements ApiClientApi {
 
-    private final ApiClientService apiClientService;
+    private final ApiClientFacade apiClientFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public ApiClientApiController(
-        ApiClientService apiClientService, ConversionService conversionService) {
-
-        this.apiClientService = apiClientService;
+    public ApiClientApiController(ApiClientFacade apiClientFacade, ConversionService conversionService) {
+        this.apiClientFacade = apiClientFacade;
         this.conversionService = conversionService;
     }
 
@@ -56,12 +54,12 @@ public class ApiClientApiController implements ApiClientApi {
     public ResponseEntity<CreateApiClient200ResponseModel> createApiClient(ApiClientModel apiClientModel) {
         return ResponseEntity.ok(
             new CreateApiClient200ResponseModel().secretKey(
-                apiClientService.create(conversionService.convert(apiClientModel, ApiClient.class))));
+                apiClientFacade.createApiClient(conversionService.convert(apiClientModel, ApiClient.class))));
     }
 
     @Override
     public ResponseEntity<Void> deleteApiClient(Long id) {
-        apiClientService.delete(id);
+        apiClientFacade.deleteApiClient(id);
 
         return ResponseEntity.ok()
             .build();
@@ -70,7 +68,7 @@ public class ApiClientApiController implements ApiClientApi {
     @Override
     public ResponseEntity<ApiClientModel> getApiClient(Long id) {
         ApiClientModel apiClientModel = Objects.requireNonNull(
-            conversionService.convert(apiClientService.getApiClient(id), ApiClientModel.class), "apiClientModel");
+            conversionService.convert(apiClientFacade.getApiClient(id), ApiClientModel.class), "apiClientModel");
 
         return ResponseEntity.ok(apiClientModel.secretKey(obfuscate(apiClientModel.getSecretKey())));
     }
@@ -79,7 +77,7 @@ public class ApiClientApiController implements ApiClientApi {
     public ResponseEntity<List<ApiClientModel>> getApiClients() {
         return ResponseEntity.ok(
             CollectionUtils.map(
-                apiClientService.getApiClients(),
+                apiClientFacade.getApiClients(),
                 apiClient -> {
                     ApiClientModel apiClientModel = Objects.requireNonNull(
                         conversionService.convert(apiClient, ApiClientModel.class), "apiClientModel");
@@ -90,7 +88,7 @@ public class ApiClientApiController implements ApiClientApi {
 
     @Override
     public ResponseEntity<Void> updateApiClient(Long id, ApiClientModel apiClientModel) {
-        apiClientService.update(conversionService.convert(apiClientModel.id(id), ApiClient.class));
+        apiClientFacade.updateApiClient(conversionService.convert(apiClientModel.id(id), ApiClient.class));
 
         return ResponseEntity.noContent()
             .build();
