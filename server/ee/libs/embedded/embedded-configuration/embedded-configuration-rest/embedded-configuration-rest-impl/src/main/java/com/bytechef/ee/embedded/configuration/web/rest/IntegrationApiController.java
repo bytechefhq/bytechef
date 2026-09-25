@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +56,7 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Long> createIntegration(IntegrationModel integrationModel) {
         return ResponseEntity.ok(
             integrationFacade.createIntegration(
@@ -63,11 +65,13 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Long> createIntegrationWorkflow(Long id, WorkflowModel workflowModel) {
         return ResponseEntity.ok(integrationWorkflowFacade.addWorkflow(id, workflowModel.getDefinition()));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> deleteIntegration(Long id) {
         integrationFacade.deleteIntegration(id);
 
@@ -76,12 +80,14 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<IntegrationModel> getIntegration(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(integrationFacade.getIntegration(id), IntegrationModel.class));
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<IntegrationVersionModel>> getIntegrationVersions(Long id) {
         return ResponseEntity.ok(
             integrationService.getIntegrationVersions(id)
@@ -91,6 +97,7 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<IntegrationModel>> getIntegrations(
         Long categoryId, Boolean integrationInstanceConfigurations, IntegrationStatusModel status, Long tagId,
         Boolean includeAllFields) {
@@ -106,6 +113,7 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> publishIntegration(
         Long id, PublishIntegrationRequestModel publishIntegrationRequestModel) {
 
@@ -117,6 +125,7 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateIntegration(Long id, IntegrationModel integrationModel) {
         integrationFacade.updateIntegration(
             Validate.notNull(
