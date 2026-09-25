@@ -20,12 +20,14 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENA
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.F16KV;
@@ -76,6 +78,7 @@ import org.mockito.MockedStatic;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
+import org.springframework.ai.ollama.api.ThinkOption;
 
 /**
  * @author Nikolina Spehar
@@ -268,5 +271,27 @@ class OllamaChatActionTest {
         assertEquals(false, options.getUseMLock());
         assertEquals(false, options.getUseNUMA());
         assertEquals(false, options.getVocabOnly());
+    }
+
+    @Test
+    void testCreateChatModelWithThinkingSendsThinkLevel() {
+        OllamaChatOptions options = createThinkingChatOptions(
+            Map.of(MODEL, "gpt-oss", THINKING, true, REASONING_EFFORT, "high"));
+
+        assertEquals(new ThinkOption.ThinkLevel("high"), options.getThinkOption());
+    }
+
+    @Test
+    void testCreateChatModelWithoutThinkingOmitsThinkLevel() {
+        OllamaChatOptions options = createThinkingChatOptions(Map.of(MODEL, "gpt-oss", REASONING_EFFORT, "high"));
+
+        assertNull(options.getThinkOption());
+    }
+
+    private OllamaChatOptions createThinkingChatOptions(Map<String, Object> inputParameters) {
+        org.springframework.ai.chat.model.ChatModel chatModel = OllamaChatAction.CHAT_MODEL.createChatModel(
+            MockParametersFactory.create(inputParameters), MockParametersFactory.create(Map.of()), false);
+
+        return (OllamaChatOptions) chatModel.getDefaultOptions();
     }
 }

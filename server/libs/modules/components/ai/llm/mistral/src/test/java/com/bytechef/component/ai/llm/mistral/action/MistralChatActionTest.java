@@ -23,6 +23,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMA
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -50,6 +51,7 @@ import org.mockito.MockedStatic;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
+import org.springframework.ai.mistralai.api.MistralAiApi.ChatCompletionRequest.ReasoningEffort;
 import org.springframework.ai.mistralai.api.MistralAiApi.ChatCompletionRequest.ResponseFormat;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -159,5 +161,27 @@ class MistralChatActionTest {
         assertEquals(FALSE, mistralAiChatOptions.getSafePrompt());
         assertEquals(42, mistralAiChatOptions.getRandomSeed());
         assertNull(mistralAiChatOptions.getResponseFormat());
+    }
+
+    @Test
+    void testCreateChatModelWithThinkingSendsHighReasoningEffort() {
+        MistralAiChatOptions options =
+            createThinkingChatOptions(Map.of(MODEL, "magistral-medium-latest", THINKING, true));
+
+        assertEquals(ReasoningEffort.HIGH, options.getReasoningEffort());
+    }
+
+    @Test
+    void testCreateChatModelWithoutThinkingOmitsReasoningEffort() {
+        MistralAiChatOptions options = createThinkingChatOptions(Map.of(MODEL, "magistral-medium-latest"));
+
+        assertNull(options.getReasoningEffort());
+    }
+
+    private MistralAiChatOptions createThinkingChatOptions(Map<String, Object> inputParameters) {
+        org.springframework.ai.chat.model.ChatModel chatModel = MistralChatAction.CHAT_MODEL.createChatModel(
+            MockParametersFactory.create(inputParameters), mockedConnectionParameters, false);
+
+        return (MistralAiChatOptions) chatModel.getDefaultOptions();
     }
 }

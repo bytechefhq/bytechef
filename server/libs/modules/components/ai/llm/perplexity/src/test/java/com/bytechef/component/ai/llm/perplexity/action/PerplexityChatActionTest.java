@@ -22,10 +22,12 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -154,5 +156,28 @@ class PerplexityChatActionTest {
         assertEquals("user123", options.getUser());
         assertEquals(Map.of("50256", -100), options.getLogitBias());
         assertNull(options.getResponseFormat());
+    }
+
+    @Test
+    void testCreateChatModelWithThinkingSendsReasoningEffort() {
+        OpenAiChatOptions options = createThinkingChatOptions(
+            Map.of(MODEL, "sonar-deep-research", THINKING, true, REASONING_EFFORT, "high"));
+
+        assertEquals("high", options.getReasoningEffort());
+    }
+
+    @Test
+    void testCreateChatModelWithoutThinkingOmitsReasoningEffort() {
+        OpenAiChatOptions options =
+            createThinkingChatOptions(Map.of(MODEL, "sonar-deep-research", REASONING_EFFORT, "high"));
+
+        assertNull(options.getReasoningEffort());
+    }
+
+    private OpenAiChatOptions createThinkingChatOptions(Map<String, Object> inputParameters) {
+        org.springframework.ai.chat.model.ChatModel chatModel = PerplexityChatAction.CHAT_MODEL.createChatModel(
+            MockParametersFactory.create(inputParameters), mockedConnectionParameters, false);
+
+        return (OpenAiChatOptions) chatModel.getDefaultOptions();
     }
 }
