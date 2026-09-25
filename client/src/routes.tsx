@@ -20,6 +20,7 @@ import ErrorPage from '@/shared/error/ErrorPage';
 import LazyLoadWrapper from '@/shared/error/LazyLoadWrapper';
 import PageNotFound from '@/shared/error/PageNotFound';
 import AutomationEnvironmentAccessGuard from '@/shared/layout/AutomationEnvironmentAccessGuard';
+import EmbeddedIndexRedirect from '@/shared/layout/EmbeddedIndexRedirect';
 import Settings from '@/shared/layout/Settings';
 import SettingsIndexRedirect from '@/shared/layout/SettingsIndexRedirect';
 import {ProjectApi} from '@/shared/middleware/automation/configuration';
@@ -703,7 +704,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     loader: async ({params}) =>
-                                        loadProjectWorkflowEditor(queryClient, parseInt(params.projectId!)),
+                                        loadProjectWorkflowEditor(queryClient, Number.parseInt(params.projectId!)),
                                     path: 'projects/:projectId/project-workflows/:projectWorkflowId',
                                 },
                                 {
@@ -972,15 +973,15 @@ export const getRouter = (queryClient: QueryClient) =>
                         {
                             children: [
                                 {
+                                    element: (
+                                        <EmbeddedIndexRedirect fallbackHref="account" tenantAdminHref="integrations" />
+                                    ),
                                     index: true,
-                                    loader: async () => {
-                                        return redirect('integrations');
-                                    },
                                 },
                                 getAccountRoutes('/embedded'),
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <Integrations />
@@ -994,7 +995,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <LazyLoadWrapper>
                                                 <EEVersion>
                                                     <Integration />
@@ -1028,7 +1029,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <IntegrationInstanceConfigurations />
@@ -1040,7 +1041,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <AutomationWorkflows />
@@ -1052,7 +1053,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <AutomationWorkflow />
@@ -1064,7 +1065,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <ConnectedUsers />
@@ -1076,7 +1077,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <AppEvents />
@@ -1088,7 +1089,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <EmbeddedIntegrationWorkflowExecutions />
@@ -1100,7 +1101,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                 },
                                 {
                                     element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                                             <EEVersion>
                                                 <LazyLoadWrapper>
                                                     <EmbeddedConnections />
