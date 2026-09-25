@@ -26,6 +26,8 @@ public interface ConnectionAdminFacade {
 
     ConnectionDTO getConnection(long id);
 
+    List<Tag> getConnectionTags();
+
     List<ConnectionDTO> getConnections(
         @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
         @Nullable Long tagId);
@@ -33,4 +35,6 @@ public interface ConnectionAdminFacade {
     Set<Long> getSharedConnectionIds();
 
     void updateConnection(long id, String name, List<Tag> tags, @Nullable Boolean shared, int version);
+
+    void updateConnectionTags(long id, List<Tag> tags);
 }
