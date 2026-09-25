@@ -232,6 +232,12 @@ class EndpointGateCoverageTest {
 
     private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.of();
 
+    private static final Set<String> READ_GATED_CONTROLLERS = Set.of(
+        "ApiClientApiController", "ApiConnectorGraphQlController", "ApprovalTaskGraphQlController",
+        "ConnectedUserMcpServerGraphQlController", "EmbeddedMcpServerGraphQlController",
+        "McpIntegrationInstanceConfigurationGraphQlController",
+        "McpIntegrationInstanceConfigurationWorkflowGraphQlController");
+
     private static final Set<String> SKIPPED_DIRECTORY_NAMES =
         Set.of(".git", ".gradle", "bin", "build", "node_modules", "src");
 
@@ -250,6 +256,7 @@ class EndpointGateCoverageTest {
         "DeleteMapping", "DELETE", "MutationMapping", "MUTATION", "PatchMapping", "PATCH", "PostMapping", "POST",
         "PutMapping", "PUT");
 
+    private static Map<String, List<Endpoint>> readEndpointsByKey;
     private static Map<String, List<Endpoint>> writeEndpointsByKey;
     private static Map<String, List<SourceType>> sourceTypesByName;
 
@@ -261,6 +268,7 @@ class EndpointGateCoverageTest {
         Map<String, Set<String>> httpMethodsByOperationId = collectHttpMethodsByOperationId(serverRoot);
 
         sourceTypesByName = new HashMap<>();
+        readEndpointsByKey = new TreeMap<>();
         writeEndpointsByKey = new TreeMap<>();
 
         for (Path sourceFile : mainSourceFiles) {
@@ -281,6 +289,10 @@ class EndpointGateCoverageTest {
 
             if (isScannedController(serverRoot, sourceFile, source)) {
                 collectWriteEndpoints(sourceType, httpMethodsByOperationId);
+            }
+
+            if (READ_GATED_CONTROLLERS.contains(typeName)) {
+                collectReadEndpoints(sourceType, httpMethodsByOperationId);
             }
         }
     }
@@ -325,6 +337,32 @@ class EndpointGateCoverageTest {
                 "these write endpoints carry no @PreAuthorize of their own and are not listed: gate them, or add them "
                     + "to GATED_DELEGATES with the gated bean method they call, to AUTHORIZED_OTHERWISE with how "
                     + "it is authorized, or to KNOWN_UNGATED_WRITES")
+            .isEmpty();
+    }
+
+    @Test
+    void testEveryReadEndpointOfAReadGatedControllerIsGated() {
+        Set<String> controllerNamesWithReads = new TreeSet<>();
+        Set<String> ungatedReadEndpoints = new TreeSet<>();
+
+        for (Map.Entry<String, List<Endpoint>> entry : readEndpointsByKey.entrySet()) {
+            for (Endpoint endpoint : entry.getValue()) {
+                SourceType controller = endpoint.controller();
+
+                controllerNamesWithReads.add(controller.name());
+
+                if (!endpoint.gated()) {
+                    ungatedReadEndpoints.add(entry.getKey() + " (" + endpoint.kind() + ")");
+                }
+            }
+        }
+
+        assertThat(controllerNamesWithReads)
+            .as("every READ_GATED_CONTROLLERS entry must name a scanned controller with at least one read endpoint")
+            .isEqualTo(new TreeSet<>(READ_GATED_CONTROLLERS));
+
+        assertThat(ungatedReadEndpoints)
+            .as("these read endpoints of a READ_GATED_CONTROLLERS controller carry no @PreAuthorize or @PostFilter")
             .isEmpty();
     }
 
@@ -502,6 +540,55 @@ class EndpointGateCoverageTest {
 
             endpoints.add(new Endpoint(controller, member.name(), kind, gated, member.body()));
         }
+    }
+
+    private static void collectReadEndpoints(
+        SourceType controller, Map<String, Set<String>> httpMethodsByOperationId) {
+
+        Set<String> classAnnotationNames = controller.classAnnotations()
+            .keySet();
+
+        boolean restController = classAnnotationNames.contains("RestController");
+
+        for (Member member : controller.members()) {
+            String kind = readKind(member, restController, httpMethodsByOperationId);
+
+            if (kind == null) {
+                continue;
+            }
+
+            Map<String, String> memberAnnotations = member.annotations();
+
+            boolean gated = controller.classGated() || memberAnnotations.containsKey("PreAuthorize") ||
+                memberAnnotations.containsKey("PostFilter");
+
+            List<Endpoint> endpoints = readEndpointsByKey.computeIfAbsent(
+                controller.name() + "#" + member.name(), key -> new ArrayList<>());
+
+            endpoints.add(new Endpoint(controller, member.name(), kind, gated, member.body()));
+        }
+    }
+
+    private static String readKind(
+        Member member, boolean restController, Map<String, Set<String>> httpMethodsByOperationId) {
+
+        Map<String, String> annotations = member.annotations();
+
+        if (annotations.containsKey("QueryMapping")) {
+            return "QUERY";
+        }
+
+        if (annotations.containsKey("GetMapping")) {
+            return "GET";
+        }
+
+        if (restController && annotations.containsKey("Override")) {
+            Set<String> httpMethods = httpMethodsByOperationId.getOrDefault(member.name(), Set.of());
+
+            return httpMethods.contains("GET") ? "GET" : null;
+        }
+
+        return null;
     }
 
     private static String writeKind(
