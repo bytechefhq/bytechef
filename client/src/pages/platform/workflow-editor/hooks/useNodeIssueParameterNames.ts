@@ -21,6 +21,10 @@ export default function useNodeIssueParameterNames(
             return new Set<string>();
         }
 
-        return getIssueParameterNames(getNodeIssues({clusterElementRootNames, issues, nodeName}), parameters);
+        return getIssueParameterNames(
+            getNodeIssues({clusterElementRootNames, issues, nodeName}),
+            parameters,
+            clusterElementRootNames
+        );
     }, [clusterElementRootNames, issues, nodeName, parameters]);
 }

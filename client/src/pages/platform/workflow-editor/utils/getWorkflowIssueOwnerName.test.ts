@@ -1,7 +1,10 @@
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {describe, expect, it} from 'vitest';
 
-import getWorkflowIssueOwnerName, {getClusterElementRootNames} from './getWorkflowIssueOwnerName';
+import getWorkflowIssueOwnerName, {
+    getClusterElementRootNames,
+    getWorkflowIssueOwnerPropertyPath,
+} from './getWorkflowIssueOwnerName';
 
 const AI_AGENT_TASK = {
     clusterElements: {
@@ -117,5 +120,30 @@ describe('getWorkflowIssueOwnerName', () => {
                 clusterElementRootNames
             )
         ).toBe('httpClient_1');
+    });
+});
+
+describe('getWorkflowIssueOwnerPropertyPath', () => {
+    const clusterElementRootNames = getClusterElementRootNames([AI_AGENT_TASK]);
+
+    it('drops the cluster element names that lead to the owning element', () => {
+        expect(getWorkflowIssueOwnerPropertyPath({propertyPath: 'openAi_1.model'}, clusterElementRootNames)).toBe(
+            'model'
+        );
+        expect(
+            getWorkflowIssueOwnerPropertyPath({propertyPath: 'rag_1.pgVector_1.index'}, clusterElementRootNames)
+        ).toBe('index');
+    });
+
+    it('keeps a path that does not start with a cluster element name', () => {
+        expect(getWorkflowIssueOwnerPropertyPath({propertyPath: 'prompt'}, clusterElementRootNames)).toBe('prompt');
+        expect(
+            getWorkflowIssueOwnerPropertyPath({propertyPath: 'firecrawl_5.data.json'}, clusterElementRootNames)
+        ).toBe('firecrawl_5.data.json');
+    });
+
+    it('returns nothing when there is no path or the path names only cluster elements', () => {
+        expect(getWorkflowIssueOwnerPropertyPath({}, clusterElementRootNames)).toBeUndefined();
+        expect(getWorkflowIssueOwnerPropertyPath({propertyPath: 'openAi_1'}, clusterElementRootNames)).toBeUndefined();
     });
 });

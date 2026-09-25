@@ -1,5 +1,6 @@
 import {WorkflowIssueI} from '../stores/useWorkflowIssuesStore';
 import {isWorkflowTask} from './flattenDefinitionTasks';
+import {getWorkflowIssueOwnerPropertyPath} from './getWorkflowIssueOwnerName';
 
 const EXPRESSION_PATTERN = /\$\{([^}]*)\}/g;
 const PARAMETER_PATH_ROOT_PATTERN = /^[^.[]+/;
@@ -82,9 +83,11 @@ export function getParameterPathRoot(parameterPath: string): string {
 
 export default function findWorkflowIssueParameterPaths(
     issue: Pick<WorkflowIssueI, 'propertyPath' | 'referencedNodeName'>,
-    parameters: Record<string, unknown> | undefined
+    parameters: Record<string, unknown> | undefined,
+    clusterElementRootNames: ReadonlyMap<string, string> = new Map()
 ): Array<string> {
-    const matchesExpression = getExpressionMatcher(issue);
+    const propertyPath = getWorkflowIssueOwnerPropertyPath(issue, clusterElementRootNames);
+    const matchesExpression = getExpressionMatcher({propertyPath, referencedNodeName: issue.referencedNodeName});
 
     if (!parameters || !matchesExpression) {
         return [];
@@ -94,8 +97,8 @@ export default function findWorkflowIssueParameterPaths(
 
     collectParameterPaths(parameters, '', matchesExpression, parameterPaths);
 
-    if (parameterPaths.length === 0 && issue.propertyPath && getParameterPathRoot(issue.propertyPath) in parameters) {
-        return [issue.propertyPath];
+    if (parameterPaths.length === 0 && propertyPath && getParameterPathRoot(propertyPath) in parameters) {
+        return [propertyPath];
     }
 
     return parameterPaths;
@@ -103,16 +106,19 @@ export default function findWorkflowIssueParameterPaths(
 
 export function getIssueParameterNames(
     issues: Array<Pick<WorkflowIssueI, 'propertyPath' | 'referencedNodeName'>>,
-    parameters: Record<string, unknown> | undefined
+    parameters: Record<string, unknown> | undefined,
+    clusterElementRootNames: ReadonlyMap<string, string> = new Map()
 ): Set<string> {
     const parameterNames = new Set<string>();
 
     for (const issue of issues) {
-        if (issue.propertyPath) {
-            parameterNames.add(getParameterPathRoot(issue.propertyPath));
+        const propertyPath = getWorkflowIssueOwnerPropertyPath(issue, clusterElementRootNames);
+
+        if (propertyPath) {
+            parameterNames.add(getParameterPathRoot(propertyPath));
         }
 
-        for (const parameterPath of findWorkflowIssueParameterPaths(issue, parameters)) {
+        for (const parameterPath of findWorkflowIssueParameterPaths(issue, parameters, clusterElementRootNames)) {
             parameterNames.add(getParameterPathRoot(parameterPath));
         }
     }
