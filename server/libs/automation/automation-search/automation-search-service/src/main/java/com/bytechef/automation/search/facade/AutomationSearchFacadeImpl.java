@@ -64,6 +64,9 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
 
         Set<Long> accessibleWorkspaceIds = getAccessibleWorkspaceIds();
 
+        if (accessibleWorkspaceIds.isEmpty()) {
+            return List.of();
+        }
 
         for (SearchAssetProvider provider : providers) {
             CompletableFuture<List<SearchResult<?>>> future = CompletableFuture.supplyAsync(() -> {
@@ -71,7 +74,7 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
 
                 try {
                     return (List<SearchResult<?>>) TenantContext.callWithTenantId(
-                        currentTenantId, () -> provider.search(query, limit));
+                        currentTenantId, () -> provider.search(query, limit, accessibleWorkspaceIds));
                 } finally {
                     SecurityContextHolder.clearContext();
                 }
@@ -86,7 +89,6 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
         return futures.stream()
             .flatMap(future -> future.join()
                 .stream())
-            .filter(searchResult -> isAccessible(searchResult, accessibleWorkspaceIds))
             .toList();
     }
 
@@ -95,12 +97,6 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
             .getId())
             .stream()
             .map(Workspace::getId)
-            .collect(Collectors.toSet());
-    }
-
-    private static boolean isAccessible(SearchResult<?> searchResult, Set<Long> accessibleWorkspaceIds) {
-        Long workspaceId = searchResult.workspaceId();
-
-        return workspaceId == null || accessibleWorkspaceIds.contains(workspaceId);
+            .collect(Collectors.toUnmodifiableSet());
     }
 }
