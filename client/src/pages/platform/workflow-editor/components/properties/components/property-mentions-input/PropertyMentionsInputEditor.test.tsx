@@ -550,6 +550,74 @@ describe('PropertyMentionsInputEditor', () => {
         });
     });
 
+    describe('data pill suggestion saving', () => {
+        beforeEach(() => {
+            useWorkflowDataStore.setState({
+                dataPills: [{id: 'firecrawl_5', value: 'firecrawl_5'}],
+            } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+        });
+
+        const savedValues = () =>
+            (saveProperty as unknown as Mock).mock.calls.map(([options]) => String(options.value).trim());
+
+        it('should not save the query typed after $ while the suggestion is open', async () => {
+            renderEditor();
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.keyboard('$fire');
+            await microtaskTick(3);
+
+            expect(textbox.textContent).toBe('$fire');
+            expect(savedValues()).toEqual([]);
+        });
+
+        it('should not save a lone $ that is deleted again', async () => {
+            renderEditor();
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.keyboard('$');
+            await microtaskTick(3);
+            await userEvent.keyboard('{Backspace}');
+            await microtaskTick(3);
+
+            expect(savedValues().filter((savedValue) => savedValue.includes('$'))).toEqual([]);
+        });
+
+        it('should save the data pill picked from the suggestion', async () => {
+            renderEditor();
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.keyboard('$fire');
+            await microtaskTick(3);
+            await userEvent.keyboard('{Enter}');
+
+            await waitFor(() => {
+                expect(savedValues()).toEqual(['${firecrawl_5}']);
+            });
+        });
+
+        it('should save an unfinished query when the editor loses focus', async () => {
+            renderEditor();
+
+            const textbox = screen.getByRole('textbox', {name: 'Editor'});
+
+            await userEvent.click(textbox);
+            await userEvent.keyboard('$fire');
+            await microtaskTick(3);
+            await userEvent.click(document.body);
+
+            await waitFor(() => {
+                expect(savedValues()).toEqual(['$fire']);
+            });
+        });
+    });
+
     describe('formula mode', () => {
         it('should strip = prefix for formula mode values', async () => {
             renderEditor({isFormulaMode: true, value: '=1 + 2'});

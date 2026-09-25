@@ -132,6 +132,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const lastSavedRef = useRef<string | number | null | undefined>(undefined);
         const savingRef = useRef<Promise<void> | null>(null);
         const pendingValueRef = useRef<string | number | null | undefined>(undefined);
+        const unsavedSuggestionValueRef = useRef<string | undefined>(undefined);
         const editorValueRef = useRef(editorValue);
         const isFocusedRef = useRef(false);
         const autoFocusAppliedRef = useRef(false);
@@ -428,7 +429,17 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 if (valueChanged) {
                     setEditorValue(value);
-                    saveMentionInputValue(value);
+
+                    // The query typed after `$` only filters the suggestion and is replaced when a data pill is
+                    // picked, so saving it would store and validate text no one meant as a value. An unfinished
+                    // query is saved when the editor loses focus instead.
+                    if (DataPillSuggestionPluginKey.getState(editor.state)?.active) {
+                        unsavedSuggestionValueRef.current = value;
+                    } else {
+                        unsavedSuggestionValueRef.current = undefined;
+
+                        saveMentionInputValue(value);
+                    }
                 }
 
                 if (onChange) {
@@ -564,6 +575,12 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             immediatelyRender: false,
             onBlur: () => {
                 isFocusedRef.current = false;
+
+                if (unsavedSuggestionValueRef.current !== undefined) {
+                    saveMentionInputValue(unsavedSuggestionValueRef.current);
+
+                    unsavedSuggestionValueRef.current = undefined;
+                }
             },
             onFocus: () => {
                 isFocusedRef.current = true;
