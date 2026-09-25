@@ -16,11 +16,15 @@
 
 package com.bytechef.automation.data.table.search;
 
+import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
+import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,17 +34,32 @@ import org.springframework.stereotype.Component;
 class DataTableSearchAssetProvider implements SearchAssetProvider {
 
     private final DataTableService dataTableService;
+    private final WorkspaceDataTableService workspaceDataTableService;
 
-    DataTableSearchAssetProvider(DataTableService dataTableService) {
+    DataTableSearchAssetProvider(
+        DataTableService dataTableService, WorkspaceDataTableService workspaceDataTableService) {
+
         this.dataTableService = dataTableService;
+        this.workspaceDataTableService = workspaceDataTableService;
     }
 
     @Override
-    public List<DataTableSearchResult> search(String query, int limit) {
+    public List<DataTableSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
+
+        Set<Long> dataTableIds = workspaceIds.stream()
+            .flatMap(workspaceId -> workspaceDataTableService.getWorkspaceDataTables(workspaceId)
+                .stream())
+            .map(WorkspaceDataTable::getDataTableId)
+            .collect(Collectors.toSet());
+
+        if (dataTableIds.isEmpty()) {
+            return List.of();
+        }
 
         return dataTableService.listTables(1L)
             .stream()
+            .filter(table -> dataTableIds.contains(table.id()))
             .filter(table -> containsIgnoreCase(table.baseName(), queryLower))
             .limit(limit)
             .map(table -> new DataTableSearchResult(table.id(), table.baseName()))

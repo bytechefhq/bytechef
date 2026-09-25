@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.search;
+package com.bytechef.automation.knowledgebase.search;
 
+import com.bytechef.automation.knowledgebase.domain.WorkspaceKnowledgeBase;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -32,17 +36,32 @@ import org.springframework.stereotype.Component;
 class KnowledgeBaseSearchAssetProvider implements SearchAssetProvider {
 
     private final KnowledgeBaseService knowledgeBaseService;
+    private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
-    KnowledgeBaseSearchAssetProvider(KnowledgeBaseService knowledgeBaseService) {
+    KnowledgeBaseSearchAssetProvider(
+        KnowledgeBaseService knowledgeBaseService, WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
+
         this.knowledgeBaseService = knowledgeBaseService;
+        this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
 
     @Override
-    public List<KnowledgeBaseSearchResult> search(String query, int limit) {
+    public List<KnowledgeBaseSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
+
+        Set<Long> knowledgeBaseIds = workspaceIds.stream()
+            .flatMap(workspaceId -> workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
+                .stream())
+            .map(WorkspaceKnowledgeBase::getKnowledgeBaseId)
+            .collect(Collectors.toSet());
+
+        if (knowledgeBaseIds.isEmpty()) {
+            return List.of();
+        }
 
         return knowledgeBaseService.getKnowledgeBases()
             .stream()
+            .filter(knowledgeBase -> knowledgeBaseIds.contains(knowledgeBase.getId()))
             .filter(
                 knowledgeBase -> containsIgnoreCase(knowledgeBase.getName(), queryLower) ||
                     containsIgnoreCase(knowledgeBase.getDescription(), queryLower))

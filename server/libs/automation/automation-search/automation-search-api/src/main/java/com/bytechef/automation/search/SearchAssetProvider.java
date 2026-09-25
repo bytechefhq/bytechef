@@ -17,13 +17,14 @@
 package com.bytechef.automation.search;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ivica Cardic
  */
 public interface SearchAssetProvider {
 
-    List<? extends SearchResult> search(String query, int limit);
+    List<? extends SearchResult> search(String query, int limit, Set<Long> workspaceIds);
 
     SearchAssetType getAssetType();
 }

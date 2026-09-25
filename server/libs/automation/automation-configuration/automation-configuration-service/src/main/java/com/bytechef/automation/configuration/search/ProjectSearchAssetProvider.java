@@ -22,6 +22,7 @@ import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,12 +38,13 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
     }
 
     @Override
-    public List<ProjectSearchResult> search(String query, int limit) {
+    public List<ProjectSearchResult> search(String query, int limit, Set<Long> workspaceIds) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
         return projectService.getProjects(false, null, null, null, null, null)
             .stream()
             .filter(project -> !SystemProjects.isSystemProject(project))
+            .filter(project -> workspaceIds.contains(project.getWorkspaceId()))
             .filter(
                 project -> containsIgnoreCase(project.getName(), queryLower) ||
                     containsIgnoreCase(project.getDescription(), queryLower))

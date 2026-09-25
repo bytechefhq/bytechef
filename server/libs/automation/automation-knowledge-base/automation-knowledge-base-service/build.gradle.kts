@@ -5,6 +5,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
+    implementation(project(":server:libs:automation:automation-search:automation-search-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:tenant:tenant-api"))

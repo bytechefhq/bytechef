@@ -16,8 +16,6 @@
 
 package com.bytechef.automation.search;
 
-import org.jspecify.annotations.Nullable;
-
 /**
  * @author Ivica Cardic
  */
@@ -30,8 +28,4 @@ public interface SearchResult<ID> {
     String description();
 
     SearchAssetType type();
-
-    default @Nullable Long workspaceId() {
-        return null;
-    }
 }

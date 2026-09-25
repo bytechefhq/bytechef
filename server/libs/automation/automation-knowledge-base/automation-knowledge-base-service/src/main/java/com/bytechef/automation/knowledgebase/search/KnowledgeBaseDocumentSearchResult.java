@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.search;
+package com.bytechef.automation.knowledgebase.search;
 
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
