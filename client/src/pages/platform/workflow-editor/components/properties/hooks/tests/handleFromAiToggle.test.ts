@@ -1,18 +1,19 @@
 import {describe, expect, it} from 'vitest';
 
+import {fromFormulaValue, toFormulaValue} from '../../propertyInputMode';
 import {computeFromAiToggle} from '../fromAiToggle';
 
 /**
- * Tests for handleFromAiToggle and handleControlledModeSwitch fromAi cleanup.
+ * Tests for handleFromAiToggle and handleControlledFormulaSwitch fromAi cleanup.
  *
  * When the user toggles the fromAi button off in a Tools cluster element
  * parameter, the previous implementation only flipped local state and left the
  * `fromAi` entry, `dynamicPropertyTypes` entry, and stale `"="` value behind in
- * the workflow definition. The same gap existed when leaving dynamic mode while
+ * the workflow definition. The same gap existed when switching formula mode while
  * fromAi was active.
  *
  * The handlers must always:
- *   - update the form field value (keeps the expression when toggling off / empty when leaving mode)
+ *   - update the form field value (keeps the expression when toggling off / converted when switching mode)
  *   - call saveProperty so the backend strips the path from the fromAi array
  */
 
@@ -21,38 +22,44 @@ const FROM_AI_EXPRESSION = "=fromAi('fieldName')";
 const toggle = (overrides: Partial<Parameters<typeof computeFromAiToggle>[0]> & {fromAi: boolean}) =>
     computeFromAiToggle({fromAiExpression: FROM_AI_EXPRESSION, ...overrides});
 
-interface ModeSwitchResultI {
+interface FormulaSwitchResultI {
     savePayload: {
         fromAi: boolean;
         includeInMetadata: boolean;
-        value: string;
+        value: unknown;
     } | null;
 }
 
-const computeControlledModeSwitch = ({
+const computeControlledFormulaSwitch = ({
     controlledFromAi,
     custom = false,
+    fieldValue = FROM_AI_EXPRESSION,
     hasPath = true,
     hasWorkflowId = true,
-    toDynamic,
+    toFormula,
+    type = 'INTEGER',
 }: {
     controlledFromAi: boolean | undefined;
     custom?: boolean;
+    fieldValue?: unknown;
     hasPath?: boolean;
     hasWorkflowId?: boolean;
-    toDynamic: boolean;
-}): ModeSwitchResultI => {
+    toFormula: boolean;
+    type?: string;
+}): FormulaSwitchResultI => {
     const wasFromAi = controlledFromAi === true;
 
     if (!wasFromAi || !hasPath || !hasWorkflowId) {
         return {savePayload: null};
     }
 
+    const convertedValue = toFormula ? toFormulaValue(fieldValue, type) : fromFormulaValue(fieldValue, type);
+
     return {
         savePayload: {
             fromAi: false,
             includeInMetadata: custom,
-            value: toDynamic ? '=' : '',
+            value: convertedValue ?? null,
         },
     };
 };
@@ -117,56 +124,57 @@ describe('handleFromAiToggle', () => {
     });
 });
 
-describe('handleControlledModeSwitch fromAi cleanup', () => {
-    it('clears fromAi metadata when leaving dynamic mode while fromAi was active', () => {
-        const result = computeControlledModeSwitch({
+describe('handleControlledFormulaSwitch fromAi cleanup', () => {
+    it('clears fromAi metadata and the unconvertible value when leaving formula mode while fromAi was active', () => {
+        const result = computeControlledFormulaSwitch({
             controlledFromAi: true,
-            toDynamic: false,
+            toFormula: false,
         });
 
         expect(result.savePayload).toEqual({
             fromAi: false,
             includeInMetadata: false,
-            value: '',
+            value: null,
         });
     });
 
-    it('clears fromAi metadata when entering dynamic mode while fromAi was active', () => {
-        const result = computeControlledModeSwitch({
+    it('clears fromAi metadata and keeps the converted value when entering formula mode while fromAi was active', () => {
+        const result = computeControlledFormulaSwitch({
             controlledFromAi: true,
-            toDynamic: true,
+            fieldValue: 5,
+            toFormula: true,
         });
 
         expect(result.savePayload).toEqual({
             fromAi: false,
             includeInMetadata: false,
-            value: '=',
+            value: '=5',
         });
     });
 
     it('does not save when fromAi was not active', () => {
-        const result = computeControlledModeSwitch({
+        const result = computeControlledFormulaSwitch({
             controlledFromAi: false,
-            toDynamic: false,
+            toFormula: false,
         });
 
         expect(result.savePayload).toBeNull();
     });
 
     it('does not save when controlledFromAi is undefined', () => {
-        const result = computeControlledModeSwitch({
+        const result = computeControlledFormulaSwitch({
             controlledFromAi: undefined,
-            toDynamic: true,
+            toFormula: true,
         });
 
         expect(result.savePayload).toBeNull();
     });
 
     it('propagates custom flag into includeInMetadata', () => {
-        const result = computeControlledModeSwitch({
+        const result = computeControlledFormulaSwitch({
             controlledFromAi: true,
             custom: true,
-            toDynamic: false,
+            toFormula: false,
         });
 
         expect(result.savePayload?.includeInMetadata).toBe(true);
