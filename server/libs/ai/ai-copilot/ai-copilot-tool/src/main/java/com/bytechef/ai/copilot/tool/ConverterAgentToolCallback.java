@@ -20,6 +20,7 @@ import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolution;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
@@ -137,6 +138,10 @@ public class ConverterAgentToolCallback implements ToolCallback {
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
+        } catch (ChatModelUnavailableException exception) {
+            log.warn("importWorkflow cannot run its sub-agent: {}", exception.getMessage());
+
+            throw exception;
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
                 ConverterAgentToolCallback.class, "importWorkflow", exception);

@@ -17,12 +17,15 @@
 package com.bytechef.ai.copilot.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.tool.catalog.IntelligentToolChatClientFactory;
 import com.bytechef.ai.copilot.tool.catalog.SubAgentChatModelResolver;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
@@ -40,17 +43,17 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
- * Covers the shared per-invocation chat-model resolution behaviour of every CE intelligent delegate callback once,
- * parameterised over the five delegates this module can construct directly.
- *
  * @author Ivica Cardic
  */
 @ExtendWith(ObjectMapperSetupExtension.class)
 class DelegateChatModelResolutionTest {
 
+    private static final String REQUEST_INPUT = "{\"request\": \"build it\"}";
+
     @ParameterizedTest
     @MethodSource("delegateConstructors")
-    void testUsesTheResolvedChatModelForTheDelegation(String toolName, CallbackConstructor callbackConstructor) {
+    void testUsesTheResolvedChatModelForTheDelegation(
+        String toolName, CallbackConstructor callbackConstructor, String toolInput) {
         ChatModel chatModel = mock(ChatModel.class);
         AtomicReference<ChatModel> received = new AtomicReference<>();
 
@@ -64,7 +67,7 @@ class DelegateChatModelResolutionTest {
             },
             chatModelResolver);
 
-        toolCallback.call("{\"request\": \"build it\"}", new ToolContext(Map.of()));
+        toolCallback.call(toolInput, new ToolContext(Map.of()));
 
         assertThat(received.get())
             .as("%s must pass the resolved ChatModel into its chatClientFactory", toolName)
@@ -74,7 +77,7 @@ class DelegateChatModelResolutionTest {
     @ParameterizedTest
     @MethodSource("delegateConstructors")
     void testFallsBackToTheDefaultClientWhenTheResolverReturnsNull(
-        String toolName, CallbackConstructor callbackConstructor) {
+        String toolName, CallbackConstructor callbackConstructor, String toolInput) {
 
         AtomicReference<ChatModel> received = new AtomicReference<>();
         AtomicReference<Boolean> factoryInvoked = new AtomicReference<>(false);
@@ -90,7 +93,7 @@ class DelegateChatModelResolutionTest {
             },
             chatModelResolver);
 
-        String result = toolCallback.call("{\"request\": \"build it\"}", new ToolContext(Map.of()));
+        String result = toolCallback.call(toolInput, new ToolContext(Map.of()));
 
         assertThat(factoryInvoked.get())
             .as("%s must still resolve a client from its default-yielding factory", toolName)
@@ -103,10 +106,39 @@ class DelegateChatModelResolutionTest {
 
     @ParameterizedTest
     @MethodSource("delegateConstructors")
-    void testFallsBackToTheDefaultClientWhenTheResolverThrows(
-        String toolName, CallbackConstructor callbackConstructor) {
+    void testFailsTheTurnWhenTheSelectedModelIsUnavailable(
+        String toolName, CallbackConstructor callbackConstructor, String toolInput) {
 
-        AtomicReference<ChatModel> received = new AtomicReference<>();
+        AtomicReference<Boolean> factoryInvoked = new AtomicReference<>(false);
+
+        SubAgentChatModelResolver chatModelResolver = toolContext -> {
+            throw new SelectedChatModelUnavailableException("anthropic", "claude-opus-4", 1);
+        };
+
+        ToolCallback toolCallback = callbackConstructor.create(
+            candidate -> {
+                factoryInvoked.set(true);
+
+                return stubChatClient("done");
+            },
+            chatModelResolver);
+
+        assertThatThrownBy(() -> toolCallback.call(toolInput, new ToolContext(Map.of())))
+            .as("%s must fail the turn rather than return a tool error", toolName)
+            .isInstanceOf(SelectedChatModelUnavailableException.class)
+            .hasMessageContaining("The selected model claude-opus-4 (anthropic) is not available in environment 1");
+
+        assertThat(factoryInvoked.get())
+            .as("%s must not run the delegate on another model", toolName)
+            .isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("delegateConstructors")
+    void testFailsTheTurnWhenTheResolverThrows(
+        String toolName, CallbackConstructor callbackConstructor, String toolInput) {
+
+        AtomicReference<Boolean> factoryInvoked = new AtomicReference<>(false);
 
         SubAgentChatModelResolver chatModelResolver = toolContext -> {
             throw new IllegalStateException("model lookup failed");
@@ -114,26 +146,26 @@ class DelegateChatModelResolutionTest {
 
         ToolCallback toolCallback = callbackConstructor.create(
             candidate -> {
-                received.set(candidate);
+                factoryInvoked.set(true);
 
                 return stubChatClient("done");
             },
             chatModelResolver);
 
-        String result = toolCallback.call("{\"request\": \"build it\"}", new ToolContext(Map.of()));
+        assertThatThrownBy(() -> toolCallback.call(toolInput, new ToolContext(Map.of())))
+            .as("%s must fail the turn rather than fall back to the startup model", toolName)
+            .isInstanceOf(ChatModelUnavailableException.class)
+            .hasMessageContaining("model lookup failed");
 
-        assertThat(received.get())
-            .as("%s must fall back to the default client when the resolver throws", toolName)
-            .isNull();
-        assertThat(result)
-            .as("%s must not let the resolver's exception escape the tool call", toolName)
-            .isEqualTo("done");
+        assertThat(factoryInvoked.get())
+            .as("%s must not run the delegate on another model", toolName)
+            .isFalse();
     }
 
     @ParameterizedTest
     @MethodSource("delegateConstructors")
     void testFallsBackToTheDefaultClientWhenThereIsNoResolver(
-        String toolName, CallbackConstructor callbackConstructor) {
+        String toolName, CallbackConstructor callbackConstructor, String toolInput) {
 
         AtomicReference<ChatModel> received = new AtomicReference<>();
 
@@ -145,7 +177,7 @@ class DelegateChatModelResolutionTest {
             },
             null);
 
-        String result = toolCallback.call("{\"request\": \"build it\"}", new ToolContext(Map.of()));
+        String result = toolCallback.call(toolInput, new ToolContext(Map.of()));
 
         assertThat(received.get())
             .as("%s must fall back to the default client when no resolver was wired", toolName)
@@ -155,17 +187,21 @@ class DelegateChatModelResolutionTest {
 
     private static Stream<Arguments> delegateConstructors() {
         return Stream.of(
-            Arguments.of("buildWorkflow", (CallbackConstructor) ProjectWorkflowAgentToolCallback::new),
-            Arguments.of("importWorkflow", (CallbackConstructor) ConverterAgentToolCallback::new),
-            Arguments.of("configureClusterElement", (CallbackConstructor) ClusterElementAgentToolCallback::new),
-            Arguments.of("writeScript", (CallbackConstructor) CodeEditorAgentToolCallback::new),
-            Arguments.of("authorSkill", (CallbackConstructor) SkillsAgentToolCallback::new));
+            Arguments.of(
+                "buildWorkflow", (CallbackConstructor) ProjectWorkflowAgentToolCallback::new, REQUEST_INPUT),
+            Arguments.of("importWorkflow", (CallbackConstructor) ConverterAgentToolCallback::new, REQUEST_INPUT),
+            Arguments.of(
+                "configureClusterElement", (CallbackConstructor) ClusterElementAgentToolCallback::new, REQUEST_INPUT),
+            Arguments.of("writeScript", (CallbackConstructor) CodeEditorAgentToolCallback::new, REQUEST_INPUT),
+            Arguments.of("authorSkill", (CallbackConstructor) SkillsAgentToolCallback::new, REQUEST_INPUT),
+            Arguments.of(
+                "debugWorkflowExecution", (CallbackConstructor) WorkflowExecutionAgentToolCallback::new,
+                REQUEST_INPUT),
+            Arguments.of(
+                "configureMcpServer", (CallbackConstructor) ConfigureMcpServerToolCallback::new,
+                "{\"mcpServerId\": 1}"));
     }
 
-    /**
-     * A deep-stub {@link ChatClient} whose {@code prompt(...).toolContext(...).call().content()} chain returns
-     * {@code content}, written once rather than repeated per test.
-     */
     private static ChatClient stubChatClient(String content) {
         ChatClient chatClient = mock(ChatClient.class, RETURNS_DEEP_STUBS);
 
@@ -177,10 +213,6 @@ class DelegateChatModelResolutionTest {
         return chatClient;
     }
 
-    /**
-     * Names the two-argument constructor every intelligent delegate callback shares, so {@link #delegateConstructors()}
-     * can pass each class's constructor reference as test data.
-     */
     private interface CallbackConstructor {
 
         ToolCallback create(
