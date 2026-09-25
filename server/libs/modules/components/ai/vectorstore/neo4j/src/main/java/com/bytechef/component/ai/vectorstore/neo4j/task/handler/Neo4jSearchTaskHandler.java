@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstant
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +30,10 @@ import org.springframework.stereotype.Component;
 @Component(NEO4J + "/v1/" + SEARCH)
 public class Neo4jSearchTaskHandler extends AbstractTaskHandler {
 
-    public Neo4jSearchTaskHandler(ActionDefinitionFacade actionDefinitionFacade) {
-        super(NEO4J, 1, SEARCH, actionDefinitionFacade);
+    public Neo4jSearchTaskHandler(
+        ActionDefinitionFacade actionDefinitionFacade,
+        JobPrincipalAuthenticationRunner jobPrincipalAuthenticationRunner) {
+
+        super(NEO4J, 1, SEARCH, actionDefinitionFacade, jobPrincipalAuthenticationRunner);
     }
 }
