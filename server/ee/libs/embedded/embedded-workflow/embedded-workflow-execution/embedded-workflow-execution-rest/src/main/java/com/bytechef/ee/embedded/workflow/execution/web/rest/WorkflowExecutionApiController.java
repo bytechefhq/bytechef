@@ -19,6 +19,7 @@ import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,6 +46,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -52,6 +54,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<TaskExecutionModel> getWorkflowExecutionTaskExecution(Long id, Long taskExecutionId) {
         return ResponseEntity.ok(
             conversionService.convert(
@@ -60,6 +63,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Page> getWorkflowExecutionsPage(
         Long environmentId, String jobStatus, OffsetDateTime jobStartDate, OffsetDateTime jobEndDate,
         Long projectId, Long integrationInstanceConfigurationId, String workflowId, Integer pageNumber) {
