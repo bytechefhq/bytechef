@@ -198,6 +198,8 @@ export function WorkflowEditor({jwtToken, workflowUuid}: {jwtToken: string; work
 
 Pass `includeComponents={['slack', 'gmail', ...]}` to restrict the component palette to a specific set (omit it to allow all). The parent container must be positioned (`position: relative`) with a defined height because the builder fills it.
 
+Set `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` on your ByteChef server to your app's origin (for example `https://app.example.com`; separate several with commas). The builder then only renders inside, and only accepts its session token from, those origins - see [the embed handshake](/platform/embedded/build/automations/automation-workflows#the-embed-handshake).
+
 You can also generate a starter workflow for a user from a natural-language prompt *(coming soon - depends on the AI Copilot, which is on the upcoming release track)* - `POST /api/embedded/v1/automation/workflows/generate` with `{ "prompt": "..." }` returns a new workflow UUID built by AI Copilot, which you can then open in the builder.
 
 ---
