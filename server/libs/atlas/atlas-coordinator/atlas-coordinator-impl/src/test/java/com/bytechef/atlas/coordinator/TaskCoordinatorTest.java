@@ -49,8 +49,8 @@ class TaskCoordinatorTest {
 
     @Test
     void testCompletionOfCancelledTaskExecutionIsDropped() {
-        when(taskExecutionService.getTaskExecution(12L))
-            .thenReturn(createTaskExecution(TaskExecution.Status.CANCELLED));
+        when(taskExecutionService.completeIfNotCancelled(12L))
+            .thenReturn(false);
 
         taskCoordinator.onTaskExecutionCompleteEvent(
             new TaskExecutionCompleteEvent(createTaskExecution(TaskExecution.Status.STARTED)));
@@ -62,8 +62,8 @@ class TaskCoordinatorTest {
     void testCompletionOfStartedTaskExecutionIsHandled() {
         TaskExecution completedTaskExecution = createTaskExecution(TaskExecution.Status.STARTED);
 
-        when(taskExecutionService.getTaskExecution(12L))
-            .thenReturn(createTaskExecution(TaskExecution.Status.STARTED));
+        when(taskExecutionService.completeIfNotCancelled(12L))
+            .thenReturn(true);
 
         taskCoordinator.onTaskExecutionCompleteEvent(new TaskExecutionCompleteEvent(completedTaskExecution));
 

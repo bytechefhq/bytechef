@@ -160,27 +160,26 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
     }
 
     private void cancelUnfinishedTaskExecutions(long jobId) {
-        Instant now = Instant.now();
+        List<TaskExecution> taskExecutions = taskExecutionService.getJobTaskExecutions(jobId);
 
-        List<TaskExecution> unfinishedTaskExecutions = taskExecutionService.getJobTaskExecutions(jobId)
-            .stream()
-            .filter(taskExecution -> taskExecution.getStatus() == null ||
-                !taskExecution.getStatus()
-                    .isTerminated())
-            .toList();
+        Long cancelledTaskExecutionId = null;
 
-        for (TaskExecution unfinishedTaskExecution : unfinishedTaskExecutions) {
-            unfinishedTaskExecution.setEndDate(now);
-            unfinishedTaskExecution.setStatus(TaskExecution.Status.CANCELLED);
+        for (TaskExecution taskExecution : taskExecutions) {
+            TaskExecution.Status status = taskExecution.getStatus();
 
-            taskExecutionService.update(unfinishedTaskExecution);
+            if (status != null && status.isTerminated()) {
+                continue;
+            }
+
+            long taskExecutionId = Validate.notNull(taskExecution.getId(), "id");
+
+            if (taskExecutionService.cancelIfUnfinished(taskExecutionId) && cancelledTaskExecutionId == null) {
+                cancelledTaskExecutionId = taskExecutionId;
+            }
         }
 
-        if (!unfinishedTaskExecutions.isEmpty()) {
-            TaskExecution firstUnfinishedTaskExecution = unfinishedTaskExecutions.getFirst();
-
-            taskDispatcher.dispatch(
-                new CancelControlTask(jobId, Validate.notNull(firstUnfinishedTaskExecution.getId(), "id")));
+        if (cancelledTaskExecutionId != null) {
+            taskDispatcher.dispatch(new CancelControlTask(jobId, cancelledTaskExecutionId));
         }
     }
 }
