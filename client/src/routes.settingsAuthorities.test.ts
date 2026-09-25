@@ -69,6 +69,27 @@ describe('settings route authorities', () => {
         expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
     });
 
+    it.each([
+        'integrations',
+        'integrations/:integrationId/integration-workflows/:integrationWorkflowId',
+        'configurations',
+        'automation-workflows',
+        'automation-workflows/:workflowId/editor',
+        'connected-users',
+        'app-events',
+        'executions',
+        'connections',
+    ])('lets only a tenant admin open the embedded %s page', (path) => {
+        const router = getRouter(new QueryClient());
+
+        const embeddedRoutes = findRoutesByPath(router.routes as RouteObject[], 'embedded');
+
+        const routes = findRoutesByPath(embeddedRoutes, path);
+
+        expect(routes).toHaveLength(1);
+        expect((routes[0].element as PrivateRouteElementType).props.hasAnyAuthorities).toEqual([AUTHORITIES.ADMIN]);
+    });
+
     it('lets only a tenant admin open the API Clients page', () => {
         const authorities = getRouteAuthorities('api-clients');
 
