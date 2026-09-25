@@ -135,6 +135,39 @@ class JobCompletionAwaiterTest {
         assertInstanceOf(TimeoutException.class, executionException.getCause());
     }
 
+    @Test
+    void testTimeoutErrorNamesTheJob() {
+        Job startedJob = job(7L, Job.Status.STARTED);
+
+        when(jobService.fetchJob(7L)).thenReturn(Optional.of(startedJob));
+
+        JobCompletionAwaiterImpl awaiter = new JobCompletionAwaiterImpl(jobService);
+
+        CompletableFuture<Job> future = awaiter.await(7L, Duration.ofMillis(100));
+
+        ExecutionException executionException = assertThrows(
+            ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
+
+        Throwable cause = executionException.getCause();
+
+        assertInstanceOf(TimeoutException.class, cause);
+        assertEquals("Job 7 did not finish within PT0.1S", cause.getMessage());
+    }
+
+    @Test
+    void testTimeoutCompletesWithTheJobWhenItFinishedWithoutAnEvent() throws Exception {
+        Job startedJob = job(8L, Job.Status.STARTED);
+        Job completedJob = job(8L, Job.Status.COMPLETED);
+
+        when(jobService.fetchJob(8L)).thenReturn(Optional.of(startedJob), Optional.of(completedJob));
+
+        JobCompletionAwaiterImpl awaiter = new JobCompletionAwaiterImpl(jobService);
+
+        CompletableFuture<Job> future = awaiter.await(8L, Duration.ofMillis(100));
+
+        assertEquals(completedJob, future.get(2, TimeUnit.SECONDS));
+    }
+
     private static Job job(long id, Job.Status status) {
         Job job = new Job();
 
