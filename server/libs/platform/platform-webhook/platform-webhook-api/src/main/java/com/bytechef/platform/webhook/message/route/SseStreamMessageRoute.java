@@ -23,7 +23,7 @@ import com.bytechef.message.route.MessageRoute;
  */
 public enum SseStreamMessageRoute implements MessageRoute {
 
-    SSE_STREAM_EVENTS(MessageRoute.Exchange.MESSAGE, "sse.sse_stream_events");
+    SSE_STREAM_EVENTS(MessageRoute.Exchange.CONTROL, "sse.sse_stream_events");
 
     private MessageRoute.Exchange exchange;
     private String routeName;
