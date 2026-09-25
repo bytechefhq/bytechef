@@ -25,6 +25,8 @@ import com.bytechef.message.route.MessageRoute;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,9 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
     private final List<MessageBrokerConfigurer<KafkaListenerEndpointRegistrar>> messageBrokerConfigurers;
     private final MessageHandlerMethodFactory messageHandlerMethodFactory;
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+    private final AtomicInteger endpointSequence = new AtomicInteger();
+    private final String instanceId = UUID.randomUUID()
+        .toString();
 
     @SuppressFBWarnings("EI")
     public KafkaMessageBrokerListenerRegistrarConfiguration(
@@ -95,6 +100,10 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
         MethodKafkaListenerEndpoint<String, String> endpoint = createListenerEndpoint(
             messageRoute.getName(), delegate, listenerMethod);
 
+        if (messageRoute.isControlExchange()) {
+            endpoint.setGroupId(messageRoute.getName() + "." + instanceId + "." + endpointSequence.get());
+        }
+
         listenerEndpointRegistrar.registerEndpoint(endpoint);
     }
 
@@ -128,7 +137,7 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
         endpoint.setBeanFactory(beanFactory);
         endpoint.setBean(listener);
         endpoint.setMethod(listenerMethod);
-        endpoint.setId(queueName + "Endpoint");
+        endpoint.setId(queueName + "Endpoint" + endpointSequence.incrementAndGet());
         endpoint.setTopics(queueName);
         endpoint.setMessageHandlerMethodFactory(messageHandlerMethodFactory);
 

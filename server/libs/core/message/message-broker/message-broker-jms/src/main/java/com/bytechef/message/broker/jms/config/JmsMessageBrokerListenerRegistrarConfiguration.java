@@ -27,6 +27,7 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.Message;
 import jakarta.jms.Session;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
     private final MessageConverter jacksonJmsMessageConverter;
     private final List<MessageBrokerConfigurer<JmsListenerEndpointRegistrar>> messageBrokerConfigurers;
     private final JmsListenerEndpointRegistry jmsListenerEndpointRegistry;
+    private final AtomicInteger endpointSequence = new AtomicInteger();
 
     @SuppressFBWarnings("EI")
     public JmsMessageBrokerListenerRegistrarConfiguration(
@@ -95,11 +97,13 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
 
         SimpleJmsListenerEndpoint simpleJmsListenerEndpoint = new SimpleJmsListenerEndpoint();
 
-        simpleJmsListenerEndpoint.setId(messageRoute + delegateClass.getSimpleName() + "Endpoint");
+        simpleJmsListenerEndpoint.setId(
+            messageRoute.getName() + delegateClass.getSimpleName() + "Endpoint" + endpointSequence.incrementAndGet());
         simpleJmsListenerEndpoint.setDestination(messageRoute.getName());
         simpleJmsListenerEndpoint.setMessageListener(messageListenerAdapter);
 
-        listenerEndpointRegistrar.registerEndpoint(simpleJmsListenerEndpoint, createContainerFactory(concurrency));
+        listenerEndpointRegistrar.registerEndpoint(
+            simpleJmsListenerEndpoint, createContainerFactory(concurrency, messageRoute.isControlExchange()));
     }
 
     @Override
@@ -124,11 +128,12 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
         }
     }
 
-    private DefaultJmsListenerContainerFactory createContainerFactory(int concurrency) {
+    private DefaultJmsListenerContainerFactory createContainerFactory(int concurrency, boolean pubSubDomain) {
         DefaultJmsListenerContainerFactory jmsListenerContainerFactory = new DefaultJmsListenerContainerFactory();
 
         jmsListenerContainerFactory.setConcurrency(String.valueOf(concurrency));
         jmsListenerContainerFactory.setConnectionFactory(connectionFactory);
+        jmsListenerContainerFactory.setPubSubDomain(pubSubDomain);
 
         return jmsListenerContainerFactory;
     }
