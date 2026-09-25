@@ -6,6 +6,7 @@ import {
     IntegrationMarketplaceKeys,
     useGetMarketplaceIntegrationsQuery,
 } from '@/ee/pages/embedded/integration-marketplace/queries/integrationMarketplace.queries';
+import {getEmbedParentOrigin} from '@/ee/pages/embedded/shared/useEmbedHandshake';
 import {IntegrationBasic} from '@/ee/shared/middleware/embedded/public';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
@@ -16,7 +17,13 @@ const CONNECT_MESSAGE_TYPE = 'EMBED_OPEN_CONNECT_DIALOG';
 const INTEGRATIONS_CHANGED_MESSAGE_TYPE = 'EMBED_INTEGRATIONS_CHANGED';
 
 const requestConnect = (integrationId: number) => {
-    window.parent.postMessage({integrationId: String(integrationId), type: CONNECT_MESSAGE_TYPE}, '*');
+    const parentOrigin = getEmbedParentOrigin();
+
+    if (!parentOrigin) {
+        return;
+    }
+
+    window.parent.postMessage({integrationId: String(integrationId), type: CONNECT_MESSAGE_TYPE}, parentOrigin);
 };
 
 const isConnected = (integration: IntegrationBasic) => (integration.integrationInstances?.length ?? 0) > 0;
@@ -28,11 +35,15 @@ const IntegrationMarketplaceView = () => {
 
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            if (event.source !== window.parent || event.data?.type !== INTEGRATIONS_CHANGED_MESSAGE_TYPE) {
+            if (
+                event.source !== window.parent ||
+                event.origin !== getEmbedParentOrigin() ||
+                event.data?.type !== INTEGRATIONS_CHANGED_MESSAGE_TYPE
+            ) {
                 return;
             }
 
-            queryClient.invalidateQueries({queryKey: IntegrationMarketplaceKeys.integrations});
+            void queryClient.invalidateQueries({queryKey: IntegrationMarketplaceKeys.integrations});
         };
 
         window.addEventListener('message', handleMessage);
