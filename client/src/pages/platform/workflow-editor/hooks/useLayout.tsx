@@ -163,9 +163,9 @@ export default function useLayout({
     const tasks = storeTasks || readOnlyWorkflow?.tasks;
     const triggers = storeTriggers || readOnlyWorkflow?.triggers;
 
-    const {initializeWithCanvasWidth, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
+    const {clearCanvas, setEdges, setNodes, setSavedPositionCrossAxisShift} = useWorkflowDataStore(
         useShallow((state) => ({
-            initializeWithCanvasWidth: state.initializeWithCanvasWidth,
+            clearCanvas: state.clearCanvas,
             setEdges: state.setEdges,
             setNodes: state.setNodes,
             setSavedPositionCrossAxisShift: state.setSavedPositionCrossAxisShift,
@@ -892,8 +892,8 @@ export default function useLayout({
     }, [layoutDirection, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
 
     useEffect(() => {
-        if (canvasWidth > 0 && !isWorkflowLoaded && !readOnlyWorkflow) {
-            initializeWithCanvasWidth(canvasWidth);
+        if (!isWorkflowLoaded && !readOnlyWorkflow) {
+            clearCanvas();
         }
-    }, [canvasWidth, initializeWithCanvasWidth, isWorkflowLoaded, readOnlyWorkflow]);
+    }, [clearCanvas, isWorkflowLoaded, readOnlyWorkflow]);
 }
