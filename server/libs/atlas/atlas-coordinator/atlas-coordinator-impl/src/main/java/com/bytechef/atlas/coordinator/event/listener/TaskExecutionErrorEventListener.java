@@ -18,6 +18,7 @@
 
 package com.bytechef.atlas.coordinator.event.listener;
 
+import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.event.ErrorEvent;
 import com.bytechef.atlas.coordinator.event.JobStatusApplicationEvent;
@@ -33,6 +34,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -149,9 +151,36 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
                 jobService.update(job);
 
+                cancelUnfinishedTaskExecutions(Validate.notNull(job.getId(), "id"));
+
                 eventPublisher.publishEvent(
                     new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
             }
+        }
+    }
+
+    private void cancelUnfinishedTaskExecutions(long jobId) {
+        Instant now = Instant.now();
+
+        List<TaskExecution> unfinishedTaskExecutions = taskExecutionService.getJobTaskExecutions(jobId)
+            .stream()
+            .filter(taskExecution -> taskExecution.getStatus() == null ||
+                !taskExecution.getStatus()
+                    .isTerminated())
+            .toList();
+
+        for (TaskExecution unfinishedTaskExecution : unfinishedTaskExecutions) {
+            unfinishedTaskExecution.setEndDate(now);
+            unfinishedTaskExecution.setStatus(TaskExecution.Status.CANCELLED);
+
+            taskExecutionService.update(unfinishedTaskExecution);
+        }
+
+        if (!unfinishedTaskExecutions.isEmpty()) {
+            TaskExecution firstUnfinishedTaskExecution = unfinishedTaskExecutions.getFirst();
+
+            taskDispatcher.dispatch(
+                new CancelControlTask(jobId, Validate.notNull(firstUnfinishedTaskExecution.getId(), "id")));
         }
     }
 }
