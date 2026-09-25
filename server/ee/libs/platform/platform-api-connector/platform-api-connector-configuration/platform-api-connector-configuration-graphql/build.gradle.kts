@@ -1,6 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.graphql:spring-graphql")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))
@@ -11,5 +12,7 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
+    testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
