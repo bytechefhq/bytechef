@@ -51,8 +51,8 @@ export default function getMissingRequiredConnectionErrors({
 }
 
 /**
- * Missing required properties and connections are resolved for the open node directly, so only the remaining workflow
- * issue kinds (broken references, type mismatches, failed lookups, ...) are listed from the node issues.
+ * Missing required properties and connections are resolved for the open node directly, so their errors are not listed
+ * again from the node issues. Warnings of those kinds (e.g. a missing recommended field) have no other source and stay.
  */
 export function getWorkflowIssueErrors(
     nodeIssues: Array<Pick<WorkflowIssueI, 'kind' | 'message' | 'severity'>>
@@ -60,7 +60,7 @@ export function getWorkflowIssueErrors(
     const severitiesByMessage = new Map<string, WorkflowIssueSeverityType>();
 
     for (const nodeIssue of nodeIssues) {
-        if (SEPARATELY_REPORTED_ISSUE_KINDS.has(nodeIssue.kind)) {
+        if (nodeIssue.severity === 'ERROR' && SEPARATELY_REPORTED_ISSUE_KINDS.has(nodeIssue.kind)) {
             continue;
         }
 

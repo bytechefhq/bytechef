@@ -136,6 +136,14 @@ describe('getWorkflowIssueErrors', () => {
         ).toEqual([]);
     });
 
+    it('keeps a missing recommended field warning, which is not listed separately', () => {
+        expect(
+            getWorkflowIssueErrors([
+                {kind: 'MISSING_REQUIRED', message: 'Missing recommended field: label', severity: 'WARNING'},
+            ])
+        ).toEqual([{kind: 'ISSUE', name: 'Missing recommended field: label', severity: 'WARNING'}]);
+    });
+
     it('lists an issue reported by several sources once', () => {
         expect(
             getWorkflowIssueErrors([
