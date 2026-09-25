@@ -58,7 +58,7 @@ describe('ConnectedUserSheetPanelMcpServerList', () => {
     it("lists the user's MCP servers", () => {
         renderPanel();
 
-        expect(hoisted.connectedUserMcpServersQuery).toHaveBeenCalledWith({connectedUserId: '1050'});
+        expect(hoisted.connectedUserMcpServersQuery).toHaveBeenCalledWith({connectedUserId: '1050'}, expect.anything());
         expect(screen.getByText('mcp server 1')).toBeInTheDocument();
         expect(screen.getByText('mcp server 2')).toBeInTheDocument();
     });
