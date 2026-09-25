@@ -17,37 +17,41 @@ export default function getDeepestFailedExecution({
     }
 
     if ('iterations' in execution && execution.iterations && execution.iterations.length > 0) {
-        let failedChild = null;
+        for (const [iterationIndex, iteration] of execution.iterations.entries()) {
+            const iterationId = `${execution.id}-iteration-${iterationIndex}`;
 
-        execution.iterations.forEach((iteration, index) => {
-            const iterationId = `${execution.id}-iteration-${index}`;
+            const iterationPath = [...path, iterationId];
 
-            iteration.forEach(
-                (iterationTask) =>
-                    (failedChild = getDeepestFailedExecution({
-                        currentPath: [...path, iterationId],
-                        execution: iterationTask,
-                        isTriggerExecution,
-                    }))
-            );
-        });
+            for (const iterationTask of iteration) {
+                const failedIterationTask = getDeepestFailedExecution({
+                    currentPath: iterationPath,
+                    execution: iterationTask,
+                    isTriggerExecution,
+                });
 
-        return failedChild;
+                if (failedIterationTask) {
+                    return failedIterationTask;
+                }
+            }
+        }
+
+        return null;
     }
 
     if ('children' in execution && execution.children && execution.children.length > 0) {
-        let failedChild = null;
+        for (const child of execution.children) {
+            const failedChildExecution = getDeepestFailedExecution({
+                currentPath: path,
+                execution: child,
+                isTriggerExecution,
+            });
 
-        execution.children.forEach(
-            (child) =>
-                (failedChild = getDeepestFailedExecution({
-                    currentPath: path,
-                    execution: child,
-                    isTriggerExecution,
-                }))
-        );
+            if (failedChildExecution) {
+                return failedChildExecution;
+            }
+        }
 
-        return failedChild;
+        return null;
     }
 
     if (execution.error) {
