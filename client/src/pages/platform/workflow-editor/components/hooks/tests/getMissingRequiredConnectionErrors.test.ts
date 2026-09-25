@@ -153,6 +153,36 @@ describe('getWorkflowIssueErrors', () => {
         ).toEqual([{kind: 'ISSUE', name: "Property 'count' has incorrect type.", severity: 'ERROR'}]);
     });
 
+    it('names the properties an issue concerns, and keeps the same message on different properties apart', () => {
+        const typeMismatch = {
+            kind: 'TYPE_MISMATCH' as const,
+            message: 'Property is of type array, not integer',
+            propertyPath: 'firecrawl_5.data.json.result',
+            severity: 'ERROR' as const,
+        };
+
+        expect(
+            getWorkflowIssueErrors(
+                [
+                    typeMismatch,
+                    {...typeMismatch, propertyPath: 'firecrawl_6.data.json.result'},
+                    {kind: 'OTHER', message: 'Deprecated option', severity: 'WARNING'},
+                ],
+                (nodeIssue) =>
+                    nodeIssue.propertyPath === 'firecrawl_6.data.json.result' ? ['Temperature'] : ['Top K', 'Top K']
+            )
+        ).toEqual([
+            {kind: 'ISSUE', name: 'Property is of type array, not integer', propertyLabel: 'Top K', severity: 'ERROR'},
+            {
+                kind: 'ISSUE',
+                name: 'Property is of type array, not integer',
+                propertyLabel: 'Temperature',
+                severity: 'ERROR',
+            },
+            {kind: 'ISSUE', name: 'Deprecated option', propertyLabel: 'Top K', severity: 'WARNING'},
+        ]);
+    });
+
     it('keeps the severity of a warning', () => {
         expect(getWorkflowIssueErrors([{kind: 'OTHER', message: 'Deprecated operation', severity: 'WARNING'}])).toEqual(
             [{kind: 'ISSUE', name: 'Deprecated operation', severity: 'WARNING'}]

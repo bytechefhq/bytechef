@@ -22,6 +22,7 @@ export interface WorkflowIssueI {
     message: string;
     nodeName: string;
     propertyPath?: string;
+    referencedNodeName?: string;
     severity: WorkflowIssueSeverityType;
     source: WorkflowIssueSourceType;
 }

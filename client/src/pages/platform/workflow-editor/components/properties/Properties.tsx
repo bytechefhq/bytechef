@@ -6,9 +6,11 @@ import {GetClusterElementParameterDisplayConditions200Response} from '@/shared/m
 import {PropertyAllType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
+import {useEffect, useState} from 'react';
 import {Control, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
+import useNodeIssueParameterNames from '../../hooks/useNodeIssueParameterNames';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 
 interface PropertiesProps<T extends FieldValues = FieldValues> {
@@ -42,7 +44,14 @@ const Properties = <T extends FieldValues = FieldValues>({
     properties,
     toolsMode,
 }: PropertiesProps<T>) => {
+    const [advancedPropertiesOpen, setAdvancedPropertiesOpen] = useState(false);
+
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+
+    const issueParameterNames = useNodeIssueParameterNames(
+        control ? undefined : currentNode?.workflowNodeName,
+        currentNode?.parameters
+    );
 
     const advancedProperties = properties.filter((property) => {
         const {advancedOption, hidden, name} = property;
@@ -72,6 +81,14 @@ const Properties = <T extends FieldValues = FieldValues>({
         return true;
     });
 
+    const advancedPropertyHasIssue = advancedProperties.some((property) => issueParameterNames.has(property.name!));
+
+    useEffect(() => {
+        if (advancedPropertyHasIssue) {
+            setAdvancedPropertiesOpen(true);
+        }
+    }, [advancedPropertyHasIssue]);
+
     return (
         <FormDisplayConditionsProvider value={formDisplayConditions}>
             <ul
@@ -95,7 +112,11 @@ const Properties = <T extends FieldValues = FieldValues>({
             </ul>
 
             {!!advancedProperties.length && (
-                <Collapsible className={twMerge('group mt-2 flex w-full flex-col justify-center', customClassName)}>
+                <Collapsible
+                    className={twMerge('group mt-2 flex w-full flex-col justify-center', customClassName)}
+                    onOpenChange={setAdvancedPropertiesOpen}
+                    open={advancedPropertiesOpen}
+                >
                     <CollapsibleTrigger asChild>
                         <Button variant="outline">
                             <span>Show Advanced Properties</span>

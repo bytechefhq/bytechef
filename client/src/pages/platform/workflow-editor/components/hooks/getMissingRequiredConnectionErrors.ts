@@ -5,8 +5,11 @@ import {WorkflowIssueI, WorkflowIssueKindType, WorkflowIssueSeverityType} from '
 export interface WorkflowNodeDetailsErrorI {
     kind: 'CONNECTION' | 'ISSUE' | 'PROPERTY';
     name: string;
+    propertyLabel?: string;
     severity: WorkflowIssueSeverityType;
 }
+
+type NodeIssueType = Pick<WorkflowIssueI, 'kind' | 'message' | 'propertyPath' | 'referencedNodeName' | 'severity'>;
 
 interface GetMissingRequiredConnectionErrorsProps {
     clusterRoot?: boolean;
@@ -55,21 +58,25 @@ export default function getMissingRequiredConnectionErrors({
  * again from the node issues. Warnings of those kinds (e.g. a missing recommended field) have no other source and stay.
  */
 export function getWorkflowIssueErrors(
-    nodeIssues: Array<Pick<WorkflowIssueI, 'kind' | 'message' | 'severity'>>
+    nodeIssues: Array<NodeIssueType>,
+    getPropertyLabels: (nodeIssue: NodeIssueType) => Array<string> = () => []
 ): Array<WorkflowNodeDetailsErrorI> {
-    const severitiesByMessage = new Map<string, WorkflowIssueSeverityType>();
+    const errorsByKey = new Map<string, WorkflowNodeDetailsErrorI>();
 
     for (const nodeIssue of nodeIssues) {
         if (nodeIssue.severity === 'ERROR' && SEPARATELY_REPORTED_ISSUE_KINDS.has(nodeIssue.kind)) {
             continue;
         }
 
-        if (severitiesByMessage.get(nodeIssue.message) !== 'ERROR') {
-            severitiesByMessage.set(nodeIssue.message, nodeIssue.severity);
+        const propertyLabel = [...new Set(getPropertyLabels(nodeIssue))].join(', ') || undefined;
+        const key = `${propertyLabel ?? ''}|${nodeIssue.message}`;
+
+        if (errorsByKey.get(key)?.severity !== 'ERROR') {
+            errorsByKey.set(key, {kind: 'ISSUE', name: nodeIssue.message, propertyLabel, severity: nodeIssue.severity});
         }
     }
 
-    return [...severitiesByMessage.entries()].map(([message, severity]) => ({kind: 'ISSUE', name: message, severity}));
+    return [...errorsByKey.values()];
 }
 
 export function getWorkflowNodeDetailsErrorsSummary(errors: Array<Pick<WorkflowNodeDetailsErrorI, 'severity'>>): {

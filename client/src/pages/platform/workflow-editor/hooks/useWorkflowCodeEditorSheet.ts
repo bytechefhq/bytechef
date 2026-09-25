@@ -11,11 +11,12 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {getTestWorkflowAttachRequest, getTestWorkflowStreamPostRequest} from '@/shared/util/testWorkflow-utils';
 import {MarkerSeverity} from 'monaco-editor';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useShallow} from 'zustand/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import getWorkflowCodeEditorIssueMessages from '../utils/getWorkflowCodeEditorIssueMessages';
 import saveWorkflowDefinitionUpdate from '../utils/saveWorkflowDefinitionUpdate';
 
 import type {editor} from 'monaco-editor';
@@ -223,7 +224,16 @@ const useWorkflowCodeEditorSheet = ({
         {enabled: !!definition}
     );
 
-    const {errors, warnings} = validateWorkflowData?.validateWorkflow ?? {errors: [], warnings: []};
+    const {errors, warnings} = useMemo(
+        () =>
+            getWorkflowCodeEditorIssueMessages({
+                definition: definition ?? '',
+                errors: validateWorkflowData?.validateWorkflow.errors ?? [],
+                nodeIssues: validateWorkflowData?.validateWorkflow.nodeIssues ?? [],
+                warnings: validateWorkflowData?.validateWorkflow.warnings ?? [],
+            }),
+        [definition, validateWorkflowData]
+    );
 
     const handleValidate = useCallback(
         (newMarkers: editor.IMarkerData[]) => {

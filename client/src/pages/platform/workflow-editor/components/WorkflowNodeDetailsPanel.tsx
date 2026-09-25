@@ -304,6 +304,12 @@ const WorkflowNodeDetailsPanel = ({
                                                                 </span>
                                                             )}
 
+                                                            {error.propertyLabel && (
+                                                                <span className="font-light">
+                                                                    {error.propertyLabel}:
+                                                                </span>
+                                                            )}
+
                                                             <span>{error.name}</span>
                                                         </li>
                                                     ))}
