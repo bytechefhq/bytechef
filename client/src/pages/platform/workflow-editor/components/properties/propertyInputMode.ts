@@ -4,6 +4,9 @@ const SINGLE_DATA_PILL_REGEX = /^\$\{[^}]+}$/;
 const INTEGER_LITERAL_REGEX = /^-?\d+$/;
 const NUMBER_LITERAL_REGEX = /^-?\d+(\.\d+)?$/;
 const QUOTED_STRING_LITERAL_REGEX = /^'((?:[^']|'')*)'$/;
+const DATE_LITERAL_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_TIME_LITERAL_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/;
+const TIME_LITERAL_REGEX = /^\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/;
 
 export interface PropertyInputModeI {
     legacyMixed: boolean;
@@ -61,7 +64,7 @@ export function getPropertyInputMode({
         return {legacyMixed: false, mode: 'text', renderer: 'mentions', singlePill: true};
     }
 
-    if (typeof value === 'string' && value.includes('${')) {
+    if (typeof value === 'string' && (value.includes('${') || value.includes('#{'))) {
         return {legacyMixed: true, mode: 'text', renderer: 'mentions', singlePill: false};
     }
 
@@ -146,4 +149,57 @@ export function shouldIncludeInMetadata(value: unknown, custom?: boolean): boole
     }
 
     return !!custom;
+}
+
+function isJsonObjectString(value: string): boolean {
+    try {
+        const parsedValue = JSON.parse(value);
+
+        return typeof parsedValue === 'object' && parsedValue !== null && !Array.isArray(parsedValue);
+    } catch {
+        return false;
+    }
+}
+
+export function fitsNativeControl(
+    controlType: string | undefined,
+    value: unknown,
+    selectOptionValues?: Array<string>
+): boolean {
+    if (value === undefined || value === null || value === '' || isSingleDataPill(value)) {
+        return true;
+    }
+
+    if (controlType === 'SELECT' && selectOptionValues?.length) {
+        return selectOptionValues.includes(String(value));
+    }
+
+    if (typeof value !== 'string') {
+        return true;
+    }
+
+    switch (controlType) {
+        case 'JSON_SCHEMA_BUILDER':
+            return isJsonObjectString(value);
+        case 'ARRAY_BUILDER':
+        case 'MULTI_SELECT':
+        case 'OBJECT_BUILDER':
+            return false;
+        case 'DATE':
+            return DATE_LITERAL_REGEX.test(value);
+        case 'DATE_TIME':
+            return DATE_TIME_LITERAL_REGEX.test(value);
+        case 'TIME':
+            return TIME_LITERAL_REGEX.test(value);
+        default:
+            return true;
+    }
+}
+
+export function parseJsonSchema(value: string | undefined): Record<string, unknown> | undefined {
+    if (!value || !isJsonObjectString(value)) {
+        return undefined;
+    }
+
+    return JSON.parse(value);
 }

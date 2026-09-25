@@ -3,6 +3,7 @@ import {getRandomId} from '@/shared/util/random-utils';
 import {
     DragEvent,
     ForwardedRef,
+    MutableRefObject,
     ReactNode,
     Suspense,
     forwardRef,
@@ -41,6 +42,7 @@ const PropertyMentionsInputEditorSheet = lazy(
 
 interface PropertyMentionsInputProps {
     autoFocus?: boolean;
+    cancelPendingSaveRef?: MutableRefObject<(() => void) | null>;
     className?: string;
     controlType?: ControlType;
     defaultValue?: string;
@@ -75,6 +77,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
     (
         {
             autoFocus,
+            cancelPendingSaveRef,
             className,
             controlType,
             defaultValue,
@@ -335,6 +338,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                     >
                         <PropertyMentionsInputEditor
                             autoFocus={autoFocus}
+                            cancelPendingSaveRef={cancelPendingSaveRef}
                             className={twMerge('px-2 py-2', leadingIcon && 'py-[7px]')}
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
