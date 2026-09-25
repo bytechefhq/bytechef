@@ -37,10 +37,9 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 
 /**
- * Bridges spring-ai-agent-utils' {@link AskUserQuestionTool} into the shared streaming agent (AI Hub and the in-editor
- * Copilot). Used by the LLM to pose a multi-choice clarification ("Which Slack action did you mean?" / "Pick a
- * connection"), with the actual UI buttons rendered by the chat client via a {@code kind: "ask-user-question"} data
- * part.
+ * Bridges spring-ai-agent-utils' {@link AskUserQuestionTool} into the in-editor Copilot streaming agent. Used by the
+ * LLM to pose a multi-choice clarification ("Which Slack action did you mean?" / "Pick a connection"), with the actual
+ * UI buttons rendered by the chat client via a {@code kind: "ask-user-question"} data part.
  *
  * @author Ivica Cardic
  */
