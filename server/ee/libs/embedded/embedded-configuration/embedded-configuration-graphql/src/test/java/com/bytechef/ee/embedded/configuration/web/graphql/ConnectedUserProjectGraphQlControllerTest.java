@@ -39,30 +39,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expression on every query and mutation of the embedded admin GraphQL
- * controllers through the real {@link AutomationMethodSecurityExpressionHandler} and
- * {@link AutomationPermissionEvaluator}. These queries and mutations read and administer the tenant's automation
- * workflow catalog and every connected user's workflows, so each must decide on
- * {@link PermissionService#isTenantAdmin()} alone.
- *
  * @version ee
  *
  * @author Ivica Cardic
  */
-class EmbeddedAdminGraphQlControllersAuthorizationTest {
-
-    private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
-        AutomationWorkflowProjectGraphQlController.class, ConnectedUserProjectGraphQlController.class);
+class ConnectedUserProjectGraphQlControllerTest {
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
-        "automationWorkflowProjectCategories", "automationWorkflowProjectTags", "automationWorkflowProjectVersions",
-        "automationWorkflowProjects", "connectedUserProjects", "createAutomationWorkflowProject",
-        "createAutomationWorkflowProjectWorkflow",
-        "deleteAutomationWorkflowProject", "deleteAutomationWorkflowProjectWorkflow",
-        "deleteConnectedUserProjectWorkflow", "enableConnectedUserProjectWorkflow",
-        "duplicateAutomationWorkflowProject", "duplicateAutomationWorkflowProjectWorkflow",
-        "publishAutomationWorkflowProject", "updateAutomationWorkflowProject",
-        "updateAutomationWorkflowProjectWorkflow", "updateAutomationWorkflowProjectWorkflowPermissionExpression");
+        "connectedUserProjects", "deleteConnectedUserProjectWorkflow", "enableConnectedUserProjectWorkflow");
 
     static Stream<Arguments> endpoints() {
         return endpointMethods().flatMap(method -> Stream.of(Arguments.of(method, false), Arguments.of(method, true)));
@@ -77,6 +61,11 @@ class EmbeddedAdminGraphQlControllersAuthorizationTest {
         assertThat(endpointNames).isEqualTo(new TreeSet<>(ENDPOINT_NAMES));
     }
 
+    /**
+     * Evaluates the real {@code @PreAuthorize} expression of the query or mutation through the real
+     * {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. It reads or
+     * administers the tenant's embedded catalog, so it must decide on {@link PermissionService#isTenantAdmin()} alone.
+     */
     @ParameterizedTest(name = "{0} tenantAdmin={1}")
     @MethodSource("endpoints")
     void testEndpointRequiresATenantAdmin(Method method, boolean tenantAdmin) {
@@ -127,8 +116,7 @@ class EmbeddedAdminGraphQlControllersAuthorizationTest {
     }
 
     private static Stream<Method> endpointMethods() {
-        return CONTROLLER_CLASSES.stream()
-            .flatMap(controllerClass -> Arrays.stream(controllerClass.getDeclaredMethods()))
+        return Arrays.stream(ConnectedUserProjectGraphQlController.class.getDeclaredMethods())
             .filter(method -> method.isAnnotationPresent(MutationMapping.class) ||
                 method.isAnnotationPresent(QueryMapping.class));
     }

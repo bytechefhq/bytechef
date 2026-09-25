@@ -21,6 +21,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -46,12 +47,14 @@ public class IntegrationWorkflowGraphQlController {
     }
 
     @QueryMapping
-    List<IntegrationWorkflowDTO> integrationWorkflows() {
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationWorkflowDTO> integrationWorkflows() {
         return integrationWorkflowFacade.getIntegrationWorkflows();
     }
 
     @QueryMapping
-    List<IntegrationWorkflowDTO> integrationWorkflowsByIntegrationId(@Argument long integrationId) {
+    @PreAuthorize("isTenantAdmin()")
+    public List<IntegrationWorkflowDTO> integrationWorkflowsByIntegrationId(@Argument long integrationId) {
         return integrationWorkflowFacade.getIntegrationWorkflows(integrationId);
     }
 
@@ -77,6 +80,7 @@ public class IntegrationWorkflowGraphQlController {
     }
 
     @MutationMapping
+    @PreAuthorize("isTenantAdmin()")
     public IntegrationWorkflowDTO updateIntegrationWorkflowPermissionExpression(
         @Argument long integrationWorkflowId, @Argument String permissionExpression) {
 
