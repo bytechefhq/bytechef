@@ -39,8 +39,8 @@ import org.springframework.security.util.SimpleMethodInvocation;
 /**
  * Evaluates the real {@code @PreAuthorize} expression on every endpoint of the embedded admin REST controllers through
  * the real {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. These endpoints
- * administer the tenant's embedded integrations, their instance configurations and app events, so each must decide on
- * {@link PermissionService#isTenantAdmin()} alone.
+ * administer the tenant's embedded integrations, their workflows, instance configurations and app events, so each must
+ * decide on {@link PermissionService#isTenantAdmin()} alone.
  *
  * @version ee
  *
@@ -51,7 +51,8 @@ class EmbeddedAdminApiControllersAuthorizationTest {
     private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
         AppEventApiController.class, CategoryApiController.class, IntegrationApiController.class,
         IntegrationInstanceApiController.class, IntegrationInstanceConfigurationApiController.class,
-        IntegrationInstanceConfigurationTagApiController.class, IntegrationTagApiController.class);
+        IntegrationInstanceConfigurationTagApiController.class, IntegrationTagApiController.class,
+        WebhookTriggerTestApiController.class, WorkflowApiController.class);
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
         "AppEventApiController#createAppEvent", "AppEventApiController#deleteAppEvent",
@@ -77,7 +78,13 @@ class EmbeddedAdminApiControllersAuthorizationTest {
         "IntegrationInstanceConfigurationApiController#updateIntegrationInstanceConfigurationWorkflow",
         "IntegrationInstanceConfigurationTagApiController#getIntegrationInstanceConfigurationTags",
         "IntegrationInstanceConfigurationTagApiController#updateIntegrationInstanceConfigurationTags",
-        "IntegrationTagApiController#getIntegrationTags", "IntegrationTagApiController#updateIntegrationTags");
+        "IntegrationTagApiController#getIntegrationTags", "IntegrationTagApiController#updateIntegrationTags",
+        "WebhookTriggerTestApiController#startWebhookTriggerTest",
+        "WebhookTriggerTestApiController#stopWebhookTriggerTest",
+        "WorkflowApiController#deleteWorkflow", "WorkflowApiController#exportWorkflow",
+        "WorkflowApiController#getIntegrationVersionWorkflows", "WorkflowApiController#getIntegrationWorkflow",
+        "WorkflowApiController#getIntegrationWorkflows", "WorkflowApiController#getWorkflow",
+        "WorkflowApiController#updateWorkflow");
 
     static Stream<Arguments> endpoints() {
         return endpointMethods().flatMap(
