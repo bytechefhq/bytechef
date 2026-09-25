@@ -21,10 +21,12 @@ import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROMPT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -276,6 +278,14 @@ public class ModelUtils {
             chatModelMessages.stream()
                 .map(chatModelMessage -> createMessage(chatModelMessage, actionContext))
                 .toList());
+    }
+
+    public static @Nullable String getReasoningEffort(Parameters inputParameters) {
+        if (inputParameters.getBoolean(THINKING, false)) {
+            return inputParameters.getString(REASONING_EFFORT, "medium");
+        }
+
+        return null;
     }
 
     public static RestClient.Builder getRestClientBuilder() {

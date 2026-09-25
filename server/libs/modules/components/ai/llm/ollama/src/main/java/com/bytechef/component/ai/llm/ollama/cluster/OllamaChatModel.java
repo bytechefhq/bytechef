@@ -18,9 +18,11 @@ package com.bytechef.component.ai.llm.ollama.cluster;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.CHAT_MODEL_PROPERTY;
@@ -99,7 +101,9 @@ public class OllamaChatModel {
                 MIROSTAT_TAU_PROPERTY,
                 MIROSTAT_ETA_PROPERTY,
                 PENALIZE_NEW_LINE_PROPERTY,
-                TRUNCATE_PROPERTY);
+                TRUNCATE_PROPERTY,
+                THINKING_PROPERTY,
+                REASONING_EFFORT_PROPERTY);
 
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {

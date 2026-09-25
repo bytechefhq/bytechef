@@ -22,10 +22,12 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -109,7 +111,9 @@ public class AnthropicConstants {
         TEMPERATURE_PROPERTY,
         TOP_P_PROPERTY,
         TOP_K_PROPERTY,
-        STOP_PROPERTY);
+        STOP_PROPERTY,
+        THINKING_PROPERTY,
+        REASONING_EFFORT_PROPERTY);
 
     /**
      * Model ids are read straight off the Anthropic SDK's {@link Model} constants via {@link Model#asString()}, so the

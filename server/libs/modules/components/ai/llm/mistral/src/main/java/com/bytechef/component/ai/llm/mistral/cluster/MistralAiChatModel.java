@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PRO
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.mistral.constant.MistralConstants.SAFE_PROMPT_PROPERTY;
@@ -49,7 +50,8 @@ public class MistralAiChatModel {
                 TOP_P_PROPERTY,
                 STOP_PROPERTY,
                 SEED_PROPERTY,
-                SAFE_PROMPT_PROPERTY);
+                SAFE_PROMPT_PROPERTY,
+                THINKING_PROPERTY);
 
     protected static ChatModel apply(
         Parameters inputParameters, Parameters connectionParameters, boolean responseFormatRequired) {

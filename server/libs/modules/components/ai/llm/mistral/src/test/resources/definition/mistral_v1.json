@@ -712,6 +712,30 @@
       "placeholder": null,
       "required": false,
       "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model reason before responding.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Thinking",
+      "metadata": { },
+      "name": "thinking",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
     } ],
     "resumePerform": null,
     "title": "Ask",
@@ -2578,6 +2602,30 @@
       "label": "Safe prompt",
       "metadata": { },
       "name": "safePrompt",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": true,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Let the model reason before responding.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Thinking",
+      "metadata": { },
+      "name": "thinking",
       "options": [ {
         "description": null,
         "label": "True",

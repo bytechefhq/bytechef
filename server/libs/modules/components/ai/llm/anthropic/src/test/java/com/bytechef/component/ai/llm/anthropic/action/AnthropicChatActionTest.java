@@ -18,8 +18,10 @@ package com.bytechef.component.ai.llm.anthropic.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -36,6 +39,8 @@ import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.AnthropicClientAsync;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
+import com.anthropic.models.messages.OutputConfig;
+import com.anthropic.models.messages.ThinkingConfigParam;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -194,6 +199,85 @@ class AnthropicChatActionTest {
             assertEquals(
                 AnthropicCacheStrategy.CONVERSATION_HISTORY, anthropicChatOptions.getCacheOptions()
                     .getStrategy());
+        }
+    }
+
+    @Test
+    void testCreateChatModelOmitsUnsetSamplingParameters() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-sonnet-5", MAX_TOKENS, 1000));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        assertEquals("claude-sonnet-5", anthropicChatOptions.getModel());
+        assertNull(anthropicChatOptions.getTopK());
+        assertNull(anthropicChatOptions.getTemperature());
+        assertNull(anthropicChatOptions.getTopP());
+        assertNull(anthropicChatOptions.getThinking());
+    }
+
+    @Test
+    void testCreateChatModelUsesAdaptiveThinking() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-opus-5", MAX_TOKENS, 16000, THINKING, true, REASONING_EFFORT, "high"));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        ThinkingConfigParam thinking = anthropicChatOptions.getThinking();
+
+        assertTrue(thinking.isAdaptive());
+
+        OutputConfig outputConfig = anthropicChatOptions.getOutputConfig();
+
+        assertEquals(OutputConfig.Effort.HIGH, outputConfig.effort()
+            .orElseThrow());
+    }
+
+    @Test
+    void testCreateChatModelOmitsSamplingParametersWhenThinking() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-sonnet-5", MAX_TOKENS, 16000, THINKING, true, TOP_K, 50, TEMPERATURE, 0.7));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters);
+
+        ThinkingConfigParam thinking = anthropicChatOptions.getThinking();
+
+        assertTrue(thinking.isAdaptive());
+        assertNull(anthropicChatOptions.getTopK());
+        assertNull(anthropicChatOptions.getTemperature());
+
+        OutputConfig outputConfig = anthropicChatOptions.getOutputConfig();
+
+        assertEquals(OutputConfig.Effort.MEDIUM, outputConfig.effort()
+            .orElseThrow());
+    }
+
+    private AnthropicChatOptions createChatOptions(Parameters inputParameters) {
+        try (MockedStatic<AnthropicOkHttpClient> syncMockedStatic = mockStatic(AnthropicOkHttpClient.class);
+            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic = mockStatic(AnthropicOkHttpClientAsync.class)) {
+
+            AnthropicOkHttpClient.Builder mockedSyncBuilder = mock(AnthropicOkHttpClient.Builder.class);
+
+            syncMockedStatic.when(AnthropicOkHttpClient::builder)
+                .thenReturn(mockedSyncBuilder);
+            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedSyncBuilder);
+            when(mockedSyncBuilder.build())
+                .thenReturn(mock(AnthropicClient.class));
+
+            AnthropicOkHttpClientAsync.Builder mockedAsyncBuilder = mock(AnthropicOkHttpClientAsync.Builder.class);
+
+            asyncMockedStatic.when(AnthropicOkHttpClientAsync::builder)
+                .thenReturn(mockedAsyncBuilder);
+            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedAsyncBuilder);
+            when(mockedAsyncBuilder.build())
+                .thenReturn(mock(AnthropicClientAsync.class));
+
+            AnthropicChatModel chatModel = (AnthropicChatModel) AnthropicChatAction.CHAT_MODEL.createChatModel(
+                inputParameters, mockedConnectionParameters, false);
+
+            return chatModel.getOptions();
         }
     }
 }
