@@ -64,25 +64,49 @@ const PropertyCodeEditorDialog = ({
                             workflowNodeName={workflowNodeName}
                         />
 
-                        <div className="flex min-h-0 min-w-0 flex-1 gap-3 p-3">
-                            <ResizablePanelGroup className="flex-1" orientation="vertical">
-                                <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={750}>
-                                    <PropertyCodeEditorDialogEditor language={language} />
+                        <div className="flex min-h-0 min-w-0 flex-1 p-3">
+                            <ResizablePanelGroup className="flex-1" orientation="horizontal">
+                                <ResizablePanel id="code-editor-main" minSize={400}>
+                                    <ResizablePanelGroup orientation="vertical">
+                                        <ResizablePanel
+                                            className="rounded-lg bg-surface-neutral-primary"
+                                            defaultSize={750}
+                                        >
+                                            <PropertyCodeEditorDialogEditor language={language} />
+                                        </ResizablePanel>
+
+                                        <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:h-1.5" />
+
+                                        <ResizablePanel
+                                            className="rounded-lg bg-surface-neutral-primary"
+                                            defaultSize={250}
+                                        >
+                                            <PropertyCodeEditorDialogExecutionOutput />
+                                        </ResizablePanel>
+                                    </ResizablePanelGroup>
                                 </ResizablePanel>
 
-                                <ResizableHandle className="bg-transparent aria-[orientation=horizontal]:h-3" />
+                                {rightPanelOpen && (
+                                    <>
+                                        <ResizableHandle
+                                            className="w-1.5 bg-transparent"
+                                            id="code-editor-right-handle"
+                                        />
 
-                                <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={250}>
-                                    <PropertyCodeEditorDialogExecutionOutput />
-                                </ResizablePanel>
+                                        <ResizablePanel
+                                            defaultSize={384}
+                                            id="code-editor-right-panel"
+                                            maxSize="50%"
+                                            minSize={280}
+                                        >
+                                            <PropertyCodeEditorDialogRightPanel
+                                                workflow={workflow}
+                                                workflowNodeName={workflowNodeName}
+                                            />
+                                        </ResizablePanel>
+                                    </>
+                                )}
                             </ResizablePanelGroup>
-
-                            {rightPanelOpen && (
-                                <PropertyCodeEditorDialogRightPanel
-                                    workflow={workflow}
-                                    workflowNodeName={workflowNodeName}
-                                />
-                            )}
                         </div>
                     </div>
 
