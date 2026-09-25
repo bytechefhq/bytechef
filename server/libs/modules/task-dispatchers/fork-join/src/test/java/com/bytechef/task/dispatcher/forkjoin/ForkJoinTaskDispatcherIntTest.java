@@ -17,9 +17,12 @@
 package com.bytechef.task.dispatcher.forkjoin;
 
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.atlas.worker.exception.TaskExecutionException;
+import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
+import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.workflow.task.dispatcher.test.annotation.TaskDispatcherIntTest;
 import com.bytechef.platform.workflow.task.dispatcher.test.task.handler.TestVarTaskHandler;
 import com.bytechef.platform.workflow.task.dispatcher.test.workflow.TaskDispatcherJobTestExecutor;
@@ -27,9 +30,13 @@ import com.bytechef.task.dispatcher.fork.join.ForkJoinTaskDispatcher;
 import com.bytechef.task.dispatcher.fork.join.completion.ForkJoinTaskCompletionHandler;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -71,5 +78,69 @@ public class ForkJoinTaskDispatcherIntTest {
 
         Assertions.assertEquals(85, testVarTaskHandler.get("sumVar1"));
         Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));
+    }
+
+    @Test
+    @Timeout(60)
+    public void testDispatchWithFailedBranchCancelsOtherBranch() throws InterruptedException {
+        CountDownLatch releaseSlowTaskLatch = new CountDownLatch(1);
+        CountDownLatch slowTaskFinishedLatch = new CountDownLatch(1);
+        CountDownLatch slowTaskStartedLatch = new CountDownLatch(1);
+        AtomicBoolean slowTaskInterrupted = new AtomicBoolean();
+
+        TaskHandler<Object> failTaskHandler = taskExecution -> {
+            try {
+                slowTaskStartedLatch.await(30, TimeUnit.SECONDS);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+            }
+
+            throw new TaskExecutionException("branch failed");
+        };
+
+        TaskHandler<Object> slowTaskHandler = taskExecution -> {
+            slowTaskStartedLatch.countDown();
+
+            try {
+                releaseSlowTaskLatch.await(30, TimeUnit.SECONDS);
+            } catch (InterruptedException interruptedException) {
+                slowTaskInterrupted.set(true);
+
+                Thread.currentThread()
+                    .interrupt();
+            } finally {
+                slowTaskFinishedLatch.countDown();
+            }
+
+            return "slow task output";
+        };
+
+        try {
+            ExecutionException executionException = Assertions.assertThrows(
+                ExecutionException.class,
+                () -> taskDispatcherJobTestExecutor.execute(
+                    EncodingUtils.base64EncodeToString("fork-join_v1-failed-branch"),
+                    (
+                        contextService, counterService, taskExecutionService) -> List.of(
+                            (taskCompletionHandler, taskDispatcher) -> new ForkJoinTaskCompletionHandler(
+                                contextService, counterService, EVALUATOR, taskExecutionService,
+                                taskCompletionHandler, taskDispatcher, taskFileStorage)),
+                    (
+                        eventPublisher, contextService, counterService, taskExecutionService) -> List.of(
+                            (taskDispatcher) -> new ForkJoinTaskDispatcher(
+                                contextService, counterService, EVALUATOR, eventPublisher, taskDispatcher,
+                                taskExecutionService, taskFileStorage)),
+                    () -> Map.of(
+                        "fail/v1", failTaskHandler, "slow/v1", slowTaskHandler, "var/v1/set", testVarTaskHandler)));
+
+            Assertions.assertEquals("branch failed", executionException.getMessage());
+
+            Assertions.assertTrue(slowTaskFinishedLatch.await(20, TimeUnit.SECONDS));
+            Assertions.assertTrue(slowTaskInterrupted.get());
+            Assertions.assertNull(testVarTaskHandler.get("afterSlowTask"));
+        } finally {
+            releaseSlowTaskLatch.countDown();
+        }
     }
 }
