@@ -231,9 +231,6 @@ class EndpointGateCoverageTest {
             "ApiKeyFacadeImpl checks the caller owns the key"));
 
     private static final Map<String, String> KNOWN_UNGATED_WRITES = Map.ofEntries(
-        Map.entry("ApiClientApiController#createApiClient", "any member manages the tenant's API platform clients"),
-        Map.entry("ApiClientApiController#deleteApiClient", "any member manages the tenant's API platform clients"),
-        Map.entry("ApiClientApiController#updateApiClient", "any member manages the tenant's API platform clients"),
         Map.entry("ApiConnectorGraphQlController#cancelGenerationJob",
             "any member manages the tenant's API connectors"),
         Map.entry("ApiConnectorGraphQlController#createApiConnector", "any member manages the tenant's API connectors"),
