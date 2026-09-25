@@ -31,6 +31,9 @@ export interface ApplicationInfoI {
         customerPortalUrl: string | undefined;
         enabled: boolean;
     };
+    embedded: {
+        allowedParentOrigins: string[];
+    } | null;
     featureFlags: Record<string, boolean>;
     helpHub: {
         commandBar: {
@@ -57,6 +60,9 @@ export interface ApplicationInfoI {
 
     getApplicationInfo: () => Promise<void>;
 }
+
+const toAllowedParentOrigins = (value: unknown): string[] =>
+    Array.isArray(value) ? value.filter((origin): origin is string => typeof origin === 'string') : [];
 
 const fetchGetActuatorInfo = async (): Promise<Response> => {
     return await fetch('/actuator/info', {
@@ -88,6 +94,7 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     customerPortalUrl: undefined,
                     enabled: false,
                 },
+                embedded: null,
                 featureFlags: {},
 
                 getApplicationInfo: async () => {
@@ -123,6 +130,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                             billing: {
                                 customerPortalUrl: json.billing?.customerPortalUrl || undefined,
                                 enabled: json.billing?.enabled === 'true',
+                            },
+                            embedded: {
+                                allowedParentOrigins: toAllowedParentOrigins(json.embedded?.allowedParentOrigins),
                             },
                             featureFlags: json.featureFlags,
                             helpHub: {

@@ -51,7 +51,13 @@ Both credentials fail as a `401`, but for different reasons:
 
 A **disabled connected user** is a distinct case: the token is valid and the user exists, but requests are refused until an admin re-enables them under **Embedded → Connected Users**. If a single customer is failing while everyone else is fine, check their enabled state first.
 
+A JWT whose `sub` does not match the `{externalUserId}` segment of the request path (`/api/embedded/v1/{externalUserId}/...`) is also rejected with a `401`, before the request reaches the endpoint. A token minted for one connected user cannot act on another user's path. Mint the token with the same id you put in the URL. The server URL-decodes the path segment before comparing.
+
 Calling a frontend operation with an API Key is also rejected. Those paths carry no `{externalUserId}` segment, so there is no user for the key to act as - see [the reference's authentication section](/openapi#authentication).
+
+## Admin operations
+
+Embedded admin operations require a **tenant admin**. This covers integrations, integration categories and tags, instance configurations, catalog projects, connected-user administration, App Events, workflow executions, connections administration, and Signing Keys. For any other ByteChef user, access is denied. If a teammate cannot manage these under **Embedded** in the ByteChef UI, check that their account has the admin authority (`ROLE_ADMIN`).
 
 ## Credential problems
 
@@ -63,6 +69,14 @@ An invalid credential does not fail the API call that lists it; it fails the wor
 - Your own app can read it per connection from [Connections](/openapi/backend/embedded-configuration-connection).
 
 The fix is always the same: have the user reconnect through the Connect dialog, which replaces the credential in place.
+
+## Embedding problems
+
+The workflow builder, Automation Hub and Integration Marketplace render in an iframe, so their failures show in the browser rather than in an API response:
+
+- **The iframe is blank and the console reports that a frame was refused because it violates `frame-ancestors`** - your app's origin is not in `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` on the ByteChef server. Add the exact origin (scheme, host and port, no path) and restart the server.
+- **The page stays on its loading state** - it never received `EMBED_INIT` from an allowed origin. Check that the origin your app runs on matches an entry in `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` exactly, including `http` versus `https` and the port. If the list is empty, the page announces itself only to your app's origin as reported in the iframe's referrer, so an app served with `Referrer-Policy: no-referrer` never hears from it; set the allowed parent origins.
+- **The console warns that no allowed parent origins are configured** - `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` is empty, so any website can embed the pages. Set it before going to production.
 
 ## Execution problems
 

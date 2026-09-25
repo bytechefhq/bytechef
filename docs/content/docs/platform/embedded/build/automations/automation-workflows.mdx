@@ -125,8 +125,13 @@ The **Workflow Builder** is the white-label editor you embed inside your own pro
 
 When the builder loads inside your app it:
 
-1. Posts an **`EMBED_READY`** message to the parent window (restricted to the origins configured in `VITE_EMBEDDED_PARENT_ORIGINS`; if none are configured it posts to any origin).
-2. Waits for your app to reply with an **`EMBED_INIT`** message. Until it arrives, the builder shows a loading state.
+1. Reads the allowed parent origins from the ByteChef server.
+2. Posts an **`EMBED_READY`** message to the parent window, addressed only to the allowed parent origins. If none are configured it addresses the origin of the page that embeds it, which the browser reports as the iframe's referrer. If your app sends no referrer (`Referrer-Policy: no-referrer`) and no origins are configured, the builder cannot announce itself, so configure the allowed parent origins.
+3. Waits for your app to reply with an **`EMBED_INIT`** message. Until it arrives, the builder shows a loading state.
+
+The allowed parent origins are set on the ByteChef server with `BYTECHEF_EMBEDDED_ALLOWED_PARENT_ORIGINS` (property `bytechef.embedded.allowed-parent-origins`): a comma-separated list of exact origins such as `https://app.example.com,https://admin.example.com`, with no path and no wildcard. The server also sends them as `Content-Security-Policy: frame-ancestors` on the builder, Automation Hub and Integration Marketplace pages, so the browser refuses to render those pages inside any other site. Set it in production. When it is empty, any website can embed the pages and send them `EMBED_INIT`, and the pages log a warning in the browser console.
+
+If you build the client yourself, `VITE_EMBEDDED_PARENT_ORIGINS` sets a build-time list with the same format. It applies only when the server list is empty; a non-empty server list replaces it.
 
 The `EMBED_INIT` message carries the parameters that configure the session:
 
@@ -137,7 +142,7 @@ The `EMBED_INIT` message carries the parameters that configure the session:
 | `includeComponents` | Restricts the component palette to the listed components. |
 | `connectionDialogAllowed` | Whether the user may open the connect dialog to create new connections. |
 
-Messages are only accepted from the parent window and, when `VITE_EMBEDDED_PARENT_ORIGINS` is set, only from an allowed origin.
+Messages are only accepted from the parent window and, when allowed parent origins are configured, only from one of those origins.
 
 Your app can send `EMBED_INIT` again at any time, for example after refreshing the user's token. The builder replaces the stored token and environment with the new values; an `EMBED_INIT` without a `jwtToken` clears the stored token. The `@bytechef/embedded` components do this for you whenever their props change.
 
