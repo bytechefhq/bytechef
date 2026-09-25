@@ -8,7 +8,7 @@ import {Select as SelectPrimitive} from 'radix-ui';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from './PropertyFormulaSwitch';
 
 interface PropertySelectProps {
     defaultValue?: string;
@@ -64,7 +64,7 @@ const PropertySelect = ({
 
                 <div className="flex items-center">
                     {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                        <PropertyInputTypeSwitch handleClick={handleInputTypeSwitchButtonClick} mentionInput={false} />
+                        <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                     )}
 
                     {deletePropertyButton}

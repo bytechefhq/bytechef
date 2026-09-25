@@ -1,15 +1,20 @@
 import Switch from '@/components/Switch/Switch';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 
-const PropertyInputTypeSwitch = ({handleClick, mentionInput}: {handleClick: () => void; mentionInput: boolean}) => (
+interface PropertyFormulaSwitchProps {
+    formulaMode: boolean;
+    handleClick: () => void;
+}
+
+const PropertyFormulaSwitch = ({formulaMode, handleClick}: PropertyFormulaSwitchProps) => (
     <Tooltip>
         <TooltipTrigger asChild>
             <span className="inline-flex">
                 <Switch
-                    checked={mentionInput}
-                    label="Dynamic"
+                    checked={formulaMode}
+                    label="Formula"
                     onCheckedChange={(checked) => {
-                        if (checked !== mentionInput) {
+                        if (checked !== formulaMode) {
                             handleClick();
                         }
                     }}
@@ -19,9 +24,9 @@ const PropertyInputTypeSwitch = ({handleClick, mentionInput}: {handleClick: () =
         </TooltipTrigger>
 
         <TooltipPortal>
-            <TooltipContent>{mentionInput ? 'Switch to constant value' : 'Switch to dynamic value'}</TooltipContent>
+            <TooltipContent>{formulaMode ? 'Switch to text' : 'Switch to formula'}</TooltipContent>
         </TooltipPortal>
     </Tooltip>
 );
 
-export default PropertyInputTypeSwitch;
+export default PropertyFormulaSwitch;

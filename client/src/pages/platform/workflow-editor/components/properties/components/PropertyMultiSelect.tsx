@@ -18,7 +18,7 @@ import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedDependencyKey from '../../../utils/getFormattedDependencyKey';
 import {resolveMainClusterRootName} from '../../../utils/resolveClusterRootId';
-import PropertyInputTypeSwitch from './PropertyInputTypeSwitch';
+import PropertyFormulaSwitch from './PropertyFormulaSwitch';
 
 interface PropertyMultiSelectProps {
     defaultValue?: string[];
@@ -274,10 +274,7 @@ const PropertyMultiSelect = ({
 
                     <div className="flex items-center">
                         {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
-                            <PropertyInputTypeSwitch
-                                handleClick={handleInputTypeSwitchButtonClick}
-                                mentionInput={false}
-                            />
+                            <PropertyFormulaSwitch formulaMode={false} handleClick={handleInputTypeSwitchButtonClick} />
                         )}
 
                         {deletePropertyButton}
