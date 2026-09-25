@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,6 +45,7 @@ public class IntegrationInstanceConfigurationTagApiController implements Integra
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<List<TagModel>> getIntegrationInstanceConfigurationTags() {
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade.getIntegrationInstanceConfigurationTags()
@@ -53,6 +55,7 @@ public class IntegrationInstanceConfigurationTagApiController implements Integra
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     public ResponseEntity<Void> updateIntegrationInstanceConfigurationTags(
         Long id, UpdateTagsRequestModel updateTagsRequestModel) {
 
