@@ -144,4 +144,100 @@ describe('collectWorkflowIssues', () => {
             },
         ]);
     });
+
+    describe('references to a node that does not run before the referencing one', () => {
+        const orderIssues = (issues: ReturnType<typeof collectWorkflowIssues>) =>
+            issues.filter((issue) => issue.kind === 'TASK_ORDER').map((issue) => [issue.nodeName, issue.propertyPath]);
+
+        it("reports a node in a sibling fork-join branch, keyed like the validator's task order error", () => {
+            const issues = collectWorkflowIssues({
+                tasks: [
+                    task('forkJoin_1', {
+                        branches: [
+                            [task('firecrawl_7'), task('anthropic_1', {prompt: '${firecrawl_7.data.html}'})],
+                            [task('firecrawl_6'), task('anthropic_2', {prompt: '${firecrawl_7.data.html}'})],
+                        ],
+                    }),
+                ],
+                triggers: [trigger('trigger_1')],
+            });
+
+            expect(issues).toEqual([
+                {
+                    kind: 'TASK_ORDER',
+                    message:
+                        '"firecrawl_7" does not run before this node, so its output is not available here (referenced as firecrawl_7.data.html)',
+                    nodeName: 'anthropic_2',
+                    propertyPath: 'firecrawl_7.data.html',
+                    severity: 'ERROR',
+                    source: 'SWEEP',
+                },
+            ]);
+        });
+
+        it('reads the structure from the dispatchers when the server also lists nested tasks at the top level', () => {
+            const firecrawl7 = task('firecrawl_7');
+            const anthropic2 = task('anthropic_2', {prompt: '${firecrawl_7.data.html}'});
+
+            const issues = collectWorkflowIssues({
+                tasks: [task('forkJoin_1', {branches: [[firecrawl7], [anthropic2]]}), firecrawl7, anthropic2],
+                triggers: [trigger('trigger_1')],
+            });
+
+            expect(orderIssues(issues)).toEqual([['anthropic_2', 'firecrawl_7.data.html']]);
+        });
+
+        it('reports a node declared later and a node in the opposite condition case', () => {
+            const issues = collectWorkflowIssues({
+                tasks: [
+                    task('logger_1', {text: '${logger_2.value}'}),
+                    task('condition_1', {
+                        caseFalse: [task('logger_4', {text: '${logger_3.value}'})],
+                        caseTrue: [task('logger_3')],
+                        expression: 'true',
+                    }),
+                    task('logger_2'),
+                ],
+                triggers: [trigger('trigger_1')],
+            });
+
+            expect(orderIssues(issues)).toEqual([
+                ['logger_1', 'logger_2.value'],
+                ['logger_4', 'logger_3.value'],
+            ]);
+        });
+
+        it('reports a node nested inside a dispatcher that ran earlier, whose output stays in that dispatcher', () => {
+            const issues = collectWorkflowIssues({
+                tasks: [
+                    task('condition_1', {caseTrue: [task('logger_1')], expression: 'true'}),
+                    task('logger_2', {text: '${condition_1.result} ${logger_1.value}'}),
+                ],
+                triggers: [trigger('trigger_1')],
+            });
+
+            expect(orderIssues(issues)).toEqual([['logger_2', 'logger_1.value']]);
+        });
+
+        it('accepts earlier siblings, enclosing dispatchers and their earlier siblings, triggers and inputs', () => {
+            const issues = collectWorkflowIssues({
+                inputs: [{name: 'customerId'}],
+                tasks: [
+                    task('http_1'),
+                    task('loop_1', {
+                        items: '${http_1.body}',
+                        iteratee: [
+                            task('logger_1'),
+                            task('logger_2', {
+                                text: '${loop_1.item} ${logger_1.value} ${http_1.body} ${trigger_1.body} ${customerId}',
+                            }),
+                        ],
+                    }),
+                ],
+                triggers: [trigger('trigger_1')],
+            });
+
+            expect(issues).toEqual([]);
+        });
+    });
 });
