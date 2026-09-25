@@ -92,6 +92,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -660,17 +661,33 @@ public class JobSyncExecutor {
     }
 
     private void checkForError(Job job) {
+        long jobId = Validate.notNull(job.getId(), "id");
+
         TaskExecution taskExecution = taskExecutionService
-            .fetchLastJobTaskExecution(Validate.notNull(job.getId(), "id"))
+            .fetchLastJobTaskExecution(jobId)
             .orElse(null);
 
-        if (taskExecution != null && taskExecution.getStatus() == TaskExecution.Status.FAILED) {
+        boolean taskExecutionFailed =
+            taskExecution != null && taskExecution.getStatus() == TaskExecution.Status.FAILED;
+
+        if (taskExecutionFailed) {
             ExecutionError error = taskExecution.getError();
 
             if (error != null && error.getMessage() != null) {
                 throw new ExecutionException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
             }
+        }
 
+        if (taskExecutionFailed || job.getStatus() == Job.Status.FAILED) {
+            String errorMessage = findFailedTaskExecutionErrorMessage(
+                taskExecutionService.getJobTaskExecutions(jobId));
+
+            if (errorMessage != null) {
+                throw new ExecutionException(errorMessage, TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+            }
+        }
+
+        if (taskExecutionFailed) {
             String message =
                 "Task execution failed for job " + job.getId() + " but no error details are available.";
 
@@ -698,6 +715,20 @@ public class JobSyncExecutor {
 
             throw new ExecutionException(message, JobErrorType.JOB_FAILED);
         }
+    }
+
+    private static @Nullable String findFailedTaskExecutionErrorMessage(List<TaskExecution> taskExecutions) {
+        for (TaskExecution taskExecution : taskExecutions.reversed()) {
+            ExecutionError error = taskExecution.getError();
+
+            if (taskExecution.getStatus() == TaskExecution.Status.FAILED && error != null &&
+                error.getMessage() != null) {
+
+                return error.getMessage();
+            }
+        }
+
+        return null;
     }
 
     private static <T> Cache<String, CopyOnWriteArrayList<T>> createCache() {
