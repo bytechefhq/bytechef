@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,6 +68,35 @@ class ConnectedUserIntegrationInstanceFacadeImplTest {
         new ConnectedUserIntegrationInstanceFacadeImpl(
             componentDefinitionFacade, connectedUserService, integrationInstanceConfigurationService,
             integrationInstanceService, integrationInstanceFacade, integrationWorkflowService);
+
+    @Test
+    void testCheckIntegrationInstanceOwnerAllowsTheOwner() {
+        setUpInstance(OWNING_CONNECTED_USER_ID, OWNING_CONNECTED_USER_ID);
+
+        assertDoesNotThrow(
+            () -> connectedUserIntegrationInstanceFacade.checkIntegrationInstanceOwner(
+                EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID));
+    }
+
+    @Test
+    void testCheckIntegrationInstanceOwnerRefusesANonOwner() {
+        setUpInstance(OWNING_CONNECTED_USER_ID, 200L);
+
+        assertThrows(
+            EmbeddedIntegrationNotVisibleException.class,
+            () -> connectedUserIntegrationInstanceFacade.checkIntegrationInstanceOwner(
+                EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID));
+    }
+
+    @Test
+    void testCheckIntegrationInstanceOwnerRefusesAnAbsentConnectedUser() {
+        setUpInstance(OWNING_CONNECTED_USER_ID, null);
+
+        assertThrows(
+            EmbeddedIntegrationNotVisibleException.class,
+            () -> connectedUserIntegrationInstanceFacade.checkIntegrationInstanceOwner(
+                EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID));
+    }
 
     @Test
     void testGetComponentInputOptionsAllowedForOwner() {

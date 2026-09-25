@@ -21,7 +21,9 @@ import org.springframework.stereotype.Component;
 public class RemoteMcpIntegrationInstanceToolFacadeClient implements McpIntegrationInstanceToolFacade {
 
     @Override
-    public void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable) {
+    public void enableMcpIntegrationInstanceTool(
+        String externalUserId, long integrationInstanceId, long mcpToolId, boolean enable) {
+
         throw new UnsupportedOperationException();
     }
 }

@@ -18,6 +18,12 @@ import java.util.Map;
  */
 public interface ConnectedUserIntegrationInstanceFacade {
 
+    /**
+     * Throws {@link com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException} unless the
+     * integration instance belongs to the connected user with the given external id.
+     */
+    void checkIntegrationInstanceOwner(String externalUserId, long id);
+
     void disableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);
 
     void enableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);

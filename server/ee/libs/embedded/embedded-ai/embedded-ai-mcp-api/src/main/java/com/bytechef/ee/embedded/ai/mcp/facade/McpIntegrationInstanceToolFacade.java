@@ -14,5 +14,6 @@ package com.bytechef.ee.embedded.ai.mcp.facade;
  */
 public interface McpIntegrationInstanceToolFacade {
 
-    void enableMcpIntegrationInstanceTool(long integrationInstanceId, long mcpToolId, boolean enable);
+    void enableMcpIntegrationInstanceTool(
+        String externalUserId, long integrationInstanceId, long mcpToolId, boolean enable);
 }
