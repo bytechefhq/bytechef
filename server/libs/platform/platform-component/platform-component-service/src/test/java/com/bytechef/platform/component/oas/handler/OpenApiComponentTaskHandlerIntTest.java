@@ -44,6 +44,7 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.worker.security.JobPrincipalAuthenticationRunner;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
@@ -746,7 +747,8 @@ public class OpenApiComponentTaskHandlerIntTest {
 
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
-            actionName, actionDefinitionFacade, ComponentRegistryConfiguration.PETSTORE_COMPONENT_HANDLER);
+            actionName, actionDefinitionFacade, new JobPrincipalAuthenticationRunner(List.of()),
+            ComponentRegistryConfiguration.PETSTORE_COMPONENT_HANDLER);
     }
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {
