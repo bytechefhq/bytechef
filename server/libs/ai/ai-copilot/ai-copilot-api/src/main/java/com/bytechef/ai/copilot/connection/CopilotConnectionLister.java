@@ -24,9 +24,9 @@ import org.jspecify.annotations.Nullable;
  * SPI for listing the connections a copilot caller may use. The {@code listConnectionsForComponent} tool offers them to
  * the LLM before {@code createConnection}, and the scoped connection guard checks model-supplied connection ids against
  * them. Each surface contributes an implementation that {@link #supports(CopilotConnectionRequest) claims} the requests
- * it can serve: the in-editor / AI Hub surface lists the workspace's connections scoped to the current environment; the
- * embedded workflow chat has no workspace and lists the connected user's connections instead. Callers dispatch to the
- * first supporting implementation via {@link #findSupporting(List, CopilotConnectionRequest)}.
+ * it can serve: the in-editor surface lists the workspace's connections scoped to the current environment; the embedded
+ * workflow chat has no workspace and lists the connected user's connections instead. Callers dispatch to the first
+ * supporting implementation via {@link #findSupporting(List, CopilotConnectionRequest)}.
  *
  * @author Ivica Cardic
  */
