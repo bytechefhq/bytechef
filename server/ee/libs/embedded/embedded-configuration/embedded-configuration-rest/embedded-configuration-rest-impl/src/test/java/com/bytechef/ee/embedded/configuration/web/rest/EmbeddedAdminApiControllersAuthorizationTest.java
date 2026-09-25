@@ -39,7 +39,7 @@ import org.springframework.security.util.SimpleMethodInvocation;
 /**
  * Evaluates the real {@code @PreAuthorize} expression on every endpoint of the embedded admin REST controllers through
  * the real {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}. These endpoints
- * administer the tenant's embedded integrations and their instance configurations, so each must decide on
+ * administer the tenant's embedded integrations, their instance configurations and app events, so each must decide on
  * {@link PermissionService#isTenantAdmin()} alone.
  *
  * @version ee
@@ -49,11 +49,14 @@ import org.springframework.security.util.SimpleMethodInvocation;
 class EmbeddedAdminApiControllersAuthorizationTest {
 
     private static final List<Class<?>> CONTROLLER_CLASSES = List.of(
-        CategoryApiController.class, IntegrationApiController.class, IntegrationInstanceApiController.class,
-        IntegrationInstanceConfigurationApiController.class, IntegrationInstanceConfigurationTagApiController.class,
-        IntegrationTagApiController.class);
+        AppEventApiController.class, CategoryApiController.class, IntegrationApiController.class,
+        IntegrationInstanceApiController.class, IntegrationInstanceConfigurationApiController.class,
+        IntegrationInstanceConfigurationTagApiController.class, IntegrationTagApiController.class);
 
     private static final Set<String> ENDPOINT_NAMES = Set.of(
+        "AppEventApiController#createAppEvent", "AppEventApiController#deleteAppEvent",
+        "AppEventApiController#getAppEvent", "AppEventApiController#getAppEvents",
+        "AppEventApiController#updateAppEvent",
         "CategoryApiController#getIntegrationCategories",
         "IntegrationApiController#createIntegration", "IntegrationApiController#createIntegrationWorkflow",
         "IntegrationApiController#deleteIntegration", "IntegrationApiController#getIntegration",
