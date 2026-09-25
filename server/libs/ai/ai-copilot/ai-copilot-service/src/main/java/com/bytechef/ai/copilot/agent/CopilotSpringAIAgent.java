@@ -22,6 +22,7 @@ import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
+import com.agui.server.EventFactory;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.commons.util.JsonUtils;
@@ -65,27 +66,28 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     protected final void run(RunAgentInput input, AgentSubscriber subscriber) {
         AgentSubscriber decoratedSubscriber = decorateSubscriber(subscriber);
 
-        runWithTenant(input, () -> runWithEnvironment(input, () -> super.run(input, decoratedSubscriber)));
+        String tenantId = getTenantId(input);
+
+        if (tenantId == null) {
+            log.error(
+                "{}: run state carries no '{}'; refusing to run the agent on the ambient tenant",
+                getClass().getSimpleName(), CopilotConstants.STATE_TENANT_ID);
+
+            emitEvent(
+                EventFactory.runErrorEvent("The Copilot run carries no tenant, so it cannot run."),
+                decoratedSubscriber);
+
+            return;
+        }
+
+        runWithTenant(tenantId, () -> runWithEnvironment(input, () -> super.run(input, decoratedSubscriber)));
     }
 
     protected AgentSubscriber decorateSubscriber(AgentSubscriber subscriber) {
         return subscriber;
     }
 
-    void runWithTenant(RunAgentInput input, Runnable action) {
-        String tenantId = getTenantId(input);
-
-        if (tenantId == null) {
-            log.warn(
-                "{}: run state carries no '{}'; leaving the agent thread on the ambient tenant '{}'. Every entry point "
-                    + "must capture the tenant id on the request thread.",
-                getClass().getSimpleName(), CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
-
-            action.run();
-
-            return;
-        }
-
+    void runWithTenant(String tenantId, Runnable action) {
         String previousTenantId = TenantContext.getCurrentTenantId();
 
         TenantContext.setCurrentTenantId(tenantId);
@@ -120,21 +122,28 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
-    protected ChatClient resolveChatClient(RunAgentInput input) {
+    protected ChatClient resolveChatClient(RunAgentInput input) throws AGUIException {
         if (overrideChatClientResolver == null) {
             return super.resolveChatClient(input);
         }
 
-        try {
-            ChatClient override = overrideChatClientResolver.resolve(input.state());
+        ChatClient override;
 
-            if (override != null) {
-                return override;
-            }
+        try {
+            override = overrideChatClientResolver.resolve(input.state());
+        } catch (ChatModelUnavailableException exception) {
+            log.warn("{}: {}", getClass().getSimpleName(), exception.getMessage());
+
+            throw new AGUIException(exception.getMessage(), exception);
         } catch (RuntimeException exception) {
-            log.warn(
-                "{}: override ChatClient resolver threw; falling back to default.", getClass().getSimpleName(),
-                exception);
+            log.warn("{}: resolving the chat model failed", getClass().getSimpleName(), exception);
+
+            throw new AGUIException(
+                "Could not resolve the AI model for this Copilot run: " + exception.getMessage(), exception);
+        }
+
+        if (override != null) {
+            return override;
         }
 
         return super.resolveChatClient(input);
@@ -223,16 +232,26 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         return message == null ? "The copilot run failed. Reference: " + input.runId() : message;
     }
 
-    private static @Nullable Integer getEnvironmentId(RunAgentInput input) {
+    private @Nullable Integer getEnvironmentId(RunAgentInput input) {
         State state = input.state();
 
         if (state == null) {
             return null;
         }
 
-        Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
+        Object environmentIdValue = state.get(CopilotConstants.STATE_ENVIRONMENT_ID);
+
+        if (environmentIdValue == null) {
+            return null;
+        }
+
+        Long environmentId = NumberUtils.asLong(environmentIdValue);
 
         if (environmentId == null || environmentId < 0 || environmentId >= Environment.values().length) {
+            log.warn(
+                "{}: run state carries an invalid '{}' value '{}'; leaving the environment context unbound",
+                getClass().getSimpleName(), CopilotConstants.STATE_ENVIRONMENT_ID, environmentIdValue);
+
             return null;
         }
 

@@ -140,6 +140,8 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(stateMap).containsEntry("mode", "BUILD");
         assertThat(stateMap).containsEntry("autonomous", false);
         assertThat(stateMap).containsKey(CopilotConstants.STATE_TENANT_ID);
+        assertThat(stateMap).containsEntry(
+            CopilotConstants.STATE_ENVIRONMENT_ID, (long) Environment.PRODUCTION.ordinal());
         assertThat(stateMap).containsKey(CopilotConstants.STATE_AUTHENTICATION);
         assertThat(stateMap).containsEntry(
             CopilotConstants.STATE_ENVIRONMENT_ID, (long) Environment.PRODUCTION.ordinal());

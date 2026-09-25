@@ -7,8 +7,9 @@
 
 package com.bytechef.ee.ai.copilot.agent;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -17,11 +18,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.agent.ChatModelUnavailableException;
+import com.bytechef.ai.copilot.agent.SelectedChatModelUnavailableException;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 
 /**
  * @version ee
@@ -60,43 +64,123 @@ class CopilotChatClientResolverTest {
     }
 
     @Test
-    void testUserSelectedWithoutEnvironmentReturnsNull() {
-        // No environment id → the catalog API key can't be resolved, so the resolver returns null without delegating.
+    void testUnresolvableUserSelectionFailsInsteadOfFallingBack() {
+        when(catalogChatClientResolver.resolve(OPENAI_KEY, OPENAI_MODEL, 3)).thenReturn(null);
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
+
+        SelectedChatModelUnavailableException exception = assertThrows(
+            SelectedChatModelUnavailableException.class, () -> resolver.resolve(state));
+
+        assertTrue(exception.getMessage()
+            .contains(OPENAI_MODEL));
+        verify(catalogChatClientResolver, never()).resolveDefault(anyInt());
+    }
+
+    @Test
+    void testFailingCatalogLookupOfTheUserSelectionFailsInsteadOfFallingBack() {
+        IllegalStateException cause = new IllegalStateException("cannot decrypt the API key");
+
+        when(catalogChatClientResolver.resolve(OPENAI_KEY, OPENAI_MODEL, 3)).thenThrow(cause);
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
+
+        SelectedChatModelUnavailableException exception = assertThrows(
+            SelectedChatModelUnavailableException.class, () -> resolver.resolve(state));
+
+        assertSame(cause, exception.getCause());
+        verify(catalogChatClientResolver, never()).resolveDefault(anyInt());
+    }
+
+    @Test
+    void testUserSelectedWithoutEnvironmentFails() {
         State state = new State();
 
         state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
         state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
 
-        assertNull(resolver.resolve(state));
+        assertThrows(ChatModelUnavailableException.class, () -> resolver.resolve(state));
         verify(catalogChatClientResolver, never()).resolve(anyString(), anyString(), anyInt());
     }
 
     @Test
-    void testNoUserSelectedReturnsNull() {
-        // No user override → resolver returns null and the caller uses its workspace @Primary ChatModel.
-        assertNull(resolver.resolve(new State()));
+    void testNullStateFails() {
+        assertThrows(ChatModelUnavailableException.class, () -> resolver.resolve(null));
     }
 
     @Test
-    void testHalfSetUserStateReturnsNull() {
-        // Transient client state (e.g. user mid-picking): one half arrived, the other didn't. Copilot has no
-        // secondary layer to fall through to, so the resolver returns null with a warning.
+    void testHalfSetUserSelectionFails() {
         State state = new State();
 
         state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "1");
 
-        assertNull(resolver.resolve(state));
+        ChatModelUnavailableException exception = assertThrows(
+            ChatModelUnavailableException.class, () -> resolver.resolve(state));
+
+        assertTrue(exception.getMessage()
+            .contains("incomplete"));
+        verify(catalogChatClientResolver, never()).resolveDefault(anyInt());
     }
 
     @Test
-    void testNullStateReturnsNull() {
-        assertNull(resolver.resolve(null));
+    void testNoEnabledProviderFailsInsteadOfUsingTheStartupModel() {
+        when(catalogChatClientResolver.resolveDefault(1)).thenReturn(null);
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "1");
+
+        ChatModelUnavailableException exception = assertThrows(
+            ChatModelUnavailableException.class, () -> resolver.resolve(state));
+
+        assertTrue(exception.getMessage()
+            .contains("No AI provider is enabled in environment 1"));
+    }
+
+    @Test
+    void testFailingCatalogDefaultLookupFails() {
+        IllegalStateException cause = new IllegalStateException("catalog down");
+
+        when(catalogChatClientResolver.resolveDefault(1)).thenThrow(cause);
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "1");
+
+        ChatModelUnavailableException exception = assertThrows(
+            ChatModelUnavailableException.class, () -> resolver.resolve(state));
+
+        assertSame(cause, exception.getCause());
+    }
+
+    @Test
+    void testResolveDefaultChatModelUsesThePreferredProvider() {
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(catalogChatClientResolver.resolveDefaultChatModel("anthropic", 1)).thenReturn(chatModel);
+
+        CopilotChatClientResolver preferringResolver =
+            new CopilotChatClientResolver(catalogChatClientResolver, "anthropic");
+
+        assertSame(chatModel, preferringResolver.resolveDefaultChatModel(1));
+    }
+
+    @Test
+    void testResolveDefaultChatModelFailsWhenNothingIsResolvable() {
+        assertThrows(ChatModelUnavailableException.class, () -> resolver.resolveDefaultChatModel(1));
     }
 
     @Test
     void testDefaultProviderPreferredWhenNoUserSelection() {
-        // bytechef.ai.copilot.provider is set and resolvable → Copilot uses it as the environment default instead of
-        // the first-enabled-provider pick.
         ChatClient preferredChatClient = mock(ChatClient.class);
 
         when(catalogChatClientResolver.resolvePreferred("anthropic", 3)).thenReturn(preferredChatClient);
@@ -115,8 +199,6 @@ class CopilotChatClientResolverTest {
 
     @Test
     void testDefaultProviderFallsBackWhenNotResolvable() {
-        // bytechef.ai.copilot.provider names a provider that is disabled or has no configured model in this
-        // environment → Copilot falls back to the first enabled chat provider.
         ChatClient defaultChatClient = mock(ChatClient.class);
 
         when(catalogChatClientResolver.resolvePreferred("anthropic", 3)).thenReturn(null);
@@ -134,7 +216,6 @@ class CopilotChatClientResolverTest {
 
     @Test
     void testNoDefaultProviderUsesEnvironmentDefault() {
-        // bytechef.ai.copilot.provider is blank → keep the existing first-enabled-provider behavior.
         ChatClient defaultChatClient = mock(ChatClient.class);
 
         when(catalogChatClientResolver.resolveDefault(3)).thenReturn(defaultChatClient);

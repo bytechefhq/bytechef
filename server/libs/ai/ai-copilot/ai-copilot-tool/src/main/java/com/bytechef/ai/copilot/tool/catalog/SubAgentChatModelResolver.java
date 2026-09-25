@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.copilot.tool.catalog;
 
-import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
 
@@ -25,9 +24,6 @@ import org.springframework.ai.chat.model.ChatModel;
  */
 public interface SubAgentChatModelResolver {
 
-    /**
-     * Resolves the {@link ChatModel} the caller picked, from the tool context a delegate forwards.
-     */
     @Nullable
-    ChatModel resolve(Map<String, Object> toolContext);
+    ChatModel resolve(SubAgentModelRequest request);
 }
