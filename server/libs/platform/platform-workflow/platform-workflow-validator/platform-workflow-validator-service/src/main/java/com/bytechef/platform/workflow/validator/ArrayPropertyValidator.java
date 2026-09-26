@@ -274,16 +274,7 @@ class ArrayPropertyValidator {
         JsonNode arrayJsonNode, String propertyPath, StringBuilder errors) {
 
         for (int i = 0; i < arrayJsonNode.size(); i++) {
-            JsonNode elementJsonNode = arrayJsonNode.get(i);
-
-            if (elementJsonNode.isObject()) {
-                continue;
-            }
-
-            String actualType = JsonNodeUtils.getJsonNodeType(elementJsonNode);
-
-            StringUtils.appendWithNewline(
-                ValidationErrorUtils.typeError(propertyPath + "[" + i + "]", "object", actualType), errors);
+            TypeValidator.validateType(arrayJsonNode.get(i), "OBJECT", propertyPath + "[" + i + "]", errors);
         }
     }
 
