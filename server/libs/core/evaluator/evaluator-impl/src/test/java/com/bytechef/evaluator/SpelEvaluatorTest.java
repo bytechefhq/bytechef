@@ -889,4 +889,108 @@ public class SpelEvaluatorTest {
 
         assertEquals("=parseDate('2026-08-26', 5)", MapUtils.get(map, "value"));
     }
+
+    @Test
+    public void testProjectionResolvesAKeyMissingFromTheFirstItemToNull() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email]"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(Arrays.asList(null, "a@x.io"), map.get("emails"));
+    }
+
+    @Test
+    public void testProjectionResolvesAKeyMissingFromEveryItemToNull() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email]"), Map.of("users", List.of(Map.of("id", 1), Map.of("id", 2))));
+
+        assertEquals(Arrays.asList(null, null), map.get("emails"));
+    }
+
+    @Test
+    public void testSelectionSkipsItemsMissingTheKey() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.?[email != null].![email]"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(List.of("a@x.io"), map.get("emails"));
+    }
+
+    @Test
+    public void testProjectionOverAnUnresolvedReferenceStaysUnresolved() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email]"), Collections.emptyMap());
+
+        assertEquals("=${users}.![email]", map.get("emails"));
+    }
+
+    @Test
+    public void testMissingNestedKeyOutsideAProjectionStaysUnresolved() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("formula", "=${task.email}", "text", "${task.email}"), Map.of("task", Map.of("id", 1)));
+
+        assertEquals("=${task.email}", map.get("formula"));
+        assertEquals("${task.email}", map.get("text"));
+    }
+
+    @Test
+    public void testMissingNestedKeyOutsideAProjectionStaysUnresolvedWhenTheFormulaAlsoProjects() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "={task: ${task.email}, emails: ${users}.![email]}"),
+            Map.of("task", Map.of("id", 1), "users", List.of(Map.of("id", 2))));
+
+        assertEquals("={task: ${task.email}, emails: ${users}.![email]}", map.get("value"));
+    }
+
+    @Test
+    public void testProjectionOfANestedPathResolvesMissingKeysToNull() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("cities", "=${users}.![address.city]"),
+            Map.of(
+                "users",
+                List.of(Map.of("id", 1), Map.of("address", Map.of()), Map.of("address", Map.of("city", "Zagreb")))));
+
+        assertEquals(Arrays.asList(null, null, "Zagreb"), map.get("cities"));
+    }
+
+    @Test
+    public void testSelectionOnANestedPathSkipsItemsMissingIt() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("ids", "=${users}.?[address.city == 'Zagreb'].![id]"),
+            Map.of(
+                "users",
+                List.of(
+                    Map.of("id", 1), Map.of("id", 2, "address", Map.of()),
+                    Map.of("id", 3, "address", Map.of("city", "Zagreb")))));
+
+        assertEquals(List.of(3), map.get("ids"));
+    }
+
+    @Test
+    public void testProjectionAppliesOperatorsToAMissingKey() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email ?: 'none']"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(List.of("none", "a@x.io"), map.get("emails"));
+    }
+
+    @Test
+    public void testProjectionKeepsInlineMapKeys() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("contacts", "=${users}.![{mail: email}]"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(
+            List.of(Collections.singletonMap("mail", null), Map.of("mail", "a@x.io")), map.get("contacts"));
+    }
+
+    @Test
+    public void testProjectionThroughThisResolvesAMissingKeyToNull() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![#this.email]"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(Arrays.asList(null, "a@x.io"), map.get("emails"));
+    }
 }

@@ -240,7 +240,15 @@ public class SpelEvaluator implements Evaluator {
                             throw new IllegalArgumentException("Invalid formula expression: " + string);
                         }
 
-                        expression = expressionParser.parseExpression(string.substring(1));
+                        String formula = string.substring(1);
+
+                        SpelExpression spelExpression = (SpelExpression) expressionParser.parseExpression(formula);
+
+                        String collectionItemSafeFormula = CollectionItemKeyRewriter.rewrite(
+                            formula, spelExpression.getAST());
+
+                        expression = collectionItemSafeFormula.equals(formula)
+                            ? spelExpression : expressionParser.parseExpression(collectionItemSafeFormula);
                     } catch (ParseException parseException) {
                         if (lenient) {
                             if (log.isDebugEnabled()) {
