@@ -59,6 +59,10 @@ public class AnthropicChatAction {
     private static final List<String> ALWAYS_THINKING_MODEL_PREFIXES = List.of(
         "claude-fable-", "claude-mythos-", "claude-opus-5-5");
 
+    private static final List<String> PROMPT_ONLY_STRUCTURED_OUTPUT_MODEL_PREFIXES = List.of(
+        "claude-2", "claude-3", "claude-instant", "claude-opus-4-0", "claude-opus-4-2025", "claude-sonnet-4-0",
+        "claude-sonnet-4-2025");
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -103,7 +107,7 @@ public class AnthropicChatAction {
             }
         }
 
-        if (responseFormatRequired) {
+        if (responseFormatRequired && supportsNativeStructuredOutput(model)) {
             String responseSchema = getJsonResponseSchema(inputParameters);
 
             if (responseSchema != null) {
@@ -146,6 +150,11 @@ public class AnthropicChatAction {
     private static boolean isAlwaysThinking(String model) {
         return ALWAYS_THINKING_MODEL_PREFIXES.stream()
             .anyMatch(model::startsWith);
+    }
+
+    private static boolean supportsNativeStructuredOutput(String model) {
+        return PROMPT_ONLY_STRUCTURED_OUTPUT_MODEL_PREFIXES.stream()
+            .noneMatch(model::startsWith);
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
