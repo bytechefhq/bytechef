@@ -281,7 +281,7 @@ describe('useWorkflowTestRunGuard', () => {
             expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
         });
 
-        it('should stop workflow on visibilitychange when hidden', async () => {
+        it('should NOT stop workflow when the tab is hidden', async () => {
             vi.mocked(useWorkflowEditorStore).mockImplementation((selector: (state: WorkflowEditorI) => unknown) =>
                 selector({
                     workflowIsRunning: true,
@@ -298,7 +298,8 @@ describe('useWorkflowTestRunGuard', () => {
             });
 
             const workflowTestApiInstance = new WorkflowTestApi();
-            expect(workflowTestApiInstance.stopWorkflowTest).toHaveBeenCalledWith({jobId}, {keepalive: true});
+            expect(workflowTestApiInstance.stopWorkflowTest).not.toHaveBeenCalled();
+            expect(mockPersistJobId).not.toHaveBeenCalled();
             visibilitySpy.mockRestore();
         });
     });
