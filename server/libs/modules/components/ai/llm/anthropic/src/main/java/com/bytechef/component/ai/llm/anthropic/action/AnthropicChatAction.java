@@ -22,6 +22,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
@@ -34,11 +37,14 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.anthropic.models.messages.OutputConfig;
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
+import com.bytechef.component.ai.llm.converter.StructuredOutputUtils;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.anthropic.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -87,6 +93,14 @@ public class AnthropicChatAction {
             }
         }
 
+        if (responseFormatRequired) {
+            String responseSchema = getJsonResponseSchema(inputParameters);
+
+            if (responseSchema != null) {
+                optionsBuilder.outputSchema(StructuredOutputUtils.toStrictJsonSchema(responseSchema));
+            }
+        }
+
         String apiKey = connectionParameters.getRequiredString(TOKEN);
 
         return AnthropicChatModel.builder()
@@ -103,6 +117,20 @@ public class AnthropicChatAction {
     };
 
     private AnthropicChatAction() {
+    }
+
+    @Nullable
+    private static String getJsonResponseSchema(Parameters inputParameters) {
+        ResponseFormat responseFormat = inputParameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
+
+        if (responseFormat != ResponseFormat.JSON) {
+            return null;
+        }
+
+        String responseSchema = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class);
+
+        return responseSchema == null || responseSchema.isBlank() ? null : responseSchema;
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
