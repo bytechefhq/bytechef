@@ -82,6 +82,12 @@ describe('OutputSchemaDisplay', () => {
         expect(screen.getByText('Output Schema')).toBeInTheDocument();
     });
 
+    it('should render the test notice below the Output Schema header', () => {
+        renderOutputSchemaDisplay({testNotice: <div data-testid="test-notice" />});
+
+        expect(screen.getByTestId('test-notice')).toBeInTheDocument();
+    });
+
     it('should warn that the output is placeholder data when it does not come from a test run', () => {
         renderOutputSchemaDisplay({testOutputResponse: false});
 
