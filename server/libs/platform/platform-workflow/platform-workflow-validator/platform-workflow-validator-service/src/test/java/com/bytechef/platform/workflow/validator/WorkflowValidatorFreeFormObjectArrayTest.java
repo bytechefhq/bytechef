@@ -61,6 +61,28 @@ class WorkflowValidatorFreeFormObjectArrayTest {
     }
 
     @Test
+    void validateTaskParametersFreeFormObjectArrayAcceptsDataPillElement() {
+        String taskParameters = """
+            {
+                "input": [
+                    {
+                        "field1": "a"
+                    },
+                    "${source.item}"
+                ]
+            }
+            """;
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        TaskValidator.validateTaskParameters("testTask", taskParameters, TASK_DEFINITION, errors, warnings);
+
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    @Test
     void validateTaskParametersFreeFormObjectArrayRejectsNonObjectElement() {
         String taskParameters = """
             {
