@@ -196,10 +196,10 @@ Chain them to filter first and then extract. For example,
 `=${step_1.users}.?[#this['active'] == true].![#this['email']]` returns the emails of the active
 users only.
 
-<Callout type="warn">
-Write the key as `#this['email']` rather than a bare `email`. An item without the key then gives
-`null` in the result. With the bare form, the whole formula can come back unevaluated when the
-first item in the list has no such key.
+<Callout type="info">
+`email` and `#this['email']` both read the key from the current item, and an item without the key
+gives `null` in the result. In ByteChef 0.34.0 and earlier, write `#this['email']`: there, the bare
+form can leave the whole formula unevaluated when the first item in the list has no such key.
 </Callout>
 
 <Callout type="info">
