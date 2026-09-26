@@ -35,6 +35,7 @@ export default function useOutputTab({
     parentWorkflowNodeName,
     workflowId,
 }: UseOutputTabProps) {
+    const [noOutputWorkflowNodeName, setNoOutputWorkflowNodeName] = useState<string | undefined>(undefined);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
@@ -161,6 +162,10 @@ export default function useOutputTab({
                 return;
             }
 
+            const testedWorkflowNodeName = currentNode.name;
+
+            setNoOutputWorkflowNodeName(undefined);
+
             saveClusterElementTestOutputMutation.mutate(
                 {
                     clusterElementType,
@@ -171,13 +176,20 @@ export default function useOutputTab({
                     workflowNodeName: parentWorkflowNodeName,
                 },
                 {
-                    onSuccess,
+                    onSuccess: (data) => {
+                        if (!data.saveClusterElementTestOutput) {
+                            setNoOutputWorkflowNodeName(testedWorkflowNodeName);
+                        }
+
+                        onSuccess?.();
+                    },
                 }
             );
         },
         [
             clusterElementType,
             currentEnvironmentId,
+            currentNode.name,
             currentNode.workflowNodeName,
             parentWorkflowNodeName,
             saveClusterElementTestOutputMutation,
@@ -186,12 +198,23 @@ export default function useOutputTab({
     );
 
     const handleTestOperationClick = useCallback(() => {
+        setNoOutputWorkflowNodeName(undefined);
+
         if (!currentNode.trigger || currentNode.triggerType === TriggerType.Polling) {
-            saveWorkflowNodeTestOutputMutation.mutate({
-                environmentId: currentEnvironmentId,
-                id: workflowId,
-                workflowNodeName: currentNode.name,
-            });
+            saveWorkflowNodeTestOutputMutation.mutate(
+                {
+                    environmentId: currentEnvironmentId,
+                    id: workflowId,
+                    workflowNodeName: currentNode.name,
+                },
+                {
+                    onSuccess: (workflowNodeTestOutput, variables) => {
+                        if (!workflowNodeTestOutput) {
+                            setNoOutputWorkflowNodeName(variables.workflowNodeName);
+                        }
+                    },
+                }
+            );
         } else {
             setStartWebhookTestDate(new Date());
             setStartWebhookTest(true);
@@ -268,7 +291,11 @@ export default function useOutputTab({
         });
     }, [currentEnvironmentId, currentNode.name, webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
 
+    const handleNoOutputNoticeDismiss = useCallback(() => setNoOutputWorkflowNodeName(undefined), []);
+
     const hasClusterElementProperties = isClusterElement && !!currentOperationProperties?.length;
+
+    const testReturnedNoOutput = !!noOutputWorkflowNodeName && noOutputWorkflowNodeName === currentNode.name;
 
     const testing =
         saveClusterElementTestOutputMutation.isPending ||
@@ -290,6 +317,7 @@ export default function useOutputTab({
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
+        handleNoOutputNoticeDismiss,
         handlePredefinedOutputSchemaClick,
         handleSampleDataDialogUpload,
         handleTestCancelClick,
@@ -304,6 +332,7 @@ export default function useOutputTab({
         setShowUploadDialog,
         showUploadDialog,
         testOutputResponse,
+        testReturnedNoOutput,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
         variableOutputSchema,
