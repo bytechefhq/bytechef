@@ -110,14 +110,6 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
         stopBestEffort();
     }, [stopBestEffort]);
 
-    const onVisibilityChange = useCallback(() => {
-        if (document.visibilityState === 'hidden') {
-            isUnloadingRef.current = true;
-
-            stopBestEffort();
-        }
-    }, [stopBestEffort]);
-
     useEffect(() => {
         latestRunningRef.current = workflowIsRunning;
     }, [workflowIsRunning]);
@@ -127,13 +119,11 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('beforeunload', onBeforeUnload);
         window.addEventListener('pagehide', onPageHide);
-        document.addEventListener('visibilitychange', onVisibilityChange);
 
         return () => {
             window.removeEventListener('keydown', onKeyDown);
             window.removeEventListener('beforeunload', onBeforeUnload);
             window.removeEventListener('pagehide', onPageHide);
-            document.removeEventListener('visibilitychange', onVisibilityChange);
 
             if (isUnloadingRef.current) {
                 return;
@@ -154,15 +144,7 @@ export function useWorkflowTestRunGuard(workflowId?: string, currentEnvironmentI
                 workflowTestApi.stopWorkflowTest({jobId}, {keepalive: true}).finally(() => persistJobId(null));
             }
         };
-    }, [
-        onBeforeUnload,
-        onKeyDown,
-        onPageHide,
-        onVisibilityChange,
-        getPersistedJobId,
-        persistJobId,
-        workflowTestExecution?.job?.id,
-    ]);
+    }, [onBeforeUnload, onKeyDown, onPageHide, getPersistedJobId, persistJobId, workflowTestExecution?.job?.id]);
 
     useEffect(() => {
         if (blocker && blocker.state === 'blocked' && latestRunningRef.current) {
