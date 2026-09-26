@@ -364,6 +364,36 @@ class AnthropicChatActionTest {
         assertNull(createChatOptions(mockedInputParameters, true).getOutputConfig());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "claude-3-haiku-20240307", "claude-3-5-sonnet-20241022", "claude-opus-4-0", "claude-opus-4-20250514",
+        "claude-sonnet-4-0", "claude-sonnet-4-20250514"
+    })
+    void testCreateChatModelKeepsPromptOnlyStructuredOutputForLegacyModels(String model) {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(
+                MODEL, model, MAX_TOKENS, 1000,
+                RESPONSE, Map.of(RESPONSE_FORMAT, "JSON", RESPONSE_SCHEMA, PRODUCT_SCHEMA)));
+
+        assertNull(createChatOptions(mockedInputParameters, true).getOutputConfig());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "claude-haiku-4-5", "claude-opus-4-1-20250805", "claude-sonnet-4-5-20250929", "claude-opus-4-8"
+    })
+    void testCreateChatModelUsesNativeStructuredOutputForSupportedModels(String model) {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(
+                MODEL, model, MAX_TOKENS, 1000,
+                RESPONSE, Map.of(RESPONSE_FORMAT, "JSON", RESPONSE_SCHEMA, PRODUCT_SCHEMA)));
+
+        OutputConfig outputConfig = createChatOptions(mockedInputParameters, true).getOutputConfig();
+
+        assertTrue(outputConfig.format()
+            .isPresent());
+    }
+
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getPath(Map<String, Object> schema, String... keys) {
         Map<String, Object> current = schema;
