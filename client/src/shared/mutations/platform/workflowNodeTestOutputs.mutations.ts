@@ -22,7 +22,10 @@ export const useDeleteWorkflowNodeTestOutputMutation = (mutationProps?: DeleteWo
     });
 
 interface SaveWorkflowNodeTestOutputProps {
-    onSuccess?: (result: WorkflowNodeTestOutput, variables: SaveWorkflowNodeTestOutputRequest) => void;
+    onSuccess?: (
+        result: WorkflowNodeTestOutput | null | undefined,
+        variables: SaveWorkflowNodeTestOutputRequest
+    ) => void;
     onError?: (error: Error, variables: SaveWorkflowNodeTestOutputRequest) => void;
 }
 

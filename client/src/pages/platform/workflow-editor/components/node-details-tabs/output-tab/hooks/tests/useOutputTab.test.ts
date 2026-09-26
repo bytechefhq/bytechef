@@ -84,6 +84,22 @@ async function flushErrorResolution() {
     });
 }
 
+type SaveWorkflowNodeTestOutputSuccessType = (
+    workflowNodeTestOutput: object | null,
+    variables: {workflowNodeName: string}
+) => void;
+
+function resolveLastWorkflowNodeTestOutput(workflowNodeTestOutput: object | null) {
+    const [variables, options] = hoisted.saveMutate.mock.lastCall as [
+        {workflowNodeName: string},
+        {onSuccess: SaveWorkflowNodeTestOutputSuccessType},
+    ];
+
+    act(() => {
+        options.onSuccess(workflowNodeTestOutput, variables);
+    });
+}
+
 describe('useOutputTab', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -333,6 +349,83 @@ describe('useOutputTab', () => {
             environmentId: 2,
             triggerName: 'trigger_2',
             workflowId: 'wf-1',
+        });
+    });
+
+    describe('a test that returns no output', () => {
+        const renderDataStorageNode = () =>
+            renderHook(({currentNode}) => useOutputTab({currentNode, workflowId: 'wf-1'}), {
+                initialProps: {currentNode: {name: 'dataStorage_1'} as NodeDataType},
+            });
+
+        it('reports that the test returned no output when the server answers without one', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            expect(result.current.testReturnedNoOutput).toBe(true);
+        });
+
+        it('does not report it when the test returned an output', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput({id: 'test-output-1'});
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('clears the report when the test is run again', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('clears the report when it is dismissed', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            act(() => {
+                result.current.handleNoOutputNoticeDismiss();
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('does not carry the report over to another node', () => {
+            const {rerender, result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            rerender({currentNode: {name: 'dataStorage_2'} as NodeDataType});
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
         });
     });
 });

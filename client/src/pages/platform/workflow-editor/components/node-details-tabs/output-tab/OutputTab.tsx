@@ -6,6 +6,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
+import OutputTabNoOutputNotice from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabNoOutputNotice';
 import OutputTabSampleDataDialog from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabSampleDataDialog';
 import OutputTabTestErrorAlert from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabTestErrorAlert';
 import DialogLoader from '@/shared/components/DialogLoader';
@@ -47,6 +48,7 @@ const OutputTab = ({
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
+        handleNoOutputNoticeDismiss,
         handlePredefinedOutputSchemaClick,
         handleSampleDataDialogUpload,
         handleTestCancelClick,
@@ -62,6 +64,7 @@ const OutputTab = ({
         showUploadDialog,
         testOutputError,
         testOutputResponse,
+        testReturnedNoOutput,
         testing,
         uploadSampleOutputRequestMutationPending,
         variableOutputSchema,
@@ -76,6 +79,8 @@ const OutputTab = ({
         parentWorkflowNodeName,
         workflowId,
     });
+
+    const operationLabel = clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action';
 
     if (!testing && workflowNodeOutputIsFetching) {
         return <></>;
@@ -117,6 +122,15 @@ const OutputTab = ({
                                 />
                             )
                         }
+                        testNotice={
+                            testReturnedNoOutput && (
+                                <OutputTabNoOutputNotice
+                                    className="mb-3"
+                                    onDismiss={handleNoOutputNoticeDismiss}
+                                    operationLabel={operationLabel}
+                                />
+                            )
+                        }
                         testOutputResponse={testOutputResponse}
                         variableOutputSchema={variableOutputSchema}
                         variablePropertiesDefined={variablePropertiesDefined}
@@ -132,6 +146,14 @@ const OutputTab = ({
                             className="mt-4"
                             onDismiss={clearTestOutputError}
                             testOutputError={testOutputError}
+                        />
+                    )}
+
+                    {testReturnedNoOutput && (
+                        <OutputTabNoOutputNotice
+                            className="mt-4"
+                            onDismiss={handleNoOutputNoticeDismiss}
+                            operationLabel={operationLabel}
                         />
                     )}
 

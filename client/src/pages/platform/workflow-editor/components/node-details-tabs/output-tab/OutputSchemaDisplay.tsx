@@ -37,6 +37,7 @@ interface OutputSchemaDisplayProps {
     setShowUploadDialog: (show: boolean) => void;
     showClusterElementTestButton?: boolean;
     testErrorAlert?: ReactNode;
+    testNotice?: ReactNode;
     testOutputResponse?: boolean;
     variableOutputSchema?: PropertyAllType;
     variablePropertiesDefined?: boolean;
@@ -63,6 +64,7 @@ const OutputSchemaDisplay = ({
     setShowUploadDialog,
     showClusterElementTestButton,
     testErrorAlert,
+    testNotice,
     testOutputResponse = false,
     variableOutputSchema,
     variablePropertiesDefined,
@@ -153,6 +155,8 @@ const OutputSchemaDisplay = ({
                     </div>
 
                     {testErrorAlert}
+
+                    {testNotice}
 
                     {showPlaceholderSampleOutputWarning && (
                         <Alert className="mb-3" variant="warning">
