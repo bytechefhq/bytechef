@@ -1244,6 +1244,7 @@ export default function useWorkflowNodeDetailsPanel({
     // guards since refetch() bypasses them — see its doc.
     useEffect(() => {
         const refetchTarget = resolveMissingRequiredPropertiesRefetch(
+            workflow.id,
             currentNodeName,
             currentClusterElementName,
             currentNode?.clusterElementType,
@@ -1257,6 +1258,7 @@ export default function useWorkflowNodeDetailsPanel({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
+        workflow.id,
         workflow.version,
         currentNodeName,
         currentClusterElementName,
