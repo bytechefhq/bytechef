@@ -179,6 +179,29 @@ comparison, and conditional logic - combine them freely with data pills and func
 | `? :` | Ternary - pick one of two values on a condition | `=${trigger_1.body.count} > 0 ? 'has items' : 'empty'` |
 | `?:` | Elvis - fall back to a default when the left side is null | `=${trigger_1.body.name} ?: 'Anonymous'` |
 
+#### Lists of objects
+
+To pull one property out of every object in a list, or keep only the objects that match a
+condition, use projection and selection - no Loop needed. Inside the brackets, `#this` is the
+current item.
+
+| Syntax | Purpose | Example |
+| --- | --- | --- |
+| `.![…]` | Projection - build a new list with one value per item | `=${step_1.users}.![#this['email']]` |
+| `.?[…]` | Selection - keep only the items that match a condition | `=${step_1.users}.?[#this['active'] == true]` |
+| `.^[…]` | First item that matches a condition | `=${step_1.users}.^[#this['role'] == 'admin']` |
+| `.$[…]` | Last item that matches a condition | `=${step_1.users}.$[#this['role'] == 'admin']` |
+
+Chain them to filter first and then extract. For example,
+`=${step_1.users}.?[#this['active'] == true].![#this['email']]` returns the emails of the active
+users only.
+
+<Callout type="warn">
+Write the key as `#this['email']` rather than a bare `email`. An item without the key then gives
+`null` in the result. With the bare form, the whole formula can come back unevaluated when the
+first item in the list has no such key.
+</Callout>
+
 <Callout type="info">
 To leave formula mode, clear the field and remove the leading `=`. To go back to a plain constant,
 turn the **Dynamic** switch off.
