@@ -16,6 +16,7 @@ const getTriggerMenuItems = (showDeleteAction: boolean, onDelete = vi.fn()) =>
         showCopyAction: false,
         showCutAction: false,
         showDeleteAction,
+        showDisableAction: false,
         showInfoAction: false,
         showRenameAction: true,
         showReplaceAction: true,
