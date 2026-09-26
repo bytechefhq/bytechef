@@ -162,6 +162,10 @@ export default function useOutputTab({
                 return;
             }
 
+            const testedWorkflowNodeName = currentNode.name;
+
+            setNoOutputWorkflowNodeName(undefined);
+
             saveClusterElementTestOutputMutation.mutate(
                 {
                     clusterElementType,
@@ -172,13 +176,20 @@ export default function useOutputTab({
                     workflowNodeName: parentWorkflowNodeName,
                 },
                 {
-                    onSuccess,
+                    onSuccess: (data) => {
+                        if (!data.saveClusterElementTestOutput) {
+                            setNoOutputWorkflowNodeName(testedWorkflowNodeName);
+                        }
+
+                        onSuccess?.();
+                    },
                 }
             );
         },
         [
             clusterElementType,
             currentEnvironmentId,
+            currentNode.name,
             currentNode.workflowNodeName,
             parentWorkflowNodeName,
             saveClusterElementTestOutputMutation,

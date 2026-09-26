@@ -4,6 +4,7 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => ({
+    clusterMutate: vi.fn(),
     invalidateQueries: vi.fn(),
     onDeleteSuccess: undefined as (() => void) | undefined,
     saveWorkflowNodeTestOutputMutate: vi.fn(),
@@ -28,7 +29,7 @@ vi.mock('@/shared/mutations/platform/workflowNodeTestOutputs.mutations', () => (
 }));
 
 vi.mock('@/shared/middleware/graphql', () => ({
-    useSaveClusterElementTestOutputMutation: () => ({mutate: vi.fn()}),
+    useSaveClusterElementTestOutputMutation: () => ({mutate: hoisted.clusterMutate}),
 }));
 
 vi.mock('@/shared/queries/platform/workflowNodeOutputs.queries', () => ({
@@ -211,6 +212,61 @@ describe('useOutputTab', () => {
             resolveLastWorkflowNodeTestOutput(null);
 
             rerender({currentNode: {name: 'dataStorage_2'} as NodeDataType});
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('reports that a tool test returned no output and still closes the properties popover', () => {
+            const onSuccess = vi.fn();
+
+            const {result} = renderHook(() =>
+                useOutputTab({
+                    clusterElementType: 'tools',
+                    currentNode: {name: 'dataStorage_1', workflowNodeName: 'dataStorage_1'} as NodeDataType,
+                    parentWorkflowNodeName: 'aiAgent_1',
+                    workflowId: 'wf-1',
+                })
+            );
+
+            act(() => {
+                result.current.handleClusterElementTestSubmit({key: 'tokic'}, onSuccess);
+            });
+
+            const [, options] = hoisted.clusterMutate.mock.lastCall as [
+                unknown,
+                {onSuccess: (data: {saveClusterElementTestOutput: object | null}) => void},
+            ];
+
+            act(() => {
+                options.onSuccess({saveClusterElementTestOutput: null});
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(true);
+            expect(onSuccess).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not report it when a tool test returned an output', () => {
+            const {result} = renderHook(() =>
+                useOutputTab({
+                    clusterElementType: 'tools',
+                    currentNode: {name: 'dataStorage_1', workflowNodeName: 'dataStorage_1'} as NodeDataType,
+                    parentWorkflowNodeName: 'aiAgent_1',
+                    workflowId: 'wf-1',
+                })
+            );
+
+            act(() => {
+                result.current.handleClusterElementTestSubmit({key: 'tokic'});
+            });
+
+            const [, options] = hoisted.clusterMutate.mock.lastCall as [
+                unknown,
+                {onSuccess: (data: {saveClusterElementTestOutput: object | null}) => void},
+            ];
+
+            act(() => {
+                options.onSuccess({saveClusterElementTestOutput: {id: 1}});
+            });
 
             expect(result.current.testReturnedNoOutput).toBe(false);
         });
