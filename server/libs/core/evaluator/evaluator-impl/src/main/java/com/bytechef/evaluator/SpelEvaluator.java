@@ -43,9 +43,6 @@ import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelMessage;
-import org.springframework.expression.spel.SpelNode;
-import org.springframework.expression.spel.ast.Projection;
-import org.springframework.expression.spel.ast.Selection;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -165,12 +162,10 @@ public class SpelEvaluator implements Evaluator {
         return evaluateInternal(map, context, lenient);
     }
 
-    StandardEvaluationContext createEvaluationContext(
-        Map<String, ?> context, boolean formulaExpression, boolean nullForMissingNestedKeys) {
-
+    StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
-        evaluationContext.addPropertyAccessor(new MapPropertyAccessor(nullForMissingNestedKeys));
+        evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
         evaluationContext.setConstructorResolvers(List.of());
         evaluationContext.setTypeLocator(typeName -> {
             throw new SpelEvaluationException(SpelMessage.TYPE_NOT_FOUND, typeName);
@@ -245,7 +240,15 @@ public class SpelEvaluator implements Evaluator {
                             throw new IllegalArgumentException("Invalid formula expression: " + string);
                         }
 
-                        expression = expressionParser.parseExpression(string.substring(1));
+                        String formula = string.substring(1);
+
+                        SpelExpression spelExpression = (SpelExpression) expressionParser.parseExpression(formula);
+
+                        String collectionItemSafeFormula = CollectionItemKeyRewriter.rewrite(
+                            formula, spelExpression.getAST());
+
+                        expression = collectionItemSafeFormula.equals(formula)
+                            ? spelExpression : expressionParser.parseExpression(collectionItemSafeFormula);
                     } catch (ParseException parseException) {
                         if (lenient) {
                             if (log.isDebugEnabled()) {
@@ -280,10 +283,7 @@ public class SpelEvaluator implements Evaluator {
                     return expression.getValue();
                 } else {
                     try {
-                        return expression.getValue(
-                            createEvaluationContext(
-                                context, formulaExpression,
-                                formulaExpression && iteratesOverCollection(expression)));
+                        return expression.getValue(createEvaluationContext(context, formulaExpression));
                     } catch (SpelEvaluationException spelEvaluationException) {
                         if (isUnresolvedReference(spelEvaluationException)) {
                             return value;
@@ -330,25 +330,6 @@ public class SpelEvaluator implements Evaluator {
         }
 
         return newMap;
-    }
-
-    private static boolean iteratesOverCollection(Expression expression) {
-        return expression instanceof SpelExpression spelExpression &&
-            containsProjectionOrSelection(spelExpression.getAST());
-    }
-
-    private static boolean containsProjectionOrSelection(SpelNode spelNode) {
-        if (spelNode instanceof Projection || spelNode instanceof Selection) {
-            return true;
-        }
-
-        for (int childIndex = 0; childIndex < spelNode.getChildCount(); childIndex++) {
-            if (containsProjectionOrSelection(spelNode.getChild(childIndex))) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private MethodResolver methodResolver() {
