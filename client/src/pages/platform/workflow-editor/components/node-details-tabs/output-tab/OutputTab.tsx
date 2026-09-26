@@ -171,6 +171,7 @@ const OutputTab = ({
                             setShowUploadDialog={setShowUploadDialog}
                             showClusterElementTestButton={hasClusterElementProperties}
                             showUploadSampleOutputButton={outputDefined}
+                            testable={!currentNode.taskDispatcher && !resumePerformFunctionDefined}
                             trigger={currentNode.trigger}
                             uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
                         />

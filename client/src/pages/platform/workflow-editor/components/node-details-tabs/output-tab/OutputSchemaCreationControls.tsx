@@ -17,6 +17,7 @@ interface OutputSchemaCreationControlsProps {
     setShowUploadDialog: (show: boolean) => void;
     showClusterElementTestButton?: boolean;
     showUploadSampleOutputButton?: boolean;
+    testable?: boolean;
     trigger?: boolean;
     uploadSampleOutputRequestMutationPending: boolean;
 }
@@ -34,6 +35,7 @@ const OutputSchemaCreationControls = ({
     setShowUploadDialog,
     showClusterElementTestButton,
     showUploadSampleOutputButton = false,
+    testable = true,
     trigger = false,
     uploadSampleOutputRequestMutationPending,
 }: OutputSchemaCreationControlsProps) => {
@@ -55,7 +57,9 @@ const OutputSchemaCreationControls = ({
                         <div className="self-center">Define Output Schema</div>
 
                         <p className="text-sm text-muted-foreground">
-                            Define the expected output schema with one of the methods
+                            {testable
+                                ? 'Define the expected output schema with one of the methods'
+                                : 'Define the expected output schema by uploading sample output data'}
                         </p>
                     </div>
                 ) : (
@@ -69,32 +73,34 @@ const OutputSchemaCreationControls = ({
                 )}
 
                 <div className="flex flex-col gap-4">
-                    <div className="flex w-full flex-col gap-3">
-                        {showClusterElementTestButton &&
-                        currentNode &&
-                        currentOperationProperties &&
-                        handleClusterElementTestSubmit ? (
-                            <ClusterElementTestButton
-                                clusterElementType={clusterElementType}
-                                connectionMissing={!!connectionMissing}
-                                currentNode={currentNode}
-                                onSubmit={handleClusterElementTestSubmit}
-                                properties={currentOperationProperties}
-                                saving={!!saveClusterElementTestOutputMutationPending}
-                            />
-                        ) : (
-                            <Button
-                                disabled={saveWorkflowNodeTestOutputMutationPending}
-                                label={`Test ${operationLabel}`}
-                                onClick={handleTestOperationClick}
-                                type="button"
-                            />
-                        )}
+                    {testable && (
+                        <div className="flex w-full flex-col gap-3">
+                            {showClusterElementTestButton &&
+                            currentNode &&
+                            currentOperationProperties &&
+                            handleClusterElementTestSubmit ? (
+                                <ClusterElementTestButton
+                                    clusterElementType={clusterElementType}
+                                    connectionMissing={!!connectionMissing}
+                                    currentNode={currentNode}
+                                    onSubmit={handleClusterElementTestSubmit}
+                                    properties={currentOperationProperties}
+                                    saving={!!saveClusterElementTestOutputMutationPending}
+                                />
+                            ) : (
+                                <Button
+                                    disabled={saveWorkflowNodeTestOutputMutationPending}
+                                    label={`Test ${operationLabel}`}
+                                    onClick={handleTestOperationClick}
+                                    type="button"
+                                />
+                            )}
 
-                        {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
-                            <span className="text-center">or</span>
-                        )}
-                    </div>
+                            {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
+                                <span className="text-center">or</span>
+                            )}
+                        </div>
+                    )}
 
                     {clusterElementType !== 'tools' && showUploadSampleOutputButton && (
                         <Button
