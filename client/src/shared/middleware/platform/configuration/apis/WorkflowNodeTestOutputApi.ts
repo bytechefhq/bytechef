@@ -251,9 +251,16 @@ export class WorkflowNodeTestOutputApi extends runtime.BaseAPI {
      * Create a new or update existing workflow node test output.
      * Create a new or update existing workflow node test output
      */
-    async saveWorkflowNodeTestOutput(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutput> {
+    async saveWorkflowNodeTestOutput(requestParameters: SaveWorkflowNodeTestOutputRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowNodeTestOutput | null | undefined > {
         const response = await this.saveWorkflowNodeTestOutputRaw(requestParameters, initOverrides);
-        return await response.value();
+        switch (response.raw.status) {
+            case 200:
+                return await response.value();
+            case 204:
+                return null;
+            default:
+                return await response.value();
+        }
     }
 
     /**
