@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 
+import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.advisor.TextGenerationFirstAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
@@ -159,7 +160,8 @@ public interface ChatModel {
                 chatClientRequestSpec = chatClientRequestSpec.advisors(
                     StructuredOutputValidationAdvisor.builder()
                         .outputJsonSchema(converter.getJsonSchema())
-                        .build());
+                        .build(),
+                    new CodeFenceStrippingAdvisor());
             }
 
             return chatClientRequestSpec;
