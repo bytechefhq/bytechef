@@ -19,6 +19,9 @@ package com.bytechef.component.ai.llm.anthropic.action;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
@@ -39,10 +42,13 @@ import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.AnthropicClientAsync;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
+import com.anthropic.core.JsonValue;
+import com.anthropic.models.messages.JsonOutputFormat;
 import com.anthropic.models.messages.OutputConfig;
 import com.anthropic.models.messages.ThinkingConfigParam;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -58,6 +64,11 @@ import org.springframework.ai.anthropic.AnthropicChatOptions;
  * @author Nikolina Spehar
  */
 class AnthropicChatActionTest {
+
+    private static final String PRODUCT_SCHEMA = """
+        {"type":"object","required":["result"],"properties":{"result":{"type":"array","items":{"type":"object",
+        "properties":{"name":{"type":"string"},"price":{"type":"number","minimum":0}}}}}}
+        """;
 
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(Map.of(TOKEN, "TOKEN"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
@@ -290,7 +301,106 @@ class AnthropicChatActionTest {
             .orElseThrow());
     }
 
+    @Test
+    void testCreateChatModelSetsStrictOutputSchemaForStructuredData() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(
+                MODEL, "claude-haiku-4-5", MAX_TOKENS, 16000,
+                RESPONSE, Map.of(RESPONSE_FORMAT, "JSON", RESPONSE_SCHEMA, PRODUCT_SCHEMA)));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters, true);
+
+        Map<String, Object> schema = getOutputSchema(anthropicChatOptions);
+
+        assertEquals("object", schema.get("type"));
+        assertEquals(false, schema.get("additionalProperties"));
+
+        Map<String, Object> item = getPath(schema, "properties", "result", "items");
+
+        assertEquals(false, item.get("additionalProperties"));
+        assertEquals(Map.of("type", "number"), getPath(item, "properties", "price"));
+    }
+
+    @Test
+    void testCreateChatModelKeepsEffortAlongsideOutputSchema() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(
+                MODEL, "claude-opus-5", MAX_TOKENS, 16000, THINKING, true, REASONING_EFFORT, "high",
+                RESPONSE, Map.of(RESPONSE_FORMAT, "JSON", RESPONSE_SCHEMA, PRODUCT_SCHEMA)));
+
+        AnthropicChatOptions anthropicChatOptions = createChatOptions(mockedInputParameters, true);
+
+        OutputConfig outputConfig = anthropicChatOptions.getOutputConfig();
+
+        assertEquals(OutputConfig.Effort.HIGH, outputConfig.effort()
+            .orElseThrow());
+        assertTrue(outputConfig.format()
+            .isPresent());
+    }
+
+    @Test
+    void testCreateChatModelOmitsOutputSchemaForText() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-haiku-4-5", MAX_TOKENS, 1000, RESPONSE, Map.of(RESPONSE_FORMAT, "TEXT")));
+
+        assertNull(createChatOptions(mockedInputParameters, true).getOutputConfig());
+    }
+
+    @Test
+    void testCreateChatModelOmitsOutputSchemaWhenResponseFormatIsNotRequired() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(
+                MODEL, "claude-haiku-4-5", MAX_TOKENS, 1000,
+                RESPONSE, Map.of(RESPONSE_FORMAT, "JSON", RESPONSE_SCHEMA, PRODUCT_SCHEMA)));
+
+        assertNull(createChatOptions(mockedInputParameters, false).getOutputConfig());
+    }
+
+    @Test
+    void testCreateChatModelOmitsOutputSchemaWhenResponseIsMissing() {
+        Parameters mockedInputParameters = MockParametersFactory.create(
+            Map.of(MODEL, "claude-haiku-4-5", MAX_TOKENS, 1000));
+
+        assertNull(createChatOptions(mockedInputParameters, true).getOutputConfig());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> getPath(Map<String, Object> schema, String... keys) {
+        Map<String, Object> current = schema;
+
+        for (String key : keys) {
+            current = (Map<String, Object>) current.get(key);
+        }
+
+        return current;
+    }
+
+    private static Map<String, Object> getOutputSchema(AnthropicChatOptions anthropicChatOptions) {
+        OutputConfig outputConfig = anthropicChatOptions.getOutputConfig();
+
+        JsonOutputFormat jsonOutputFormat = outputConfig.format()
+            .orElseThrow();
+
+        JsonOutputFormat.Schema schema = jsonOutputFormat.schema();
+
+        Map<String, Object> schemaMap = new HashMap<>();
+
+        for (Map.Entry<String, JsonValue> entry : schema._additionalProperties()
+            .entrySet()) {
+
+            schemaMap.put(
+                entry.getKey(), entry.getValue()
+                    .convert(Object.class));
+        }
+
+        return schemaMap;
+    }
+
     private AnthropicChatOptions createChatOptions(Parameters inputParameters) {
+        return createChatOptions(inputParameters, false);
+    }
+
+    private AnthropicChatOptions createChatOptions(Parameters inputParameters, boolean responseFormatRequired) {
         try (MockedStatic<AnthropicOkHttpClient> syncMockedStatic = mockStatic(AnthropicOkHttpClient.class);
             MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic = mockStatic(AnthropicOkHttpClientAsync.class)) {
 
@@ -313,7 +423,7 @@ class AnthropicChatActionTest {
                 .thenReturn(mock(AnthropicClientAsync.class));
 
             AnthropicChatModel chatModel = (AnthropicChatModel) AnthropicChatAction.CHAT_MODEL.createChatModel(
-                inputParameters, mockedConnectionParameters, false);
+                inputParameters, mockedConnectionParameters, responseFormatRequired);
 
             return chatModel.getOptions();
         }
