@@ -6,6 +6,7 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 const hoisted = vi.hoisted(() => ({
     invalidateQueries: vi.fn(),
     onDeleteSuccess: undefined as (() => void) | undefined,
+    saveWorkflowNodeTestOutputMutate: vi.fn(),
     webhookTriggerTestApi: undefined as
         | {startWebhookTriggerTest: ReturnType<typeof vi.fn>; stopWebhookTriggerTest: ReturnType<typeof vi.fn>}
         | undefined,
@@ -22,7 +23,7 @@ vi.mock('@/shared/mutations/platform/workflowNodeTestOutputs.mutations', () => (
 
         return {mutate: () => onSuccess?.()};
     },
-    useSaveWorkflowNodeTestOutputMutation: () => ({mutate: vi.fn()}),
+    useSaveWorkflowNodeTestOutputMutation: () => ({mutate: hoisted.saveWorkflowNodeTestOutputMutate}),
     useUploadSampleOutputRequestMutation: () => ({mutate: vi.fn()}),
 }));
 
@@ -57,6 +58,22 @@ vi.mock('@uidotdev/usehooks', () => ({
 }));
 
 import useOutputTab from '../useOutputTab';
+
+type SaveWorkflowNodeTestOutputSuccessType = (
+    workflowNodeTestOutput: object | null,
+    variables: {workflowNodeName: string}
+) => void;
+
+function resolveLastWorkflowNodeTestOutput(workflowNodeTestOutput: object | null) {
+    const [variables, options] = hoisted.saveWorkflowNodeTestOutputMutate.mock.lastCall as [
+        {workflowNodeName: string},
+        {onSuccess: SaveWorkflowNodeTestOutputSuccessType},
+    ];
+
+    act(() => {
+        options.onSuccess(workflowNodeTestOutput, variables);
+    });
+}
 
 describe('useOutputTab', () => {
     beforeEach(() => {
@@ -119,6 +136,83 @@ describe('useOutputTab', () => {
             environmentId: 2,
             triggerName: 'trigger_2',
             workflowId: 'wf-1',
+        });
+    });
+
+    describe('a test that returns no output', () => {
+        const renderDataStorageNode = () =>
+            renderHook(({currentNode}) => useOutputTab({currentNode, workflowId: 'wf-1'}), {
+                initialProps: {currentNode: {name: 'dataStorage_1'} as NodeDataType},
+            });
+
+        it('reports that the test returned no output when the server answers without one', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            expect(result.current.testReturnedNoOutput).toBe(true);
+        });
+
+        it('does not report it when the test returned an output', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput({id: 'test-output-1'});
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('clears the report when the test is run again', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('clears the report when it is dismissed', () => {
+            const {result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            act(() => {
+                result.current.handleNoOutputNoticeDismiss();
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
+
+        it('does not carry the report over to another node', () => {
+            const {rerender, result} = renderDataStorageNode();
+
+            act(() => {
+                result.current.handleTestOperationClick();
+            });
+
+            resolveLastWorkflowNodeTestOutput(null);
+
+            rerender({currentNode: {name: 'dataStorage_2'} as NodeDataType});
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
         });
     });
 });

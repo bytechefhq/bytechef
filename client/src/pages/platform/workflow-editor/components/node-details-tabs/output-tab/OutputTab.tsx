@@ -6,6 +6,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import OutputSchemaCreationControls from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaCreationControls';
 import OutputSchemaDisplay from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputSchemaDisplay';
+import OutputTabNoOutputNotice from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabNoOutputNotice';
 import OutputTabSampleDataDialog from '@/pages/platform/workflow-editor/components/node-details-tabs/output-tab/OutputTabSampleDataDialog';
 import DialogLoader from '@/shared/components/DialogLoader';
 import {TriggerType} from '@/shared/middleware/platform/configuration';
@@ -45,6 +46,7 @@ const OutputTab = ({
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
+        handleNoOutputNoticeDismiss,
         handlePredefinedOutputSchemaClick,
         handleSampleDataDialogUpload,
         handleTestCancelClick,
@@ -59,6 +61,7 @@ const OutputTab = ({
         setShowUploadDialog,
         showUploadDialog,
         testOutputResponse,
+        testReturnedNoOutput,
         testing,
         uploadSampleOutputRequestMutationPending,
         variableOutputSchema,
@@ -73,6 +76,8 @@ const OutputTab = ({
         parentWorkflowNodeName,
         workflowId,
     });
+
+    const operationLabel = clusterElementType === 'tools' ? 'Tool' : currentNode.trigger ? 'Trigger' : 'Action';
 
     if (!testing && workflowNodeOutputIsFetching) {
         return <></>;
@@ -105,6 +110,15 @@ const OutputTab = ({
                         saveWorkflowNodeTestOutputMutation={saveWorkflowNodeTestOutputMutation}
                         setShowUploadDialog={setShowUploadDialog}
                         showClusterElementTestButton={hasClusterElementProperties}
+                        testNotice={
+                            testReturnedNoOutput && (
+                                <OutputTabNoOutputNotice
+                                    className="mb-3"
+                                    onDismiss={handleNoOutputNoticeDismiss}
+                                    operationLabel={operationLabel}
+                                />
+                            )
+                        }
                         testOutputResponse={testOutputResponse}
                         variableOutputSchema={variableOutputSchema}
                         variablePropertiesDefined={variablePropertiesDefined}
@@ -114,23 +128,33 @@ const OutputTab = ({
             )}
 
             {!testing && !outputSchema && !variablePropertiesDefined && (
-                <div className="absolute inset-0 flex items-center justify-center px-4">
-                    <OutputSchemaCreationControls
-                        clusterElementType={clusterElementType}
-                        connectionMissing={connectionMissing}
-                        currentNode={currentNode}
-                        currentOperationProperties={currentOperationProperties}
-                        handleClusterElementTestSubmit={handleClusterElementTestSubmit}
-                        handleTestOperationClick={handleTestOperationClick}
-                        outputDefined={outputDefined}
-                        saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
-                        saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}
-                        setShowUploadDialog={setShowUploadDialog}
-                        showClusterElementTestButton={hasClusterElementProperties}
-                        showUploadSampleOutputButton={outputDefined}
-                        trigger={currentNode.trigger}
-                        uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
-                    />
+                <div className="absolute inset-0 flex flex-col px-4">
+                    {testReturnedNoOutput && (
+                        <OutputTabNoOutputNotice
+                            className="mt-4"
+                            onDismiss={handleNoOutputNoticeDismiss}
+                            operationLabel={operationLabel}
+                        />
+                    )}
+
+                    <div className="min-h-0 flex-1">
+                        <OutputSchemaCreationControls
+                            clusterElementType={clusterElementType}
+                            connectionMissing={connectionMissing}
+                            currentNode={currentNode}
+                            currentOperationProperties={currentOperationProperties}
+                            handleClusterElementTestSubmit={handleClusterElementTestSubmit}
+                            handleTestOperationClick={handleTestOperationClick}
+                            outputDefined={outputDefined}
+                            saveClusterElementTestOutputMutationPending={saveClusterElementTestOutputMutationPending}
+                            saveWorkflowNodeTestOutputMutationPending={saveWorkflowNodeTestOutputMutationPending}
+                            setShowUploadDialog={setShowUploadDialog}
+                            showClusterElementTestButton={hasClusterElementProperties}
+                            showUploadSampleOutputButton={outputDefined}
+                            trigger={currentNode.trigger}
+                            uploadSampleOutputRequestMutationPending={uploadSampleOutputRequestMutationPending}
+                        />
+                    </div>
                 </div>
             )}
 
