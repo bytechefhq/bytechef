@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
@@ -17,7 +18,7 @@ import {
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {ChevronDownIcon, ExternalLinkIcon, InfoIcon, TriangleAlertIcon, XIcon} from 'lucide-react';
+import {ExternalLinkIcon, InfoIcon, TriangleAlertIcon, XIcon} from 'lucide-react';
 import {ReactNode, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -66,7 +67,6 @@ const WorkflowNodeDetailsPanel = ({
         currentWorkflowNodeConnections,
         currentWorkflowNodeOperations,
         errors,
-        errorsAccordionOpen,
         errorsLoading,
         filteredClusterElementOperations,
         getNodeVersion,
@@ -81,7 +81,6 @@ const WorkflowNodeDetailsPanel = ({
         propertiesLoading,
         rootClusterElementNodeData,
         setActiveTab,
-        setErrorsAccordionOpen,
         tabDataExists,
         workflow,
         workflowNodeDetailsPanelOpen,
@@ -186,6 +185,70 @@ const WorkflowNodeDetailsPanel = ({
                                 </div>
                             </div>
 
+                            {errors.length > 0 && (
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            aria-busy={errorsLoading}
+                                            aria-label={errorsLoading ? 'Checking errors…' : errorsHeading}
+                                            className={twMerge(
+                                                'mr-1 h-7 shrink-0 gap-1 rounded-full border px-2 text-xs font-semibold',
+                                                errorsWarningOnly
+                                                    ? 'border-stroke-warning-primary bg-surface-warning-secondary text-content-warning-primary hover:bg-surface-warning-secondary-hover hover:text-content-warning-primary dark:hover:bg-surface-warning-secondary-hover'
+                                                    : 'border-stroke-destructive-primary bg-surface-destructive-secondary text-content-destructive-primary hover:bg-surface-destructive-secondary-hover hover:text-content-destructive-primary dark:hover:bg-surface-destructive-secondary-hover',
+                                                errorsLoading && 'opacity-60'
+                                            )}
+                                            disabled={errorsLoading}
+                                            icon={
+                                                errorsWarningOnly ? (
+                                                    <TriangleAlertIcon aria-hidden="true" className="size-3.5" />
+                                                ) : (
+                                                    <InfoIcon aria-hidden="true" className="size-3.5" />
+                                                )
+                                            }
+                                            label={String(errors.length)}
+                                            variant="ghost"
+                                        />
+                                    </PopoverTrigger>
+
+                                    <PopoverContent align="end" className="w-80 p-0">
+                                        <div className="border-b px-3 py-2 text-sm font-semibold">{errorsHeading}</div>
+
+                                        <ScrollArea className="max-h-60">
+                                            <ul className="flex flex-col gap-2 p-2">
+                                                {errors.map((error, index) => (
+                                                    <li
+                                                        className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm dark:bg-surface-neutral-secondary"
+                                                        key={`${error.kind}_${error.name}_${index}`}
+                                                    >
+                                                        {error.severity === 'WARNING' && (
+                                                            <TriangleAlertIcon
+                                                                aria-label="Warning"
+                                                                className="mb-0.5 inline size-3.5 text-content-warning-primary"
+                                                            />
+                                                        )}
+
+                                                        {error.kind !== 'ISSUE' && (
+                                                            <span className="font-light">
+                                                                {error.kind === 'CONNECTION'
+                                                                    ? 'Missing required connection:'
+                                                                    : 'Missing required property:'}
+                                                            </span>
+                                                        )}
+
+                                                        {error.propertyLabel && (
+                                                            <span className="font-light">{error.propertyLabel}:</span>
+                                                        )}
+
+                                                        <span>{error.name}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </ScrollArea>
+                                    </PopoverContent>
+                                </Popover>
+                            )}
+
                             {closeButton ? (
                                 closeButton
                             ) : (
@@ -232,92 +295,6 @@ const WorkflowNodeDetailsPanel = ({
                                     triggerSelect={currentNode?.trigger}
                                     value={currentOperationName}
                                 />
-                            )}
-
-                            {errors.length > 0 && (
-                                <div className="border-b p-2">
-                                    <div
-                                        className={twMerge(
-                                            'flex shrink-0 flex-col overflow-hidden rounded-lg border',
-                                            errorsWarningOnly
-                                                ? 'border-stroke-warning-primary bg-surface-warning-secondary'
-                                                : 'border-stroke-destructive-primary bg-surface-destructive-secondary'
-                                        )}
-                                    >
-                                        <Button
-                                            aria-busy={errorsLoading}
-                                            aria-expanded={errorsAccordionOpen}
-                                            className={twMerge(
-                                                'h-auto w-full shrink-0 justify-start rounded-none px-3 py-2 text-content-neutral-primary hover:bg-transparent',
-                                                errorsLoading && 'opacity-60'
-                                            )}
-                                            disabled={errorsLoading}
-                                            onClick={() => setErrorsAccordionOpen(!errorsAccordionOpen)}
-                                            variant="ghost"
-                                        >
-                                            <InfoIcon
-                                                className={twMerge(
-                                                    'size-4 shrink-0',
-                                                    errorsWarningOnly
-                                                        ? 'text-content-warning-primary'
-                                                        : 'text-content-destructive-primary'
-                                                )}
-                                            />
-
-                                            <span className="text-sm">
-                                                {errorsLoading ? 'Checking errors…' : errorsHeading}
-                                            </span>
-
-                                            {!errorsLoading && (
-                                                <span className="ml-auto flex items-center gap-1 text-xs">
-                                                    Show all
-                                                    <ChevronDownIcon
-                                                        className={twMerge(
-                                                            'transition-all',
-                                                            errorsAccordionOpen && 'rotate-180'
-                                                        )}
-                                                    />
-                                                </span>
-                                            )}
-                                        </Button>
-
-                                        {errorsAccordionOpen && !errorsLoading && (
-                                            <ScrollArea className="max-h-[132px]">
-                                                <ul className="flex flex-col gap-2 px-3 pt-0 pb-2">
-                                                    {errors.map((error, index) => (
-                                                        <li
-                                                            className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
-                                                            key={`${error.kind}_${error.name}_${index}`}
-                                                        >
-                                                            {error.severity === 'WARNING' && (
-                                                                <TriangleAlertIcon
-                                                                    aria-label="Warning"
-                                                                    className="mb-0.5 inline size-3.5 text-content-warning-primary"
-                                                                />
-                                                            )}
-
-                                                            {error.kind !== 'ISSUE' && (
-                                                                <span className="font-light">
-                                                                    {error.kind === 'CONNECTION'
-                                                                        ? 'Missing required connection:'
-                                                                        : 'Missing required property:'}
-                                                                </span>
-                                                            )}
-
-                                                            {error.propertyLabel && (
-                                                                <span className="font-light">
-                                                                    {error.propertyLabel}:
-                                                                </span>
-                                                            )}
-
-                                                            <span>{error.name}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </ScrollArea>
-                                        )}
-                                    </div>
-                                </div>
                             )}
 
                             {tabDataExists && (
