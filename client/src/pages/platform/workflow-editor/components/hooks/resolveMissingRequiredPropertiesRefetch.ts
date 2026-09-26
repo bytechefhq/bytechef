@@ -3,16 +3,18 @@ export type MissingRequiredPropertiesRefetchTargetType = 'cluster' | 'none' | 'r
 /**
  * Picks which missing-required-properties query to imperatively refetch for the focused node ('cluster' |
  * 'regular'), or 'none'. refetch() bypasses the declarative queries' `enabled` guards, so this replicates
- * them: returns 'none' during the cluster-editor-close race (currentNodeName lags clusterElementType) and
- * for a freshly added node still awaiting its first save — both would 404 against the stale server definition.
+ * them: returns 'none' while the workflow has no id yet (the query's workflowId is non-null), during the
+ * cluster-editor-close race (currentNodeName lags clusterElementType) and for a freshly added node still
+ * awaiting its first save — the last two would 404 against the stale server definition.
  */
 export function resolveMissingRequiredPropertiesRefetch(
+    workflowId: string | undefined,
     currentNodeName: string | undefined,
     currentClusterElementName: string | undefined,
     currentNodeClusterElementType: string | undefined,
     awaitingFirstSave: boolean
 ): MissingRequiredPropertiesRefetchTargetType {
-    if (!currentNodeName || currentNodeName === 'manual') {
+    if (!workflowId || !currentNodeName || currentNodeName === 'manual') {
         return 'none';
     }
 
