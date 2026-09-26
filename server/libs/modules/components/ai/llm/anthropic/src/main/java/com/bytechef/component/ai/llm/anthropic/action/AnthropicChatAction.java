@@ -22,6 +22,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING_EFFORT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.THINKING;
@@ -34,11 +37,15 @@ import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.anthropic.models.messages.OutputConfig;
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
+import com.bytechef.component.ai.llm.converter.StructuredOutputUtils;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.anthropic.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
@@ -49,6 +56,10 @@ import org.springframework.ai.anthropic.AnthropicChatOptions;
  */
 public class AnthropicChatAction {
 
+    private static final List<String> PROMPT_ONLY_STRUCTURED_OUTPUT_MODEL_PREFIXES = List.of(
+        "claude-2", "claude-3", "claude-instant", "claude-opus-4-0", "claude-opus-4-2025", "claude-sonnet-4-0",
+        "claude-sonnet-4-2025");
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -58,8 +69,10 @@ public class AnthropicChatAction {
         .perform(AnthropicChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        String model = inputParameters.getRequiredString(MODEL);
+
         AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
+            .model(model)
             .maxTokens(inputParameters.getInteger(MAX_TOKENS, DEFAULT_MAX_TOKENS))
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
             .cacheOptions(
@@ -87,6 +100,14 @@ public class AnthropicChatAction {
             }
         }
 
+        if (responseFormatRequired && supportsNativeStructuredOutput(model)) {
+            String responseSchema = getJsonResponseSchema(inputParameters);
+
+            if (responseSchema != null) {
+                optionsBuilder.outputSchema(StructuredOutputUtils.toStrictJsonSchema(responseSchema));
+            }
+        }
+
         String apiKey = connectionParameters.getRequiredString(TOKEN);
 
         return AnthropicChatModel.builder()
@@ -103,6 +124,25 @@ public class AnthropicChatAction {
     };
 
     private AnthropicChatAction() {
+    }
+
+    @Nullable
+    private static String getJsonResponseSchema(Parameters inputParameters) {
+        ResponseFormat responseFormat = inputParameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
+
+        if (responseFormat != ResponseFormat.JSON) {
+            return null;
+        }
+
+        String responseSchema = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class);
+
+        return responseSchema == null || responseSchema.isBlank() ? null : responseSchema;
+    }
+
+    private static boolean supportsNativeStructuredOutput(String model) {
+        return PROMPT_ONLY_STRUCTURED_OUTPUT_MODEL_PREFIXES.stream()
+            .noneMatch(model::startsWith);
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

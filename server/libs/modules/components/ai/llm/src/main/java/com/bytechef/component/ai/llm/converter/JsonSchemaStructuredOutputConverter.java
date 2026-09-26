@@ -72,7 +72,7 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
      */
     @Override
     public Object convert(@NonNull String text) {
-        String processedText = processText(text);
+        String processedText = StructuredOutputUtils.stripCodeFence(text);
 
         try {
             return context.json(json -> json.read(processedText, this.typeReference));
@@ -117,32 +117,5 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
         int limit = 200;
 
         return text.length() <= limit ? text : text.substring(0, limit) + "...";
-    }
-
-    private static String processText(String text) {
-        // Remove leading and trailing whitespace
-        text = text.trim();
-
-        // Check for and remove triple backticks and "json" identifier
-        if (text.startsWith("```") && text.endsWith("```")) {
-            // Remove the first line if it contains "```json"
-            String[] lines = text.split("\n", 2);
-
-            String line = lines[0].trim();
-
-            if (line.equalsIgnoreCase("```json")) {
-                text = lines.length > 1 ? lines[1] : "";
-            } else {
-                text = text.substring(3); // Remove leading ```
-            }
-
-            // Remove trailing ```
-            text = text.substring(0, text.length() - 3);
-
-            // Trim again to remove any potential whitespace
-            text = text.trim();
-        }
-
-        return text;
     }
 }
