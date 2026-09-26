@@ -20,6 +20,12 @@ describe('resolveShowOutputTab', () => {
         expect(resolveShowOutputTab({operationDefinition: {outputDefined: false}, taskDispatcher: true})).toBe(false);
     });
 
+    it('hides the tab for a task dispatcher that declares only variable properties, such as each', () => {
+        const eachDefinition = {outputDefined: false, variablePropertiesDefined: true};
+
+        expect(resolveShowOutputTab({operationDefinition: eachDefinition, taskDispatcher: true})).toBe(false);
+    });
+
     it('shows the tab for a task dispatcher that declares an output', () => {
         expect(resolveShowOutputTab({operationDefinition: {outputDefined: true}, taskDispatcher: true})).toBe(true);
     });
