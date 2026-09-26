@@ -389,13 +389,13 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         OutputResponse outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, clusterElementWorkflowNodeName, environmentId)
             .map(workflowNodeTestOutput -> workflowNodeTestOutput.getOutput(typeClass))
+            .or(() -> getClusterElementDynamicOutputResponse(workflowId, clusterElement, environmentId))
             .orElse(null);
 
         boolean testOutputResponse = outputResponse != null;
 
         if (outputResponse == null) {
-            outputResponse = getClusterElementDynamicOutputResponse(workflowId, clusterElement, environmentId)
-                .orElseGet(() -> checkOutputSchemaIsFileEntryProperty(clusterElementDefinition.getOutputResponse()));
+            outputResponse = checkOutputSchemaIsFileEntryProperty(clusterElementDefinition.getOutputResponse());
         }
 
         return new ClusterElementOutputDTO(
@@ -484,6 +484,8 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                     try {
                         outputResponse = getWorkflowTaskDynamicOutputResponse(
                             workflowId, workflowTask, environmentId, sampleOutputsCache);
+
+                        testoutputResponse = outputResponse != null;
                     } catch (RuntimeException e) {
                         if (!previousNode) {
                             throw e;
