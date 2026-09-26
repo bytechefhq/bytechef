@@ -1721,6 +1721,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowNodeTestOutput"
+        "204":
+          description: "The test ran but produced no output, so nothing was saved."
   /workflows/{id}/workflow-nodes/{workflowNodeName}/test-outputs/exists:
     get:
       description: "Check if a workflow node test output exists."
