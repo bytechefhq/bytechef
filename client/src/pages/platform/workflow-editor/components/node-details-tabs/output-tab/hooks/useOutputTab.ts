@@ -53,6 +53,7 @@ export default function useOutputTab({
     parentWorkflowNodeName,
     workflowId,
 }: UseOutputTabProps) {
+    const [noOutputWorkflowNodeName, setNoOutputWorkflowNodeName] = useState<string | undefined>(undefined);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [startWebhookTest, setStartWebhookTest] = useState(false);
     const [startWebhookTestDate, setStartWebhookTestDate] = useState(new Date());
@@ -243,6 +244,8 @@ export default function useOutputTab({
     const handleTestOperationClick = useCallback(() => {
         const generation = clearTestOutputError();
 
+        setNoOutputWorkflowNodeName(undefined);
+
         if (!currentNode.trigger || currentNode.triggerType === TriggerType.Polling) {
             saveWorkflowNodeTestOutputMutation.mutate(
                 {
@@ -252,6 +255,11 @@ export default function useOutputTab({
                 },
                 {
                     onError: (error) => showTestOutputError('Test failed', error, generation),
+                    onSuccess: (workflowNodeTestOutput, variables) => {
+                        if (!workflowNodeTestOutput) {
+                            setNoOutputWorkflowNodeName(variables.workflowNodeName);
+                        }
+                    },
                 }
             );
         } else {
@@ -332,7 +340,11 @@ export default function useOutputTab({
         });
     }, [currentEnvironmentId, currentNode.name, webhookTriggerTestApi, workflowId, workflowNodeOutputRefetch]);
 
+    const handleNoOutputNoticeDismiss = useCallback(() => setNoOutputWorkflowNodeName(undefined), []);
+
     const hasClusterElementProperties = isClusterElement && !!currentOperationProperties?.length;
+
+    const testReturnedNoOutput = !!noOutputWorkflowNodeName && noOutputWorkflowNodeName === currentNode.name;
 
     const testing =
         saveClusterElementTestOutputMutation.isPending ||
@@ -359,6 +371,7 @@ export default function useOutputTab({
         copiedValue,
         copyToClipboard,
         handleClusterElementTestSubmit,
+        handleNoOutputNoticeDismiss,
         handlePredefinedOutputSchemaClick,
         handleSampleDataDialogUpload,
         handleTestCancelClick,
@@ -374,6 +387,7 @@ export default function useOutputTab({
         showUploadDialog,
         testOutputError,
         testOutputResponse,
+        testReturnedNoOutput,
         testing,
         uploadSampleOutputRequestMutationPending: uploadSampleOutputRequestMutation.isPending,
         variableOutputSchema,
