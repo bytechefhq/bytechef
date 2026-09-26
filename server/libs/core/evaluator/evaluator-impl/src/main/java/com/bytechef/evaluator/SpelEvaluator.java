@@ -43,6 +43,9 @@ import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelMessage;
+import org.springframework.expression.spel.SpelNode;
+import org.springframework.expression.spel.ast.Projection;
+import org.springframework.expression.spel.ast.Selection;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -162,10 +165,12 @@ public class SpelEvaluator implements Evaluator {
         return evaluateInternal(map, context, lenient);
     }
 
-    StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
+    StandardEvaluationContext createEvaluationContext(
+        Map<String, ?> context, boolean formulaExpression, boolean nullForMissingNestedKeys) {
+
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
-        evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
+        evaluationContext.addPropertyAccessor(new MapPropertyAccessor(nullForMissingNestedKeys));
         evaluationContext.setConstructorResolvers(List.of());
         evaluationContext.setTypeLocator(typeName -> {
             throw new SpelEvaluationException(SpelMessage.TYPE_NOT_FOUND, typeName);
@@ -275,7 +280,10 @@ public class SpelEvaluator implements Evaluator {
                     return expression.getValue();
                 } else {
                     try {
-                        return expression.getValue(createEvaluationContext(context, formulaExpression));
+                        return expression.getValue(
+                            createEvaluationContext(
+                                context, formulaExpression,
+                                formulaExpression && iteratesOverCollection(expression)));
                     } catch (SpelEvaluationException spelEvaluationException) {
                         if (isUnresolvedReference(spelEvaluationException)) {
                             return value;
@@ -322,6 +330,25 @@ public class SpelEvaluator implements Evaluator {
         }
 
         return newMap;
+    }
+
+    private static boolean iteratesOverCollection(Expression expression) {
+        return expression instanceof SpelExpression spelExpression &&
+            containsProjectionOrSelection(spelExpression.getAST());
+    }
+
+    private static boolean containsProjectionOrSelection(SpelNode spelNode) {
+        if (spelNode instanceof Projection || spelNode instanceof Selection) {
+            return true;
+        }
+
+        for (int childIndex = 0; childIndex < spelNode.getChildCount(); childIndex++) {
+            if (containsProjectionOrSelection(spelNode.getChild(childIndex))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private MethodResolver methodResolver() {

@@ -34,6 +34,12 @@ import org.springframework.expression.TypedValue;
  */
 class MapPropertyAccessor implements PropertyAccessor {
 
+    private final boolean nullForMissingNestedKeys;
+
+    MapPropertyAccessor(boolean nullForMissingNestedKeys) {
+        this.nullForMissingNestedKeys = nullForMissingNestedKeys;
+    }
+
     @Override
     public Class<?>[] getSpecificTargetClasses() {
         return new Class<?>[] {
@@ -43,10 +49,17 @@ class MapPropertyAccessor implements PropertyAccessor {
 
     @Override
     public boolean canRead(EvaluationContext evaluationContext, @Nullable Object target, String name) {
-        if (!(target instanceof Map)) {
+        if (!(target instanceof Map<?, ?> map)) {
             return false;
         }
-        return ((Map<?, ?>) target).containsKey(name);
+
+        if (map.containsKey(name)) {
+            return true;
+        }
+
+        TypedValue rootObject = evaluationContext.getRootObject();
+
+        return nullForMissingNestedKeys && target != rootObject.getValue();
     }
 
     @Override
