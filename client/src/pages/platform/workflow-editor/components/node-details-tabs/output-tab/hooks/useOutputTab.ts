@@ -213,6 +213,9 @@ export default function useOutputTab({
             }
 
             const generation = clearTestOutputError();
+            const testedWorkflowNodeName = currentNode.name;
+
+            setNoOutputWorkflowNodeName(undefined);
 
             saveClusterElementTestOutputMutation.mutate(
                 {
@@ -225,7 +228,13 @@ export default function useOutputTab({
                 },
                 {
                     onError: (error) => showTestOutputError('Test failed', error, generation),
-                    onSuccess,
+                    onSuccess: (data) => {
+                        if (!data.saveClusterElementTestOutput) {
+                            setNoOutputWorkflowNodeName(testedWorkflowNodeName);
+                        }
+
+                        onSuccess?.();
+                    },
                 }
             );
         },
@@ -233,6 +242,7 @@ export default function useOutputTab({
             clearTestOutputError,
             clusterElementType,
             currentEnvironmentId,
+            currentNode.name,
             currentNode.workflowNodeName,
             parentWorkflowNodeName,
             saveClusterElementTestOutputMutation,

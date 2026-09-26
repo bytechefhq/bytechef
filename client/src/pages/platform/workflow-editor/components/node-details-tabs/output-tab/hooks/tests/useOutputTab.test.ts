@@ -427,5 +427,60 @@ describe('useOutputTab', () => {
 
             expect(result.current.testReturnedNoOutput).toBe(false);
         });
+
+        it('reports that a tool test returned no output and still closes the properties popover', () => {
+            const onSuccess = vi.fn();
+
+            const {result} = renderHook(() =>
+                useOutputTab({
+                    clusterElementType: 'tools',
+                    currentNode: {name: 'dataStorage_1', workflowNodeName: 'dataStorage_1'} as NodeDataType,
+                    parentWorkflowNodeName: 'aiAgent_1',
+                    workflowId: 'wf-1',
+                })
+            );
+
+            act(() => {
+                result.current.handleClusterElementTestSubmit({key: 'tokic'}, onSuccess);
+            });
+
+            const [, options] = hoisted.clusterMutate.mock.lastCall as [
+                unknown,
+                {onSuccess: (data: {saveClusterElementTestOutput: object | null}) => void},
+            ];
+
+            act(() => {
+                options.onSuccess({saveClusterElementTestOutput: null});
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(true);
+            expect(onSuccess).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not report it when a tool test returned an output', () => {
+            const {result} = renderHook(() =>
+                useOutputTab({
+                    clusterElementType: 'tools',
+                    currentNode: {name: 'dataStorage_1', workflowNodeName: 'dataStorage_1'} as NodeDataType,
+                    parentWorkflowNodeName: 'aiAgent_1',
+                    workflowId: 'wf-1',
+                })
+            );
+
+            act(() => {
+                result.current.handleClusterElementTestSubmit({key: 'tokic'});
+            });
+
+            const [, options] = hoisted.clusterMutate.mock.lastCall as [
+                unknown,
+                {onSuccess: (data: {saveClusterElementTestOutput: object | null}) => void},
+            ];
+
+            act(() => {
+                options.onSuccess({saveClusterElementTestOutput: {id: 1}});
+            });
+
+            expect(result.current.testReturnedNoOutput).toBe(false);
+        });
     });
 });
