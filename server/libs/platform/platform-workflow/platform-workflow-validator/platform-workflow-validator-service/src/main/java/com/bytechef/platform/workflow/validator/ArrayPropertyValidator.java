@@ -77,7 +77,9 @@ class ArrayPropertyValidator {
         if (!valueJsonNode.isEmpty()) {
             JsonNode firstElement = valueJsonNode.get(0);
 
-            if (firstElement.isObject()) {
+            if (isFreeFormObjectArray(nestedPropertyInfos)) {
+                validateFreeFormObjectArray(valueJsonNode, propertyPath, errors);
+            } else if (firstElement.isObject()) {
                 validateObjectArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors, warnings);
             } else {
                 validateUnionTypeArray(valueJsonNode, nestedPropertyInfos, propertyPath, errors);
@@ -154,6 +156,13 @@ class ArrayPropertyValidator {
 
     private static String formatValue(JsonNode jsonNode) {
         return jsonNode.isString() ? "'" + jsonNode.asString() + "'" : jsonNode.toString();
+    }
+
+    private static boolean isFreeFormObjectArray(List<PropertyInfo> nestedPropertyInfos) {
+        return nestedPropertyInfos.stream()
+            .allMatch(propertyInfo -> "OBJECT".equalsIgnoreCase(propertyInfo.type()) &&
+                org.apache.commons.lang3.StringUtils.isEmpty(propertyInfo.name()) &&
+                CollectionUtils.isEmpty(propertyInfo.nestedProperties()));
     }
 
     private static boolean isTaskTypeArray(List<PropertyInfo> nestedPropertyInfos) {
@@ -258,6 +267,23 @@ class ArrayPropertyValidator {
                 null, "ARRAY", null, false, false, null, wrapperInfo.nestedProperties());
 
             validate(elementJsonNode, elementInfo, elementPath, errors, warnings);
+        }
+    }
+
+    private static void validateFreeFormObjectArray(
+        JsonNode arrayJsonNode, String propertyPath, StringBuilder errors) {
+
+        for (int i = 0; i < arrayJsonNode.size(); i++) {
+            JsonNode elementJsonNode = arrayJsonNode.get(i);
+
+            if (elementJsonNode.isObject()) {
+                continue;
+            }
+
+            String actualType = JsonNodeUtils.getJsonNodeType(elementJsonNode);
+
+            StringUtils.appendWithNewline(
+                ValidationErrorUtils.typeError(propertyPath + "[" + i + "]", "object", actualType), errors);
         }
     }
 
