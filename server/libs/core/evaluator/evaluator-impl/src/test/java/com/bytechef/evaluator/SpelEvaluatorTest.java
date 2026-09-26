@@ -582,7 +582,7 @@ public class SpelEvaluatorTest {
     @Test
     void testCreateEvaluationContextBlocksConstructorInvocations() {
         SpelEvaluator evaluator = (SpelEvaluator) SpelEvaluator.create();
-        StandardEvaluationContext context = evaluator.createEvaluationContext(Collections.emptyMap(), true);
+        StandardEvaluationContext context = evaluator.createEvaluationContext(Collections.emptyMap(), true, false);
         SpelExpressionParser parser = new SpelExpressionParser();
 
         assertThrowsExactly(
@@ -603,7 +603,7 @@ public class SpelEvaluatorTest {
     @Test
     void testCreateEvaluationContextBlocksTypeReferences() {
         SpelEvaluator evaluator = (SpelEvaluator) SpelEvaluator.create();
-        StandardEvaluationContext context = evaluator.createEvaluationContext(Collections.emptyMap(), true);
+        StandardEvaluationContext context = evaluator.createEvaluationContext(Collections.emptyMap(), true, false);
         SpelExpressionParser parser = new SpelExpressionParser();
 
         assertThrowsExactly(
@@ -888,5 +888,48 @@ public class SpelEvaluatorTest {
             Map.of("value", "=parseDate('2026-08-26', 5)"), Collections.emptyMap(), true);
 
         assertEquals("=parseDate('2026-08-26', 5)", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    public void testProjectionResolvesAKeyMissingFromTheFirstItemToNull() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email]"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(Arrays.asList(null, "a@x.io"), map.get("emails"));
+    }
+
+    @Test
+    public void testProjectionResolvesAKeyMissingFromEveryItemToNull() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email]"), Map.of("users", List.of(Map.of("id", 1), Map.of("id", 2))));
+
+        assertEquals(Arrays.asList(null, null), map.get("emails"));
+    }
+
+    @Test
+    public void testSelectionSkipsItemsMissingTheKey() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.?[email != null].![email]"),
+            Map.of("users", List.of(Map.of("id", 2), Map.of("id", 1, "email", "a@x.io"))));
+
+        assertEquals(List.of("a@x.io"), map.get("emails"));
+    }
+
+    @Test
+    public void testProjectionOverAnUnresolvedReferenceStaysUnresolved() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("emails", "=${users}.![email]"), Collections.emptyMap());
+
+        assertEquals("=${users}.![email]", map.get("emails"));
+    }
+
+    @Test
+    public void testMissingNestedKeyOutsideAProjectionStaysUnresolved() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("formula", "=${task.email}", "text", "${task.email}"), Map.of("task", Map.of("id", 1)));
+
+        assertEquals("=${task.email}", map.get("formula"));
+        assertEquals("${task.email}", map.get("text"));
     }
 }
