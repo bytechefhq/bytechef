@@ -19,6 +19,7 @@ import handleComponentAddedSuccess, {
 } from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
+import {getWorkflowNodeComponentName} from './workflowNodeNameUtils';
 
 interface HandleTaskDispatcherSubtaskOperationClickProps {
     clusterRoot?: boolean;
@@ -49,7 +50,7 @@ export default function handleTaskDispatcherSubtaskOperationClick({
 
     const taskDispatcherId = taskDispatcherContext!.taskDispatcherId;
 
-    const componentName = taskDispatcherId.split('_')[0] as keyof typeof TASK_DISPATCHER_CONFIG;
+    const componentName = getWorkflowNodeComponentName(taskDispatcherId) as keyof typeof TASK_DISPATCHER_CONFIG;
 
     const taskDispatcherConfig = TASK_DISPATCHER_CONFIG[componentName];
 

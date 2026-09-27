@@ -9,8 +9,10 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
+import {getWorkflowNodeComponentName} from './workflowNodeNameUtils';
+
 function nestedBottomGhostIdForDispatcherTask(taskNodeId: string): string {
-    const componentName = taskNodeId.split('_')[0];
+    const componentName = getWorkflowNodeComponentName(taskNodeId);
 
     if (componentName === 'fork-join') {
         return `${taskNodeId}-forkJoin-bottom-ghost`;
@@ -122,7 +124,7 @@ function connectSequentialTasks(branchSubtasks: WorkflowTask[]): Edge[] {
             const sourceTaskNodeId = task.name;
             const targetTaskNodeId = branchSubtasks[index + 1].name;
 
-            const sourceTaskComponentName = sourceTaskNodeId.split('_')[0];
+            const sourceTaskComponentName = getWorkflowNodeComponentName(sourceTaskNodeId);
 
             if (
                 TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
@@ -172,7 +174,7 @@ function createBranchExitEdge(
         const bottomGhostNodeId = `${onErrorId}-onError-bottom-ghost`;
         const lastTaskNode = allNodes.find((node) => node.id === lastTaskNodeId);
 
-        const lastTaskComponentName = lastTaskNodeId.split('_')[0];
+        const lastTaskComponentName = getWorkflowNodeComponentName(lastTaskNodeId);
 
         if (lastTaskNode?.data.taskDispatcher && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)) {
             const nestedBottomGhostId = nestedBottomGhostIdForDispatcherTask(lastTaskNodeId);
