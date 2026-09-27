@@ -43,9 +43,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Pamod Madubashana
  */
 public class DiscordNewMessageTrigger {
+
+    private static final int LATEST_MESSAGE_LIMIT = 1;
+    private static final int MESSAGE_LIMIT = 100;
+
+    private static final Comparator<Map<String, ?>> MESSAGE_ID_COMPARATOR = Comparator.comparingLong(
+        message -> Long.parseLong(String.valueOf(message.get("id"))));
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newMessage")
         .title("New Message")
@@ -119,60 +125,62 @@ public class DiscordNewMessageTrigger {
 
         String channelId = inputParameters.getRequiredString(CHANNEL_ID);
         String lastMessageId = closureParameters.getString(LAST_MESSAGE_ID);
-        boolean editorEnvironment = context.isEditorEnvironment();
-
-        List<Map<String, ?>> messages;
 
         if (lastMessageId == null) {
-            messages = fetchMessages(context, channelId, null, editorEnvironment ? 1 : 100);
-
-            if (messages.isEmpty()) {
-                return new PollOutput(List.of(), Map.of(), false);
-            }
-
-            Map<String, ?> latestMessage = Collections.max(
-                messages, Comparator.comparing(message -> String.valueOf(message.get("id"))));
-
-            String latestMessageId = String.valueOf(latestMessage.get("id"));
-
-            if (editorEnvironment) {
-                return new PollOutput(List.of(latestMessage), Map.of(LAST_MESSAGE_ID, latestMessageId), false);
-            }
-
-            return new PollOutput(List.of(), Map.of(LAST_MESSAGE_ID, latestMessageId), false);
+            return createInitialPollOutput(context, channelId, context.isEditorEnvironment());
         }
 
-        messages = fetchMessages(context, channelId, lastMessageId, 100);
+        List<Map<String, ?>> newMessages = fetchMessages(context, channelId, lastMessageId, MESSAGE_LIMIT);
 
-        if (messages.isEmpty()) {
+        if (newMessages.isEmpty()) {
             return new PollOutput(List.of(), Map.of(LAST_MESSAGE_ID, lastMessageId), false);
         }
 
-        List<Map<String, ?>> sortedMessages = new ArrayList<>(messages);
+        List<Map<String, ?>> sortedNewMessages = new ArrayList<>(newMessages);
 
-        sortedMessages.sort(Comparator.comparing(message -> String.valueOf(message.get("id"))));
+        sortedNewMessages.sort(MESSAGE_ID_COMPARATOR);
 
-        Map<String, ?> newestMessage = sortedMessages.get(sortedMessages.size() - 1);
+        String newestMessageId = toMessageId(sortedNewMessages.getLast());
 
-        String newestMessageId = String.valueOf(newestMessage.get("id"));
+        return new PollOutput(sortedNewMessages, Map.of(LAST_MESSAGE_ID, newestMessageId), false);
+    }
 
-        return new PollOutput(sortedMessages, Map.of(LAST_MESSAGE_ID, newestMessageId), false);
+    private static PollOutput createInitialPollOutput(
+        TriggerContext context, String channelId, boolean editorEnvironment) {
+
+        List<Map<String, ?>> messages = fetchMessages(context, channelId, null, LATEST_MESSAGE_LIMIT);
+
+        if (messages.isEmpty()) {
+            return new PollOutput(List.of(), Map.of(), false);
+        }
+
+        Map<String, ?> newestMessage = Collections.max(messages, MESSAGE_ID_COMPARATOR);
+
+        String newestMessageId = toMessageId(newestMessage);
+
+        if (!editorEnvironment) {
+            return new PollOutput(List.of(), Map.of(LAST_MESSAGE_ID, newestMessageId), false);
+        }
+
+        return new PollOutput(List.of(newestMessage), Map.of(LAST_MESSAGE_ID, newestMessageId), false);
     }
 
     private static List<Map<String, ?>> fetchMessages(
         TriggerContext context, String channelId, String afterMessageId, int limit) {
 
-        return context.http(http -> http.get("/channels/" + channelId + "/messages"))
-            .queryParameters(
-                afterMessageId == null
-                    ? new Object[] {
-                        "limit", limit
-                    }
-                    : new Object[] {
-                        "limit", limit, "after", afterMessageId
-                    })
+        Http.Executor httpExecutor = context.http(http -> http.get("/channels/" + channelId + "/messages"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
+            .queryParameter("limit", String.valueOf(limit));
+
+        if (afterMessageId != null) {
+            httpExecutor.queryParameter("after", afterMessageId);
+        }
+
+        return httpExecutor.execute()
             .getBody(new TypeReference<>() {});
+    }
+
+    private static String toMessageId(Map<String, ?> message) {
+        return String.valueOf(message.get("id"));
     }
 }
