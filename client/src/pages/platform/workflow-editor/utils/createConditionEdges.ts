@@ -3,6 +3,8 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
+import {getWorkflowNodeComponentName, toWorkflowNodeNamePrefix} from './workflowNodeNameUtils';
+
 /**
  * Creates placeholder edges for an empty condition branch (top ghost -> placeholder -> bottom ghost).
  */
@@ -111,10 +113,10 @@ function connectSequentialTasks(branchSubtasks: WorkflowTask[]): Edge[] {
             const sourceTaskNodeId = task.name;
             const targetTaskNodeId = branchSubtasks[index + 1].name;
 
-            const sourceTaskComponentName = task.name.split('_')[0];
+            const sourceTaskComponentName = getWorkflowNodeComponentName(task.name);
 
             if (TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)) {
-                const nestedBottomGhostId = `${sourceTaskNodeId}-${sourceTaskComponentName}-bottom-ghost`;
+                const nestedBottomGhostId = `${sourceTaskNodeId}-${toWorkflowNodeNamePrefix(sourceTaskComponentName)}-bottom-ghost`;
 
                 const edgeFromNestedBottomGhostToNextSubtask = {
                     id: `${nestedBottomGhostId}=>${targetTaskNodeId}`,
@@ -161,10 +163,10 @@ function createBranchExitEdge(
         const bottomGhostNodeId = `${conditionId}-condition-bottom-ghost`;
         const lastTaskNode = allNodes.find((node) => node.id === lastTaskNodeId);
 
-        const lastTaskComponentName = lastTaskNodeId.split('_')[0];
+        const lastTaskComponentName = getWorkflowNodeComponentName(lastTaskNodeId);
 
         if (lastTaskNode?.data.taskDispatcher && !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)) {
-            const nestedBottomGhostId = `${lastTaskNodeId}-${lastTaskComponentName}-bottom-ghost`;
+            const nestedBottomGhostId = `${lastTaskNodeId}-${toWorkflowNodeNamePrefix(lastTaskComponentName)}-bottom-ghost`;
 
             if (nestedBottomGhostId) {
                 const nestedGhostToParentGhostEdge = {
