@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
 import {DialogClose} from '@/components/ui/dialog';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {usePropertyCodeEditorDialogToolbar} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/hooks';
@@ -58,43 +59,49 @@ const PropertyCodeEditorDialogToolbar = ({
         <div className="flex flex-row items-center justify-between space-y-0 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
             <span className="text-lg font-semibold">Edit Script</span>
 
-            <div className="flex items-center gap-1">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            disabled={!dirty || saving}
-                            icon={saving ? <LoadingIcon /> : <SaveIcon />}
-                            onClick={handleSaveClick}
-                            size="icon"
-                            type="submit"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>{saving ? 'Saving...' : 'Save current workflow'}</TooltipContent>
-                </Tooltip>
-
-                {!scriptIsRunning && (
+            <div className="flex items-center gap-2">
+                <ButtonGroup>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <span tabIndex={0}>
+                            <div>
                                 <Button
-                                    disabled={dirty}
-                                    icon={<PlayIcon className="text-success" />}
-                                    onClick={handleRunClick}
+                                    className="rounded-r-none"
+                                    disabled={!dirty || saving}
+                                    icon={saving ? <LoadingIcon /> : <SaveIcon />}
+                                    onClick={handleSaveClick}
                                     size="icon"
-                                    variant="ghost"
+                                    type="submit"
                                 />
-                            </span>
+                            </div>
                         </TooltipTrigger>
 
-                        <TooltipContent>Run the current workflow</TooltipContent>
+                        <TooltipContent>{saving ? 'Saving...' : 'Save current workflow'}</TooltipContent>
                     </Tooltip>
-                )}
 
-                {scriptIsRunning && (
-                    <Button icon={<SquareIcon />} onClick={handleStopClick} size="icon" variant="destructive" />
-                )}
+                    <ButtonGroupSeparator className="bg-stroke-brand-secondary" />
+
+                    {!scriptIsRunning && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span tabIndex={0}>
+                                    <Button
+                                        className="rounded-l-none"
+                                        disabled={dirty}
+                                        icon={<PlayIcon />}
+                                        label="Test"
+                                        onClick={handleRunClick}
+                                    />
+                                </span>
+                            </TooltipTrigger>
+
+                            <TooltipContent>Run the current workflow</TooltipContent>
+                        </Tooltip>
+                    )}
+
+                    {scriptIsRunning && (
+                        <Button icon={<SquareIcon />} label="Stop" onClick={handleStopClick} variant="destructive" />
+                    )}
+                </ButtonGroup>
 
                 <Tooltip>
                     <TooltipTrigger asChild>
