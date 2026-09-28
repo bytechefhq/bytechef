@@ -107,7 +107,7 @@ const WorkflowExecutionSheet = () => {
                                 )}
                             </ResizablePanel>
 
-                            <ResizableHandle className="mx-2.5" withHandle />
+                            <ResizableHandle className="w-1.5 bg-transparent" />
 
                             <ResizablePanel
                                 className="flex min-h-0 flex-col overflow-hidden rounded-lg"
