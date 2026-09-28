@@ -11,13 +11,32 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import ProjectDeploymentWorkflowExecutionsSheet from '../ProjectDeploymentWorkflowExecutionsSheet';
 
-const {detailQueryMock, queryMock, refetchMock, sheetContentPropsMock} = vi.hoisted(() => ({
+const {
+    detailQueryMock,
+    openInProjectOptionsMock,
+    openProjectMock,
+    openProjectWorkflowMock,
+    queryMock,
+    refetchMock,
+    sheetContentPropsMock,
+} = vi.hoisted(() => ({
     detailQueryMock: vi.fn((_request: {id: number}, enabled: boolean) => ({
         data: enabled ? {id: 5, job: {id: '5'}, projectVersion: 2} : undefined,
     })),
+    openInProjectOptionsMock: vi.fn(),
+    openProjectMock: vi.fn(),
+    openProjectWorkflowMock: vi.fn(),
     queryMock: vi.fn(),
     refetchMock: vi.fn(),
     sheetContentPropsMock: vi.fn(),
+}));
+
+vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
+    default: (options: {onBeforeNavigate?: () => void}) => {
+        openInProjectOptionsMock(options);
+
+        return {canOpenInProject: true, openProject: openProjectMock, openProjectWorkflow: openProjectWorkflowMock};
+    },
 }));
 
 vi.mock('@/components/ui/sheet', async (importOriginal) => {
@@ -91,12 +110,15 @@ const jobExecution = {
 describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
     beforeEach(() => {
         detailQueryMock.mockClear();
+        openProjectMock.mockReset();
+        openProjectWorkflowMock.mockReset();
         queryMock.mockReset();
         refetchMock.mockReset();
 
         useProjectDeploymentWorkflowSheetStore.setState({
             projectDeploymentId: undefined,
             projectDeploymentWorkflowSheetOpen: false,
+            projectId: undefined,
             projectName: undefined,
             workflow: undefined,
         });
@@ -135,6 +157,49 @@ describe('ProjectDeploymentWorkflowExecutionsSheet', () => {
             {id: 1, pageNumber: 0, projectDeploymentId: 3, workflowId: 'workflow1'},
             true
         );
+    });
+
+    it('links the project and workflow names in the header to the project editor', async () => {
+        const user = userEvent.setup();
+
+        mockQueryResult([]);
+
+        useProjectDeploymentWorkflowSheetStore.getState().openProjectDeploymentWorkflowSheet({
+            projectDeploymentId: 3,
+            projectId: 7,
+            projectName: 'Subflow',
+            projectVersion: 3,
+            workflow: {id: 'workflow1', label: 'workflow1', workflowUuid: 'workflow-uuid'} as Workflow,
+        });
+
+        renderSheet();
+
+        expect(document.querySelector('header')).toHaveTextContent('Subflow/workflow1/ V3');
+
+        await user.click(screen.getByRole('button', {name: 'Subflow'}));
+
+        expect(openProjectMock).toHaveBeenCalledWith(7);
+
+        await user.click(screen.getByRole('button', {name: 'workflow1'}));
+
+        expect(openProjectWorkflowMock).toHaveBeenCalledWith(7, 'workflow-uuid');
+    });
+
+    it('closes both sheets before leaving for the project editor', () => {
+        mockQueryResult([]);
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionSheetOpen: true});
+
+        openSheet();
+
+        renderSheet();
+
+        act(() => {
+            openInProjectOptionsMock.mock.lastCall![0].onBeforeNavigate();
+        });
+
+        expect(useProjectDeploymentWorkflowSheetStore.getState().projectDeploymentWorkflowSheetOpen).toBe(false);
+        expect(useWorkflowExecutionSheetStore.getState().workflowExecutionSheetOpen).toBe(false);
     });
 
     it('shows the deployment version in the list header and the executed version in the execution detail', async () => {

@@ -5,6 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import ProjectDeploymentWorkflowListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/ProjectDeploymentWorkflowListItemDropdownMenu';
 import {getPageUrl} from '@/pages/automation/project-deployments/components/project-deployment-workflow-list/util/pageUrl-utils';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import useWorkflowExecutionSheetStore from '@/pages/automation/workflow-executions/stores/useWorkflowExecutionSheetStore';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
@@ -14,7 +15,7 @@ import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/aut
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
+import {ClipboardIcon, FormIcon, MessageCircleMoreIcon, PlayIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
 import {MouseEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -28,6 +29,7 @@ interface ProjectDeploymentWorkflowListItemProps {
     projectDeploymentEnabled: boolean;
     projectDeploymentId: number;
     projectDeploymentWorkflow: ProjectDeploymentWorkflow;
+    projectId?: number;
     projectName?: string;
     projectVersion?: number;
     workflow: Workflow;
@@ -45,6 +47,7 @@ const ProjectDeploymentWorkflowListItem = ({
     projectDeploymentEnabled,
     projectDeploymentId,
     projectDeploymentWorkflow,
+    projectId,
     projectName,
     projectVersion,
     workflow,
@@ -59,6 +62,8 @@ const ProjectDeploymentWorkflowListItem = ({
     const setWorkflowExecutionSheetOpen = useWorkflowExecutionSheetStore(
         (state) => state.setWorkflowExecutionSheetOpen
     );
+
+    const {canOpenInProject, openProjectWorkflow} = useOpenInProject();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -91,7 +96,15 @@ const ProjectDeploymentWorkflowListItem = ({
         if (workflow) {
             setWorkflowExecutionSheetOpen(false);
 
-            openProjectDeploymentWorkflowSheet({projectDeploymentId, projectName, projectVersion, workflow});
+            openProjectDeploymentWorkflowSheet({projectDeploymentId, projectId, projectName, projectVersion, workflow});
+        }
+    };
+
+    const showOpenInProject = canOpenInProject && projectId != null;
+
+    const handleOpenInProjectClick = () => {
+        if (projectId != null) {
+            openProjectWorkflow(projectId, workflow.workflowUuid);
         }
     };
 
@@ -135,22 +148,45 @@ const ProjectDeploymentWorkflowListItem = ({
         <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
             <div className="flex min-w-0 flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
                 <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1">
-                    <Tooltip>
-                        <TooltipTrigger className="line-clamp-1 w-full truncate text-start">
-                            <span
-                                className={twMerge(
-                                    'block truncate text-sm font-semibold',
-                                    !enabled && 'text-content-neutral-secondary'
-                                )}
-                            >
-                                {workflow.label}
-                            </span>
-                        </TooltipTrigger>
+                    <div className="flex min-w-0 items-center gap-2">
+                        <Tooltip>
+                            <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
+                                <span
+                                    className={twMerge(
+                                        'block truncate text-sm font-semibold',
+                                        !enabled && 'text-content-neutral-secondary'
+                                    )}
+                                >
+                                    {workflow.label}
+                                </span>
+                            </TooltipTrigger>
 
-                        <TooltipContent align="start" className="max-w-md break-all">
-                            {workflow.label}
-                        </TooltipContent>
-                    </Tooltip>
+                            <TooltipContent align="start" className="max-w-md break-all">
+                                {workflow.label}
+                            </TooltipContent>
+                        </Tooltip>
+
+                        {showOpenInProject && (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        aria-label="Open in project"
+                                        className="size-6 shrink-0"
+                                        icon={<SquareArrowOutUpRightIcon className="size-3.5" />}
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+
+                                            handleOpenInProjectClick();
+                                        }}
+                                        size="icon"
+                                        variant="ghost"
+                                    />
+                                </TooltipTrigger>
+
+                                <TooltipContent>Open in project</TooltipContent>
+                            </Tooltip>
+                        )}
+                    </div>
 
                     <div className="flex gap-x-6 xl:hidden">
                         {projectDeploymentWorkflow?.lastExecutionDate ? (
@@ -312,6 +348,7 @@ const ProjectDeploymentWorkflowListItem = ({
 
                 <ProjectDeploymentWorkflowListItemDropdownMenu
                     onEditClick={() => setShowEditWorkflowDialog(true)}
+                    onOpenInProjectClick={showOpenInProject ? handleOpenInProjectClick : undefined}
                     workflow={workflow}
                 />
             </div>

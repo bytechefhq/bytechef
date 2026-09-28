@@ -4,6 +4,7 @@ import {create} from 'zustand';
 
 interface OpenProjectDeploymentWorkflowSheetPropsI {
     projectDeploymentId: number;
+    projectId?: number;
     projectName?: string;
     projectVersion?: number;
     workflow: Workflow;
@@ -11,6 +12,7 @@ interface OpenProjectDeploymentWorkflowSheetPropsI {
 
 interface ProjectDeploymentWorkflowSheetStateI {
     projectDeploymentId: number | undefined;
+    projectId: number | undefined;
     projectName: string | undefined;
     projectVersion: number | undefined;
     workflow: Workflow | undefined;
@@ -22,14 +24,16 @@ interface ProjectDeploymentWorkflowSheetStateI {
 
 export const useProjectDeploymentWorkflowSheetStore = create<ProjectDeploymentWorkflowSheetStateI>()((set) => ({
     projectDeploymentId: undefined,
+    projectId: undefined,
     projectName: undefined,
     projectVersion: undefined,
     workflow: undefined,
-    openProjectDeploymentWorkflowSheet: ({projectDeploymentId, projectName, projectVersion, workflow}) =>
+    openProjectDeploymentWorkflowSheet: ({projectDeploymentId, projectId, projectName, projectVersion, workflow}) =>
         set((state) => ({
             ...state,
             projectDeploymentId,
             projectDeploymentWorkflowSheetOpen: true,
+            projectId,
             projectName,
             projectVersion,
             workflow,

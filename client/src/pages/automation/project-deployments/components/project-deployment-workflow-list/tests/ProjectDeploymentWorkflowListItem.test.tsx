@@ -14,7 +14,14 @@ vi.mock('@/shared/mutations/automation/projectDeploymentWorkflows.mutations', ()
     useEnableProjectDeploymentWorkflowMutation: () => ({isPending: false, mutate: vi.fn()}),
 }));
 
-const {rowPropsMock} = vi.hoisted(() => ({rowPropsMock: vi.fn()}));
+const {openProjectWorkflowMock, rowPropsMock} = vi.hoisted(() => ({
+    openProjectWorkflowMock: vi.fn(),
+    rowPropsMock: vi.fn(),
+}));
+
+vi.mock('@/pages/automation/project-deployments/hooks/useOpenInProject', () => ({
+    default: () => ({canOpenInProject: true, openProject: vi.fn(), openProjectWorkflow: openProjectWorkflowMock}),
+}));
 
 vi.mock('@/shared/components/workflow/WorkflowTriggerAndComponentsRow', () => ({
     default: (props: object) => {
@@ -33,9 +40,14 @@ vi.mock('@/pages/automation/project-deployments/components/ProjectDeploymentEdit
     default: () => null,
 }));
 
-const workflow = {id: 'workflow1', label: 'workflow1', triggers: []} as unknown as Workflow;
+const workflow = {
+    id: 'workflow1',
+    label: 'workflow1',
+    triggers: [],
+    workflowUuid: 'workflow-uuid',
+} as unknown as Workflow;
 
-const renderListItem = (projectName?: string) =>
+const renderListItem = (projectName?: string, projectId?: number) =>
     render(
         <QueryClientProvider client={new QueryClient()}>
             <MemoryRouter>
@@ -47,6 +59,7 @@ const renderListItem = (projectName?: string) =>
                         projectDeploymentWorkflow={
                             {enabled: true, workflowId: 'workflow1'} as ProjectDeploymentWorkflow
                         }
+                        projectId={projectId}
                         projectName={projectName}
                         projectVersion={2}
                         workflow={workflow}
@@ -60,9 +73,12 @@ const renderListItem = (projectName?: string) =>
 
 describe('ProjectDeploymentWorkflowListItem', () => {
     beforeEach(() => {
+        openProjectWorkflowMock.mockReset();
+
         useProjectDeploymentWorkflowSheetStore.setState({
             projectDeploymentId: undefined,
             projectDeploymentWorkflowSheetOpen: false,
+            projectId: undefined,
             projectName: undefined,
             projectVersion: undefined,
             workflow: undefined,
@@ -72,7 +88,7 @@ describe('ProjectDeploymentWorkflowListItem', () => {
     it('opens the executions sheet for its deployment, project, version and workflow when clicked', async () => {
         const user = userEvent.setup();
 
-        renderListItem('Subflow');
+        renderListItem('Subflow', 7);
 
         await user.click(screen.getByText('workflow1'));
 
@@ -80,6 +96,7 @@ describe('ProjectDeploymentWorkflowListItem', () => {
 
         expect(state.projectDeploymentWorkflowSheetOpen).toBe(true);
         expect(state.projectDeploymentId).toBe(3);
+        expect(state.projectId).toBe(7);
         expect(state.projectName).toBe('Subflow');
         expect(state.projectVersion).toBe(2);
         expect(state.workflow).toBe(workflow);
@@ -127,6 +144,23 @@ describe('ProjectDeploymentWorkflowListItem', () => {
         await waitFor(() =>
             expect(document.querySelector('[data-slot="tooltip-content"]')).toHaveAttribute('data-align', 'start')
         );
+    });
+
+    it('opens the workflow in its project from the icon beside the name without opening the sheet', async () => {
+        const user = userEvent.setup();
+
+        renderListItem('Subflow', 7);
+
+        await user.click(screen.getByRole('button', {name: 'Open in project'}));
+
+        expect(openProjectWorkflowMock).toHaveBeenCalledWith(7, 'workflow-uuid');
+        expect(useProjectDeploymentWorkflowSheetStore.getState().projectDeploymentWorkflowSheetOpen).toBe(false);
+    });
+
+    it('hides the open in project icon without a project', () => {
+        renderListItem('Subflow');
+
+        expect(screen.queryByRole('button', {name: 'Open in project'})).not.toBeInTheDocument();
     });
 
     it('does not open the executions sheet when the enable switch is toggled', async () => {

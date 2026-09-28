@@ -5,6 +5,7 @@ import TablePagination from '@/components/TablePagination';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowExecutionsTable from '@/pages/automation/workflow-executions/components/WorkflowExecutionsTable';
@@ -19,7 +20,7 @@ import {
 } from '@/shared/queries/automation/workflowExecutions.queries';
 import {ActivityIcon, ArrowLeftIcon, RefreshCwIcon, WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -30,6 +31,7 @@ type ProjectDeploymentWorkflowSheetTabType = 'executions' | 'workflow';
 interface ProjectDeploymentWorkflowExecutionsContentProps {
     enabled: boolean;
     projectDeploymentId: number;
+    projectId?: number;
     projectName?: string;
     projectVersion?: number;
     workflow: Workflow;
@@ -38,6 +40,7 @@ interface ProjectDeploymentWorkflowExecutionsContentProps {
 const ProjectDeploymentWorkflowExecutionsContent = ({
     enabled,
     projectDeploymentId,
+    projectId,
     projectName,
     projectVersion,
     workflow,
@@ -56,6 +59,17 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
                 workflowExecutionSheetOpen: state.workflowExecutionSheetOpen,
             }))
         );
+
+    const setProjectDeploymentWorkflowSheetOpen = useProjectDeploymentWorkflowSheetStore(
+        (state) => state.setProjectDeploymentWorkflowSheetOpen
+    );
+
+    const closeSheets = useCallback(() => {
+        setWorkflowExecutionSheetOpen(false);
+        setProjectDeploymentWorkflowSheetOpen(false);
+    }, [setProjectDeploymentWorkflowSheetOpen, setWorkflowExecutionSheetOpen]);
+
+    const {canOpenInProject, openProject, openProjectWorkflow} = useOpenInProject({onBeforeNavigate: closeSheets});
 
     const {data: workflowExecution} = useGetProjectWorkflowExecutionQuery(
         {id: workflowExecutionId},
@@ -91,6 +105,8 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
     const executionsTabActive = activeTab === 'executions';
     const workflowExecutionDetailOpen = enabled && executionsTabActive && workflowExecutionSheetOpen;
 
+    const showOpenInProject = canOpenInProject && projectId != null;
+
     let headerProjectVersion = projectVersion;
 
     if (workflowExecutionDetailOpen) {
@@ -120,9 +136,45 @@ const ProjectDeploymentWorkflowExecutionsContent = ({
                     <WorkflowIcon />
 
                     <span className="flex gap-x-1 text-base text-content-neutral-secondary">
-                        {projectName && `${projectName} /`}
+                        {projectName &&
+                            (showOpenInProject ? (
+                                <>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                className="hover:text-content-neutral-primary hover:underline"
+                                                onClick={() => openProject(projectId)}
+                                                type="button"
+                                            >
+                                                {projectName}
+                                            </button>
+                                        </TooltipTrigger>
 
-                        <strong className="text-content-neutral-primary">{workflow.label}</strong>
+                                        <TooltipContent>Open project</TooltipContent>
+                                    </Tooltip>
+                                    /
+                                </>
+                            ) : (
+                                `${projectName} /`
+                            ))}
+
+                        {showOpenInProject ? (
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        className="font-bold text-content-neutral-primary hover:underline"
+                                        onClick={() => openProjectWorkflow(projectId, workflow.workflowUuid)}
+                                        type="button"
+                                    >
+                                        {workflow.label}
+                                    </button>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Open in project</TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <strong className="text-content-neutral-primary">{workflow.label}</strong>
+                        )}
 
                         {headerProjectVersion != null && <span>{`/ V${headerProjectVersion}`}</span>}
                     </span>
@@ -217,6 +269,7 @@ const ProjectDeploymentWorkflowExecutionsSheet = () => {
     const {
         projectDeploymentId,
         projectDeploymentWorkflowSheetOpen,
+        projectId,
         projectName,
         projectVersion,
         setProjectDeploymentWorkflowSheetOpen,
@@ -225,6 +278,7 @@ const ProjectDeploymentWorkflowExecutionsSheet = () => {
         useShallow((state) => ({
             projectDeploymentId: state.projectDeploymentId,
             projectDeploymentWorkflowSheetOpen: state.projectDeploymentWorkflowSheetOpen,
+            projectId: state.projectId,
             projectName: state.projectName,
             projectVersion: state.projectVersion,
             setProjectDeploymentWorkflowSheetOpen: state.setProjectDeploymentWorkflowSheetOpen,
@@ -260,6 +314,7 @@ const ProjectDeploymentWorkflowExecutionsSheet = () => {
                         enabled={projectDeploymentWorkflowSheetOpen}
                         key={`${projectDeploymentId}_${workflow.id}`}
                         projectDeploymentId={projectDeploymentId}
+                        projectId={projectId}
                         projectName={projectName}
                         projectVersion={projectVersion}
                         workflow={workflow}
