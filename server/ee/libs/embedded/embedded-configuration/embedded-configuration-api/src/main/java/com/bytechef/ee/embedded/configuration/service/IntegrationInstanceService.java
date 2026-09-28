@@ -44,6 +44,9 @@ public interface IntegrationInstanceService {
 
     IntegrationInstance getIntegrationInstance(long id);
 
+    List<IntegrationInstance> getIntegrationInstanceConfigurationIntegrationInstances(
+        List<Long> integrationInstanceConfigurationIds);
+
     IntegrationInstance getIntegrationInstance(long connectedUserId, String workflowId, Environment environment);
 
     List<IntegrationInstance> getIntegrationInstances(List<Long> ids);

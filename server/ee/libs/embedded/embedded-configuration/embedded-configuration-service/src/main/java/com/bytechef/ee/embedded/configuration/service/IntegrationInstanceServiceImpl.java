@@ -123,6 +123,19 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
 
     @Override
     @Transactional(readOnly = true)
+    public List<IntegrationInstance> getIntegrationInstanceConfigurationIntegrationInstances(
+        List<Long> integrationInstanceConfigurationIds) {
+
+        if (integrationInstanceConfigurationIds.isEmpty()) {
+            return List.of();
+        }
+
+        return integrationInstanceRepository.findAllByIntegrationInstanceConfigurationIdIn(
+            integrationInstanceConfigurationIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<IntegrationInstance> getIntegrationInstances(List<Long> ids) {
         return integrationInstanceRepository.findAllById(ids);
     }
