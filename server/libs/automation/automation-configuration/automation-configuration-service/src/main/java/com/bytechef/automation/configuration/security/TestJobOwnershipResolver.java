@@ -21,6 +21,9 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.platform.workflow.test.service.TestJobRegistry;
 import com.bytechef.platform.workflow.test.service.TestJobRegistry.TestJob;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
+import java.util.Optional;
+import java.util.OptionalLong;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
@@ -52,17 +55,32 @@ public class TestJobOwnershipResolver implements ResourceOwnershipResolver {
 
     @Override
     public ResourceOwner resolveOwner(long id) {
+        return fetchProject(id)
+            .map(Project::getWorkspaceId)
+            .map(ResourceOwner::ofWorkspace)
+            .orElseGet(ResourceOwner::unknown);
+    }
+
+    @Override
+    public OptionalLong resolveProjectId(Serializable id) {
+        if (!(id instanceof Number number)) {
+            return OptionalLong.empty();
+        }
+
+        return fetchProject(number.longValue())
+            .map(project -> OptionalLong.of(project.getId()))
+            .orElseGet(OptionalLong::empty);
+    }
+
+    private Optional<Project> fetchProject(long id) {
         TestJobRegistry testJobRegistry = testJobRegistryProvider.getIfAvailable();
 
         if (testJobRegistry == null) {
-            return ResourceOwner.unknown();
+            return Optional.empty();
         }
 
         return testJobRegistry.fetchTestJob(id)
             .map(TestJob::workflowId)
-            .flatMap(projectService::fetchWorkflowProject)
-            .map(Project::getWorkspaceId)
-            .map(ResourceOwner::ofWorkspace)
-            .orElseGet(ResourceOwner::unknown);
+            .flatMap(projectService::fetchWorkflowProject);
     }
 }
