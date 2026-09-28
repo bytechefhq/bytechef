@@ -67,6 +67,18 @@ describe('edges of a camelCased fork-join nested in another dispatcher', () => {
         expect(edgeSources(edges)).toContain('forkJoin_2-forkJoin-bottom-ghost');
     });
 
+    it('condition wires a childless dispatcher straight to the next subtask', () => {
+        const edges = createConditionEdges(
+            dispatcherNode('condition_1', 'condition', {
+                caseFalse: [],
+                caseTrue: [subtask('subflow_1', 'subflow/v1'), action],
+            }),
+            allNodes
+        );
+
+        expect(edgeIds(edges)).toContain('subflow_1=>action_1');
+    });
+
     it('on-error leaves a nested fork-join from its bottom ghost', () => {
         const edges = createOnErrorEdges(
             dispatcherNode('onError_1', 'on-error', {
