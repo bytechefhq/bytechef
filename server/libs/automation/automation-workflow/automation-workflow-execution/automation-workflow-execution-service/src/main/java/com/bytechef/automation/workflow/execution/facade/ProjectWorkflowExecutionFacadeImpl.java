@@ -202,6 +202,39 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return toTaskExecutionDTO(taskExecution, null, true);
     }
 
+    private List<String> getNarrowedWorkflowIds(
+        Long projectId, String workflowId, Integer projectVersion, long workspaceId) {
+
+        List<String> workflowIds = new ArrayList<>();
+
+        // The getWorkflowExecutions gate answers "may this caller list executions in this workspace and environment",
+        // which is the whole question only for the unnarrowed listing. Each narrowing argument names a resource that
+        // the caller might not reach, and the gate cannot see it, so each is checked here against the same scope.
+        // Without this a member holding EXECUTION_VIEW anywhere in the workspace could name any project, deployment or
+        // workflow in it and read back that one's runs.
+        if (workflowId != null) {
+            // hasWorkflowScope rather than a 'Workflow' resource check: no ownership resolver registers that token on
+            // this branch, and hasResourceScope denies outright for an unregistered type -- which would turn every
+            // by-workflow listing into a 403 rather than a narrowing. This method resolves workflow -> project ->
+            // workspace itself and asks the same question.
+            if (!permissionService.hasWorkflowScope(workflowId, "EXECUTION_VIEW")) {
+                throw new AccessDeniedException("Workflow id=%s".formatted(workflowId));
+            }
+
+            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
+        } else if (projectId != null) {
+            requireResourceScope(projectId, "Project", "EXECUTION_VIEW");
+
+            workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
+        } else {
+            workflowIds.addAll(
+                CollectionUtils.map(
+                    projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId));
+        }
+
+        return workflowIds;
+    }
+
     /**
      * Denies unless the caller holds {@code scope} for the resource. Throwing rather than returning a narrowed result
      * on purpose: the caller named this resource, so an empty page would read as "no runs" and hide the refusal.
@@ -239,32 +272,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         Long projectId, Long projectDeploymentId, String workflowId, Integer projectVersion, long workspaceId,
         int pageNumber) {
 
-        List<String> workflowIds = new ArrayList<>();
-
-        // The gate above answers "may this caller list executions in this workspace and environment", which is the
-        // whole question only for the unnarrowed listing. Each narrowing argument names a resource that the caller
-        // might not reach, and the gate cannot see it, so each is checked here against the same scope. Without this a
-        // member holding EXECUTION_VIEW anywhere in the workspace could name any project, deployment or workflow in
-        // it and read back that one's runs.
-        if (workflowId != null) {
-            // hasWorkflowScope rather than a 'Workflow' resource check: no ownership resolver registers that token on
-            // this branch, and hasResourceScope denies outright for an unregistered type -- which would turn every
-            // by-workflow listing into a 403 rather than a narrowing. This method resolves workflow -> project ->
-            // workspace itself and asks the same question.
-            if (!permissionService.hasWorkflowScope(workflowId, "EXECUTION_VIEW")) {
-                throw new AccessDeniedException("Workflow id=%s".formatted(workflowId));
-            }
-
-            workflowIds.addAll(getWorkflowVersionWorkflowIds(workflowId, projectVersion));
-        } else if (projectId != null) {
-            requireResourceScope(projectId, "Project", "EXECUTION_VIEW");
-
-            workflowIds.addAll(projectWorkflowService.getProjectWorkflowIds(projectId));
-        } else {
-            workflowIds.addAll(
-                CollectionUtils.map(
-                    projectFacade.getWorkspaceProjectWorkflows(workspaceId), ProjectWorkflowDTO::getId));
-        }
+        List<String> workflowIds = getNarrowedWorkflowIds(projectId, workflowId, projectVersion, workspaceId);
 
         Page<WorkflowExecutionDTO> workflowExecutionPage;
 
