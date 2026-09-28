@@ -124,6 +124,7 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
         // These tests exercise the reference and catalog flows, not connection authorization: let every deployment
         // workflow use its connection so the rollouts reach the code under test.
         when(permissionService.canUseConnectionInWorkflow(anyLong(), anyString(), any())).thenReturn(true);
+        when(permissionService.hasWorkflowScope(anyString(), anyString())).thenReturn(true);
 
         return permissionService;
     }
