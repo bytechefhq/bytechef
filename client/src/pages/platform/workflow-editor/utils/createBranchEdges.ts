@@ -1,9 +1,9 @@
-import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {EDGE_STYLES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
-import {getNestedBottomGhostId, getWorkflowNodeComponentName} from './workflowNodeNameUtils';
+import {createSubtaskChainEdges, getSubtaskExitNodeId} from './taskDispatcherSubtaskEdges';
 
 /**
  * Creates the base Branch structure edges (branch -> top ghost -> placeholder -> bottom ghost)
@@ -82,77 +82,19 @@ function createEdgesForSingleCase(
 
     edges.push(edgeFromTopGhostToFirstTask);
 
-    caseTasks.forEach((caseTask, index) => {
-        const sourceTaskId = caseTask.name;
-        const targetTaskId = caseTasks[index + 1]?.name;
+    edges.push(...createSubtaskChainEdges(caseTasks));
 
-        if (!targetTaskId) {
-            return;
-        }
+    const lastNodeId = getSubtaskExitNodeId(caseTasks[caseTasks.length - 1].name);
 
-        const sourceTaskComponentName = getWorkflowNodeComponentName(sourceTaskId);
-
-        if (
-            TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
-            !CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)
-        ) {
-            const nestedBottomGhostId = getNestedBottomGhostId(sourceTaskId);
-
-            const edgeFromNestedGhostToNextTask = {
-                id: `${nestedBottomGhostId}=>${targetTaskId}`,
-                source: nestedBottomGhostId,
-                style: EDGE_STYLES,
-                target: targetTaskId,
-                type: 'workflow',
-            };
-
-            edges.push(edgeFromNestedGhostToNextTask);
-        } else {
-            const edgeBetweenTasks = {
-                id: `${sourceTaskId}=>${targetTaskId}`,
-                source: sourceTaskId,
-                style: EDGE_STYLES,
-                target: targetTaskId,
-                type: 'workflow',
-            };
-
-            edges.push(edgeBetweenTasks);
-        }
+    edges.push({
+        ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
+        id: `${lastNodeId}=>${bottomGhostId}`,
+        source: lastNodeId,
+        style: EDGE_STYLES,
+        target: bottomGhostId,
+        targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
+        type: 'workflow',
     });
-
-    const lastTaskId = caseTasks[caseTasks.length - 1].name;
-    const lastTaskComponentName = getWorkflowNodeComponentName(lastTaskId);
-
-    if (
-        TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) &&
-        !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
-    ) {
-        const nestedBottomGhostId = getNestedBottomGhostId(lastTaskId);
-
-        const edgeFromNestedGhostToBottomGhost = {
-            ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
-            id: `${nestedBottomGhostId}=>${bottomGhostId}`,
-            source: nestedBottomGhostId,
-            style: EDGE_STYLES,
-            target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
-            type: 'workflow',
-        };
-
-        edges.push(edgeFromNestedGhostToBottomGhost);
-    } else {
-        const edgeFromLastTaskToBottomGhost = {
-            ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
-            id: `${lastTaskId}=>${bottomGhostId}`,
-            source: lastTaskId,
-            style: EDGE_STYLES,
-            target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
-            type: 'workflow',
-        };
-
-        edges.push(edgeFromLastTaskToBottomGhost);
-    }
 
     return edges;
 }
