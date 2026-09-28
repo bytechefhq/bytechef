@@ -22,9 +22,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 
 /**
@@ -83,7 +86,9 @@ class PermissionServiceTest {
 
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(), List.of());
+            workspaceUserRepository, List.of(), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -835,7 +840,9 @@ class PermissionServiceTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
-            List.of(connectionEnvironmentResolver));
+            List.of(connectionEnvironmentResolver),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
     }
 
     private void givenWorkflowInWorkspace(long workspaceId) {
@@ -849,7 +856,9 @@ class PermissionServiceTest {
     private PermissionServiceImpl createService(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of());
+            workspaceUserRepository, List.of(resolvers), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {

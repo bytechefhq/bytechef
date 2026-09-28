@@ -17,9 +17,9 @@
 package com.bytechef.automation.configuration.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +45,8 @@ class AutomationMethodSecurityExpressionRootTest {
     @BeforeEach
     void setUp() {
         permissionService = mock(PermissionService.class);
+
+        when(permissionService.isAuthorizationSkipped()).thenReturn(false);
 
         Supplier<Authentication> authentication = () -> mock(Authentication.class);
         MethodInvocation methodInvocation = mock(MethodInvocation.class);
@@ -139,7 +141,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null)).isFalse();
         assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, 99L)).isFalse();
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -152,13 +154,15 @@ class AutomationMethodSecurityExpressionRootTest {
 
     @Test
     void testHasWorkflowScopeShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).isTrue();
 
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -174,6 +178,8 @@ class AutomationMethodSecurityExpressionRootTest {
 
     @Test
     void testHasWorkflowScopeInEnvironmentShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.hasWorkflowScopeInEnvironment("workflow-1", "WORKFLOW_EDIT", Environment.DEVELOPMENT))
                 .isTrue();
@@ -181,7 +187,7 @@ class AutomationMethodSecurityExpressionRootTest {
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -223,11 +229,13 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId("workflow-1", "WORKFLOW_EDIT", -1L))
             .isFalse();
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasWorkflowScopeIfProjectWorkflowInEnvironmentIdShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId("workflow-1", "WORKFLOW_EDIT", 3L))
                 .isTrue();
@@ -235,7 +243,7 @@ class AutomationMethodSecurityExpressionRootTest {
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -245,7 +253,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE)).isTrue();
 
         verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -277,7 +285,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkspaceScopeInEnvironment(WORKSPACE_ID, SCOPE, Environment.STAGING)).isTrue();
 
         verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE, Environment.STAGING);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -287,35 +295,41 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkspaceScopeInEnvironment(WORKSPACE_ID, SCOPE, Environment.PRODUCTION)).isFalse();
 
         verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE, Environment.PRODUCTION);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasWorkspaceScopeInEnvironmentShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.hasWorkspaceScopeInEnvironment(WORKSPACE_ID, SCOPE, Environment.PRODUCTION)).isTrue();
 
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasWorkspaceScopeInEnvironmentIdRequiresEveryEnvironmentForNull() {
-        when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE)).thenReturn(true);
+        for (Environment environment : Environment.values()) {
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE, environment)).thenReturn(true);
+        }
 
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null)).isTrue();
 
-        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE);
-        verifyNoMoreInteractions(permissionService);
+        for (Environment environment : Environment.values()) {
+            verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE, environment);
+        }
+
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasWorkspaceScopeInEnvironmentIdDeniesNullToAMemberWhoHoldsTheScopeOnlyInDevelopment() {
         when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE)).thenReturn(true);
         when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE, Environment.DEVELOPMENT)).thenReturn(true);
-        when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, SCOPE)).thenReturn(false);
 
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null)).isFalse();
     }
@@ -327,7 +341,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 1L)).isTrue();
 
         verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE, Environment.STAGING);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -337,7 +351,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 2L)).isFalse();
 
         verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, SCOPE, Environment.PRODUCTION);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -347,11 +361,13 @@ class AutomationMethodSecurityExpressionRootTest {
             .isFalse();
         assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, Long.MAX_VALUE)).isFalse();
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasWorkspaceScopeInEnvironmentIdShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 1L)).isTrue();
             assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null)).isTrue();
@@ -359,7 +375,7 @@ class AutomationMethodSecurityExpressionRootTest {
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -369,7 +385,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasResourceScopeInEnvironment(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null)).isTrue();
 
         verify(permissionService).hasResourceScope(RESOURCE_ID, RESOURCE_TYPE, SCOPE);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -379,7 +395,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasResourceScopeInEnvironment(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null)).isFalse();
 
         verify(permissionService).hasResourceScope(RESOURCE_ID, RESOURCE_TYPE, SCOPE);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -391,7 +407,7 @@ class AutomationMethodSecurityExpressionRootTest {
             .isTrue();
 
         verify(permissionService).hasResourceScopeInEnvironment(RESOURCE_ID, RESOURCE_TYPE, SCOPE, Environment.STAGING);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -405,11 +421,13 @@ class AutomationMethodSecurityExpressionRootTest {
 
         verify(permissionService).hasResourceScopeInEnvironment(
             RESOURCE_ID, RESOURCE_TYPE, SCOPE, Environment.PRODUCTION);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasResourceScopeInEnvironmentShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(root.hasResourceScopeInEnvironment(RESOURCE_ID, RESOURCE_TYPE, SCOPE, Environment.PRODUCTION))
                 .isTrue();
@@ -418,7 +436,7 @@ class AutomationMethodSecurityExpressionRootTest {
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -428,7 +446,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkflowScopeInEnvironment(WORKFLOW_ID, SCOPE, Environment.STAGING)).isFalse();
 
         verify(permissionService).hasWorkflowScope(WORKFLOW_ID, SCOPE, Environment.STAGING);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -440,11 +458,13 @@ class AutomationMethodSecurityExpressionRootTest {
             .isTrue();
 
         verify(permissionService).hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, SCOPE, Environment.PRODUCTION);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
     void testHasWorkflowScopeIfProjectWorkflowInEnvironmentShortCircuitsUnderSkipChecks() throws Throwable {
+        when(permissionService.isAuthorizationSkipped()).thenReturn(true);
+
         AutomationAuthorizationContext.callSkippingChecks(() -> {
             assertThat(
                 root.hasWorkflowScopeIfProjectWorkflowInEnvironment(WORKFLOW_ID, SCOPE, Environment.PRODUCTION))
@@ -453,7 +473,7 @@ class AutomationMethodSecurityExpressionRootTest {
             return null;
         });
 
-        verifyNoInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -464,7 +484,7 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, SCOPE, 1L)).isTrue();
 
         verify(permissionService).hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, SCOPE, Environment.STAGING);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
     }
 
     @Test
@@ -475,6 +495,40 @@ class AutomationMethodSecurityExpressionRootTest {
         assertThat(root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, SCOPE, null)).isFalse();
 
         verify(permissionService).hasWorkflowScopeIfProjectWorkflow(WORKFLOW_ID, SCOPE, Environment.DEVELOPMENT);
-        verifyNoMoreInteractions(permissionService);
+        verifyNoMoreInteractions(ignoreStubs(permissionService));
+    }
+
+    @Test
+    void testRootDelegatesUnderSkipChecksWhenThePermissionServiceDoesNotSkip() throws Throwable {
+        when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).thenReturn(false);
+
+        AutomationAuthorizationContext.callSkippingChecks(() -> {
+            assertThat(root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).isFalse();
+
+            return null;
+        });
+
+        verify(permissionService).isAuthorizationSkipped();
+        verify(permissionService).hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW");
+    }
+
+    @Test
+    void testUnusableEnvironmentFallsBackToTheEnvironmentUnawareCheckOnlyUnderSkipChecks() throws Throwable {
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, SCOPE)).thenReturn(true);
+        when(permissionService.hasResourceScope(RESOURCE_ID, RESOURCE_TYPE, SCOPE)).thenReturn(true);
+        when(permissionService.hasWorkflowScope(WORKFLOW_ID, SCOPE)).thenReturn(true);
+
+        assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 99L)).isFalse();
+        assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null)).isFalse();
+        assertThat(root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, SCOPE, 99L)).isFalse();
+
+        AutomationAuthorizationContext.callSkippingChecks(() -> {
+            assertThat(root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 99L)).isTrue();
+            assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null)).isTrue();
+            assertThat(root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, 99L)).isTrue();
+            assertThat(root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, SCOPE, 99L)).isTrue();
+
+            return null;
+        });
     }
 }

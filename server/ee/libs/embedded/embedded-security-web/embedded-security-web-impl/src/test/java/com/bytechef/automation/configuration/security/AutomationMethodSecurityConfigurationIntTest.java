@@ -10,6 +10,7 @@ package com.bytechef.automation.configuration.security;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationToken;
@@ -133,7 +134,12 @@ class AutomationMethodSecurityConfigurationIntTest {
 
         @Bean("permissionService")
         PermissionService permissionService() {
-            return mock(PermissionService.class);
+            PermissionService permissionService = mock(PermissionService.class);
+
+            when(permissionService.isAuthorizationSkipped())
+                .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
+
+            return permissionService;
         }
     }
 

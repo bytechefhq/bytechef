@@ -12,14 +12,17 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import java.util.List;
 import java.util.OptionalLong;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 
 /**
  * Pins the EE behavior of {@code hasResourceScope} (workspace-scope path, fail-closed when no workspace) and
@@ -40,7 +43,9 @@ class PermissionServiceResourceTest {
     private PermissionServiceImpl service(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
-            workspaceUserRepository, List.of(resolvers), List.of());
+            workspaceUserRepository, List.of(resolvers), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {
