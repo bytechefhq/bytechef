@@ -1,9 +1,9 @@
-import {CHILDLESS_TASK_DISPATCHER_NAMES, EDGE_STYLES, TASK_DISPATCHER_NAMES} from '@/shared/constants';
+import {EDGE_STYLES} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
-import {getNestedBottomGhostId, getWorkflowNodeComponentName} from './workflowNodeNameUtils';
+import {createSubtaskChainEdges, getSubtaskExitNodeId} from './taskDispatcherSubtaskEdges';
 
 /**
  * Creates edges for the left ghost node in a fork-join task
@@ -99,75 +99,18 @@ function createForkJoinTaskEdges(
 
     edges.push(edgeFromTopGhostToFirstTask);
 
-    branch.forEach((branchTask, index) => {
-        const sourceTaskId = branchTask.name;
-        const targetTaskId = branch[index + 1]?.name;
+    edges.push(...createSubtaskChainEdges(branch));
 
-        if (!targetTaskId) {
-            return;
-        }
+    const lastNodeId = getSubtaskExitNodeId(branch[branch.length - 1].name);
 
-        const sourceTaskComponentName = getWorkflowNodeComponentName(sourceTaskId);
-
-        if (
-            TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
-            !CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)
-        ) {
-            const nestedBottomGhostId = getNestedBottomGhostId(sourceTaskId);
-
-            const edgeFromNestedGhostToNextTask = {
-                id: `${nestedBottomGhostId}=>${targetTaskId}`,
-                source: nestedBottomGhostId,
-                style: EDGE_STYLES,
-                target: targetTaskId,
-                type: 'workflow',
-            };
-
-            edges.push(edgeFromNestedGhostToNextTask);
-        } else {
-            const edgeBetweenTasks = {
-                id: `${sourceTaskId}=>${targetTaskId}`,
-                source: sourceTaskId,
-                style: EDGE_STYLES,
-                target: targetTaskId,
-                type: 'workflow',
-            };
-
-            edges.push(edgeBetweenTasks);
-        }
+    edges.push({
+        id: `${lastNodeId}=>${bottomGhostId}`,
+        source: lastNodeId,
+        style: EDGE_STYLES,
+        target: bottomGhostId,
+        targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
+        type: 'workflow',
     });
-
-    const lastTaskId = branch[branch.length - 1].name;
-    const lastTaskComponentName = getWorkflowNodeComponentName(lastTaskId);
-
-    if (
-        TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) &&
-        !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
-    ) {
-        const nestedBottomGhostId = getNestedBottomGhostId(lastTaskId);
-
-        const edgeFromNestedGhostToBottomGhost = {
-            id: `${nestedBottomGhostId}=>${bottomGhostId}`,
-            source: nestedBottomGhostId,
-            style: EDGE_STYLES,
-            target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
-            type: 'workflow',
-        };
-
-        edges.push(edgeFromNestedGhostToBottomGhost);
-    } else {
-        const edgeFromLastTaskToBottomGhost = {
-            id: `${lastTaskId}=>${bottomGhostId}`,
-            source: lastTaskId,
-            style: EDGE_STYLES,
-            target: bottomGhostId,
-            targetHandle: `${bottomGhostId}-${bottomGhostHandlePosition}`,
-            type: 'workflow',
-        };
-
-        edges.push(edgeFromLastTaskToBottomGhost);
-    }
 
     return edges;
 }
