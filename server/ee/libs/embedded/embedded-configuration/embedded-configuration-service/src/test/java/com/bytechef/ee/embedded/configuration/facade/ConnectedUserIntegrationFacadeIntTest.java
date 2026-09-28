@@ -546,8 +546,11 @@ class ConnectedUserIntegrationFacadeIntTest {
                         new McpIntegrationInstanceConfiguration(
                             MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID, integrationInstanceConfigurationId,
                             MCP_SERVER_ID)));
-            when(mcpServerService.getMcpServer(MCP_SERVER_ID))
-                .thenReturn(new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true));
+            McpServer mcpServer = new McpServer("embedded-server", PlatformType.EMBEDDED, Environment.PRODUCTION, true);
+
+            mcpServer.setId(MCP_SERVER_ID);
+
+            when(mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of(mcpServer));
             when(mcpIntegrationInstanceConfigurationWorkflowService
                 .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
                     MCP_INTEGRATION_INSTANCE_CONFIGURATION_ID))
