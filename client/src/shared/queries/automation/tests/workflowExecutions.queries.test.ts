@@ -5,6 +5,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
     WorkflowExecutionKeys,
+    getWorkflowExecutionsRefetchInterval,
     useGetProjectWorkflowExecutionQuery,
     useGetWorkspaceProjectWorkflowExecutionsQuery,
 } from '../workflowExecutions.queries';
@@ -31,6 +32,32 @@ const wrapper = ({children}: {children: ReactNode}) =>
         {client: new QueryClient({defaultOptions: {queries: {retry: false}}})},
         children
     );
+
+describe('getWorkflowExecutionsRefetchInterval', () => {
+    it('polls while a job on the page is created or started', () => {
+        expect(getWorkflowExecutionsRefetchInterval({content: [{job: {status: 'CREATED'}}]} as never)).toBe(2000);
+        expect(
+            getWorkflowExecutionsRefetchInterval({
+                content: [{job: {status: 'COMPLETED'}}, {job: {status: 'STARTED'}}],
+            } as never)
+        ).toBe(2000);
+    });
+
+    it('stops polling once every job on the page has finished', () => {
+        expect(
+            getWorkflowExecutionsRefetchInterval({
+                content: [{job: {status: 'COMPLETED'}}, {job: {status: 'FAILED'}}, {job: {status: 'STOPPED'}}],
+            } as never)
+        ).toBe(false);
+    });
+
+    it('does not poll for failed trigger rows without a job or before any page is loaded', () => {
+        expect(getWorkflowExecutionsRefetchInterval({content: [{triggerExecution: {status: 'FAILED'}}]} as never)).toBe(
+            false
+        );
+        expect(getWorkflowExecutionsRefetchInterval(undefined)).toBe(false);
+    });
+});
 
 describe('workflowExecutions.queries', () => {
     describe('WorkflowExecutionKeys', () => {
@@ -151,6 +178,19 @@ describe('workflowExecutions.queries', () => {
 
             expect(result.current.fetchStatus).toBe('idle');
             expect(getWorkflowExecutionsPageMock).not.toHaveBeenCalled();
+        });
+
+        it('refetches while a listed execution is still running, so its finished status replaces STARTED', async () => {
+            getWorkflowExecutionsPageMock
+                .mockResolvedValueOnce({content: [{id: 1, job: {id: 1, status: 'STARTED'}}], totalPages: 1})
+                .mockResolvedValue({content: [{id: 1, job: {id: 1, status: 'COMPLETED'}}], totalPages: 1});
+
+            const {result} = renderHook(() => useGetWorkspaceProjectWorkflowExecutionsQuery(request), {wrapper});
+
+            await waitFor(
+                () => expect(result.current.data?.content).toEqual([{id: 1, job: {id: 1, status: 'COMPLETED'}}]),
+                {interval: 50, timeout: 5000}
+            );
         });
 
         it('fetches once enabled', async () => {
