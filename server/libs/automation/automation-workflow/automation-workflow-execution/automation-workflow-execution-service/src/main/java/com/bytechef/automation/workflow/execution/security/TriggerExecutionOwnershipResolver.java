@@ -21,12 +21,15 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 import org.springframework.stereotype.Component;
 
 /**
@@ -71,15 +74,31 @@ public class TriggerExecutionOwnershipResolver implements ResourceOwnershipResol
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return fetchTriggerExecution(id)
-            .map(TriggerExecution::getWorkflowExecutionId)
-            .map(WorkflowExecutionId::getJobPrincipalId)
-            .flatMap(projectDeploymentService::fetchProjectDeployment)
-            .map(ProjectDeployment::getProjectId)
-            .flatMap(projectService::fetchProject)
+        return fetchProject(id)
             .map(Project::getWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
+    }
+
+    @Override
+    public OptionalLong resolveProjectId(Serializable id) {
+        if (!(id instanceof Number number)) {
+            return OptionalLong.empty();
+        }
+
+        return fetchProject(number.longValue())
+            .map(project -> OptionalLong.of(project.getId()))
+            .orElseGet(OptionalLong::empty);
+    }
+
+    private Optional<Project> fetchProject(long id) {
+        return fetchTriggerExecution(id)
+            .map(TriggerExecution::getWorkflowExecutionId)
+            .filter(workflowExecutionId -> workflowExecutionId.getType() == PlatformType.AUTOMATION)
+            .map(WorkflowExecutionId::getJobPrincipalId)
+            .flatMap(projectDeploymentService::fetchProjectDeployment)
+            .map(ProjectDeployment::getProjectId)
+            .flatMap(projectService::fetchProject);
     }
 
     private Optional<TriggerExecution> fetchTriggerExecution(long id) {

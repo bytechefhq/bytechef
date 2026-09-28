@@ -89,6 +89,28 @@ class ProjectDeploymentWorkflowOwnershipResolverTest {
         assertThat(resolver.resolveOwner("not-a-number")).isEqualTo(ResourceOwner.unknown());
     }
 
+    @Test
+    void testResolveProjectIdOfAKnownRow() {
+        Project project = new Project();
+
+        project.setId(5L);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        givenRowBelongingToDeployment();
+
+        when(projectRepository.findByProjectDeploymentId(PROJECT_DEPLOYMENT_ID)).thenReturn(Optional.of(project));
+
+        assertThat(resolver.resolveProjectId(PROJECT_DEPLOYMENT_WORKFLOW_ID)).hasValue(5L);
+    }
+
+    @Test
+    void testResolveProjectIdOfAnUnknownRowIsEmpty() {
+        when(projectDeploymentWorkflowRepository.findById(PROJECT_DEPLOYMENT_WORKFLOW_ID))
+            .thenReturn(Optional.empty());
+
+        assertThat(resolver.resolveProjectId(PROJECT_DEPLOYMENT_WORKFLOW_ID)).isEmpty();
+    }
+
     private void givenRowBelongingToDeployment() {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 

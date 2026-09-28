@@ -19,6 +19,9 @@ package com.bytechef.automation.configuration.security;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
+import java.util.Optional;
+import java.util.OptionalLong;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,9 +55,24 @@ public class ProjectDeploymentOwnershipResolver implements ResourceOwnershipReso
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return projectRepository.findByProjectDeploymentId(id)
+        return fetchProject(id)
             .map(Project::getWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
+    }
+
+    @Override
+    public OptionalLong resolveProjectId(Serializable id) {
+        if (!(id instanceof Number number)) {
+            return OptionalLong.empty();
+        }
+
+        return fetchProject(number.longValue())
+            .map(project -> OptionalLong.of(project.getId()))
+            .orElseGet(OptionalLong::empty);
+    }
+
+    private Optional<Project> fetchProject(long id) {
+        return projectRepository.findByProjectDeploymentId(id);
     }
 }
