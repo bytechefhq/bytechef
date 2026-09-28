@@ -16,7 +16,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -75,7 +74,6 @@ import com.bytechef.platform.external.invocation.ExternalInvocationSource;
 import com.bytechef.platform.external.invocation.ExternalInvocationStatus;
 import com.bytechef.platform.external.invocation.WorkflowToolRunResult;
 import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -735,9 +733,11 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     }
 
     private void checkMcpServerEnabled(long mcpServerId) {
-        McpServer mcpServer = callSkippingAutomationChecks(() -> mcpServerService.getMcpServer(mcpServerId));
+        boolean enabled = mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)
+            .stream()
+            .anyMatch(mcpServer -> Objects.equals(mcpServer.getId(), mcpServerId));
 
-        if (!mcpServer.isEnabled()) {
+        if (!enabled) {
             throw new IllegalStateException("MCP server is disabled");
         }
     }
