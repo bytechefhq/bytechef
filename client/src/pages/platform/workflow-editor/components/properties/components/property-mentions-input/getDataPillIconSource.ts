@@ -1,3 +1,4 @@
+import {getWorkflowNodeComponentName} from '@/pages/platform/workflow-editor/utils/workflowNodeNameUtils';
 import {TASK_DISPATCHER_NAMES} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -23,7 +24,7 @@ export function getDataPillIconSource({
     const definitions = componentDefinitions ?? [];
     const dispatchers = taskDispatcherDefinitions ?? [];
 
-    let componentName = mentionDisplay?.split('_')[0].replace('${', '');
+    let componentName = getWorkflowNodeComponentName(mentionDisplay?.replace('${', '') ?? '');
 
     if (componentName === 'trigger') {
         componentName = workflow.workflowTriggerComponentNames?.[0] || '';
