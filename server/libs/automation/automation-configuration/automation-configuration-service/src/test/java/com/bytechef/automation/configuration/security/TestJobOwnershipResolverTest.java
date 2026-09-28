@@ -91,6 +91,30 @@ class TestJobOwnershipResolverTest {
     }
 
     @Test
+    void testResolveProjectIdOfATestJob() {
+        Project project = new Project();
+
+        project.setId(7L);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.of(new TestJob(WORKFLOW_ID, 0)));
+        when(projectService.fetchWorkflowProject(WORKFLOW_ID)).thenReturn(Optional.of(project));
+
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+
+        assertThat(resolver.resolveProjectId(JOB_ID)).hasValue(7L);
+    }
+
+    @Test
+    void testResolveProjectIdOfAnUnknownTestJobIsEmpty() {
+        when(testJobRegistry.fetchTestJob(JOB_ID)).thenReturn(Optional.empty());
+
+        TestJobOwnershipResolver resolver = new TestJobOwnershipResolver(projectService, testJobRegistryProvider);
+
+        assertThat(resolver.resolveProjectId(JOB_ID)).isEmpty();
+    }
+
+    @Test
     void testReportsTheEnvironmentTheTestRanIn() {
         when(testJobRegistry.fetchTestJob(JOB_ID))
             .thenReturn(Optional.of(new TestJob(WORKFLOW_ID, Environment.PRODUCTION.ordinal())));

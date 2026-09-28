@@ -76,4 +76,23 @@ class ProjectOwnershipResolverTest {
     void testResolveOwnerFailsClosedForANonNumericId() {
         assertThat(resolver.resolveOwner("not-a-number")).isEqualTo(ResourceOwner.unknown());
     }
+
+    @Test
+    void testResolveProjectIdOfAKnownProject() {
+        Project project = new Project();
+
+        project.setId(3L);
+        project.setWorkspaceId(9L);
+
+        when(projectRepository.findById(3L)).thenReturn(Optional.of(project));
+
+        assertThat(resolver.resolveProjectId(3L)).hasValue(3L);
+    }
+
+    @Test
+    void testResolveProjectIdOfAnUnknownProjectIsEmpty() {
+        when(projectRepository.findById(3L)).thenReturn(Optional.empty());
+
+        assertThat(resolver.resolveProjectId(3L)).isEmpty();
+    }
 }

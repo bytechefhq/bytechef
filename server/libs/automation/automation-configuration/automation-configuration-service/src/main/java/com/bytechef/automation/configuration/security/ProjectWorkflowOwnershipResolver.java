@@ -21,6 +21,9 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
+import java.util.Optional;
+import java.util.OptionalLong;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,11 +53,26 @@ public class ProjectWorkflowOwnershipResolver implements ResourceOwnershipResolv
 
     @Override
     public ResourceOwner resolveOwner(long id) {
-        return projectWorkflowRepository.findById(id)
-            .map(ProjectWorkflow::getProjectId)
-            .flatMap(projectRepository::findById)
+        return fetchProject(id)
             .map(Project::getWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
+    }
+
+    @Override
+    public OptionalLong resolveProjectId(Serializable id) {
+        if (!(id instanceof Number number)) {
+            return OptionalLong.empty();
+        }
+
+        return fetchProject(number.longValue())
+            .map(project -> OptionalLong.of(project.getId()))
+            .orElseGet(OptionalLong::empty);
+    }
+
+    private Optional<Project> fetchProject(long id) {
+        return projectWorkflowRepository.findById(id)
+            .map(ProjectWorkflow::getProjectId)
+            .flatMap(projectRepository::findById);
     }
 }

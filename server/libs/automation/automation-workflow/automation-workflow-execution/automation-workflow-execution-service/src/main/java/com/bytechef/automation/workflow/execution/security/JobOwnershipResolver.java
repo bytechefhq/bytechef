@@ -22,7 +22,9 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.service.ProjectService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Serializable;
 import java.util.Optional;
+import java.util.OptionalLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -62,6 +64,19 @@ public class JobOwnershipResolver implements ResourceOwnershipResolver {
             .map(Project::getWorkspaceId)
             .map(ResourceOwner::ofWorkspace)
             .orElseGet(ResourceOwner::unknown);
+    }
+
+    @Override
+    public OptionalLong resolveProjectId(Serializable id) {
+        if (!(id instanceof Number number)) {
+            return OptionalLong.empty();
+        }
+
+        return jobService.fetchJob(number.longValue())
+            .map(Job::getWorkflowId)
+            .flatMap(this::fetchProject)
+            .map(project -> OptionalLong.of(project.getId()))
+            .orElseGet(OptionalLong::empty);
     }
 
     /**
