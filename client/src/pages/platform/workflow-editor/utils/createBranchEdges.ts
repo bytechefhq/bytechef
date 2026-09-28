@@ -3,7 +3,7 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 
-import {getWorkflowNodeComponentName, toWorkflowNodeNamePrefix} from './workflowNodeNameUtils';
+import {getNestedBottomGhostId, getWorkflowNodeComponentName} from './workflowNodeNameUtils';
 
 /**
  * Creates the base Branch structure edges (branch -> top ghost -> placeholder -> bottom ghost)
@@ -96,7 +96,7 @@ function createEdgesForSingleCase(
             TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName) &&
             !CHILDLESS_TASK_DISPATCHER_NAMES.includes(sourceTaskComponentName)
         ) {
-            const nestedBottomGhostId = `${sourceTaskId}-${toWorkflowNodeNamePrefix(sourceTaskComponentName)}-bottom-ghost`;
+            const nestedBottomGhostId = getNestedBottomGhostId(sourceTaskId);
 
             const edgeFromNestedGhostToNextTask = {
                 id: `${nestedBottomGhostId}=>${targetTaskId}`,
@@ -127,7 +127,7 @@ function createEdgesForSingleCase(
         TASK_DISPATCHER_NAMES.includes(lastTaskComponentName) &&
         !CHILDLESS_TASK_DISPATCHER_NAMES.includes(lastTaskComponentName)
     ) {
-        const nestedBottomGhostId = `${lastTaskId}-${toWorkflowNodeNamePrefix(lastTaskComponentName)}-bottom-ghost`;
+        const nestedBottomGhostId = getNestedBottomGhostId(lastTaskId);
 
         const edgeFromNestedGhostToBottomGhost = {
             ...(isMiddle ? {data: {isMiddleCase: true}} : {}),
