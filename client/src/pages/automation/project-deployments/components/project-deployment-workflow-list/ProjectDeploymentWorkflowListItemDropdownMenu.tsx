@@ -2,15 +2,17 @@ import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {EditIcon, EllipsisVerticalIcon} from 'lucide-react';
+import {EditIcon, EllipsisVerticalIcon, SquareArrowOutUpRightIcon} from 'lucide-react';
 
 interface ProjectDeploymentWorkflowListItemDropDownProps {
     onEditClick: () => void;
+    onOpenInProjectClick?: () => void;
     workflow: Workflow;
 }
 
 const ProjectDeploymentWorkflowListItemDropdownMenu = ({
     onEditClick,
+    onOpenInProjectClick,
     workflow,
 }: ProjectDeploymentWorkflowListItemDropDownProps) => {
     return (
@@ -27,6 +29,12 @@ const ProjectDeploymentWorkflowListItemDropdownMenu = ({
                 >
                     <EditIcon /> Edit
                 </DropdownMenuItem>
+
+                {onOpenInProjectClick && (
+                    <DropdownMenuItem className="dropdown-menu-item" onClick={onOpenInProjectClick}>
+                        <SquareArrowOutUpRightIcon /> Open in Project
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
