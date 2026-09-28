@@ -97,6 +97,15 @@ public class McpServerServiceImpl implements McpServerService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<McpServer> getEnabledMcpServers(PlatformType type) {
+        return mcpServerRepository.findAll()
+            .stream()
+            .filter(server -> server.getType() == type && server.isEnabled())
+            .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<McpServer> getMcpServers(PlatformType type) {
         return mcpServerRepository.findAll()
             .stream()
