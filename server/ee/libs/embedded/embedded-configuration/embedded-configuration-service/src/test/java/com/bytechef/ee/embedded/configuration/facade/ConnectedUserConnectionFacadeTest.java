@@ -28,6 +28,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -38,6 +39,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -76,7 +78,7 @@ class ConnectedUserConnectionFacadeTest {
 
     @Test
     void testCreateConnectedUserConnection() {
-        authenticate("external-user-1");
+        authenticateAsConnectedUser("external-user-1", 0L);
 
         mockConnectedUser(1L, "external-user-1");
 
@@ -94,7 +96,39 @@ class ConnectedUserConnectionFacadeTest {
 
     @Test
     void testCreateConnectedUserConnectionForAnotherConnectedUserIsDenied() {
-        authenticate("external-user-2");
+        authenticateAsConnectedUser("external-user-2", 0L);
+
+        mockConnectedUser(1L, "external-user-1");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .build();
+
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, connectionDTO))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).create(any(), any());
+        verify(connectedUserConnectionService, never()).create(anyLong(), anyLong());
+    }
+
+    @Test
+    void testCreateConnectedUserConnectionWithMatchingLoginButNoConnectedUserPrincipalIsDenied() {
+        authenticate("external-user-1");
+
+        mockConnectedUser(1L, "external-user-1");
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .build();
+
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, connectionDTO))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).create(any(), any());
+        verify(connectedUserConnectionService, never()).create(anyLong(), anyLong());
+    }
+
+    @Test
+    void testCreateConnectedUserConnectionFromAnotherEnvironmentIsDenied() {
+        authenticateAsConnectedUser("external-user-1", 2L);
 
         mockConnectedUser(1L, "external-user-1");
 
@@ -126,7 +160,7 @@ class ConnectedUserConnectionFacadeTest {
 
     @Test
     void testGetConnectedUserConnectionsOfAnotherConnectedUserIsDenied() {
-        authenticate("external-user-2");
+        authenticateAsConnectedUser("external-user-2", 0L);
 
         mockConnectedUser(1L, "external-user-1");
 
@@ -148,7 +182,7 @@ class ConnectedUserConnectionFacadeTest {
 
     @Test
     void testGetConnectedUserConnectionsOfTheCurrentConnectedUser() {
-        authenticate("external-user-1");
+        authenticateAsConnectedUser("external-user-1", 0L);
 
         ConnectedUser connectedUser = mockConnectedUser(1L, "external-user-1");
 
@@ -200,6 +234,14 @@ class ConnectedUserConnectionFacadeTest {
         SecurityContextHolder.setContext(securityContext);
     }
 
+    private static void authenticateAsConnectedUser(String externalUserId, long environmentId) {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new TestConnectedUserAuthentication(externalUserId, environmentId));
+
+        SecurityContextHolder.setContext(securityContext);
+    }
+
     private ConnectedUser mockConnectedUser(long id, String externalId) {
         ConnectedUser connectedUser = mock(ConnectedUser.class);
 
@@ -207,9 +249,52 @@ class ConnectedUserConnectionFacadeTest {
             .thenReturn(id);
         lenient().when(connectedUser.getExternalId())
             .thenReturn(externalId);
+        lenient().when(connectedUser.getEnvironmentId())
+            .thenReturn(0L);
 
         when(connectedUserService.getConnectedUser(id)).thenReturn(connectedUser);
 
         return connectedUser;
+    }
+
+    private static final class TestConnectedUserAuthentication extends AbstractAuthenticationToken
+        implements ConnectedUserAuthentication {
+
+        private final String externalUserId;
+        private final long environmentId;
+
+        private TestConnectedUserAuthentication(String externalUserId, long environmentId) {
+            super(List.of());
+
+            this.externalUserId = externalUserId;
+            this.environmentId = environmentId;
+
+            setAuthenticated(true);
+        }
+
+        @Override
+        public Object getCredentials() {
+            return null;
+        }
+
+        @Override
+        public Object getPrincipal() {
+            return externalUserId;
+        }
+
+        @Override
+        public long connectedUserId() {
+            return 0;
+        }
+
+        @Override
+        public String externalUserId() {
+            return externalUserId;
+        }
+
+        @Override
+        public long environmentId() {
+            return environmentId;
+        }
     }
 }
