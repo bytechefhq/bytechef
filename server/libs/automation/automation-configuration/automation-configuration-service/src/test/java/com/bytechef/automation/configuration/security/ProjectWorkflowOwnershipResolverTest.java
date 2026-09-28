@@ -76,6 +76,27 @@ class ProjectWorkflowOwnershipResolverTest {
         assertThat(resolver.resolveOwner(PROJECT_WORKFLOW_ID)).isEqualTo(ResourceOwner.unknown());
     }
 
+    @Test
+    void testResolveProjectIdOfAKnownProjectWorkflow() {
+        Project project = new Project();
+
+        project.setId(PROJECT_ID);
+        project.setWorkspaceId(WORKSPACE_ID);
+
+        givenRowBelongingToProject();
+
+        when(projectRepository.findById(PROJECT_ID)).thenReturn(Optional.of(project));
+
+        assertThat(resolver.resolveProjectId(PROJECT_WORKFLOW_ID)).hasValue(PROJECT_ID);
+    }
+
+    @Test
+    void testResolveProjectIdOfAnUnknownProjectWorkflowIsEmpty() {
+        when(projectWorkflowRepository.findById(PROJECT_WORKFLOW_ID)).thenReturn(Optional.empty());
+
+        assertThat(resolver.resolveProjectId(PROJECT_WORKFLOW_ID)).isEmpty();
+    }
+
     private void givenRowBelongingToProject() {
         ProjectWorkflow projectWorkflow = new ProjectWorkflow(PROJECT_ID, 1, "workflow-1");
 
