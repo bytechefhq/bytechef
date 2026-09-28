@@ -15,8 +15,10 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
+import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -31,6 +33,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 
 /**
@@ -67,7 +70,9 @@ class PermissionServiceEnvironmentTest {
 
         permissionService = new PermissionServiceImpl(
             new CurrentUserResolver(userService), permissionScopeRegistry, projectRepository,
-            workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of());
+            workspaceScopeCacheService, workspaceUserRepository, List.of(), List.of(),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -218,7 +223,9 @@ class PermissionServiceEnvironmentTest {
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()),
-            List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)));
+            List.of(deploymentEnvironmentResolver(Environment.PRODUCTION)),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID, Environment.PRODUCTION))
             .thenReturn(Set.of("DEPLOYMENT_VIEW"));
@@ -238,7 +245,9 @@ class PermissionServiceEnvironmentTest {
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
             List.of(deploymentOwnershipResolver()),
-            List.of(deploymentEnvironmentResolver(null)));
+            List.of(deploymentEnvironmentResolver(null)),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
 
         when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
@@ -266,7 +275,9 @@ class PermissionServiceEnvironmentTest {
         PermissionServiceImpl permissionServiceWithResolvers = new PermissionServiceImpl(
             new CurrentUserResolver(userService), mock(PermissionScopeRegistry.class), projectRepository,
             workspaceScopeCacheService, mock(WorkspaceUserRepository.class),
-            List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver));
+            List.of(deploymentOwnershipResolver()), List.of(failingEnvironmentResolver),
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
+            new ApplicationProperties());
 
         lenient().when(workspaceScopeCacheService.getWorkspaceScopes(USER_ID, WORKSPACE_ID))
             .thenReturn(Set.of("DEPLOYMENT_EDIT"));
