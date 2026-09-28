@@ -310,11 +310,11 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                         className={twMerge(
                                             'flex size-4 items-center justify-center rounded-xs border border-stroke-neutral-tertiary',
                                             selectedValues?.length === options.length
-                                                ? 'border-content-brand-primary bg-content-brand-primary text-primary-foreground'
+                                                ? 'border-surface-brand-primary bg-surface-brand-primary'
                                                 : '[&_svg]:invisible'
                                         )}
                                     >
-                                        <CheckIcon className="size-4" />
+                                        <CheckIcon className="size-3.5 text-content-onsurface-primary" />
                                     </div>
 
                                     <span aria-label="Select All">Select All</span>
@@ -334,13 +334,13 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                             >
                                                 <div
                                                     className={twMerge(
-                                                        'flex h-4 w-4 items-center justify-center rounded-xs border border-stroke-neutral-tertiary',
+                                                        'flex size-4 items-center justify-center rounded-xs border border-stroke-neutral-tertiary',
                                                         isSelected
-                                                            ? 'border-content-brand-primary bg-content-brand-primary text-primary-foreground'
+                                                            ? 'border-surface-brand-primary bg-surface-brand-primary'
                                                             : '[&_svg]:invisible'
                                                     )}
                                                 >
-                                                    <CheckIcon className="size-4" />
+                                                    <CheckIcon className="size-3.5 text-content-onsurface-primary" />
                                                 </div>
 
                                                 {option.icon && (
