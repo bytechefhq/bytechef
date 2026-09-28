@@ -3,9 +3,10 @@ import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
+import {defaultFilter} from 'cmdk';
 import {CheckIcon, ChevronsUpDownIcon} from 'lucide-react';
 import {Popover as PopoverPrimitive} from 'radix-ui';
-import {FC, FocusEventHandler, ReactNode, useState} from 'react';
+import {FC, FocusEventHandler, ReactNode, useLayoutEffect, useRef, useState} from 'react';
 
 export type ComboBoxItemType = {
     icon?: string;
@@ -28,6 +29,38 @@ export interface ComboBoxProps {
     value?: any;
 }
 
+interface ComboBoxCommandItemProps {
+    children: ReactNode;
+    onSelect: () => void;
+    searchValue?: string;
+    value: string;
+}
+
+const filterByKeywords = (value: string, search: string, keywords?: string[]) =>
+    defaultFilter(keywords?.join(' ') ?? '', search);
+
+const ComboBoxCommandItem = ({children, onSelect, searchValue, value}: ComboBoxCommandItemProps) => {
+    const [renderedText, setRenderedText] = useState('');
+
+    const itemRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        setRenderedText(itemRef.current?.textContent?.trim() ?? '');
+    }, [children]);
+
+    return (
+        <CommandItem
+            key={renderedText}
+            keywords={searchValue ? [renderedText, searchValue] : [renderedText]}
+            onSelect={onSelect}
+            ref={itemRef}
+            value={value}
+        >
+            {children}
+        </CommandItem>
+    );
+};
+
 const ComboBox: FC<ComboBoxProps> = ({
     disabled,
     emptyMessage,
@@ -49,7 +82,7 @@ const ComboBox: FC<ComboBoxProps> = ({
     };
 
     const commandItems = items.map((comboBoxItem) => (
-        <CommandItem
+        <ComboBoxCommandItem
             key={comboBoxItem.value}
             onSelect={() => {
                 setOpen(false);
@@ -58,14 +91,15 @@ const ComboBox: FC<ComboBoxProps> = ({
                     onChange(comboBoxItem);
                 }
             }}
-            value={comboBoxItem.value}
+            searchValue={typeof comboBoxItem.value === 'string' ? comboBoxItem.value : undefined}
+            value={String(comboBoxItem.value)}
         >
             {comboBoxItem.icon && <LazyLoadSVG className="mr-2 size-6 flex-none" src={comboBoxItem.icon} />}
 
             {comboBoxItem.label}
 
             <CheckIcon className={cn('ml-auto size-4', comboBoxItem.value === value ? 'opacity-100' : 'opacity-0')} />
-        </CommandItem>
+        </ComboBoxCommandItem>
     ));
 
     const item = items.find((item) => item.value === value);
@@ -100,7 +134,7 @@ const ComboBox: FC<ComboBoxProps> = ({
                     align="start"
                     className="z-50 w-72 min-w-combo-box-popper-anchor-width rounded-md border bg-popover p-0 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
                 >
-                    <Command>
+                    <Command filter={filterByKeywords}>
                         <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
                         <CommandList>
