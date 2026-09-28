@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import {devtools} from 'zustand/middleware';
+import {devtools, persist} from 'zustand/middleware';
 
 interface ConnectionNoteStateI {
     showConnectionNote: boolean;
@@ -8,13 +8,18 @@ interface ConnectionNoteStateI {
 
 export const useConnectionNoteStore = create<ConnectionNoteStateI>()(
     devtools(
-        (set) => ({
-            setShowConnectionNote: (connectionNoteStatus) =>
-                set(() => ({
-                    showConnectionNote: connectionNoteStatus,
-                })),
-            showConnectionNote: true,
-        }),
+        persist(
+            (set) => ({
+                setShowConnectionNote: (connectionNoteStatus) =>
+                    set(() => ({
+                        showConnectionNote: connectionNoteStatus,
+                    })),
+                showConnectionNote: true,
+            }),
+            {
+                name: 'bytechef.connection-note',
+            }
+        ),
         {
             name: 'connection-note',
         }
