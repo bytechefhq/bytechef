@@ -62,8 +62,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsUsesClusterElementTitleAsLabel() {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
 
-        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME);
+        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos = getMcpTools();
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "sendEmail", "Send Email", "Send an email"));
@@ -73,8 +72,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsKeepsNullLabelWhenClusterElementHasNoTitle() {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "getEmail");
 
-        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME);
+        List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos = getMcpTools();
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "getEmail", null, "Get an email"));
@@ -84,14 +82,19 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsSkipsToolsOfDisabledMcpServer() {
         createMcpTool(PlatformType.EMBEDDED, false, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools()).isEmpty();
     }
 
     @Test
     void testGetMcpToolsSkipsToolsOfNonEmbeddedMcpServer() {
         createMcpTool(PlatformType.AUTOMATION, true, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools()).isEmpty();
+    }
+
+    private List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools() {
+        return connectedUserIntegrationFacade.getMcpTools(
+            COMPONENT_NAME, connectedUserIntegrationFacade.getEnabledEmbeddedMcpServerIds());
     }
 
     private McpTool createMcpTool(PlatformType type, boolean enabled, String name) {
