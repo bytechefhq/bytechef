@@ -79,6 +79,8 @@ vi.mock('@/shared/mutations/automation/projects.mutations', async () => {
     };
 });
 
+vi.mock('@/pages/automation/project/loadProject', () => ({default: vi.fn()}));
+
 vi.mock('sonner', () => ({toast: vi.fn()}));
 
 const createTestQueryClient = () =>
