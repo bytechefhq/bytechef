@@ -1,12 +1,7 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {
-    CANVAS_TOP_OFFSET,
-    COPILOT_PANEL_WIDTH,
-    FINAL_PLACEHOLDER_NODE_ID,
-    PROJECT_LEFT_SIDEBAR_WIDTH,
-} from '@/shared/constants';
+import {COPILOT_PANEL_WIDTH, FINAL_PLACEHOLDER_NODE_ID, PROJECT_LEFT_SIDEBAR_WIDTH} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -44,6 +39,7 @@ import {
     buildDraggingPlaceholderState,
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
+import getInitialViewportPosition from '../utils/getInitialViewportPosition';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
@@ -591,10 +587,15 @@ const useWorkflowEditorCanvas = ({
             return;
         }
 
+        const {x, y} = getInitialViewportPosition({
+            layoutDirection: useLayoutDirectionStore.getState().layoutDirection,
+            offsetX: getViewportOffsetX(),
+        });
+
         setViewport(
             {
-                x: getViewportOffsetX(),
-                y: CANVAS_TOP_OFFSET,
+                x,
+                y,
                 zoom: 1,
             },
             {
