@@ -6,14 +6,14 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getAllTasksRecursively from './getAllTasksRecursively';
 import {toWorkflowNodeNamePrefix} from './workflowNodeNameUtils';
 
-export default function getFormattedName(itemName: string, reservedNames?: Set<string>): string {
-    const nodeNamePrefix = toWorkflowNodeNamePrefix(itemName);
+export default function getFormattedName(componentName: string, reservedNames?: Set<string>): string {
+    const itemName = toWorkflowNodeNamePrefix(componentName);
 
     const {nodes, workflow} = useWorkflowDataStore.getState();
 
     const nodeNames = nodes.map((node) => (node.data as NodeDataType).name);
 
-    const existingNodes = nodeNames.filter((name) => name?.includes(nodeNamePrefix));
+    const existingNodes = nodeNames.filter((name) => name?.includes(itemName));
 
     const workflowDefinition = JSON.parse(workflow.definition!);
 
@@ -34,7 +34,7 @@ export default function getFormattedName(itemName: string, reservedNames?: Set<s
 
                 if (Array.isArray(typeElements)) {
                     typeElements.forEach((element) => {
-                        if (element.name?.includes(nodeNamePrefix)) {
+                        if (element.name?.includes(itemName)) {
                             names.push(element.name);
                         }
 
@@ -43,7 +43,7 @@ export default function getFormattedName(itemName: string, reservedNames?: Set<s
                         }
                     });
                 } else if (isPlainObject(typeElements)) {
-                    if (typeElements.name?.includes(nodeNamePrefix)) {
+                    if (typeElements.name?.includes(itemName)) {
                         names.push(typeElements.name);
                     }
 
@@ -63,20 +63,18 @@ export default function getFormattedName(itemName: string, reservedNames?: Set<s
 
     const existingClusterElementNodes = clusterElementNames.flatMap((names: string[] | string) => {
         if (Array.isArray(names)) {
-            return names.filter((name: string) => name?.includes(nodeNamePrefix));
+            return names.filter((name: string) => name?.includes(itemName));
         }
 
-        return names?.includes(nodeNamePrefix) ? [names] : [];
+        return names?.includes(itemName) ? [names] : [];
     });
 
-    const reservedMatchingNames = reservedNames
-        ? [...reservedNames].filter((name) => name?.includes(nodeNamePrefix))
-        : [];
+    const reservedMatchingNames = reservedNames ? [...reservedNames].filter((name) => name?.includes(itemName)) : [];
 
     const allExistingNodes = [...existingNodes, ...existingClusterElementNodes, ...reservedMatchingNames];
 
     if (!allExistingNodes.length) {
-        return `${nodeNamePrefix}_1`;
+        return `${itemName}_1`;
     }
 
     const allNumbers = allExistingNodes.map((name: string) => {
@@ -88,5 +86,5 @@ export default function getFormattedName(itemName: string, reservedNames?: Set<s
 
     const maxExistingNumber = Math.max(...allNumbers);
 
-    return `${nodeNamePrefix}_${maxExistingNumber + 1}`;
+    return `${itemName}_${maxExistingNumber + 1}`;
 }

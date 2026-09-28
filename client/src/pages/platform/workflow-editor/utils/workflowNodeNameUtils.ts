@@ -16,3 +16,7 @@ export function getWorkflowNodeComponentName(workflowNodeName: string): string {
 
     return COMPONENT_NAME_BY_NODE_NAME_PREFIX[nodeNamePrefix] || nodeNamePrefix;
 }
+
+export function getNestedBottomGhostId(taskNodeId: string): string {
+    return `${taskNodeId}-${toWorkflowNodeNamePrefix(getWorkflowNodeComponentName(taskNodeId))}-bottom-ghost`;
+}
