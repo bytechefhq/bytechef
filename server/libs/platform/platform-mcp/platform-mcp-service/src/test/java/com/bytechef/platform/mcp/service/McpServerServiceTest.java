@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.ai.mcp.security;
+package com.bytechef.platform.mcp.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -26,10 +26,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.mcp.service.McpServerServiceImpl;
+import com.bytechef.platform.mcp.repository.McpServerRepository;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
@@ -47,16 +47,33 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expressions on {@link McpServerServiceImpl} through the real
- * {@link AutomationMethodSecurityExpressionHandler} backed by the real {@link AutomationPermissionEvaluator}, asserting
- * each guard in both directions and the exact check that reaches {@link PermissionService}.
- *
  * @author Ivica Cardic
  */
-class McpServerServiceAuthorizationTest {
+class McpServerServiceTest {
 
     private static final long MCP_SERVER_ID = 11L;
     private static final String MCP_SERVER_TYPE = "McpServer";
+
+    private final McpServerRepository mcpServerRepository = mock(McpServerRepository.class);
+
+    private final McpServerServiceImpl mcpServerService = new McpServerServiceImpl(mcpServerRepository);
+
+    @Test
+    void testGetEnabledMcpServersReturnsOnlyEnabledServersOfTheRequestedType() {
+        McpServer enabledEmbeddedServer = new McpServer(
+            "enabled-embedded", PlatformType.EMBEDDED, Environment.DEVELOPMENT, true);
+        McpServer disabledEmbeddedServer = new McpServer(
+            "disabled-embedded", PlatformType.EMBEDDED, Environment.DEVELOPMENT, false);
+        McpServer enabledAutomationServer = new McpServer(
+            "enabled-automation", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true);
+
+        when(mcpServerRepository.findAll())
+            .thenReturn(List.of(enabledEmbeddedServer, disabledEmbeddedServer, enabledAutomationServer));
+
+        List<McpServer> enabledEmbeddedServers = mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED);
+
+        assertThat(enabledEmbeddedServers).containsExactly(enabledEmbeddedServer);
+    }
 
     @Test
     void testGetMcpServerDeniesWhenTheMcpViewScopeIsRefused() throws Exception {

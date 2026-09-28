@@ -83,6 +83,15 @@ public interface McpServerService {
     McpServer getMcpServer(String secretKey);
 
     /**
+     * Gets the enabled MCP servers of the given platform type; ungated, meant for internal callers that already
+     * authenticated the caller.
+     *
+     * @param type the type to filter by
+     * @return a list of the enabled MCP servers with the given type
+     */
+    List<McpServer> getEnabledMcpServers(PlatformType type);
+
+    /**
      * Gets MCP servers filtered by type.
      *
      * @param type the type to filter by

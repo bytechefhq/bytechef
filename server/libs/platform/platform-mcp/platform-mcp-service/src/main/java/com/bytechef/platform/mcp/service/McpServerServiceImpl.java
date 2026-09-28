@@ -85,6 +85,15 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<McpServer> getEnabledMcpServers(PlatformType type) {
+        return mcpServerRepository.findAll()
+            .stream()
+            .filter(server -> server.getType() == type && server.isEnabled())
+            .toList();
+    }
+
+    @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(readOnly = true)
     public List<McpServer> getMcpServers(PlatformType type, McpServerOrderBy orderBy) {
