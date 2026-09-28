@@ -72,12 +72,39 @@ class WorkspaceApiKeyGraphQlControllerTest {
 
     @Test
     void testCreateWorkspaceApiKeyWithoutAnEnvironmentDeniesUnlessEveryEnvironmentGrants() throws Exception {
-        assertEnvironmentUnawareGuard(false);
+        PermissionService permissionService = mock(PermissionService.class);
+        Environment[] environments = Environment.values();
+        Environment lastEnvironment = environments[environments.length - 1];
+
+        for (Environment environment : environments) {
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "API_KEY_CREATE", environment))
+                .thenReturn(environment != lastEnvironment);
+        }
+
+        assertThat(evaluateEnvironmentUnawareGuard(permissionService)).isFalse();
+
+        for (Environment environment : environments) {
+            verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "API_KEY_CREATE", environment);
+        }
+
+        verifyNoMoreInteractions(permissionService);
     }
 
     @Test
     void testCreateWorkspaceApiKeyWithoutAnEnvironmentAllowsWhenEveryEnvironmentGrants() throws Exception {
-        assertEnvironmentUnawareGuard(true);
+        PermissionService permissionService = mock(PermissionService.class);
+
+        for (Environment environment : Environment.values()) {
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "API_KEY_CREATE", environment)).thenReturn(true);
+        }
+
+        assertThat(evaluateEnvironmentUnawareGuard(permissionService)).isTrue();
+
+        for (Environment environment : Environment.values()) {
+            verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "API_KEY_CREATE", environment);
+        }
+
+        verifyNoMoreInteractions(permissionService);
     }
 
     private void assertEnvironmentGuard(boolean granted) throws Exception {
@@ -95,18 +122,10 @@ class WorkspaceApiKeyGraphQlControllerTest {
         verifyNoMoreInteractions(permissionService);
     }
 
-    private void assertEnvironmentUnawareGuard(boolean granted) throws Exception {
-        PermissionService permissionService = mock(PermissionService.class);
-
-        when(permissionService.hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "API_KEY_CREATE")).thenReturn(granted);
-
-        assertThat(evaluateGuard(permissionService, createWorkspaceApiKeyMethod(), new Object[] {
+    private static boolean evaluateEnvironmentUnawareGuard(PermissionService permissionService) throws Exception {
+        return evaluateGuard(permissionService, createWorkspaceApiKeyMethod(), new Object[] {
             WORKSPACE_ID, "name", null
-        }))
-            .isEqualTo(granted);
-
-        verify(permissionService).hasWorkspaceScopeInEveryEnvironment(WORKSPACE_ID, "API_KEY_CREATE");
-        verifyNoMoreInteractions(permissionService);
+        });
     }
 
     // The expression parsed here is read straight off our own @PreAuthorize annotation in this repository's compiled

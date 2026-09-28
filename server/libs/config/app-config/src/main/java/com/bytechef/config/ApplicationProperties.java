@@ -4066,6 +4066,11 @@ public class ApplicationProperties {
     public static class Security {
 
         /**
+         * Connected-user authorization mode (log | enforce)
+         */
+        private ConnectedUserAuthorizationMode connectedUserAuthorizationMode = ConnectedUserAuthorizationMode.LOG;
+
+        /**
          * Content Security Policy header value
          */
         private String contentSecurityPolicy;
@@ -4095,12 +4100,20 @@ public class ApplicationProperties {
          */
         private TwoFactorAuthentication twoFactorAuthentication = new TwoFactorAuthentication();
 
+        public ConnectedUserAuthorizationMode getConnectedUserAuthorizationMode() {
+            return connectedUserAuthorizationMode;
+        }
+
         public String getContentSecurityPolicy() {
             return contentSecurityPolicy;
         }
 
         public RememberMe getRememberMe() {
             return rememberMe;
+        }
+
+        public void setConnectedUserAuthorizationMode(ConnectedUserAuthorizationMode connectedUserAuthorizationMode) {
+            this.connectedUserAuthorizationMode = connectedUserAuthorizationMode;
         }
 
         public void setContentSecurityPolicy(String contentSecurityPolicy) {
@@ -4141,6 +4154,13 @@ public class ApplicationProperties {
 
         public void setTwoFactorAuthentication(TwoFactorAuthentication twoFactorAuthentication) {
             this.twoFactorAuthentication = twoFactorAuthentication;
+        }
+
+        /**
+         * How a connected user's authorization decisions are applied.
+         */
+        public enum ConnectedUserAuthorizationMode {
+            LOG, ENFORCE
         }
 
         /**

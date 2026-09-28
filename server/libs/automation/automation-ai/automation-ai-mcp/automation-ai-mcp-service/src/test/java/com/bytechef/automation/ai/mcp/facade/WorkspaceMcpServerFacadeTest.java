@@ -45,6 +45,7 @@ import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -140,6 +141,8 @@ class WorkspaceMcpServerFacadeTest {
                     .workspaceId()
                     .isPresent() && grantedScopes.contains(invocation.<String>getArgument(2));
             });
+        when(permissionService.isAuthorizationSkipped())
+            .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
         when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class)))
             .thenAnswer(invocation -> grantedScopes.contains(invocation.<String>getArgument(1)));
 

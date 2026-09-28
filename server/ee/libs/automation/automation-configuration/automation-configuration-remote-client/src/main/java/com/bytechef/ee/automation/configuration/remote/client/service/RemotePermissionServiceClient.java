@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.remote.client.service;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -74,6 +75,11 @@ public class RemotePermissionServiceClient implements PermissionService {
         Serializable id, String resourceType, String scope, Environment environment) {
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isAuthorizationSkipped() {
+        return AutomationAuthorizationContext.isSkipChecks();
     }
 
     @Override
