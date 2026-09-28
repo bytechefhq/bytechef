@@ -7,11 +7,15 @@
 
 package com.bytechef.ee.automation.configuration.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -36,6 +40,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class EeAutomationConfigurationIntTestConfiguration {
+
+    @Bean
+    Encryption encryption() {
+        return mock(Encryption.class);
+    }
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class EeAutomationConfigurationIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
