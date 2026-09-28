@@ -37,15 +37,11 @@ export const WorkflowExecutionKeys = {
 
 const RUNNING_WORKFLOW_EXECUTIONS_POLLING_INTERVAL_MS = 2000;
 
-const RUNNING_JOB_STATUSES = ['CREATED', 'STARTED'];
+const RUNNING_JOB_STATUSES = new Set(['CREATED', 'STARTED']);
 
-/**
- * Poll the executions list while any job on the loaded page is still running. Opening a row polls only that row's
- * own query, so without this the list keeps the STARTED snapshot it fetched and shows it again on the way back.
- */
 export function getWorkflowExecutionsRefetchInterval(page: Page | undefined): number | false {
     const hasRunningJob = (page?.content ?? []).some((workflowExecution) =>
-        RUNNING_JOB_STATUSES.includes((workflowExecution as {job?: {status?: string}}).job?.status ?? '')
+        RUNNING_JOB_STATUSES.has((workflowExecution as {job?: {status?: string}}).job?.status ?? '')
     );
 
     return hasRunningJob ? RUNNING_WORKFLOW_EXECUTIONS_POLLING_INTERVAL_MS : false;
