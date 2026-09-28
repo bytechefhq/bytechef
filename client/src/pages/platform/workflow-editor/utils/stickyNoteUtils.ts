@@ -2,15 +2,10 @@ import {UpdateWorkflowMutationType, WorkflowStickyNoteType} from '@/shared/types
 import {Node} from '@xyflow/react';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
-import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import fireWorkflowDefinitionMutation from './fireWorkflowDefinitionMutation';
 import stringifyWorkflowDefinition from './stringifyWorkflowDefinition';
-import {
-    consumePendingDefinition,
-    drainPendingSaves,
-    enqueuePendingSave,
-    isWorkflowMutating,
-    setWorkflowMutating,
-} from './workflowMutationGuard';
+import {enqueuePendingSave, isWorkflowMutating} from './workflowMutationGuard';
 
 export const STICKY_NOTE_NODE_TYPE = 'stickyNote';
 
@@ -298,7 +293,7 @@ export function saveStickyNotes({updateWorkflowMutation, updater}: SaveStickyNot
         },
     }));
 
-    fireStickyNoteMutation({
+    fireWorkflowDefinitionMutation({
         definition: updatedDefinition,
         previousDefinition,
         updateWorkflowMutation,
@@ -345,79 +340,4 @@ export function addStickyNote({
         updateWorkflowMutation,
         updater: (stickyNotes) => [...stickyNotes, createStickyNote(position)],
     });
-}
-
-interface FireStickyNoteMutationProps {
-    definition: string;
-    previousDefinition: string;
-    updateWorkflowMutation: UpdateWorkflowMutationType;
-    version?: number;
-    workflowId: string;
-}
-
-function fireStickyNoteMutation({
-    definition,
-    previousDefinition,
-    updateWorkflowMutation,
-    version,
-    workflowId,
-}: FireStickyNoteMutationProps) {
-    setWorkflowMutating(workflowId, true);
-
-    let settledDefinition = previousDefinition;
-
-    updateWorkflowMutation.mutate(
-        {
-            id: workflowId,
-            workflow: {
-                definition,
-                version,
-            },
-        },
-        {
-            onError: () => {
-                if (useWorkflowDataStore.getState().workflow.definition !== definition) {
-                    return;
-                }
-
-                runWithoutHistory(() => {
-                    useWorkflowDataStore.setState((state) => ({
-                        workflow: {
-                            ...state.workflow,
-                            definition: previousDefinition,
-                        },
-                    }));
-                });
-            },
-            onSettled: () => {
-                setWorkflowMutating(workflowId, false);
-
-                const pendingDefinition = consumePendingDefinition(workflowId);
-
-                if (pendingDefinition) {
-                    const currentWorkflow = useWorkflowDataStore.getState().workflow;
-
-                    fireStickyNoteMutation({
-                        definition: pendingDefinition,
-                        previousDefinition: settledDefinition,
-                        updateWorkflowMutation,
-                        version: currentWorkflow.version,
-                        workflowId,
-                    });
-                } else {
-                    drainPendingSaves(workflowId);
-                }
-            },
-            onSuccess: (updatedWorkflow) => {
-                settledDefinition = definition;
-
-                const currentWorkflow = useWorkflowDataStore.getState().workflow;
-
-                useWorkflowDataStore.getState().setWorkflow({
-                    ...currentWorkflow,
-                    version: updatedWorkflow.version,
-                });
-            },
-        }
-    );
 }

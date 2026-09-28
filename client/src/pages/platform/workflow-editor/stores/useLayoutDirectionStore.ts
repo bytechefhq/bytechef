@@ -7,8 +7,8 @@ interface LayoutDirectionStateI {
     currentWorkflowUuid: string;
     directionsByWorkflowUuid: Record<string, LayoutDirectionType>;
     layoutDirection: LayoutDirectionType;
-    resetLayoutDirection: () => void;
-    setCurrentWorkflowUuid: (workflowUuid: string) => void;
+    resetLayoutDirection: (layoutDirection?: LayoutDirectionType) => void;
+    setCurrentWorkflowUuid: (workflowUuid: string, definitionLayoutDirection?: LayoutDirectionType) => void;
     setLayoutDirection: (layoutDirection: LayoutDirectionType) => void;
 }
 
@@ -26,17 +26,33 @@ const useLayoutDirectionStore = create<LayoutDirectionStateI>()(
                 directionsByWorkflowUuid: {},
                 layoutDirection: DEFAULT_LAYOUT_DIRECTION,
 
-                resetLayoutDirection: () => set({layoutDirection: DEFAULT_LAYOUT_DIRECTION}),
+                resetLayoutDirection: (layoutDirection) =>
+                    set({layoutDirection: layoutDirection ?? DEFAULT_LAYOUT_DIRECTION}),
 
-                setCurrentWorkflowUuid: (workflowUuid) => {
+                setCurrentWorkflowUuid: (workflowUuid, definitionLayoutDirection) => {
                     if (workflowUuid === get().currentWorkflowUuid) {
                         return;
                     }
 
-                    set((state) => ({
-                        currentWorkflowUuid: workflowUuid,
-                        layoutDirection: state.directionsByWorkflowUuid[workflowUuid] ?? DEFAULT_LAYOUT_DIRECTION,
-                    }));
+                    set((state) => {
+                        const storedLayoutDirection = state.directionsByWorkflowUuid[workflowUuid];
+
+                        if (!storedLayoutDirection && definitionLayoutDirection) {
+                            return {
+                                currentWorkflowUuid: workflowUuid,
+                                directionsByWorkflowUuid: {
+                                    ...state.directionsByWorkflowUuid,
+                                    [workflowUuid]: definitionLayoutDirection,
+                                },
+                                layoutDirection: definitionLayoutDirection,
+                            };
+                        }
+
+                        return {
+                            currentWorkflowUuid: workflowUuid,
+                            layoutDirection: storedLayoutDirection ?? DEFAULT_LAYOUT_DIRECTION,
+                        };
+                    });
                 },
 
                 setLayoutDirection: (layoutDirection) =>

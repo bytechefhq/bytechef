@@ -40,6 +40,7 @@ import {
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
 import getInitialViewportPosition from '../utils/getInitialViewportPosition';
+import {extractLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
@@ -573,14 +574,14 @@ const useWorkflowEditorCanvas = ({
             return;
         }
 
-        resetLayoutDirection();
+        resetLayoutDirection(extractLayoutDirection(readOnlyWorkflow.definition));
 
         return () => applyStoredLayoutDirection();
     }, [applyStoredLayoutDirection, readOnlyWorkflow, resetLayoutDirection]);
 
     useEffect(() => {
         if (workflowUuid && !readOnlyWorkflow) {
-            setCurrentWorkflowUuid(workflowUuid);
+            setCurrentWorkflowUuid(workflowUuid, extractLayoutDirection(workflow.definition));
         }
 
         if (fitViewOnLoad) {

@@ -188,4 +188,72 @@ describe('useLayoutDirectionStore', () => {
 
         expect(result.current.layoutDirection).toBe('TB');
     });
+
+    it('falls back to the definition direction for a workflow this browser has not seen', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            result.current.setCurrentWorkflowUuid('duplicated-workflow', 'LR');
+        });
+
+        expect(result.current.layoutDirection).toBe('LR');
+        expect(result.current.directionsByWorkflowUuid['duplicated-workflow']).toBe('LR');
+    });
+
+    it('prefers the direction saved in this browser over the definition direction', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            useLayoutDirectionStore.setState({directionsByWorkflowUuid: {'workflow-1': 'TB'}});
+        });
+
+        act(() => {
+            result.current.setCurrentWorkflowUuid('workflow-1', 'LR');
+        });
+
+        expect(result.current.layoutDirection).toBe('TB');
+        expect(result.current.directionsByWorkflowUuid['workflow-1']).toBe('TB');
+    });
+
+    it('does not seed the saved directions when the definition has no direction', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            result.current.setCurrentWorkflowUuid('workflow-1', undefined);
+        });
+
+        expect(result.current.layoutDirection).toBe('TB');
+        expect(result.current.directionsByWorkflowUuid).toEqual({});
+    });
+
+    it('keeps the definition direction after a read-only view restores the stored direction', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            result.current.setCurrentWorkflowUuid('imported-workflow', 'LR');
+        });
+
+        act(() => {
+            result.current.resetLayoutDirection();
+        });
+
+        expect(result.current.layoutDirection).toBe('TB');
+
+        act(() => {
+            result.current.applyStoredLayoutDirection();
+        });
+
+        expect(result.current.layoutDirection).toBe('LR');
+    });
+
+    it('resets to the given direction for a read-only workflow', () => {
+        const {result} = renderHook(() => useLayoutDirectionStore());
+
+        act(() => {
+            result.current.resetLayoutDirection('LR');
+        });
+
+        expect(result.current.layoutDirection).toBe('LR');
+        expect(result.current.directionsByWorkflowUuid).toEqual({});
+    });
 });
