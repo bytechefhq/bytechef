@@ -307,7 +307,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     .distinct()
                     .toList();
 
-                Map<Long, ProjectDeployment> deploymentMap =
+                Map<Long, ProjectDeployment> projectDeploymentMap =
                     projectDeploymentService.getProjectDeployments(principalIds)
                         .stream()
                         .collect(Collectors.toMap(
@@ -326,7 +326,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
                 Map<Long, WorkflowExecutionDTO> jobWorkflowExecutionDTOMap = buildWorkflowExecutionDTOs(
                     jobIds, jobMap, workflows, projects, projectWorkflowIdsMap, workflowProjectVersionMap,
-                    jobToPrincipalMap, deploymentMap, triggerExecutionByJobIdMap)
+                    jobToPrincipalMap, projectDeploymentMap, triggerExecutionByJobIdMap)
                         .stream()
                         .collect(Collectors.toMap(WorkflowExecutionDTO::id, Function.identity()));
 
@@ -388,14 +388,12 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             Optional<Project> projectOptional = CollectionUtils.findFirst(
                 projects,
                 project -> CollectionUtils.contains(
-                    projectWorkflowIdsMap.getOrDefault(project.getId(), List.of()),
-                    job.getWorkflowId()));
+                    projectWorkflowIdsMap.getOrDefault(project.getId(), List.of()), job.getWorkflowId()));
 
             if (projectOptional.isEmpty()) {
                 if (log.isWarnEnabled()) {
                     log.warn(
-                        "Skipping job id={}: no project found for workflow '{}'",
-                        job.getId(), job.getWorkflowId());
+                        "Skipping job id={}: no project found for workflow '{}'", job.getId(), job.getWorkflowId());
                 }
 
                 continue;
@@ -413,14 +411,12 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 ? null
                 : taskFileStorage.readJobOutputs(job.getOutputs());
 
-            workflowExecutionDTOs.add(new WorkflowExecutionDTO(
-                Validate.notNull(job.getId(), "id"),
-                projectOptional.get(),
-                jobProjectDeployment,
-                workflowProjectVersionMap.get(job.getWorkflowId()),
-                new JobDTO(job, outputs, getSubflowJobTaskExecutions(job.getId())),
-                workflowOptional.get(),
-                getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
+            workflowExecutionDTOs.add(
+                new WorkflowExecutionDTO(
+                    Validate.notNull(job.getId(), "id"), projectOptional.get(), jobProjectDeployment,
+                    workflowProjectVersionMap.get(job.getWorkflowId()),
+                    new JobDTO(job, outputs, getSubflowJobTaskExecutions(job.getId())), workflowOptional.get(),
+                    getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
         }
 
         return workflowExecutionDTOs;
