@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.service;
 
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
@@ -153,6 +154,11 @@ public class PermissionServiceImpl implements PermissionService {
         Serializable id, String resourceType, String scope, Environment environment) {
 
         return hasResourceScope(id, resourceType, scope);
+    }
+
+    @Override
+    public boolean isAuthorizationSkipped() {
+        return AutomationAuthorizationContext.isSkipChecks();
     }
 
     @Override

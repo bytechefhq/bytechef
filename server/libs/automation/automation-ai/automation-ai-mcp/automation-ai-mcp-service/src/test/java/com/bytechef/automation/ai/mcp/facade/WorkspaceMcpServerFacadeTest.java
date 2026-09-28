@@ -45,6 +45,7 @@ import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacadeImpl;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
@@ -59,14 +60,13 @@ import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.tag.service.TagService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,30 +75,26 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.relational.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.relational.core.mapping.event.Identifier;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor;
 import org.springframework.security.authorization.method.PreAuthorizeAuthorizationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expressions on {@link WorkspaceMcpServerFacadeImpl} through the real
- * {@link AutomationMethodSecurityExpressionHandler} backed by the real {@link AutomationPermissionEvaluator}, asserting
- * each guard in both directions and the exact check that reaches {@link PermissionService}, and runs the workspace MCP
- * server create and delete flows through the real guards, with a caller who is not a tenant admin and whose MCP server
- * scopes come from the workspace the server is assigned to.
+ * Calls {@link WorkspaceMcpServerFacadeImpl} through the real Spring method-security interceptor, backed by the real
+ * {@link AutomationMethodSecurityExpressionHandler} and {@link AutomationPermissionEvaluator}, asserting each guard in
+ * both directions and the exact check that reaches {@link PermissionService}, and runs the workspace MCP server create
+ * and delete flows through the real guards, with a caller who is not a tenant admin and whose MCP server scopes come
+ * from the workspace the server is assigned to.
  *
  * @author Ivica Cardic
  */
 class WorkspaceMcpServerFacadeTest {
 
+    private static final String BODY_REACHED = "body reached";
     private static final Environment ENVIRONMENT = Environment.STAGING;
     private static final long MCP_PROJECT_ID = 9L;
     private static final long MCP_PROJECT_WORKFLOW_ID = 11L;
@@ -140,6 +136,8 @@ class WorkspaceMcpServerFacadeTest {
                     .workspaceId()
                     .isPresent() && grantedScopes.contains(invocation.<String>getArgument(2));
             });
+        when(permissionService.isAuthorizationSkipped())
+            .thenAnswer(invocation -> AutomationAuthorizationContext.isSkipChecks());
         when(permissionService.hasWorkspaceScope(anyLong(), anyString(), any(Environment.class)))
             .thenAnswer(invocation -> grantedScopes.contains(invocation.<String>getArgument(1)));
 
@@ -158,40 +156,38 @@ class WorkspaceMcpServerFacadeTest {
     }
 
     @Test
-    void testGetWorkspaceMcpServersDeniesWhenTheMcpViewScopeIsRefusedOnTheWorkspace() throws Exception {
-        assertResourceGuard(getWorkspaceMcpServersMethod(), new Object[] {
-            WORKSPACE_ID
-        }, WORKSPACE_ID, "Workspace", "MCP_VIEW", false);
+    void testGetWorkspaceMcpServersDeniesWhenTheMcpViewScopeIsRefusedOnTheWorkspace() {
+        assertResourceGuard(
+            facade -> facade.getWorkspaceMcpServers(WORKSPACE_ID), WORKSPACE_ID, "Workspace", "MCP_VIEW", false);
     }
 
     @Test
-    void testGetWorkspaceMcpServersAllowsWhenTheMcpViewScopeIsGrantedOnTheWorkspace() throws Exception {
-        assertResourceGuard(getWorkspaceMcpServersMethod(), new Object[] {
-            WORKSPACE_ID
-        }, WORKSPACE_ID, "Workspace", "MCP_VIEW", true);
+    void testGetWorkspaceMcpServersAllowsWhenTheMcpViewScopeIsGrantedOnTheWorkspace() {
+        assertResourceGuard(
+            facade -> facade.getWorkspaceMcpServers(WORKSPACE_ID), WORKSPACE_ID, "Workspace", "MCP_VIEW", true);
     }
 
     @Test
-    void testDeleteWorkspaceMcpServerDeniesWhenTheMcpDeleteScopeIsRefused() throws Exception {
-        assertResourceGuard(deleteWorkspaceMcpServerMethod(), new Object[] {
-            MCP_SERVER_ID
-        }, MCP_SERVER_ID, "McpServer", "MCP_DELETE", false);
+    void testDeleteWorkspaceMcpServerDeniesWhenTheMcpDeleteScopeIsRefused() {
+        assertResourceGuard(
+            facade -> facade.deleteWorkspaceMcpServer(MCP_SERVER_ID), MCP_SERVER_ID, "McpServer", "MCP_DELETE",
+            false);
     }
 
     @Test
-    void testDeleteWorkspaceMcpServerAllowsWhenTheMcpDeleteScopeIsGranted() throws Exception {
-        assertResourceGuard(deleteWorkspaceMcpServerMethod(), new Object[] {
-            MCP_SERVER_ID
-        }, MCP_SERVER_ID, "McpServer", "MCP_DELETE", true);
+    void testDeleteWorkspaceMcpServerAllowsWhenTheMcpDeleteScopeIsGranted() {
+        assertResourceGuard(
+            facade -> facade.deleteWorkspaceMcpServer(MCP_SERVER_ID), MCP_SERVER_ID, "McpServer", "MCP_DELETE",
+            true);
     }
 
     @Test
-    void testCreateWorkspaceMcpServerDeniesWhenTheMcpCreateScopeIsRefusedInTheServersEnvironment() throws Exception {
+    void testCreateWorkspaceMcpServerDeniesWhenTheMcpCreateScopeIsRefusedInTheServersEnvironment() {
         assertCreateGuard(false);
     }
 
     @Test
-    void testCreateWorkspaceMcpServerAllowsWhenTheMcpCreateScopeIsGrantedInTheServersEnvironment() throws Exception {
+    void testCreateWorkspaceMcpServerAllowsWhenTheMcpCreateScopeIsGrantedInTheServersEnvironment() {
         assertCreateGuard(true);
     }
 
@@ -301,77 +297,57 @@ class WorkspaceMcpServerFacadeTest {
         assertThat(workspaceIdsByMcpServerId).doesNotContainKey(MCP_SERVER_ID);
     }
 
-    private static void assertResourceGuard(
-        Method method, Object[] arguments, long expectedId, String expectedType, String expectedScope,
+    private void assertResourceGuard(
+        Consumer<WorkspaceMcpServerFacade> invocation, long expectedId, String expectedType, String expectedScope,
         boolean granted) {
 
-        PermissionService permissionService = mock(PermissionService.class);
+        PermissionService guardPermissionService = mock(PermissionService.class);
 
-        when(permissionService.hasResourceScope(expectedId, expectedType, expectedScope)).thenReturn(granted);
+        when(guardPermissionService.hasResourceScope(expectedId, expectedType, expectedScope)).thenReturn(granted);
 
-        assertThat(evaluateGuard(permissionService, method, arguments))
-            .as("%s must %s when hasResourceScope(%s, '%s', '%s') returns %s", method.getName(),
-                granted ? "allow" : "deny", expectedId, expectedType, expectedScope, granted)
-            .isEqualTo(granted);
+        assertInvocationOutcome(invocation, guardPermissionService, granted);
 
-        verify(permissionService).hasResourceScope(expectedId, expectedType, expectedScope);
-        verifyNoMoreInteractions(permissionService);
+        verify(guardPermissionService).hasResourceScope(expectedId, expectedType, expectedScope);
+        verifyNoMoreInteractions(guardPermissionService);
     }
 
-    private static void assertCreateGuard(boolean granted) throws Exception {
-        PermissionService permissionService = mock(PermissionService.class);
+    private void assertCreateGuard(boolean granted) {
+        PermissionService guardPermissionService = mock(PermissionService.class);
 
-        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "MCP_CREATE", ENVIRONMENT)).thenReturn(granted);
+        when(guardPermissionService.hasWorkspaceScope(WORKSPACE_ID, "MCP_CREATE", ENVIRONMENT)).thenReturn(granted);
 
-        Method method = WorkspaceMcpServerFacadeImpl.class.getMethod(
-            "createWorkspaceMcpServer", String.class, PlatformType.class, Environment.class, Boolean.class,
-            Long.class);
+        assertInvocationOutcome(
+            facade -> facade.createWorkspaceMcpServer(
+                "name", PlatformType.AUTOMATION, ENVIRONMENT, Boolean.TRUE, WORKSPACE_ID),
+            guardPermissionService, granted);
 
-        assertThat(evaluateGuard(permissionService, method, new Object[] {
-            "name", PlatformType.AUTOMATION, ENVIRONMENT, Boolean.TRUE, WORKSPACE_ID
-        }))
-            .isEqualTo(granted);
-
-        verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, "MCP_CREATE", ENVIRONMENT);
-        verifyNoMoreInteractions(permissionService);
+        verify(guardPermissionService).hasWorkspaceScope(WORKSPACE_ID, "MCP_CREATE", ENVIRONMENT);
+        verifyNoMoreInteractions(guardPermissionService);
     }
 
-    // The expression parsed here is read straight off our own @PreAuthorize annotation in this repository's compiled
-    // bytecode, not attacker-influenced input.
-    @SuppressFBWarnings(
-        value = "SPEL_INJECTION",
-        justification = "The expression is this repository's own @PreAuthorize value, not untrusted input.")
-    private static boolean evaluateGuard(PermissionService permissionService, Method method, Object[] arguments) {
-        PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+    private void assertInvocationOutcome(
+        Consumer<WorkspaceMcpServerFacade> invocation, PermissionService guardPermissionService, boolean allowed) {
 
-        assertThat(preAuthorize)
-            .as("%s must carry a @PreAuthorize guard", method.getName())
-            .isNotNull();
+        WorkspaceMcpServerFacade securedWorkspaceMcpServerFacade = secure(
+            new WorkspaceMcpServerFacadeImpl(
+                bodyReachedMock(McpServerFacade.class), bodyReachedMock(McpServerService.class),
+                bodyReachedMock(WorkspaceMcpServerService.class)),
+            guardPermissionService);
 
-        AutomationMethodSecurityExpressionHandler expressionHandler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
-
-        expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken("alice", "credentials", List.of());
-
-        SimpleMethodInvocation methodInvocation = new SimpleMethodInvocation(new Object(), method, arguments);
-
-        EvaluationContext evaluationContext =
-            expressionHandler.createEvaluationContext(() -> authentication, methodInvocation);
-
-        Expression expression = expressionHandler.getExpressionParser()
-            .parseExpression(preAuthorize.value());
-
-        return Boolean.TRUE.equals(expression.getValue(evaluationContext, Boolean.class));
+        if (allowed) {
+            assertThatThrownBy(() -> invocation.accept(securedWorkspaceMcpServerFacade))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        } else {
+            assertThatThrownBy(() -> invocation.accept(securedWorkspaceMcpServerFacade))
+                .isInstanceOf(AccessDeniedException.class);
+        }
     }
 
-    private static Method deleteWorkspaceMcpServerMethod() throws NoSuchMethodException {
-        return WorkspaceMcpServerFacadeImpl.class.getMethod("deleteWorkspaceMcpServer", Long.class);
-    }
-
-    private static Method getWorkspaceMcpServersMethod() throws NoSuchMethodException {
-        return WorkspaceMcpServerFacadeImpl.class.getMethod("getWorkspaceMcpServers", Long.class);
+    private static <T> T bodyReachedMock(Class<T> type) {
+        return mock(type, invocation -> {
+            throw new IllegalStateException(BODY_REACHED);
+        });
     }
 
     private WorkspaceMcpServerFacade createWorkspaceMcpServerFacade() {
@@ -444,12 +420,16 @@ class WorkspaceMcpServerFacadeTest {
             .delete(anyLong());
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T secure(T target) {
-        AutomationMethodSecurityExpressionHandler expressionHandler =
-            new AutomationMethodSecurityExpressionHandler(permissionService);
+        return secure(target, permissionService);
+    }
 
-        expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+    @SuppressWarnings("unchecked")
+    private static <T> T secure(T target, PermissionService guardPermissionService) {
+        AutomationMethodSecurityExpressionHandler expressionHandler =
+            new AutomationMethodSecurityExpressionHandler(guardPermissionService);
+
+        expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(guardPermissionService));
 
         PreAuthorizeAuthorizationManager preAuthorizeAuthorizationManager = new PreAuthorizeAuthorizationManager();
 
