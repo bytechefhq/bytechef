@@ -14,7 +14,7 @@
     <version>0.0.1</version>
 
     <properties>
-        <jackson.version>2.19.2</jackson.version>
+        <jackson.version>2.21.6</jackson.version>
         <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 
