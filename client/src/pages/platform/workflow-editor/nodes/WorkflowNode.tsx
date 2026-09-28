@@ -37,6 +37,7 @@ import handleDeleteTask from '../utils/handleDeleteTask';
 import handleDeleteTrigger from '../utils/handleDeleteTrigger';
 import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
+import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import styles from './NodeTypes.module.css';
@@ -147,6 +148,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     onOpenChange={setSwitchPopoverOpen}
                     open={switchPopoverOpen}
                     sourceNodeId={id}
+                    sourceNodeName={resolveTargetTriggerName(data)}
                 />
             )}
 

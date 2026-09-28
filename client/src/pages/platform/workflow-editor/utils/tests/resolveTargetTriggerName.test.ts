@@ -5,9 +5,25 @@ import resolveTargetTriggerName from '../resolveTargetTriggerName';
 
 describe('resolveTargetTriggerName', () => {
     it('resolves the synthetic Manual placeholder to trigger_1', () => {
-        const data = {componentName: 'manual', name: 'manual', operationName: 'manual'} as NodeDataType;
+        const data = {
+            componentName: 'manual',
+            name: 'manual',
+            operationName: 'manual',
+            workflowNodeName: 'trigger_1',
+        } as NodeDataType;
 
         expect(resolveTargetTriggerName(data)).toBe('trigger_1');
+    });
+
+    it('reuses the existing name of a saved Manual trigger', () => {
+        const data = {
+            componentName: 'manual',
+            name: 'trigger_3',
+            operationName: 'manual',
+            workflowNodeName: 'trigger_3',
+        } as NodeDataType;
+
+        expect(resolveTargetTriggerName(data)).toBe('trigger_3');
     });
 
     it('reuses the existing name when dropping on a real trigger (replace in place)', () => {

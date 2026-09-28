@@ -9,8 +9,9 @@ import useWorkflowIssuesStore from '../stores/useWorkflowIssuesStore';
 import WorkflowNode from './WorkflowNode';
 
 // Mutable slice of the editor store so each test can toggle which node is being renamed.
-const {editorStoreState} = vi.hoisted(() => ({
+const {editorStoreState, popoverMenuMock} = vi.hoisted(() => ({
     editorStoreState: {renamingNodeName: undefined as string | undefined},
+    popoverMenuMock: vi.fn(),
 }));
 
 // Render the context menu as a passthrough so the node content (and its rename input) is asserted directly.
@@ -23,7 +24,11 @@ vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu', 
 }));
 
 vi.mock('@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu', () => ({
-    default: () => null,
+    default: (props: Record<string, unknown>) => {
+        popoverMenuMock(props);
+
+        return null;
+    },
 }));
 
 vi.mock('@/pages/platform/workflow-editor/providers/workflowEditorProvider', () => ({
@@ -108,13 +113,23 @@ const NESTED_CLUSTER_ROOT_DATA = {
     workflowNodeName: 'approval_1',
 } as unknown as NodeDataType;
 
-function renderNode() {
+const MANUAL_TRIGGER_DATA = {
+    componentName: 'manual',
+    label: 'Manual',
+    name: 'trigger_3',
+    operationName: 'manual',
+    trigger: true,
+    type: 'manual/v1/manual',
+    workflowNodeName: 'trigger_3',
+} as unknown as NodeDataType;
+
+function renderNode(data: NodeDataType = NESTED_CLUSTER_ROOT_DATA, id = 'approval_1') {
     const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
 
     return render(
         <QueryClientProvider client={queryClient}>
             <ReactFlowProvider>
-                <WorkflowNode data={NESTED_CLUSTER_ROOT_DATA} id="approval_1" />
+                <WorkflowNode data={data} id={id} />
             </ReactFlowProvider>
         </QueryClientProvider>
     );
@@ -123,6 +138,16 @@ function renderNode() {
 describe('WorkflowNode', () => {
     beforeEach(() => {
         editorStoreState.renamingNodeName = undefined;
+
+        popoverMenuMock.mockClear();
+    });
+
+    it('points the trigger replace popover at the trigger it replaces', () => {
+        renderNode(MANUAL_TRIGGER_DATA, 'trigger_3');
+
+        expect(popoverMenuMock).toHaveBeenCalledWith(
+            expect.objectContaining({hideActionComponents: true, sourceNodeName: 'trigger_3'})
+        );
     });
 
     it('renders a rename input for a nested cluster root that is being renamed', () => {
