@@ -234,6 +234,8 @@ export const TASK_DISPATCHER_DATA_KEY_MAP = {
 
 export const DEFAULT_CANVAS_WIDTH = 670;
 
+export const CANVAS_LEFT_TO_RIGHT_LEFT_OFFSET = 56;
+
 export const CANVAS_TOP_OFFSET = 48;
 
 export const COPILOT_PANEL_WIDTH = 450;
