@@ -26,6 +26,7 @@ import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "sendEmail");
 
         List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME);
+            getMcpTools(INTEGRATION_ID);
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "sendEmail", "Send Email", "Send an email"));
@@ -93,7 +94,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
         McpTool mcpTool = createMcpTool(PlatformType.EMBEDDED, true, "getEmail");
 
         List<ConnectedUserIntegrationDTO.McpToolInfo> mcpToolInfos =
-            connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME);
+            getMcpTools(INTEGRATION_ID);
 
         assertThat(mcpToolInfos).containsExactly(
             new ConnectedUserIntegrationDTO.McpToolInfo(mcpTool.getId(), "getEmail", null, "Get an email"));
@@ -103,14 +104,14 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
     void testGetMcpToolsSkipsToolsOfDisabledMcpServer() {
         createMcpTool(PlatformType.EMBEDDED, false, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools(INTEGRATION_ID)).isEmpty();
     }
 
     @Test
     void testGetMcpToolsSkipsToolsOfNonEmbeddedMcpServer() {
         createMcpTool(PlatformType.AUTOMATION, true, "sendEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools(INTEGRATION_ID)).isEmpty();
     }
 
     @Test
@@ -119,7 +120,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
         createDisabledMcpTool(enabledMcpTool.getMcpComponentId(), "getEmail");
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(INTEGRATION_ID, COMPONENT_NAME))
+        assertThat(getMcpTools(INTEGRATION_ID))
             .extracting(ConnectedUserIntegrationDTO.McpToolInfo::id)
             .containsExactly(enabledMcpTool.getId());
     }
@@ -132,7 +133,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
         mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), integrationId);
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(integrationId, COMPONENT_NAME))
+        assertThat(getMcpTools(integrationId))
             .extracting(ConnectedUserIntegrationDTO.McpToolInfo::id)
             .containsExactly(mcpTool.getId());
     }
@@ -146,7 +147,7 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
 
         mcpIntegrationComponentService.create(mcpTool.getMcpComponentId(), siblingIntegrationId);
 
-        assertThat(connectedUserIntegrationFacade.getMcpTools(integrationId, COMPONENT_NAME)).isEmpty();
+        assertThat(getMcpTools(integrationId)).isEmpty();
     }
 
     @Test
@@ -159,7 +160,10 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
                 new McpIntegrationInstanceTool(1L, enabledMcpTool.getId(), true),
                 new McpIntegrationInstanceTool(1L, disabledMcpTool.getId(), true)));
 
-        assertThat(connectedUserIntegrationFacade.getMcpInstanceTools(1L)).containsExactly(
+        Set<Long> enabledEmbeddedMcpToolIds = connectedUserIntegrationFacade.getEnabledEmbeddedMcpToolIds(
+            connectedUserIntegrationFacade.getEnabledEmbeddedMcpServerIds());
+
+        assertThat(connectedUserIntegrationFacade.getMcpInstanceTools(1L, enabledEmbeddedMcpToolIds)).containsExactly(
             new ConnectedUserIntegrationDTO.McpInstanceToolInfo(enabledMcpTool.getId(), true));
     }
 
@@ -192,5 +196,10 @@ class ConnectedUserIntegrationFacadeMcpToolsIntTest {
             new McpComponent(COMPONENT_NAME, 1, mcpServer.getId(), null));
 
         return mcpToolRepository.save(new McpTool(name, Map.of(), mcpComponent.getId()));
+    }
+
+    private List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(long integrationId) {
+        return connectedUserIntegrationFacade.getMcpTools(
+            integrationId, COMPONENT_NAME, connectedUserIntegrationFacade.getEnabledEmbeddedMcpServerIds());
     }
 }
