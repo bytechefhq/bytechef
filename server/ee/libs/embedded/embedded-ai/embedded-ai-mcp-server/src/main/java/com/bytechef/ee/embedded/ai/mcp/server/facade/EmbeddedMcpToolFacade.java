@@ -16,7 +16,6 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -58,7 +57,6 @@ import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -78,7 +76,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -336,11 +333,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         String tenantId) {
 
         return request -> {
-            McpServer mcpServer = readMcpServerConfiguration(() -> mcpServerService.getMcpServer(mcpServerId));
-
-            if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
-            }
+            requireEnabledEmbeddedMcpServer(mcpServerId);
 
             IntegrationInstance integrationInstance = fetchIntegrationInstance(
                 externalUserId, componentName, integrationId, environment);
@@ -373,13 +366,13 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         };
     }
 
-    private McpServer getMcpServer(long mcpServerId) {
-        try {
-            return AutomationAuthorizationContext.callSkippingChecks(() -> mcpServerService.getMcpServer(mcpServerId));
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
+    private void requireEnabledEmbeddedMcpServer(long mcpServerId) {
+        boolean enabled = mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)
+            .stream()
+            .anyMatch(mcpServer -> Objects.equals(mcpServer.getId(), mcpServerId));
+
+        if (!enabled) {
+            throw new IllegalStateException("MCP server is disabled");
         }
     }
 
@@ -398,11 +391,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
 
         return inputParameters -> {
-            McpServer mcpServer = readMcpServerConfiguration(() -> mcpServerService.getMcpServer(mcpServerId));
-
-            if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
-            }
+            requireEnabledEmbeddedMcpServer(mcpServerId);
 
             Long integrationInstanceId = fetchIntegrationInstanceIdByConfiguration(
                 externalUserId, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
@@ -580,16 +569,6 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
             componentDefinitionService.getComponentDefinition(componentName, componentVersion);
 
         return componentDefinition.getConnection() != null;
-    }
-
-    private static <T> T readMcpServerConfiguration(Supplier<T> read) {
-        try {
-            return AutomationAuthorizationContext.callSkippingChecks(read::get);
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
-        }
     }
 
     private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {

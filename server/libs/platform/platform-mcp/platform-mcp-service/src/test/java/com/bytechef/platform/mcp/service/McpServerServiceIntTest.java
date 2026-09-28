@@ -154,6 +154,19 @@ class McpServerServiceIntTest {
     }
 
     @Test
+    void testGetEnabledMcpServersReturnsOnlyEnabledServersOfTheRequestedType() {
+        McpServer enabledEmbeddedServer = mcpServerRepository.save(
+            new McpServer("enabled-embedded-server", PlatformType.EMBEDDED, Environment.DEVELOPMENT, true));
+
+        mcpServerRepository.save(
+            new McpServer("disabled-embedded-server", PlatformType.EMBEDDED, Environment.DEVELOPMENT, false));
+        mcpServerRepository.save(
+            new McpServer("enabled-automation-server", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true));
+
+        assertThat(mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)).containsExactly(enabledEmbeddedServer);
+    }
+
+    @Test
     void testGetMcpServersByType() {
         McpServer automationServer = mcpServerRepository.save(getMcpServer());
         McpServer embeddedServer =
