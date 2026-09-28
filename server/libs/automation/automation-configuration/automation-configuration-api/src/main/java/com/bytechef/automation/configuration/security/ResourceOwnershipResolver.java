@@ -51,6 +51,15 @@ public interface ResourceOwnershipResolver {
     }
 
     /**
+     * The id of the project owning the given resource, for a resolver whose resource family is project-bearing. Returns
+     * empty for a non-numeric id, a missing resource, or a resource with no owning project; never throws for "not
+     * found". The default answers empty for resolvers that are not project-bearing.
+     */
+    default OptionalLong resolveProjectId(Serializable id) {
+        return OptionalLong.empty();
+    }
+
+    /**
      * Owning coordinates of a resource. A resolver may populate {@code workspaceId} (workspace-mapped resources),
      * {@code ownerUserId} (user-owned resources), or both.
      */
