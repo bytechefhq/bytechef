@@ -13,7 +13,6 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
@@ -53,7 +52,6 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
-import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -300,11 +298,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Map<String, ?> parameters, long mcpServerId, Environment environment, String tenantId) {
 
         return request -> {
-            McpServer mcpServer = getMcpServer(mcpServerId);
-
-            if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
-            }
+            requireEnabledEmbeddedMcpServer(mcpServerId);
 
             Long connectionId = fetchConnectionId(externalUserId, componentName, environment);
 
@@ -331,13 +325,13 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         };
     }
 
-    private McpServer getMcpServer(long mcpServerId) {
-        try {
-            return AutomationAuthorizationContext.callSkippingChecks(() -> mcpServerService.getMcpServer(mcpServerId));
-        } catch (RuntimeException | Error exception) {
-            throw exception;
-        } catch (Throwable throwable) {
-            throw new IllegalStateException(throwable);
+    private void requireEnabledEmbeddedMcpServer(long mcpServerId) {
+        boolean enabled = mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)
+            .stream()
+            .anyMatch(mcpServer -> Objects.equals(mcpServer.getId(), mcpServerId));
+
+        if (!enabled) {
+            throw new IllegalStateException("MCP server is disabled");
         }
     }
 
@@ -356,11 +350,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         Map<String, ?> workflowParameters, long mcpServerId, Environment environment, String tenantId) {
 
         return inputParameters -> {
-            McpServer mcpServer = getMcpServer(mcpServerId);
-
-            if (!mcpServer.isEnabled()) {
-                throw new IllegalStateException("MCP server is disabled");
-            }
+            requireEnabledEmbeddedMcpServer(mcpServerId);
 
             Long integrationInstanceId = fetchIntegrationInstanceId(externalUserId, componentName, environment);
 

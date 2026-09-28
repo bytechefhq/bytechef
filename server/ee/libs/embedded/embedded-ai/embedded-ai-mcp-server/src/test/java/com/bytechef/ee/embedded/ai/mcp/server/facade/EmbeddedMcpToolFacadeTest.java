@@ -8,21 +8,22 @@
 package com.bytechef.ee.embedded.ai.mcp.server.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
-import com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication.EmbeddedMcpServerApiKeyAuthenticationToken;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -39,6 +40,7 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -50,15 +52,11 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.execution.ToolExecutionException;
 import org.springframework.ai.tool.function.FunctionToolCallback;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 
 /**
  * @version ee
@@ -88,32 +86,14 @@ class EmbeddedMcpToolFacadeTest {
         mcpServerService, mock(PrincipalJobFacade.class), "http://localhost:8080", mock(TaskExecutionService.class),
         mock(TaskFileStorage.class), mock(WorkflowService.class));
 
-    @AfterEach
-    void afterEach() {
-        SecurityContextHolder.clearContext();
-    }
-
     @Test
-    void testToolCallReadsTheGatedServerUnderTheConnectedUserPrincipal() {
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-
-        securityContext.setAuthentication(
-            new EmbeddedMcpServerApiKeyAuthenticationToken(
-                1L, 1L, new User("externalUserId", "", List.of())));
-
-        SecurityContextHolder.setContext(securityContext);
-
+    void testToolCallReadsTheServerThroughTheUngatedEnabledEmbeddedServersLookup() {
         McpServer mcpServer = new McpServer();
 
+        mcpServer.setId(1L);
         mcpServer.setEnabled(true);
 
-        when(mcpServerService.getMcpServer(1L)).thenAnswer(invocation -> {
-            if (!AutomationAuthorizationContext.isSkipChecks()) {
-                throw new AccessDeniedException("Access Denied");
-            }
-
-            return mcpServer;
-        });
+        when(mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of(mcpServer));
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
 
@@ -124,7 +104,25 @@ class EmbeddedMcpToolFacadeTest {
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getFunctionToolCallback(Map.of());
 
         assertEquals("\"posted\"", functionToolCallback.call("{}"));
-        assertFalse(AutomationAuthorizationContext.isSkipChecks());
+        verify(mcpServerService, never()).getMcpServer(anyLong());
+    }
+
+    @Test
+    void testToolCallThrowsWhenTheMcpServerIsNotAmongTheEnabledEmbeddedServers() {
+        when(mcpServerService.getEnabledMcpServers(PlatformType.EMBEDDED)).thenReturn(List.of());
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        when(componentDefinitionService.getComponentDefinition("httpClient", 1)).thenReturn(componentDefinition);
+
+        FunctionToolCallback<Map<String, Object>, Object> functionToolCallback = getFunctionToolCallback(Map.of());
+
+        ToolExecutionException toolExecutionException = assertThrows(
+            ToolExecutionException.class, () -> functionToolCallback.call("{}"));
+
+        assertEquals("MCP server is disabled", toolExecutionException.getCause()
+            .getMessage());
+        verify(mcpServerService, never()).getMcpServer(anyLong());
     }
 
     // The tool name is optional, so a tool configured without one still has to reach the model under a callable
