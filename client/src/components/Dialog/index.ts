@@ -1,4 +1,11 @@
-export {Dialog, DialogClose, DialogContent, type DialogContentProps, DialogTrigger} from './Dialog';
+export {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    type DialogContentProps,
+    type DialogContentSizeType,
+    DialogTrigger,
+} from './Dialog';
 
 export {
     DialogCancelButton,

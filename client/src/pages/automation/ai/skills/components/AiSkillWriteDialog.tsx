@@ -39,8 +39,8 @@ const AiSkillWriteDialog = ({onCreated, onOpenChange, open}: AiSkillWriteDialogP
 
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
-            <DialogContent>
-                <DialogMain className="sm:w-[672px] sm:max-w-full">
+            <DialogContent size="md">
+                <DialogMain>
                     <DialogHeader
                         description="Enter a name, description and instructions for the skill."
                         icon={<PenLineIcon />}
