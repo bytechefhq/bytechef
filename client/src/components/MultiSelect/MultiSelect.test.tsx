@@ -221,6 +221,25 @@ describe('MultiSelect component', () => {
         expect(screen.getByLabelText('Select All')).toBeInTheDocument();
     });
 
+    it('should give the check icon of a checked box its own text colour (regression #5940)', async () => {
+        renderMultiSelect({
+            defaultValue: mockOptions.map((option) => option.value),
+        });
+
+        fireEvent.click(screen.getByText('Option One'));
+
+        const selectAllItem = (await screen.findByLabelText('Select All')).parentElement;
+        const optionItem = screen.getByLabelText('Option One').parentElement;
+
+        for (const commandItem of [selectAllItem, optionItem]) {
+            const checkIcon = commandItem?.querySelector('svg');
+
+            expect(checkIcon).toHaveClass('text-content-onsurface-primary');
+            expect(checkIcon?.parentElement).toHaveClass('bg-surface-brand-primary');
+            expect(checkIcon?.parentElement).not.toHaveClass('[&_svg]:invisible');
+        }
+    });
+
     it('should render the leadingIcon when provided', () => {
         const MockIcon = () => <div data-testid="mock-leading-icon">Icon</div>;
 
