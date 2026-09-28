@@ -90,6 +90,13 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public List<IntegrationInstance> getIntegrationInstanceConfigurationIntegrationInstances(
+        List<Long> integrationInstanceConfigurationIds) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationInstance
         getIntegrationInstance(long connectedUserId, String workflowId, Environment environment) {
         throw new UnsupportedOperationException();
