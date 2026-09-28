@@ -21,8 +21,10 @@ import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowUndoRedo from '../hooks/useWorkflowUndoRedo';
+import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import {saveLayoutDirection} from '../utils/layoutDirectionDefinitionUtils';
 
 interface WorkflowEditorToolbarPropsI {
     enableUndoRedo?: boolean;
@@ -54,10 +56,13 @@ const WorkflowEditorToolbar = ({
 
     const {fitView, zoomIn, zoomOut} = useReactFlow();
     const {canRedo, canUndo, handleRedo, handleUndo} = useWorkflowUndoRedo();
+    const {updateWorkflowMutation} = useWorkflowEditor();
 
     const taskCount = nodes.filter(
         (node) => (node.type === 'workflow' || node.type === 'readonly') && !(node.data as NodeDataType).taskDispatcher
     ).length;
+
+    const layoutDirectionLabel = layoutDirection === 'TB' ? 'Switch to horizontal layout' : 'Switch to vertical layout';
 
     const handleZoomIn = useCallback(() => zoomIn({duration: 300}), [zoomIn]);
 
@@ -68,8 +73,14 @@ const WorkflowEditorToolbar = ({
     }, [fitView]);
 
     const handleToggleLayout = useCallback(() => {
-        setLayoutDirection(layoutDirection === 'TB' ? 'LR' : 'TB');
-    }, [layoutDirection, setLayoutDirection]);
+        const nextLayoutDirection = layoutDirection === 'TB' ? 'LR' : 'TB';
+
+        setLayoutDirection(nextLayoutDirection);
+
+        if (!readOnly && updateWorkflowMutation) {
+            saveLayoutDirection({layoutDirection: nextLayoutDirection, updateWorkflowMutation});
+        }
+    }, [layoutDirection, readOnly, setLayoutDirection, updateWorkflowMutation]);
 
     const handleClear = useCallback(() => {
         setResetWorkflowLayout(true);
@@ -149,6 +160,7 @@ const WorkflowEditorToolbar = ({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
+                                aria-label={layoutDirectionLabel}
                                 icon={
                                     <ArrowRightIcon
                                         className="text-content-neutral-primary transition-transform duration-200"
@@ -165,7 +177,7 @@ const WorkflowEditorToolbar = ({
                             className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
                             side="top"
                         >
-                            {layoutDirection === 'TB' ? 'Switch to horizontal layout' : 'Switch to vertical layout'}
+                            {layoutDirectionLabel}
                         </TooltipContent>
                     </Tooltip>
 

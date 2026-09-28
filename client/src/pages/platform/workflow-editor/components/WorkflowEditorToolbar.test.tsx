@@ -1,11 +1,13 @@
 import {TooltipProvider} from '@/components/ui/tooltip';
 import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {ReactFlowProvider} from '@xyflow/react';
-import {beforeEach, describe, expect, it} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import {WorkflowMockProvider} from '../providers/workflowEditorProvider';
+import {WorkflowEditorProvider, WorkflowEditorStateI, WorkflowMockProvider} from '../providers/workflowEditorProvider';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
+import {clearAllWorkflowMutations} from '../utils/workflowMutationGuard';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
 
 const renderToolbar = (readOnly = false) =>
@@ -47,5 +49,86 @@ describe('WorkflowEditorToolbar - lock button', () => {
 
         expect(useWorkflowEditorStore.getState().nodesLocked).toBe(false);
         expect(screen.getByLabelText('Lock node movement')).toBeInTheDocument();
+    });
+});
+
+describe('WorkflowEditorToolbar - layout direction button', () => {
+    const mutateMock = vi.fn();
+
+    const renderEditorToolbar = (readOnly = false) =>
+        render(
+            <TooltipProvider>
+                <ReactFlowProvider>
+                    <WorkflowEditorProvider
+                        value={{updateWorkflowMutation: {mutate: mutateMock}} as unknown as WorkflowEditorStateI}
+                    >
+                        <WorkflowEditorToolbar readOnly={readOnly} />
+                    </WorkflowEditorProvider>
+                </ReactFlowProvider>
+            </TooltipProvider>
+        );
+
+    beforeEach(() => {
+        clearAllWorkflowMutations();
+        mutateMock.mockReset();
+
+        useLayoutDirectionStore.setState({
+            currentWorkflowUuid: 'workflow-uuid-1',
+            directionsByWorkflowUuid: {},
+            layoutDirection: 'TB',
+        });
+
+        useWorkflowDataStore.setState((state) => ({
+            edges: [],
+            nodes: [],
+            workflow: {
+                ...state.workflow,
+                definition: JSON.stringify({label: 'Workflow', tasks: []}),
+                id: 'workflow_1',
+                version: 1,
+            },
+        }));
+    });
+
+    it('saves the new direction into the workflow definition', async () => {
+        const user = userEvent.setup();
+
+        renderEditorToolbar(false);
+
+        await user.click(screen.getByLabelText('Switch to horizontal layout'));
+
+        expect(useLayoutDirectionStore.getState().layoutDirection).toBe('LR');
+        expect(screen.getByLabelText('Switch to vertical layout')).toBeInTheDocument();
+
+        const storedDefinition = useWorkflowDataStore.getState().workflow.definition!;
+
+        expect(JSON.parse(storedDefinition).metadata.ui.layoutDirection).toBe('LR');
+        expect(mutateMock).toHaveBeenCalledTimes(1);
+        expect(mutateMock.mock.calls[0][0].workflow.definition).toBe(storedDefinition);
+    });
+
+    it('only switches the canvas direction in read-only mode', async () => {
+        const definition = useWorkflowDataStore.getState().workflow.definition;
+        const user = userEvent.setup();
+
+        renderEditorToolbar(true);
+
+        await user.click(screen.getByLabelText('Switch to horizontal layout'));
+
+        expect(useLayoutDirectionStore.getState().layoutDirection).toBe('LR');
+        expect(useWorkflowDataStore.getState().workflow.definition).toBe(definition);
+        expect(mutateMock).not.toHaveBeenCalled();
+    });
+
+    it('does not save without an update mutation', async () => {
+        const definition = useWorkflowDataStore.getState().workflow.definition;
+        const user = userEvent.setup();
+
+        renderToolbar(false);
+
+        await user.click(screen.getByLabelText('Switch to horizontal layout'));
+
+        expect(useLayoutDirectionStore.getState().layoutDirection).toBe('LR');
+        expect(useWorkflowDataStore.getState().workflow.definition).toBe(definition);
     });
 });

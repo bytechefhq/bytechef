@@ -2,11 +2,13 @@ import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
+import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore, {
     setWorkflowWithoutHistory,
     useWorkflowTemporalStore,
 } from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import {applyLayoutDirectionToDefinition} from '../utils/layoutDirectionDefinitionUtils';
 import {drainPendingSaves, isWorkflowMutating, setWorkflowMutating} from '../utils/workflowMutationGuard';
 
 interface UseWorkflowUndoRedoReturnI {
@@ -40,8 +42,15 @@ export default function useWorkflowUndoRedo(): UseWorkflowUndoRedoReturnI {
                 return;
             }
 
-            const definition = workflow.definition;
+            const definition = applyLayoutDirectionToDefinition(
+                workflow.definition,
+                useLayoutDirectionStore.getState().layoutDirection
+            );
             const workflowId = workflow.id;
+
+            if (definition !== workflow.definition) {
+                setWorkflowWithoutHistory({...workflow, definition});
+            }
 
             setWorkflowMutating(workflowId, true);
 
