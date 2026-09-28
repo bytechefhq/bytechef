@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.web.authentication.NonPlatformUserAuthentication;
 import java.io.Serializable;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jspecify.annotations.Nullable;
@@ -130,7 +131,7 @@ public final class AutomationMethodSecurityExpressionRoot
      * promotion and is lost on worker threads.
      */
     public boolean hasWorkspaceScopeInEnvironment(long workspaceId, String scope, Environment environment) {
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -154,20 +155,26 @@ public final class AutomationMethodSecurityExpressionRoot
      * read Production by omitting the parameter.
      */
     public boolean hasWorkspaceScopeInEnvironmentId(long workspaceId, String scope, @Nullable Long environmentId) {
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
-        }
-
-        if (environmentId == null) {
-            return permissionService.hasWorkspaceScopeInEveryEnvironment(workspaceId, scope);
         }
 
         Environment[] environments = Environment.values();
 
-        // An ordinal outside the enum is a forged argument, not an absent one: deny rather than fall back to the
-        // environment-unaware check, which would make a bad ordinal the way around this gate.
+        if (environmentId == null) {
+            for (Environment environment : environments) {
+                if (!permissionService.hasWorkspaceScope(workspaceId, scope, environment)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // An ordinal outside the enum is a forged argument, not an absent one: outside skip mode deny rather than fall
+        // back to the environment-unaware check, which would make a bad ordinal the way around this gate.
         if (environmentId < 0 || environmentId >= environments.length) {
-            return false;
+            return isSkippedAndGranted(() -> permissionService.hasWorkspaceScope(workspaceId, scope));
         }
 
         return permissionService.hasWorkspaceScope(workspaceId, scope, environments[(int) (long) environmentId]);
@@ -186,7 +193,7 @@ public final class AutomationMethodSecurityExpressionRoot
     public boolean hasResourceScopeInEnvironment(
         Serializable id, String resourceType, String scope, @Nullable Environment environment) {
 
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -200,19 +207,19 @@ public final class AutomationMethodSecurityExpressionRoot
     /**
      * The raw-ordinal counterpart of {@link #hasResourceScopeInEnvironment}, for an operation on a resource whose data
      * the caller-supplied environment selects, such as the physical table of a data table. A {@code null} ordinal and
-     * an ordinal outside the enum are denied.
+     * an ordinal outside the enum are denied outside skip mode.
      */
     public boolean hasResourceScopeInEnvironmentId(
         Serializable id, String resourceType, String scope, @Nullable Long environmentId) {
 
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
         Environment[] environments = Environment.values();
 
         if (environmentId == null || environmentId < 0 || environmentId >= environments.length) {
-            return false;
+            return isSkippedAndGranted(() -> permissionService.hasResourceScope(id, resourceType, scope));
         }
 
         return permissionService.hasResourceScopeInEnvironment(
@@ -224,7 +231,7 @@ public final class AutomationMethodSecurityExpressionRoot
      * not confined to one environment. A workflow that belongs to no project is granted to a tenant administrator only.
      */
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -238,7 +245,7 @@ public final class AutomationMethodSecurityExpressionRoot
      * where only automation traffic arrives.
      */
     public boolean hasWorkflowScopeInEnvironment(String workflowId, String scope, Environment environment) {
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -254,7 +261,7 @@ public final class AutomationMethodSecurityExpressionRoot
     public boolean hasWorkflowScopeIfProjectWorkflowInEnvironment(
         String workflowId, String scope, Environment environment) {
 
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -264,12 +271,12 @@ public final class AutomationMethodSecurityExpressionRoot
     /**
      * The raw-ordinal counterpart of {@link #hasWorkflowScopeIfProjectWorkflowInEnvironment}, named differently for the
      * reason given on {@link #hasWorkspaceScopeInEnvironmentId}. A {@code null} ordinal is the Development environment
-     * projects are edited in, and an ordinal outside the enum is denied.
+     * projects are edited in, and an ordinal outside the enum is denied outside skip mode.
      */
     public boolean hasWorkflowScopeIfProjectWorkflowInEnvironmentId(
         String workflowId, String scope, @Nullable Long environmentId) {
 
-        if (AutomationAuthorizationContext.isSkipChecks()) {
+        if (isAuthorizationSkipped()) {
             return true;
         }
 
@@ -280,11 +287,19 @@ public final class AutomationMethodSecurityExpressionRoot
         }
 
         if (environmentId < 0 || environmentId >= environments.length) {
-            return false;
+            return isSkippedAndGranted(() -> permissionService.hasWorkflowScope(workflowId, scope));
         }
 
         return permissionService.hasWorkflowScopeIfProjectWorkflow(
             workflowId, scope, environments[(int) (long) environmentId]);
+    }
+
+    private boolean isAuthorizationSkipped() {
+        return AutomationAuthorizationContext.isSkipChecks() && permissionService.isAuthorizationSkipped();
+    }
+
+    private static boolean isSkippedAndGranted(BooleanSupplier environmentUnawareCheck) {
+        return AutomationAuthorizationContext.isSkipChecks() && environmentUnawareCheck.getAsBoolean();
     }
 
     @Override
