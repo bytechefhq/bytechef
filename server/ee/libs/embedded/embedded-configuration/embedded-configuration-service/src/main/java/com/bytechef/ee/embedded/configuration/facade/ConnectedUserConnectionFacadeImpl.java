@@ -18,11 +18,14 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -103,10 +106,16 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
             return;
         }
 
-        String currentUserLogin = SecurityUtils.fetchCurrentUserLogin()
-            .orElse(null);
+        Optional<ConnectedUserAuthentication> connectedUserAuthentication = ConnectedUserAuthentications
+            .fetchCurrent();
 
-        if (!Objects.equals(connectedUser.getExternalId(), currentUserLogin)) {
+        boolean connectedUserMatches = connectedUserAuthentication
+            .filter(
+                authentication -> Objects.equals(authentication.externalUserId(), connectedUser.getExternalId()) &&
+                    authentication.environmentId() == connectedUser.getEnvironmentId())
+            .isPresent();
+
+        if (!connectedUserMatches) {
             throw new AccessDeniedException(
                 "Connected user " + connectedUser.getId() + " does not belong to the current user");
         }
