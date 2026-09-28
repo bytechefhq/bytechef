@@ -3,7 +3,7 @@ import {render, screen, userEvent} from '@/shared/util/test-utils';
 import {type ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
-import {Dialog, DialogClose, DialogContent, DialogTrigger, useDialogLayout} from './Dialog';
+import {Dialog, DialogClose, DialogContent, type DialogContentSizeType, DialogTrigger, useDialogLayout} from './Dialog';
 
 function LayoutProbe() {
     const {hasSidebar} = useDialogLayout();
@@ -11,10 +11,10 @@ function LayoutProbe() {
     return <span data-testid="layout-probe">{String(hasSidebar)}</span>;
 }
 
-function renderOpenDialog(content?: ReactNode, className?: string, hasSidebar?: boolean) {
+function renderOpenDialog(content?: ReactNode, className?: string, hasSidebar?: boolean, size?: DialogContentSizeType) {
     return render(
         <Dialog open>
-            <DialogContent aria-describedby={undefined} className={className} hasSidebar={hasSidebar}>
+            <DialogContent aria-describedby={undefined} className={className} hasSidebar={hasSidebar} size={size}>
                 <ShadcnDialogTitle>Title</ShadcnDialogTitle>
 
                 {content}
@@ -52,6 +52,43 @@ describe('DialogContent - Surface', () => {
         renderOpenDialog();
 
         expect(screen.getByRole('dialog')).not.toHaveClass('lg:w-[860px]');
+    });
+
+    it('should size the dialog to 512 px from sm up by default', () => {
+        renderOpenDialog();
+
+        const dialog = screen.getByRole('dialog');
+
+        expect(dialog).toHaveClass('w-full', 'sm:w-[512px]');
+        expect(dialog).not.toHaveClass('sm:w-auto');
+    });
+
+    it.each([
+        ['md', 'sm:w-[640px]'],
+        ['lg', 'sm:w-[800px]'],
+        ['xl', 'sm:w-[1000px]'],
+    ] as [DialogContentSizeType, string][])('should apply the %s width', (size, widthClass) => {
+        renderOpenDialog(undefined, undefined, undefined, size);
+
+        const dialog = screen.getByRole('dialog');
+
+        expect(dialog).toHaveClass(widthClass);
+        expect(dialog).not.toHaveClass('sm:w-[512px]');
+    });
+
+    it('should keep the sidebar width from lg up next to the size width', () => {
+        renderOpenDialog(undefined, undefined, true, 'md');
+
+        expect(screen.getByRole('dialog')).toHaveClass('sm:w-[640px]', 'lg:w-[860px]');
+    });
+
+    it('should let className override the size width', () => {
+        renderOpenDialog(undefined, 'sm:w-[900px]');
+
+        const dialog = screen.getByRole('dialog');
+
+        expect(dialog).toHaveClass('sm:w-[900px]');
+        expect(dialog).not.toHaveClass('sm:w-[512px]');
     });
 
     it('should merge className', () => {

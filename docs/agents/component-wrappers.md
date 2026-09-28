@@ -414,6 +414,22 @@ point; no known divergences remain.
 does **not** use a discriminated union (single optional-adornment interface). Study it for the
 gotchas in §12.
 
+[Dialog](../../client/src/components/Dialog/) is a fifth reference and the only *family*: a set
+of compound parts (`DialogContent`, `DialogMain`, `DialogHeader`, `DialogBody`, `DialogFooter`,
+`DialogSidebar`, plus a headless `DialogStepsProvider`) that share layout through context
+instead of props. Two rules from it generalise: the family owns the single Radix Title and
+Description — `DialogHeader` takes them as `title` / `description` props so a consumer can't
+render two — and `DialogContent` sizes itself with a `size` union (`sm` 512 / `md` 640 / `lg`
+800 / `xl` 1000) rather than letting callers hand-roll widths.
+
+### Migrating a dialog
+
+`@/components/ui/dialog` is restricted by ESLint. Existing importers are listed as a shrinking
+backlog in `eslint.config.mjs`; new code has to use the family. The old-part → new-part table,
+the `<form>` wrapper rule and the per-PR checklist live in
+[dialog-migration-plan.md](dialog-migration-plan.md) §4 and §7, and §6 gives the order the
+remaining files get migrated in.
+
 ---
 
 ## 12. Gotchas (learned from the Input pilot)

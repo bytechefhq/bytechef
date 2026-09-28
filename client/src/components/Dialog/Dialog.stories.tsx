@@ -60,6 +60,43 @@ export const Default: Story = {
     ),
 };
 
+export const WithLongCopy: Story = {
+    render: () => (
+        <Dialog defaultOpen>
+            <DialogTrigger asChild>
+                <Button label="Open dialog" />
+            </DialogTrigger>
+
+            <DialogContent size="lg">
+                <DialogMain>
+                    <DialogHeader
+                        description="The size prop fixes the width, so neither this description nor the body below can stretch the dialog"
+                        icon={<PencilIcon />}
+                        title="Edit Skill"
+                    />
+
+                    <DialogBody>
+                        <p className="text-sm text-content-neutral-secondary">
+                            Every size is a fixed width from the sm breakpoint up: sm is 512 px, md 640 px, lg 800 px
+                            and xl 1000 px. An auto width would resolve against the space between the dialog and the
+                            right edge of the viewport, because DialogContent is positioned fixed left-1/2, so a single
+                            long line like this one used to push the dialog out to half the viewport and keep growing
+                            with the screen. Below the sm breakpoint every size falls back to the full width minus the
+                            16 px gutters.
+                        </p>
+                    </DialogBody>
+
+                    <DialogFooter>
+                        <DialogCancelButton />
+
+                        <Button label="Save" />
+                    </DialogFooter>
+                </DialogMain>
+            </DialogContent>
+        </Dialog>
+    ),
+};
+
 export const WithSidebar: Story = {
     render: () => (
         <Dialog defaultOpen>
