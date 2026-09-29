@@ -14,7 +14,7 @@ const OutputTabNoOutputNotice = ({className, onDismiss, operationLabel}: OutputT
 
         <AlertTitle className="pr-6">Test completed</AlertTitle>
 
-        <AlertDescription className="col-span-2 col-start-1 mt-1">
+        <AlertDescription>
             {`The ${operationLabel.toLowerCase()} ran successfully but returned no data.`}
         </AlertDescription>
 
