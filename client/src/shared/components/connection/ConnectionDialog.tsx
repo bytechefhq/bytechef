@@ -82,7 +82,7 @@ interface ConnectionDialogProps {
         onSuccess?: (result: number, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
     }) => UseMutationResult<number, Error, ConnectionI, unknown>;
-    useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
+    useGetConnectionTagsQuery?: () => UseQueryResult<Tag[], Error>;
     useUpdateConnectionCredentialsMutation?: (mutationProps: {
         onSuccess?: (result: void, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
@@ -92,6 +92,10 @@ interface ConnectionDialogProps {
         onError?: (error: Error, variables: ConnectionI) => void;
     }) => UseMutationResult<void, Error, ConnectionI, unknown>;
 }
+
+const NO_TAGS_QUERY_RESULT = {data: undefined, error: null, isLoading: false} as UseQueryResult<Tag[], Error>;
+
+const useNoConnectionTagsQuery = () => NO_TAGS_QUERY_RESULT;
 
 const ConnectionDialog = ({
     componentDefinition,
@@ -171,7 +175,9 @@ const ConnectionDialog = ({
         isLoading: oAuth2AuthorizationParametersLoading,
     } = useGetOAuth2AuthorizationParametersQuery(getNewOAuth2AuthorizationParameters(), wizardStep === 'oauth_step');
 
-    const {data: tags, error: tagsError, isLoading: tagsLoading} = useGetConnectionTagsQuery();
+    const useTagsQuery = useGetConnectionTagsQuery ?? useNoConnectionTagsQuery;
+
+    const {data: tags, error: tagsError, isLoading: tagsLoading} = useTagsQuery();
 
     const {
         data: oAuth2Properties,
@@ -372,7 +378,7 @@ const ConnectionDialog = ({
             errors.push(connectionMutation.error?.message);
         }
 
-        if (tagsError && !tagsLoading) {
+        if (useGetConnectionTagsQuery && tagsError && !tagsLoading) {
             errors.push(tagsError.message);
         }
 
@@ -756,7 +762,7 @@ const ConnectionDialog = ({
                                         </div>
                                     )}
 
-                                    {!tagsLoading && !isUpdatingCredentials && (
+                                    {useGetConnectionTagsQuery && !tagsLoading && !isUpdatingCredentials && (
                                         <FormField
                                             control={control}
                                             name="tags"
