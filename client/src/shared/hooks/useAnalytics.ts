@@ -25,6 +25,14 @@ export interface AnalyticsI {
     reset(): void;
 }
 
+export const identifyAccount = (posthog: PostHog, account: UserI, edition?: string) => {
+    posthog.identify(account.uuid, {
+        edition,
+        email: account.email,
+        name: `${account.firstName} ${account.lastName}`,
+    });
+};
+
 export const useAnalytics = (): AnalyticsI => {
     const identifyRef = useRef(false);
     const posthogRef = useRef<PostHog | null>(null);
@@ -90,11 +98,7 @@ export const useAnalytics = (): AnalyticsI => {
             const posthog = await getPostHog();
 
             if (posthog) {
-                posthog.identify(account.uuid, {
-                    edition: application?.edition,
-                    email: account.email,
-                    name: `${account.firstName} ${account.lastName}`,
-                });
+                identifyAccount(posthog, account, application?.edition);
             }
         },
         reset: async () => {

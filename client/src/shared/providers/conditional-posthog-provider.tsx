@@ -1,4 +1,6 @@
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {identifyAccount} from '@/shared/hooks/useAnalytics';
+import {applicationInfoStore, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {ReactNode, Suspense, lazy, useEffect, useState} from 'react';
 
 import type {PostHog} from 'posthog-js';
@@ -27,6 +29,13 @@ export const ConditionalPostHogProvider = ({children}: ConditionalPostHogProvide
             posthog.init(analytics.postHog.apiKey, {
                 api_host: analytics.postHog.host,
                 capture_pageview: false,
+                loaded: () => {
+                    const {account, authenticated} = authenticationStore.getState();
+
+                    if (authenticated && account) {
+                        identifyAccount(posthog, account, applicationInfoStore.getState().application?.edition);
+                    }
+                },
                 person_profiles: 'identified_only',
             });
         }
