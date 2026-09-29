@@ -1,4 +1,5 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
+import {type ReactNode, createElement} from 'react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 const hoisted = vi.hoisted(() => {
@@ -179,6 +180,22 @@ describe('usePropertyCodeEditorDialogToolbar', () => {
 
             const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
             const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps));
+
+            expect(result.current.copilotEnabled).toBe(false);
+        });
+
+        it('should be false when the workflow editor runs with the copilot disabled', async () => {
+            hoisted.storeState.ai = {copilot: {enabled: true}};
+            hoisted.storeState.ff_1570 = true;
+
+            const {WorkflowEditorCopilotContext} =
+                await import('@/pages/platform/workflow-editor/providers/workflowEditorCopilotContext');
+            const {usePropertyCodeEditorDialogToolbar} = await import('../usePropertyCodeEditorDialogToolbar');
+
+            const wrapper = ({children}: {children: ReactNode}) =>
+                createElement(WorkflowEditorCopilotContext.Provider, {value: false}, children);
+
+            const {result} = renderHook(() => usePropertyCodeEditorDialogToolbar(defaultProps), {wrapper});
 
             expect(result.current.copilotEnabled).toBe(false);
         });
