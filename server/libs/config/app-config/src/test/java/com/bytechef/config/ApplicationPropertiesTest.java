@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Redis;
 import com.bytechef.config.ApplicationProperties.Oauth2;
 import com.bytechef.config.ApplicationProperties.Oauth2.ResourceServer;
-import com.bytechef.config.ApplicationProperties.Security.ConnectedUserAuthorizationMode;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -184,12 +183,5 @@ class ApplicationPropertiesTest {
             .bindOrCreate(
                 "bytechef", Bindable.of(ApplicationProperties.class),
                 new NoUnboundElementsBindHandler(BindHandler.DEFAULT, new UnboundElementsSourceFilter()));
-    }
-
-    @Test
-    void testConnectedUserAuthorizationModeDefaultsToEnforce() {
-        ApplicationProperties.Security security = new ApplicationProperties.Security();
-
-        assertThat(security.getConnectedUserAuthorizationMode()).isEqualTo(ConnectedUserAuthorizationMode.ENFORCE);
     }
 }

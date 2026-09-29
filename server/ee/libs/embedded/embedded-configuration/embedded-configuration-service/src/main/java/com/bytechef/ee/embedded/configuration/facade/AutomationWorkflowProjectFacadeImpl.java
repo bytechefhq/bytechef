@@ -15,7 +15,6 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.SystemProjects;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
@@ -69,7 +68,6 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
     private static final String MARKER = SystemProjects.EMBEDDED_AUTOMATION_NAME_PREFIX;
 
@@ -319,22 +317,12 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    public List<AutomationWorkflowProjectDTO> getPublishedProjects() {
-        Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
-
-        return getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())
-            .stream()
-            .map(project -> toPublishedDTO(project, automationWorkflowProjects.get(project.getId())))
-            .toList();
-    }
-
-    @Override
     public List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         Map<String, Long> integrationIdsByComponentName = getIntegrationIdsByComponentName(environment, connectedUser);
 
-        return getPublishedProjects().stream()
+        return getAllPublishedProjects().stream()
             .filter(project -> embeddedPermissionEvaluator.evaluate(project.permissionExpression(), connectedUser))
             .map(project -> filterWorkflowTemplates(project, connectedUser, integrationIdsByComponentName))
             .toList();
@@ -477,6 +465,15 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
 
         return integrationIdsByComponentName;
+    }
+
+    private List<AutomationWorkflowProjectDTO> getAllPublishedProjects() {
+        Map<Long, AutomationWorkflowProject> automationWorkflowProjects = getAutomationWorkflowProjects();
+
+        return getAutomationWorkflowProjectProjects(automationWorkflowProjects.keySet())
+            .stream()
+            .map(project -> toPublishedDTO(project, automationWorkflowProjects.get(project.getId())))
+            .toList();
     }
 
     private AutomationWorkflowProjectDTO filterWorkflowTemplates(

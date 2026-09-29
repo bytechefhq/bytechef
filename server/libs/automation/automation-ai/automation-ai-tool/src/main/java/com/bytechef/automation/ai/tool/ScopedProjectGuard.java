@@ -176,7 +176,7 @@ public class ScopedProjectGuard {
         Long scopedProjectId = ScopedProjectToolContext.fetchScopedProjectId(toolContext);
 
         if (scopedProjectId == null && ScopedProjectToolContext.isConfined(toolContext)) {
-            log.warn("Rejected a tool call: the run skips automation authorization but carries no scoped project");
+            log.warn("Rejected a tool call: the connected user's run carries no scoped project");
 
             throw new ExecutionException(UNSCOPED_MESSAGE, errorType);
         }

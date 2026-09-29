@@ -106,6 +106,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.function.RouterFunction;
@@ -120,6 +121,7 @@ import org.springframework.web.servlet.function.ServerResponse;
 @ConditionalOnEEVersion
 public class EmbeddedMcpServerConfiguration {
 
+    private static final String AUTHENTICATION = "authentication";
     private static final String ENVIRONMENT = "environment";
     private static final String EXTERNAL_USER_ID = "externalUserId";
     private static final String SECRET_KEY = "secretKey";
@@ -226,6 +228,8 @@ public class EmbeddedMcpServerConfiguration {
 
                 String tenantId = tenantKey.getTenantId();
 
+                Authentication authentication = (Authentication) mcpTransportContext.get(AUTHENTICATION);
+
                 mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
                     .stream()
                     .flatMap(
@@ -233,7 +237,7 @@ public class EmbeddedMcpServerConfiguration {
                             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
                     .forEach(mcpTool -> {
                         var callback = embeddedMcpToolFacade.getFunctionToolCallback(
-                            mcpTool, externalUserId, environment, tenantId);
+                            mcpTool, externalUserId, environment, tenantId, authentication);
 
                         if (callback != null) {
                             toolSpecifications.add(McpToolUtils.toAsyncToolSpecification(callback));
@@ -245,7 +249,8 @@ public class EmbeddedMcpServerConfiguration {
                     .stream()
                     .flatMap(mcpIntegrationInstanceConfiguration -> CollectionUtils.stream(
                         embeddedMcpToolFacade.getFunctionToolCallbacks(
-                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId)))
+                            mcpIntegrationInstanceConfiguration, externalUserId, environment, tenantId,
+                            authentication)))
                     .map(McpToolUtils::toAsyncToolSpecification)
                     .forEach(toolSpecifications::add);
 
@@ -284,8 +289,16 @@ public class EmbeddedMcpServerConfiguration {
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        if (!(securityContext.getAuthentication() instanceof McpAnonymousAuthenticationToken)) {
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (!(authentication instanceof McpAnonymousAuthenticationToken)) {
             context.put(EXTERNAL_USER_ID, SecurityUtils.getCurrentUserLogin());
+        }
+
+        // The tool callbacks run on a pooled worker that does not inherit the request's security context, so they get
+        // the principal from here and act as that connected user rather than as nobody.
+        if (authentication != null) {
+            context.put(AUTHENTICATION, authentication);
         }
 
         return McpTransportContext.create(context);
