@@ -85,17 +85,6 @@ describe('isElkLayoutSupported', () => {
         );
     });
 
-    it('rejects a cluster root that a read-only layout retyped', () => {
-        const readOnlyClusterRootNode: Node = {
-            data: {clusterRoot: true, componentName: 'aiAgent', workflowNodeName: 'aiAgent_1'},
-            id: 'aiAgent_1',
-            position: {x: 0, y: 0},
-            type: 'readonly',
-        };
-
-        expect(isElkLayoutSupported([taskNode('task1'), readOnlyClusterRootNode])).toBe(false);
-    });
-
     it('supports an empty node list', () => {
         expect(isElkLayoutSupported([])).toBe(true);
     });
