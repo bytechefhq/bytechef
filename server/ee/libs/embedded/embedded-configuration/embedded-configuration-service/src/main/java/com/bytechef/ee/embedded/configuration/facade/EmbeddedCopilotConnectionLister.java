@@ -57,7 +57,7 @@ public class EmbeddedCopilotConnectionLister implements CopilotConnectionLister 
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(request.externalUserId(), environment);
 
         List<ConnectionDTO> connectionDTOs =
-            connectedUserConnectionFacade.getConnections(connectedUser.getId(), request.componentName(), List.of());
+            connectedUserConnectionFacade.getConnections(connectedUser.getId(), request.componentName());
 
         return connectionDTOs.stream()
             .map(connectionDTO -> new CopilotConnection(

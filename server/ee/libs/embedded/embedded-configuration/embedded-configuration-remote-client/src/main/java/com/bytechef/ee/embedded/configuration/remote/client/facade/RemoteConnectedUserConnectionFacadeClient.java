@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFaca
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,19 +24,19 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserConnectionFacade {
 
     @Override
-    public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<ConnectionDTO> getConnectedUserConnections(
-        long connectedUserId, String componentName, List<Long> connectionIds) {
+    public long createConnectedUserConnection(
+        long connectedUserId, @Nullable Long requestedEnvironmentId, ConnectionDTO connectionDTO) {
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds) {
+    public List<ConnectionDTO> getConnectedUserConnections(long connectedUserId, @Nullable String componentName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<ConnectionDTO> getConnections(Long connectedUserId, @Nullable String componentName) {
         throw new UnsupportedOperationException();
     }
 }

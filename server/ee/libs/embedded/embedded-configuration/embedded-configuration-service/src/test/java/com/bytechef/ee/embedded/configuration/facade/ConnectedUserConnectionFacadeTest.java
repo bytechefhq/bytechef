@@ -10,15 +10,18 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.ee.embedded.configuration.security.ConnectedUserConnectionMembership;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
@@ -31,6 +34,8 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +73,8 @@ class ConnectedUserConnectionFacadeTest {
     @BeforeEach
     void setUp() {
         facade = new ConnectedUserConnectionFacadeImpl(
-            connectedUserConnectionService, connectedUserService, connectionFacade, integrationInstanceService);
+            new ConnectedUserConnectionMembership(connectedUserConnectionService, integrationInstanceService),
+            connectedUserConnectionService, connectedUserService, connectionFacade);
     }
 
     @AfterEach
@@ -87,7 +93,7 @@ class ConnectedUserConnectionFacadeTest {
 
         when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(5L);
 
-        long connectionId = facade.createConnectedUserConnection(1L, connectionDTO);
+        long connectionId = facade.createConnectedUserConnection(1L, null, connectionDTO);
 
         assertThat(connectionId).isEqualTo(5L);
 
@@ -103,7 +109,7 @@ class ConnectedUserConnectionFacadeTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .build();
 
-        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, connectionDTO))
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, null, connectionDTO))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).create(any(), any());
@@ -119,7 +125,7 @@ class ConnectedUserConnectionFacadeTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .build();
 
-        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, connectionDTO))
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, null, connectionDTO))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).create(any(), any());
@@ -135,7 +141,53 @@ class ConnectedUserConnectionFacadeTest {
         ConnectionDTO connectionDTO = ConnectionDTO.builder()
             .build();
 
-        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, connectionDTO))
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, null, connectionDTO))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(connectionFacade, never()).create(any(), any());
+        verify(connectedUserConnectionService, never()).create(anyLong(), anyLong());
+    }
+
+    @Test
+    void testCreateConnectedUserConnectionTakesTheEnvironmentFromThePrincipal() {
+        authenticateAsConnectedUser("external-user-1", 2L);
+
+        ConnectedUser connectedUser = mockConnectedUser(1L, "external-user-1");
+
+        when(connectedUser.getEnvironmentId()).thenReturn(2L);
+        when(connectionFacade.create(any(), eq(PlatformType.EMBEDDED))).thenReturn(5L);
+
+        facade.createConnectedUserConnection(
+            1L, null, ConnectionDTO.builder()
+                .environmentId(0)
+                .build());
+        facade.createConnectedUserConnection(
+            1L, 2L, ConnectionDTO.builder()
+                .environmentId(2)
+                .build());
+
+        ArgumentCaptor<ConnectionDTO> connectionDTOArgumentCaptor = ArgumentCaptor.captor();
+
+        verify(connectionFacade, times(2)).create(connectionDTOArgumentCaptor.capture(), eq(PlatformType.EMBEDDED));
+
+        assertThat(connectionDTOArgumentCaptor.getAllValues())
+            .extracting(ConnectionDTO::environmentId)
+            .containsExactly(2, 2);
+    }
+
+    @Test
+    void testCreateConnectedUserConnectionInAnotherEnvironmentThanThePrincipalsIsDenied() {
+        authenticateAsConnectedUser("external-user-1", 2L);
+
+        ConnectedUser connectedUser = mockConnectedUser(1L, "external-user-1");
+
+        when(connectedUser.getEnvironmentId()).thenReturn(2L);
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .environmentId(0)
+            .build();
+
+        assertThatThrownBy(() -> facade.createConnectedUserConnection(1L, 0L, connectionDTO))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).create(any(), any());
@@ -153,7 +205,7 @@ class ConnectedUserConnectionFacadeTest {
 
         when(connectionFacade.create(connectionDTO, PlatformType.EMBEDDED)).thenReturn(5L);
 
-        assertThat(facade.createConnectedUserConnection(1L, connectionDTO)).isEqualTo(5L);
+        assertThat(facade.createConnectedUserConnection(1L, null, connectionDTO)).isEqualTo(5L);
 
         verify(connectedUserConnectionService).create(1L, 5L);
     }
@@ -164,7 +216,7 @@ class ConnectedUserConnectionFacadeTest {
 
         mockConnectedUser(1L, "external-user-1");
 
-        assertThatThrownBy(() -> facade.getConnectedUserConnections(1L, "slack", List.of()))
+        assertThatThrownBy(() -> facade.getConnectedUserConnections(1L, "slack"))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).getConnections(any(), any());
@@ -174,7 +226,7 @@ class ConnectedUserConnectionFacadeTest {
     void testGetConnectedUserConnectionsWithoutAuthenticationIsDenied() {
         mockConnectedUser(1L, "external-user-1");
 
-        assertThatThrownBy(() -> facade.getConnectedUserConnections(1L, "slack", List.of()))
+        assertThatThrownBy(() -> facade.getConnectedUserConnections(1L, "slack"))
             .isInstanceOf(AccessDeniedException.class);
 
         verify(connectionFacade, never()).getConnections(any(), any());
@@ -190,7 +242,7 @@ class ConnectedUserConnectionFacadeTest {
         when(connectedUserConnectionService.getConnectionIds(1L)).thenReturn(List.of(20L));
         when(connectionFacade.getConnections(List.of(20L), PlatformType.EMBEDDED)).thenReturn(List.of());
 
-        assertThat(facade.getConnectedUserConnections(1L, "slack", List.of())).isEmpty();
+        assertThat(facade.getConnectedUserConnections(1L, "slack")).isEmpty();
 
         verify(connectionFacade).getConnections(List.of(20L), PlatformType.EMBEDDED);
     }
@@ -208,18 +260,69 @@ class ConnectedUserConnectionFacadeTest {
 
         integrationInstance.setConnectionId(10L);
 
-        when(integrationInstanceService.getIntegrationInstances(1L, "slack", Environment.PRODUCTION))
+        when(integrationInstanceService.getConnectedUserIntegrationInstances(1L, Environment.PRODUCTION))
             .thenReturn(List.of(integrationInstance));
         when(connectedUserConnectionService.getConnectionIds(1L)).thenReturn(List.of(20L));
         when(connectionFacade.getConnections(List.of(10L, 20L), PlatformType.EMBEDDED)).thenReturn(List.of());
 
-        facade.getConnections(1L, "slack", List.of());
+        facade.getConnections(1L, "slack");
 
         ArgumentCaptor<List<Long>> captor = ArgumentCaptor.captor();
 
         verify(connectionFacade).getConnections(captor.capture(), eq(PlatformType.EMBEDDED));
 
         assertThat(captor.getValue()).containsExactly(10L, 20L);
+    }
+
+    @Test
+    void testGetConnectionsFiltersByComponentName() {
+        ConnectedUser connectedUser = mockConnectedUser(1L, "external-user-1");
+
+        when(connectedUser.getEnvironment()).thenReturn(Environment.PRODUCTION);
+        when(connectedUserConnectionService.getConnectionIds(1L)).thenReturn(List.of(20L, 40L));
+
+        ConnectionDTO slackConnectionDTO = getConnectionDTO(20L, "slack");
+        ConnectionDTO githubConnectionDTO = getConnectionDTO(40L, "github");
+
+        when(connectionFacade.getConnections(List.of(20L, 40L), PlatformType.EMBEDDED))
+            .thenReturn(List.of(slackConnectionDTO, githubConnectionDTO));
+
+        assertThat(facade.getConnections(1L, "slack")).containsExactly(slackConnectionDTO);
+        assertThat(facade.getConnections(1L, null)).containsExactly(slackConnectionDTO, githubConnectionDTO);
+    }
+
+    @Test
+    void testGetConnectionsListsNoConnectionOfAnotherConnectedUser() {
+        ConnectedUser connectedUser = mockConnectedUser(1L, "external-user-1");
+
+        when(connectedUser.getEnvironment()).thenReturn(Environment.DEVELOPMENT);
+        when(connectedUserConnectionService.getConnectionIds(1L)).thenReturn(List.of(20L));
+
+        Map<Long, ConnectionDTO> connectionDTOs = Map.of(
+            20L, getConnectionDTO(20L, "slack"), 40L, getConnectionDTO(40L, "slack"));
+
+        when(connectionFacade.getConnections(anyList(), eq(PlatformType.EMBEDDED)))
+            .thenAnswer(invocation -> {
+                List<Long> connectionIds = invocation.getArgument(0);
+
+                return connectionIds.stream()
+                    .map(connectionDTOs::get)
+                    .filter(Objects::nonNull)
+                    .toList();
+            });
+
+        assertThat(facade.getConnections(1L, "slack"))
+            .extracting(ConnectionDTO::id)
+            .containsExactly(20L);
+
+        verify(connectionFacade, never()).getConnections(any(), any(), any(), any(), any(), any());
+    }
+
+    private static ConnectionDTO getConnectionDTO(long id, String componentName) {
+        return ConnectionDTO.builder()
+            .componentName(componentName)
+            .id(id)
+            .build();
     }
 
     private static void authenticate(String login, String... authorities) {

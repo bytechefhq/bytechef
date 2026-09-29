@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.ConnectionModel;
@@ -66,7 +65,8 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<Long> createConnectedUserConnection(Long connectedUserId, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
             connectedUserConnectionFacade.createConnectedUserConnection(
-                connectedUserId, conversionService.convert(connectionModel, ConnectionDTO.class)));
+                connectedUserId, connectionModel.getEnvironmentId(),
+                conversionService.convert(connectionModel, ConnectionDTO.class)));
     }
 
     @Override
@@ -84,8 +84,7 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectedUserConnectionFacade
-                .getConnectedUserConnections(
-                    connectedUserId, componentName, connectionIds == null ? List.of() : connectionIds)
+                .getConnectedUserConnections(connectedUserId, componentName)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());
@@ -130,12 +129,13 @@ public class ConnectionApiController implements ConnectionApi {
     private ConnectionModel toConnectionModel(ConnectionDTO connection) {
         ConnectionModel connectionModel = conversionService.convert(connection, ConnectionModel.class);
 
-        Objects.requireNonNull(connectionModel)
-            .authorizationParameters(
-                MapUtils.toMap(
-                    connectionModel.getAuthorizationParameters(),
-                    Map.Entry::getKey,
-                    entry -> ObfuscateUtils.obfuscate(String.valueOf(entry.getValue()), 28, 8)));
+        Map<String, Object> authorizationParameters = Objects.requireNonNull(connectionModel)
+            .getAuthorizationParameters();
+
+        if (authorizationParameters != null) {
+            connectionModel.authorizationParameters(
+                ObfuscateUtils.toObfuscatedMap(authorizationParameters, 28, 8));
+        }
 
         return Validate.notNull(connectionModel, "connectionModel")
             .parameters(null);
