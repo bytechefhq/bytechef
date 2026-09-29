@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.ai:spring-ai-model")
     implementation("software.amazon.awssdk:s3")

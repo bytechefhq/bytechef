@@ -130,16 +130,16 @@ public final class BuiltInSessionRepositoryFactory {
     private static S3Client buildS3Client(Environment environment) {
         S3ClientBuilder builder = S3Client.builder();
 
-        String region = environment.getProperty("bytechef.ai.memory.aws.region");
+        String region = getAwsProperty(environment, "region");
 
-        if (region != null && !region.isBlank()) {
+        if (region != null) {
             builder.region(Region.of(region));
         }
 
-        String accessKeyId = environment.getProperty("bytechef.ai.memory.aws.access-key-id");
-        String secretAccessKey = environment.getProperty("bytechef.ai.memory.aws.secret-access-key");
+        String accessKeyId = getAwsProperty(environment, "access-key-id");
+        String secretAccessKey = getAwsProperty(environment, "secret-access-key");
 
-        if (accessKeyId != null && !accessKeyId.isBlank() && secretAccessKey != null && !secretAccessKey.isBlank()) {
+        if (accessKeyId != null && secretAccessKey != null) {
             builder.credentialsProvider(
                 StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey)));
         } else {
@@ -147,5 +147,21 @@ public final class BuiltInSessionRepositoryFactory {
         }
 
         return builder.build();
+    }
+
+    static @Nullable String getAwsProperty(Environment environment, String name) {
+        String value = environment.getProperty("bytechef.ai.memory.aws." + name);
+
+        if (value != null && !value.isBlank()) {
+            return value;
+        }
+
+        String fallbackValue = environment.getProperty("bytechef.cloud.aws." + name);
+
+        if (fallbackValue != null && !fallbackValue.isBlank()) {
+            return fallbackValue;
+        }
+
+        return null;
     }
 }

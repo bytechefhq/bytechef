@@ -17,7 +17,11 @@
 package com.bytechef.ai.chat.memory.aws.config;
 
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Aws;
+import com.bytechef.config.ApplicationProperties.Cloud;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -34,25 +38,52 @@ final class AwsS3ClientFactory {
     private AwsS3ClientFactory() {
     }
 
-    static S3Client create(Aws aws) {
+    static S3Client create(Aws memoryAws, Cloud.@Nullable Aws cloudAws) {
         S3ClientBuilder builder = S3Client.builder();
 
-        String region = aws.getRegion();
+        Cloud.Aws fallbackAws = cloudAws == null ? new Cloud.Aws() : cloudAws;
 
-        if (region != null && !region.isBlank()) {
+        String region = StringUtils.firstNonBlank(memoryAws.getRegion(), fallbackAws.getRegion());
+
+        if (region != null) {
             builder.region(Region.of(region));
         }
 
-        String accessKeyId = aws.getAccessKeyId();
-        String secretAccessKey = aws.getSecretAccessKey();
+        return builder.credentialsProvider(getAwsCredentialsProvider(memoryAws, fallbackAws))
+            .build();
+    }
 
-        if (accessKeyId != null && !accessKeyId.isBlank() && secretAccessKey != null && !secretAccessKey.isBlank()) {
-            builder.credentialsProvider(
-                StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey)));
-        } else {
-            builder.credentialsProvider(DefaultCredentialsProvider.create());
+    static AwsCredentialsProvider getAwsCredentialsProvider(Aws memoryAws, Cloud.Aws cloudAws) {
+        AwsBasicCredentials memoryAwsCredentials = getAwsCredentials(
+            memoryAws.getAccessKeyId(), memoryAws.getSecretAccessKey(), "bytechef.ai.memory.aws.");
+
+        if (memoryAwsCredentials != null) {
+            return StaticCredentialsProvider.create(memoryAwsCredentials);
         }
 
-        return builder.build();
+        AwsBasicCredentials cloudAwsCredentials = getAwsCredentials(
+            cloudAws.getAccessKeyId(), cloudAws.getSecretAccessKey(), "bytechef.cloud.aws.");
+
+        if (cloudAwsCredentials != null) {
+            return StaticCredentialsProvider.create(cloudAwsCredentials);
+        }
+
+        return DefaultCredentialsProvider.builder()
+            .build();
+    }
+
+    private static @Nullable AwsBasicCredentials getAwsCredentials(
+        @Nullable String accessKeyId, @Nullable String secretAccessKey, String propertyPrefix) {
+
+        if (StringUtils.isAllBlank(accessKeyId, secretAccessKey)) {
+            return null;
+        }
+
+        if (StringUtils.isAnyBlank(accessKeyId, secretAccessKey)) {
+            throw new IllegalArgumentException(
+                propertyPrefix + "access-key-id and " + propertyPrefix + "secret-access-key must be set together");
+        }
+
+        return AwsBasicCredentials.create(accessKeyId, secretAccessKey);
     }
 }

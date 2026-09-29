@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.agent.chat.memory.builtin.session.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -57,6 +58,20 @@ class BuiltInSessionRepositoryFactoryTest {
 
         assertNull(builtInSessionRepository.closeable());
         assertSessionsAreIsolatedPerTenant(builtInSessionRepository.sessionRepository());
+    }
+
+    @Test
+    void testAwsPropertiesFallBackToCloudAws() {
+        MockEnvironment environment = new MockEnvironment()
+            .withProperty("bytechef.cloud.aws.region", "eu-north-1")
+            .withProperty("bytechef.cloud.aws.access-key-id", "cloud-access-key")
+            .withProperty("bytechef.ai.memory.aws.access-key-id", "memory-access-key")
+            .withProperty("bytechef.ai.memory.aws.secret-access-key", " ");
+
+        assertEquals("eu-north-1", BuiltInSessionRepositoryFactory.getAwsProperty(environment, "region"));
+        assertEquals(
+            "memory-access-key", BuiltInSessionRepositoryFactory.getAwsProperty(environment, "access-key-id"));
+        assertNull(BuiltInSessionRepositoryFactory.getAwsProperty(environment, "secret-access-key"));
     }
 
     @Test
