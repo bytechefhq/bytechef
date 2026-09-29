@@ -108,7 +108,7 @@ The connected user owns exactly one project per environment (`connected_user_pro
 | Workflow UUID (`hasWorkflowScope*`, `…IfProjectWorkflow…`) | `projectRepository.findByWorkflowId` → project rule. No project (integration workflow) → DENY |
 | `ProjectWorkflow`, `ProjectDeployment`, `ProjectDeploymentWorkflow` | → project → project rule |
 | `Job`, `TestJob`, `TriggerExecution` | → workflow / deployment → project rule |
-| `Connection` | GRANT iff owned (`connected_user_connection` or `integration_instance.connection_id`) |
+| `Connection` | GRANT iff owned (`connected_user_connection` or `integration_instance.connection_id`), any scope. Every scope on a connection the principal does not own DENY |
 | Template project/workflow (Automation Workflows, `__EMBEDDED_AUTOMATION__`) | read-only: `WORKFLOW_VIEW`, iff published to the connected user (`getPublishedProjects(ext, env)`). Listing and `copyWorkflowTemplate` are the only template operations a connected user has; the copy lands in their own project, which the project rule covers |
 | Embedded `McpServer` / `McpTool` (no workspace row) | DENY (connected-user MCP reads go through ungated service methods) |
 | Workspace-level (`Workspace`, `DataTable`, `KnowledgeBase*`, `ApiKey`, workspace `Mcp*`, `hasWorkspaceScope*`) | DENY |
@@ -134,26 +134,30 @@ environment, which is not the principal's own project in any other environment.
 
 ### 5. Copilot and async hand-offs
 
-The copilot hand-offs set skip when `STATE_AUTHENTICATION` is present (`WorkflowEditorSpringAIAgent`,
-`RehydrateContextToolCallback` via `CopilotToolContextUtils`). They already run the action under
-`SecurityUtils.runAs(authentication, …)` and carry the tenant id, so the decider sees the connected user once the
-skip is dropped for a connected-user authentication (rollout step 5).
+The copilot hand-offs (`WorkflowEditorSpringAIAgent`, `RehydrateContextToolCallback` via `CopilotToolContextUtils`)
+run the action under `SecurityUtils.runAs(authentication, …)` and carry the tenant id, and they never set skip for a
+connected-user authentication (rollout step 5), so the decider sees the connected user. The agent checks
+`hasWorkflowScope(workflowId, 'WORKFLOW_VIEW')` as the carried authentication before it reads the workflow.
 
 ## Rollout
 
-1. **Principal.** Carry environment and connected user on the tokens; add `ConnectedUserPrincipal`. No behaviour
+All five steps are done.
+
+1. **Principal (done).** Carry environment and connected user on the tokens; add `ConnectedUserPrincipal`. No behaviour
    change.
-2. **Decider, log-only.** Add the SPI, the EE implementation and all call sites. Governed decisions are computed and
-   logged (WARN once per resource type + scope + decision) wherever the decider would DENY what skip grants; the
-   returned answer is still skip's. A governed call outside skip already gets the decider's answer, which never
-   exceeds what enforcement allows; its denials are logged too. Property
-   `bytechef.security.connected-user-authorization-mode = log | enforce`, default `log`.
-3. **Observe.** One full embedded builder session and the SDK flows (connect dialog, integration instances, MCP
-   tools, copilot): build, test, attach/stop, logs, publish, enable, delete. Every logged DENY is either a rule gap
-   (fix the rule) or a real hole (keep denying).
-4. **Enforce.** Default `enforce`; decider answers are authoritative for governed principals.
-5. **Delete.** Remove `EmbeddedAutomationAuthorizationSkipFilter`, `@SkipAutomationAuthorization` on the connected-user
-   facades and managers, the copilot skip, and the `mode` property. Skip remains only for the trusted system paths.
+2. **Decider, log-only (done).** Add the SPI, the EE implementation and all call sites. Governed decisions are
+   computed and logged wherever the decider would DENY what skip grants; the returned answer is still skip's. A
+   governed call outside skip already gets the decider's answer. Property
+   `bytechef.security.connected-user-authorization-mode = log | enforce`; `log` is the observation mode.
+3. **Observe (done).** One full embedded builder session and the connect dialog in `log` mode: create, open,
+   connection, test, publish, enable, disable and delete logged GRANT only; the only denials were deliberate probes.
+   MCP tools and the copilot were not exercised live.
+4. **Enforce (done).** Decider answers became authoritative for governed principals.
+5. **Delete (done).** `EmbeddedAutomationAuthorizationSkipFilter`, `@SkipAutomationAuthorization` on the
+   connected-user facades and managers, the copilot skip for a connected-user authentication, the `mode` property and
+   the `log` branch are removed. Skip remains only for the trusted system paths (MCP server save/delete listeners and
+   the automation MCP server runtime). A brand-new connected user's first request provisions its project through
+   ungated service methods, so no provisioning step needs skip.
 
 ## Testing
 

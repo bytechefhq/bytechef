@@ -4427,7 +4427,7 @@ public class ApplicationProperties {
         /**
          * Connected-user authorization mode (log | enforce)
          */
-        private ConnectedUserAuthorizationMode connectedUserAuthorizationMode = ConnectedUserAuthorizationMode.LOG;
+        private ConnectedUserAuthorizationMode connectedUserAuthorizationMode = ConnectedUserAuthorizationMode.ENFORCE;
 
         /**
          * Content Security Policy header value
