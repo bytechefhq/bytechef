@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-tool-execution:platform-tool-execution-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
@@ -67,4 +68,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-config")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -24,7 +23,6 @@ import com.bytechef.automation.configuration.service.ProjectVersionWorkflowChang
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.AutomationWorkflowProject;
 import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
-import com.bytechef.ee.embedded.configuration.security.SkipAutomationAuthorizationAspect;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.AutomationWorkflowProjectService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -42,7 +40,6 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.service.TagService;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +65,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
  */
 @SpringBootTest(
     classes = {
-        AutomationWorkflowProjectFacadeImpl.class, SkipAutomationAuthorizationAspect.class,
+        AutomationWorkflowProjectFacadeImpl.class,
         AutomationWorkflowProjectFacadeAuthorizationIntTest.MethodSecurityConfiguration.class
     },
     properties = "bytechef.edition=ee")
@@ -147,20 +144,12 @@ class AutomationWorkflowProjectFacadeAuthorizationIntTest {
     }
 
     @Test
-    void testGetPublishedProjectsRunsSkippingChecksWithoutTenantAdmin() {
-        AtomicBoolean skippingChecks = new AtomicBoolean();
-
-        when(automationWorkflowProjectService.getAutomationWorkflowProjects())
-            .thenAnswer(invocation -> {
-                skippingChecks.set(AutomationAuthorizationContext.isSkipChecks());
-
-                return List.of();
-            });
+    void testGetPublishedProjectsRunsWithoutTenantAdmin() {
+        when(automationWorkflowProjectService.getAutomationWorkflowProjects()).thenReturn(List.of());
 
         authenticate(nonAdmin());
 
         assertThat(automationWorkflowProjectFacade.getPublishedProjects()).isEmpty();
-        assertThat(skippingChecks).isTrue();
     }
 
     private static void authenticate(Authentication authentication) {

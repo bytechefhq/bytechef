@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
@@ -67,4 +68,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

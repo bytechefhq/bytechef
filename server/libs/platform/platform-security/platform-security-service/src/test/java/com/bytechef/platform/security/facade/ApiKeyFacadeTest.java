@@ -25,12 +25,14 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.UserService;
@@ -42,6 +44,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * An API key authenticates as its owner, so these are the tests that keep one person's programmatic identity out of
@@ -245,6 +249,41 @@ class ApiKeyFacadeTest {
         ((ApiKeyRevoker) apiKeyFacade).revokeAll(OTHER_USER_ID);
 
         verify(apiKeyService, never()).delete(anyLong());
+    }
+
+    @Test
+    void testAConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEveryApiKeyOperation() {
+        ApiKey ownerApiKey = apiKey(1L, OWNER_USER_ID);
+
+        when(apiKeyService.getApiKeys(1L, PlatformType.AUTOMATION)).thenReturn(List.of(ownerApiKey));
+        when(apiKeyService.getApiKey(1L)).thenReturn(ownerApiKey);
+
+        Authentication connectedUser = mock(
+            Authentication.class, withSettings().extraInterfaces(ConnectedUserAuthentication.class));
+
+        when(connectedUser.isAuthenticated()).thenReturn(true);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(connectedUser);
+
+        try {
+            assertThatThrownBy(() -> apiKeyFacade.getApiKeys(1L, PlatformType.AUTOMATION))
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> apiKeyFacade.getApiKey(1L))
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> apiKeyFacade.update(ownerApiKey))
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> apiKeyFacade.delete(1L))
+                .isInstanceOf(AccessDeniedException.class);
+            assertThatThrownBy(() -> apiKeyFacade.createAutomationApiKey(new ApiKey()))
+                .isInstanceOf(AccessDeniedException.class);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
+
+        verify(apiKeyService, never()).update(any());
+        verify(apiKeyService, never()).delete(anyLong());
+        verify(apiKeyService, never()).create(any());
     }
 
     private void authenticateAs(long userId, boolean tenantAdmin) {

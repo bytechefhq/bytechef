@@ -24,8 +24,6 @@ import com.bytechef.automation.configuration.security.AutomationMethodSecurityEx
 import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider.Decision;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Security.ConnectedUserAuthorizationMode;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.service.CurrentUserResolver;
 import com.bytechef.ee.automation.configuration.service.PermissionScopeRegistry;
@@ -50,7 +48,7 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Ivica Cardic
  */
-class ConnectedUserLogModeExpressionTest {
+class ConnectedUserSkippedChecksExpressionTest {
 
     private static final long PROJECT_ID = 9L;
     private static final Method TO_STRING_METHOD = ReflectionUtils.findMethod(Object.class, "toString");
@@ -60,7 +58,6 @@ class ConnectedUserLogModeExpressionTest {
     private static final String WORKFLOW_ID = "workflow-1";
     private static final long WORKSPACE_ID = 1L;
 
-    private ApplicationProperties applicationProperties;
     private CurrentUserResolver currentUserResolver;
     private AutomationPermissionEvaluator evaluator;
     private ProjectRepository projectRepository;
@@ -69,10 +66,6 @@ class ConnectedUserLogModeExpressionTest {
 
     @BeforeEach
     void setUp() {
-        applicationProperties = new ApplicationProperties();
-
-        applicationProperties.setSecurity(new ApplicationProperties.Security());
-
         currentUserResolver = mock(CurrentUserResolver.class);
         projectRepository = mock(ProjectRepository.class);
         workspaceScopeCacheService = mock(WorkspaceScopeCacheService.class);
@@ -91,7 +84,7 @@ class ConnectedUserLogModeExpressionTest {
         PermissionServiceImpl permissionService = new PermissionServiceImpl(
             currentUserResolver, mock(PermissionScopeRegistry.class), projectRepository, workspaceScopeCacheService,
             mock(WorkspaceUserRepository.class), List.of(), List.of(),
-            beanFactory.getBeanProvider(ConnectedUserAccessDecider.class), applicationProperties);
+            beanFactory.getBeanProvider(ConnectedUserAccessDecider.class));
 
         AutomationMethodSecurityExpressionHandler expressionHandler =
             new AutomationMethodSecurityExpressionHandler(permissionService);
@@ -110,71 +103,71 @@ class ConnectedUserLogModeExpressionTest {
     }
 
     @Test
-    void testHasWorkspaceScopeInEnvironmentStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(
+    void testHasWorkspaceScopeInEnvironmentIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(
             () -> root.hasWorkspaceScopeInEnvironment(WORKSPACE_ID, SCOPE, Environment.PRODUCTION));
     }
 
     @Test
-    void testHasWorkspaceScopeInEnvironmentIdStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(() -> root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 2L));
-        assertLogGrantsAndEnforceDenies(() -> root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null));
-        assertLogGrantsAndEnforceDenies(() -> root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 99L));
+    void testHasWorkspaceScopeInEnvironmentIdIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(() -> root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 2L));
+        assertDeniedUnderSkippedChecks(() -> root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, null));
+        assertDeniedUnderSkippedChecks(() -> root.hasWorkspaceScopeInEnvironmentId(WORKSPACE_ID, SCOPE, 99L));
     }
 
     @Test
-    void testHasResourceScopeInEnvironmentStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(
+    void testHasResourceScopeInEnvironmentIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(
             () -> root.hasResourceScopeInEnvironment(RESOURCE_ID, RESOURCE_TYPE, SCOPE, Environment.PRODUCTION));
-        assertLogGrantsAndEnforceDenies(
+        assertDeniedUnderSkippedChecks(
             () -> root.hasResourceScopeInEnvironment(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null));
     }
 
     @Test
-    void testHasResourceScopeInEnvironmentIdStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(
+    void testHasResourceScopeInEnvironmentIdIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(
             () -> root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, 2L));
-        assertLogGrantsAndEnforceDenies(
+        assertDeniedUnderSkippedChecks(
             () -> root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, null));
-        assertLogGrantsAndEnforceDenies(
+        assertDeniedUnderSkippedChecks(
             () -> root.hasResourceScopeInEnvironmentId(RESOURCE_ID, RESOURCE_TYPE, SCOPE, 99L));
     }
 
     @Test
-    void testHasWorkflowScopeStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(() -> root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW"));
+    void testHasWorkflowScopeIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(() -> root.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW"));
     }
 
     @Test
-    void testHasWorkflowScopeInEnvironmentStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(
+    void testHasWorkflowScopeInEnvironmentIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(
             () -> root.hasWorkflowScopeInEnvironment(WORKFLOW_ID, "WORKFLOW_EDIT", Environment.PRODUCTION));
     }
 
     @Test
-    void testHasWorkflowScopeIfProjectWorkflowInEnvironmentStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(
+    void testHasWorkflowScopeIfProjectWorkflowInEnvironmentIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(
             () -> root.hasWorkflowScopeIfProjectWorkflowInEnvironment(
                 WORKFLOW_ID, "WORKFLOW_EDIT", Environment.DEVELOPMENT));
     }
 
     @Test
-    void testHasWorkflowScopeIfProjectWorkflowInEnvironmentIdStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(
+    void testHasWorkflowScopeIfProjectWorkflowInEnvironmentIdIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(
             () -> root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, "WORKFLOW_EDIT", 0L));
-        assertLogGrantsAndEnforceDenies(
+        assertDeniedUnderSkippedChecks(
             () -> root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, "WORKFLOW_EDIT", null));
-        assertLogGrantsAndEnforceDenies(
+        assertDeniedUnderSkippedChecks(
             () -> root.hasWorkflowScopeIfProjectWorkflowInEnvironmentId(WORKFLOW_ID, "WORKFLOW_EDIT", 99L));
     }
 
     @Test
-    void testHasPermissionByIdStaysGrantedUnderSkipInLogMode() throws Throwable {
-        assertLogGrantsAndEnforceDenies(() -> evaluator.hasPermission(null, RESOURCE_ID, RESOURCE_TYPE, SCOPE));
+    void testHasPermissionByIdIsDeniedUnderSkippedChecks() throws Throwable {
+        assertDeniedUnderSkippedChecks(() -> evaluator.hasPermission(null, RESOURCE_ID, RESOURCE_TYPE, SCOPE));
     }
 
     @Test
-    void testHasPermissionOnAProjectDeploymentStaysGrantedUnderSkipInLogMode() throws Throwable {
+    void testHasPermissionOnAProjectDeploymentIsDeniedUnderSkippedChecks() throws Throwable {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setEnvironment(Environment.PRODUCTION);
@@ -182,25 +175,14 @@ class ConnectedUserLogModeExpressionTest {
 
         ProjectDeploymentDTO projectDeploymentDTO = new ProjectDeploymentDTO(projectDeployment);
 
-        assertLogGrantsAndEnforceDenies(
+        assertDeniedUnderSkippedChecks(
             () -> evaluator.hasPermission(null, projectDeploymentDTO, "DEPLOYMENT_CREATE"));
     }
 
-    private void assertLogGrantsAndEnforceDenies(BooleanSupplier check) throws Throwable {
-        givenMode(ConnectedUserAuthorizationMode.LOG);
-
-        assertThat(AutomationAuthorizationContext.callSkippingChecks(check::getAsBoolean)).isTrue();
-
-        givenMode(ConnectedUserAuthorizationMode.ENFORCE);
-
+    private void assertDeniedUnderSkippedChecks(BooleanSupplier check) throws Throwable {
         assertThat(AutomationAuthorizationContext.callSkippingChecks(check::getAsBoolean)).isFalse();
+        assertThat(check.getAsBoolean()).isFalse();
 
         verifyNoInteractions(currentUserResolver, projectRepository, workspaceScopeCacheService);
-    }
-
-    private void givenMode(ConnectedUserAuthorizationMode mode) {
-        ApplicationProperties.Security security = applicationProperties.getSecurity();
-
-        security.setConnectedUserAuthorizationMode(mode);
     }
 }

@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.mcp.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -28,10 +29,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
+import com.bytechef.platform.security.web.authentication.TestNonPlatformUserAuthentication;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -48,6 +53,34 @@ class McpComponentServiceTest {
 
     private final McpComponentServiceImpl mcpComponentService = new McpComponentServiceImpl(
         mcpComponentRepository, List.of(mcpComponentConnectionUsageChecker), mcpToolRepository);
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testGetMcpComponentsRefusesAConnectedUser() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestNonPlatformUserAuthentication.of("external-user"));
+
+        assertThatThrownBy(mcpComponentService::getMcpComponents)
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(mcpComponentRepository, never()).findAll();
+    }
+
+    @Test
+    void testGetMcpComponentsListsEveryComponentForAPlatformUser() {
+        McpComponent mcpComponent = new McpComponent("slack", 1, MCP_SERVER_ID, CONNECTION_ID);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(UsernamePasswordAuthenticationToken.authenticated("admin", null, List.of()));
+
+        when(mcpComponentRepository.findAll()).thenReturn(List.of(mcpComponent));
+
+        assertThat(mcpComponentService.getMcpComponents()).containsExactly(mcpComponent);
+    }
 
     @Test
     void testCreateChecksTheConnectionAgainstTheServer() {

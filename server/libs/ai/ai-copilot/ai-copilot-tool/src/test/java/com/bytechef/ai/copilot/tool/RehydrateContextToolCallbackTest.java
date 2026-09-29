@@ -17,19 +17,20 @@
 package com.bytechef.ai.copilot.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
@@ -176,7 +177,7 @@ class RehydrateContextToolCallbackTest {
     }
 
     @Test
-    void testArmsSkipChecksInsideCallOnAnotherThreadThenRestores() {
+    void testDoesNotSkipChecksForACapturedAuthentication() {
         TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
         SecurityContextHolder.clearContext();
 
@@ -184,54 +185,13 @@ class RehydrateContextToolCallbackTest {
 
         ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken("connected-user", "");
-
-        Map<String, Object> map = AgentToolInvocationContext.builder()
-            .tenantId("acme")
-            .authentication(authentication)
-            .skipAutomationAuthorization(true)
-            .build()
-            .toToolContext();
-
-        AtomicBoolean skipChecksAfterCall = new AtomicBoolean(true);
-
-        Thread thread = new Thread(() -> {
-            wrapped.call("{}", new ToolContext(map));
-
-            skipChecksAfterCall.set(AutomationAuthorizationContext.isSkipChecks());
-        });
-
-        assertThatCode(() -> {
-            thread.start();
-            thread.join();
-        }).doesNotThrowAnyException();
-
-        assertThat(probe.authenticationSeenInside).isSameAs(authentication);
-        assertThat(probe.skipChecksSeenInside).isTrue();
-        assertThat(skipChecksAfterCall).isFalse();
-        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
-    }
-
-    @Test
-    void testDoesNotSkipChecksOnAnotherThreadWhenFlagAbsent() {
-        TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
-        SecurityContextHolder.clearContext();
-
-        ProbeToolCallback probe = new ProbeToolCallback();
-
-        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken("connected-user", "");
+        Authentication authentication = mock(
+            Authentication.class, withSettings().extraInterfaces(ConnectedUserAuthentication.class));
 
         Map<String, Object> map =
             new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext();
 
-        Thread thread = new Thread(() -> wrapped.call("{}", new ToolContext(map)));
-
-        assertThatCode(() -> {
-            thread.start();
-            thread.join();
-        }).doesNotThrowAnyException();
+        wrapped.call("{}", new ToolContext(map));
 
         assertThat(probe.authenticationSeenInside).isSameAs(authentication);
         assertThat(probe.skipChecksSeenInside).isFalse();

@@ -472,7 +472,8 @@ class AutomationWorkflowProjectFacadeIntTest {
 
         automationWorkflowProjectFacade.createProjectWorkflow(unpublishedProjectId, null, null);
 
-        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects();
+        List<AutomationWorkflowProjectDTO> publishedProjects = automationWorkflowProjectFacade.getPublishedProjects(
+            TEST_EXTERNAL_USER_ID, Environment.PRODUCTION);
 
         AutomationWorkflowProjectDTO publishedProject = publishedProjects.stream()
             .filter(project -> project.id() == publishedProjectId)
@@ -1077,7 +1078,7 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     private ConnectedUserWorkflowTemplateDTO getPublishedTemplate(long projectId, String workflowUuid) {
-        return automationWorkflowProjectFacade.getPublishedProjects()
+        return automationWorkflowProjectFacade.getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
             .stream()
             .filter(project -> project.id() == projectId)
             .flatMap(project -> project.workflowTemplates()
@@ -1094,7 +1095,7 @@ class AutomationWorkflowProjectFacadeIntTest {
     }
 
     private ConnectedUserWorkflowTemplateDTO getPublishedTemplate(long projectId) {
-        return automationWorkflowProjectFacade.getPublishedProjects()
+        return automationWorkflowProjectFacade.getPublishedProjects(TEST_EXTERNAL_USER_ID, Environment.PRODUCTION)
             .stream()
             .filter(project -> project.id() == projectId)
             .flatMap(project -> project.workflowTemplates()
