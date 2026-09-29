@@ -9,10 +9,13 @@ package com.bytechef.ee.automation.configuration.config;
 
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.Encryption;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
+import java.util.List;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +23,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Spring test configuration for EE automation-configuration repository {@code *IntTest}s. Wires the EE repository
@@ -48,5 +53,13 @@ public class EeAutomationConfigurationIntTestConfiguration {
 
     @EnableJdbcAuditing(auditorAwareRef = "auditorProvider", dateTimeProviderRef = "auditingDateTimeProvider")
     public static class EeAutomationConfigurationIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
+
+        @Override
+        protected List<?> userConverters() {
+            ObjectMapper objectMapper = new JsonMapper();
+
+            return List.of(
+                new MapWrapperToStringConverter(objectMapper), new StringToMapWrapperConverter(objectMapper));
+        }
     }
 }
