@@ -1,17 +1,16 @@
 import Button from '@/components/Button/Button';
+import {
+    Dialog,
+    DialogBody,
+    DialogCancelButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import {
-    Dialog,
-    DialogClose,
-    DialogCloseButton,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {UseFormReturn} from 'react-hook-form';
@@ -56,167 +55,164 @@ const NotificationDialog = ({
             open={isEditDialogOpen}
         >
             <DialogContent>
-                <Form {...form}>
-                    <form
-                        className="flex flex-col gap-4"
-                        onSubmit={handleSubmit(saveNotification, (error) =>
-                            console.error('There has been an error submitting the Notifications form', error)
-                        )}
-                    >
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>
-                                    {`${selectedNotification?.id ? 'Edit' : 'Create'}`} Notification
-                                </DialogTitle>
+                <DialogMain>
+                    <DialogHeader
+                        description="Define notification parameters."
+                        title={`${selectedNotification?.id ? 'Edit' : 'Create'} Notification`}
+                    />
 
-                                <DialogDescription>Define notification parameters.</DialogDescription>
-                            </div>
-
-                            <DialogCloseButton />
-                        </DialogHeader>
-
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                </FormItem>
+                    <Form {...form}>
+                        <form
+                            className="flex min-h-0 flex-1 flex-col"
+                            onSubmit={handleSubmit(saveNotification, (error) =>
+                                console.error('There has been an error submitting the Notifications form', error)
                             )}
-                        />
+                        >
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                        {notificationEvents && (
-                            <FormField
-                                control={control}
-                                name="notificationEventIds"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Events</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
 
-                                        <FormControl>
-                                            <MultiSelect
-                                                defaultValue={[]}
-                                                onValueChange={field.onChange}
-                                                options={notificationEvents.map((notificationEvent) => ({
-                                                    label: notificationEvent.type ?? notificationEvent.id.toString(),
-                                                    value: notificationEvent.id.toString(),
-                                                }))}
-                                                optionsLoading={isNotificationEventsLoading}
-                                                placeholder="Select events"
-                                                value={field.value}
-                                            />
-                                        </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                        <FormMessage />
-                                    </FormItem>
+                                {notificationEvents && (
+                                    <FormField
+                                        control={control}
+                                        name="notificationEventIds"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Events</FormLabel>
+
+                                                <FormControl>
+                                                    <MultiSelect
+                                                        defaultValue={[]}
+                                                        onValueChange={field.onChange}
+                                                        options={notificationEvents.map((notificationEvent) => ({
+                                                            label:
+                                                                notificationEvent.type ??
+                                                                notificationEvent.id.toString(),
+                                                            value: notificationEvent.id.toString(),
+                                                        }))}
+                                                        optionsLoading={isNotificationEventsLoading}
+                                                        placeholder="Select events"
+                                                        value={field.value}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
-                        )}
 
-                        <FormField
-                            control={control}
-                            name="type"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Type</FormLabel>
+                                <FormField
+                                    control={control}
+                                    name="type"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Type</FormLabel>
 
-                                    <FormControl>
-                                        <Select
-                                            onValueChange={(value) => {
-                                                field.onChange(value);
+                                            <FormControl>
+                                                <Select
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
 
-                                                setNotificationType(value as NotificationTypeEnum);
-                                            }}
-                                            value={field.value}
-                                        >
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue />
-                                            </SelectTrigger>
-
-                                            <SelectContent>
-                                                <SelectItem
-                                                    key={NotificationTypeEnum.Email.toString()}
-                                                    value={NotificationTypeEnum.Email.toString()}
+                                                        setNotificationType(value as NotificationTypeEnum);
+                                                    }}
+                                                    value={field.value}
                                                 >
-                                                    {NotificationTypeEnum.Email.toString()}
-                                                </SelectItem>
+                                                    <SelectTrigger className="w-full">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
 
-                                                {ff_1132 && (
-                                                    <SelectItem
-                                                        key={NotificationTypeEnum.Webhook.toString()}
-                                                        value={NotificationTypeEnum.Webhook.toString()}
-                                                    >
-                                                        {NotificationTypeEnum.Webhook.toString()}
-                                                    </SelectItem>
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem
+                                                            key={NotificationTypeEnum.Email.toString()}
+                                                            value={NotificationTypeEnum.Email.toString()}
+                                                        >
+                                                            {NotificationTypeEnum.Email.toString()}
+                                                        </SelectItem>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                                        {ff_1132 && (
+                                                            <SelectItem
+                                                                key={NotificationTypeEnum.Webhook.toString()}
+                                                                value={NotificationTypeEnum.Webhook.toString()}
+                                                            >
+                                                                {NotificationTypeEnum.Webhook.toString()}
+                                                            </SelectItem>
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
 
-                        {notificationType === NotificationTypeEnum.Email && (
-                            <FormField
-                                control={control}
-                                name="settings.email"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                        <FormControl>
-                                            <Input
-                                                autoComplete="email"
-                                                onChange={(e) => field.onChange(e.target.value)}
-                                                type="email"
-                                                value={(field.value as string) || ''}
-                                            />
-                                        </FormControl>
+                                {notificationType === NotificationTypeEnum.Email && (
+                                    <FormField
+                                        control={control}
+                                        name="settings.email"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Email</FormLabel>
 
-                                        <FormMessage />
-                                    </FormItem>
+                                                <FormControl>
+                                                    <Input
+                                                        autoComplete="email"
+                                                        onChange={(e) => field.onChange(e.target.value)}
+                                                        type="email"
+                                                        value={(field.value as string) || ''}
+                                                    />
+                                                </FormControl>
+
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
-                        )}
 
-                        {notificationType === NotificationTypeEnum.Webhook && (
-                            <FormField
-                                control={control}
-                                name="settings.webhook"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Webhook URL</FormLabel>
+                                {notificationType === NotificationTypeEnum.Webhook && (
+                                    <FormField
+                                        control={control}
+                                        name="settings.webhook"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Webhook URL</FormLabel>
 
-                                        <FormControl>
-                                            <Input
-                                                onChange={(e) => field.onChange(e.target.value)}
-                                                value={(field.value as string) || ''}
-                                            />
-                                        </FormControl>
+                                                <FormControl>
+                                                    <Input
+                                                        onChange={(e) => field.onChange(e.target.value)}
+                                                        value={(field.value as string) || ''}
+                                                    />
+                                                </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
-                        )}
+                            </DialogBody>
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
