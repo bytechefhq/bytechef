@@ -302,7 +302,7 @@ const WorkflowTestConfigurationDialog = ({
                                 connectionsQueryKey={ConnectionKeys!.connections}
                                 onClose={() => setShowNewConnectionDialog(false)}
                                 useCreateConnectionMutation={useCreateConnectionMutation}
-                                useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
+                                useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                             />
                         </Portal.Root>
                     )}
