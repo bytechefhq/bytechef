@@ -556,8 +556,8 @@ describe('getElkLayoutElements', () => {
         // The frame box (spanned by the two case placeholders) is centered on the
         // condition's 72px anchor box
         const conditionCenter = positionOf(result.nodes, 'condition_1').x + 36;
-        const leftPlaceholderCenter = positionOf(result.nodes, 'condition_1-condition-left-placeholder-0').x + 14;
-        const rightPlaceholderCenter = positionOf(result.nodes, 'condition_1-condition-right-placeholder-0').x + 14;
+        const leftPlaceholderCenter = positionOf(result.nodes, 'condition_1-condition-left-placeholder-0').x + 36;
+        const rightPlaceholderCenter = positionOf(result.nodes, 'condition_1-condition-right-placeholder-0').x + 36;
 
         expect(Math.abs((leftPlaceholderCenter + rightPlaceholderCenter) / 2 - conditionCenter)).toBeLessThanOrEqual(1);
 

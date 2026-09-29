@@ -1,8 +1,9 @@
 import {
+    FINAL_PLACEHOLDER_NODE_ID,
+    FINAL_PLACEHOLDER_NODE_SIZE,
     LayoutDirectionType,
     NODE_HEIGHT,
     PLACEHOLDER_NODE_HEIGHT,
-    PLACEHOLDER_NODE_WIDTH,
     TRIGGER_PLACEHOLDER_NODE_ID,
 } from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
@@ -30,6 +31,11 @@ const ELK_SPACING = 50;
 // `w-[72px]`/`h-[72px]` in TaskDispatcherTopGhostNode.tsx), matching
 // PLACEHOLDER_DOM_CROSS_SIZE in postDagreConstraints.ts.
 const GHOST_RENDERED_CROSS_SIZE = 72;
+
+// A placeholder's own box is small, but the node element around it carries
+// margins that bring it to the same 72px cross size as a task node, so its
+// handles line up with the chain.
+const PLACEHOLDER_RENDERED_CROSS_SIZE = 72;
 
 const FRAME_ID_SUFFIX = '__frame';
 
@@ -332,13 +338,16 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
     const isGhostNode = node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode';
     const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
 
+    const placeholderMainAxisSize =
+        node.id === FINAL_PLACEHOLDER_NODE_ID ? FINAL_PLACEHOLDER_NODE_SIZE : PLACEHOLDER_NODE_HEIGHT;
+
     if (direction === 'LR') {
         if (isGhostNode) {
             return {height: GHOST_RENDERED_CROSS_SIZE, width: 2};
         }
 
         if (isSmallNode) {
-            return {height: PLACEHOLDER_NODE_HEIGHT, width: PLACEHOLDER_NODE_WIDTH};
+            return {height: PLACEHOLDER_RENDERED_CROSS_SIZE, width: placeholderMainAxisSize};
         }
 
         return {height: 72, width: 72};
@@ -349,7 +358,7 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
     }
 
     if (isSmallNode) {
-        return {height: PLACEHOLDER_NODE_HEIGHT, width: PLACEHOLDER_NODE_WIDTH};
+        return {height: placeholderMainAxisSize, width: PLACEHOLDER_RENDERED_CROSS_SIZE};
     }
 
     return {height: NODE_HEIGHT, width: 72};
