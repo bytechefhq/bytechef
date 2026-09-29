@@ -1,14 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
+    DialogBody,
     DialogClose,
-    DialogCloseButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 
 import useEditUserDialog from './hooks/useEditUserDialog';
 
@@ -28,53 +28,48 @@ const EditUserDialog = () => {
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
-                <div className="flex flex-col gap-4">
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                        <DialogTitle>Edit User</DialogTitle>
+                <DialogMain>
+                    <DialogHeader description="Change the user role." title="Edit User" />
 
-                        <DialogCloseButton />
-                    </DialogHeader>
+                    <DialogBody>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-medium">User</label>
 
-                    <p className="text-sm text-muted-foreground">Change the user role.</p>
+                                <p className="text-sm text-muted-foreground">{editUser?.email ?? editUser?.login}</p>
+                            </div>
 
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">User</label>
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm font-medium">Role</label>
 
-                            <p className="text-sm text-muted-foreground">{editUser?.email ?? editUser?.login}</p>
+                                <Select
+                                    onValueChange={(value) => handleRoleChange(value)}
+                                    value={editRole ?? undefined}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select role" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {authorities.map((authority) => (
+                                            <SelectItem key={authority} value={authority}>
+                                                {authority}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium">Role</label>
-
-                            <Select onValueChange={(value) => handleRoleChange(value)} value={editRole ?? undefined}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    {authorities.map((authority) => (
-                                        <SelectItem key={authority} value={authority}>
-                                            {authority}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
+                    </DialogBody>
 
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button onClick={handleClose} variant="outline">
-                                Cancel
-                            </Button>
+                            <Button label="Cancel" onClick={handleClose} variant="outline" />
                         </DialogClose>
 
-                        <Button disabled={updateDisabled} onClick={handleUpdate}>
-                            Save
-                        </Button>
+                        <Button disabled={updateDisabled} label="Save" onClick={handleUpdate} />
                     </DialogFooter>
-                </div>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
