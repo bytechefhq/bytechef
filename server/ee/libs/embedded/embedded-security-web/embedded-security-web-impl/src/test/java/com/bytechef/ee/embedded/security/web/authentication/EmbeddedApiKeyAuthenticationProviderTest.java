@@ -99,5 +99,22 @@ class EmbeddedApiKeyAuthenticationProviderTest {
         assertThat(connectedUserAuthentication.connectedUserId()).isEqualTo(42L);
         assertThat(connectedUserAuthentication.externalUserId()).isEqualTo("ext-1");
         assertThat(connectedUserAuthentication.environmentId()).isEqualTo(2L);
+        assertThat(connectedUserAuthentication.apiKeyAuthenticated()).isTrue();
+    }
+
+    @Test
+    void testAConnectedUserTokenIsNotApiKeyAuthenticated() {
+        ConnectedUser connectedUser = new ConnectedUser(Map.of(), null, true, "ext-1", 42L, null, 0);
+
+        when(connectedUserService.fetchConnectedUser("ext-1", 2L)).thenReturn(Optional.of(connectedUser));
+
+        Authentication authentication = embeddedApiKeyAuthenticationProvider.authenticate(
+            new EmbeddedApiKeyAuthenticationToken(2L, "ext-1", null, "public"));
+
+        ConnectedUserAuthentication connectedUserAuthentication = (ConnectedUserAuthentication) authentication;
+
+        assertThat(connectedUserAuthentication.apiKeyAuthenticated()).isFalse();
+
+        verify(apiKeyService, never()).exists(anyString(), anyLong(), any());
     }
 }

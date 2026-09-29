@@ -18,7 +18,6 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
 /**
@@ -96,16 +95,6 @@ public class RemoteAutomationWorkflowProjectFacadeClient implements AutomationWo
     @Override
     public List<AutomationWorkflowProjectDTO> getProjects() {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<AutomationWorkflowProjectDTO> getPublishedProjects() {
-        return loadBalancedRestClient.get(
-            uriBuilder -> uriBuilder
-                .host(CONFIGURATION_APP)
-                .path(AUTOMATION_WORKFLOW_PROJECT_FACADE + "/get-published-projects")
-                .build(),
-            new ParameterizedTypeReference<>() {});
     }
 
     @Override

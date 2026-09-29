@@ -320,8 +320,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     // no SpEL built-in reaches PermissionService.hasWorkspaceScopeForProject(long, String, Environment), which does
     // exist and is implemented; AutomationMethodSecurityExpressionRoot simply exposes no passthrough for it, so writing
     // an environment-aware expression here would mean adding one. Its only production caller is the embedded
-    // connected-user facade, which runs under skip-checks where every guard is inert, so an environment-blind check
-    // here costs nothing and is what a future caller reaching the bean directly would otherwise not get at all.
+    // connected-user facade, which resolves the project and the environment from the same request.
     @Override
     @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_EDIT')")
     public void enableProjectDeploymentWorkflow(

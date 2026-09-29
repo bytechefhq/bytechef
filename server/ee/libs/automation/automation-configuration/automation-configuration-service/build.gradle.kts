@@ -27,6 +27,7 @@ dependencies {
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
     testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-graphql"))
+    testImplementation(project(":server:libs:automation:automation-data-table:automation-data-table-service"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:config:liquibase-config"))
