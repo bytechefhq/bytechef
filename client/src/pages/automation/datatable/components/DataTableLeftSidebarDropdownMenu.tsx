@@ -2,6 +2,8 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {MoreVertical, Pencil, Trash2} from 'lucide-react';
 
+import '@/shared/styles/dropdownMenu.css';
+
 import useDeleteDataTableAlertDialog from '../hooks/useDeleteDataTableAlertDialog';
 import useRenameDataTableDialog from '../hooks/useRenameDataTableDialog';
 
@@ -27,15 +29,15 @@ const DataTableLeftSidebarDropdownMenu = ({tableId, tableName}: Props) => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onSelect={() => handleRenameOpen(tableId, tableName)}>
+                <DropdownMenuItem className="dropdown-menu-item" onSelect={() => handleRenameOpen(tableId, tableName)}>
                     <Pencil className="mr-2 size-4" /> Rename
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                    className="text-red-600 focus:text-red-700"
+                    className="dropdown-menu-item-destructive"
                     onSelect={() => handleDeleteOpen(tableId, tableName)}
                 >
-                    <Trash2 className="mr-2 size-4" /> Delete
+                    <Trash2 className="mr-2 size-4 text-content-destructive" /> Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
