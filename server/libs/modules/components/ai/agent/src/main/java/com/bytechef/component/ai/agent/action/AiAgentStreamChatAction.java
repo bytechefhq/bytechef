@@ -36,6 +36,8 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantContextThreadLocalAccessor;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -142,7 +144,7 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context);
 
-        Flux<Object> contentFlux = withEnvironmentContext(
+        Flux<Object> contentFlux = withExecutionContext(
             chatClientRequestSpec.stream()
                 .chatResponse()
                 .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context))));
@@ -212,15 +214,17 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         };
     }
 
-    private static Flux<Object> withEnvironmentContext(Flux<Object> flux) {
+    static Flux<Object> withExecutionContext(Flux<Object> flux) {
+        reactor.util.context.Context reactorContext = reactor.util.context.Context.of(
+            TenantContextThreadLocalAccessor.KEY, TenantContext.getCurrentTenantId());
+
         Environment environment = EnvironmentContext.fetchCurrentEnvironment();
 
-        if (environment == null) {
-            return flux;
+        if (environment != null) {
+            reactorContext = reactorContext.put(EnvironmentContextThreadLocalAccessor.KEY, environment);
         }
 
-        return flux.contextWrite(
-            reactor.util.context.Context.of(EnvironmentContextThreadLocalAccessor.KEY, environment));
+        return flux.contextWrite(reactorContext);
     }
 
     private static List<Object> toSseEvents(ChatResponse chatResponse, ActionContext context) {
