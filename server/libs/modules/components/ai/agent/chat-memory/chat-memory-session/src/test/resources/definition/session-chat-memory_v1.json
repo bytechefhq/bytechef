@@ -250,7 +250,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Restrict recalled events to this dot-path branch (multi-agent isolation).",
+      "description": "Dot-path branch of this agent (e.g. orch.researcher) for multi-agent isolation. New events are tagged with it, and the agent sees only its own branch, its ancestors' and root-level events.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,

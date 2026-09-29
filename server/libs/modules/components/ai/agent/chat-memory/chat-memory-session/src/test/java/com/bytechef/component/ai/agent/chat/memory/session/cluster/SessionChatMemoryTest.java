@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.agent.chat.memory.session.cluster;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -35,12 +36,20 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.session.EventFilter;
 import org.springframework.ai.session.InMemorySessionRepository;
 import org.springframework.ai.session.Session;
 import org.springframework.ai.session.SessionEvent;
@@ -141,6 +150,73 @@ class SessionChatMemoryTest {
     }
 
     @Test
+    void testAdvisorWritesAreIsolatedBetweenSiblingAgentBranches() throws Exception {
+        SessionRepository sessionRepository = InMemorySessionRepository.builder()
+            .build();
+
+        sessionRepository.save(Session.builder()
+            .id(CONVERSATION_ID)
+            .userId("user-1")
+            .createdAt(Instant.now())
+            .build());
+
+        appendEvent(sessionRepository, "root context", null);
+
+        ChatMemoryFunction.Result orchestratorResult = applySessionChatMemory(
+            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "agentBranch", "orch"));
+        ChatMemoryFunction.Result researcherResult = applySessionChatMemory(
+            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "agentBranch", "orch.researcher"));
+        ChatMemoryFunction.Result writerResult = applySessionChatMemory(
+            sessionRepository, Map.of("conversationId", CONVERSATION_ID, "agentBranch", "orch.writer"));
+
+        runTurn(orchestratorResult, "orchestrator question", "orchestrator answer");
+        runTurn(researcherResult, "research question", "research answer");
+        runTurn(writerResult, "writer question", "writer answer");
+
+        assertThat(sessionRepository.findEvents(CONVERSATION_ID, EventFilter.all()))
+            .extracting(event -> event.getMessage()
+                .getText(), SessionEvent::getBranch)
+            .containsExactly(
+                tuple("root context", null),
+                tuple("orchestrator question", "orch"),
+                tuple("orchestrator answer", "orch"),
+                tuple("research question", "orch.researcher"),
+                tuple("research answer", "orch.researcher"),
+                tuple("writer question", "orch.writer"),
+                tuple("writer answer", "orch.writer"));
+
+        ChatMemory researcherChatMemory = researcherResult.chatMemory();
+
+        assertThat(researcherChatMemory.get(CONVERSATION_ID))
+            .extracting(Message::getText)
+            .containsExactly(
+                "root context", "orchestrator question", "orchestrator answer", "research question",
+                "research answer");
+
+        ChatMemory writerChatMemory = writerResult.chatMemory();
+
+        assertThat(writerChatMemory.get(CONVERSATION_ID))
+            .extracting(Message::getText)
+            .containsExactly(
+                "root context", "orchestrator question", "orchestrator answer", "writer question", "writer answer");
+    }
+
+    @Test
+    void testAdvisorWritesStayRootLevelWithoutAgentBranch() throws Exception {
+        SessionRepository sessionRepository = InMemorySessionRepository.builder()
+            .build();
+
+        ChatMemoryFunction.Result result = applySessionChatMemory(
+            sessionRepository, Map.of("conversationId", CONVERSATION_ID));
+
+        runTurn(result, "question", "answer");
+
+        assertThat(sessionRepository.findEvents(CONVERSATION_ID, EventFilter.all()))
+            .extracting(SessionEvent::getBranch)
+            .containsExactly(null, null);
+    }
+
+    @Test
     void testSlidingWindowTriggerCountsEventsNotTurns() {
         CompactionTrigger compactionTrigger = SessionChatMemory.resolveCompactionTrigger(
             MockParametersFactory.create(Map.of("compactionStrategy", "SLIDING_WINDOW", "maxEvents", 2)));
@@ -205,6 +281,26 @@ class SessionChatMemoryTest {
         return chatMemoryFunction.apply(
             MockParametersFactory.create(inputParameterValues), MockParametersFactory.create(Map.of()), extensions,
             Map.of("sessionRepository_1", componentConnection));
+    }
+
+    private static void runTurn(ChatMemoryFunction.Result result, String userText, String assistantText) {
+        BaseAdvisor advisor = result.advisor();
+
+        Map<String, Object> context = Map.of(SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY, CONVERSATION_ID);
+
+        advisor.before(
+            ChatClientRequest.builder()
+                .prompt(new Prompt(new UserMessage(userText)))
+                .context(context)
+                .build(),
+            mock(AdvisorChain.class));
+
+        advisor.after(
+            ChatClientResponse.builder()
+                .chatResponse(new ChatResponse(List.of(new Generation(new AssistantMessage(assistantText)))))
+                .context(context)
+                .build(),
+            mock(AdvisorChain.class));
     }
 
     private static void appendEvent(SessionRepository sessionRepository, String text, String branch) {

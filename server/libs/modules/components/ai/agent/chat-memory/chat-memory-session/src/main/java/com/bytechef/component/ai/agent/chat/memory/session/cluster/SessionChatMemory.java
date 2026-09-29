@@ -42,6 +42,7 @@ import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.
 import static com.bytechef.platform.component.definition.ai.agent.SessionRepositoryFunction.SESSION_REPOSITORY;
 
 import com.bytechef.component.ai.agent.chat.memory.session.compaction.EventCountTrigger;
+import com.bytechef.component.ai.agent.chat.memory.session.service.BranchStampingSessionService;
 import com.bytechef.component.ai.agent.chat.memory.session.tool.SessionConversationSearchTools;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -74,6 +75,7 @@ import org.springframework.ai.session.compaction.TurnCountTrigger;
 import org.springframework.ai.session.compaction.TurnWindowCompactionStrategy;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Ivica Cardic
@@ -161,7 +163,10 @@ public class SessionChatMemory {
                     .required(false),
                 string(AGENT_BRANCH)
                     .label("Agent branch")
-                    .description("Restrict recalled events to this dot-path branch (multi-agent isolation).")
+                    .description(
+                        "Dot-path branch of this agent (e.g. orch.researcher) for multi-agent isolation. New " +
+                            "events are tagged with it, and the agent sees only its own branch, its ancestors' and " +
+                            "root-level events.")
                     .required(false))
             .type(CHAT_MEMORY)
             .object(() -> this::apply);
@@ -175,17 +180,17 @@ public class SessionChatMemory {
             .sessionRepository(resolveSessionRepository(extensions, componentConnections))
             .build();
 
-        SessionMemoryAdvisor.Builder builder = SessionMemoryAdvisor.builder(sessionService)
+        String agentBranch = StringUtils.hasText(inputParameters.getString(AGENT_BRANCH))
+            ? inputParameters.getString(AGENT_BRANCH)
+            : null;
+
+        EventFilter eventFilter = EventFilter.forBranch(agentBranch);
+
+        SessionMemoryAdvisor.Builder builder = SessionMemoryAdvisor
+            .builder(new BranchStampingSessionService(sessionService, agentBranch))
             .defaultUserId(inputParameters.getString(DEFAULT_USER_ID, DEFAULT_USER_ID_VALUE))
-            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER);
-
-        String agentBranch = inputParameters.getString(AGENT_BRANCH);
-
-        EventFilter eventFilter = agentBranch == null || agentBranch.isBlank()
-            ? EventFilter.all()
-            : EventFilter.forBranch(agentBranch);
-
-        builder.eventFilter(eventFilter);
+            .order(ChatMemoryFunction.TOOL_MESSAGE_PERSISTENCE_ADVISOR_ORDER)
+            .eventFilter(eventFilter);
 
         CompactionStrategy compactionStrategy = resolveCompactionStrategy(
             inputParameters, extensions, componentConnections);
