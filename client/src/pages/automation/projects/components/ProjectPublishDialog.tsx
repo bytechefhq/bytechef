@@ -1,12 +1,13 @@
 import Button from '@/components/Button/Button';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
+    DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
@@ -40,25 +41,24 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
 
     return (
         <Dialog onOpenChange={() => onClose()} open={true}>
-            <DialogContent className="flex flex-col">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Publish Project {project.name}</DialogTitle>
+            <DialogContent>
+                <DialogMain>
+                    <DialogHeader
+                        description="Publish project to activate its workflows."
+                        title={`Publish Project ${project.name}`}
+                    />
 
-                        <DialogDescription>Publish project to activate its workflows.</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <div className="flex flex-col space-y-2">
+                            <Label>Description</Label>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                            <Textarea className="h-28" onChange={(event) => setDescription(event.target.value)} />
+                        </div>
+                    </DialogBody>
 
-                <div className="flex flex-col space-y-4">
-                    <div className="flex flex-col space-y-2">
-                        <Label>Description</Label>
+                    <DialogFooter>
+                        <DialogCancelButton />
 
-                        <Textarea className="h-28" onChange={(event) => setDescription(event.target.value)}></Textarea>
-                    </div>
-
-                    <div className="flex justify-end">
                         <Button
                             label="Publish"
                             onClick={() =>
@@ -70,8 +70,8 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
                                 })
                             }
                         />
-                    </div>
-                </div>
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
