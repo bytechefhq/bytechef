@@ -17,7 +17,13 @@
 package com.bytechef.ai.chat.memory.aws.config;
 
 import com.bytechef.config.ApplicationProperties.Ai.Memory.Aws;
+import com.bytechef.config.ApplicationProperties.Cloud;
+import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -25,34 +31,86 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 
 /**
- * Factory for creating {@link S3Client} instances from the AWS chat memory configuration.
+ * Creates {@link S3Client} instances for chat memory, resolving the region and credentials from
+ * {@code bytechef.ai.memory.aws.*}, then {@code bytechef.cloud.aws.*}, then the default AWS provider chains.
  *
  * @author Ivica Cardic
  */
-final class AwsS3ClientFactory {
+public final class AwsS3ClientFactory {
+
+    private static final String CLOUD_AWS_PREFIX = "bytechef.cloud.aws.";
+    private static final String MEMORY_AWS_PREFIX = "bytechef.ai.memory.aws.";
+
+    private static final Logger log = LoggerFactory.getLogger(AwsS3ClientFactory.class);
 
     private AwsS3ClientFactory() {
     }
 
-    static S3Client create(Aws aws) {
+    private record ResolvedAwsCredentials(AwsCredentialsProvider awsCredentialsProvider, String source) {
+    }
+
+    static S3Client create(Aws memoryAws, Cloud.@Nullable Aws cloudAws) {
         S3ClientBuilder builder = S3Client.builder();
 
-        String region = aws.getRegion();
+        Cloud.Aws fallbackAws = cloudAws == null ? new Cloud.Aws() : cloudAws;
 
-        if (region != null && !region.isBlank()) {
+        String region = StringUtils.firstNonBlank(memoryAws.getRegion(), fallbackAws.getRegion());
+
+        if (region != null) {
             builder.region(Region.of(region));
         }
 
-        String accessKeyId = aws.getAccessKeyId();
-        String secretAccessKey = aws.getSecretAccessKey();
+        ResolvedAwsCredentials resolvedAwsCredentials = resolveAwsCredentials(memoryAws, fallbackAws);
 
-        if (accessKeyId != null && !accessKeyId.isBlank() && secretAccessKey != null && !secretAccessKey.isBlank()) {
-            builder.credentialsProvider(
-                StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey)));
-        } else {
-            builder.credentialsProvider(DefaultCredentialsProvider.create());
+        log.info(
+            "Chat memory S3 client uses AWS credentials from {} in region {}", resolvedAwsCredentials.source(),
+            region == null ? "resolved by the default region provider chain" : region);
+
+        return builder.credentialsProvider(resolvedAwsCredentials.awsCredentialsProvider())
+            .build();
+    }
+
+    public static AwsCredentialsProvider getAwsCredentialsProvider(Aws memoryAws, Cloud.Aws cloudAws) {
+        ResolvedAwsCredentials resolvedAwsCredentials = resolveAwsCredentials(memoryAws, cloudAws);
+
+        return resolvedAwsCredentials.awsCredentialsProvider();
+    }
+
+    private static ResolvedAwsCredentials resolveAwsCredentials(Aws memoryAws, Cloud.Aws cloudAws) {
+        AwsBasicCredentials memoryAwsCredentials = getAwsCredentials(
+            memoryAws.getAccessKeyId(), memoryAws.getSecretAccessKey(), MEMORY_AWS_PREFIX);
+
+        if (memoryAwsCredentials != null) {
+            return new ResolvedAwsCredentials(
+                StaticCredentialsProvider.create(memoryAwsCredentials), MEMORY_AWS_PREFIX + "*");
         }
 
-        return builder.build();
+        AwsBasicCredentials cloudAwsCredentials = getAwsCredentials(
+            cloudAws.getAccessKeyId(), cloudAws.getSecretAccessKey(), CLOUD_AWS_PREFIX);
+
+        if (cloudAwsCredentials != null) {
+            return new ResolvedAwsCredentials(
+                StaticCredentialsProvider.create(cloudAwsCredentials), CLOUD_AWS_PREFIX + "*");
+        }
+
+        return new ResolvedAwsCredentials(
+            DefaultCredentialsProvider.builder()
+                .build(),
+            "the default credentials provider chain");
+    }
+
+    private static @Nullable AwsBasicCredentials getAwsCredentials(
+        @Nullable String accessKeyId, @Nullable String secretAccessKey, String propertyPrefix) {
+
+        if (StringUtils.isAllBlank(accessKeyId, secretAccessKey)) {
+            return null;
+        }
+
+        if (StringUtils.isAnyBlank(accessKeyId, secretAccessKey)) {
+            throw new IllegalArgumentException(
+                propertyPrefix + "access-key-id and " + propertyPrefix + "secret-access-key must be set together");
+        }
+
+        return AwsBasicCredentials.create(accessKeyId, secretAccessKey);
     }
 }

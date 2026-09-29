@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.apache.commons:commons-lang3")
     implementation(libs.org.springaicommunity.spring.ai.session)
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("jakarta.annotation:jakarta.annotation-api")
@@ -11,4 +12,13 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":spring-ai:spring-ai-session-aws"))
     implementation(project(":spring-ai:spring-ai-session-redis"))
+
+    testImplementation("com.h2database:h2")
+    testImplementation("org.liquibase:liquibase-core")
+    testImplementation("org.postgresql:postgresql")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-aws-config"))
+    testImplementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-jdbc-config"))
+    testImplementation(project(":server:libs:config:app-config"))
 }

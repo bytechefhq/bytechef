@@ -20,12 +20,17 @@ import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.env.MockEnvironment;
 
+/**
+ * @author Ivica Cardic
+ */
 public class BuiltInSessionChatMemoryComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/built-in-session-chat-memory_v1.json",
-            new BuiltInSessionChatMemoryComponentHandler(null, new MockEnvironment()).getDefinition());
+            new BuiltInSessionChatMemoryComponentHandler(
+                null, new MockEnvironment().withProperty("bytechef.ai.memory.provider", "in_memory"))
+                    .getDefinition());
     }
 }
