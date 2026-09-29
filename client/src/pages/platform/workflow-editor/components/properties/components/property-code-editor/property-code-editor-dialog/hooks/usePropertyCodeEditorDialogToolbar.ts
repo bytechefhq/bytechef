@@ -1,4 +1,5 @@
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import {useWorkflowEditorCopilotAllowed} from '@/pages/platform/workflow-editor/providers/workflowEditorCopilotContext';
 import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -57,7 +58,9 @@ export const usePropertyCodeEditorDialogToolbar = ({
 
     const readOnly = useWorkflowEditorReadOnly();
 
-    const copilotEnabled = ai.copilot.enabled && ff_1570;
+    const copilotAllowed = useWorkflowEditorCopilotAllowed();
+
+    const copilotEnabled = ai.copilot.enabled && ff_1570 && copilotAllowed;
 
     const testClusterElementScriptMutation = useTestClusterElementScriptMutation();
     const testWorkflowNodeScriptMutation = useTestWorkflowNodeScriptMutation();
