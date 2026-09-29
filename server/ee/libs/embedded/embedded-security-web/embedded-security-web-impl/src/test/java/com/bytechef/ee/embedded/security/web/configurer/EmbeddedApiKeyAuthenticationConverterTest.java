@@ -80,13 +80,12 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     }
 
     @Test
-    void testConvertWithNonJwtTokenAndInternalUrlThrowsIllegalArgumentException() {
+    void testConvertWithNonJwtTokenAndInternalUrlIsRefused() {
         when(request.getHeader("Authorization")).thenReturn("Bearer invalid-token");
         when(request.getRequestURI()).thenReturn("/api/platform/internal/some-endpoint");
 
         assertThatThrownBy(() -> converter.convert(request))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("externalUserId parameter is required");
+            .isInstanceOf(BadCredentialsException.class);
     }
 
     @Test
@@ -109,6 +108,103 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         assertThat(token.getExternalUserId()).isEqualTo(externalUserId);
         assertThat(token.getTenantId()).isEqualTo(tenantId);
         assertThat(token.getEnvironmentId()).isEqualTo(Environment.PRODUCTION.ordinal());
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenTakesTheExternalUserIdOfAnExternalMcpInstanceRoute() {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI())
+            .thenReturn("/api/embedded/v1/external/user123/integration-instances/5/mcp-tools/7/enable");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) converter.convert(request);
+
+        assertThat(token.getExternalUserId()).isEqualTo("user123");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenKeepsAnExternalUserNamedExternal() {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/external/integration-instances/5");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) converter.convert(request);
+
+        assertThat(token.getExternalUserId()).isEqualTo("external");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenDecodesAnEncodedExternalUserId() {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn("/api/embedded/v1/user%40example.com/tools");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) converter.convert(request);
+
+        assertThat(token.getExternalUserId()).isEqualTo("user@example.com");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenDecodesAnEncodedExternalUserIdOfAnExternalMcpInstanceRoute() {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI())
+            .thenReturn("/api/embedded/v1/external/user%40example.com/integration-instances/5/mcp-tools/7/enable");
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) converter.convert(request);
+
+        assertThat(token.getExternalUserId()).isEqualTo("user@example.com");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenAcceptsAPathWithoutTrailingSegment() {
+        assertThat(convertApiKeyRequest("/api/embedded/v1/alice")).isEqualTo("alice");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenTakesTheFirstSegmentWhenExternalAppearsLater() {
+        assertThat(convertApiKeyRequest("/api/embedded/v1/alice/automation/external/bob/integration-instances/1"))
+            .isEqualTo("alice");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenTakesTheFirstSegmentWhenALaterSegmentLooksLikeAVersion() {
+        assertThat(convertApiKeyRequest("/api/embedded/v1/alice/v2/bob/tools")).isEqualTo("alice");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenRespectsTheServletContextPath() {
+        when(request.getContextPath()).thenReturn("/app");
+
+        assertThat(convertApiKeyRequest("/app/api/embedded/v1/alice/tools")).isEqualTo("alice");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenRefusesTheConnectedUserOnlyWebhookRoutes() {
+        assertThatThrownBy(() -> convertApiKeyRequest("/api/embedded/v1/app-events"))
+            .isInstanceOf(BadCredentialsException.class);
+        assertThatThrownBy(() -> convertApiKeyRequest("/api/embedded/v1/workflows/workflow-uuid"))
+            .isInstanceOf(BadCredentialsException.class);
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenKeepsExternalUsersNamedLikeTheWebhookRoutes() {
+        assertThat(convertApiKeyRequest("/api/embedded/v1/workflows/connections/5")).isEqualTo("workflows");
+        assertThat(convertApiKeyRequest("/api/embedded/v1/app-events/tools")).isEqualTo("app-events");
+    }
+
+    @Test
+    void testConvertWithNonJwtTokenRefusesAMalformedEncodedExternalUserId() {
+        assertThatThrownBy(() -> convertApiKeyRequest("/api/embedded/v1/%zz/tools"))
+            .isInstanceOf(BadCredentialsException.class);
     }
 
     @Test
@@ -211,7 +307,7 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     void testExternalUserIdPatternMatchesValidUri() {
         String validUri = "/api/embedded/v1/user123/endpoint";
 
-        assertThat(EmbeddedApiKeyAuthenticationConverter.EXTERNAL_USER_ID_PATTERN.matcher(validUri)
+        assertThat(EmbeddedApiKeyAuthenticationConverter.API_KEY_PATH_PATTERN.matcher(validUri)
             .matches())
                 .isTrue();
     }
@@ -220,7 +316,7 @@ class EmbeddedApiKeyAuthenticationConverterTest {
     void testExternalUserIdPatternDoesNotMatchInvalidUri() {
         String invalidUri = "/api/platform/internal/some-endpoint";
 
-        assertThat(EmbeddedApiKeyAuthenticationConverter.EXTERNAL_USER_ID_PATTERN.matcher(invalidUri)
+        assertThat(EmbeddedApiKeyAuthenticationConverter.API_KEY_PATH_PATTERN.matcher(invalidUri)
             .matches())
                 .isFalse();
     }
@@ -326,5 +422,17 @@ class EmbeddedApiKeyAuthenticationConverterTest {
         }
 
         return mockHttpServletRequest;
+    }
+
+    private String convertApiKeyRequest(String requestURI) {
+        String tenantKey = EncodingUtils.base64EncodeToString("test-tenant:randomData");
+
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + tenantKey);
+        when(request.getHeader("X-ENVIRONMENT")).thenReturn(null);
+        when(request.getRequestURI()).thenReturn(requestURI);
+
+        EmbeddedApiKeyAuthenticationToken token = (EmbeddedApiKeyAuthenticationToken) converter.convert(request);
+
+        return token.getExternalUserId();
     }
 }

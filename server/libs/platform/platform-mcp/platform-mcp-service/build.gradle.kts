@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-mail"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
@@ -23,6 +24,10 @@ dependencies {
     testImplementation(project(":server:libs:core:commons:commons-data"))
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
+    testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
+    testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
+    testImplementation(project(":server:libs:platform:platform-user:platform-user-service"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

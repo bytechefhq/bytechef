@@ -26,7 +26,6 @@ import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider
 import com.bytechef.automation.configuration.security.ResourceEnvironmentResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -87,8 +86,7 @@ class PermissionServiceTest {
         permissionService = new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            new ApplicationProperties());
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
 
         securityUtilsMock = mockStatic(SecurityUtils.class);
 
@@ -486,10 +484,9 @@ class PermissionServiceTest {
 
     @Test
     void testHasWorkflowScopeGrantsUnderAutomationAuthorizationSkip() throws Throwable {
-        // Embedded → automation delegation (whole ConnectedUserProjectFacadeImpl is @SkipAutomationAuthorization):
-        // the principal is an API-key identity with no row in the user table, so resolving it throws
-        // UserNotFoundException. The skip flag must short-circuit the gate to grant BEFORE any project/user/cache
-        // lookup runs. Without the skip flag this same call returns false (project not stubbed → no workspace).
+        // A trusted system path under the skip flag: the gate must short-circuit to grant BEFORE any
+        // project/user/cache lookup runs. Without the skip flag this same call returns false (project not stubbed → no
+        // workspace).
         boolean granted = AutomationAuthorizationContext.callSkippingChecks(
             () -> permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_EDIT"));
 
@@ -841,8 +838,7 @@ class PermissionServiceTest {
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolver("Connection", ResourceOwner.ofWorkspace(connectionWorkspaceId))),
             List.of(connectionEnvironmentResolver),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            new ApplicationProperties());
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
     private void givenWorkflowInWorkspace(long workspaceId) {
@@ -857,8 +853,7 @@ class PermissionServiceTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, List.of(resolvers), List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            new ApplicationProperties());
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
     private static ResourceOwnershipResolver resolver(String type, ResourceOwner owner) {

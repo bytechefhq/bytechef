@@ -1,8 +1,7 @@
 ---
-# NOTE: any route defined below with NO {externalUserId} path parameter (e.g. /app-events,
-# /workflows/{workflowUuid}) is JWT-only by design -- add its literal first path segment to
-# ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS (embedded-connected-user-api) so
-# EmbeddedApiKeyAuthenticationConverter rejects non-JWT tokens on it instead of minting a phantom ConnectedUser.
+# NOTE: the routes below have NO {externalUserId} path parameter (/app-events, /workflows/{workflowUuid}) and accept
+# only the connected-user JWT. EmbeddedApiKeyAuthenticationConverter refuses a non-JWT (API key) token on them with 401,
+# because an API-key call resolves its connected user from the first path segment after /v{n}/.
 openapi: "3.0.1"
 info:
   title: "The Embedded Public V1 API"

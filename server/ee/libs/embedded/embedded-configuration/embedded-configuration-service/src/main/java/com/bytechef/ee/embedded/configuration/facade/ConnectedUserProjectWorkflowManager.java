@@ -13,7 +13,6 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
@@ -55,7 +54,6 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class ConnectedUserProjectWorkflowManager {
 
     private static final String DEFAULT_DEFINITION = """

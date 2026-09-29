@@ -90,23 +90,7 @@ class CopilotToolContextUtilsTest {
 
         assertThat(toolContext)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_AUTHENTICATION_KEY, authentication)
-            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_TENANT_ID_KEY, "acme")
-            // An embedded run (captured Authentication, no platform user) must skip platform automation RBAC on the
-            // tool-execution worker threads.
-            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY, Boolean.TRUE);
-    }
-
-    @Test
-    void testDoesNotSkipAutomationAuthorizationWithoutCapturedAuthentication() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
-        stateMap.put("workspaceId", 7L);
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext)
-            .doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY);
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_TENANT_ID_KEY, "acme");
     }
 
     @Test

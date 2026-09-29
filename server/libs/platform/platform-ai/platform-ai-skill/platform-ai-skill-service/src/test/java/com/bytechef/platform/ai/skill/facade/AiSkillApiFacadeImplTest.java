@@ -18,6 +18,7 @@ package com.bytechef.platform.ai.skill.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -131,6 +133,30 @@ class AiSkillApiFacadeImplTest {
         when(aiSkillFacade.getAiSkills()).thenReturn(List.of(skill("alice"), skill("bob")));
 
         assertThat(aiSkillApiFacade.getAiSkills()).hasSize(2);
+    }
+
+    @Test
+    void testConnectedUserWhoseExternalIdIsAPlatformLoginIsRefusedEverySkillOperation() {
+        TestConnectedUserAuthentication connectedUser = TestConnectedUserAuthentication.of("alice");
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(connectedUser);
+
+        when(aiSkillFacade.getAiSkills()).thenReturn(List.of(skill("alice")));
+        when(aiSkillFacade.getAiSkill(1L)).thenReturn(skill("alice"));
+
+        assertThatThrownBy(aiSkillApiFacade::getAiSkills).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.getAiSkill(1L)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.deleteAiSkill(1L)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.updateAiSkill(1L, "renamed", null))
+            .isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> aiSkillApiFacade.createAiSkillFromInstructions("skill", null, "do it"))
+            .isInstanceOf(AccessDeniedException.class);
+
+        verify(aiSkillFacade, never()).deleteAiSkill(anyLong());
+        verify(aiSkillFacade, never()).updateAiSkill(anyLong(), anyString(), any());
+        verify(aiSkillFacade, never()).createAiSkillFromInstructions(anyString(), any(),
+            anyString());
     }
 
     private static AiSkill skill(String createdBy) {

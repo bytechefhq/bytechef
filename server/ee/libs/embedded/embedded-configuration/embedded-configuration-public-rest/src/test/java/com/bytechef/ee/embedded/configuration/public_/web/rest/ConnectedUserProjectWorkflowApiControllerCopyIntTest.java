@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import org.junit.jupiter.api.Assertions;
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -69,7 +69,7 @@ public class ConnectedUserProjectWorkflowApiControllerCopyIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
+    @WithMockConnectedUser(externalUserId = "user@example.com")
     public void testCopyFrontendWorkflowTemplateReturnsWorkflowUuid() {
         String newWorkflowUuid = "new-workflow-uuid-999";
 
@@ -93,7 +93,7 @@ public class ConnectedUserProjectWorkflowApiControllerCopyIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
+    @WithMockConnectedUser(externalUserId = "user@example.com")
     public void testCopyFrontendWorkflowTemplateUnknownIdReturns404() {
         when(connectedUserProjectFacade.copyWorkflowTemplate(
             eq("user@example.com"), eq("unknown-id"), any(Environment.class)))

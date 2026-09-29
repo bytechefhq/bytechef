@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -44,6 +45,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -97,7 +99,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-user-1")
+    @WithMockConnectedUser(externalUserId = "ext-user-1")
     public void testCopilotChatAuthorizesResolvesStateAndRunsBuildAgent() throws Exception {
         SseEmitter completedEmitter = new SseEmitter();
 
@@ -146,7 +148,39 @@ public class ConnectedUserCopilotApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-user-1")
+    @WithMockConnectedUser(externalUserId = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedAuthenticatedUserId() throws Exception {
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(new SseEmitter());
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"threadId\":\"thread-1\",\"state\":{\"authenticatedUserId\":1,"
+                            + "\"authentication\":\"forged\"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+        assertThat(stateMap.get(CopilotConstants.STATE_AUTHENTICATION)).isInstanceOf(Authentication.class);
+    }
+
+    @Test
+    @WithMockConnectedUser(externalUserId = "ext-user-1")
     public void testCopilotChatTrimsClientAdditionalSystemPrompt() throws Exception {
         SseEmitter completedEmitter = new SseEmitter();
 
@@ -179,7 +213,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-user-1")
+    @WithMockConnectedUser(externalUserId = "ext-user-1")
     public void testCopilotChatCapsOverlongAdditionalSystemPrompt() throws Exception {
         SseEmitter completedEmitter = new SseEmitter();
 
@@ -215,7 +249,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "ext-user-1")
+    @WithMockConnectedUser(externalUserId = "ext-user-1")
     public void testCopilotChatBlocksAccessForForeignWorkflowUuid() throws Exception {
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq("foreign-uuid"), eq(Environment.PRODUCTION)))
@@ -240,6 +274,29 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
         assertThat(exceptionThrown).isTrue();
 
+        verify(agUiService, never()).runAgent(any(), any());
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatRefusesAPlatformUserWhoseLoginIsAnExternalId() {
+        boolean exceptionThrown = false;
+
+        try {
+            mockMvc.perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"threadId\":\"thread-1\",\"state\":{}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM));
+        } catch (Exception exception) {
+            assertThat(exception.getCause()).isInstanceOf(AccessDeniedException.class);
+
+            exceptionThrown = true;
+        }
+
+        assertThat(exceptionThrown).isTrue();
+
+        verify(connectedUserProjectFacade, never()).prepareCopilotChat(any(), any(), any());
         verify(agUiService, never()).runAgent(any(), any());
     }
 

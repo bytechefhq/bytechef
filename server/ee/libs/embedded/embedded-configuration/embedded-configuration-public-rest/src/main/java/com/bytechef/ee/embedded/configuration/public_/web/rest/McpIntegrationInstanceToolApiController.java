@@ -11,7 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +48,8 @@ class McpIntegrationInstanceToolApiController {
     public ResponseEntity<Void> enableFrontendMcpIntegrationInstanceTool(
         @PathVariable Long id, @PathVariable Long mcpToolId) {
 
-        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(getCurrentUserLogin(), id, mcpToolId, true);
+        mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
+            ConnectedUserAuthentications.getCurrentExternalUserId(), id, mcpToolId, true);
 
         return ResponseEntity.noContent()
             .build();
@@ -60,7 +61,7 @@ class McpIntegrationInstanceToolApiController {
         @PathVariable Long id, @PathVariable Long mcpToolId) {
 
         mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(
-            getCurrentUserLogin(), id, mcpToolId, false);
+            ConnectedUserAuthentications.getCurrentExternalUserId(), id, mcpToolId, false);
 
         return ResponseEntity.noContent()
             .build();
@@ -69,6 +70,8 @@ class McpIntegrationInstanceToolApiController {
     @PostMapping("/external/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
     public ResponseEntity<Void> enableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(externalUserId, id, mcpToolId, true);
 
@@ -80,6 +83,8 @@ class McpIntegrationInstanceToolApiController {
     public ResponseEntity<Void> disableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(externalUserId, id, mcpToolId, false);
 
         return ResponseEntity.noContent()
@@ -90,10 +95,5 @@ class McpIntegrationInstanceToolApiController {
     public ResponseEntity<Void> handleEmbeddedIntegrationNotVisibleException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build();
-    }
-
-    private static String getCurrentUserLogin() {
-        return SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
     }
 }

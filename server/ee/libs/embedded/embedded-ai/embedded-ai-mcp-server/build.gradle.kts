@@ -51,7 +51,10 @@ dependencies {
     runtimeOnly(libs.jjwt.impl)
     runtimeOnly(libs.jjwt.jackson)
 
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
+    testImplementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-service"))
 }

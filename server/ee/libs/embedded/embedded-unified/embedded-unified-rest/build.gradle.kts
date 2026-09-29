@@ -84,4 +84,5 @@ dependencies {
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

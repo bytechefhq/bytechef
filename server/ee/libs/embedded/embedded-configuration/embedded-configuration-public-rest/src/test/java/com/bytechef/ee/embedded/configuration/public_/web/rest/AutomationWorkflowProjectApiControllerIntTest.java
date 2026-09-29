@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateD
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestSharedMocks;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.config.EmbeddedConfigurationPublicRestTestConfiguration;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.config.WithMockConnectedUser;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import java.util.List;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -44,6 +44,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 public class AutomationWorkflowProjectApiControllerIntTest {
 
     private static final String WORKFLOW_UUID = "workflow-uuid-001";
+    private static final String EXTERNAL_USER_ID = "user@example.com";
     private static final long PROJECT_ID = 42L;
 
     @MockitoBean
@@ -68,7 +69,7 @@ public class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
+    @WithMockConnectedUser(externalUserId = "user@example.com")
     public void testGetFrontendProjectsReturnsPublishedProjectWithWorkflows() {
         ConnectedUserWorkflowTemplateDTO.Component componentDTO =
             new ConnectedUserWorkflowTemplateDTO.Component("gmail", "Gmail", "gmail-icon-svg");
@@ -81,7 +82,7 @@ public class AutomationWorkflowProjectApiControllerIntTest {
             PROJECT_ID, "Onboarding Project", "New user onboarding automations", null, List.of(), true, 1, 1,
             List.of(workflowDTO), null);
 
-        when(automationWorkflowProjectFacade.getPublishedProjects())
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(projectDTO));
 
         try {
@@ -115,9 +116,9 @@ public class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
+    @WithMockConnectedUser(externalUserId = "user@example.com")
     public void testGetFrontendProjectsReturnsEmptyList() {
-        when(automationWorkflowProjectFacade.getPublishedProjects())
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of());
 
         try {
@@ -139,13 +140,13 @@ public class AutomationWorkflowProjectApiControllerIntTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
+    @WithMockConnectedUser(externalUserId = "user@example.com")
     public void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationWorkflowProjectDTO unpublishedProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
             List.of(), null);
 
-        when(automationWorkflowProjectFacade.getPublishedProjects())
+        when(automationWorkflowProjectFacade.getPublishedProjects(EXTERNAL_USER_ID, Environment.PRODUCTION))
             .thenReturn(List.of(unpublishedProjectDTO));
 
         try {

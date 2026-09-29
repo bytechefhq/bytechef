@@ -16,8 +16,10 @@
 
 package com.bytechef.automation.configuration.web.rest;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +34,9 @@ import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectTagFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.automation.configuration.web.rest.config.AutomationConfigurationRestConfigurationSharedMocks;
@@ -43,12 +48,26 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -284,5 +303,72 @@ public class WorkflowApiControllerIntTest {
             new com.bytechef.platform.configuration.dto.WorkflowDTO(
                 workflow, List.of(new WorkflowTaskDTO(tasks.getFirst(), false, null, List.of())), List.of()),
             projectWorkflow, false);
+    }
+
+    @Nested
+    @Import(MethodSecurityEnforcement.MethodSecurityConfiguration.class)
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final String WORKFLOW_ID = "workflow-1";
+
+        @Autowired
+        private WorkflowApiController workflowApiController;
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @BeforeEach
+        void beforeEach() {
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+            securityContext.setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                    "member", null, List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            SecurityContextHolder.setContext(securityContext);
+
+            when(workflowService.getWorkflow(anyString())).thenThrow(new IllegalStateException(BODY_REACHED));
+        }
+
+        @AfterEach
+        void afterEach() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {
+            false, true
+        })
+        void testExportWorkflowRequiresWorkflowView(boolean granted) {
+            when(permissionService.hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW")).thenReturn(granted);
+
+            if (granted) {
+                assertThatThrownBy(() -> workflowApiController.exportWorkflow(WORKFLOW_ID))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+            } else {
+                assertThatThrownBy(() -> workflowApiController.exportWorkflow(WORKFLOW_ID))
+                    .isInstanceOf(AccessDeniedException.class);
+            }
+
+            verify(permissionService).hasWorkflowScope(WORKFLOW_ID, "WORKFLOW_VIEW");
+        }
+
+        @EnableMethodSecurity(proxyTargetClass = true)
+        static class MethodSecurityConfiguration {
+
+            @Bean
+            static MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+                @Lazy PermissionService permissionService) {
+
+                AutomationMethodSecurityExpressionHandler expressionHandler =
+                    new AutomationMethodSecurityExpressionHandler(permissionService);
+
+                expressionHandler.setPermissionEvaluator(new AutomationPermissionEvaluator(permissionService));
+
+                return expressionHandler;
+            }
+        }
     }
 }

@@ -20,7 +20,6 @@ import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
@@ -80,7 +79,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
 
     private static final String MARKER = "__EMBEDDED__";
@@ -161,7 +159,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
-        boolean isPublishedCatalogWorkflowTemplate = automationWorkflowProjectFacade.getPublishedProjects()
+        boolean isPublishedCatalogWorkflowTemplate = automationWorkflowProjectFacade
+            .getPublishedProjects(externalUserId, environment)
             .stream()
             .flatMap(project -> CollectionUtils.stream(project.workflowTemplates()))
             .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid));
