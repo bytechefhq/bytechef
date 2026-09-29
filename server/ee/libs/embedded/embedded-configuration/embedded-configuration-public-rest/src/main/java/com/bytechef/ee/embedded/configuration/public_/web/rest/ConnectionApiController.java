@@ -66,7 +66,7 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectedUserConnectionFacade
-                .getConnections(connectedUser.getId(), componentName, connectionIds == null ? List.of() : connectionIds)
+                .getConnections(connectedUser.getId(), componentName)
                 .stream()
                 .map(connectionDTO -> conversionService.convert(connectionDTO, ConnectionModel.class))
                 .toList());
@@ -87,7 +87,7 @@ public class ConnectionApiController implements ConnectionApi {
 
         return ResponseEntity.ok(
             connectedUserConnectionFacade
-                .getConnections(connectedUser.getId(), componentName, connectionIds == null ? List.of() : connectionIds)
+                .getConnections(connectedUser.getId(), componentName)
                 .stream()
                 .map(connectionDTO -> conversionService.convert(connectionDTO, ConnectionModel.class))
                 .toList());
