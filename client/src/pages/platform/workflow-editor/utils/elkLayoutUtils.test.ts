@@ -283,6 +283,55 @@ const positionOf = (layoutedNodes: Node[], id: string): {x: number; y: number} =
     return layoutedNode.position;
 };
 
+describe('read-only and trigger sizing', () => {
+    const triggerNode = (id: string, label: string): Node => ({
+        data: {componentName: 'webhook', label, trigger: true, workflowNodeName: id},
+        id,
+        position: {x: 0, y: 0},
+        type: 'workflow',
+    });
+
+    it('anchors a read-only placeholder on its 2px dot, not on a task box', async () => {
+        const nodes: Node[] = [
+            taskNode('task1'),
+            {...taskNode('task1-placeholder-0'), type: 'readonlyPlaceholder'},
+            taskNode('task2'),
+        ];
+        const edges = [edge('task1', 'task1-placeholder-0'), edge('task1-placeholder-0', 'task2')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1000, direction: 'TB', edges, nodes});
+
+        const chainCenter = positionOf(result.nodes, 'task1').x + 36;
+        const placeholderCenter = positionOf(result.nodes, 'task1-placeholder-0').x + 1;
+
+        expect(Math.abs(placeholderCenter - chainCenter)).toBeLessThanOrEqual(1);
+    });
+
+    it('reserves the shared trigger row width so long trigger labels do not overlap', async () => {
+        const shortLabelGraph = buildElkGraph(
+            [triggerNode('trigger_1', 'Webhook'), triggerNode('trigger_2', 'Webhook'), taskNode('task1')],
+            [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')],
+            'TB'
+        );
+
+        const longLabelGraph = buildElkGraph(
+            [
+                triggerNode('trigger_1', 'A trigger with a very long label indeed'),
+                triggerNode('trigger_2', 'Webhook'),
+                taskNode('task1'),
+            ],
+            [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')],
+            'TB'
+        );
+
+        const triggerWidth = (graph: ElkNode, id: string) =>
+            (graph.children ?? []).find((child) => child.id === id)?.width ?? 0;
+
+        expect(triggerWidth(longLabelGraph, 'trigger_1')).toBeGreaterThan(triggerWidth(shortLabelGraph, 'trigger_1'));
+        expect(triggerWidth(longLabelGraph, 'trigger_2')).toBe(triggerWidth(longLabelGraph, 'trigger_1'));
+    });
+});
+
 describe('getElkLayoutElements', () => {
     it('spaces a TB chain uniformly (footprint gap = 50)', async () => {
         const nodes = [taskNode('task1'), taskNode('task2'), taskNode('task3')];
@@ -528,8 +577,8 @@ describe('getElkLayoutElements', () => {
 
         const result = await getElkLayoutElements({canvasWidth: 1000, direction: 'TB', edges, nodes});
 
-        // rendered centers: placeholder 28 wide, condition anchor 72 wide
-        const placeholderCenter = positionOf(result.nodes, 'condition_1-condition-left-placeholder-0').x + 14;
+        // rendered centers: both the placeholder node element and the condition anchor are 72 wide
+        const placeholderCenter = positionOf(result.nodes, 'condition_1-condition-left-placeholder-0').x + 36;
         const nestedConditionCenter = positionOf(result.nodes, 'condition_2').x + 36;
 
         expect(placeholderCenter).toBeLessThan(nestedConditionCenter);
