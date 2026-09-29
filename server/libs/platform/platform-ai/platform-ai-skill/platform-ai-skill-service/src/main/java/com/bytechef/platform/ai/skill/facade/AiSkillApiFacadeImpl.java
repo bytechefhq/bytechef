@@ -19,10 +19,12 @@ package com.bytechef.platform.ai.skill.facade;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,16 +46,22 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public AiSkill createAiSkill(String name, @Nullable String description, String filename, byte[] bytes) {
+        checkNotConnectedUser();
+
         return aiSkillFacade.createAiSkill(name, description, filename, bytes);
     }
 
     @Override
     public AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions) {
+        checkNotConnectedUser();
+
         return aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
     }
 
     @Override
     public AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.createAdditionalFilesInSkill(id, additionalFiles);
@@ -61,6 +69,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public void deleteAiSkill(long id) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         aiSkillFacade.deleteAiSkill(id);
@@ -68,6 +78,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public AiSkill getAiSkill(long id) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.getAiSkill(id);
@@ -75,6 +87,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public AiSkillFacade.AiSkillDownload getAiSkillWithDownload(long id) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.getAiSkillWithDownload(id);
@@ -82,6 +96,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public String getAiSkillFileContent(long id, String path) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.getAiSkillFileContent(id, path);
@@ -89,6 +105,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public List<String> getAiSkillFilePaths(long id) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.getAiSkillFilePaths(id);
@@ -96,6 +114,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public List<AiSkill> getAiSkills() {
+        checkNotConnectedUser();
+
         if (isAdmin()) {
             return aiSkillFacade.getAiSkills();
         }
@@ -115,6 +135,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public List<Tag> getAiSkillTags() {
+        checkNotConnectedUser();
+
         return aiSkillFacade.getTags(
             getAiSkills()
                 .stream()
@@ -126,11 +148,15 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public List<Tag> getTags(List<Long> tagIds) {
+        checkNotConnectedUser();
+
         return aiSkillFacade.getTags(tagIds);
     }
 
     @Override
     public AiSkill removeFileInSkill(long id, String path) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.removeFileInSkill(id, path);
@@ -138,6 +164,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public AiSkill updateAiSkill(long id, String name, @Nullable String description) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.updateAiSkill(id, name, description);
@@ -145,6 +173,8 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public AiSkill updateAiSkillTags(long id, List<Tag> tags) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.updateAiSkillTags(id, tags);
@@ -152,9 +182,17 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
 
     @Override
     public AiSkill updateAiSkillContent(long id, @Nullable String path, String content) {
+        checkNotConnectedUser();
+
         checkOwnerOrAdmin(id);
 
         return aiSkillFacade.updateAiSkillContent(id, path, content);
+    }
+
+    private static void checkNotConnectedUser() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user has no AI skills");
+        }
     }
 
     /**

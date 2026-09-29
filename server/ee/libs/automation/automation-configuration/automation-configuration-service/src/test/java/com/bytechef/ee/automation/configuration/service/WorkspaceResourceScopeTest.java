@@ -15,7 +15,6 @@ import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.security.ConnectedUserAccessDecider;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.WorkspaceOwnershipResolver;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
 import java.util.List;
 import java.util.OptionalLong;
@@ -99,8 +98,7 @@ class WorkspaceResourceScopeTest {
         return new PermissionServiceImpl(
             currentUserResolver, permissionScopeRegistry, projectRepository, workspaceScopeCacheService,
             workspaceUserRepository, resourceOwnershipResolvers, List.of(),
-            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class),
-            new ApplicationProperties());
+            new StaticListableBeanFactory().getBeanProvider(ConnectedUserAccessDecider.class));
     }
 
     private static List<ResourceOwnershipResolver> ownershipResolvers() {

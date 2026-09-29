@@ -17,7 +17,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -58,6 +58,8 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String externalUserId, String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         Environment environment = getEnvironment(xEnvironment);
 
         // TODO Move to facade
@@ -76,8 +78,7 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<List<ConnectionModel>> getFrontendConnections(
         String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
 
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         Environment environment = getEnvironment(xEnvironment);
 

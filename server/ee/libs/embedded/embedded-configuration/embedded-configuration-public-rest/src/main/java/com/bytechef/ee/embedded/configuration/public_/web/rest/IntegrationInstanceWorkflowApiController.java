@@ -17,7 +17,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.NonNull;
@@ -52,8 +52,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     @CrossOrigin
     public ResponseEntity<Void> disableFrontendIntegrationInstanceWorkflow(Long id, String workflowUuid) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid);
@@ -66,6 +65,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     public ResponseEntity<Void> disableIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid);
 
@@ -76,8 +77,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     @CrossOrigin
     public ResponseEntity<Void> enableFrontendIntegrationInstanceWorkflow(Long id, String workflowUuid) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid);
@@ -89,6 +89,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     public ResponseEntity<Void> enableIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid);
@@ -102,8 +104,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     public ResponseEntity<List<OptionModel>> getFrontendComponentInputOptions(
         Long id, ComponentInputOptionsRequestModel componentInputOptionsRequestModel) {
 
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         return ResponseEntity.ok(
             resolveComponentInputOptions(externalUserId, id, componentInputOptionsRequestModel));
@@ -112,6 +113,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     public ResponseEntity<List<OptionModel>> getComponentInputOptions(
         String externalUserId, Long id, ComponentInputOptionsRequestModel componentInputOptionsRequestModel) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         return ResponseEntity.ok(
             resolveComponentInputOptions(externalUserId, id, componentInputOptionsRequestModel));
@@ -123,8 +126,7 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
         Long id, String workflowUuid,
         UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid,
@@ -138,6 +140,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     public ResponseEntity<Void> updateIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid,
         @NonNull UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid,

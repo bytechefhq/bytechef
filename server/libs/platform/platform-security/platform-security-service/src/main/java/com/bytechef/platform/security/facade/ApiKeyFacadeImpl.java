@@ -21,6 +21,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.ApiKeyRevoker;
 import com.bytechef.platform.user.service.UserService;
@@ -71,6 +72,8 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
      */
     @Override
     public ApiKey create(ApiKey apiKey, PlatformType type) {
+        checkNotConnectedUser();
+
         if (!isTenantAdmin()) {
             throw new AccessDeniedException("Only a tenant admin may create this API key");
         }
@@ -80,11 +83,15 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
     @Override
     public ApiKey createAutomationApiKey(ApiKey apiKey) {
+        checkNotConnectedUser();
+
         return createOwnedApiKey(apiKey, PlatformType.AUTOMATION);
     }
 
     @Override
     public void delete(long id) {
+        checkNotConnectedUser();
+
         getOwnedApiKey(id);
 
         apiKeyService.delete(id);
@@ -97,6 +104,8 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
      */
     @Override
     public List<ApiKey> getAdminApiKeys(long environmentId) {
+        checkNotConnectedUser();
+
         if (!isTenantAdmin()) {
             throw new AccessDeniedException("Only a tenant admin may list platform API keys");
         }
@@ -106,16 +115,22 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
     @Override
     public ApiKey getApiKey(long id) {
+        checkNotConnectedUser();
+
         return getOwnedApiKey(id);
     }
 
     @Override
     public List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
+        checkNotConnectedUser();
+
         return filterOwned(apiKeyService.getApiKeys(environmentId, type));
     }
 
     @Override
     public ApiKey update(ApiKey apiKey) {
+        checkNotConnectedUser();
+
         getOwnedApiKey(apiKey.getId());
 
         return apiKeyService.update(apiKey);
@@ -132,6 +147,12 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade, ApiKeyRevoker {
 
         for (ApiKey apiKey : apiKeys) {
             apiKeyService.delete(apiKey.getId());
+        }
+    }
+
+    private static void checkNotConnectedUser() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user has no platform API keys");
         }
     }
 

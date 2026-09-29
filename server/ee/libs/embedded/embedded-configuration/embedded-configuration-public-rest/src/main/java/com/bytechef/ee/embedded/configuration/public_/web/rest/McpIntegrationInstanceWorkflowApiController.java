@@ -12,7 +12,7 @@ import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFaca
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,7 +53,8 @@ class McpIntegrationInstanceWorkflowApiController {
         @RequestBody UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
 
         mcpIntegrationInstanceWorkflowFacade.updateMcpIntegrationInstanceWorkflow(
-            getCurrentUserLogin(), id, workflowUuid, updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
+            ConnectedUserAuthentications.getCurrentExternalUserId(), id, workflowUuid,
+            updateFrontendIntegrationInstanceWorkflowRequestModel.getInputs());
 
         return ResponseEntity.noContent()
             .build();
@@ -65,7 +66,7 @@ class McpIntegrationInstanceWorkflowApiController {
         @PathVariable Long id, @PathVariable String workflowUuid) {
 
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
-            getCurrentUserLogin(), id, workflowUuid, true);
+            ConnectedUserAuthentications.getCurrentExternalUserId(), id, workflowUuid, true);
 
         return ResponseEntity.noContent()
             .build();
@@ -77,7 +78,7 @@ class McpIntegrationInstanceWorkflowApiController {
         @PathVariable Long id, @PathVariable String workflowUuid) {
 
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
-            getCurrentUserLogin(), id, workflowUuid, false);
+            ConnectedUserAuthentications.getCurrentExternalUserId(), id, workflowUuid, false);
 
         return ResponseEntity.noContent()
             .build();
@@ -86,6 +87,8 @@ class McpIntegrationInstanceWorkflowApiController {
     @PostMapping("/external/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> enableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
+
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid, true);
@@ -98,6 +101,8 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> disableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid, false);
 
@@ -109,10 +114,5 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> handleEmbeddedIntegrationNotVisibleException() {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build();
-    }
-
-    private static String getCurrentUserLogin() {
-        return SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
     }
 }

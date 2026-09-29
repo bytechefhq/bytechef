@@ -20,9 +20,11 @@ import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.automation.ai.mcp.security.McpProjectWorkspaceGuard;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +86,10 @@ public class McpProjectServiceImpl implements McpProjectService {
 
     @Override
     public List<McpProject> getMcpProjects() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user may not list every MCP project");
+        }
+
         return mcpProjectRepository.findAll();
     }
 

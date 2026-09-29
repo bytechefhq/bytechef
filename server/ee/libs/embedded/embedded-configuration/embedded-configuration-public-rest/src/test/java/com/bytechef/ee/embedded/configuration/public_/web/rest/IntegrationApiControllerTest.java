@@ -23,10 +23,19 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.web.authentication.ConnectedUserPathBindings;
+import com.bytechef.platform.security.web.authentication.ConnectedUserPathBindings.ExternalUserIdEndpoint;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @version ee
@@ -35,6 +44,8 @@ import org.springframework.http.ResponseEntity;
  */
 class IntegrationApiControllerTest {
 
+    private static final String BASE_PACKAGE = "com.bytechef.ee.embedded.configuration.public_.web.rest";
+
     private final ConnectedUserIntegrationFacade connectedUserIntegrationFacade =
         mock(ConnectedUserIntegrationFacade.class);
     private final ConversionService conversionService = mock(ConversionService.class);
@@ -42,6 +53,17 @@ class IntegrationApiControllerTest {
 
     private final IntegrationApiController integrationApiController = new IntegrationApiController(
         conversionService, connectedUserIntegrationFacade, environmentService);
+
+    @BeforeEach
+    void authenticateTheConnectedUser() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("external-user-id"));
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void testGetIntegrationReturnsNotFoundWhenIntegrationNotVisible() {
@@ -75,5 +97,44 @@ class IntegrationApiControllerTest {
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isSameAs(integrationModel);
+    }
+
+    @Test
+    void testDiscoversEveryExternalUserIdEndpoint() {
+        assertThat(externalUserIdEndpoints()).hasSize(2);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("externalUserIdEndpoints")
+    void testAConnectedUserIsRefusedAnotherConnectedUsersPath(ExternalUserIdEndpoint externalUserIdEndpoint)
+        throws ReflectiveOperationException {
+
+        ConnectedUserPathBindings.assertRefusesAnotherConnectedUser(externalUserIdEndpoint);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("externalUserIdEndpoints")
+    void testAPlatformSessionIsRefusedAConnectedUsersPath(ExternalUserIdEndpoint externalUserIdEndpoint)
+        throws ReflectiveOperationException {
+
+        ConnectedUserPathBindings.assertRefusesAPlatformSession(externalUserIdEndpoint);
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("externalUserIdEndpoints")
+    void testAConnectedUserPassesTheGuardOnTheirOwnPath(ExternalUserIdEndpoint externalUserIdEndpoint)
+        throws ReflectiveOperationException {
+
+        ConnectedUserPathBindings.assertLetsTheConnectedUserActOnTheirOwnPath(externalUserIdEndpoint);
+    }
+
+    static List<ExternalUserIdEndpoint> externalUserIdEndpoints() {
+        List<ExternalUserIdEndpoint> externalUserIdEndpoints =
+            ConnectedUserPathBindings.findExternalUserIdEndpoints(BASE_PACKAGE);
+
+        return externalUserIdEndpoints.stream()
+            .filter(
+                externalUserIdEndpoint -> externalUserIdEndpoint.controllerClass() == IntegrationApiController.class)
+            .toList();
     }
 }

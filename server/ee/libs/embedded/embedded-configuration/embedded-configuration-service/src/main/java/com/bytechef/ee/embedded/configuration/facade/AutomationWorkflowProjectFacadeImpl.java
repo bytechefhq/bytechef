@@ -15,7 +15,6 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
-import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.JsonUtils;
@@ -64,7 +63,6 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 @ConditionalOnEEVersion
-@SkipAutomationAuthorization
 public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowProjectFacade {
 
     private static final String MARKER = "__EMBEDDED_AUTOMATION__";
@@ -266,20 +264,10 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     }
 
     @Override
-    public List<AutomationWorkflowProjectDTO> getPublishedProjects() {
-        return projectService.getProjects()
-            .stream()
-            .filter(project -> project.getName() != null && Strings.CS.startsWith(project.getName(), MARKER) &&
-                Objects.equals(project.getWorkspaceId(), Workspace.DEFAULT_WORKSPACE_ID))
-            .map(this::toPublishedDTO)
-            .toList();
-    }
-
-    @Override
     public List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
-        return getPublishedProjects().stream()
+        return getAllPublishedProjects().stream()
             .filter(project -> embeddedPermissionEvaluator.evaluate(project.permissionExpression(), connectedUser))
             .map(project -> filterWorkflowTemplates(project, connectedUser))
             .toList();
@@ -389,6 +377,15 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             .filter(tag -> tagIds.contains(tag.getId()))
             .map(tag -> new AutomationWorkflowProjectTagDTO(
                 Objects.requireNonNull(tag.getId(), "tag id"), tag.getName()))
+            .toList();
+    }
+
+    private List<AutomationWorkflowProjectDTO> getAllPublishedProjects() {
+        return projectService.getProjects()
+            .stream()
+            .filter(project -> project.getName() != null && Strings.CS.startsWith(project.getName(), MARKER) &&
+                Objects.equals(project.getWorkspaceId(), Workspace.DEFAULT_WORKSPACE_ID))
+            .map(this::toPublishedDTO)
             .toList();
     }
 

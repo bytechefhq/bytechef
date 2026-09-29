@@ -18,11 +18,14 @@ package com.bytechef.ai.copilot.tool;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.tenant.TenantContext;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -139,7 +142,7 @@ class RehydrateContextToolCallbackTest {
     }
 
     @Test
-    void testReArmsSkipChecksInsideCallThenRestores() {
+    void testDoesNotSkipChecksForACapturedAuthentication() {
         TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
         SecurityContextHolder.clearContext();
 
@@ -147,18 +150,16 @@ class RehydrateContextToolCallbackTest {
 
         ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken("captured-user", "");
+        Authentication authentication = mock(
+            Authentication.class, withSettings().extraInterfaces(ConnectedUserAuthentication.class));
 
         Map<String, Object> map =
-            new AgentToolInvocationContext(null, null, null, null, "acme", authentication, true).toToolContext();
+            new AgentToolInvocationContext(null, null, null, null, "acme", authentication).toToolContext();
 
-        String result = wrapped.call("{}", new ToolContext(map));
+        wrapped.call("{}", new ToolContext(map));
 
-        assertThat(result).isEqualTo("ok");
-        // The embedded skip-authorization flag is re-armed on the worker thread for the duration of the delegate call.
-        assertThat(probe.skipChecksSeenInside).isTrue();
-        // ... and the ThreadLocal returns to its fail-closed default afterward.
-        assertThat(AutomationAuthorizationContext.isSkipChecks()).isFalse();
+        assertThat(probe.authenticationSeenInside).isSameAs(authentication);
+        assertThat(probe.skipChecksSeenInside).isFalse();
     }
 
     @Test

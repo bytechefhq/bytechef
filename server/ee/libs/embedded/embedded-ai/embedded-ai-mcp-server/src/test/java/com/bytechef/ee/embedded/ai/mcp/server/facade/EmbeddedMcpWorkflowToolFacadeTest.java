@@ -174,7 +174,7 @@ class EmbeddedMcpWorkflowToolFacadeTest {
         when(workflowService.getWorkflow("workflow-1")).thenReturn(workflow);
 
         List<ToolCallback> toolCallbacks = embeddedMcpToolFacade.getFunctionToolCallbacks(
-            mcpIntegrationInstanceConfiguration, "external-user-1", Environment.PRODUCTION, "000001");
+            mcpIntegrationInstanceConfiguration, "external-user-1", Environment.PRODUCTION, "000001", null);
 
         assertEquals(1, toolCallbacks.size());
 

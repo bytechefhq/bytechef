@@ -19,9 +19,11 @@ package com.bytechef.platform.mcp.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.repository.McpComponentRepository;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,6 +87,10 @@ public class McpComponentServiceImpl implements McpComponentService {
 
     @Override
     public List<McpComponent> getMcpComponents() {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user may not list every MCP component");
+        }
+
         return mcpComponentRepository.findAll();
     }
 

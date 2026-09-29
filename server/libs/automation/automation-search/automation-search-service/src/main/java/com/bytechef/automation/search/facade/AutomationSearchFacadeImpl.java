@@ -18,10 +18,12 @@ package com.bytechef.automation.search.facade;
 
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchResult;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.tenant.TenantContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,10 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
     @Override
     @SuppressWarnings("unchecked")
     public List<SearchResult<?>> search(String query, int limit) {
+        if (ConnectedUserAuthentications.isConnectedUser()) {
+            throw new AccessDeniedException("A connected user may not search the tenant");
+        }
+
         List<CompletableFuture<List<SearchResult<?>>>> futures = new ArrayList<>();
 
         String currentTenantId = TenantContext.getCurrentTenantId();

@@ -17,11 +17,12 @@
 package com.bytechef.platform.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -50,7 +51,8 @@ class ConnectedUserAuthenticationsTest {
 
     @Test
     void testFetchCurrentReturnsEmptyForAnUnauthenticatedConnectedUserToken() {
-        TestConnectedUserAuthentication authentication = new TestConnectedUserAuthentication(false);
+        TestConnectedUserAuthentication authentication =
+            new TestConnectedUserAuthentication("external-user", 42L, 2L, false);
 
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);
@@ -60,7 +62,8 @@ class ConnectedUserAuthenticationsTest {
 
     @Test
     void testFetchCurrentReturnsTheConnectedUserAuthentication() {
-        TestConnectedUserAuthentication authentication = new TestConnectedUserAuthentication(true);
+        TestConnectedUserAuthentication authentication =
+            new TestConnectedUserAuthentication("external-user", 42L, 2L, true);
 
         SecurityContextHolder.getContext()
             .setAuthentication(authentication);
@@ -68,38 +71,56 @@ class ConnectedUserAuthenticationsTest {
         assertThat(ConnectedUserAuthentications.fetchCurrent()).contains(authentication);
     }
 
-    private static final class TestConnectedUserAuthentication extends AbstractAuthenticationToken
-        implements ConnectedUserAuthentication {
+    @Test
+    void testGetCurrentExternalUserIdReturnsTheConnectedUsersExternalId() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestConnectedUserAuthentication("external-user", 42L, 2L, true));
 
-        private TestConnectedUserAuthentication(boolean authenticated) {
-            super(List.of());
+        assertThat(ConnectedUserAuthentications.getCurrentExternalUserId()).isEqualTo("external-user");
+    }
 
-            setAuthenticated(authenticated);
-        }
+    @Test
+    void testGetCurrentExternalUserIdRefusesAPlatformUser() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken("external-user", "", List.of()));
 
-        @Override
-        public Object getCredentials() {
-            return null;
-        }
+        assertThatThrownBy(ConnectedUserAuthentications::getCurrentExternalUserId)
+            .isInstanceOf(AccessDeniedException.class);
+    }
 
-        @Override
-        public Object getPrincipal() {
-            return "external-user";
-        }
+    @Test
+    void testRequireCurrentExternalUserIdAcceptsOnlyTheCallersOwnExternalId() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("alice"));
 
-        @Override
-        public long connectedUserId() {
-            return 42L;
-        }
+        assertThat(ConnectedUserAuthentications.requireCurrentExternalUserId("alice")).isEqualTo("alice");
+        assertThatThrownBy(() -> ConnectedUserAuthentications.requireCurrentExternalUserId("bob"))
+            .isInstanceOf(AccessDeniedException.class);
 
-        @Override
-        public String externalUserId() {
-            return "external-user";
-        }
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken("bob", "", List.of()));
 
-        @Override
-        public long environmentId() {
-            return 2L;
-        }
+        assertThatThrownBy(() -> ConnectedUserAuthentications.requireCurrentExternalUserId("bob"))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testIsConnectedUserIsTrueOnlyForAnAuthenticatedConnectedUserToken() {
+        assertThat(ConnectedUserAuthentications.isConnectedUser()).isFalse();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken("admin", "", List.of()));
+
+        assertThat(ConnectedUserAuthentications.isConnectedUser()).isFalse();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestConnectedUserAuthentication("external-user", 42L, 2L, false));
+
+        assertThat(ConnectedUserAuthentications.isConnectedUser()).isFalse();
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(new TestConnectedUserAuthentication("external-user", 42L, 2L, true));
+
+        assertThat(ConnectedUserAuthentications.isConnectedUser()).isTrue();
     }
 }
