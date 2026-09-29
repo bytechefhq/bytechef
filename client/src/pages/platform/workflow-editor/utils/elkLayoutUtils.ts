@@ -14,9 +14,11 @@ import {
     GetLayoutElementsProps,
     filterAndDedupeLayoutEdges,
     getDagreNodeSize,
+    getLabelCrossOverhang,
     getLayoutElements,
     positionTriggerPlaceholder,
 } from './layoutUtils';
+import {nestedDispatcherGhostSegment} from './nestedBottomGhostId';
 import {
     CHAIN_CENTERING_MAX_SLACK,
     applySavedPositions,
@@ -113,28 +115,6 @@ const COLUMN_SPINE_HALF_WIDTH = 45;
 // on the icon (±120). Packing against the centered footprint under-reserves
 // the label side by ~116px, so a neighbour's vertical edge run placed at the
 // exact 50px gap sliced straight through the label text. The overhang is
-// estimated PER NODE from its label texts so short-labelled columns don't pay
-// the worst case: the title truncates at max-w-48 (192px) + the 8px icon
-// margin, which caps the estimate at 200.
-const NODE_LABEL_MAX_CROSS_OVERHANG = 200;
-
-// Generous per-character upper bound for the 14px label text (semibold title,
-// monospace operation name), plus the icon→label margin.
-const LABEL_CHAR_WIDTH = 9;
-const LABEL_BLOCK_MARGIN = 16;
-
-function getLabelCrossOverhang(memberNode: Node): number {
-    const nodeData = memberNode.data as NodeDataType;
-
-    const longestLabelLength = Math.max(
-        String(nodeData.title || nodeData.label || '').length,
-        String(nodeData.operationName || '').length,
-        String(nodeData.workflowNodeName || nodeData.name || '').length
-    );
-
-    return Math.min(NODE_LABEL_MAX_CROSS_OVERHANG, LABEL_BLOCK_MARGIN + longestLabelLength * LABEL_CHAR_WIDTH);
-}
-
 // Air between a trigger's estimated label end and the next trigger's icon.
 const TRIGGER_LABEL_CLEARANCE = 30;
 
@@ -303,19 +283,10 @@ function isFrameDispatcherNode(node: Node): boolean {
     return nodeData.taskDispatcher === true && ELK_FRAME_DISPATCHER_COMPONENT_NAMES.includes(nodeData.componentName);
 }
 
-// Fork-join and on-error aux node ids use camelCase segments ('forkJoin',
-// 'onError'), not their kebab-case componentNames (see createForkJoinNode,
-// createOnErrorNode).
-const GHOST_ID_SEGMENT_BY_COMPONENT_NAME: Record<string, string> = {'fork-join': 'forkJoin', 'on-error': 'onError'};
-
-function getGhostIdSegment(componentName: string): string {
-    return GHOST_ID_SEGMENT_BY_COMPONENT_NAME[componentName] || componentName;
-}
-
 // Ghost bar ids embed the dispatcher kind: `<id>-condition-top-ghost`,
 // `<id>-loop-bottom-ghost`, `<id>-forkJoin-top-ghost`, ...
 function getGhostIds(dispatcherNode: Node): {bottomGhostId: string; topGhostId: string} {
-    const ghostIdSegment = getGhostIdSegment((dispatcherNode.data as NodeDataType).componentName);
+    const ghostIdSegment = nestedDispatcherGhostSegment((dispatcherNode.data as NodeDataType).componentName);
 
     return {
         bottomGhostId: `${dispatcherNode.id}-${ghostIdSegment}-bottom-ghost`,
@@ -943,7 +914,7 @@ export const getElkLayoutElements = async ({
                                 ? dispatcherBox.x + dispatcherBox.width / 2
                                 : dispatcherBox.y + dispatcherBox.height / 2;
 
-                        const topGhostId = `${dispatcherId}-${getGhostIdSegment(dispatcherKind)}-top-ghost`;
+                        const topGhostId = `${dispatcherId}-${nestedDispatcherGhostSegment(dispatcherKind)}-top-ghost`;
                         const branchEntryCenters: number[] = [];
 
                         (child.edges || []).forEach((frameEdge) => {
@@ -1549,7 +1520,8 @@ export const getElkLayoutElements = async ({
                 const dispatcherKind = frameDispatcherKindById.get(railDispatcherId);
                 const topBarNode = allNodes.find(
                     (candidateNode) =>
-                        candidateNode.id === `${railDispatcherId}-${getGhostIdSegment(dispatcherKind || '')}-top-ghost`
+                        candidateNode.id ===
+                        `${railDispatcherId}-${nestedDispatcherGhostSegment(dispatcherKind || '')}-top-ghost`
                 );
 
                 if (!topBarNode) {
@@ -1620,7 +1592,7 @@ export const getElkLayoutElements = async ({
                 const bottomBarNode = allNodes.find(
                     (candidateNode) =>
                         candidateNode.id ===
-                        `${railDispatcherId}-${getGhostIdSegment(dispatcherKind || '')}-bottom-ghost`
+                        `${railDispatcherId}-${nestedDispatcherGhostSegment(dispatcherKind || '')}-bottom-ghost`
                 );
 
                 let railCross: number;
