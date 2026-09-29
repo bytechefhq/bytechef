@@ -12,11 +12,11 @@ import {Node} from '@xyflow/react';
  */
 export default function isElkLayoutSupported(nodes: Node[]): boolean {
     return nodes.every((node) => {
-        if (node.type === 'clusterRoot') {
+        const nodeData = node.data as NodeDataType;
+
+        if (node.type === 'clusterRoot' || nodeData.clusterRoot) {
             return false;
         }
-
-        const nodeData = node.data as NodeDataType;
 
         if (nodeData.taskDispatcher && nodeData.componentName !== 'condition') {
             return false;

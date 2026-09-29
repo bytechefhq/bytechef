@@ -15,6 +15,7 @@ import {
     filterAndDedupeLayoutEdges,
     getDagreNodeSize,
     getLayoutElements,
+    getTriggerRowDagreWidth,
     positionTriggerPlaceholder,
 } from './layoutUtils';
 import {applySavedPositions} from './postDagreConstraints';
@@ -36,6 +37,14 @@ const GHOST_RENDERED_CROSS_SIZE = 72;
 // margins that bring it to the same 72px cross size as a task node, so its
 // handles line up with the chain.
 const PLACEHOLDER_RENDERED_CROSS_SIZE = 72;
+
+// A read-only placeholder renders as a 2px dot (ReadOnlyPlaceholderNode), so it
+// anchors like a ghost bar rather than like an editable placeholder.
+const READ_ONLY_PLACEHOLDER_RENDERED_SIZE = 2;
+
+function isReadOnlyPlaceholder(node: Node): boolean {
+    return node.type === 'readonlyPlaceholder';
+}
 
 const FRAME_ID_SUFFIX = '__frame';
 
@@ -63,8 +72,16 @@ const getElkLayoutOptions = (direction: LayoutDirectionType): Record<string, str
 // dagre's zero-height box (the 2px bar renders centered inside it).
 const GHOST_MAIN_AXIS_FOOTPRINT = 50;
 
-function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
-    const {height, width} = getDagreNodeSize(node, direction);
+function getElkNodeSize(
+    node: Node,
+    direction: LayoutDirectionType,
+    triggerRowWidth: number
+): {height: number; width: number} {
+    const {height, width} = getDagreNodeSize(
+        isReadOnlyPlaceholder(node) ? {...node, type: 'placeholder'} : node,
+        direction,
+        triggerRowWidth
+    );
 
     const isGhostNode = node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode';
 
@@ -113,6 +130,10 @@ function getOwningConditionId(node: Node): string | undefined {
  */
 export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDirectionType): ElkNode {
     const nodesById = new Map(nodes.map((node) => [node.id, node]));
+
+    const triggerRowWidth = getTriggerRowDagreWidth(
+        nodes.filter((node) => (node.data as NodeDataType).trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID)
+    );
 
     const conditionIds = nodes
         .filter((node) => {
@@ -274,7 +295,7 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
                 return;
             }
 
-            const {height, width} = getElkNodeSize(node, direction);
+            const {height, width} = getElkNodeSize(node, direction, triggerRowWidth);
 
             memberEntries.push({caseRank: getConditionCaseRank(node), child: {height, id: node.id, width}});
         });
@@ -337,6 +358,10 @@ const loadElk = async (): Promise<ElkInstanceType> => {
 function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
     const isGhostNode = node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode';
     const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
+
+    if (isReadOnlyPlaceholder(node)) {
+        return {height: READ_ONLY_PLACEHOLDER_RENDERED_SIZE, width: READ_ONLY_PLACEHOLDER_RENDERED_SIZE};
+    }
 
     const placeholderMainAxisSize =
         node.id === FINAL_PLACEHOLDER_NODE_ID ? FINAL_PLACEHOLDER_NODE_SIZE : PLACEHOLDER_NODE_HEIGHT;
