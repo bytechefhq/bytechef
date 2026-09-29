@@ -1,17 +1,16 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import {WORKFLOW_DEFINITION_SPACE} from '@/components/JsonSchemaBuilder/utils/constants';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import {WORKFLOW_DEFINITION_SPACE} from '@/components/JsonSchemaBuilder/utils/constants';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {Workflow} from '@/shared/middleware/platform/configuration';
@@ -61,6 +60,7 @@ const WorkflowDialog = ({
     const {isPending, mutate} = createWorkflowMutation ? createWorkflowMutation! : updateWorkflowMutation!;
 
     function closeDialog() {
+        console.log('closeDialog');
         setIsOpen(false);
 
         if (onClose) {
@@ -156,68 +156,70 @@ const WorkflowDialog = ({
                     labelInputRef.current?.focus();
                 }}
             >
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
-
-                        <DialogDescription>
-                            {workflow?.id
+                <DialogMain>
+                    <DialogHeader
+                        description={
+                            workflow?.id
                                 ? 'Edit the details of the workflow.'
-                                : 'Create a new workflow by filling out the form below.'}
-                        </DialogDescription>
-                    </div>
-
-                    <DialogCloseButton />
-                </DialogHeader>
-
-                <Form {...form}>
-                    <FormField
-                        control={control}
-                        name="label"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Label</FormLabel>
-
-                                <FormControl>
-                                    <Input {...field} onKeyDown={handleOnKeyDown} ref={labelInputRef} />
-                                </FormControl>
-
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
+                                : 'Create a new workflow by filling out the form below.'
+                        }
+                        title={`${!workflow?.id ? 'Create' : 'Edit'} Workflow`}
                     />
 
-                    <FormField
-                        control={control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
+                    <Form {...form}>
+                        <DialogBody className="flex flex-col gap-4">
+                            <FormField
+                                control={control}
+                                name="label"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Label</FormLabel>
 
-                                <FormControl>
-                                    <Textarea
-                                        placeholder="Cute description of your project deployment"
-                                        {...field}
-                                        onKeyDown={handleOnKeyDown}
-                                    />
-                                </FormControl>
+                                        <FormControl>
+                                            <Input {...field} onKeyDown={handleOnKeyDown} ref={labelInputRef} />
+                                        </FormControl>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                rules={{required: true}}
+                            />
 
-                    {additionalContent}
+                            <FormField
+                                control={control}
+                                name="description"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Description</FormLabel>
 
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button label="Cancel" type="button" variant="outline" />
-                        </DialogClose>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Cute description of your project deployment"
+                                                {...field}
+                                                onKeyDown={handleOnKeyDown}
+                                            />
+                                        </FormControl>
 
-                        <Button disabled={isPending} label="Save" onClick={handleSubmit(saveWorkflow)} type="submit" />
-                    </DialogFooter>
-                </Form>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            {additionalContent}
+                        </DialogBody>
+
+                        <DialogFooter>
+                            <DialogCancelButton />
+
+                            <Button
+                                disabled={isPending}
+                                label="Save"
+                                onClick={handleSubmit(saveWorkflow)}
+                                type="submit"
+                            />
+                        </DialogFooter>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
