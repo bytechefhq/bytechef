@@ -133,7 +133,7 @@ describe('DataTableLeftSidebarDropdownMenu', () => {
 
             const deleteItem = screen.getByText('Delete').closest('[role="menuitem"]');
 
-            expect(deleteItem).toHaveClass('text-red-600');
+            expect(deleteItem).toHaveClass('dropdown-menu-item-destructive');
         });
     });
 });
