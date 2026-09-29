@@ -1,16 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {AppEvent} from '@/ee/shared/middleware/embedded/configuration';
 import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/ee/shared/mutations/embedded/appEvents.mutations';
@@ -99,91 +98,86 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveAppEvent)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${appEvent?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
+                <DialogMain>
+                    <DialogHeader
+                        description="Send app events from your application to trigger workflows using App Event trigger."
+                        title={`${appEvent?.id ? 'Edit' : 'Create'} App Event`}
+                    />
 
-                                <DialogDescription>
-                                    Send app events from your application to trigger workflows using App Event trigger.
-                                </DialogDescription>
-                            </div>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveAppEvent)}>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
 
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="schema"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Schema</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
+                                            <FormControl>
+                                                <div className="h-48 overflow-hidden rounded-md border border-input shadow-xs focus-within:ring-1 focus-within:ring-ring focus-within:outline-hidden">
+                                                    <Suspense fallback={<MonacoEditorLoader />}>
+                                                        <MonacoEditor
+                                                            defaultLanguage="json"
+                                                            onChange={(value) => {
+                                                                if (value) {
+                                                                    form.setValue('schema', value);
+                                                                }
+                                                            }}
+                                                            onMount={() => {}}
+                                                            options={{
+                                                                automaticLayout: true,
+                                                                folding: true,
+                                                                fontSize: 12,
+                                                                lineNumbers: 'on',
+                                                                minimap: {enabled: false},
+                                                                scrollBeyondLastLine: false,
+                                                                tabSize: 2,
+                                                                wordWrap: 'on',
+                                                            }}
+                                                            value={field.value}
+                                                        />
+                                                    </Suspense>
+                                                </div>
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="schema"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Schema</FormLabel>
+                                            <FormDescription>
+                                                Define the app event as JSON that will be sent from your application.
+                                                App event properties will be passed into your workflows as variables.
+                                            </FormDescription>
 
-                                    <FormControl>
-                                        <div className="h-48 overflow-hidden rounded-md border border-input shadow-xs focus-within:ring-1 focus-within:ring-ring focus-within:outline-hidden">
-                                            <Suspense fallback={<MonacoEditorLoader />}>
-                                                <MonacoEditor
-                                                    defaultLanguage="json"
-                                                    onChange={(value) => {
-                                                        if (value) {
-                                                            form.setValue('schema', value);
-                                                        }
-                                                    }}
-                                                    onMount={() => {}}
-                                                    options={{
-                                                        automaticLayout: true,
-                                                        folding: true,
-                                                        fontSize: 12,
-                                                        lineNumbers: 'on',
-                                                        minimap: {enabled: false},
-                                                        scrollBeyondLastLine: false,
-                                                        tabSize: 2,
-                                                        wordWrap: 'on',
-                                                    }}
-                                                    value={field.value}
-                                                />
-                                            </Suspense>
-                                        </div>
-                                    </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                    rules={{required: true}}
+                                />
+                            </DialogBody>
 
-                                    <FormDescription>
-                                        Define the app event as JSON that will be sent from your application. App event
-                                        properties will be passed into your workflows as variables.
-                                    </FormDescription>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            rules={{required: true}}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
