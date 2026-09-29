@@ -1,6 +1,6 @@
 import '@xyflow/react/dist/base.css';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {CANVAS_BACKGROUND_COLOR, CANVAS_TOP_OFFSET} from '@/shared/constants';
+import {CANVAS_BACKGROUND_COLOR, CANVAS_TOP_OFFSET, LayoutDirectionType} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -22,11 +22,13 @@ import WorkflowIssuesNote from './WorkflowIssuesNote';
 
 type ConditionalWorkflowEditorPropsType =
     | {
+          readOnlyLayoutDirection?: LayoutDirectionType;
           readOnlyWorkflow?: Workflow;
           parentId?: never;
           parentType?: never;
       }
     | {
+          readOnlyLayoutDirection?: never;
           readOnlyWorkflow?: never;
       };
 
@@ -57,6 +59,7 @@ const WorkflowEditor = ({
     leftSidebarOpen,
     onFitView,
     preview,
+    readOnlyLayoutDirection,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: WorkflowEditorPropsType & ConditionalWorkflowEditorPropsType) => {
@@ -96,6 +99,7 @@ const WorkflowEditor = ({
         customCanvasWidth,
         fitViewOnLoad: fitsViewOnLoad,
         leftSidebarOpen,
+        readOnlyLayoutDirection,
         readOnlyWorkflow,
         taskDispatcherDefinitions,
     });
