@@ -14,6 +14,7 @@ import useWorkflowIssues from '@/pages/platform/workflow-editor/hooks/useWorkflo
 import useWorkflowIssuesSweep from '@/pages/platform/workflow-editor/hooks/useWorkflowIssuesSweep';
 import useWorkflowIssuesValidation from '@/pages/platform/workflow-editor/hooks/useWorkflowIssuesValidation';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
+import {WorkflowEditorCopilotContext} from '@/pages/platform/workflow-editor/providers/workflowEditorCopilotContext';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useWorkflowEditorReadOnly} from '@/pages/platform/workflow-editor/providers/workflowEditorReadOnlyContext';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
@@ -164,7 +165,8 @@ const WorkflowEditorLayout = ({
 
     const issues = useWorkflowIssues();
 
-    const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
+    const {automationProjectId, codeWorkflow, codeWorkflowLanguage, invalidateWorkflowQueries, updateWorkflowMutation} =
+        useWorkflowEditor();
     const readOnly = useWorkflowEditorReadOnly();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
@@ -254,219 +256,225 @@ const WorkflowEditorLayout = ({
         (clusterElementsViewMode === 'box' || !isMainRootClusterElement);
 
     return (
-        <ReactFlowProvider>
-            <div
-                className={twMerge(
-                    'relative mx-3 mt-1.5 mb-3 flex w-full overflow-hidden rounded-lg border border-stroke-neutral-secondary',
-                    leftSidebarOpen && 'ml-0',
-                    copilotLayoutShifted && 'mr-0'
-                )}
-            >
-                <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
-                    <SubflowBanner />
-                </div>
-
-                {isJavaCodeWorkflow ? (
-                    <div className="flex flex-1 items-center justify-center bg-surface-main p-8">
-                        <div className="max-w-md text-center text-sm text-content-neutral-secondary">
-                            This project&apos;s workflows are defined in a compiled Java artifact. There is no source to
-                            edit here — rebuild the JAR and deploy it again to change them.
-                        </div>
+        <WorkflowEditorCopilotContext.Provider value={showCopilot}>
+            <ReactFlowProvider>
+                <div
+                    className={twMerge(
+                        'relative mx-3 mt-1.5 mb-3 flex w-full overflow-hidden rounded-lg border border-stroke-neutral-secondary',
+                        leftSidebarOpen && 'ml-0',
+                        copilotLayoutShifted && 'mr-0'
+                    )}
+                >
+                    <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
+                        <SubflowBanner />
                     </div>
-                ) : isCodeWorkflow && codeWorkflowLanguage && automationProjectId ? (
-                    <Suspense>
-                        <AutomationProjectCodeWorkflowDetail
-                            automationProjectId={automationProjectId}
-                            headerless
-                            invalidateWorkflowQueries={invalidateWorkflowQueries}
-                            language={codeWorkflowLanguage}
-                            onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
-                            testConfigurationDisabled={testConfigurationDisabled}
-                            workflowId={workflow.id}
-                        />
-                    </Suspense>
-                ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
-                    <Suspense>
-                        <IntegrationCodeWorkflowDetail
-                            headerless
-                            integrationId={integrationId}
-                            invalidateWorkflowQueries={invalidateWorkflowQueries}
-                            language={codeWorkflowLanguage}
-                            onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
-                            testConfigurationDisabled={testConfigurationDisabled}
-                            workflowId={workflow.id}
-                        />
-                    </Suspense>
-                ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
-                    <Suspense>
-                        <ProjectCodeWorkflowDetail
-                            headerless
-                            invalidateWorkflowQueries={invalidateWorkflowQueries}
-                            language={codeWorkflowLanguage}
-                            onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
-                            projectId={projectId}
-                            testConfigurationDisabled={testConfigurationDisabled}
-                            workflowId={workflow.id}
-                        />
-                    </Suspense>
-                ) : (
-                    componentDefinitions &&
-                    taskDispatcherDefinitions && (
+
+                    {isJavaCodeWorkflow ? (
+                        <div className="flex flex-1 items-center justify-center bg-surface-main p-8">
+                            <div className="max-w-md text-center text-sm text-content-neutral-secondary">
+                                This project&apos;s workflows are defined in a compiled Java artifact. There is no
+                                source to edit here — rebuild the JAR and deploy it again to change them.
+                            </div>
+                        </div>
+                    ) : isCodeWorkflow && codeWorkflowLanguage && automationProjectId ? (
                         <Suspense>
-                            <WorkflowEditor
-                                componentDefinitions={componentDefinitions}
-                                enableUndoRedo={enableUndoRedo}
-                                leftSidebarOpen={leftSidebarOpen}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            <AutomationProjectCodeWorkflowDetail
+                                automationProjectId={automationProjectId}
+                                headerless
+                                invalidateWorkflowQueries={invalidateWorkflowQueries}
+                                language={codeWorkflowLanguage}
+                                onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                                testConfigurationDisabled={testConfigurationDisabled}
+                                workflowId={workflow.id}
                             />
                         </Suspense>
-                    )
-                )}
+                    ) : isCodeWorkflow && codeWorkflowLanguage && integrationId ? (
+                        <Suspense>
+                            <IntegrationCodeWorkflowDetail
+                                headerless
+                                integrationId={integrationId}
+                                invalidateWorkflowQueries={invalidateWorkflowQueries}
+                                language={codeWorkflowLanguage}
+                                onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                                testConfigurationDisabled={testConfigurationDisabled}
+                                workflowId={workflow.id}
+                            />
+                        </Suspense>
+                    ) : isCodeWorkflow && codeWorkflowLanguage && projectId ? (
+                        <Suspense>
+                            <ProjectCodeWorkflowDetail
+                                headerless
+                                invalidateWorkflowQueries={invalidateWorkflowQueries}
+                                language={codeWorkflowLanguage}
+                                onTestConfigurationClick={() => setShowCodeWorkflowTestConfigurationDialog(true)}
+                                projectId={projectId}
+                                testConfigurationDisabled={testConfigurationDisabled}
+                                workflowId={workflow.id}
+                            />
+                        </Suspense>
+                    ) : (
+                        componentDefinitions &&
+                        taskDispatcherDefinitions && (
+                            <Suspense>
+                                <WorkflowEditor
+                                    componentDefinitions={componentDefinitions}
+                                    enableUndoRedo={enableUndoRedo}
+                                    leftSidebarOpen={leftSidebarOpen}
+                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                />
+                            </Suspense>
+                        )
+                    )}
 
-                {!readOnly && rightSidebarMounted && componentDefinitions && taskDispatcherDefinitions && (
-                    <Suspense fallback={<WorkflowNodesSidebarSkeleton />}>
-                        <WorkflowNodesSidebar
-                            data={{
-                                componentDefinitions,
-                                taskDispatcherDefinitions,
-                            }}
-                            visible={rightSidebarVisible}
-                        />
-                    </Suspense>
-                )}
-
-                {issuesSidebarMounted && (
-                    <Suspense>
-                        <WorkflowIssuesSidebar visible={issuesSidebarVisible} />
-                    </Suspense>
-                )}
-
-                {componentDefinitions && taskDispatcherDefinitions && !isCodeWorkflow && (
-                    <Suspense
-                        fallback={
-                            <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 4 : 6} />
-                        }
-                    >
-                        <WorkflowRightSidebar
-                            copilotPanelOpen={copilotPanelOpen}
-                            issueCount={issues.length}
-                            issueSeverity={issues[0]?.severity}
-                            issuesSidebarOpen={issuesSidebarOpen}
-                            missingConnectionCount={missingConnectionCount}
-                            onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
-                            onCopilotClick={handleCopilotClick}
-                            onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
-                            onWorkflowConnectionsClick={handleWorkflowConnectionsClick}
-                            onWorkflowInputsClick={handleWorkflowInputsClick}
-                            onWorkflowIssuesClick={handleWorkflowIssuesClick}
-                            onWorkflowOutputsClick={handleWorkflowOutputsClick}
-                            rightSidebarOpen={rightSidebarOpen}
-                            showCopilot={showCopilot}
-                            showWorkflowInputs={showWorkflowInputs}
-                        />
-                    </Suspense>
-                )}
-            </div>
-
-            {showRootLevelDetailsPanel && (
-                <WorkflowNodeDetailsPanel
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
-            )}
-
-            {clusterDialogMounted && (
-                <ClusterElementsCanvasDialog
-                    onOpenChange={handleClusterElementsCanvasOpenChange}
-                    open={clusterElementsCanvasOpen}
-                    previousComponentDefinitions={previousComponentDefinitions}
-                    updateWorkflowMutation={updateWorkflowMutation!}
-                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
-                />
-            )}
-
-            {workflow.id && <WorkflowTestChatPanel />}
-
-            {clusterElementsViewMode === 'box' && testingPanelOpen && !clusterElementsCanvasOpen && (
-                <Suspense fallback={null}>
-                    <div
-                        className={twMerge(
-                            'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-surface-main',
-                            copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
+                    {!isCodeWorkflow &&
+                        !readOnly &&
+                        rightSidebarMounted &&
+                        componentDefinitions &&
+                        taskDispatcherDefinitions && (
+                            <Suspense fallback={<WorkflowNodesSidebarSkeleton />}>
+                                <WorkflowNodesSidebar
+                                    data={{
+                                        componentDefinitions,
+                                        taskDispatcherDefinitions,
+                                    }}
+                                    visible={rightSidebarVisible}
+                                />
+                            </Suspense>
                         )}
-                    >
-                        <AiAgentTestingPanel
-                            contentClassName="rounded-none bg-transparent"
-                            headerClassName="p-4"
-                            onClose={handleClosePlayground}
-                            skipIntro
-                        />
-                    </div>
-                </Suspense>
-            )}
 
-            {showRootLevelDetailsPanel && dataPillPanelOpen && (
-                <Suspense fallback={<DataPillPanelSkeleton />}>
-                    <DataPillPanel
-                        loading={isWorkflowNodeOutputsPending}
+                    {issuesSidebarMounted && (
+                        <Suspense>
+                            <WorkflowIssuesSidebar visible={issuesSidebarVisible} />
+                        </Suspense>
+                    )}
+
+                    {componentDefinitions && taskDispatcherDefinitions && !isCodeWorkflow && (
+                        <Suspense
+                            fallback={
+                                <WorkflowRightSidebarSkeleton itemCount={!showCopilot && !showWorkflowInputs ? 4 : 6} />
+                            }
+                        >
+                            <WorkflowRightSidebar
+                                copilotPanelOpen={copilotPanelOpen}
+                                issueCount={issues.length}
+                                issueSeverity={issues[0]?.severity}
+                                issuesSidebarOpen={issuesSidebarOpen}
+                                missingConnectionCount={missingConnectionCount}
+                                onComponentsAndFlowControlsClick={handleComponentsAndFlowControlsClick}
+                                onCopilotClick={handleCopilotClick}
+                                onWorkflowCodeEditorClick={handleWorkflowCodeEditorClick}
+                                onWorkflowConnectionsClick={handleWorkflowConnectionsClick}
+                                onWorkflowInputsClick={handleWorkflowInputsClick}
+                                onWorkflowIssuesClick={handleWorkflowIssuesClick}
+                                onWorkflowOutputsClick={handleWorkflowOutputsClick}
+                                rightSidebarOpen={rightSidebarOpen}
+                                showCopilot={showCopilot}
+                                showWorkflowInputs={showWorkflowInputs}
+                            />
+                        </Suspense>
+                    )}
+                </div>
+
+                {showRootLevelDetailsPanel && (
+                    <WorkflowNodeDetailsPanel
                         previousComponentDefinitions={previousComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation!}
                         workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
-                </Suspense>
-            )}
+                )}
 
-            {showWorkflowConnectionsSheet && (
-                <WorkflowConnectionsSheet
-                    onSheetOpenChange={setShowWorkflowConnectionsSheet}
-                    sheetOpen={showWorkflowConnectionsSheet}
-                    workflow={workflow}
-                    workflowTestConfiguration={workflowTestConfiguration}
-                    workflowTestConfigurationLoading={workflowTestConfigurationLoading}
-                />
-            )}
+                {clusterDialogMounted && (
+                    <ClusterElementsCanvasDialog
+                        onOpenChange={handleClusterElementsCanvasOpenChange}
+                        open={clusterElementsCanvasOpen}
+                        previousComponentDefinitions={previousComponentDefinitions}
+                        updateWorkflowMutation={updateWorkflowMutation!}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                    />
+                )}
 
-            {showWorkflowInputsSheet && (
-                <WorkflowInputsSheet
-                    internalOnlyVisible={internalOnlyVisible}
-                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                    onSheetOpenChange={setShowWorkflowInputsSheet}
-                    sheetOpen={showWorkflowInputsSheet}
-                    workflowTestConfiguration={workflowTestConfiguration}
-                />
-            )}
+                {workflow.id && <WorkflowTestChatPanel />}
 
-            {showWorkflowOutputsSheet && (
-                <WorkflowOutputsSheet
-                    onSheetOpenChange={setShowWorkflowOutputsSheet}
-                    sheetOpen={showWorkflowOutputsSheet}
-                    workflow={workflow}
-                />
-            )}
+                {clusterElementsViewMode === 'box' && testingPanelOpen && !clusterElementsCanvasOpen && (
+                    <Suspense fallback={null}>
+                        <div
+                            className={twMerge(
+                                'absolute top-[15px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-surface-main',
+                                copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
+                            )}
+                        >
+                            <AiAgentTestingPanel
+                                contentClassName="rounded-none bg-transparent"
+                                headerClassName="p-4"
+                                onClose={handleClosePlayground}
+                                skipIntro
+                            />
+                        </div>
+                    </Suspense>
+                )}
 
-            {showCodeWorkflowTestConfigurationDialog && (
-                <Suspense>
-                    <WorkflowTestConfigurationDialog
-                        onClose={() => setShowCodeWorkflowTestConfigurationDialog(false)}
+                {showRootLevelDetailsPanel && dataPillPanelOpen && (
+                    <Suspense fallback={<DataPillPanelSkeleton />}>
+                        <DataPillPanel
+                            loading={isWorkflowNodeOutputsPending}
+                            previousComponentDefinitions={previousComponentDefinitions}
+                            workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
+                        />
+                    </Suspense>
+                )}
+
+                {showWorkflowConnectionsSheet && (
+                    <WorkflowConnectionsSheet
+                        onSheetOpenChange={setShowWorkflowConnectionsSheet}
+                        sheetOpen={showWorkflowConnectionsSheet}
+                        workflow={workflow}
+                        workflowTestConfiguration={workflowTestConfiguration}
+                        workflowTestConfigurationLoading={workflowTestConfigurationLoading}
+                    />
+                )}
+
+                {showWorkflowInputsSheet && (
+                    <WorkflowInputsSheet
+                        internalOnlyVisible={internalOnlyVisible}
+                        invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                        onSheetOpenChange={setShowWorkflowInputsSheet}
+                        sheetOpen={showWorkflowInputsSheet}
+                        workflowTestConfiguration={workflowTestConfiguration}
+                    />
+                )}
+
+                {showWorkflowOutputsSheet && (
+                    <WorkflowOutputsSheet
+                        onSheetOpenChange={setShowWorkflowOutputsSheet}
+                        sheetOpen={showWorkflowOutputsSheet}
+                        workflow={workflow}
+                    />
+                )}
+
+                {showCodeWorkflowTestConfigurationDialog && (
+                    <Suspense>
+                        <WorkflowTestConfigurationDialog
+                            onClose={() => setShowCodeWorkflowTestConfigurationDialog(false)}
+                            workflow={workflow}
+                            workflowTestConfiguration={workflowTestConfiguration}
+                        />
+                    </Suspense>
+                )}
+
+                {showWorkflowCodeEditorSheet && (
+                    <WorkflowCodeEditorSheet
+                        invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                        onEditSubflowClick={onEditSubflowClick}
+                        onSheetOpenClose={setShowWorkflowCodeEditorSheet}
+                        runDisabled={runDisabled}
+                        sheetOpen={showWorkflowCodeEditorSheet}
+                        testConfigurationDisabled={testConfigurationDisabled}
                         workflow={workflow}
                         workflowTestConfiguration={workflowTestConfiguration}
                     />
-                </Suspense>
-            )}
-
-            {showWorkflowCodeEditorSheet && (
-                <WorkflowCodeEditorSheet
-                    invalidateWorkflowQueries={invalidateWorkflowQueries!}
-                    onEditSubflowClick={onEditSubflowClick}
-                    onSheetOpenClose={setShowWorkflowCodeEditorSheet}
-                    runDisabled={runDisabled}
-                    sheetOpen={showWorkflowCodeEditorSheet}
-                    testConfigurationDisabled={testConfigurationDisabled}
-                    workflow={workflow}
-                    workflowTestConfiguration={workflowTestConfiguration}
-                />
-            )}
-        </ReactFlowProvider>
+                )}
+            </ReactFlowProvider>
+        </WorkflowEditorCopilotContext.Provider>
     );
 };
 
