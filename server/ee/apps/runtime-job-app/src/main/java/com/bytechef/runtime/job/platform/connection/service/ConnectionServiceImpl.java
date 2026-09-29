@@ -14,6 +14,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,6 +51,11 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(ConnectionContext.getConnectionParameters(id));
 
         return connection;
+    }
+
+    @Override
+    public Optional<Connection> fetchConnection(long id) {
+        return Optional.of(getConnection(id));
     }
 
     @Override

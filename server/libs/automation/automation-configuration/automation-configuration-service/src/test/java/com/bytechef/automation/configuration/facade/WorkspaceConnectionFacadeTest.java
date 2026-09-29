@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.security;
+package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -22,7 +22,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacadeImpl;
+import com.bytechef.automation.configuration.security.AutomationMethodSecurityExpressionHandler;
+import com.bytechef.automation.configuration.security.AutomationPermissionEvaluator;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -38,13 +39,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.util.SimpleMethodInvocation;
 
 /**
- * Evaluates the real {@code @PreAuthorize} expressions on {@link WorkspaceConnectionFacadeImpl} through the real
- * {@link AutomationMethodSecurityExpressionHandler} backed by the real {@link AutomationPermissionEvaluator}, asserting
- * each guard in both directions and the exact check that reaches {@link PermissionService}.
- *
  * @author Ivica Cardic
  */
-class WorkspaceConnectionFacadeAuthorizationTest {
+class WorkspaceConnectionFacadeTest {
 
     private static final long CONNECTION_ID = 7L;
     private static final String CONNECTION_TYPE = "Connection";
@@ -232,5 +229,23 @@ class WorkspaceConnectionFacadeAuthorizationTest {
 
     private static Method updateTagsMethod() throws NoSuchMethodException {
         return WorkspaceConnectionFacadeImpl.class.getMethod("updateTags", long.class, List.class);
+    }
+
+    @Test
+    void testConnectionTagsRequireTheConnectionViewScopeInTheRequestedEnvironment() throws Exception {
+        Method method = WorkspaceConnectionFacadeImpl.class.getMethod("getConnectionTags", long.class, Long.class);
+
+        assertThat(evaluateEnvironmentGuard(method, "CONNECTION_VIEW", Environment.PRODUCTION)).isTrue();
+        assertThat(evaluateEnvironmentGuard(method, "CONNECTION_VIEW", Environment.DEVELOPMENT)).isFalse();
+    }
+
+    private static boolean evaluateEnvironmentGuard(Method method, String scope, Environment grantedEnvironment) {
+        PermissionService permissionService = mock(PermissionService.class);
+
+        when(permissionService.hasWorkspaceScope(WORKSPACE_ID, scope, grantedEnvironment)).thenReturn(true);
+
+        return evaluateGuard(permissionService, method, new Object[] {
+            WORKSPACE_ID, (long) Environment.PRODUCTION.ordinal()
+        });
     }
 }
