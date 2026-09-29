@@ -16,7 +16,7 @@ const OutputTabTestErrorAlert = ({className, onDismiss, testOutputError}: Output
 
         <AlertTitle className="pr-6">{testOutputError.title}</AlertTitle>
 
-        <AlertDescription className="col-span-2 col-start-1 mt-1 max-h-48 min-w-0 overflow-y-auto font-mono text-xs wrap-anywhere whitespace-pre-wrap">
+        <AlertDescription className="max-h-48 min-w-0 overflow-y-auto wrap-anywhere whitespace-pre-wrap">
             {testOutputError.message}
         </AlertDescription>
 
