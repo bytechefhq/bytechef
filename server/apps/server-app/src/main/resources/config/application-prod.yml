@@ -2,8 +2,9 @@ logging:
   file:
     name: /opt/bytechef/server/logs/bytechef.log
   level:
-    ROOT: INFO
-    com.bytechef: INFO
+    ROOT: DEBUG
+    com.bytechef: DEBUG
+    liquibase: INFO
   structured:
     format:
       file: ecs
