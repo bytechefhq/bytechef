@@ -27,6 +27,9 @@ public interface ConnectedUserAuthentication {
 
     long environmentId();
 
+    /**
+     * Whether the principal was authenticated with the customer back end's API key rather than a connected-user token.
+     */
     default boolean apiKeyAuthenticated() {
         return false;
     }

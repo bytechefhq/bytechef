@@ -15,7 +15,6 @@ import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ai.copilot.util.Mode;
 import com.bytechef.ai.copilot.util.Source;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
@@ -24,7 +23,7 @@ import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -83,7 +82,7 @@ public class ConnectedUserCopilotApiController {
         @PathVariable("workflowUuid") String workflowUuid, @RequestBody AgUiParameters agUiParameters,
         @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment) {
 
-        String externalUserId = OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found");
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
         Environment environment = getEnvironment(xEnvironment);
 
         CopilotChatContextDTO context =
@@ -106,6 +105,9 @@ public class ConnectedUserCopilotApiController {
             String.join(":", "embedded", TenantContext.getCurrentTenantId(), externalUserId, workflowUuid));
         stateMap.put(CopilotConstants.STATE_ENVIRONMENT_ID, (long) environment.ordinal());
         stateMap.put(CopilotConstants.STATE_SCOPED_PROJECT_ID, context.projectId());
+
+        stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+        stateMap.remove(CopilotConstants.STATE_AUTHENTICATION);
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();

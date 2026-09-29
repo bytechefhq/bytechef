@@ -233,7 +233,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThat(
             embeddedMcpToolFacade.getFunctionToolCallback(
-                disabledMcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                disabledMcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null))
                     .isNull();
 
         verifyNoInteractions(mcpComponentService, clusterElementDefinitionService, mcpIntegrationInstanceToolService);
@@ -527,7 +527,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThat(
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null))
                     .isNotNull();
     }
 
@@ -551,7 +551,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 
@@ -584,7 +584,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant");
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 
@@ -615,7 +615,7 @@ class EmbeddedMcpToolFacadeIntTest {
 
         assertThat(
             embeddedMcpToolFacade.getFunctionToolCallback(
-                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant"))
+                mcpTool, CONNECTED_EXTERNAL_USER_ID, Environment.PRODUCTION, "tenant", null))
                     .isNull();
     }
 
@@ -654,7 +654,8 @@ class EmbeddedMcpToolFacadeIntTest {
             .thenReturn(clusterElementDefinition);
 
         FunctionToolCallback<Map<String, Object>, Object> functionToolCallback =
-            embeddedMcpToolFacade.getFunctionToolCallback(mcpTool, externalUserId, Environment.PRODUCTION, "tenant");
+            embeddedMcpToolFacade.getFunctionToolCallback(
+                mcpTool, externalUserId, Environment.PRODUCTION, "tenant", null);
 
         assertThat(functionToolCallback).isNotNull();
 
@@ -808,7 +809,7 @@ class EmbeddedMcpToolFacadeIntTest {
         assertThat(mcpIntegrationInstanceConfigurations).hasSize(1);
 
         return embeddedMcpToolFacade.getFunctionToolCallbacks(
-            mcpIntegrationInstanceConfigurations.getFirst(), externalUserId, Environment.PRODUCTION, "tenant-1");
+            mcpIntegrationInstanceConfigurations.getFirst(), externalUserId, Environment.PRODUCTION, "tenant-1", null);
     }
 
     private void insertNewerSiblingIntegrationInstance(long connectedUserId, long connectionId, long environment) {

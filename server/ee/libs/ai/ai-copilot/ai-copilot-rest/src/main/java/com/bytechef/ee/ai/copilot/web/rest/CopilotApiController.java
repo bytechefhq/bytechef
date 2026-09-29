@@ -18,6 +18,7 @@ import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,9 +76,18 @@ public class CopilotApiController {
     public SseEmitter chat(
         @NonNull @PathVariable("agentId") String agentId, @NonNull @RequestBody() AgUiParameters agUiParameters) {
 
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        if (securityContext.getAuthentication() instanceof ConnectedUserAuthentication) {
+            throw new AccessDeniedException("The platform copilot is not available to connected users");
+        }
+
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
         Object mode = stateMap.get("mode");
+
+        stateMap.remove(CopilotConstants.STATE_AUTHENTICATED_USER_ID);
+        stateMap.remove(CopilotConstants.STATE_AUTHENTICATION);
 
         authorizeWorkflowAccess(stateMap, mode);
 

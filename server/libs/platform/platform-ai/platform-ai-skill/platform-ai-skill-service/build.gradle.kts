@@ -4,9 +4,11 @@ dependencies {
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
 
     testImplementation("org.springframework.security:spring-security-core")
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

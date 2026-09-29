@@ -28,6 +28,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,11 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -118,8 +117,7 @@ class ConnectedUserProjectWorkflowApiControllerIntTest {
 
     @Test
     void testFallsBackToHeaderWhenPrincipalCarriesNoEnvironment() {
-        enableConnectedUserProjectWorkflow(
-            new UsernamePasswordAuthenticationToken(LOGIN, "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        enableConnectedUserProjectWorkflow(TestConnectedUserAuthentication.of(LOGIN));
 
         verify(connectedUserProjectFacade).enableProjectWorkflow(
             LOGIN, WORKFLOW_UUID, true, (long) Environment.PRODUCTION.ordinal());

@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.unified.web.rest.accounting;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.unified.accounting.AccountingModelType;
 import com.bytechef.component.definition.unified.accounting.model.AccountUnifiedInputModel;
@@ -21,7 +20,7 @@ import com.bytechef.ee.embedded.unified.web.rest.accounting.model.CreatedModel;
 import com.bytechef.ee.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
@@ -56,7 +55,7 @@ public class AccountingAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             new CreatedModel(
                 unifiedApiFacade.create(
-                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
+                    ConnectedUserAuthentications.getCurrentExternalUserId(),
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
                     Environment.valueOf(StringUtils.upperCase(environment)),
@@ -70,7 +69,7 @@ public class AccountingAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 unifiedApiFacade.get(
-                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), accountId,
+                    ConnectedUserAuthentications.getCurrentExternalUserId(), accountId,
                     UnifiedApiDefinition.UnifiedApiCategory.CRM,
                     xInstanceId, Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT),
                 AccountModel.class));
@@ -83,7 +82,7 @@ public class AccountingAccountApiController implements AccountApi {
         return ResponseEntity.ok(
             unifiedApiFacade
                 .getPage(
-                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"),
+                    ConnectedUserAuthentications.getCurrentExternalUserId(),
                     conversionService.convert(pageable, CursorPageRequest.class),
                     UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
                     Environment.valueOf(StringUtils.upperCase(environment)),
@@ -96,7 +95,7 @@ public class AccountingAccountApiController implements AccountApi {
         String accountId, CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
         unifiedApiFacade.update(
-            OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), accountId,
+            ConnectedUserAuthentications.getCurrentExternalUserId(), accountId,
             conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
             UnifiedApiDefinition.UnifiedApiCategory.CRM, xInstanceId,
             Environment.valueOf(StringUtils.upperCase(environment)), AccountingModelType.ACCOUNT);

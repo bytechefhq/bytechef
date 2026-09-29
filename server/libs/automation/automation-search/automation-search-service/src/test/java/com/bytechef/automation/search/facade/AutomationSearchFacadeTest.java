@@ -17,7 +17,9 @@
 package com.bytechef.automation.search.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -25,18 +27,44 @@ import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
+import com.bytechef.platform.security.web.authentication.TestConnectedUserAuthentication;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
  */
 class AutomationSearchFacadeTest {
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testSearchRefusesAConnectedUser() {
+        SearchAssetProvider searchAssetProvider = mock(SearchAssetProvider.class);
+        UserService userService = mock(UserService.class);
+        WorkspaceFacade workspaceFacade = mock(WorkspaceFacade.class);
+
+        SecurityContextHolder.getContext()
+            .setAuthentication(TestConnectedUserAuthentication.of("external-user"));
+
+        AutomationSearchFacadeImpl facade = new AutomationSearchFacadeImpl(
+            List.of(searchAssetProvider), userService, workspaceFacade);
+
+        assertThatThrownBy(() -> facade.search("slack", 10)).isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(searchAssetProvider, userService, workspaceFacade);
+    }
 
     @Test
     void testProvidersAreScopedToCallerWorkspaces() {

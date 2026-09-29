@@ -17,7 +17,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -58,8 +58,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
 
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         Map<String, Object> parameters = connection.getParameters();
 
@@ -75,6 +74,8 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
         EnvironmentModel xEnvironment) {
 
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
 
@@ -89,8 +90,7 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     @Override
     @CrossOrigin
     public ResponseEntity<Void> deleteFrontendIntegrationInstance(Long id) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new RuntimeException("User not authenticated"));
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
 
@@ -100,6 +100,8 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
 
     @Override
     public ResponseEntity<Void> deleteIntegrationInstance(String externalUserId, Long id) {
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
+
         connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
 
         return ResponseEntity.noContent()
