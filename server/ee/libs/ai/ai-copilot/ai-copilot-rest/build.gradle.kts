@@ -7,10 +7,12 @@ dependencies {
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
     implementation(project(":spring-ai:spring-ag-ui:servers:spring"))
+    implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-api"))
 

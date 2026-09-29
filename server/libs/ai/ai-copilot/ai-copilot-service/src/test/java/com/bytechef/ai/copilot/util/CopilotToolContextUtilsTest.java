@@ -17,34 +17,20 @@
 package com.bytechef.ai.copilot.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
 import com.bytechef.ai.copilot.constant.CopilotConstants;
-import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
-import com.bytechef.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.ai.copilot.tool.context.LookupPropertyTracker;
 import com.bytechef.ai.copilot.tool.context.ScopedProjectToolContext;
 import com.bytechef.automation.ai.tool.AutomationToolInvocationContext;
-import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
-import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -101,7 +87,7 @@ class CopilotToolContextUtilsTest {
     }
 
     @Test
-    void testToToolContextDisablesTheConnectionFallbackForARunThatSkipsAuthorization() {
+    void testToToolContextDisablesTheConnectionFallbackForAConnectedUserRun() {
         Map<String, Object> stateMap = new HashMap<>();
 
         stateMap.put(
@@ -207,89 +193,7 @@ class CopilotToolContextUtilsTest {
 
         assertThat(toolContext)
             .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_AUTHENTICATION_KEY, authentication)
-            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_TENANT_ID_KEY, "acme")
-            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY, Boolean.TRUE);
-    }
-
-    @Test
-    void testDoesNotSkipAutomationAuthorizationForAPlatformUser() {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("user", ""));
-
-        Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
-
-        assertThat(toolContext).doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY);
-    }
-
-    @Test
-    void testConnectedUserToolCallSkipsChecksOnAPooledWorker() throws Exception {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATION, new UsernamePasswordAuthenticationToken("cu", ""));
-
-        assertThat(callProbeOnPooledWorker(CopilotToolContextUtils.toToolContext(new State(stateMap)))).isTrue();
-    }
-
-    @Test
-    void testPlatformUserToolCallDoesNotSkipChecksOnAPooledWorker() throws Throwable {
-        Map<String, Object> stateMap = new HashMap<>();
-
-        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
-
-        Map<String, Object> toolContext = AutomationAuthorizationContext.callSkippingChecks(
-            () -> CopilotToolContextUtils.toToolContext(new State(stateMap)));
-
-        assertThat(toolContext).doesNotContainKey(AgentToolInvocationContext.TOOL_CONTEXT_SKIP_AUTHORIZATION_KEY);
-        assertThat(callProbeOnPooledWorker(toolContext)).isFalse();
-    }
-
-    private static boolean callProbeOnPooledWorker(Map<String, Object> toolContext) throws Exception {
-        AtomicBoolean skipChecksSeenInside = new AtomicBoolean();
-
-        ToolCallback probe = new ToolCallback() {
-
-            @Override
-            public ToolDefinition getToolDefinition() {
-                return ToolDefinition.builder()
-                    .name("probe")
-                    .description("probe")
-                    .inputSchema("{\"type\":\"object\"}")
-                    .build();
-            }
-
-            @Override
-            public String call(String toolInput) {
-                return call(toolInput, null);
-            }
-
-            @Override
-            public String call(String toolInput, @Nullable ToolContext toolContext) {
-                skipChecksSeenInside.set(AutomationAuthorizationContext.isSkipChecks());
-
-                return "ok";
-            }
-        };
-
-        SecurityContextRehydrator securityContextRehydrator = mock(SecurityContextRehydrator.class);
-
-        when(securityContextRehydrator.withUserSecurityContext(any(), any())).thenAnswer(
-            invocation -> invocation.<Supplier<?>>getArgument(1)
-                .get());
-
-        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, securityContextRehydrator);
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-
-        try {
-            executorService.submit(() -> wrapped.call("{}", new ToolContext(toolContext)))
-                .get(10, TimeUnit.SECONDS);
-        } finally {
-            executorService.shutdownNow();
-        }
-
-        return skipChecksSeenInside.get();
+            .containsEntry(AgentToolInvocationContext.TOOL_CONTEXT_TENANT_ID_KEY, "acme");
     }
 
     @Test
