@@ -38,6 +38,14 @@ const ELK_LAYER_SPACING = 52;
 
 const ANCHOR_MAIN_FOOTPRINT = 100;
 
+// ReadOnlyPlaceholderNode renders a 2px dot, so a read-only placeholder anchors
+// like a ghost bar rather than like an editable placeholder.
+const READ_ONLY_PLACEHOLDER_RENDERED_SIZE = 2;
+
+function isReadOnlyPlaceholder(node: Node): boolean {
+    return node.type === 'readonlyPlaceholder';
+}
+
 // Cross-axis gap between sibling branch columns.
 const ELK_SIBLING_SPACING = 50;
 
@@ -393,9 +401,13 @@ const getChildAlignmentOptions = (direction: LayoutDirectionType): Record<string
  * ELK_LAYER_SPACING + 1×slack — the consistency guarantee of the ELK engine.
  */
 function getElkNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
-    const {height, width} = getDagreNodeSize(node, direction);
+    const {height, width} = getDagreNodeSize(
+        isReadOnlyPlaceholder(node) ? {...node, type: 'placeholder'} : node,
+        direction
+    );
 
-    const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
+    const isSmallNode =
+        node.type === 'placeholder' || node.type === 'triggerPlaceholder' || isReadOnlyPlaceholder(node);
 
     let mainAxisSize = ANCHOR_MAIN_FOOTPRINT;
 
@@ -770,6 +782,10 @@ const loadElk = async (): Promise<ElkInstanceType> => {
  * reservation is.
  */
 function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+    if (isReadOnlyPlaceholder(node)) {
+        return {height: READ_ONLY_PLACEHOLDER_RENDERED_SIZE, width: READ_ONLY_PLACEHOLDER_RENDERED_SIZE};
+    }
+
     const isGhostNode = node.type === 'taskDispatcherTopGhostNode' || node.type === 'taskDispatcherBottomGhostNode';
     const isSmallNode = node.type === 'placeholder' || node.type === 'triggerPlaceholder';
 

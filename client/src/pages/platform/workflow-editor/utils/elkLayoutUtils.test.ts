@@ -2,6 +2,7 @@ import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {buildElkGraph, getElkLayoutElements, getFrameId} from './elkLayoutUtils';
+import {getLabelCrossOverhang} from './layoutUtils';
 
 import type {ElkNode} from 'elkjs/lib/elk-api';
 
@@ -394,28 +395,27 @@ describe('read-only and trigger sizing', () => {
         expect(Math.abs(placeholderCenter - chainCenter)).toBeLessThanOrEqual(1);
     });
 
-    it('reserves the shared trigger row width so long trigger labels do not overlap', async () => {
-        const shortLabelGraph = buildElkGraph(
-            [triggerNode('trigger_1', 'Webhook'), triggerNode('trigger_2', 'Webhook'), taskNode('task1')],
-            [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')],
-            'TB'
-        );
+    it('keeps a long trigger label clear of the next trigger box', async () => {
+        const triggers = [
+            triggerNode('trigger_1', 'A trigger with a very long label indeed'),
+            triggerNode('trigger_2', 'Webhook'),
+        ];
+        const nodes = [...triggers, taskNode('task1')];
 
-        const longLabelGraph = buildElkGraph(
-            [
-                triggerNode('trigger_1', 'A trigger with a very long label indeed'),
-                triggerNode('trigger_2', 'Webhook'),
-                taskNode('task1'),
-            ],
-            [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')],
-            'TB'
-        );
+        const result = await getElkLayoutElements({
+            canvasWidth: 1200,
+            direction: 'TB',
+            edges: [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')],
+            nodes,
+        });
 
-        const triggerWidth = (graph: ElkNode, id: string) =>
-            (graph.children ?? []).find((child) => child.id === id)?.width ?? 0;
+        const laidOutTriggers = result.nodes
+            .filter((node) => node.id.startsWith('trigger_'))
+            .sort((first, second) => first.position.x - second.position.x);
 
-        expect(triggerWidth(longLabelGraph, 'trigger_1')).toBeGreaterThan(triggerWidth(shortLabelGraph, 'trigger_1'));
-        expect(triggerWidth(longLabelGraph, 'trigger_2')).toBe(triggerWidth(longLabelGraph, 'trigger_1'));
+        const labelEnd = laidOutTriggers[0].position.x + 72 + getLabelCrossOverhang(laidOutTriggers[0]);
+
+        expect(laidOutTriggers[1].position.x).toBeGreaterThan(labelEnd);
     });
 });
 
