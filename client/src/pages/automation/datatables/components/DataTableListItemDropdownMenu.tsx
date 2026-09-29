@@ -1,4 +1,6 @@
 import Button from '@/components/Button/Button';
+
+import '@/shared/styles/dropdownMenu.css';
 import {
     DropdownMenu,
     DropdownMenuContent,
