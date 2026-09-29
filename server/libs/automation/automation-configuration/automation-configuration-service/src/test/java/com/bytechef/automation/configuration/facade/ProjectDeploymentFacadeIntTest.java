@@ -762,6 +762,7 @@ public class ProjectDeploymentFacadeIntTest {
         private static final long PROJECT_DEPLOYMENT_WORKFLOW_ID = 77L;
         private static final long PROJECT_ID = 42L;
         private static final String WORKFLOW_ID = "workflow-1";
+        private static final long WORKSPACE_ID = 5L;
 
         @MockitoBean
         private PermissionService permissionService;
@@ -800,6 +801,8 @@ public class ProjectDeploymentFacadeIntTest {
             when(projectDeploymentService.getProjectDeploymentId(anyLong(), any()))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
             when(projectDeploymentWorkflowService.update(any(ProjectDeploymentWorkflow.class)))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(projectDeploymentService.getProjectDeployments(any(), any(), any(), any(), any()))
                 .thenThrow(new IllegalStateException(BODY_REACHED));
         }
 
@@ -950,6 +953,24 @@ public class ProjectDeploymentFacadeIntTest {
             grant("DEPLOYMENT_CREATE");
 
             assertThatThrownBy(() -> projectDeploymentFacade.updateProjectDeployment(projectDeploymentDTO()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testProjectDeploymentTagsRequireTheDeploymentViewScopeInTheRequestedEnvironment() {
+            long environmentId = Environment.PRODUCTION.ordinal();
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.DEVELOPMENT))
+                .thenReturn(true);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
+                .isInstanceOf(AccessDeniedException.class);
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "DEPLOYMENT_VIEW", Environment.PRODUCTION))
+                .thenReturn(true);
+
+            assertThatThrownBy(() -> projectDeploymentFacade.getProjectDeploymentTags(WORKSPACE_ID, environmentId))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage(BODY_REACHED);
         }

@@ -17,6 +17,18 @@
 package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
@@ -30,20 +42,34 @@ import com.bytechef.automation.configuration.repository.ProjectDeploymentWorkflo
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.automation.configuration.util.ProjectDeploymentFacadeHelper;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.repository.WorkflowTestConfigurationRepository;
+import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -259,5 +285,193 @@ public class WorkspaceConnectionFacadeIntTest {
         workspaceConnectionFacade.disconnectConnection(nonExistentConnectionId);
 
         // Then - No exception should be thrown (method completes successfully)
+    }
+
+    @Nested
+    @Import({
+        MethodSecurityEnforcement.Config.class, PostgreSQLContainerConfiguration.class
+    })
+    class MethodSecurityEnforcement {
+
+        private static final String BODY_REACHED = "body reached";
+        private static final long CONNECTION_ID = 7L;
+        private static final String CONNECTION_TYPE = "Connection";
+        private static final long ENVIRONMENT_ID = 2L;
+        private static final long WORKSPACE_ID = 42L;
+
+        @Autowired
+        private ConnectionFacade connectionFacade;
+
+        @MockitoBean
+        private PermissionService permissionService;
+
+        @MockitoBean
+        private WorkspaceConnectionService workspaceConnectionService;
+
+        @BeforeEach
+        void authenticateAsNonAdmin() {
+            SecurityContextHolder.getContext()
+                .setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                        "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
+
+            when(workspaceConnectionService.getWorkspaceConnections(anyLong()))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(connectionFacade.create(any(ConnectionDTO.class), any(PlatformType.class)))
+                .thenThrow(new IllegalStateException(BODY_REACHED));
+            when(connectionFacade.getConnection(anyLong())).thenThrow(new IllegalStateException(BODY_REACHED));
+
+            doThrow(new IllegalStateException(BODY_REACHED)).when(workspaceConnectionService)
+                .deleteWorkspaceConnection(anyLong());
+            doThrow(new IllegalStateException(BODY_REACHED)).when(connectionFacade)
+                .update(anyLong(), anyString(), anyList(), anyInt());
+            doThrow(new IllegalStateException(BODY_REACHED)).when(connectionFacade)
+                .update(anyLong(), anyList());
+        }
+
+        @AfterEach
+        void clearSecurityContext() {
+            SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void testConnectionTagsRequireTheConnectionViewScopeInTheRequestedEnvironment() {
+            long environmentId = Environment.PRODUCTION.ordinal();
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "CONNECTION_VIEW", Environment.DEVELOPMENT))
+                .thenReturn(true);
+
+            assertThatThrownBy(() -> workspaceConnectionFacade.getConnectionTags(WORKSPACE_ID, environmentId))
+                .isInstanceOf(AccessDeniedException.class);
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, "CONNECTION_VIEW", Environment.PRODUCTION))
+                .thenReturn(true);
+
+            assertThatThrownBy(() -> workspaceConnectionFacade.getConnectionTags(WORKSPACE_ID, environmentId))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(BODY_REACHED);
+        }
+
+        @Test
+        void testDeleteDeniesWhenTheConnectionDeleteScopeIsRefused() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", false);
+        }
+
+        @Test
+        void testDeleteAllowsWhenTheConnectionDeleteScopeIsGranted() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.delete(CONNECTION_ID), "CONNECTION_DELETE", true);
+        }
+
+        @Test
+        void testGetConnectionDeniesWhenTheConnectionViewScopeIsRefused() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.getConnection(CONNECTION_ID), "CONNECTION_VIEW", false);
+        }
+
+        @Test
+        void testGetConnectionAllowsWhenTheConnectionViewScopeIsGranted() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.getConnection(CONNECTION_ID), "CONNECTION_VIEW", true);
+        }
+
+        @Test
+        void testUpdateDeniesWhenTheConnectionEditScopeIsRefused() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", false);
+        }
+
+        @Test
+        void testUpdateAllowsWhenTheConnectionEditScopeIsGranted() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.update(CONNECTION_ID, "name", List.of(), 1), "CONNECTION_EDIT", true);
+        }
+
+        @Test
+        void testUpdateTagsDeniesWhenTheConnectionEditScopeIsRefused() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", false);
+        }
+
+        @Test
+        void testUpdateTagsAllowsWhenTheConnectionEditScopeIsGranted() {
+            assertResourceGuard(
+                () -> workspaceConnectionFacade.updateTags(CONNECTION_ID, List.of()), "CONNECTION_EDIT", true);
+        }
+
+        @Test
+        void testGetConnectionsDeniesWhenTheConnectionViewScopeIsRefusedInTheNamedEnvironment() {
+            assertWorkspaceGuard(
+                () -> workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, ENVIRONMENT_ID, null),
+                "CONNECTION_VIEW", false);
+        }
+
+        @Test
+        void testGetConnectionsAllowsWhenTheConnectionViewScopeIsGrantedInTheNamedEnvironment() {
+            assertWorkspaceGuard(
+                () -> workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, ENVIRONMENT_ID, null),
+                "CONNECTION_VIEW", true);
+        }
+
+        @Test
+        void testCreateDeniesWhenTheConnectionCreateScopeIsRefusedInTheConnectionsEnvironment() {
+            assertWorkspaceGuard(
+                () -> workspaceConnectionFacade.create(WORKSPACE_ID, connectionDTO()), "CONNECTION_CREATE", false);
+        }
+
+        @Test
+        void testCreateAllowsWhenTheConnectionCreateScopeIsGrantedInTheConnectionsEnvironment() {
+            assertWorkspaceGuard(
+                () -> workspaceConnectionFacade.create(WORKSPACE_ID, connectionDTO()), "CONNECTION_CREATE", true);
+        }
+
+        @Test
+        void testDisconnectConnectionCarriesNoScopeGuard() {
+            assertThatCode(() -> workspaceConnectionFacade.disconnectConnection(CONNECTION_ID))
+                .doesNotThrowAnyException();
+
+            verifyNoInteractions(permissionService);
+        }
+
+        private void assertResourceGuard(ThrowingCallable invocation, String expectedScope, boolean granted) {
+            when(permissionService.hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, expectedScope)).thenReturn(granted);
+
+            assertInvocationOutcome(invocation, granted);
+
+            verify(permissionService).hasResourceScope(CONNECTION_ID, CONNECTION_TYPE, expectedScope);
+            verifyNoMoreInteractions(permissionService);
+        }
+
+        private void assertWorkspaceGuard(ThrowingCallable invocation, String expectedScope, boolean granted) {
+            Environment environment = Environment.values()[(int) ENVIRONMENT_ID];
+
+            when(permissionService.hasWorkspaceScope(WORKSPACE_ID, expectedScope, environment)).thenReturn(granted);
+
+            assertInvocationOutcome(invocation, granted);
+
+            verify(permissionService).hasWorkspaceScope(WORKSPACE_ID, expectedScope, environment);
+            verifyNoMoreInteractions(permissionService);
+        }
+
+        private void assertInvocationOutcome(ThrowingCallable invocation, boolean allowed) {
+            if (allowed) {
+                assertThatThrownBy(invocation)
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessage(BODY_REACHED);
+            } else {
+                assertThatThrownBy(invocation).isInstanceOf(AccessDeniedException.class);
+            }
+        }
+
+        private ConnectionDTO connectionDTO() {
+            return ConnectionDTO.builder()
+                .environmentId((int) ENVIRONMENT_ID)
+                .build();
+        }
+
+        @EnableMethodSecurity
+        static class Config {
+        }
     }
 }

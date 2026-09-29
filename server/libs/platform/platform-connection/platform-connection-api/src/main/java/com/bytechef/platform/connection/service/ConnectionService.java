@@ -21,6 +21,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,6 +38,8 @@ public interface ConnectionService {
     void delete(long id);
 
     Connection getConnection(long id);
+
+    Optional<Connection> fetchConnection(long id);
 
     List<Connection> getConnections(PlatformType type);
 
