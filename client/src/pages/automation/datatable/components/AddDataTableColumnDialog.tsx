@@ -1,15 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
 import {ColumnType} from '@/shared/middleware/graphql';
 import {useEffect, useState} from 'react';
@@ -55,55 +55,50 @@ const AddDataTableColumnDialog = () => {
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Add Column</DialogTitle>
+                <DialogMain>
+                    <DialogHeader description="Enter a new name for the column." title="Add Column" />
 
-                        <DialogDescription>Enter a new name for the column.</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-1.5">
+                                <Label>Name</Label>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                                <Input onChange={(event) => setColumnName(event.target.value)} value={columnName} />
 
-                <div className="space-y-3 py-2">
-                    <div className="space-y-1">
-                        <Label>Name</Label>
+                                {isReservedName && (
+                                    <p className="text-sm text-destructive">&quot;id&quot; is a reserved column name</p>
+                                )}
+                            </div>
 
-                        <Input onChange={(event) => setColumnName(event.target.value)} value={columnName} />
+                            <div className="flex flex-col gap-1.5">
+                                <Label>Type</Label>
 
-                        {isReservedName && (
-                            <p className="text-sm text-destructive">&quot;id&quot; is a reserved column name</p>
-                        )}
-                    </div>
+                                <Select
+                                    onValueChange={(value) => setColumnType(value as ColumnType)}
+                                    value={columnType}
+                                >
+                                    <SelectTrigger className="w-[240px]">
+                                        <SelectValue placeholder="Select type" />
+                                    </SelectTrigger>
 
-                    <div className="space-y-1">
-                        <Label>Type</Label>
+                                    <SelectContent>
+                                        {COLUMN_TYPES.map((type) => (
+                                            <SelectItem key={type} value={type}>
+                                                {type}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </DialogBody>
 
-                        <Select onValueChange={(value) => setColumnType(value as ColumnType)} value={columnType}>
-                            <SelectTrigger className="w-[240px]">
-                                <SelectValue placeholder="Select type" />
-                            </SelectTrigger>
+                    <DialogFooter>
+                        <DialogCancelButton />
 
-                            <SelectContent>
-                                {COLUMN_TYPES.map((type) => (
-                                    <SelectItem key={type} value={type}>
-                                        {type}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button onClick={() => handleOpenChange(false)} variant="outline">
-                        Cancel
-                    </Button>
-
-                    <Button disabled={!isValidColumnName} onClick={handleAddClick}>
-                        Add
-                    </Button>
-                </DialogFooter>
+                        <Button disabled={!isValidColumnName} label="Add" onClick={handleAddClick} />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
