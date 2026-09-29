@@ -1,13 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import useDuplicateDataTableDialog from '@/pages/automation/datatables/components/hooks/useDuplicateDataTableDialog';
 
 const DuplicateDataTableDialog = () => {
@@ -24,28 +17,28 @@ const DuplicateDataTableDialog = () => {
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent onClick={(event) => event.stopPropagation()}>
-                <DialogHeader>
-                    <DialogTitle>Duplicate table</DialogTitle>
+                <DialogMain>
+                    <DialogHeader description="Enter a name for the duplicated table." title="Duplicate table" />
 
-                    <DialogDescription>Enter a name for the duplicated table.</DialogDescription>
-                </DialogHeader>
+                    <DialogBody>
+                        <Input
+                            autoFocus
+                            onChange={(event) => handleDuplicateValueChange(event.target.value)}
+                            value={duplicateValue}
+                        />
+                    </DialogBody>
 
-                <Input
-                    autoFocus
-                    className="my-2"
-                    onChange={(event) => handleDuplicateValueChange(event.target.value)}
-                    value={duplicateValue}
-                />
+                    <DialogFooter>
+                        <Button className="shadow-none" label="Cancel" onClick={handleClose} variant="outline" />
 
-                <DialogFooter>
-                    <Button className="shadow-none" onClick={handleClose} variant="outline">
-                        Cancel
-                    </Button>
-
-                    <Button className="shadow-none" disabled={!canDuplicate} onClick={handleDuplicateSubmit}>
-                        Duplicate
-                    </Button>
-                </DialogFooter>
+                        <Button
+                            className="shadow-none"
+                            disabled={!canDuplicate}
+                            label="Duplicate"
+                            onClick={handleDuplicateSubmit}
+                        />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

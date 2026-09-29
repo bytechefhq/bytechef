@@ -1,14 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import {FileText, Loader2, X} from 'lucide-react';
 import {useState} from 'react';
@@ -37,79 +37,65 @@ const ImportDataTableCsvDialog = () => {
         setImportFile(null);
     };
 
-    const handleCancel = () => {
-        handleOpenChange(false);
-        setImportFile(null);
-    };
-
     return (
         <Dialog onOpenChange={handleDialogOpenChange} open={open}>
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Import CSV</DialogTitle>
+                <DialogMain>
+                    <DialogHeader description="Upload a CSV file to add rows to this table." title="Import CSV" />
 
-                        <DialogDescription>Upload a CSV file to add rows to this table.</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <div className="flex flex-col gap-1.5">
+                            <Label htmlFor="csvFile">CSV file</Label>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                            <Input
+                                accept=".csv,text/csv"
+                                className="bg-background"
+                                id="csvFile"
+                                onChange={(event) => {
+                                    const file = event.target.files?.[0] ?? null;
 
-                <div className="space-y-3 py-2">
-                    <div className="space-y-1">
-                        <Label htmlFor="csvFile">CSV file</Label>
+                                    setImportFile(file);
+                                }}
+                                type="file"
+                            />
 
-                        <Input
-                            accept=".csv,text/csv"
-                            className="bg-background"
-                            id="csvFile"
-                            onChange={(event) => {
-                                const file = event.target.files?.[0] ?? null;
+                            {importFile && (
+                                <div className="pt-1">
+                                    <div className="flex items-center justify-between rounded-md border p-2">
+                                        <div className="flex items-center gap-2">
+                                            <FileText className="h-4 w-4 text-muted-foreground" />
 
-                                setImportFile(file);
-                            }}
-                            type="file"
-                        />
+                                            <span className="text-sm">{importFile.name}</span>
 
-                        {importFile && (
-                            <div className="space-y-2 pt-1">
-                                <div className="flex items-center justify-between rounded-md border p-2">
-                                    <div className="flex items-center gap-2">
-                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                            <span className="text-xs text-muted-foreground">
+                                                ({(importFile.size / 1024).toFixed(1)} KB)
+                                            </span>
+                                        </div>
 
-                                        <span className="text-sm">{importFile.name}</span>
-
-                                        <span className="text-xs text-muted-foreground">
-                                            ({(importFile.size / 1024).toFixed(1)} KB)
-                                        </span>
+                                        <Button
+                                            className="size-6"
+                                            icon={<X className="size-3" />}
+                                            onClick={() => setImportFile(null)}
+                                            type="button"
+                                            variant="ghost"
+                                        />
                                     </div>
-
-                                    <Button
-                                        className="size-6"
-                                        icon={<X className="size-3" />}
-                                        onClick={() => setImportFile(null)}
-                                        type="button"
-                                        variant="ghost"
-                                    />
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                            )}
+                        </div>
+                    </DialogBody>
 
-                <DialogFooter>
-                    <Button onClick={handleCancel} variant="outline">
-                        Cancel
-                    </Button>
+                    <DialogFooter>
+                        <DialogCancelButton />
 
-                    <Button
-                        disabled={!importFile || isPending}
-                        icon={isPending ? <Loader2 className="animate-spin" /> : undefined}
-                        onClick={handleImportClick}
-                    >
-                        {isPending ? 'Importing…' : 'Import'}
-                    </Button>
-                </DialogFooter>
+                        <Button
+                            disabled={!importFile || isPending}
+                            icon={isPending ? <Loader2 className="animate-spin" /> : undefined}
+                            label={isPending ? 'Importing…' : 'Import'}
+                            onClick={handleImportClick}
+                        />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

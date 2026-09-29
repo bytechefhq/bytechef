@@ -1,14 +1,14 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 
 import useRenameDataTableColumnDialog from '../hooks/useRenameDataTableColumnDialog';
@@ -20,38 +20,28 @@ const RenameDataTableColumnDialog = () => {
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Rename Column</DialogTitle>
+                <DialogMain>
+                    <DialogHeader description="Enter a new name for this column." title="Rename Column" />
 
-                        <DialogDescription>Enter a new name for this column.</DialogDescription>
-                    </div>
+                    <DialogBody>
+                        <div className="flex flex-col gap-1.5">
+                            <Label>New name for "{currentName}"</Label>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                            <Input
+                                autoFocus
+                                onChange={(event) => handleRenameValueChange(event.target.value)}
+                                placeholder="Enter new column name"
+                                value={renameValue}
+                            />
+                        </div>
+                    </DialogBody>
 
-                <div className="space-y-3 py-2">
-                    <div className="space-y-1">
-                        <Label>New name for "{currentName}"</Label>
+                    <DialogFooter>
+                        <DialogCancelButton />
 
-                        <Input
-                            autoFocus
-                            onChange={(event) => handleRenameValueChange(event.target.value)}
-                            placeholder="Enter new column name"
-                            value={renameValue}
-                        />
-                    </div>
-                </div>
-
-                <DialogFooter>
-                    <Button onClick={() => handleOpenChange(false)} variant="outline">
-                        Cancel
-                    </Button>
-
-                    <Button disabled={!canRename} onClick={handleRenameSubmit}>
-                        Rename
-                    </Button>
-                </DialogFooter>
+                        <Button disabled={!canRename} label="Rename" onClick={handleRenameSubmit} />
+                    </DialogFooter>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
