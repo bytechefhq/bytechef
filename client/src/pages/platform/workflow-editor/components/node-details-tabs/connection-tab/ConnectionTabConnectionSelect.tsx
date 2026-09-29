@@ -425,7 +425,7 @@ const ConnectionTabConnectionSelect = ({
                     onClose={() => setShowConnectionDialog(false)}
                     onConnectionCreate={handleOnConnectionCreate}
                     useCreateConnectionMutation={useCreateConnectionMutation}
-                    useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
+                    useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                 />
             )}
         </div>
