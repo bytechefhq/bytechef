@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.chat.memory.builtin.session.cluster.BuiltInSessionChatMemory;
 import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory;
-import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory.BuiltInSessionRepository;
+import com.bytechef.component.ai.agent.chat.memory.builtin.session.util.BuiltInSessionRepositoryFactory.BuiltInSessionStore;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,31 +46,29 @@ public class BuiltInSessionChatMemoryComponentHandler implements ComponentHandle
     private final ComponentDefinition componentDefinition;
     private final AutoCloseable closeable;
 
+    @Autowired
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     public BuiltInSessionChatMemoryComponentHandler(
         @Autowired(required = false) @Nullable JdbcTemplate jdbcTemplate, Environment environment) {
 
-        BuiltInSessionRepository builtInSessionRepository = BuiltInSessionRepositoryFactory.create(
+        BuiltInSessionStore builtInSessionStore = BuiltInSessionRepositoryFactory.create(
             environment, jdbcTemplate);
 
-        this.closeable = builtInSessionRepository.closeable();
-
+        this.closeable = builtInSessionStore.closeable();
         this.componentDefinition = component(BUILT_IN_SESSION_CHAT_MEMORY)
             .title("Built-in Session Repository")
             .description("Built-in storage backend for Session Chat Memory.")
             .icon("path:assets/built-in-session-chat-memory.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-            .clusterElements(BuiltInSessionChatMemory.of(builtInSessionRepository.sessionRepository()));
+            .clusterElements(BuiltInSessionChatMemory.of(builtInSessionStore.sessionRepository()));
     }
 
     @PreDestroy
     public void destroy() {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Exception exception) {
-                log.warn("Failed to close built-in session repository client", exception);
-            }
+        try {
+            closeable.close();
+        } catch (Exception exception) {
+            log.warn("Failed to close built-in session repository client", exception);
         }
     }
 
