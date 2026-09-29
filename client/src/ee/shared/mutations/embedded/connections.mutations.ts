@@ -12,7 +12,7 @@ export const getCreateConnectedUserConnection =
             mutationFn: (connection: Connection) => {
                 return new ConnectionApi().createConnectedUserConnection({
                     connectedUserId,
-                    connection,
+                    connection: {...connection, environmentId: undefined},
                 });
             },
             onError: mutationProps?.onError,

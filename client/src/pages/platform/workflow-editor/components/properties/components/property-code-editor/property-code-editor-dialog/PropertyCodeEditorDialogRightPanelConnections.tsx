@@ -105,7 +105,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                                     <div className="mt-6">
                                         <PropertyCodeEditorDialogRightPanelConnectionsPopover
                                             onSubmit={handleOnSubmit}
-                                            triggerNode={<Button label="Add Component" />}
+                                            triggerNode={<Button label="Add Connection" />}
                                         />
                                     </div>
                                 )}
@@ -142,7 +142,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                         connectionsQueryKey={ConnectionKeys!.connections}
                         onClose={() => setShowNewConnectionDialog(false)}
                         useCreateConnectionMutation={useCreateConnectionMutation}
-                        useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
+                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
                     />
                 )}
             </CardContent>
