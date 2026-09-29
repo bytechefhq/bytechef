@@ -89,6 +89,7 @@ class ConnectedUserProjectWorkflowManager {
         ProjectWorkflowService projectWorkflowService, WorkflowService workflowService,
         WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowValidatorFacade workflowValidatorFacade) {
+
         this.connectedUserConnectionMembership = connectedUserConnectionMembership;
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
@@ -122,7 +123,7 @@ class ConnectedUserProjectWorkflowManager {
 
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
-        List<Connection> connections = getEntitledConnections(connectedUserProject.getConnectedUserId(), environment);
+        List<Connection> connections = getOwnedConnections(connectedUserProject.getConnectedUserId(), environment);
         Map<String, ?> workflowMap = JsonUtils.readMap(effectiveDefinition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
@@ -172,16 +173,17 @@ class ConnectedUserProjectWorkflowManager {
             });
     }
 
-    private List<Connection> getEntitledConnections(long connectedUserId, Environment environment) {
-        List<Long> connectionIds = new ArrayList<>(getEntitledConnectionIds(connectedUserId, environment));
+    private List<Connection> getOwnedConnections(long connectedUserId, Environment environment) {
+        List<Long> ownedConnectionIds = new ArrayList<>(
+            connectedUserConnectionMembership.getOwnedConnectionIds(connectedUserId, environment));
 
-        if (connectionIds.isEmpty()) {
+        if (ownedConnectionIds.isEmpty()) {
             return List.of();
         }
 
-        return connectionService.getConnections(connectionIds)
+        return connectionService.getConnections(ownedConnectionIds)
             .stream()
-            .sorted(Comparator.comparingInt(connection -> connectionIds.indexOf(connection.getId())))
+            .sorted(Comparator.comparingInt(connection -> ownedConnectionIds.indexOf(connection.getId())))
             .toList();
     }
 
