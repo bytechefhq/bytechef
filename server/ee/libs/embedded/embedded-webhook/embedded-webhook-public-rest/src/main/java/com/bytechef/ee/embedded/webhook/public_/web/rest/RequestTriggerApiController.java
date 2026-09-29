@@ -13,7 +13,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
@@ -31,7 +30,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
-import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.security.web.authentication.ConnectedUserAuthentications;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -110,7 +109,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     @CrossOrigin
     @Override
     public ResponseEntity<Object> executeFrontendWorkflow(String workflowUuid, EnvironmentModel xEnvironment) {
-        String externalUserId = OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found");
+        String externalUserId = ConnectedUserAuthentications.getCurrentExternalUserId();
 
         return executeWorkflow(externalUserId, workflowUuid, xEnvironment);
     }
@@ -119,7 +118,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     public ResponseEntity<Object> executeWorkflow(
         String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
 
-        SecurityUtils.checkCurrentUserLogin(externalUserId);
+        ConnectedUserAuthentications.requireCurrentExternalUserId(externalUserId);
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 

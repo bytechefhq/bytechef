@@ -142,4 +142,6 @@ dependencies {
 
     testImplementation(project(":server:libs:platform:platform-mcp:platform-mcp-api"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+    testImplementation(testFixtures(project(":server:libs:platform:platform-security-web:platform-security-web-api")))
 }

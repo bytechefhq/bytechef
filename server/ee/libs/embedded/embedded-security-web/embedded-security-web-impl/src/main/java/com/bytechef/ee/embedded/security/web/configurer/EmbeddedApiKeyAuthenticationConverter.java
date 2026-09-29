@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriUtils;
 
 /**
  * Authentication converter for embedded API key authentication.
@@ -42,7 +43,9 @@ import org.springframework.util.StringUtils;
  */
 class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthenticationConverter {
 
-    static final Pattern EXTERNAL_USER_ID_PATTERN = Pattern.compile(".*/v\\d+/([^/]+)/.*");
+    static final Pattern API_KEY_PATH_PATTERN = Pattern.compile("^/api/embedded/v\\d+/([^/]+)(?:/.*)?$");
+    static final Pattern CONNECTED_USER_ONLY_PATH_PATTERN =
+        Pattern.compile("^/api/embedded/v\\d+/(?:app-events|workflows/[^/]+)/?$");
     static final Pattern PUBLIC_API_EXTERNAL_USER_ID_PATTERN = Pattern.compile("^/api/embedded/v\\d+/([^/]+)(?:/.*)?$");
     static final Pattern JWT_TOKEN_PATTERN =
         Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_.+/=]*$");
@@ -93,13 +96,30 @@ class EmbeddedApiKeyAuthenticationConverter extends AbstractApiKeyAuthentication
             return new EmbeddedApiKeyAuthenticationToken(
                 environment.ordinal(), externalUserId, null, tenantKey.getTenantId());
         } else {
-            String externalUserId;
-            Matcher matcher = EXTERNAL_USER_ID_PATTERN.matcher(request.getRequestURI());
+            String contextPath = request.getContextPath() == null ? "" : request.getContextPath();
+            String requestURI = request.getRequestURI();
 
-            if (matcher.matches()) {
-                externalUserId = matcher.group(1);
-            } else {
-                throw new IllegalArgumentException("externalUserId parameter is required");
+            String path = requestURI.substring(contextPath.length());
+
+            Matcher connectedUserOnlyPathMatcher = CONNECTED_USER_ONLY_PATH_PATTERN.matcher(path);
+
+            if (connectedUserOnlyPathMatcher.matches()) {
+                throw new BadCredentialsException("This endpoint requires a connected-user token");
+            }
+
+            Matcher matcher = API_KEY_PATH_PATTERN.matcher(path);
+
+            if (!matcher.matches()) {
+                throw new BadCredentialsException("An API key requires the external user id as the first path segment");
+            }
+
+            String externalUserId;
+
+            try {
+                externalUserId = UriUtils.decode(matcher.group(1), StandardCharsets.UTF_8);
+            } catch (IllegalArgumentException illegalArgumentException) {
+                throw new BadCredentialsException("The external user id is not validly encoded",
+                    illegalArgumentException);
             }
 
             if (ConnectedUserConstants.FRONTEND_RESERVED_PATH_SEGMENTS.contains(externalUserId)) {
