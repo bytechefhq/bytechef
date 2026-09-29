@@ -1,16 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {McpServer, useCreateEmbeddedMcpServerMutation, useUpdateMcpServerMutation} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -101,47 +100,44 @@ const McpServerDialog = ({
             <DialogTrigger asChild>{triggerNode}</DialogTrigger>
 
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>{mcpServer ? 'Edit MCP Server' : 'Create MCP Server'}</DialogTitle>
-
-                        <DialogDescription>
-                            {mcpServer
+                <DialogMain>
+                    <DialogHeader
+                        description={
+                            mcpServer
                                 ? 'Edit the details of the MCP server.'
-                                : 'Create a new MCP server by filling out the form below.'}
-                        </DialogDescription>
-                    </div>
+                                : 'Create a new MCP server by filling out the form below.'
+                        }
+                        title={mcpServer ? 'Edit MCP Server' : 'Create MCP Server'}
+                    />
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(onSubmit)}>
+                            <DialogBody>
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                <Form {...form}>
-                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="Enter server name" {...field} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <Input placeholder="Enter server name" {...field} />
-                                    </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

@@ -1,16 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Textarea} from '@/components/ui/textarea';
 import {
@@ -109,61 +108,56 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent>
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkspace)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} Workspace</DialogTitle>
+                <DialogMain>
+                    <DialogHeader
+                        description="Define workspace name and description."
+                        title={`${workspace?.id ? 'Edit' : 'Create'} Workspace`}
+                    />
 
-                                <DialogDescription>Define workspace name and description.</DialogDescription>
-                            </div>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveWorkspace)}>
+                            <DialogBody className="flex flex-col gap-4">
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
 
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
+                                <FormField
+                                    control={control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Description</FormLabel>
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                            <FormControl>
+                                                <Textarea rows={6} {...field} />
+                                            </FormControl>
 
-                        <FormField
-                            control={control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </DialogBody>
 
-                                    <FormControl>
-                                        <Textarea rows={6} {...field} />
-                                    </FormControl>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-
-                            <Button type="submit">Save</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );

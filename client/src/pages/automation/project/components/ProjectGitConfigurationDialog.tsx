@@ -1,16 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
-import Switch from '@/components/Switch/Switch';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+    DialogMain,
+} from '@/components/Dialog';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
+import Switch from '@/components/Switch/Switch';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {useGetProjectRemoteBranchesQuery} from '@/ee/shared/mutations/automation/projectGit.queries';
@@ -66,91 +65,93 @@ const ProjectGitConfigurationDialog = ({
     return (
         <Dialog onOpenChange={onClose} open={true}>
             <DialogContent>
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                    <div className="flex flex-col space-y-1">
-                        <DialogTitle>Update Git Configuration</DialogTitle>
+                <DialogMain>
+                    <DialogHeader
+                        description="Set the repository branch where the project will be saved."
+                        title="Update Git Configuration"
+                    />
 
-                        <DialogDescription>
-                            Set the repository branch where the project will be saved.
-                        </DialogDescription>
-                    </div>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={form.handleSubmit(handleSubmit)}>
+                            <DialogBody>
+                                <div className="grid gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="branch"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Branch</FormLabel>
 
-                    <DialogCloseButton />
-                </DialogHeader>
+                                                <FormControl>
+                                                    <Select
+                                                        disabled={isLoadingBranches}
+                                                        onValueChange={field.onChange}
+                                                        value={field.value}
+                                                    >
+                                                        <SelectTrigger>
+                                                            <SelectValue
+                                                                placeholder={
+                                                                    isLoadingBranches
+                                                                        ? 'Loading branches...'
+                                                                        : 'Select a branch'
+                                                                }
+                                                            />
+                                                        </SelectTrigger>
 
-                <Form {...form}>
-                    <form className="space-y-8" onSubmit={form.handleSubmit(handleSubmit)}>
-                        <div className="grid gap-4 py-4">
-                            <FormField
-                                control={form.control}
-                                name="branch"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Branch</FormLabel>
+                                                        <SelectContent>
+                                                            {remoteBranches?.map((branch) => (
+                                                                <SelectItem key={branch} value={branch}>
+                                                                    {branch}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
 
-                                        <FormControl>
-                                            <Select
-                                                disabled={isLoadingBranches}
-                                                onValueChange={field.onChange}
-                                                value={field.value}
-                                            >
-                                                <SelectTrigger>
-                                                    <SelectValue
-                                                        placeholder={
-                                                            isLoadingBranches
-                                                                ? 'Loading branches...'
-                                                                : 'Select a branch'
-                                                        }
-                                                    />
-                                                </SelectTrigger>
+                                                <FormDescription>
+                                                    This is the branch name of a git repository.
+                                                </FormDescription>
 
-                                                <SelectContent>
-                                                    {remoteBranches?.map((branch) => (
-                                                        <SelectItem key={branch} value={branch}>
-                                                            {branch}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
-                                        <FormDescription>This is the branch name of a git repository.</FormDescription>
+                                    <FormField
+                                        control={form.control}
+                                        name="enabled"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <div className="flex items-center gap-2">
+                                                    <FormLabel>Enabled</FormLabel>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                                    <FormControl>
+                                                        <Switch
+                                                            checked={field.value}
+                                                            onCheckedChange={field.onChange}
+                                                        />
+                                                    </FormControl>
+                                                </div>
 
-                            <FormField
-                                control={form.control}
-                                name="enabled"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <div className="flex items-center gap-2">
-                                            <FormLabel>Enabled</FormLabel>
+                                                <FormDescription>
+                                                    Enable git configuration for this project.
+                                                </FormDescription>
 
-                                            <FormControl>
-                                                <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                            </FormControl>
-                                        </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </DialogBody>
 
-                                        <FormDescription>Enable git configuration for this project.</FormDescription>
+                            <DialogFooter>
+                                <DialogCancelButton />
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                <Button label="Save" type="submit" />
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
