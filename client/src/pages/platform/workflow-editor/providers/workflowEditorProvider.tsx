@@ -121,7 +121,7 @@ export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     useCreateConnectionMutation: (
         props?: CreateConnectionMutationProps
     ) => UseMutationResult<number, Error, ConnectionI, unknown>;
-    useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
+    useGetConnectionTagsQuery?: () => UseQueryResult<Tag[], Error>;
     useGetConnectionsQuery: (request: RequestI, enabled?: boolean) => UseQueryResult<ConnectionI[], Error>;
     webhookTriggerTestApi: WebhookTriggerTestApiI;
 }

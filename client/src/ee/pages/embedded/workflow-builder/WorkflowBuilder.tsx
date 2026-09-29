@@ -3,11 +3,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import WorkflowBuilderHeader from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
 import {useWorkflowBuilder} from '@/ee/pages/embedded/workflow-builder/hooks/useWorkflowBuilder';
 import {getCreateConnectedUserConnection} from '@/ee/shared/mutations/embedded/connections.mutations';
-import {
-    ConnectionKeys,
-    getConnectedUserConnectionsQuery,
-    useGetConnectionTagsQuery,
-} from '@/ee/shared/queries/embedded/connections.queries';
+import {ConnectionKeys, getConnectedUserConnectionsQuery} from '@/ee/shared/queries/embedded/connections.queries';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
@@ -95,7 +91,6 @@ const WorkflowBuilder = () => {
                                     connectedUserProjectWorkflow.connectedUserId!
                                 ),
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                useGetConnectionTagsQuery: useGetConnectionTagsQuery,
                                 useGetConnectionsQuery: getConnectedUserConnectionsQuery(
                                     connectedUserProjectWorkflow.connectedUserId!,
                                     sharedConnectionIds ? sharedConnectionIds : []
