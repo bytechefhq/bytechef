@@ -1,15 +1,15 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/Input/Input';
 import {
     Dialog,
-    DialogClose,
-    DialogCloseButton,
+    DialogBody,
+    DialogCancelButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
-    DialogTitle,
+    DialogMain,
     DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
@@ -87,74 +87,69 @@ const ApiKeyDialog = ({triggerNode}: ApiKeyDialogProps) => {
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="min-w-api-key-dialog-width">
-                <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiKey)}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <DialogTitle>
-                                {secretKey ? 'Save your' : `${currentApiKey?.id ? 'Edit' : 'Create'}`} API Key
-                            </DialogTitle>
+            <DialogContent aria-describedby={undefined} size="md">
+                <DialogMain>
+                    <DialogHeader
+                        title={`${secretKey ? 'Save your' : currentApiKey?.id ? 'Edit' : 'Create'} API Key`}
+                    />
 
-                            <DialogCloseButton />
-                        </DialogHeader>
+                    <Form {...form}>
+                        <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleSubmit(saveApiKey)}>
+                            <DialogBody>
+                                {secretKey ? (
+                                    <div className="space-y-4">
+                                        <p className="text-sm">
+                                            Please save this secret key somewhere safe and accessible. For security
+                                            reasons, you won&apos;t be able to view it again through your ByteChef
+                                            account. If you lose this secret key, you&apos;ll need to generate a new
+                                            one.
+                                        </p>
 
-                        {secretKey ? (
-                            <div className="space-y-4">
-                                <p className="text-sm">
-                                    Please save this secret key somewhere safe and accessible. For security reasons, you
-                                    won&apos;t be able to view it again through your ByteChef account. If you lose this
-                                    secret key, you&apos;ll need to generate a new one.
-                                </p>
+                                        <div className="flex space-x-1">
+                                            <Input readOnly={true} value={secretKey} />
 
-                                <div className="flex space-x-1">
-                                    <Input readOnly={true} value={secretKey} />
+                                            <Button
+                                                icon={<ClipboardIcon />}
+                                                label="Copy"
+                                                onClick={(event) => {
+                                                    event.preventDefault();
 
-                                    <Button
-                                        onClick={(event) => {
-                                            event.preventDefault();
+                                                    copyToClipboard(secretKey);
 
-                                            copyToClipboard(secretKey);
+                                                    toast('The secret API key is copied.');
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <FormField
+                                        control={control}
+                                        name="name"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Name</FormLabel>
 
-                                            toast('The secret API key is copied.');
-                                        }}
-                                    >
-                                        <ClipboardIcon className="h-4" /> Copy
-                                    </Button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <FormField
-                                    control={control}
-                                    name="name"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
 
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                )}
+                            </DialogBody>
 
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </>
-                        )}
+                            <DialogFooter>
+                                <DialogCancelButton label={secretKey ? 'Done' : 'Cancel'} />
 
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="outline">
-                                    {secretKey ? 'Done' : 'Cancel'}
-                                </Button>
-                            </DialogClose>
-
-                            {!secretKey && (
-                                <Button type="submit">{currentApiKey?.id ? 'Save' : 'Create API Key'}</Button>
-                            )}
-                        </DialogFooter>
-                    </form>
-                </Form>
+                                {!secretKey && (
+                                    <Button label={currentApiKey?.id ? 'Save' : 'Create API Key'} type="submit" />
+                                )}
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogMain>
             </DialogContent>
         </Dialog>
     );
