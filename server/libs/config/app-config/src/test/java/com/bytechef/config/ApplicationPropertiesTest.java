@@ -41,7 +41,8 @@ class ApplicationPropertiesTest {
                 "bytechef.ai.memory.redis.port", "6380",
                 "bytechef.ai.memory.redis.username", "bytechef",
                 "bytechef.ai.memory.redis.password", "secret",
-                "bytechef.ai.memory.redis.key-prefix", "session:"));
+                "bytechef.ai.memory.redis.session-key-prefix", "session:",
+                "bytechef.ai.memory.session-max-archived-events", "250"));
 
         Binder binder = new Binder(mapConfigurationPropertySource);
 
@@ -60,6 +61,27 @@ class ApplicationPropertiesTest {
         assertThat(redis.getPort()).isEqualTo(6380);
         assertThat(redis.getUsername()).isEqualTo("bytechef");
         assertThat(redis.getPassword()).isEqualTo("secret");
-        assertThat(redis.getKeyPrefix()).isEqualTo("session:");
+        assertThat(redis.getSessionKeyPrefix()).isEqualTo("session:");
+        assertThat(memory.getSessionMaxArchivedEvents()).isEqualTo(250);
+    }
+
+    @Test
+    void testLeavesTheAiMemoryRedisPortNullUntilBound() {
+        MapConfigurationPropertySource mapConfigurationPropertySource = new MapConfigurationPropertySource(
+            Map.of("bytechef.ai.memory.provider", "redis"));
+
+        Binder binder = new Binder(mapConfigurationPropertySource);
+
+        ApplicationProperties applicationProperties = binder.bind(
+            "bytechef", Bindable.of(ApplicationProperties.class))
+            .get();
+
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        ApplicationProperties.Ai.Memory memory = ai.getMemory();
+
+        Redis redis = memory.getRedis();
+
+        assertThat(redis.getPort()).isNull();
     }
 }
