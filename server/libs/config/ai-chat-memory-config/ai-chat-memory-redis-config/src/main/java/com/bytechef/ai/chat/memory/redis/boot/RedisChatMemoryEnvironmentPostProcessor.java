@@ -18,7 +18,6 @@ package com.bytechef.ai.chat.memory.redis.boot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
@@ -35,23 +34,14 @@ public class RedisChatMemoryEnvironmentPostProcessor implements EnvironmentPostP
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.ai.memory.provider", String.class), "redis")) {
-            source.computeIfPresent(
-                "spring.autoconfigure.exclude",
-                (k, v) -> ((String) v).replace(
-                    "org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,", ""));
-        }
-
-        if (!Objects.equals(environment.getProperty("bytechef.ai.memory.provider", String.class), "redis")) {
-            source.put(
-                "spring.autoconfigure.exclude",
-                StringUtils.join(
-                    environment.getProperty("spring.autoconfigure.exclude"),
-                    ", org.springframework.ai.model.chat.memory.redis.autoconfigure.RedisChatMemoryAutoConfiguration"));
-        }
+        source.put(
+            "spring.autoconfigure.exclude",
+            StringUtils.join(
+                environment.getProperty("spring.autoconfigure.exclude"),
+                ", org.springframework.ai.model.chat.memory.repository.redis.autoconfigure.RedisChatMemoryRepositoryAutoConfiguration"));
 
         MapPropertySource mapPropertySource =
-            new MapPropertySource("Memory provider JDBC initialization Config", source);
+            new MapPropertySource("Memory provider Redis initialization Config", source);
 
         MutablePropertySources mutablePropertySources = environment.getPropertySources();
 
