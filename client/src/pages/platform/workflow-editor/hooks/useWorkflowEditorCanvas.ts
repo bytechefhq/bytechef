@@ -1,7 +1,12 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {COPILOT_PANEL_WIDTH, FINAL_PLACEHOLDER_NODE_ID, PROJECT_LEFT_SIDEBAR_WIDTH} from '@/shared/constants';
+import {
+    COPILOT_PANEL_WIDTH,
+    FINAL_PLACEHOLDER_NODE_ID,
+    LayoutDirectionType,
+    PROJECT_LEFT_SIDEBAR_WIDTH,
+} from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
@@ -52,6 +57,7 @@ interface UseWorkflowEditorCanvasParamsI {
     customCanvasWidth?: number;
     fitViewOnLoad?: boolean;
     leftSidebarOpen?: boolean;
+    readOnlyLayoutDirection?: LayoutDirectionType;
     readOnlyWorkflow?: Workflow;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 }
@@ -61,6 +67,7 @@ const useWorkflowEditorCanvas = ({
     customCanvasWidth,
     fitViewOnLoad,
     leftSidebarOpen,
+    readOnlyLayoutDirection,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
 }: UseWorkflowEditorCanvasParamsI) => {
@@ -574,10 +581,10 @@ const useWorkflowEditorCanvas = ({
             return;
         }
 
-        resetLayoutDirection(extractLayoutDirection(readOnlyWorkflow.definition));
+        resetLayoutDirection(readOnlyLayoutDirection ?? extractLayoutDirection(readOnlyWorkflow.definition));
 
         return () => applyStoredLayoutDirection();
-    }, [applyStoredLayoutDirection, readOnlyWorkflow, resetLayoutDirection]);
+    }, [applyStoredLayoutDirection, readOnlyLayoutDirection, readOnlyWorkflow, resetLayoutDirection]);
 
     useEffect(() => {
         if (workflowUuid && !readOnlyWorkflow) {

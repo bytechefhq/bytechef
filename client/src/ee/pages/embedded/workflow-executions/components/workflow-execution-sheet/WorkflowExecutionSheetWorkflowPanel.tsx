@@ -66,6 +66,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                                     componentDefinitions={componentDefinitions}
                                     customCanvasWidth={canvasWidth}
                                     fitViewOnLoad
+                                    readOnlyLayoutDirection="TB"
                                     readOnlyWorkflow={workflowDetails}
                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
                                 />
