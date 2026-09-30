@@ -112,7 +112,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
                 if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
                     responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);
-                } else if (disabled && webhookTriggerFlags.workflowSyncExecution()) {
+                } else if (disabled && (!head || webhookTriggerFlags.workflowSyncExecution())) {
                     responseEntity = ResponseEntity.status(HttpStatus.GONE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(Map.of("detail", "Workflow is disabled."));
