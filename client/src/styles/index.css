@@ -206,6 +206,7 @@
         --sidebar-accent-foreground: var(--accent-foreground);
         --sidebar-border: var(--border);
         --sidebar-ring: var(--ring);
+        --sidebar-active-foreground: var(--content-brand-primary);
         --rdg-color-scheme: light;
     }
 
@@ -349,15 +350,19 @@
     }
 
     [data-environment='staging'] {
-        --sidebar: 48 70% 95%;
-        --sidebar-accent: 48 75% 89%;
-        --sidebar-border: 48 60% 84%;
+        --sidebar: 48 85% 90%;
+        --sidebar-accent: 48 90% 81%;
+        --sidebar-border: 48 70% 74%;
+        --sidebar-ring: 38 92% 50%;
+        --sidebar-active-foreground: 32 95% 34%;
     }
 
     [data-environment='production'] {
-        --sidebar: 215 55% 95%;
-        --sidebar-accent: 215 60% 89%;
-        --sidebar-border: 215 50% 84%;
+        --sidebar: 0 80% 92%;
+        --sidebar-accent: 0 80% 86%;
+        --sidebar-border: 0 65% 80%;
+        --sidebar-ring: 0 72% 60%;
+        --sidebar-active-foreground: 0 72% 42%;
     }
 
     .dark [data-environment='development'],
@@ -369,16 +374,20 @@
 
     .dark [data-environment='staging'],
     .dark[data-environment='staging'] {
-        --sidebar: 43 40% 15%;
-        --sidebar-accent: 43 40% 22%;
-        --sidebar-border: 43 35% 27%;
+        --sidebar: 43 50% 18%;
+        --sidebar-accent: 43 50% 26%;
+        --sidebar-border: 43 45% 32%;
+        --sidebar-ring: 43 80% 50%;
+        --sidebar-active-foreground: 45 93% 65%;
     }
 
     .dark [data-environment='production'],
     .dark[data-environment='production'] {
-        --sidebar: 217 40% 16%;
-        --sidebar-accent: 217 42% 23%;
-        --sidebar-border: 217 38% 28%;
+        --sidebar: 0 45% 18%;
+        --sidebar-accent: 0 48% 26%;
+        --sidebar-border: 0 42% 32%;
+        --sidebar-ring: 0 65% 55%;
+        --sidebar-active-foreground: 0 85% 72%;
     }
 
 

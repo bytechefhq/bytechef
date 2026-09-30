@@ -77,7 +77,11 @@ const EnvironmentSelect = ({onChange, variant = 'default'}: EnvironmentSelectPro
             <DropdownMenuTrigger asChild>
                 <Button
                     aria-label={isIcon ? currentConfig.label : undefined}
-                    className={twMerge('h-auto gap-1 p-2', isCompact && 'px-1', isIcon && 'p-1')}
+                    className={twMerge(
+                        'h-auto gap-1 p-2 hover:bg-sidebar-accent focus-visible:border-sidebar-ring focus-visible:ring-sidebar-ring/50 data-[state=open]:bg-sidebar-accent dark:hover:bg-sidebar-accent',
+                        isCompact && 'px-1',
+                        isIcon && 'p-1'
+                    )}
                     variant="ghost"
                 >
                     {isIcon ? (
