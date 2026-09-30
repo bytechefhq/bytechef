@@ -18,31 +18,45 @@ package com.bytechef.platform.webhook.executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
+import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 public class WebhookWorkflowExecutorTest {
 
     private final WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
@@ -54,17 +68,26 @@ public class WebhookWorkflowExecutorTest {
     private JobSyncExecutor jobSyncExecutor;
     private WebhookWorkflowExecutor webhookWorkflowExecutor;
     private WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
+    private WorkflowService workflowService;
 
     @BeforeEach
     void beforeEach() {
         eventPublisher = mock(ApplicationEventPublisher.class);
         jobSyncExecutor = mock(JobSyncExecutor.class);
         webhookWorkflowSyncExecutor = mock(WebhookWorkflowSyncExecutor.class);
+        workflowService = mock(WorkflowService.class);
+
+        JobPrincipalAccessor jobPrincipalAccessor = mock(JobPrincipalAccessor.class);
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry = mock(JobPrincipalAccessorRegistry.class);
+
+        when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
+        when(jobPrincipalAccessor.getInputMap(anyLong(), anyString())).thenReturn(Map.of());
+        when(jobPrincipalAccessor.getWorkflowId(anyLong(), anyString())).thenReturn("workflow-id");
 
         webhookWorkflowExecutor = new WebhookWorkflowExecutorImpl(
-            eventPublisher, mock(JobPrincipalAccessorRegistry.class), jobSyncExecutor, mock(PrincipalJobFacade.class),
+            eventPublisher, jobPrincipalAccessorRegistry, jobSyncExecutor, mock(PrincipalJobFacade.class),
             mock(SseStreamBridgeRegistry.class), webhookWorkflowSyncExecutor, mock(TaskFileStorage.class),
-            mock(TriggerDefinitionService.class), mock(WorkflowService.class));
+            mock(TriggerDefinitionService.class), workflowService);
     }
 
     @Test
@@ -93,8 +116,45 @@ public class WebhookWorkflowExecutorTest {
     }
 
     @Test
+    public void testExecuteSyncWaitsAtMostTriggerTimeout() {
+        assertThat(executeSyncAndCaptureTimeout(Map.of("timeout", 1500))).isEqualTo(Duration.ofMillis(1500));
+    }
+
+    @Test
+    public void testExecuteSyncUsesDefaultTimeoutWhenTriggerTimeoutIsNotSet() {
+        assertThat(executeSyncAndCaptureTimeout(Map.of())).isNull();
+    }
+
+    @Test
+    public void testExecuteSyncUsesDefaultTimeoutWhenTriggerTimeoutIsNotNumber() {
+        assertThat(executeSyncAndCaptureTimeout(Map.of("timeout", "${input.timeout}"))).isNull();
+    }
+
+    @Test
     @Disabled
     public void testValidateAndExecuteAsync() {
         // TODO
+    }
+
+    private Duration executeSyncAndCaptureTimeout(Map<String, ?> triggerParameters) {
+        Workflow workflow = mock(Workflow.class);
+
+        when(workflow.getExtensions(any(), any(), any())).thenReturn(
+            List.of(
+                new WorkflowTrigger(
+                    Map.of(
+                        "name", "trigger_1", "type", "webhook/v1/awaitWorkflowAndRespond",
+                        "parameters", triggerParameters))));
+        when(workflowService.getWorkflow("workflow-id")).thenReturn(workflow);
+        when(webhookWorkflowSyncExecutor.execute(any(), any())).thenReturn(new TriggerOutput(Map.of(), null, false));
+        when(jobSyncExecutor.execute(any(), any(), anyBoolean(), any(), any())).thenReturn(new Job());
+
+        webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+
+        ArgumentCaptor<Duration> timeoutArgumentCaptor = ArgumentCaptor.forClass(Duration.class);
+
+        verify(jobSyncExecutor).execute(any(), any(), anyBoolean(), any(), timeoutArgumentCaptor.capture());
+
+        return timeoutArgumentCaptor.getValue();
     }
 }

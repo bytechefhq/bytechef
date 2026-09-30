@@ -81,6 +81,7 @@ import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -371,7 +372,7 @@ public class JobSyncExecutor {
      * @return the completed job after processing, including any webhook response if applicable
      */
     public Job awaitJob(long jobId, boolean checkForError) {
-        waitForJobCompletion(jobId);
+        waitForJobCompletion(jobId, null);
 
         Job job = jobService.getJob(jobId);
 
@@ -396,10 +397,29 @@ public class JobSyncExecutor {
     public Job awaitJob(
         long jobId, boolean checkForError, Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
 
+        return awaitJob(jobId, checkForError, taskExecutionCompleteCallback, null);
+    }
+
+    /**
+     * Waits for the completion of a job identified by the specified job ID while invoking a callback for each completed
+     * task execution, waiting at most the given timeout.
+     *
+     * @param jobId                         the unique identifier of the job to wait for completion
+     * @param checkForError                 a flag indicating whether to check for errors in the completed job
+     * @param taskExecutionCompleteCallback a callback invoked for each completed task execution during the job's
+     *                                      lifecycle
+     * @param timeout                       the maximum time to wait; {@code null} uses the configured timeout, and a
+     *                                      value longer than the configured timeout is capped at it
+     * @return the completed job after processing
+     */
+    public Job awaitJob(
+        long jobId, boolean checkForError, Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback,
+        @Nullable Duration timeout) {
+
         AutoCloseable listenerHandle = addTaskExecutionCompleteListener(jobId, taskExecutionCompleteCallback);
 
         try {
-            waitForJobCompletion(jobId);
+            waitForJobCompletion(jobId, timeout);
         } finally {
             try {
                 listenerHandle.close();
@@ -456,11 +476,33 @@ public class JobSyncExecutor {
         JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction, boolean checkForError,
         Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
 
+        return execute(jobParametersDTO, jobFactoryFunction, checkForError, taskExecutionCompleteCallback, null);
+    }
+
+    /**
+     * Executes a job like {@link #execute(JobParametersDTO, JobFactoryFunction, boolean, Consumer)}, waiting at most
+     * the given timeout for the job to complete.
+     *
+     * @param jobParametersDTO              the job parameters used to configure and initiate the job
+     * @param jobFactoryFunction            the function used to create an instance of the job
+     * @param checkForError                 a flag indicating whether to check for errors during execution
+     * @param taskExecutionCompleteCallback a callback invoked for each completed task execution during the job's
+     *                                      lifecycle
+     * @param timeout                       the maximum time to wait; {@code null} uses the configured timeout, and a
+     *                                      value longer than the configured timeout is capped at it
+     * @return the executed job
+     */
+    public Job execute(
+        JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction, boolean checkForError,
+        Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback, @Nullable Duration timeout) {
+
         JobFacade jobFacade = new JobFacadeImpl(
             coordinatorEventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction),
             taskExecutionService, taskFileStorage, workflowService);
 
-        return executeWithCallback(jobParametersDTO, jobFacade, checkForError, taskExecutionCompleteCallback);
+        long jobId = jobFacade.createJob(jobParametersDTO);
+
+        return awaitJob(jobId, checkForError, taskExecutionCompleteCallback, timeout);
     }
 
     /**
@@ -511,7 +553,7 @@ public class JobSyncExecutor {
     private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError) {
         long jobId = jobFacade.createJob(jobParametersDTO);
 
-        waitForJobCompletion(jobId);
+        waitForJobCompletion(jobId, null);
 
         Job job = jobService.getJob(jobId);
 
@@ -520,15 +562,6 @@ public class JobSyncExecutor {
         }
 
         return job;
-    }
-
-    private Job executeWithCallback(
-        JobParametersDTO jobParametersDTO, JobFacade jobFacade, boolean checkForError,
-        Consumer<TaskExecutionCompleteEvent> taskExecutionCompleteCallback) {
-
-        long jobId = jobFacade.createJob(jobParametersDTO);
-
-        return awaitJob(jobId, checkForError, taskExecutionCompleteCallback);
     }
 
     private void handleCoordinatorApplicationEvent(
@@ -887,7 +920,19 @@ public class JobSyncExecutor {
         });
     }
 
-    private void waitForJobCompletion(long jobId) {
+    private long getTimeoutMillis(@Nullable Duration timeout) {
+        if (timeout == null || timeout.isNegative() || timeout.isZero()) {
+            return this.timeout == NO_TIMEOUT ? NO_TIMEOUT : TimeUnit.SECONDS.toMillis(this.timeout);
+        }
+
+        if (this.timeout == NO_TIMEOUT) {
+            return timeout.toMillis();
+        }
+
+        return Math.min(timeout.toMillis(), TimeUnit.SECONDS.toMillis(this.timeout));
+    }
+
+    private void waitForJobCompletion(long jobId, @Nullable Duration timeout) {
         Job job = jobService.getJob(jobId);
 
         if (job.getStatus() == Job.Status.COMPLETED || job.getStatus() == Job.Status.FAILED ||
@@ -919,10 +964,12 @@ public class JobSyncExecutor {
         }
 
         try {
-            if (timeout == NO_TIMEOUT) {
+            long timeoutMillis = getTimeoutMillis(timeout);
+
+            if (timeoutMillis == NO_TIMEOUT) {
                 latch.await();
             } else {
-                if (!latch.await(timeout, TimeUnit.SECONDS)) {
+                if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
                     throw new TimeoutException("Timeout waiting for job completion: " + jobId);
                 }
             }

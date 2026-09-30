@@ -19,6 +19,8 @@ package com.bytechef.platform.job.sync.executor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -308,6 +310,46 @@ class JobSyncExecutorTest {
         assertThatThrownBy(() -> jobSyncExecutor.awaitJob(jobId, true))
             .isInstanceOf(ExecutionException.class)
             .hasMessageContaining("Job 707 failed");
+    }
+
+    @Test
+    void testAwaitJobStopsWaitingAfterPerCallTimeout() {
+        long jobId = 808L;
+
+        stubStartedJob(jobId);
+
+        long startNanos = System.nanoTime();
+
+        jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofMillis(100));
+
+        assertThat(Duration.ofNanos(System.nanoTime() - startNanos)).isLessThan(Duration.ofMillis(1500));
+
+        verify(jobService).update(argThat(job -> job.getStatus() == Job.Status.FAILED));
+    }
+
+    @Test
+    void testAwaitJobCapsPerCallTimeoutAtConfiguredTimeout() {
+        long jobId = 909L;
+
+        stubStartedJob(jobId);
+
+        long startNanos = System.nanoTime();
+
+        jobSyncExecutor.awaitJob(jobId, false, taskExecutionCompleteEvent -> {}, Duration.ofSeconds(30));
+
+        assertThat(Duration.ofNanos(System.nanoTime() - startNanos))
+            .isGreaterThanOrEqualTo(Duration.ofMillis(1900))
+            .isLessThan(Duration.ofSeconds(10));
+    }
+
+    private void stubStartedJob(long jobId) {
+        Job startedJob = new Job();
+
+        startedJob.setId(jobId);
+        startedJob.setStatus(Job.Status.STARTED);
+
+        when(jobService.getJob(jobId)).thenReturn(startedJob);
+        when(taskExecutionService.fetchLastJobTaskExecution(jobId)).thenReturn(java.util.Optional.empty());
     }
 
     private static void waitForLatchRegistration(JobSyncExecutor jobSyncExecutor, String key, Duration timeout)
