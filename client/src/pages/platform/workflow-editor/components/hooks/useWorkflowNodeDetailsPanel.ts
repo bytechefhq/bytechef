@@ -78,12 +78,12 @@ import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
 import changeComponentVersion from '../../utils/changeComponentVersion';
 import findWorkflowIssueParameterPaths, {getParameterPathRoot} from '../../utils/findWorkflowIssueParameterPaths';
-import getDataPillPanelNodeOutputs from '../../utils/getDataPillPanelNodeOutputs';
 import getDataPillsFromProperties from '../../utils/getDataPillsFromProperties';
 import getNodeIssues from '../../utils/getNodeIssues';
 import getOutputSchemaFromWorkflowNodeOutput from '../../utils/getOutputSchemaFromWorkflowNodeOutput';
 import getParametersWithDefaultValues from '../../utils/getParametersWithDefaultValues';
 import {getClusterElementRootNames} from '../../utils/getWorkflowIssueOwnerName';
+import hasDataPillPanelContent from '../../utils/hasDataPillPanelContent';
 import invalidateOperationQueries from '../../utils/invalidateOperationQueries';
 import saveClusterElementFieldChange from '../../utils/saveClusterElementFieldChange';
 import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcherSubtaskFieldChange';
@@ -1296,9 +1296,7 @@ export default function useWorkflowNodeDetailsPanel({
     }, [calculatedDataPills, setDataPills]);
 
     useEffect(() => {
-        const hasNodeOutputs = getDataPillPanelNodeOutputs(workflowNodeOutputs ?? [], currentNode?.name).length > 0;
-
-        setDataPillPanelHasContent(hasNodeOutputs || !!workflow.inputs?.length);
+        setDataPillPanelHasContent(hasDataPillPanelContent(workflowNodeOutputs, currentNode?.name, workflow.inputs));
     }, [currentNode?.name, setDataPillPanelHasContent, workflow.inputs, workflowNodeOutputs]);
 
     // Set sample outputs only when the calculated sample outputs change
