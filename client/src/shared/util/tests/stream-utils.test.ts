@@ -208,6 +208,25 @@ describe('stream-utils', () => {
             expect(result).toBe('');
         });
 
+        it('returns number data as text', () => {
+            expect(extractStreamChunk(42)).toBe('42');
+            expect(extractStreamChunk(0)).toBe('0');
+        });
+
+        it('returns boolean data as text', () => {
+            expect(extractStreamChunk(false)).toBe('false');
+        });
+
+        it('keeps numeric string chunks unchanged', () => {
+            expect(extractStreamChunk('42')).toBe('42');
+            expect(extractStreamChunk('1.50')).toBe('1.50');
+            expect(extractStreamChunk(' 2024')).toBe(' 2024');
+        });
+
+        it('unwraps JSON-quoted string chunks', () => {
+            expect(extractStreamChunk('"quoted"')).toBe('quoted');
+        });
+
         it('handles empty content array', () => {
             const data = {content: []};
 
