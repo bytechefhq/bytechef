@@ -73,6 +73,8 @@ public class AdminUserDTO {
 
     private Set<String> authorities;
 
+    private String uuid;
+
     @JsonCreator
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
@@ -91,6 +93,7 @@ public class AdminUserDTO {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
+        this.uuid = user.getUuidAsString();
         this.authorities = user.getAuthorityIds()
             .stream()
             .map(authorityId -> CollectionUtils.getFirst(
@@ -151,6 +154,10 @@ public class AdminUserDTO {
         return authorities;
     }
 
+    public String getUuid() {
+        return uuid;
+    }
+
     public boolean isActivated() {
         return activated;
     }
@@ -203,6 +210,10 @@ public class AdminUserDTO {
         this.authorities = authorities;
     }
 
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     // prettier-ignore
     @Override
     public String toString() {
@@ -219,6 +230,7 @@ public class AdminUserDTO {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
+            ", uuid='" + uuid + '\'' +
             "}";
     }
 }
