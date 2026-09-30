@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 class JobServiceTest {
 
     private static final long JOB_ID = 7L;
+    private static final Instant ORIGINAL_START_DATE = Instant.parse("2026-09-07T18:47:00Z");
 
     private final JobRepository jobRepository = mock(JobRepository.class);
     private final JobService jobService = new JobServiceImpl(jobRepository);
@@ -49,18 +50,20 @@ class JobServiceTest {
         assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(resumedJob.getCurrentTask()).isEqualTo(2);
         assertThat(resumedJob.getEndDate()).isNull();
+        assertThat(resumedJob.getStartDate()).isAfter(ORIGINAL_START_DATE);
 
         verify(jobRepository).save(job);
     }
 
     @Test
-    void testResumeToStatusStartedRestartsStoppedJob() {
+    void testResumeToStatusStartedContinuesStoppedJob() {
         Job job = stubJob(Job.Status.STOPPED);
 
         Job resumedJob = jobService.resumeToStatusStarted(JOB_ID);
 
         assertThat(resumedJob.getStatus()).isEqualTo(Job.Status.STARTED);
         assertThat(resumedJob.getEndDate()).isNull();
+        assertThat(resumedJob.getStartDate()).isEqualTo(ORIGINAL_START_DATE);
 
         verify(jobRepository).save(job);
     }
@@ -81,6 +84,7 @@ class JobServiceTest {
         job.setCurrentTask(2);
         job.setEndDate(Instant.now());
         job.setId(JOB_ID);
+        job.setStartDate(ORIGINAL_START_DATE);
         job.setStatus(status);
 
         when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(job));
