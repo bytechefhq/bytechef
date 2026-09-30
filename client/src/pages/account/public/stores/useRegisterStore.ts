@@ -6,12 +6,15 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 export interface RegisterI {
+    registerEmailAlreadyUsed: boolean;
     registerErrorMessage: string;
     registerSuccess: boolean;
 
     register: (email: string, password: string) => Promise<void>;
     reset: () => void;
 }
+
+const EMAIL_ALREADY_USED_ERROR_KEY = 101;
 
 const fetchRegister = async (data: string): Promise<Response> => {
     return await fetch('/api/register', {
@@ -27,6 +30,7 @@ const fetchRegister = async (data: string): Promise<Response> => {
 export const useRegisterStore = create<RegisterI>()(
     devtools(
         (set) => ({
+            registerEmailAlreadyUsed: false,
             registerSuccess: false,
             registerErrorMessage: '',
 
@@ -39,9 +43,15 @@ export const useRegisterStore = create<RegisterI>()(
                             }));
                         } else {
                             response.json().then((data) => {
-                                set(() => ({
-                                    registerErrorMessage: data.detail,
-                                }));
+                                if (data.entityClass === 'User' && data.errorKey === EMAIL_ALREADY_USED_ERROR_KEY) {
+                                    set(() => ({
+                                        registerEmailAlreadyUsed: true,
+                                    }));
+                                } else {
+                                    set(() => ({
+                                        registerErrorMessage: data.detail,
+                                    }));
+                                }
                             });
                         }
                     }
@@ -50,6 +60,7 @@ export const useRegisterStore = create<RegisterI>()(
 
             reset: () => {
                 set(() => ({
+                    registerEmailAlreadyUsed: false,
                     registerErrorMessage: '',
                     registerSuccess: false,
                 }));
