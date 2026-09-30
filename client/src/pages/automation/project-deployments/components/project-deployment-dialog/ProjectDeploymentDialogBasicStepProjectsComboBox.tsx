@@ -28,7 +28,7 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
 }: ProjectDeploymentDialogBasicStepProjectsComboBoxProps) =>
     projects ? (
         <ComboBox
-            emptyMessage="No published projects found. Please publish a project first."
+            emptyMessage="No projects with workflows yet. Add a workflow to a project and publish it."
             items={projects.map(
                 (project) =>
                     ({

@@ -34,6 +34,7 @@ import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConve
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
+import ProjectListItemPublishMenuItem from '@/pages/automation/projects/components/project-list/ProjectListItemPublishMenuItem';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -63,7 +64,6 @@ import {
     LoaderCircleIcon,
     PlusIcon,
     RocketIcon,
-    SendIcon,
     Share2Icon,
     Trash2Icon,
     UploadIcon,
@@ -496,13 +496,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="p-0">
-                                <DropdownMenuItem
-                                    aria-label="Publish Project"
-                                    className="dropdown-menu-item"
+                                <ProjectListItemPublishMenuItem
+                                    hasWorkflows={(project.projectWorkflowIds?.length ?? 0) > 0}
                                     onClick={() => setShowPublishProjectDialog(true)}
-                                >
-                                    <SendIcon /> Publish
-                                </DropdownMenuItem>
+                                />
 
                                 <DropdownMenuSeparator className="m-0" />
 
