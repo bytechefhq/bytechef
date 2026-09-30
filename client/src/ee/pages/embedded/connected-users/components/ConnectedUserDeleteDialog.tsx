@@ -1,13 +1,4 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {useDeleteConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -30,23 +21,12 @@ const ConnectedUserDeleteDialog = ({connectedUserId, onClose}: {connectedUserId:
     };
 
     return (
-        <AlertDialog onOpenChange={onClose} open={true}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the connected user.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <DestructiveAlertDialogAction onClick={handleClick}>Delete</DestructiveAlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <DeleteAlertDialog
+            description="This action cannot be undone. This will permanently delete the connected user."
+            onCancel={onClose}
+            onDelete={handleClick}
+            open
+        />
     );
 };
 
