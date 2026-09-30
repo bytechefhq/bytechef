@@ -250,7 +250,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     </div>
                 </div>
 
-                <AlertDialog open={showDeleteDialog}>
+                <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -273,7 +273,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     </AlertDialogContent>
                 </AlertDialog>
 
-                <AlertDialog open={showDisconnectDialog}>
+                <AlertDialog onOpenChange={setShowDisconnectDialog} open={showDisconnectDialog}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>

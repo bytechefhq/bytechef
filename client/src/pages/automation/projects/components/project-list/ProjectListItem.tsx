@@ -601,7 +601,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 </div>
             </div>
 
-            <AlertDialog open={showDeleteDialog}>
+            <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

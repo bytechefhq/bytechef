@@ -16,7 +16,14 @@ interface WorkflowTestRunLeaveDialogProps {
 }
 
 const WorkflowTestRunLeaveDialog = ({onCancel, onConfirm, open}: WorkflowTestRunLeaveDialogProps) => (
-    <AlertDialog open={open}>
+    <AlertDialog
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                onCancel();
+            }
+        }}
+        open={open}
+    >
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>Workflow is running</AlertDialogTitle>

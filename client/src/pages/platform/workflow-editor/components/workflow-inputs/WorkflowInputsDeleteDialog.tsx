@@ -25,7 +25,14 @@ const WorkflowInputsDeleteDialog = ({
     isDeleteDialogOpen,
     workflowInputs,
 }: WorkflowInputsDeleteDialogProps) => (
-    <AlertDialog open={isDeleteDialogOpen}>
+    <AlertDialog
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                closeDeleteDialog();
+            }
+        }}
+        open={isDeleteDialogOpen}
+    >
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
