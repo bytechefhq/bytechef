@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -33,21 +34,17 @@ class AbstractListMap extends HashMap<String, List<String>> {
     }
 
     public List<String> allValues(String name) {
-        return values()
-            .stream()
-            .flatMap(List::stream)
-            .toList();
+        List<String> values = getValues(name);
+
+        return values == null ? List.of() : List.copyOf(values);
     }
 
     public Optional<String> firstValue(String name) {
         Optional<String> optional = Optional.empty();
+        List<String> values = getValues(name);
 
-        if (containsKey(name)) {
-            List<String> values = get(name);
-
-            if (values != null && !values.isEmpty()) {
-                optional = Optional.of(values.getFirst());
-            }
+        if (values != null && !values.isEmpty()) {
+            optional = Optional.of(values.getFirst());
         }
 
         return optional;
@@ -57,6 +54,10 @@ class AbstractListMap extends HashMap<String, List<String>> {
         return firstValue(name).stream()
             .mapToLong(Long::valueOf)
             .findFirst();
+    }
+
+    protected @Nullable List<String> getValues(String name) {
+        return get(name);
     }
 
     public Map<String, List<String>> toMap() {
