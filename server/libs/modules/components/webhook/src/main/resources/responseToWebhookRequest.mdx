@@ -1,0 +1,39 @@
+#### What the Caller Receives
+
+This action sets the HTTP response for the [Await Workflow and Respond](#await-workflow-and-respond) trigger. With the other Webhook triggers, ByteChef sends the response before the workflow runs, so this action has no effect on the response.
+
+ByteChef sends the response when the workflow run is complete. The table shows the response for each **Response Type**. For all types except **Redirect**, the **Headers** that you configure are added to the response.
+
+| Response Type | Status | Content-Type | Body |
+|:---|:---|:---|:---|
+| **JSON** | **Status Code** (default `200`) | `application/json` | The **Body** object as JSON. If the body contains a file, the file is replaced with a URL that downloads it. |
+| **Raw** | **Status Code** (default `200`) | `text/plain` | The **Body** text. |
+| **Binary** | **Status Code** (default `200`) | The MIME type of the file, or `application/octet-stream` if it is unknown | The content of the file. |
+| **Redirect** | `302 Found` | None | Empty. The `Location` header contains the **Redirect URL**. |
+| **No Data** | **Status Code** (default `200`) | None | Empty. |
+
+##### Notes for Postman and Bruno
+
+- **Binary**: Postman and Bruno show images and PDFs as a preview. To save the file, use **Save response to file** in Postman, or the save option in the Bruno response pane.
+- **Redirect**: Postman and Bruno follow redirects automatically. To see the `302 Found` response and its `Location` header, turn off redirect following in the settings of the request.
+- **Redirect**: The **Redirect URL** must be a relative path, such as `/thank-you`, or a URL on the same host as ByteChef. For other URLs, ByteChef returns `400 Bad Request` with the body `Invalid redirect URL`.
+- **Status Code**: The **Redirect** type always uses `302 Found`. The **Status Code** property has no effect.
+
+##### Example
+
+A **Response to Webhook Request** step with these settings:
+
+- **Response Type**: **Raw**
+- **Status Code**: `202`
+- **Headers**: `X-Request-Source` = `bytechef`
+- **Body**: `Order received`
+
+returns this response:
+
+```http
+HTTP/1.1 202 Accepted
+Content-Type: text/plain
+X-Request-Source: bytechef
+
+Order received
+```

@@ -60,6 +60,45 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### What the Caller Receives
+
+This action sets the HTTP response for the [Await Workflow and Respond](#await-workflow-and-respond) trigger. With the other Webhook triggers, ByteChef sends the response before the workflow runs, so this action has no effect on the response.
+
+ByteChef sends the response when the workflow run is complete. The table shows the response for each **Response Type**. For all types except **Redirect**, the **Headers** that you configure are added to the response.
+
+| Response Type | Status | Content-Type | Body |
+|:---|:---|:---|:---|
+| **JSON** | **Status Code** (default `200`) | `application/json` | The **Body** object as JSON. If the body contains a file, the file is replaced with a URL that downloads it. |
+| **Raw** | **Status Code** (default `200`) | `text/plain` | The **Body** text. |
+| **Binary** | **Status Code** (default `200`) | The MIME type of the file, or `application/octet-stream` if it is unknown | The content of the file. |
+| **Redirect** | `302 Found` | None | Empty. The `Location` header contains the **Redirect URL**. |
+| **No Data** | **Status Code** (default `200`) | None | Empty. |
+
+##### Notes for Postman and Bruno
+
+- **Binary**: Postman and Bruno show images and PDFs as a preview. To save the file, use **Save response to file** in Postman, or the save option in the Bruno response pane.
+- **Redirect**: Postman and Bruno follow redirects automatically. To see the `302 Found` response and its `Location` header, turn off redirect following in the settings of the request.
+- **Redirect**: The **Redirect URL** must be a relative path, such as `/thank-you`, or a URL on the same host as ByteChef. For other URLs, ByteChef returns `400 Bad Request` with the body `Invalid redirect URL`.
+- **Status Code**: The **Redirect** type always uses `302 Found`. The **Status Code** property has no effect.
+
+##### Example
+
+A **Response to Webhook Request** step with these settings:
+
+- **Response Type**: **Raw**
+- **Status Code**: `202`
+- **Headers**: `X-Request-Source` = `bytechef`
+- **Body**: `Order received`
+
+returns this response:
+
+```http
+HTTP/1.1 202 Accepted
+Content-Type: text/plain
+X-Request-Source: bytechef
+
+Order received
+```
 
 
 
@@ -104,6 +143,31 @@ Use the **static workflow webhook trigger URL** for this trigger type. This URL 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/db326975-06b1-4c41-880e-484eb14bd33d?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
 </div>
+
+#### Testing with Postman or Bruno
+
+For the URLs, body formats and trigger output, see [Testing Webhooks with Postman or Bruno](#testing-webhooks-with-postman-or-bruno).
+
+##### Request
+
+| Setting | Value |
+|:---|:---|
+| Method | `POST` or `GET` |
+| URL | The static workflow webhook trigger URL |
+| Required headers | None. Add `Content-Type` if you send a body. |
+| Body | Optional. Use any format. |
+
+##### Response
+
+ByteChef sends the response **before** the workflow runs. The response does not show the result of the workflow.
+
+| Situation | Status | Body |
+|:---|:---|:---|
+| The request is received | `200 OK` | Empty |
+| The workflow is disabled | `200 OK` | Empty. The workflow does not run. |
+| A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
+
+A `200 OK` response does not confirm that the workflow ran. To see the result, open **Executions** in ByteChef.
 
 
 
@@ -154,6 +218,38 @@ Use the **Static workflow webhook trigger URL** for this trigger type. This URL 
     <iframe src="https://www.guidejar.com/embed/86347f45-900a-4bca-8763-5f3982305010?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
 </div>
 
+#### Testing with Postman or Bruno
+
+For the URLs, body formats and trigger output, see [Testing Webhooks with Postman or Bruno](#testing-webhooks-with-postman-or-bruno).
+
+##### Request
+
+| Setting | Value |
+|:---|:---|
+| Method | `POST` or `GET` |
+| URL | The static workflow webhook trigger URL |
+| Required headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Add `Content-Type` if you send a body. |
+| Body | Optional. Use any format. |
+
+##### Response
+
+ByteChef checks the token, then sends the response. The workflow runs **after** the response is sent, so the response does not show the result of the workflow.
+
+| Situation | Status | Body |
+|:---|:---|:---|
+| The token is correct | `200 OK` | Empty. The workflow starts. |
+| The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
+| The workflow is disabled | `200 OK` | Empty. The token is not checked and the workflow does not run. |
+| A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
+
+If you get `400 Bad Request`, make sure that:
+
+- The header name is exactly `X-Csrf-Token`.
+- The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
+- The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
+
+The test URL does not check the token. To test the validation, use the static workflow webhook trigger URL.
+
 
 
 ### Await Workflow and Respond
@@ -199,13 +295,177 @@ Type: STATIC_WEBHOOK
 ```
 #### Webhook Trigger Execution Modes
 
-Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token HTTP header`. After successful validation, the workflow starts executing, but the HTTP response is delayed until the [**Webhook/Response to Webhook Request**](/reference/components/webhook_v1#response-to-webhook-request) component is reached. In that component, users can define the exact response body, status code, and output returned to the sender.
+Use the **Static workflow webhook trigger URL** for this trigger type. This URL becomes available only after the workflow is **published and deployed**. Incoming requests are first validated by checking the CSRF token sent in the `X-Csrf-Token HTTP header`. After successful validation, the workflow starts executing, and the HTTP response is sent when the workflow run is complete. Add the [**Webhook/Response to Webhook Request**](/reference/components/webhook_v1#response-to-webhook-request) action to the workflow to define the exact response body, status code and headers returned to the sender.
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/60d86013-a975-4e96-a7ac-7a7bccb982d7?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
 </div>
 
+#### Testing with Postman or Bruno
+
+For the URLs, body formats and trigger output, see [Testing Webhooks with Postman or Bruno](#testing-webhooks-with-postman-or-bruno).
+
+##### Request
+
+| Setting | Value |
+|:---|:---|
+| Method | `POST` or `GET` |
+| URL | The static workflow webhook trigger URL |
+| Required headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Add `Content-Type` if you send a body. |
+| Body | Optional. Use any format. |
+
+##### Response
+
+The HTTP connection stays open while the workflow runs. ByteChef sends the response when **all steps of the workflow are complete**, not when the **Response to Webhook Request** step runs. Steps after **Response to Webhook Request** also make the response wait. ByteChef waits at most 5 minutes.
+
+| Situation | Status | Body |
+|:---|:---|:---|
+| The workflow runs a **Response to Webhook Request** step | The **Status Code** of that step | The body and headers of that step. See [Response to Webhook Request](#response-to-webhook-request). |
+| The workflow has no **Response to Webhook Request** step | `200 OK` | The outputs of the workflow as JSON. If the workflow has no outputs, the body is empty. |
+| The `X-Csrf-Token` header is missing, or its value is incorrect | `500 Internal Server Error` | A JSON error object with `"detail": "Invalid trigger signature."`. The workflow does not run. |
+| A step of the workflow fails | `500 Internal Server Error` | A JSON error object. The `detail` field contains the error message of the step that failed. |
+| The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}` |
+
+If the workflow runs more than one **Response to Webhook Request** step, for example in different branches, the last step that runs sets the response.
+
+The test URL does not wait for the workflow and does not apply **Response to Webhook Request**. It always returns `200 OK` with an empty body. To test the response, use the static workflow webhook trigger URL.
+
+##### Example
+
+Configure the trigger with the **CSRF Token** `my-secret-token`. Add a **Response to Webhook Request** step with **Response Type** set to **JSON**, **Status Code** set to `201`, and this **Body**:
+
+```json
+{
+  "received": "${trigger_1.body.orderId}",
+  "status": "accepted"
+}
+```
+
+Send this request:
+
+```bash
+curl -i -X POST "https://<your-bytechef-host>/webhooks/<id>" \
+  -H "Content-Type: application/json" \
+  -H "X-Csrf-Token: my-secret-token" \
+  -d '{"orderId": 1001}'
+```
+
+The response is:
+
+```http
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{"received":1001,"status":"accepted"}
+```
 
 
 
 
+
+<hr />
+
+# Additional Instructions
+
+## Testing Webhooks with Postman or Bruno
+
+Each Webhook trigger listens on a URL. You can use any HTTP client, such as [Postman](https://www.postman.com/), [Bruno](https://www.usebruno.com/) or `curl`, to send a request to it. This section describes what to send. See the section for each trigger above for the response that you get.
+
+### Which URL to Use
+
+| URL | Where to find it | What it does |
+|:---|:---|:---|
+| **Webhook test URL** | In the workflow editor, open the trigger, go to the **Output** tab and click **Test**. The URL is shown under **Action Required**. | Records the request as the sample output of the trigger. The workflow does **not** run. The CSRF token is **not** checked. The response is always `200 OK` with an empty body. |
+| **Static workflow webhook trigger URL** | After you publish and deploy the workflow, go to **Deployments**, find the workflow and click the **Copy static workflow webhook trigger url** icon. | Runs the deployed workflow. The response depends on the trigger type. |
+
+The production URL has the form `https://<your-bytechef-host>/webhooks/<id>`. The test URL has the form `https://<your-bytechef-host>/webhooks/<id>/test/environments/<environmentId>`. Always copy the URL from ByteChef. Do not build it manually.
+
+<Callout type="warn">
+The test URL records a request only while the trigger waits for test data (after you click **Test**, before you click **Cancel**). Use the test URL first, so that the next steps of the workflow can use the fields of your sample request.
+</Callout>
+
+### HTTP Methods
+
+| Method | Result |
+|:---|:---|
+| `POST` | Runs the trigger. Use this method for requests that have a body. |
+| `GET` | Runs the trigger. The query string parameters are available in `parameters`. |
+| `HEAD` | Returns `200 OK`. The workflow does not run. |
+| `PUT`, `PATCH`, `DELETE` | Not supported. The server returns `405 Method Not Allowed`. |
+
+### Headers
+
+- **Content-Type**: Tells ByteChef how to read the body. Postman and Bruno set it automatically when you select a body type.
+- **X-Csrf-Token**: Required for the **Validate and Respond** trigger and the **Await Workflow and Respond** trigger. The value must be the same as the value in the **CSRF Token** property of the trigger. Write the header name exactly as `X-Csrf-Token`. The name and the value are case-sensitive.
+- All other headers are sent to the workflow in the `headers` output.
+
+### Body Formats
+
+The `Content-Type` header controls how ByteChef reads the body:
+
+| Postman / Bruno body type | Content-Type | Value of `body` in the trigger output |
+|:---|:---|:---|
+| **raw → JSON** / **JSON** | `application/json` | The parsed JSON object or array. |
+| **raw → XML** / **XML** | `application/xml` | The parsed XML, as an object. |
+| **x-www-form-urlencoded** / **Form URL Encoded** | `application/x-www-form-urlencoded` | An object with one key for each form field. Numbers and booleans are converted from text. Keys such as `customer[name]` or `customer.name` become nested objects. |
+| **form-data** / **Multipart Form** | `multipart/form-data` | An object with one key for each form field. File fields become file objects that the next steps can use. |
+| **binary** / **File** | `application/pdf`, `application/octet-stream`, other `application/*` | A file object that contains the uploaded content. |
+| **raw → Text** / **Text** | `text/plain`, other `text/*` | The body as a string. |
+| **none** / **No Body** | (none) | `body` is not included. |
+
+### Trigger Output
+
+All three triggers give the same output to the next steps of the workflow:
+
+```json
+{
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "X-Csrf-Token": "my-secret-token"
+  },
+  "parameters": {
+    "source": "postman"
+  },
+  "body": {
+    "orderId": 1001,
+    "status": "paid"
+  }
+}
+```
+
+- `method`: The HTTP method of the request.
+- `headers`: The request headers, with the names spelled as the client sent them. A header with one value is a string. A header with more than one value is a list.
+- `parameters`: The query string parameters. A parameter with one value is a string. A parameter with more than one value is a list.
+- `body`: The request body, in the format that the table above shows.
+
+In the next steps, refer to these fields with expressions such as `${trigger_1.body.orderId}` or `${trigger_1.parameters.source}`.
+
+### Example Request
+
+Configure Postman or Bruno as follows:
+
+1. Set the method to `POST`.
+2. Paste the webhook URL from ByteChef. To add query parameters, append them, for example `?source=postman`.
+3. On the **Headers** tab, add `X-Csrf-Token` if the trigger requires it.
+4. On the **Body** tab, select **raw → JSON** in Postman or **JSON** in Bruno, and enter the body:
+
+```json
+{
+  "orderId": 1001,
+  "status": "paid"
+}
+```
+
+5. Click **Send**.
+
+The same request with `curl`:
+
+```bash
+curl -i -X POST "https://<your-bytechef-host>/webhooks/<id>?source=postman" \
+  -H "Content-Type: application/json" \
+  -H "X-Csrf-Token: my-secret-token" \
+  -d '{"orderId": 1001, "status": "paid"}'
+```
+
+The `-i` option shows the response status and headers. Use it to compare the response with the tables for each trigger.
