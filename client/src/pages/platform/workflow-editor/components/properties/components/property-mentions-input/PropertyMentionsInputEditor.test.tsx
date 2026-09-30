@@ -871,4 +871,25 @@ describe('one-pill editor', () => {
         expect(pressKey('a')).toBe(true);
         expect(pressKey('$')).toBe(true);
     });
+
+    it('offers the data pills for a $ handed over as it mounts', async () => {
+        useWorkflowDataStore.setState({
+            dataPills: [{id: 'textGeneration_1', value: 'textGeneration_1'}],
+        } as unknown as Partial<ReturnType<typeof useWorkflowDataStore.getState>>);
+
+        const {container} = renderEditor({
+            controlType: 'OBJECT_BUILDER',
+            focusRequest: {initialInput: '$', token: 1},
+            singlePill: true,
+            type: 'OBJECT',
+        });
+
+        await waitFor(() => expect(container.querySelector('.ProseMirror')?.textContent).toBe('$'));
+
+        await waitFor(() =>
+            expect(document.querySelector('.property-mentions-suggestion-menu')?.textContent).toContain(
+                'textGeneration_1'
+            )
+        );
+    });
 });

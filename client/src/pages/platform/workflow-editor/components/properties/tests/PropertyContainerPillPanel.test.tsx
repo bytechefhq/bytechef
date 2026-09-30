@@ -70,7 +70,7 @@ describe('picking an empty container opens the data pill panel', () => {
 
         await settle();
 
-        fireEvent.mouseDown(screen.getByText('Drop or click a data pill'));
+        fireEvent.mouseDown(screen.getByText('Drop or click a data pill, or type $'));
 
         expect(useDataPillPanelStore.getState().dataPillPanelOpen).toBe(true);
     });
@@ -118,6 +118,6 @@ describe('picking an empty container opens the data pill panel', () => {
 
         await settle();
 
-        expect(screen.getByText('Drop or click a data pill')).toHaveClass('mb-2');
+        expect(screen.getByText('Drop or click a data pill, or type $')).toHaveClass('mb-2');
     });
 });

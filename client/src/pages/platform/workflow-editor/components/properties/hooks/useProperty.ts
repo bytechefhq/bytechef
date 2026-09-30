@@ -152,6 +152,7 @@ type UsePropertyReturnType = {
     setLookupDependsOnValues: Dispatch<SetStateAction<Array<unknown> | undefined>>;
     setSelectValue: (value: string) => void;
     showFormulaSwitch: boolean;
+    startPillEntry: () => void;
     type?: PropertyAllType['type'];
     typeIcon: ReactNode;
     validatePropertyValue: (value: string | number) => boolean;
@@ -1109,6 +1110,12 @@ export const useProperty = ({
         [cancelPendingSaves, requestEditorFocus, saveResolvedValue]
     );
 
+    const startPillEntry = useCallback(() => {
+        setPillEntry(true);
+
+        requestEditorFocus('$');
+    }, [requestEditorFocus]);
+
     const handleNativeKeyDown = useCallback(
         (event: KeyboardEvent<HTMLInputElement>) => {
             const isEmpty = (event.currentTarget as HTMLInputElement).value === '';
@@ -1131,11 +1138,9 @@ export const useProperty = ({
                 return;
             }
 
-            setPillEntry(true);
-
-            requestEditorFocus('$');
+            startPillEntry();
         },
-        [expressionEnabled, handleFormulaSwitch, isNumericalInput, requestEditorFocus, showFormulaSwitch]
+        [expressionEnabled, handleFormulaSwitch, isNumericalInput, showFormulaSwitch, startPillEntry]
     );
 
     const handleSinglePillAbandoned = useCallback(() => {
@@ -1966,6 +1971,7 @@ export const useProperty = ({
         setLookupDependsOnValues,
         setSelectValue,
         showFormulaSwitch,
+        startPillEntry,
         type,
         typeIcon,
         validatePropertyValue,
