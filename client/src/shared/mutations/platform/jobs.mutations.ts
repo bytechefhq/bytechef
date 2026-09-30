@@ -6,6 +6,17 @@ interface JobMutationProps {
     onSuccess?: (result: void, variables: number) => void;
 }
 
+export const useRestartJobMutation = (jobMutationProps: JobMutationProps) =>
+    useMutation<void, Error, number>({
+        mutationFn: (id: number) => {
+            return new JobApi().restartJob({
+                id,
+            });
+        },
+        onError: jobMutationProps?.onError,
+        onSuccess: jobMutationProps?.onSuccess,
+    });
+
 export const useStopJobMutation = (jobMutationProps: JobMutationProps) =>
     useMutation<void, Error, number>({
         mutationFn: (id: number) => {
