@@ -46,6 +46,7 @@ import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorReg
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -65,6 +66,8 @@ import org.springframework.context.ApplicationEventPublisher;
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
+
+    private static final String TIMEOUT = "timeout";
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -152,6 +155,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
         String workflowId = getWorkflowId(workflowExecutionId);
 
+        Duration timeout = getTimeout(workflowExecutionId, workflowId);
+
         if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> triggerOutputValues) {
             List<Map<String, ?>> outputsList = new ArrayList<>();
 
@@ -159,7 +164,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                 AtomicReference<@Nullable Object> collectedWebhookResponse = new AtomicReference<>();
 
                 Job job = executeSyncJob(
-                    workflowExecutionId, workflowId, inputMap, triggerOutputValue, collectedWebhookResponse);
+                    workflowExecutionId, workflowId, inputMap, triggerOutputValue, collectedWebhookResponse, timeout);
 
                 Object webhookResponse = collectedWebhookResponse.get();
 
@@ -179,7 +184,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             AtomicReference<@Nullable Object> collectedWebhookResponse = new AtomicReference<>();
 
             Job job = executeSyncJob(
-                workflowExecutionId, workflowId, inputMap, triggerOutput.value(), collectedWebhookResponse);
+                workflowExecutionId, workflowId, inputMap, triggerOutput.value(), collectedWebhookResponse, timeout);
 
             Object webhookResponse = collectedWebhookResponse.get();
 
@@ -268,7 +273,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
      */
     private Job executeSyncJob(
         WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap, Object triggerOutputValue,
-        AtomicReference<@Nullable Object> collectedWebhookResponse) {
+        AtomicReference<@Nullable Object> collectedWebhookResponse, @Nullable Duration timeout) {
 
         return jobSyncExecutor.execute(
             createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
@@ -276,7 +281,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
                 jobParameters, workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getType()),
             true,
             taskExecutionCompleteEvent -> collectWebhookResponse(
-                taskExecutionCompleteEvent, collectedWebhookResponse));
+                taskExecutionCompleteEvent, collectedWebhookResponse),
+            timeout);
     }
 
     @Override
@@ -342,6 +348,19 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+    }
+
+    private @Nullable Duration getTimeout(WorkflowExecutionId workflowExecutionId, String workflowId) {
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(
+            workflowExecutionId.getTriggerName(), workflowService.getWorkflow(workflowId));
+
+        Map<String, ?> parameters = workflowTrigger.getParameters();
+
+        if (parameters.get(TIMEOUT) instanceof Number timeout && timeout.longValue() > 0) {
+            return Duration.ofMillis(timeout.longValue());
+        }
+
+        return null;
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
