@@ -1,4 +1,4 @@
-import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {Trash2Icon} from 'lucide-react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
@@ -147,6 +147,34 @@ describe('DeleteAlertDialog confirmation', () => {
         render(<DeleteAlertDialog {...defaultProps} />);
 
         expect(screen.getByRole('button', {name: 'Delete'})).toHaveClass('bg-surface-destructive-primary');
+    });
+});
+
+describe('DeleteAlertDialog alert semantics', () => {
+    it('should keep the alertdialog role rather than a plain dialog', () => {
+        render(<DeleteAlertDialog {...defaultProps} />);
+
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('should focus the close button on open', async () => {
+        render(<DeleteAlertDialog {...defaultProps} />);
+
+        await waitFor(() => expect(screen.getByRole('button', {name: 'Close'})).toHaveFocus());
+    });
+
+    // There is deliberately no outside-click test here. Radix's outside dismissal never fires under jsdom — with
+    // the onInteractOutside guard removed, pointerdown on the body, on the overlay and on the document all leave the
+    // dialog open — so any such test would pass whether or not the guard exists. The guard is verified in a browser.
+
+    it('should leave closing to the caller when the confirming action is clicked', async () => {
+        render(<DeleteAlertDialog {...defaultProps} />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
+
+        expect(onDelete).toHaveBeenCalledTimes(1);
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     });
 });
 
