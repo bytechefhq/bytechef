@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 interface DeleteWorkflowAlertDialogProps {
     onClose: () => void;
@@ -6,10 +6,10 @@ interface DeleteWorkflowAlertDialogProps {
 }
 
 const DeleteWorkflowAlertDialog = ({onClose, onDelete}: DeleteWorkflowAlertDialogProps) => (
-    <DeleteAlertDialog
+    <AlertDialog
         description="This action cannot be undone. This will permanently delete the workflow."
         onCancel={onClose}
-        onDelete={onDelete}
+        onConfirm={onDelete}
         open
     />
 );

@@ -1,16 +1,6 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import {LinkIcon, UnlinkIcon} from 'lucide-react';
 import {useCallback, useEffect, useState} from 'react';
 import {toast} from 'sonner';
@@ -23,6 +13,7 @@ interface LinkedAccountI {
 
 const AccountProfileLinkedAccounts = () => {
     const [linkedAccount, setLinkedAccount] = useState<LinkedAccountI | null>(null);
+    const [showUnlinkDialog, setShowUnlinkDialog] = useState(false);
 
     const fetchLinkedAccounts = useCallback(async () => {
         try {
@@ -88,30 +79,28 @@ const AccountProfileLinkedAccounts = () => {
                         </div>
 
                         {isLinked && (
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button disabled={!linkedAccount.hasPassword} label="Unlink" variant="outline" />
-                                </AlertDialogTrigger>
+                            <>
+                                <Button
+                                    disabled={!linkedAccount.hasPassword}
+                                    label="Unlink"
+                                    onClick={() => setShowUnlinkDialog(true)}
+                                    variant="outline"
+                                />
 
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Unlink Provider</AlertDialogTitle>
+                                <AlertDialog
+                                    confirmButtonVariant="default"
+                                    confirmLabel="Unlink"
+                                    description={`Are you sure you want to unlink ${linkedAccount.authProvider}? You will need to use your password to log in.`}
+                                    onCancel={() => setShowUnlinkDialog(false)}
+                                    onConfirm={() => {
+                                        setShowUnlinkDialog(false);
 
-                                        <AlertDialogDescription>
-                                            Are you sure you want to unlink {linkedAccount.authProvider}? You will need
-                                            to use your password to log in.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                                        <AlertDialogAction onClick={() => handleUnlink(linkedAccount.authProvider)}>
-                                            Unlink
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                        handleUnlink(linkedAccount.authProvider);
+                                    }}
+                                    open={showUnlinkDialog}
+                                    title="Unlink Provider"
+                                />
+                            </>
                         )}
 
                         {!isLinked && (

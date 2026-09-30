@@ -4,33 +4,39 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {Trash2Icon} from 'lucide-react';
 import {ReactElement, ReactNode} from 'react';
 
-interface DeleteAlertDialogProps {
+type ConfirmVariantType = 'default' | 'destructive' | 'destructiveGhost';
+
+interface AlertDialogProps {
     open: boolean;
     ariaLabel?: string;
     cancelLabel?: string;
+    confirmButtonVariant?: ConfirmVariantType;
+    confirmClassName?: string;
     confirmIcon?: ReactElement;
     confirmLabel?: string;
     description?: ReactNode;
     isPending?: boolean;
     nodeName?: string;
     onCancel: () => void;
-    onDelete: () => void;
+    onConfirm: () => void;
     title?: string;
 }
 
-const DeleteAlertDialog = ({
+const AlertDialog = ({
     ariaLabel,
     cancelLabel,
+    confirmButtonVariant = 'destructive',
+    confirmClassName,
     confirmIcon,
     confirmLabel,
     description,
     isPending,
     nodeName,
     onCancel,
-    onDelete,
+    onConfirm,
     open,
     title,
-}: DeleteAlertDialogProps) => {
+}: AlertDialogProps) => {
     const isNodeDeleteDialog = !!nodeName;
 
     const resolvedCancelLabel = cancelLabel || (isNodeDeleteDialog ? 'Keep node' : 'Cancel');
@@ -58,15 +64,16 @@ const DeleteAlertDialog = ({
                     <DialogHeader description={resolvedDescription} title={resolvedTitle} />
 
                     <DialogFooter>
-                        <DialogCancelButton label={resolvedCancelLabel} />
+                        <DialogCancelButton disabled={isPending} label={resolvedCancelLabel} />
 
                         <Button
                             aria-label={ariaLabel}
+                            className={confirmClassName}
                             disabled={isPending}
                             icon={isPending ? <LoadingIcon /> : resolvedConfirmIcon}
                             label={resolvedConfirmLabel}
-                            onClick={onDelete}
-                            variant="destructive"
+                            onClick={onConfirm}
+                            variant={confirmButtonVariant}
                         />
                     </DialogFooter>
                 </DialogMain>
@@ -75,4 +82,5 @@ const DeleteAlertDialog = ({
     );
 };
 
-export default DeleteAlertDialog;
+export default AlertDialog;
+export type {AlertDialogProps, ConfirmVariantType};

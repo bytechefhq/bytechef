@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {McpComponent, useDeleteMcpComponentMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
@@ -49,9 +49,9 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleConfirmDelete}
+                onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}
             />
         </>

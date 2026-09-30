@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
@@ -35,10 +35,10 @@ const ApiClientDeleteDialog = ({apiClientId, onClose}: {apiClientId: number; onC
     };
 
     return (
-        <DeleteAlertDialog
+        <AlertDialog
             description="This action cannot be undone. This will permanently delete API key."
             onCancel={onClose}
-            onDelete={handleClick}
+            onConfirm={handleClick}
             open
         />
     );

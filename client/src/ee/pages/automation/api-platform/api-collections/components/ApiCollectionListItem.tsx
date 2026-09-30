@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -228,9 +228,9 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             </div>
 
             {showDeleteDialog && (
-                <DeleteAlertDialog
+                <AlertDialog
                     onCancel={() => setShowDeleteDialog(false)}
-                    onDelete={() => deleteApiCollection.mutate(apiCollection.id!)}
+                    onConfirm={() => deleteApiCollection.mutate(apiCollection.id!)}
                     open={showDeleteDialog}
                 />
             )}

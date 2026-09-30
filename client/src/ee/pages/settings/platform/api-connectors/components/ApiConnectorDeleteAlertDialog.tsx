@@ -1,10 +1,10 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 const ApiConnectorDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
-    <DeleteAlertDialog
+    <AlertDialog
         description="This action cannot be undone. This will permanently delete the API connector."
         onCancel={onClose}
-        onDelete={onDelete}
+        onConfirm={onDelete}
         open
     />
 );

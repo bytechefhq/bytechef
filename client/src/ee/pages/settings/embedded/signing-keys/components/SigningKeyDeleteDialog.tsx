@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {useDeleteSigningKeyMutation} from '@/ee/shared/mutations/embedded/signingKeys.mutations';
 import {SigningKeyKeys} from '@/ee/shared/queries/embedded/signingKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -21,10 +21,10 @@ const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose:
     };
 
     return (
-        <DeleteAlertDialog
+        <AlertDialog
             description="This action cannot be undone. This will permanently delete the signing key."
             onCancel={onClose}
-            onDelete={handleClick}
+            onConfirm={handleClick}
             open
         />
     );

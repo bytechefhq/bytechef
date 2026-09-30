@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -132,9 +132,9 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             )}
 
             {showDeleteWorkflowAlertDialog && (
-                <DeleteAlertDialog
+                <AlertDialog
                     onCancel={() => setShowDeleteWorkflowAlertDialog(false)}
-                    onDelete={() => {
+                    onConfirm={() => {
                         handleDeleteWorkflowAlertDialogClick();
 
                         setShowDeleteWorkflowAlertDialog(false);

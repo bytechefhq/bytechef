@@ -1,13 +1,14 @@
-import {Input} from '@/components/Input/Input';
+import Button from '@/components/Button/Button';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+    Dialog,
+    DialogBody,
+    DialogCancelButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+} from '@/components/Dialog';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import {useState} from 'react';
 
@@ -28,7 +29,7 @@ const AiSkillFileAddDialog = ({existingPaths, onAdd, onClose}: AiSkillFileAddDia
     const isValid = trimmedPath.length > 0 && !isDuplicate && !isSkillMd && !hasInvalidPath;
 
     return (
-        <AlertDialog
+        <Dialog
             onOpenChange={(open) => {
                 if (!open) {
                     onClose();
@@ -36,47 +37,49 @@ const AiSkillFileAddDialog = ({existingPaths, onAdd, onClose}: AiSkillFileAddDia
             }}
             open
         >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Add File</AlertDialogTitle>
-                </AlertDialogHeader>
+            <DialogContent aria-describedby={undefined}>
+                <DialogMain>
+                    <DialogHeader title="Add File" />
 
-                <div className="flex flex-col gap-1 py-2">
-                    <Label htmlFor="add-skill-file-path">File Path</Label>
+                    <DialogBody>
+                        <fieldset className="flex flex-col gap-1 border-0 p-0">
+                            <Label htmlFor="add-skill-file-path">File Path</Label>
 
-                    <Input
-                        id="add-skill-file-path"
-                        onChange={(event) => setPath(event.target.value)}
-                        placeholder="e.g. scripts/extract.py"
-                        value={path}
-                    />
+                            <Input
+                                id="add-skill-file-path"
+                                onChange={(event) => setPath(event.target.value)}
+                                placeholder="e.g. scripts/extract.py"
+                                value={path}
+                            />
 
-                    {isDuplicate && (
-                        <p className="text-sm text-content-destructive">A file with this path already exists.</p>
-                    )}
+                            {isDuplicate && (
+                                <p className="text-sm text-content-destructive">
+                                    A file with this path already exists.
+                                </p>
+                            )}
 
-                    {isSkillMd && !isDuplicate && (
-                        <p className="text-sm text-content-destructive">
-                            SKILL.md already exists and cannot be re-added.
-                        </p>
-                    )}
+                            {isSkillMd && !isDuplicate && (
+                                <p className="text-sm text-content-destructive">
+                                    SKILL.md already exists and cannot be re-added.
+                                </p>
+                            )}
 
-                    {hasInvalidPath && (
-                        <p className="text-sm text-content-destructive">
-                            Path must not be absolute or contain traversal sequences (..).
-                        </p>
-                    )}
-                </div>
+                            {hasInvalidPath && (
+                                <p className="text-sm text-content-destructive">
+                                    Path must not be absolute or contain traversal sequences (..).
+                                </p>
+                            )}
+                        </fieldset>
+                    </DialogBody>
 
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
+                    <DialogFooter>
+                        <DialogCancelButton />
 
-                    <AlertDialogAction disabled={!isValid} onClick={() => onAdd(trimmedPath)}>
-                        Add
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                        <Button disabled={!isValid} label="Add" onClick={() => onAdd(trimmedPath)} />
+                    </DialogFooter>
+                </DialogMain>
+            </DialogContent>
+        </Dialog>
     );
 };
 

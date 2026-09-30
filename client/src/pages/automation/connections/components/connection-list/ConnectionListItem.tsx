@@ -1,18 +1,8 @@
 import '@/shared/styles/dropdownMenu.css';
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -251,33 +241,22 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     </div>
                 </div>
 
-                <DeleteAlertDialog
+                <AlertDialog
                     description="This action cannot be undone. This will permanently delete the connection."
                     onCancel={() => setShowDeleteDialog(false)}
-                    onDelete={handleAlertDeleteDialogClick}
+                    onConfirm={handleAlertDeleteDialogClick}
                     open={showDeleteDialog}
                 />
 
-                <AlertDialog onOpenChange={setShowDisconnectDialog} open={showDisconnectDialog}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Disconnect <strong>{connection.name}</strong> from all workflows?
-                            </AlertDialogTitle>
-
-                            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setShowDisconnectDialog(false)}>Cancel</AlertDialogCancel>
-
-                            <DestructiveAlertDialogAction onClick={handleDisconnectFromAllClick}>
-                                <Link2OffIcon className="size-4" />
-                                Disconnect from all
-                            </DestructiveAlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                <AlertDialog
+                    confirmIcon={<Link2OffIcon />}
+                    confirmLabel="Disconnect from all"
+                    description="This action cannot be undone."
+                    onCancel={() => setShowDisconnectDialog(false)}
+                    onConfirm={handleDisconnectFromAllClick}
+                    open={showDisconnectDialog}
+                    title={`Disconnect ${connection.name} from all workflows?`}
+                />
 
                 {showEditDialog && componentDefinitions && (
                     <ConnectionDialog

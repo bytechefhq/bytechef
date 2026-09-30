@@ -1,6 +1,6 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
@@ -208,9 +208,9 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                 )}
             </CollapsibleContent>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={() => deleteIntegrationInstanceMutation.mutate({id: connectedUserIntegrationInstance.id!})}
+                onConfirm={() => deleteIntegrationInstanceMutation.mutate({id: connectedUserIntegrationInstance.id!})}
                 open={showDeleteDialog}
             />
         </Collapsible>

@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
 import {useShallow} from 'zustand/react/shallow';
@@ -20,10 +20,10 @@ const ApiKeyDeleteDialog = () => {
     };
 
     return (
-        <DeleteAlertDialog
+        <AlertDialog
             description="This action cannot be undone. This will permanently delete the API key."
             onCancel={handleCancel}
-            onDelete={() => currentApiKey && handleDelete(+currentApiKey.id!)}
+            onConfirm={() => currentApiKey && handleDelete(+currentApiKey.id!)}
             open
         />
     );

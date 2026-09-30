@@ -1,6 +1,6 @@
 import '@/shared/styles/dropdownMenu.css';
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -88,10 +88,10 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                 </DropdownMenu>
             </div>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 description="This action cannot be undone. This will permanently delete the app event."
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleAlertDeleteDialogClick}
+                onConfirm={handleAlertDeleteDialogClick}
                 open={showDeleteDialog}
             />
 

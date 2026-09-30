@@ -1,5 +1,5 @@
 import '@/shared/styles/dropdownMenu.css';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -150,10 +150,10 @@ const WorkflowNodeDropdownMenu = ({
             </DropdownMenu>
 
             {showDeleteAction && (
-                <DeleteAlertDialog
+                <AlertDialog
                     nodeName={data.label}
                     onCancel={handleDeleteCancel}
-                    onDelete={onDelete}
+                    onConfirm={onDelete}
                     open={deleteDialogOpen}
                 />
             )}

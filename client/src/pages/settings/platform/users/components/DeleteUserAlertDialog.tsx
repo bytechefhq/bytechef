@@ -1,11 +1,11 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 import useDeleteUserAlertDialog from './hooks/useDeleteUserAlertDialog';
 
 const DeleteUserAlertDialog = () => {
     const {handleClose, handleDelete, open} = useDeleteUserAlertDialog();
 
-    return <DeleteAlertDialog onCancel={handleClose} onDelete={handleDelete} open={open} />;
+    return <AlertDialog onCancel={handleClose} onConfirm={handleDelete} open={open} />;
 };
 
 export default DeleteUserAlertDialog;
