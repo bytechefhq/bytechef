@@ -27,12 +27,12 @@ ByteChef checks the token, then sends the response. The workflow runs **after** 
 |:---|:---|:---|
 | The token is correct | `200 OK` | Empty. The workflow starts. |
 | The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
-| The workflow is disabled | `200 OK` | Empty. The token is not checked and the workflow does not run. |
+| The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The token is not checked and the workflow does not run. |
 | A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
 
 If you get `400 Bad Request`, make sure that:
 
-- The header name is exactly `X-Csrf-Token`.
+- The request has an `X-Csrf-Token` header.
 - The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
 - The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
 
