@@ -608,7 +608,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                         <AlertDialogDescription>
                             This action cannot be undone. This will permanently delete the project and workflows it
-                            contains..
+                            contains.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 

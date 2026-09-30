@@ -103,7 +103,7 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the connection.
+                            This action cannot be undone. This will permanently delete the app event.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 

@@ -127,7 +127,7 @@ const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceLis
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
 
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the connection.
+                            This action cannot be undone. This will permanently delete the workspace.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
