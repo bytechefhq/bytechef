@@ -1,4 +1,5 @@
 import {render, resetAll, screen, userEvent, windowResizeObserver} from '@/shared/util/test-utils';
+import {Trash2Icon} from 'lucide-react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import DeleteAlertDialog from '../DeleteAlertDialog';
@@ -146,5 +147,65 @@ describe('DeleteAlertDialog confirmation', () => {
         render(<DeleteAlertDialog {...defaultProps} />);
 
         expect(screen.getByRole('button', {name: 'Delete'})).toHaveClass('bg-surface-destructive-primary');
+    });
+});
+
+describe('DeleteAlertDialog overrides', () => {
+    it('should use confirmLabel in place of Delete', () => {
+        render(<DeleteAlertDialog {...defaultProps} confirmLabel="Remove" />);
+
+        expect(screen.getByRole('button', {name: 'Remove'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Delete'})).not.toBeInTheDocument();
+    });
+
+    it('should use cancelLabel in place of Cancel', () => {
+        render(<DeleteAlertDialog {...defaultProps} cancelLabel="Keep it" />);
+
+        expect(screen.getByRole('button', {name: 'Keep it'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
+    });
+
+    it('should render confirmIcon on the confirming action', () => {
+        render(<DeleteAlertDialog {...defaultProps} confirmIcon={<Trash2Icon data-testid="custom-icon" />} />);
+
+        expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
+    });
+
+    it('should still call onDelete through a relabelled confirming action', async () => {
+        render(<DeleteAlertDialog {...defaultProps} confirmLabel="Remove" />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Remove'}));
+
+        expect(onDelete).toHaveBeenCalledTimes(1);
+        expect(onCancel).not.toHaveBeenCalled();
+    });
+});
+
+describe('DeleteAlertDialog override precedence over the nodeName preset', () => {
+    const nodeProps = {...defaultProps, nodeName: 'httpClient_1'};
+
+    it('should let confirmLabel win over Delete node', () => {
+        render(<DeleteAlertDialog {...nodeProps} confirmLabel="Remove node" />);
+
+        expect(screen.getByRole('button', {name: 'Remove node'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Delete node'})).not.toBeInTheDocument();
+    });
+
+    it('should let cancelLabel win over Keep node', () => {
+        render(<DeleteAlertDialog {...nodeProps} cancelLabel="Never mind" />);
+
+        expect(screen.getByRole('button', {name: 'Never mind'})).toBeInTheDocument();
+        expect(screen.queryByRole('button', {name: 'Keep node'})).not.toBeInTheDocument();
+    });
+
+    it('should keep the title and description driven by nodeName when labels are overridden', () => {
+        render(<DeleteAlertDialog {...nodeProps} cancelLabel="Never mind" confirmLabel="Remove node" />);
+
+        expect(screen.getByRole('heading', {level: 2})).toHaveTextContent('Delete node httpClient_1?');
+        expect(
+            screen.getByText(
+                'This action cannot be undone. This will permanently delete the node and properties it contains.'
+            )
+        ).toBeInTheDocument();
     });
 });
