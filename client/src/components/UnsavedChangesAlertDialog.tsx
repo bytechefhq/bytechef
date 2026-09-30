@@ -16,7 +16,14 @@ interface UnsavedChangesAlertDialogPropsI {
 
 const UnsavedChangesAlertDialog = ({onCancel, onClose, open}: UnsavedChangesAlertDialogPropsI) => {
     return (
-        <AlertDialog open={open}>
+        <AlertDialog
+            onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                    onCancel();
+                }
+            }}
+            open={open}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Discard code changes?</AlertDialogTitle>

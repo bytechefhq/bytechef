@@ -121,7 +121,7 @@ const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceLis
                 </div>
             </div>
 
-            <AlertDialog open={showDeleteDialog}>
+            <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
