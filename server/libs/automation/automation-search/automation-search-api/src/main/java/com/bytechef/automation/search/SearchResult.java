@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.search;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Ivica Cardic
  */
@@ -28,4 +30,12 @@ public interface SearchResult<ID> {
     String description();
 
     SearchAssetType type();
+
+    /**
+     * The id of the workspace this result belongs to, used by {@code AutomationSearchFacade} to drop results from
+     * workspaces the caller cannot access. A {@code null} workspace id means the result is not accessible and is always
+     * dropped, so every provider must stamp the owning workspace on its results.
+     */
+    @Nullable
+    Long workspaceId();
 }

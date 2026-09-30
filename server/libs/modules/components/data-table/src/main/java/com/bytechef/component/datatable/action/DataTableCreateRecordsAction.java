@@ -28,12 +28,15 @@ import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
 import com.bytechef.component.datatable.util.DataTableUtils;
+import com.bytechef.component.datatable.util.DataTableUtils.ResolvedDataTable;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.definition.BaseProperty.ResourceType;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -51,17 +54,24 @@ public class DataTableCreateRecordsAction {
 
     private final DataTableService dataTableService;
     private final DataTableRowService dataTableRowService;
+    private final DataTableWorkspaceResolver dataTableWorkspaceResolver;
 
     @SuppressFBWarnings("EI")
     public static ModifiableActionDefinition of(
-        DataTableService dataTableService, DataTableRowService dataTableRowService) {
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
 
-        return new DataTableCreateRecordsAction(dataTableService, dataTableRowService).build();
+        return new DataTableCreateRecordsAction(dataTableService, dataTableRowService, dataTableWorkspaceResolver)
+            .build();
     }
 
-    private DataTableCreateRecordsAction(DataTableService dataTableService, DataTableRowService dataTableRowService) {
+    private DataTableCreateRecordsAction(
+        DataTableService dataTableService, DataTableRowService dataTableRowService,
+        DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         this.dataTableService = dataTableService;
         this.dataTableRowService = dataTableRowService;
+        this.dataTableWorkspaceResolver = dataTableWorkspaceResolver;
     }
 
     private ModifiableActionDefinition build() {
@@ -73,10 +83,11 @@ public class DataTableCreateRecordsAction {
                     .label("Table")
                     .resourceReference(ResourceType.DATA_TABLE)
                     .required(true)
-                    .options(DataTableUtils.getActionTableOptions(dataTableService)),
+                    .options(DataTableUtils.getActionTableOptions(dataTableService, dataTableWorkspaceResolver)),
                 dynamicProperties(RECORDS)
                     .propertiesLookupDependsOn(TABLE)
-                    .properties(DataTableUtils.createDynamicProperties(dataTableService, false))
+                    .properties(
+                        DataTableUtils.createDynamicProperties(dataTableService, dataTableWorkspaceResolver, false))
                     .required(true))
             .output(this::output)
             .perform(this::perform);
@@ -86,11 +97,18 @@ public class DataTableCreateRecordsAction {
     private OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
-        var rowSchema = DataTableUtils.rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
+
+        DataTableInfo dataTableInfo = resolvedDataTable.dataTableInfo();
+
+        var rowSchema = DataTableUtils.rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(resolvedDataTable.dataTableRef(), 1, 0);
 
         if (rows.isEmpty()) {
             return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema));
@@ -99,7 +117,7 @@ public class DataTableCreateRecordsAction {
         DataTableRow firstRow = rows.getFirst();
 
         Map<String, Object> sampleOutput = DataTableUtils.createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
+            dataTableInfo, firstRow.id(), firstRow.values());
 
         return OutputResponse.of(array().items((Property.ValueProperty<?>) rowSchema), List.of(sampleOutput));
     }
@@ -112,20 +130,26 @@ public class DataTableCreateRecordsAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) actionContext;
 
-        String baseName = inputParameters.getRequiredString(TABLE);
+        String name = inputParameters.getRequiredString(TABLE);
 
         Map<String, Object> recordsMap = inputParameters.getRequiredMap(RECORDS, Object.class);
         Object valuesObj = recordsMap.get(VALUES);
 
         List<DataTableRow> created = new ArrayList<>();
 
+        long environmentId = Objects.requireNonNull(actionContextAware.getEnvironmentId());
+
+        long workspaceId = DataTableUtils.resolveWorkspaceId(dataTableWorkspaceResolver, actionContext);
+
+        ResolvedDataTable resolvedDataTable = DataTableUtils.resolveDataTable(
+            dataTableService, workspaceId, name, environmentId);
+
         if (valuesObj instanceof List<?> valuesList) {
             for (Object record : valuesList) {
                 if (record instanceof Map<?, ?> map) {
                     created.add(
                         dataTableRowService.insertRow(
-                            baseName, (Map<String, Object>) map,
-                            Objects.requireNonNull(actionContextAware.getEnvironmentId())));
+                            resolvedDataTable.dataTableRef(), (Map<String, Object>) map));
                 }
             }
         }

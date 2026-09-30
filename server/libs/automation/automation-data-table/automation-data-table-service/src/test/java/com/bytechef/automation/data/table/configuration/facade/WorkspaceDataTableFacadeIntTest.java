@@ -19,8 +19,7 @@ package com.bytechef.automation.data.table.configuration.facade;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.data.table.config.AutomationDataTableIntTestConfiguration;
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
@@ -44,7 +43,8 @@ class WorkspaceDataTableFacadeIntTest {
 
     private static final long DEV_ENVIRONMENT_ID = 0;
     private static final long STAGE_ENVIRONMENT_ID = 1;
-    private static final long WORKSPACE_ID = 9001;
+    private static final long FIRST_WORKSPACE_ID = 9001;
+    private static final long SECOND_WORKSPACE_ID = 9002;
     private static final List<ColumnSpec> COLUMN_SPECS = List.of(new ColumnSpec("title", ColumnType.STRING));
 
     @Autowired
@@ -56,76 +56,92 @@ class WorkspaceDataTableFacadeIntTest {
     @Autowired
     private WorkspaceDataTableFacade workspaceDataTableFacade;
 
-    @Autowired
-    private WorkspaceDataTableService workspaceDataTableService;
-
     @BeforeEach
     void beforeEach() {
-        dropTestTables();
+        for (long workspaceId : List.of(FIRST_WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
+            dropWorkspaceTables(workspaceId);
 
-        jdbcTemplate.update(
-            "INSERT INTO workspace " +
-                "(id, name, created_date, created_by, last_modified_date, last_modified_by, version) " +
-                "VALUES (?, 'data-table-workspace', CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0)",
-            WORKSPACE_ID);
+            jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", workspaceId);
+
+            jdbcTemplate.update(
+                "INSERT INTO workspace " +
+                    "(id, name, created_date, created_by, last_modified_date, last_modified_by, version) " +
+                    "VALUES (?, ?, CURRENT_TIMESTAMP, 'test', CURRENT_TIMESTAMP, 'test', 0)",
+                workspaceId, "data-table-workspace-" + workspaceId);
+        }
     }
 
     @AfterEach
     void afterEach() {
-        dropTestTables();
+        for (long workspaceId : List.of(FIRST_WORKSPACE_ID, SECOND_WORKSPACE_ID)) {
+            dropWorkspaceTables(workspaceId);
 
-        jdbcTemplate.update("DELETE FROM workspace_data_table WHERE workspace_id = ?", WORKSPACE_ID);
-        jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", WORKSPACE_ID);
+            jdbcTemplate.update("DELETE FROM workspace WHERE id = ?", workspaceId);
+        }
     }
 
     @Test
-    void testDropTableRemovesWorkspaceAssignment() {
-        workspaceDataTableFacade.createTable("dropped", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+    void testDropTableInTheLastEnvironmentRemovesTheTableFromTheWorkspace() {
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "dropped", null, COLUMN_SPECS, FIRST_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        long dataTableId = dataTableService.getIdByBaseName("dropped");
+        assertThat(workspaceDataTableFacade.getWorkspaceId(dataTableId)).isEqualTo(FIRST_WORKSPACE_ID);
 
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId)).hasSize(1);
+        workspaceDataTableFacade.dropTable(dataTableId, DEV_ENVIRONMENT_ID);
 
-        dataTableService.dropTable("dropped", DEV_ENVIRONMENT_ID);
-
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId)).isEmpty();
-        assertThat(workspaceDataTableService.getWorkspaceDataTables(WORKSPACE_ID)).isEmpty();
+        assertThat(dataTableService.getWorkspaceDataTables(FIRST_WORKSPACE_ID)).isEmpty();
     }
 
     @Test
-    void testDropTableKeepsWorkspaceAssignmentWhileAnotherEnvironmentHasTheTable() {
-        workspaceDataTableFacade.createTable("dropped", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
-        workspaceDataTableFacade.createTable("dropped", null, COLUMN_SPECS, WORKSPACE_ID, STAGE_ENVIRONMENT_ID);
+    void testDropTableKeepsTheTableWhileAnotherEnvironmentHasIt() {
+        long dataTableId = workspaceDataTableFacade.createTable(
+            "dropped", null, COLUMN_SPECS, FIRST_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long stageDataTableId = workspaceDataTableFacade.createTable(
+            "dropped", null, COLUMN_SPECS, FIRST_WORKSPACE_ID, STAGE_ENVIRONMENT_ID);
 
-        long dataTableId = dataTableService.getIdByBaseName("dropped");
+        assertThat(stageDataTableId).isEqualTo(dataTableId);
 
-        dataTableService.dropTable("dropped", DEV_ENVIRONMENT_ID);
+        workspaceDataTableFacade.dropTable(dataTableId, DEV_ENVIRONMENT_ID);
 
-        assertThat(workspaceDataTableService.getDataTableWorkspaceDataTables(dataTableId))
-            .extracting(WorkspaceDataTable::getWorkspaceId)
-            .containsExactly(WORKSPACE_ID);
-        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, STAGE_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+        assertThat(workspaceDataTableFacade.getWorkspaceId(dataTableId)).isEqualTo(FIRST_WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.listTables(FIRST_WORKSPACE_ID, STAGE_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::name)
             .containsExactly("dropped");
     }
 
     @Test
     void testDuplicateTableIsListedInSourceWorkspace() {
-        workspaceDataTableFacade.createTable("original", null, COLUMN_SPECS, WORKSPACE_ID, DEV_ENVIRONMENT_ID);
+        long originalDataTableId = workspaceDataTableFacade.createTable(
+            "original", null, COLUMN_SPECS, FIRST_WORKSPACE_ID, DEV_ENVIRONMENT_ID);
 
-        long originalDataTableId = dataTableService.getIdByBaseName("original");
+        long copyDataTableId = workspaceDataTableFacade.duplicateTable(originalDataTableId, "copy", DEV_ENVIRONMENT_ID);
 
-        workspaceDataTableFacade.duplicateTable(originalDataTableId, "copy", DEV_ENVIRONMENT_ID);
-
-        assertThat(workspaceDataTableFacade.listTables(WORKSPACE_ID, DEV_ENVIRONMENT_ID))
-            .extracting(DataTableInfo::baseName)
+        assertThat(workspaceDataTableFacade.getWorkspaceId(copyDataTableId)).isEqualTo(FIRST_WORKSPACE_ID);
+        assertThat(workspaceDataTableFacade.listTables(FIRST_WORKSPACE_ID, DEV_ENVIRONMENT_ID))
+            .extracting(DataTableInfo::name)
             .containsExactlyInAnyOrder("original", "copy");
+        assertThat(workspaceDataTableFacade.listTables(SECOND_WORKSPACE_ID, DEV_ENVIRONMENT_ID)).isEmpty();
     }
 
-    private void dropTestTables() {
-        for (String baseName : List.of("dropped", "original", "copy")) {
-            dataTableService.dropTable(baseName, DEV_ENVIRONMENT_ID);
-            dataTableService.dropTable(baseName, STAGE_ENVIRONMENT_ID);
+    @Test
+    void testTwoWorkspacesCreateTheSameName() {
+        long firstId = workspaceDataTableFacade.createTable(
+            "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), FIRST_WORKSPACE_ID, 0L);
+        long secondId = workspaceDataTableFacade.createTable(
+            "orders", null, List.of(new ColumnSpec("title", ColumnType.STRING)), SECOND_WORKSPACE_ID, 0L);
+
+        assertThat(workspaceDataTableFacade.listTables(FIRST_WORKSPACE_ID, 0L))
+            .extracting(DataTableInfo::id)
+            .containsExactly(firstId);
+        assertThat(workspaceDataTableFacade.listTables(SECOND_WORKSPACE_ID, 0L))
+            .extracting(DataTableInfo::id)
+            .containsExactly(secondId);
+    }
+
+    private void dropWorkspaceTables(long workspaceId) {
+        for (DataTable dataTable : dataTableService.getWorkspaceDataTables(workspaceId)) {
+            dataTableService.dropTable(dataTable.getId(), DEV_ENVIRONMENT_ID);
+            dataTableService.dropTable(dataTable.getId(), STAGE_ENVIRONMENT_ID);
         }
     }
 }

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -45,6 +46,9 @@ public class DataTable {
     private String name;
 
     private String description;
+
+    @Column("workspace_id")
+    private Long workspaceId;
 
     @MappedCollection(idColumn = "data_table_id")
     private Set<DataTableTag> dataTableTags = new HashSet<>();
@@ -112,6 +116,14 @@ public class DataTable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public @Nullable Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(@Nullable Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     public Instant getCreatedDate() {
@@ -185,6 +197,7 @@ public class DataTable {
             "id=" + id +
             ", name='" + name + '\'' +
             ", description='" + description + '\'' +
+            ", workspaceId=" + workspaceId +
             ", dataTableTags=" + dataTableTags +
             ", createdDate=" + createdDate +
             ", createdBy='" + createdBy + '\'' +

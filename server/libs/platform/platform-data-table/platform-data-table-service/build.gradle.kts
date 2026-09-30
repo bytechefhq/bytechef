@@ -1,4 +1,7 @@
 dependencies {
+    // Liquibase loads DataTableOwnerColumnChange itself, so it is only needed to compile against
+    compileOnly("org.liquibase:liquibase-core")
+
     implementation("de.siegmar:fastcsv:2.2.2")
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework.boot:spring-boot-actuator")
@@ -7,6 +10,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -21,7 +25,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":server:libs:automation:automation-configuration:automation-configuration-service"))
-    testImplementation(project(":server:libs:config:app-config"))
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:core:commons:commons-data"))

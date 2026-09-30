@@ -207,7 +207,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 return triggerDefinitionFacade.executeOptions(
                     workflowNodeType.name(), workflowNodeType.version(),
                     workflowNodeType.operation(), propertyName, workflowTrigger.evaluateParameters(inputs, evaluator),
-                    lookupDependsOnPaths, searchText, connectionId);
+                    lookupDependsOnPaths, searchText, connectionId, workflowId);
             })
             .orElseGet(
                 () -> {
@@ -242,7 +242,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                         workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
                         workflowTask.evaluateParameters(
                             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs), evaluator),
-                        lookupDependsOnPaths, searchText, connectionIds, workflowTask.getExtensions());
+                        lookupDependsOnPaths, searchText, connectionIds, workflowTask.getExtensions(), workflowId);
                 });
     }
 }

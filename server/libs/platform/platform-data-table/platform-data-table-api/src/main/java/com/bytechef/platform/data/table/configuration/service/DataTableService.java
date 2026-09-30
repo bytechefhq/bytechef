@@ -16,21 +16,20 @@
 
 package com.bytechef.platform.data.table.configuration.service;
 
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import java.util.List;
+import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Unified service for managing dynamic data tables and querying their metadata.
  *
  * <p>
- * Physical table names are constructed internally using the pattern: <code>dt_&lt;envIndex&gt;_&lt;baseName&gt;</code>,
- * where envIndex is mapped as DEVELOPMENT=0, STAGING=1, PRODUCTION=2.
- * </p>
- *
- * <p>
- * Callers must pass only the logical base table name (without any <code>dt_</code> prefix). Inputs starting with
- * <code>dt_</code> will be rejected.
+ * A table is addressed by its registry id. A name is unique only within a workspace, so the one name lookup,
+ * {@link #fetchDataTable(Long, String)}, always takes the workspace the name belongs to. Each environment holds its own
+ * physical instance of a registered table.
  * </p>
  *
  * @author Ivica Cardic
@@ -38,119 +37,78 @@ import java.util.List;
 public interface DataTableService {
 
     /**
-     * Adds a new column to an existing dynamic data table in the specified environment.
-     *
-     * @param baseName      The logical base name of the table to which the column will be added. The name must not
-     *                      include a "dt_" prefix.
-     * @param columnSpec    The specification of the column to be added, including the column name and type.
-     * @param environmentId The target environment ID.
+     * Adds a column to the table's physical instance in the given environment.
      */
-    void addColumn(String baseName, ColumnSpec columnSpec, long environmentId);
+    void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId);
 
     /**
-     * Creates a new dynamic data table in the specified environment with the given base name and column specifications.
-     * The physical table name is derived internally based on the environment and base name.
-     *
-     * @param baseName      The logical base name of the table. The name must not include a "dt_" prefix, as it will be
-     *                      automatically added.
-     * @param columnSpecs   A list of column specifications defining the structure of the table, including column names
-     *                      and types. This list must be non-null and non-empty.
-     * @param environmentId The target environment where the table should be created (e.g., DEVELOPMENT, STAGING,
-     *                      PRODUCTION).
+     * Creates the environment's physical table for {@code (workspaceId, name)}, registering the name first when the
+     * workspace does not hold it yet, and returns the table's id.
      */
-    void createTable(String baseName, List<ColumnSpec> columnSpecs, long environmentId);
+    long createTable(
+        @Nullable Long workspaceId, String name, @Nullable String description, List<ColumnSpec> columnSpecs,
+        long environmentId);
 
     /**
-     * Creates a new dynamic data table in the specified environment with the given base name, description, and column
-     * specifications. The physical table name is derived internally based on the environment and base name.
-     *
-     * @param baseName      The logical base name of the table. The name must not include a "dt_" prefix, as it will be
-     *                      automatically added.
-     * @param description   A description for the table to provide additional metadata about its purpose. Must not be
-     *                      null or empty.
-     * @param columnSpecs   A list of column specifications defining the structure of the table, including column names
-     *                      and types. This list must be non-null and non-empty.
-     * @param environmentId The target environment where the table should be created (e.g., DEVELOPMENT, STAGING,
-     *                      PRODUCTION).
+     * Drops the table's physical instance in the given environment and deletes the registry row once no environment
+     * holds one.
      */
-    void createTable(String baseName, String description, List<ColumnSpec> columnSpecs, long environmentId);
+    void dropTable(long dataTableId, long environmentId);
 
     /**
-     * Deletes a dynamic data table in the specified environment with the given base name. This action is irreversible
-     * and will permanently remove the table and its associated data.
-     *
-     * @param baseName      The logical base name of the table to be deleted. The name must not include a "dt_" prefix,
-     *                      as it is added internally.
-     * @param environmentId The target environmentID.
+     * Copies the table's columns and rows in the given environment into a new table of the source's workspace and
+     * returns the copy's id.
      */
-    void dropTable(String baseName, long environmentId);
+    long duplicateTable(long dataTableId, String newName, long environmentId);
 
     /**
-     * Duplicates an existing dynamic data table in the specified environment. The new table will have a different base
-     * name while preserving the structure
+     * The registry row {@code name} names within the workspace, the only lookup by name.
      */
-    void duplicateTable(String fromBaseName, String toBaseName, long environmentId);
+    Optional<DataTable> fetchDataTable(@Nullable Long workspaceId, String name);
 
     /**
-     * Retrieves the base name of a dynamic data table by its unique identifier.
-     *
-     * @param id The unique identifier of the data table.
-     * @return The base name of the data table corresponding to the given identifier. If no table is found for the
-     *         provided ID, the method may return null or an empty string.
+     * The table's registry metadata and user columns, present only when its physical table exists in the environment.
      */
-    String getBaseNameById(long id);
+    Optional<DataTableInfo> fetchDataTableInfo(long dataTableId, long environmentId);
 
     /**
-     * Retrieves the unique identifier of a dynamic data table based on its base name.
-     *
-     * @param baseName The logical base name of the data table. The base name should not include a "dt_" prefix, as it
-     *                 is internally managed by the service. Must not be null or empty.
-     * @return The unique identifier of the data table corresponding to the given base name. If no table is found with
-     *         the provided base name, the method may return -1 or a similar default value.
+     * The registry row with the given id, failing with {@code DATA_TABLE_NOT_FOUND} when there is none.
      */
-    long getIdByBaseName(String baseName);
+    DataTable getDataTable(long dataTableId);
 
     /**
-     * Retrieves a list of metadata for all dynamic data tables available in the specified environment.
-     *
-     * @param environmentId The target environment ID.
-     * @return A list of {@code DataTableInfo} objects representing the metadata of the tables in the environment. If no
-     *         tables exist, an empty list is returned.
+     * Every registry row of the workspace, ordered by name.
      */
-    List<DataTableInfo> listTables(long environmentId);
+    List<DataTable> getWorkspaceDataTables(long workspaceId);
 
     /**
-     * Removes a column from an existing dynamic data table in the specified environment.
-     *
-     * @param baseName      The logical base name of the table from which the column will be removed. The name must not
-     *                      include a "dt_" prefix.
-     * @param columnName    The name of the column to be removed. This must match the existing column name in the table.
-     * @param environmentId The target environment ID.
+     * Every table of every workspace whose physical table exists in the environment.
      */
-    void removeColumn(String baseName, String columnName, long environmentId);
+    List<DataTableInfo> listAllTables(long environmentId);
 
     /**
-     * Renames a column in an existing dynamic data table in the specified environment.
-     *
-     * @param baseName       The logical base name of the table containing the column to be renamed. The name must not
-     *                       include a "dt_" prefix.
-     * @param fromColumnName The current name of the column to be renamed. This must match the existing column name in
-     *                       the table.
-     * @param toColumnName   The new name for the column. This name must not conflict with any existing columns in the
-     *                       table.
-     * @param environmentId  The target environment ID.
+     * The workspace's tables whose physical table exists in the environment, ordered by name.
      */
-    void renameColumn(String baseName, String fromColumnName, String toColumnName, long environmentId);
+    List<DataTableInfo> listTables(@Nullable Long workspaceId, long environmentId);
 
     /**
-     * Renames an existing dynamic data table in the specified environment from one base name to another. This method
-     * updates the logical base name of the table, which will also be reflected in its physical table representation.
-     *
-     * @param fromBaseName  The current logical base name of the table. This name must not include a "dt_" prefix and
-     *                      must match an existing table.
-     * @param toBaseName    The new logical base name for the table. This name must not include a "dt_" prefix and must
-     *                      not conflict with any existing table's base name in the same environment .
-     * @param environmentId The target environment ID.
+     * Removes a column from the table's physical instance in the given environment.
      */
-    void renameTable(String fromBaseName, String toBaseName, long environmentId);
+    void removeColumn(long dataTableId, String columnName, long environmentId);
+
+    /**
+     * Renames a column of the table's physical instance in the given environment.
+     */
+    void renameColumn(long dataTableId, String fromColumnName, String toColumnName, long environmentId);
+
+    /**
+     * Renames the table within its workspace; every environment keeps reaching it because the physical name holds the
+     * id.
+     */
+    void renameTable(long dataTableId, String newName);
+
+    /**
+     * Writes the registry description, which is shared by every environment.
+     */
+    void updateDescription(long dataTableId, @Nullable String description);
 }

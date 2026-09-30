@@ -17,6 +17,7 @@
 package com.bytechef.platform.data.table.configuration.repository;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTable;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
@@ -25,7 +26,11 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface DataTableRepository extends CrudRepository<DataTable, Long> {
 
-    Optional<DataTable> findByName(String name);
+    List<DataTable> findAllByWorkspaceIdOrderByName(long workspaceId);
 
-    long deleteByName(String name);
+    List<DataTable> findAllByWorkspaceIdIsNullOrderByName();
+
+    Optional<DataTable> findByWorkspaceIdAndName(long workspaceId, String name);
+
+    Optional<DataTable> findByWorkspaceIdIsNullAndName(String name);
 }

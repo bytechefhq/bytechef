@@ -30,25 +30,39 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
-import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.TriggerContextAware;
+import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableErrorType;
+import com.bytechef.platform.data.table.configuration.exception.DataTableException;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.domain.DataTableWorkspaceResolver;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.workflow.WorkflowExecutionId;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalLong;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -58,83 +72,138 @@ import org.jspecify.annotations.Nullable;
  */
 public final class DataTableUtils {
 
+    private static final String UNRESOLVED_WORKSPACE = "Unable to determine the workspace of this workflow";
+
     private DataTableUtils() {
     }
 
-    /**
-     * Returns an OptionsFunction for action table selection dropdowns.
-     *
-     * @param dataTableService the data table service
-     * @return an OptionsFunction that provides table options
-     */
-    public static ActionDefinition.OptionsFunction<String> getActionTableOptions(DataTableService dataTableService) {
+    public static ActionDefinition.OptionsFunction<String> getActionTableOptions(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
-            searchText, dataTableService);
+            searchText, dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context));
     }
 
-    /**
-     * Returns an OptionsFunction for trigger table selection dropdowns.
-     *
-     * @param dataTableService the data table service
-     * @return an OptionsFunction that provides table options
-     */
-    public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(DataTableService dataTableService) {
+    public static TriggerDefinition.OptionsFunction<String> getTriggerTableOptions(
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver) {
+
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> getTableOptions(
-            searchText, dataTableService);
-    }
-
-    public static List<Option<String>> getTableOptions(String searchText, DataTableService dataTableService) {
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(DEVELOPMENT.ordinal());
-
-        return dataTableInfos.stream()
-            .filter(
-                dataTableInfo -> searchText == null || dataTableInfo.baseName()
-                    .toLowerCase()
-                    .contains(searchText.toLowerCase()))
-            .<Option<String>>map(
-                dataTableInfo -> option(dataTableInfo.baseName(), dataTableInfo.baseName(),
-                    dataTableInfo.description()))
-            .toList();
+            searchText, dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context));
     }
 
     /**
-     * Fetches a DataTableInfo by base name and environment ID.
-     *
-     * @param dataTableService the data table service
-     * @param baseName         the table base name
-     * @param environmentId    the environment ID
-     * @return the DataTableInfo if found, null otherwise
+     * A named table together with the physical table it resolved to and that table's column metadata. The three travel
+     * together because every caller that needs one needs the others, and resolving them separately risked the metadata
+     * describing a different table from the one the rows come out of.
      */
+    public record ResolvedDataTable(DataTableRef dataTableRef, DataTableInfo dataTableInfo) {
+    }
+
+    public static long resolveWorkspaceId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, ActionContext actionContext) {
+
+        if (!(actionContext instanceof ActionContextAware actionContextAware)) {
+            throw new IllegalStateException(UNRESOLVED_WORKSPACE);
+        }
+
+        OptionalLong workspaceId = resolveByWorkflowId(dataTableWorkspaceResolver, actionContextAware.getWorkflowId());
+
+        if (workspaceId.isPresent()) {
+            return workspaceId.getAsLong();
+        }
+
+        Long jobPrincipalId = actionContextAware.getJobPrincipalId();
+        PlatformType platformType = actionContextAware.getPlatformType();
+
+        if (jobPrincipalId != null && platformType != null) {
+            workspaceId = dataTableWorkspaceResolver.resolveByJobPrincipalId(jobPrincipalId, platformType);
+
+            if (workspaceId.isPresent()) {
+                return workspaceId.getAsLong();
+            }
+        }
+
+        throw new IllegalStateException(UNRESOLVED_WORKSPACE);
+    }
+
+    public static long resolveWorkspaceId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, TriggerContext triggerContext) {
+
+        if (!(triggerContext instanceof TriggerContextAware triggerContextAware)) {
+            throw new IllegalStateException(UNRESOLVED_WORKSPACE);
+        }
+
+        return resolveByWorkflowId(dataTableWorkspaceResolver, triggerContextAware.getWorkflowId())
+            .orElseThrow(() -> new IllegalStateException(UNRESOLVED_WORKSPACE));
+    }
+
+    public static long resolveWorkspaceId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, String workflowExecutionId) {
+
+        WorkflowExecutionId parsedWorkflowExecutionId = WorkflowExecutionId.parse(workflowExecutionId);
+
+        long jobPrincipalId = parsedWorkflowExecutionId.getJobPrincipalId();
+
+        OptionalLong workspaceId = jobPrincipalId > 0
+            ? dataTableWorkspaceResolver.resolveByJobPrincipalId(jobPrincipalId, parsedWorkflowExecutionId.getType())
+            : dataTableWorkspaceResolver.resolveByWorkflowUuid(parsedWorkflowExecutionId.getWorkflowUuid());
+
+        return workspaceId.orElseThrow(() -> new IllegalStateException(UNRESOLVED_WORKSPACE));
+    }
+
+    public static ResolvedDataTable resolveDataTable(
+        DataTableService dataTableService, long workspaceId, String name, long environmentId) {
+
+        DataTable dataTable = dataTableService.fetchDataTable(workspaceId, name)
+            .orElseThrow(() -> notFound(name));
+
+        DataTableInfo dataTableInfo = dataTableService.fetchDataTableInfo(dataTable.getId(), environmentId)
+            .orElseThrow(() -> notFound(name));
+
+        return new ResolvedDataTable(new DataTableRef(dataTable.getId(), environmentId), dataTableInfo);
+    }
+
     @Nullable
     public static DataTableInfo getDataTableInfo(
-        DataTableService dataTableService, String baseName, long environmentId) {
+        DataTableService dataTableService, long workspaceId, String name, long environmentId) {
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
-
-        return dataTableInfos.stream()
-            .filter(dataTableInfo -> {
-                String curBaseName = dataTableInfo.baseName();
-
-                return curBaseName.equalsIgnoreCase(baseName);
-            })
-            .findFirst()
+        return dataTableService.fetchDataTable(workspaceId, name)
+            .flatMap(dataTable -> dataTableService.fetchDataTableInfo(dataTable.getId(), environmentId))
             .orElse(null);
     }
 
-    /**
-     * Creates a OutputResponse for a data table trigger, including schema and sample data from the first row.
-     *
-     * @param dataTableRowService the data table row service
-     * @param dataTableService    the data table service
-     * @param baseName            the table base name
-     * @return an OutputResponse with schema and optional sample data
-     */
+    public static List<Option<String>> getTableOptions(
+        @Nullable String searchText, DataTableService dataTableService, long workspaceId) {
+
+        return dataTableService.listTables(workspaceId, DEVELOPMENT.ordinal())
+            .stream()
+            .filter(dataTableInfo -> searchText == null || dataTableInfo.name()
+                .contains(searchText.toLowerCase(Locale.ROOT)))
+            .<Option<String>>map(
+                dataTableInfo -> option(dataTableInfo.name(), dataTableInfo.name(), dataTableInfo.description()))
+            .toList();
+    }
+
+    public static long registerWebhook(
+        DataTableService dataTableService, DataTableWebhookService dataTableWebhookService, long workspaceId,
+        String name, String webhookUrl, DataTableWebhookType type, long environmentId) {
+
+        ResolvedDataTable resolvedDataTable = resolveDataTable(dataTableService, workspaceId, name, environmentId);
+
+        return dataTableWebhookService.addWebhook(resolvedDataTable.dataTableRef(), webhookUrl, type);
+    }
+
     public static OutputResponse createTriggerOutputResponse(
-        DataTableRowService dataTableRowService, DataTableService dataTableService, String baseName) {
+        DataTableRowService dataTableRowService, DataTableService dataTableService, long workspaceId, String name) {
 
-        BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableService, DEVELOPMENT, baseName);
+        ResolvedDataTable resolvedDataTable = resolveDataTable(
+            dataTableService, workspaceId, name, DEVELOPMENT.ordinal());
 
-        List<DataTableRow> rows = dataTableRowService.listRows(baseName, 1, 0, DEVELOPMENT.ordinal());
+        DataTableInfo dataTableInfo = resolvedDataTable.dataTableInfo();
+
+        BaseValueProperty<?> rowSchema = rowObjectSchema(dataTableInfo);
+
+        List<DataTableRow> rows = dataTableRowService.listRows(resolvedDataTable.dataTableRef(), 1, 0);
 
         if (rows.isEmpty()) {
             return OutputResponse.of(rowSchema);
@@ -142,17 +211,14 @@ public final class DataTableUtils {
 
         DataTableRow firstRow = rows.getFirst();
 
-        Map<String, Object> sampleOutput = createSampleOutput(
-            dataTableService, DEVELOPMENT, baseName, firstRow.id(), firstRow.values());
-
-        return OutputResponse.of(rowSchema, sampleOutput);
+        return OutputResponse.of(rowSchema, createSampleOutput(dataTableInfo, firstRow.id(), firstRow.values()));
     }
 
-    public static BaseValueProperty<?> rowObjectSchema(
-        DataTableService dataTableService, Environment environment, String baseName) {
-
-        DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, environment.ordinal());
-
+    /**
+     * Takes the already-resolved table rather than looking it up, so that an output refresh scans the catalog once
+     * instead of once here and once again in {@link #createSampleOutput}.
+     */
+    public static BaseValueProperty<?> rowObjectSchema(@Nullable DataTableInfo dataTableInfo) {
         List<Property.ValueProperty<?>> properties = new ArrayList<>();
 
         properties.add(integer("id").label("ID"));
@@ -168,19 +234,15 @@ public final class DataTableUtils {
 
     /**
      * Creates a sample output map from a row's values, filling in sample values for null columns based on their types.
+     * Takes the already-resolved table for the same reason {@link #rowObjectSchema} does.
      *
-     * @param dataTableService the data table service
-     * @param environment      the environment
-     * @param baseName         the table base name
-     * @param rowId            the row id
-     * @param rowValues        the row values map (may contain null values)
+     * @param dataTableInfo the resolved table, or null when the run could not see one
+     * @param rowId         the row id
+     * @param rowValues     the row values map (may contain null values)
      * @return a map with id and all column values, with sample values for null entries
      */
     public static Map<String, Object> createSampleOutput(
-        DataTableService dataTableService, Environment environment, String baseName, long rowId,
-        Map<String, Object> rowValues) {
-
-        DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, environment.ordinal());
+        @Nullable DataTableInfo dataTableInfo, long rowId, Map<String, Object> rowValues) {
 
         Map<String, Object> sampleOutput = new HashMap<>();
 
@@ -239,22 +301,23 @@ public final class DataTableUtils {
     }
 
     /**
-     * Creates a PropertiesFunction for dynamic properties lookup based on table columns.
+     * Creates a PropertiesFunction for dynamic properties lookup based on the columns of the selected table.
      *
-     * @param dataTableService the data table service
      * @return a PropertiesFunction that returns properties based on the selected table
      */
     public static ActionDefinition.PropertiesFunction createDynamicProperties(
-        DataTableService dataTableService, boolean singleRecord) {
+        DataTableService dataTableService, DataTableWorkspaceResolver dataTableWorkspaceResolver,
+        boolean singleRecord) {
 
         return (inputParameters, connectionParameters, dependencyPaths, context) -> {
-            String baseName = inputParameters.getString(TABLE);
+            String name = inputParameters.getString(TABLE);
 
-            if (baseName == null || baseName.isBlank()) {
+            if (name == null || name.isBlank()) {
                 return List.of();
             }
 
-            DataTableInfo dataTableInfo = getDataTableInfo(dataTableService, baseName, DEVELOPMENT.ordinal());
+            DataTableInfo dataTableInfo = getDataTableInfo(
+                dataTableService, resolveWorkspaceId(dataTableWorkspaceResolver, context), name, DEVELOPMENT.ordinal());
 
             if (dataTableInfo == null || dataTableInfo.columns() == null) {
                 return List.of();
@@ -293,6 +356,21 @@ public final class DataTableUtils {
             case DATE_TIME -> LocalDateTime.now();
             case BOOLEAN -> false;
         };
+    }
+
+    private static OptionalLong resolveByWorkflowId(
+        DataTableWorkspaceResolver dataTableWorkspaceResolver, @Nullable String workflowId) {
+
+        if (workflowId == null) {
+            return OptionalLong.empty();
+        }
+
+        return dataTableWorkspaceResolver.resolveByWorkflowId(workflowId);
+    }
+
+    private static DataTableException notFound(String name) {
+        return new DataTableException(
+            "Data table '" + name + "' not found in this workspace", DataTableErrorType.DATA_TABLE_NOT_FOUND);
     }
 
     private static Property.ValueProperty<?> mapColumn(ColumnSpec columnSpec) {

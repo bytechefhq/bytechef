@@ -17,23 +17,24 @@
 package com.bytechef.automation.data.table.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTable;
-import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
+import com.bytechef.platform.data.table.configuration.domain.DataTable;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
+import com.bytechef.platform.data.table.domain.DataTableRef;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
+import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -43,87 +44,65 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class WorkspaceDataTableFacadeTest {
 
-    private static final long ENVIRONMENT_ID = 0L;
+    @Mock
+    private DataTableRowService dataTableRowService;
 
     @Mock
     private DataTableService dataTableService;
 
     @Mock
-    private WorkspaceDataTableService workspaceDataTableService;
+    private DataTableStorageService dataTableStorageService;
+
+    @Mock
+    private DataTableTagService dataTableTagService;
+
+    @Mock
+    private DataTableWebhookService dataTableWebhookService;
 
     private WorkspaceDataTableFacade workspaceDataTableFacade;
 
     @BeforeEach
     void setUp() {
-        workspaceDataTableFacade = new WorkspaceDataTableFacadeImpl(dataTableService, workspaceDataTableService);
+        workspaceDataTableFacade = new WorkspaceDataTableFacadeImpl(
+            dataTableRowService, dataTableService, dataTableStorageService, dataTableTagService,
+            dataTableWebhookService);
     }
 
     @Test
-    void testCreateTableAssignsTableToWorkspace() {
-        List<ColumnSpec> columnSpecs = List.of(new ColumnSpec("name", ColumnType.STRING));
+    void testCreateTablePassesTheWorkspaceAndReturnsTheId() {
+        List<ColumnSpec> columnSpecs = List.of(new ColumnSpec("title", ColumnType.STRING));
 
-        when(dataTableService.getIdByBaseName("events")).thenReturn(7L);
+        when(dataTableService.createTable(7L, "orders", "desc", columnSpecs, 0L)).thenReturn(1051L);
 
-        workspaceDataTableFacade.createTable("events", "Events", columnSpecs, 3L, ENVIRONMENT_ID);
+        long dataTableId = workspaceDataTableFacade.createTable("orders", "desc", columnSpecs, 7L, 0L);
 
-        InOrder inOrder = inOrder(dataTableService, workspaceDataTableService);
-
-        inOrder.verify(dataTableService)
-            .createTable("events", "Events", columnSpecs, ENVIRONMENT_ID);
-        inOrder.verify(workspaceDataTableService)
-            .assignDataTableToWorkspace(7L, 3L);
+        assertThat(dataTableId).isEqualTo(1051L);
     }
 
     @Test
-    void testDuplicateTableAssignsCopyToSourceWorkspace() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("events");
-        when(dataTableService.getIdByBaseName("events_copy")).thenReturn(8L);
-        when(workspaceDataTableService.getDataTableWorkspaceDataTables(7L))
-            .thenReturn(List.of(new WorkspaceDataTable(7L, 3L)));
+    void testListTablesListsOnlyTheWorkspace() {
+        DataTableInfo dataTableInfo = new DataTableInfo(1051L, "orders", 7L, null, List.of(), Instant.EPOCH);
 
-        workspaceDataTableFacade.duplicateTable(7L, "events_copy", ENVIRONMENT_ID);
+        when(dataTableService.listTables(7L, 0L)).thenReturn(List.of(dataTableInfo));
 
-        InOrder inOrder = inOrder(dataTableService, workspaceDataTableService);
-
-        inOrder.verify(dataTableService)
-            .duplicateTable("events", "events_copy", ENVIRONMENT_ID);
-        inOrder.verify(workspaceDataTableService)
-            .assignDataTableToWorkspace(8L, 3L);
+        assertThat(workspaceDataTableFacade.listTables(7L, 0L)).containsExactly(dataTableInfo);
     }
 
     @Test
-    void testDuplicateTableAssignsCopyToEverySourceWorkspace() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("events");
-        when(dataTableService.getIdByBaseName("events_copy")).thenReturn(8L);
-        when(workspaceDataTableService.getDataTableWorkspaceDataTables(7L))
-            .thenReturn(List.of(new WorkspaceDataTable(7L, 3L), new WorkspaceDataTable(7L, 4L)));
+    void testGetWorkspaceIdReadsTheColumn() {
+        DataTable dataTable = new DataTable(1051L, "orders");
 
-        workspaceDataTableFacade.duplicateTable(7L, "events_copy", ENVIRONMENT_ID);
+        dataTable.setWorkspaceId(7L);
 
-        verify(workspaceDataTableService).assignDataTableToWorkspace(8L, 3L);
-        verify(workspaceDataTableService).assignDataTableToWorkspace(8L, 4L);
+        when(dataTableService.getDataTable(1051L)).thenReturn(dataTable);
+
+        assertThat(workspaceDataTableFacade.getWorkspaceId(1051L)).isEqualTo(7L);
     }
 
     @Test
-    void testDuplicateTableWithoutSourceWorkspaceAssignsNothing() {
-        when(dataTableService.getBaseNameById(7L)).thenReturn("events");
-        when(dataTableService.getIdByBaseName("events_copy")).thenReturn(8L);
-        when(workspaceDataTableService.getDataTableWorkspaceDataTables(7L)).thenReturn(List.of());
+    void testListRowsBuildsAnIdRef() {
+        workspaceDataTableFacade.listRows(1051L, 10, 0, 0L);
 
-        workspaceDataTableFacade.duplicateTable(7L, "events_copy", ENVIRONMENT_ID);
-
-        verify(dataTableService).duplicateTable("events", "events_copy", ENVIRONMENT_ID);
-        verify(workspaceDataTableService, never()).assignDataTableToWorkspace(anyLong(), anyLong());
-    }
-
-    @Test
-    void testListTablesReturnsOnlyWorkspaceTables() {
-        DataTableInfo events = new DataTableInfo(7L, "events", null, List.of(), null);
-        DataTableInfo eventsCopy = new DataTableInfo(8L, "events_copy", null, List.of(), null);
-
-        when(dataTableService.listTables(ENVIRONMENT_ID)).thenReturn(List.of(events, eventsCopy));
-        when(workspaceDataTableService.getWorkspaceDataTables(3L)).thenReturn(List.of(new WorkspaceDataTable(7L, 3L)));
-
-        assertThat(workspaceDataTableFacade.listTables(3L, ENVIRONMENT_ID)).containsExactly(events);
+        verify(dataTableRowService).listRows(new DataTableRef(1051L, 0L), 10, 0);
     }
 }

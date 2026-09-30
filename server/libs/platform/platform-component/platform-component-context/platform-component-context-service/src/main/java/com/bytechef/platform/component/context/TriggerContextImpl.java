@@ -41,6 +41,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     private final @Nullable Long jobPrincipalId;
     private final String triggerName;
     private final @Nullable PlatformType type;
+    private final @Nullable String workflowId;
     private final @Nullable String workflowUuid;
 
     @SuppressFBWarnings("EI")
@@ -59,6 +60,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         this.jobPrincipalId = builder.jobPrincipalId;
         this.triggerName = builder.triggerName;
         this.type = builder.type;
+        this.workflowId = builder.workflowId;
         this.workflowUuid = builder.workflowUuid;
     }
 
@@ -90,6 +92,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
         private @Nullable Long triggerExecutionId;
         private final String triggerName;
         private @Nullable PlatformType type;
+        private @Nullable String workflowId;
         private @Nullable String workflowUuid;
 
         private Builder(
@@ -155,6 +158,12 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
             return this;
         }
 
+        Builder workflowId(@Nullable String workflowId) {
+            this.workflowId = workflowId;
+
+            return this;
+        }
+
         Builder workflowUuid(@Nullable String workflowUuid) {
             this.workflowUuid = workflowUuid;
 
@@ -193,6 +202,11 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     @Override
     public @Nullable PlatformType getType() {
         return type;
+    }
+
+    @Override
+    public @Nullable String getWorkflowId() {
+        return workflowId;
     }
 
     @Override

@@ -22,7 +22,7 @@ import com.bytechef.automation.search.SearchResult;
 /**
  * @author Ivica Cardic
  */
-public record WorkflowSearchResult(Long id, long projectId, String label, String description)
+public record WorkflowSearchResult(Long id, long projectId, String label, String description, Long workspaceId)
     implements SearchResult<Long> {
 
     @Override

@@ -96,6 +96,18 @@ const GROUP_META: Record<
     description: "Pull a project from its configured git repository.",
     // Deliberately not comingSoon: settings/git-configuration is not flagged.
   },
+  // One entry per tag in the automation-data-tables spec -- the keys are `automation-data-tables-<tag>`.
+  'automation-data-tables-data-table': {
+    title: 'Automation Data Tables',
+    navTitle: 'Tables',
+    description: 'Create, fetch, update and delete data tables and their columns.',
+  },
+  'automation-data-tables-data-table-row': {
+    title: 'Automation Data Table Rows',
+    navTitle: 'Rows',
+    description:
+      'Query, write, batch, import and export the rows of a data table, and upsert them by external ID.',
+  },
   // Browser-facing twins: same resources, reached with a Signing Key JWT.
   'embedded-configuration-integration-frontend': {
     title: 'Embedded Integrations (Frontend)',

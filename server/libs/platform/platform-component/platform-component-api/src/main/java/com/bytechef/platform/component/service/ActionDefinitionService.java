@@ -92,10 +92,37 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @throws ProviderException                             if the external systems or services are unavailable or
      *                                                       result in errors
      */
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable ComponentConnection componentConnection) {
+
+        return executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnection, null);
+    }
+
+    /**
+     * Executes the dynamic resolution of options for a specific property of a component, on behalf of the workflow the
+     * editor call runs for. Behaves like
+     * {@link #executeOptions(String, int, String, String, Map, List, String, ComponentConnection)} and additionally
+     * exposes {@code workflowId} through the action context.
+     *
+     * @param componentName        the name of the component
+     * @param componentVersion     the version of the component
+     * @param actionName           the name of the action triggering the option resolution
+     * @param propertyName         the name of the property for which options are being resolved
+     * @param inputParameters      a map containing input parameters required for business logic
+     * @param lookupDependsOnPaths a list of dependent property paths that impact the options
+     * @param searchText           the text query to filter the resolved options (if applicable)
+     * @param componentConnection  an optional connection object for interactions with external systems
+     * @param workflowId           the id of the workflow the editor call runs for, if any
+     * @return a list of {@link Option} objects dynamically resolved for the specified property
+     */
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        @Nullable ComponentConnection componentConnection);
+        @Nullable ComponentConnection componentConnection, @Nullable String workflowId);
 
     /**
      * Executes the dynamic resolution of options for a property of an action that binds multiple connections. Behaves
@@ -118,10 +145,38 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @throws ProviderException                             if the external systems or services are unavailable or
      *                                                       result in errors
      */
+    default List<Option> executeOptions(
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions) {
+
+        return executeOptions(
+            componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
+            searchText, componentConnections, extensions, null);
+    }
+
+    /**
+     * Executes the dynamic resolution of options for a property of an action that binds multiple connections, on behalf
+     * of the workflow the editor call runs for. Behaves like
+     * {@link #executeOptions(String, int, String, String, Map, List, String, Map, Map)} and additionally exposes
+     * {@code workflowId} through the action context.
+     *
+     * @param componentName        the name of the component
+     * @param componentVersion     the version of the component
+     * @param actionName           the name of the action triggering the option resolution
+     * @param propertyName         the name of the property for which options are being resolved
+     * @param inputParameters      a map containing input parameters required for business logic
+     * @param lookupDependsOnPaths a list of dependent property paths that impact the options
+     * @param searchText           the text query to filter the resolved options (if applicable)
+     * @param componentConnections a map of the action's bound connections, keyed by component connection name
+     * @param extensions           a map of optional extensions to further control the option resolution
+     * @param workflowId           the id of the workflow the editor call runs for, if any
+     * @return a list of {@link Option} objects dynamically resolved for the specified property
+     */
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
-        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions);
+        Map<String, ComponentConnection> componentConnections, Map<String, ?> extensions, @Nullable String workflowId);
 
     /**
      * Executes the defined output logic for a specific component and its version, based on the given action name, input
@@ -135,10 +190,30 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @param componentConnections a map of component connections used for external interactions
      * @return the result of the output execution as an OutputResponse object
      */
+    default @Nullable OutputResponse executeOutput(
+        String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
+        Map<String, ComponentConnection> componentConnections) {
+
+        return executeOutput(componentName, componentVersion, actionName, inputParameters, componentConnections, null);
+    }
+
+    /**
+     * Executes the defined output logic for a specific component and its version on behalf of the workflow the editor
+     * call runs for. Behaves like {@link #executeOutput(String, int, String, Map, Map)} and additionally exposes
+     * {@code workflowId} through the action context.
+     *
+     * @param componentName        the name of the component
+     * @param componentVersion     the version of the component
+     * @param actionName           the name of the action to execute
+     * @param inputParameters      a map of input parameters required for processing
+     * @param componentConnections a map of component connections used for external interactions
+     * @param workflowId           the id of the workflow the editor call runs for, if any
+     * @return the result of the output execution as an OutputResponse object
+     */
     @Nullable
     OutputResponse executeOutput(
         String componentName, int componentVersion, String actionName, Map<String, ?> inputParameters,
-        Map<String, ComponentConnection> componentConnections);
+        Map<String, ComponentConnection> componentConnections, @Nullable String workflowId);
 
     /**
      * Executes the perform logic for a specific component and its version, based on the given action name, mode type,

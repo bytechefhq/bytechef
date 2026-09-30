@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,10 +30,17 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.PropertiesDataSource;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.OptionsFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
@@ -75,10 +83,12 @@ public class TriggerDefinitionServiceTest {
 
     @BeforeEach
     void setUpMocks() {
-        when(contextFactory.createTriggerContext(
-            Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(),
-            Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any()))
-                .thenReturn(triggerContext);
+        Mockito.lenient()
+            .when(
+                contextFactory.createTriggerContext(
+                    Mockito.anyString(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(),
+                    Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.any()))
+            .thenReturn(triggerContext);
     }
 
     @Test
@@ -450,5 +460,75 @@ public class TriggerDefinitionServiceTest {
             .createTriggerContext(
                 Mockito.eq("testComponent"), Mockito.eq(1), Mockito.eq("testTrigger"), Mockito.any(), Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(false), Mockito.eq(4200L));
+    }
+
+    @Test
+    public void testExecuteOptionsPassesTheWorkflowIdToTheContext() throws Exception {
+        DynamicOptionsProperty<?> dynamicOptionsProperty = mock(
+            DynamicOptionsProperty.class, Mockito.withSettings()
+                .extraInterfaces(Property.class));
+        OptionsDataSource<?> optionsDataSource = mock(OptionsDataSource.class);
+        OptionsFunction<String> optionsFunction =
+            (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> List.of();
+
+        doReturn(dynamicOptionsProperty).when(componentDefinitionRegistry)
+            .getTriggerProperty(
+                Mockito.eq("dataTable"), Mockito.eq(1), Mockito.eq("recordCreated"), Mockito.eq("table"),
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        doReturn(Optional.of(optionsDataSource)).when(dynamicOptionsProperty)
+            .getOptionsDataSource();
+        doReturn(optionsFunction).when(optionsDataSource)
+            .getOptions();
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        triggerDefinitionService.executeOptions(
+            "dataTable", 1, "recordCreated", "table", Map.of(), List.of(), null, null, "workflow-1");
+
+        Mockito.verify(contextFactory)
+            .createTriggerContext("dataTable", 1, "recordCreated", null, null, "workflow-1", null, null, null, true);
+    }
+
+    @Test
+    public void testExecuteOutputPassesTheWorkflowIdToTheContext() {
+        TriggerDefinition triggerDefinition = mock(TriggerDefinition.class);
+
+        when(componentDefinitionRegistry.getTriggerDefinition("dataTable", 1, "recordCreated"))
+            .thenReturn(triggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        triggerDefinitionService.executeOutput("dataTable", 1, "recordCreated", Map.of(), null, "workflow-1");
+
+        Mockito.verify(contextFactory)
+            .createTriggerContext("dataTable", 1, "recordCreated", null, null, "workflow-1", null, null, null, true);
+    }
+
+    @Test
+    public void testExecuteDynamicPropertiesPassesTheWorkflowIdToTheContext() throws Exception {
+        DynamicPropertiesProperty dynamicPropertiesProperty = mock(DynamicPropertiesProperty.class);
+        PropertiesDataSource<?> propertiesDataSource = mock(PropertiesDataSource.class);
+        PropertiesFunction propertiesFunction =
+            (inputParameters, connectionParameters, lookupDependsOnPaths, context) -> List.of();
+
+        doReturn(dynamicPropertiesProperty).when(componentDefinitionRegistry)
+            .getTriggerProperty(
+                Mockito.eq("dataTable"), Mockito.eq(1), Mockito.eq("recordCreated"), Mockito.eq("columns"),
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+        doReturn(propertiesDataSource).when(dynamicPropertiesProperty)
+            .getDynamicPropertiesDataSource();
+        doReturn(propertiesFunction).when(propertiesDataSource)
+            .getProperties();
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        triggerDefinitionService.executeDynamicProperties(
+            "dataTable", 1, "recordCreated", Map.of(), "columns", List.of(), null, "workflow-1");
+
+        Mockito.verify(contextFactory)
+            .createTriggerContext("dataTable", 1, "recordCreated", null, null, "workflow-1", null, null, null, true);
     }
 }

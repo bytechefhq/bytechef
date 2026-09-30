@@ -45,7 +45,9 @@ class ProjectSearchAssetProvider implements SearchAssetProvider {
                 project -> containsIgnoreCase(project.getName(), queryLower) ||
                     containsIgnoreCase(project.getDescription(), queryLower))
             .limit(limit)
-            .map(project -> new ProjectSearchResult(project.getId(), project.getName(), project.getDescription()))
+            .map(
+                project -> new ProjectSearchResult(
+                    project.getId(), project.getName(), project.getDescription(), project.getWorkspaceId()))
             .toList();
     }
 

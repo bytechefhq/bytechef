@@ -17,10 +17,9 @@
 package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
-import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -35,26 +34,21 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableWebhookGraphQlController {
 
-    private final DataTableService dataTableService;
-    private final DataTableWebhookService dataTableWebhookService;
     private final EnvironmentService environmentService;
+    private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     public DataTableWebhookGraphQlController(
-        DataTableService dataTableService, DataTableWebhookService dataTableWebhookService,
-        EnvironmentService environmentService) {
+        EnvironmentService environmentService, WorkspaceDataTableFacade workspaceDataTableFacade) {
 
-        this.dataTableService = dataTableService;
-        this.dataTableWebhookService = dataTableWebhookService;
         this.environmentService = environmentService;
+        this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
     @QueryMapping
     public List<Webhook> dataTableWebhooks(@Argument Long environmentId, @Argument Long tableId) {
         environmentService.getEnvironment(environmentId);
 
-        String baseName = dataTableService.getBaseNameById(tableId);
-
-        return dataTableWebhookService.listWebhooks(baseName, environmentId)
+        return workspaceDataTableFacade.listWebhooks(tableId, environmentId)
             .stream()
             .map(webhook -> new Webhook(webhook.id(), webhook.url(), webhook.type(), webhook.environmentId()))
             .toList();

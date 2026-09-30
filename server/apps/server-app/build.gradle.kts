@@ -269,6 +269,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-service"))
+    implementation(project(":server:ee:libs:automation:automation-data-table:automation-data-table-public-rest"))
     implementation(project(":server:ee:libs:automation:automation-security-web:automation-security-web-impl"))
     implementation(project(":server:ee:libs:config:cloud-config"))
     implementation(project(":server:ee:libs:config:observability-config"))

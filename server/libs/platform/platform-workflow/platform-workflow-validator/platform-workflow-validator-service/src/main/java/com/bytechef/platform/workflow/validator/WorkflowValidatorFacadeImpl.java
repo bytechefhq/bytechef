@@ -148,9 +148,9 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
         WorkflowValidator.validateWorkflow(
             workflow, this::getTaskProperties, this::getTaskOutputProperty, clusterTypesProvider,
-            createResourceReferenceProvider(resourceReferenceResolverMap, environmentId), new HashMap<>(),
-            new HashMap<>(), nodeOutputMaps.outputMap(), nodeOutputMaps.variableOutputMap(), new HashMap<>(), errors,
-            warnings);
+            createResourceReferenceProvider(resourceReferenceResolverMap, environmentId, workflowId),
+            new HashMap<>(), new HashMap<>(), nodeOutputMaps.outputMap(), nodeOutputMaps.variableOutputMap(),
+            new HashMap<>(), errors, warnings);
 
         if (workflowId != null) {
             appendMissingConnections(workflow, workflowId, environmentId, errors);
@@ -185,14 +185,15 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     static WorkflowValidator.ResourceReferenceProvider createResourceReferenceProvider(
-        Map<ResourceType, ResourceReferenceResolver> resourceReferenceResolverMap, long environmentId) {
+        Map<ResourceType, ResourceReferenceResolver> resourceReferenceResolverMap, long environmentId,
+        @Nullable String workflowId) {
 
         return (resourceType, reference) -> {
             ResourceReferenceResolver resourceReferenceResolver =
                 resourceReferenceResolverMap.get(ResourceType.valueOf(resourceType));
 
             return resourceReferenceResolver == null
-                ? null : resourceReferenceResolver.findProblem(reference, environmentId);
+                ? null : resourceReferenceResolver.findProblem(reference, environmentId, workflowId);
         };
     }
 
