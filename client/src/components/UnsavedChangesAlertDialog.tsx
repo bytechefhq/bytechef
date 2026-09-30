@@ -1,12 +1,4 @@
-import Button from '@/components/Button/Button';
-import {
-    AlertDialog,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import AlertDialog from '@/components/AlertDialog';
 
 interface UnsavedChangesAlertDialogPropsI {
     onCancel: () => void;
@@ -14,38 +6,18 @@ interface UnsavedChangesAlertDialogPropsI {
     open: boolean;
 }
 
-const UnsavedChangesAlertDialog = ({onCancel, onClose, open}: UnsavedChangesAlertDialogPropsI) => {
-    return (
-        <AlertDialog
-            onOpenChange={(isOpen) => {
-                if (!isOpen) {
-                    onCancel();
-                }
-            }}
-            open={open}
-        >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Discard code changes?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        You have unsaved changes. Are you sure you want to discard them?
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <Button label="Keep editing" onClick={onCancel} variant="outline" />
-
-                    <Button
-                        className="opacity-100"
-                        label="Close & discard"
-                        onClick={onClose}
-                        variant="destructiveGhost"
-                    />
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-};
+const UnsavedChangesAlertDialog = ({onCancel, onClose, open}: UnsavedChangesAlertDialogPropsI) => (
+    <AlertDialog
+        cancelLabel="Keep editing"
+        confirmButtonVariant="destructiveGhost"
+        confirmClassName="opacity-100"
+        confirmLabel="Close & discard"
+        description="You have unsaved changes. Are you sure you want to discard them?"
+        onCancel={onCancel}
+        onConfirm={onClose}
+        open={open}
+        title="Discard code changes?"
+    />
+);
 
 export default UnsavedChangesAlertDialog;

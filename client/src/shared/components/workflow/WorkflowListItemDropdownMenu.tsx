@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -65,9 +65,9 @@ const WorkflowListItemDropdownMenu = ({
             </DropdownMenu>
 
             {showDeleteWorkflowAlertDialog && (
-                <DeleteAlertDialog
+                <AlertDialog
                     onCancel={() => setShowDeleteWorkflowAlertDialog(false)}
-                    onDelete={() => {
+                    onConfirm={() => {
                         onDelete();
 
                         setShowDeleteWorkflowAlertDialog(false);

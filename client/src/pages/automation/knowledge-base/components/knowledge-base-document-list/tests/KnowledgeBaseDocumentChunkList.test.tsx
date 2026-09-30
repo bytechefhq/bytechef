@@ -33,13 +33,13 @@ vi.mock('../KnowledgeBaseDocumentChunkListSelectionBar', () => ({
     default: () => <div data-testid="selection-bar">Selection Bar</div>,
 }));
 
-vi.mock('@/components/DeleteAlertDialog', () => ({
-    default: ({onCancel, onDelete, open}: {open: boolean; onCancel: () => void; onDelete: () => void}) =>
+vi.mock('@/components/AlertDialog', () => ({
+    default: ({onCancel, onConfirm, open}: {open: boolean; onCancel: () => void; onConfirm: () => void}) =>
         open ? (
             <div data-testid="delete-dialog">
                 <button onClick={onCancel}>Cancel</button>
 
-                <button onClick={onDelete}>Delete</button>
+                <button onClick={onConfirm}>Delete</button>
             </div>
         ) : null,
 }));

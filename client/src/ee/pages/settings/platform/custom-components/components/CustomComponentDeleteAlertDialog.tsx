@@ -1,10 +1,10 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 const CustomComponentDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
-    <DeleteAlertDialog
+    <AlertDialog
         description="This action cannot be undone. This will permanently delete the custom component."
         onCancel={onClose}
-        onDelete={onDelete}
+        onConfirm={onDelete}
         open
     />
 );

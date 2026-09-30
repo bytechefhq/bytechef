@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -48,9 +48,9 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleConfirmDelete}
+                onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}
             />
         </>

@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -187,9 +187,9 @@ const AiAgentEvalTestCard = ({
             </div>
 
             {showDeleteDialog && (
-                <DeleteAlertDialog
+                <AlertDialog
                     onCancel={() => setShowDeleteDialog(false)}
-                    onDelete={() => {
+                    onConfirm={() => {
                         onDeleteTest(test.id);
                         setShowDeleteDialog(false);
                     }}

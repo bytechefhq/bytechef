@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import useKnowledgeBaseListItemDeleteDialog from '@/pages/automation/knowledge-bases/components/knowledge-base-list/hooks/useKnowledgeBaseListItemDeleteDialog';
 
 interface KnowledgeBaseListItemDeleteDialogProps {
@@ -18,10 +18,10 @@ const KnowledgeBaseListItemDeleteDialog = ({
     });
 
     return (
-        <DeleteAlertDialog
+        <AlertDialog
             description="This action cannot be undone. This will permanently delete the knowledge base and all documents it contains."
             onCancel={handleCancelClick}
-            onDelete={handleDeleteClick}
+            onConfirm={handleDeleteClick}
             open={open}
         />
     );

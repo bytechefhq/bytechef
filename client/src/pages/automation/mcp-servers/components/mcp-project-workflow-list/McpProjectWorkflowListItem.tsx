@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
@@ -84,9 +84,9 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
                 )}
             </Popover>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleConfirmDelete}
+                onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}
             />
 

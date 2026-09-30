@@ -1,11 +1,11 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 const DeleteIntegrationAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
-    <DeleteAlertDialog
+    <AlertDialog
         ariaLabel="Confirm Integration Deletion"
         description="This action cannot be undone. This will permanently delete the integration and workflows it contains."
         onCancel={onClose}
-        onDelete={onDelete}
+        onConfirm={onDelete}
         open
     />
 );

@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {Notification} from '@/shared/middleware/platform/notification';
 
 interface NotificationDeleteDialogProps {
@@ -14,10 +14,10 @@ const NotificationDeleteDialog = ({
     isDeleteDialogOpen,
     selectedNotification,
 }: NotificationDeleteDialogProps) => (
-    <DeleteAlertDialog
+    <AlertDialog
         description="This action cannot be undone."
         onCancel={closeDeleteDialog}
-        onDelete={() => selectedNotification && handleDeleteNotification(selectedNotification.id!)}
+        onConfirm={() => selectedNotification && handleDeleteNotification(selectedNotification.id!)}
         open={isDeleteDialogOpen}
         title={`Delete ${selectedNotification?.name} notification?`}
     />

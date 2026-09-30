@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import KnowledgeBaseDocumentChunkEditDialog from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkEditDialog';
 import KnowledgeBaseDocumentChunkListItemDropdownMenu from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkListItemDropdownMenu';
 import KnowledgeBaseDocumentChunkListItemHeader from '@/pages/automation/knowledge-base/components/knowledge-base-document-list/KnowledgeBaseDocumentChunkListItemHeader';
@@ -61,11 +61,7 @@ const KnowledgeBaseDocumentChunkList = ({
 
             <KnowledgeBaseDocumentChunkEditDialog knowledgeBaseId={knowledgeBaseId} />
 
-            <DeleteAlertDialog
-                onCancel={handleDeleteDialogClose}
-                onDelete={handleDeleteConfirm}
-                open={deleteDialogOpen}
-            />
+            <AlertDialog onCancel={handleDeleteDialogClose} onConfirm={handleDeleteConfirm} open={deleteDialogOpen} />
         </div>
     );
 };

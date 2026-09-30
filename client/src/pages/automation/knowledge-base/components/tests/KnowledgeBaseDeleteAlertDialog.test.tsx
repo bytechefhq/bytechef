@@ -15,15 +15,15 @@ vi.mock('../hooks/useKnowledgeBaseDeleteAlertDialog', () => ({
     default: hoisted.mockUseKnowledgeBaseDeleteAlertDialog,
 }));
 
-vi.mock('@/components/DeleteAlertDialog', () => ({
-    default: ({onCancel, onDelete, open}: {onCancel: () => void; onDelete: () => void; open: boolean}) =>
+vi.mock('@/components/AlertDialog', () => ({
+    default: ({onCancel, onConfirm, open}: {onCancel: () => void; onConfirm: () => void; open: boolean}) =>
         open ? (
             <div data-testid="delete-alert-dialog">
                 <button data-testid="cancel-button" onClick={onCancel}>
                     Cancel
                 </button>
 
-                <button data-testid="delete-button" onClick={onDelete}>
+                <button data-testid="delete-button" onClick={onConfirm}>
                     Delete
                 </button>
             </div>

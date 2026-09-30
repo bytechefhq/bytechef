@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {useDeleteConnectedUserMutation} from '@/ee/shared/mutations/embedded/connectedUsers.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -21,10 +21,10 @@ const ConnectedUserDeleteDialog = ({connectedUserId, onClose}: {connectedUserId:
     };
 
     return (
-        <DeleteAlertDialog
+        <AlertDialog
             description="This action cannot be undone. This will permanently delete the connected user."
             onCancel={onClose}
-            onDelete={handleClick}
+            onConfirm={handleClick}
             open
         />
     );

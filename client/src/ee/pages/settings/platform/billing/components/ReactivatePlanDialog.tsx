@@ -1,14 +1,4 @@
-import Button from '@/components/Button/Button';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {Loader2Icon} from 'lucide-react';
+import AlertDialog from '@/components/AlertDialog';
 
 interface ReactivatePlanDialogPropsI {
     isPending: boolean;
@@ -19,36 +9,16 @@ interface ReactivatePlanDialogPropsI {
 
 const ReactivatePlanDialog = ({isPending, onClose, onConfirm, open}: ReactivatePlanDialogPropsI) => (
     <AlertDialog
-        onOpenChange={(isOpen) => {
-            if (!isOpen) {
-                onClose();
-            }
-        }}
+        cancelLabel="Keep cancelled"
+        confirmButtonVariant="default"
+        confirmLabel={isPending ? 'Reactivating…' : 'Reactivate subscription'}
+        description="Your subscription will continue and you will be charged at the next billing cycle. Your plan will no longer be cancelled."
+        isPending={isPending}
+        onCancel={onClose}
+        onConfirm={onConfirm}
         open={open}
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Reactivate subscription?</AlertDialogTitle>
-
-                <AlertDialogDescription>
-                    Your subscription will continue and you will be charged at the next billing cycle. Your plan will no
-                    longer be cancelled.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter>
-                <AlertDialogCancel disabled={isPending}>Keep cancelled</AlertDialogCancel>
-
-                <Button
-                    disabled={isPending}
-                    icon={isPending ? <Loader2Icon className="animate-spin" /> : undefined}
-                    label={isPending ? 'Reactivating…' : 'Reactivate subscription'}
-                    onClick={onConfirm}
-                    variant="default"
-                />
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+        title="Reactivate subscription?"
+    />
 );
 
 export default ReactivatePlanDialog;

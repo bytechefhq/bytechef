@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
@@ -34,9 +34,9 @@ const McpComponentToolDropdownMenu = ({
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleConfirmDelete}
+                onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}
             />
         </>

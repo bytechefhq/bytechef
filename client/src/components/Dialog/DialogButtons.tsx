@@ -19,6 +19,7 @@ interface DialogPreviousButtonProps {
 
 interface DialogCancelButtonProps {
     className?: string;
+    disabled?: boolean;
     label?: string;
 }
 
@@ -72,10 +73,10 @@ function DialogPreviousButton({className, label = 'Previous'}: DialogPreviousBut
 
 DialogPreviousButton.displayName = 'DialogPreviousButton';
 
-function DialogCancelButton({className, label = 'Cancel'}: DialogCancelButtonProps) {
+function DialogCancelButton({className, disabled, label = 'Cancel'}: DialogCancelButtonProps) {
     return (
         <ShadcnDialogClose asChild>
-            <Button className={className} label={label} type="button" variant="outline" />
+            <Button className={className} disabled={disabled} label={label} type="button" variant="outline" />
         </ShadcnDialogClose>
     );
 }

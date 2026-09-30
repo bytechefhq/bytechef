@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 interface ProjectDeploymentListItemAlertDialogProps {
     onCancelClick: () => void;
@@ -11,11 +11,11 @@ const ProjectDeploymentListItemAlertDialog = ({
     onCancelClick,
     onDeleteClick,
 }: ProjectDeploymentListItemAlertDialogProps) => (
-    <DeleteAlertDialog
+    <AlertDialog
         description="This action cannot be undone. This will permanently delete the project and workflows it contains."
         isPending={isPending}
         onCancel={onCancelClick}
-        onDelete={onDeleteClick}
+        onConfirm={onDeleteClick}
         open
     />
 );

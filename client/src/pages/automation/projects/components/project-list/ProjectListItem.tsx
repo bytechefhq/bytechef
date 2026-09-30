@@ -1,7 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
@@ -592,11 +592,11 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 </div>
             </div>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 ariaLabel="Confirm Project Deletion"
                 description="This action cannot be undone. This will permanently delete the project and workflows it contains."
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={() => {
+                onConfirm={() => {
                     if (project.id) {
                         deleteProjectMutation.mutate(project.id);
                     }

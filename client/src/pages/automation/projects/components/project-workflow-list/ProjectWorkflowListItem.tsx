@@ -23,7 +23,7 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 
 import '@/shared/styles/dropdownMenu.css';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
@@ -226,9 +226,9 @@ const ProjectWorkflowListItem = ({
             </div>
 
             {showDeleteDialog && (
-                <DeleteAlertDialog
+                <AlertDialog
                     onCancel={() => setShowDeleteDialog(false)}
-                    onDelete={() => {
+                    onConfirm={() => {
                         if (workflow?.id) {
                             deleteWorkflowMutation.mutate({
                                 id: workflow.id,

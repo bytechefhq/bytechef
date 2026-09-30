@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
@@ -136,9 +136,9 @@ const ConnectedUserMcpServerListItem = ({
                 </CollapsibleContent>
             </Collapsible>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={() =>
+                onConfirm={() =>
                     deleteConnectedUserMcpServerMutation.mutate({
                         connectedUserId: connectedUserId.toString(),
                         mcpServerId: mcpServer.id,

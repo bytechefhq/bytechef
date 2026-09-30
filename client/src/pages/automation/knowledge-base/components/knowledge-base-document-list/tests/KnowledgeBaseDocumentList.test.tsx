@@ -30,7 +30,7 @@ vi.mock('../KnowledgeBaseDocumentListRow', () => ({
     ),
 }));
 
-vi.mock('@/components/DeleteAlertDialog', () => ({
+vi.mock('@/components/AlertDialog', () => ({
     default: ({open}: {open: boolean}) => (open ? <div data-testid="delete-dialog">Delete Dialog</div> : null),
 }));
 

@@ -1,7 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
@@ -268,9 +268,9 @@ const AutomationWorkflowProjectListItem = ({
                 </div>
             </div>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={() => {
+                onConfirm={() => {
                     onDeleteProject(project.id);
 
                     setShowDeleteDialog(false);
