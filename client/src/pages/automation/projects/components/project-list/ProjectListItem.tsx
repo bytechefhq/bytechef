@@ -1,9 +1,9 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -617,9 +617,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             Cancel
                         </AlertDialogCancel>
 
-                        <AlertDialogAction
+                        <DestructiveAlertDialogAction
                             aria-label="Confirm Project Deletion"
-                            className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
                             onClick={() => {
                                 if (project.id) {
                                     deleteProjectMutation.mutate(project.id);
@@ -627,7 +626,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                             }}
                         >
                             Delete
-                        </AlertDialogAction>
+                        </DestructiveAlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

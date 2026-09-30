@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -30,13 +30,9 @@ const DeleteProjectAlertDialog = ({onClose, onDelete}: {onClose: () => void; onD
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
-                <AlertDialogAction
-                    aria-label="Confirm Project Deletion"
-                    className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                    onClick={() => onDelete()}
-                >
+                <DestructiveAlertDialogAction aria-label="Confirm Project Deletion" onClick={() => onDelete()}>
                     Delete
-                </AlertDialogAction>
+                </DestructiveAlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

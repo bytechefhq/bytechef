@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -50,14 +50,11 @@ const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDial
                         {isNodeDeleteDialog ? 'Keep node' : 'Cancel'}
                     </AlertDialogCancel>
 
-                    <AlertDialogAction
-                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                        onClick={onDelete}
-                    >
+                    <DestructiveAlertDialogAction onClick={onDelete}>
                         {isNodeDeleteDialog && <Trash2Icon />}
 
                         {isNodeDeleteDialog ? 'Delete node' : 'Delete'}
-                    </AlertDialogAction>
+                    </DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

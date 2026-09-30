@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -38,9 +38,7 @@ const AiSkillFileDeleteAlertDialog = ({
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
-                <AlertDialogAction className="bg-red-600" onClick={onDelete}>
-                    Remove
-                </AlertDialogAction>
+                <DestructiveAlertDialogAction onClick={onDelete}>Remove</DestructiveAlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

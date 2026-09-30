@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -31,13 +31,9 @@ const DeleteIntegrationAlertDialog = ({onClose, onDelete}: {onClose: () => void;
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
-                <AlertDialogAction
-                    aria-label="Confirm Integration Deletion"
-                    className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                    onClick={() => onDelete()}
-                >
+                <DestructiveAlertDialogAction aria-label="Confirm Integration Deletion" onClick={() => onDelete()}>
                     Delete
-                </AlertDialogAction>
+                </DestructiveAlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

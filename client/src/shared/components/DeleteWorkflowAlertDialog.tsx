@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -57,13 +57,9 @@ const DeleteWorkflowAlertDialog = ({onClose, onDelete}: DeleteWorkflowAlertDialo
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction
-                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                        onClick={() => onDelete()}
-                        ref={deleteButtonRef}
-                    >
+                    <DestructiveAlertDialogAction onClick={() => onDelete()} ref={deleteButtonRef}>
                         Delete
-                    </AlertDialogAction>
+                    </DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

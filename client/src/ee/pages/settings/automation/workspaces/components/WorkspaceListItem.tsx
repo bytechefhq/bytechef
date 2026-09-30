@@ -1,8 +1,8 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -134,9 +134,9 @@ const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceLis
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                        <AlertDialogAction className="bg-destructive" onClick={handleAlertDeleteDialogClick}>
+                        <DestructiveAlertDialogAction onClick={handleAlertDeleteDialogClick}>
                             Delete
-                        </AlertDialogAction>
+                        </DestructiveAlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

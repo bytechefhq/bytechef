@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -50,12 +50,7 @@ const KnowledgeBaseListItemDeleteDialog = ({
                         Cancel
                     </AlertDialogCancel>
 
-                    <AlertDialogAction
-                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                        onClick={handleDeleteClick}
-                    >
-                        Delete
-                    </AlertDialogAction>
+                    <DestructiveAlertDialogAction onClick={handleDeleteClick}>Delete</DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
