@@ -76,6 +76,10 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     };
 
     const handleDeleteClick = async () => {
+        if (isPending) {
+            return;
+        }
+
         setIsPending(true);
 
         deleteEmbeddedMcpServerMutation.mutate(
@@ -83,6 +87,9 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
                 mcpServerId: mcpServer.id,
             },
             {
+                onSettled: () => {
+                    setIsPending(false);
+                },
                 onSuccess: () => {
                     queryClient.invalidateQueries({queryKey: ['embeddedMcpServers']});
                     setShowDeleteDialog(false);

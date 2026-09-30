@@ -23,7 +23,7 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
     onEditWorkflowsClick,
     onUpdateIntegrationVersionClick,
 }: McpIntegrationInstanceConfigurationListItemDropdownMenuProps) => {
-    const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} =
+    const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
         useMcpIntegrationInstanceConfigurationListItemDropdownMenu(mcpIntegrationInstanceConfiguration.id.toString());
 
     return (
@@ -49,6 +49,7 @@ const McpIntegrationInstanceConfigurationListItemDropdownMenu = ({
             </DropdownMenu>
 
             <AlertDialog
+                isPending={isDeletePending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

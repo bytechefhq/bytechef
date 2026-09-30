@@ -11,6 +11,7 @@ interface UseDeleteDataTableColumnDialogI {
     handleDelete: () => void;
     handleOpen: (columnId: string, columnName: string) => void;
     handleOpenChange: (open: boolean) => void;
+    isPending: boolean;
     open: boolean;
 }
 
@@ -56,6 +57,7 @@ export default function useDeleteDataTableColumnDialog(): UseDeleteDataTableColu
         handleDelete,
         handleOpen,
         handleOpenChange,
+        isPending: removeColumnMutation.isPending,
         open: columnId !== null,
     };
 }

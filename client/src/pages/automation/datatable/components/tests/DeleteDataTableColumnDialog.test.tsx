@@ -9,6 +9,7 @@ const hoisted = vi.hoisted(() => {
         mockHandleDelete: vi.fn(),
         storeState: {
             columnName: 'TestColumn',
+            isPending: false,
             open: true,
         },
     };
@@ -19,12 +20,14 @@ vi.mock('../../hooks/useDeleteDataTableColumnDialog', () => ({
         columnName: hoisted.storeState.columnName,
         handleClose: hoisted.mockHandleClose,
         handleDelete: hoisted.mockHandleDelete,
+        isPending: hoisted.storeState.isPending,
         open: hoisted.storeState.open,
     }),
 }));
 
 beforeEach(() => {
     windowResizeObserver();
+    hoisted.storeState.isPending = false;
     hoisted.storeState.open = true;
     hoisted.storeState.columnName = 'TestColumn';
 });
@@ -101,6 +104,14 @@ describe('DeleteDataTableColumnDialog', () => {
             await user.click(screen.getByRole('button', {name: 'Close'}));
 
             expect(hoisted.mockHandleClose).toHaveBeenCalledTimes(1);
+        });
+
+        it('should disable the delete button while deleting', () => {
+            hoisted.storeState.isPending = true;
+
+            render(<DeleteDataTableColumnDialog />);
+
+            expect(screen.getByRole('button', {name: 'Delete'})).toBeDisabled();
         });
     });
 

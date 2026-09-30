@@ -145,6 +145,7 @@ const IntegrationWorkflowListItem = ({
 
             {showDeleteDialog && (
                 <DeleteWorkflowAlertDialog
+                    isPending={deleteWorkflowMutation.isPending}
                     onClose={() => setShowDeleteDialog(false)}
                     onDelete={() => {
                         if (workflow?.id) {

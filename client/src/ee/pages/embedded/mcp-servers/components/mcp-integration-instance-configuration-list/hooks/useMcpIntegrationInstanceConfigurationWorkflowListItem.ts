@@ -69,6 +69,7 @@ export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
         handleCloseEditDialog,
         handleConfirmDelete,
         integrationInstanceConfigurationWorkflow,
+        isDeletePending: deleteMcpIntegrationInstanceConfigurationWorkflowMutation.isPending,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,
         showDeleteDialog,

@@ -20,6 +20,7 @@ const KnowledgeBaseDocumentChunkList = ({
     const {
         handleClose: handleDeleteDialogClose,
         handleConfirm: handleDeleteConfirm,
+        isPending: isDeletePending,
         open: deleteDialogOpen,
     } = useKnowledgeBaseDocumentChunkDeleteDialog({knowledgeBaseId});
 
@@ -61,7 +62,12 @@ const KnowledgeBaseDocumentChunkList = ({
 
             <KnowledgeBaseDocumentChunkEditDialog knowledgeBaseId={knowledgeBaseId} />
 
-            <AlertDialog onCancel={handleDeleteDialogClose} onConfirm={handleDeleteConfirm} open={deleteDialogOpen} />
+            <AlertDialog
+                isPending={isDeletePending}
+                onCancel={handleDeleteDialogClose}
+                onConfirm={handleDeleteConfirm}
+                open={deleteDialogOpen}
+            />
         </div>
     );
 };

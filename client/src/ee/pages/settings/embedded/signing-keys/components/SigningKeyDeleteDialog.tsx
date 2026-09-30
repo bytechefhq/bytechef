@@ -23,6 +23,7 @@ const SigningKeyDeleteDialog = ({apiKeyId, onClose}: {apiKeyId: number; onClose:
     return (
         <AlertDialog
             description="This action cannot be undone. This will permanently delete the signing key."
+            isPending={deleteSigningKeyMutation.isPending}
             onCancel={onClose}
             onConfirm={handleClick}
             open

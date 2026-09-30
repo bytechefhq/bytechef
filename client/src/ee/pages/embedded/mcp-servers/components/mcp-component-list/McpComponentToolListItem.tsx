@@ -25,7 +25,8 @@ const McpComponentToolListItem = ({
     description,
     mcpTool,
 }: McpComponentToolListItemProps) => {
-    const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} = useMcpComponentToolDropdownMenu({mcpTool});
+    const {handleConfirmDelete, isDeletePending, setShowDeleteDialog, showDeleteDialog} =
+        useMcpComponentToolDropdownMenu({mcpTool});
 
     const {activePopoverId, closePopover, openPopover} = useMcpActivePopover();
 
@@ -82,6 +83,7 @@ const McpComponentToolListItem = ({
             </Popover>
 
             <AlertDialog
+                isPending={isDeletePending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

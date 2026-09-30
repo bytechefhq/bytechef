@@ -29,6 +29,7 @@ export default function useMcpProjectComponentToolDropdownMenu({mcpTool}: UseMcp
 
     return {
         handleConfirmDelete,
+        isDeletePending: deleteMcpToolMutation.isPending,
         setShowDeleteDialog,
         showDeleteDialog,
     };

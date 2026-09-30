@@ -26,6 +26,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
         handleMcpServerListItemClick,
         handleOnCheckedChange,
         isEnablePending,
+        isPending,
         mcpServerTagIds,
         setShowDeleteDialog,
         setShowEditDialog,
@@ -141,6 +142,7 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
             </div>
 
             <AlertDialog
+                isPending={isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleDeleteClick}
                 open={showDeleteDialog}

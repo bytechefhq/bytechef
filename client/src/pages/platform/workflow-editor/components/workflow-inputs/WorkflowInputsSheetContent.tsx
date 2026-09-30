@@ -24,6 +24,7 @@ const WorkflowInputsSheetContent = ({
         deleteWorkflowInput,
         form,
         isDeleteDialogOpen,
+        isDeletePending,
         isEditDialogOpen,
         nameInputRef,
         openDeleteDialog,
@@ -81,6 +82,7 @@ const WorkflowInputsSheetContent = ({
                         currentInputIndex={currentInputIndex}
                         deleteWorkflowInput={deleteWorkflowInput}
                         isDeleteDialogOpen={isDeleteDialogOpen}
+                        isDeletePending={isDeletePending}
                         workflowInputs={workflow.inputs!}
                     />
                 )}

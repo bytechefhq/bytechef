@@ -20,6 +20,7 @@ export function useAccountProfileMfa() {
     const [mfaState, setMfaState] = useState<MfaStateType>('disabled');
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
     const [secret, setSecret] = useState('');
+    const [showDisableDialog, setShowDisableDialog] = useState(false);
     const [verifyCode, setVerifyCode] = useState('');
 
     const fetchMfaStatus = useCallback(async () => {
@@ -111,6 +112,7 @@ export function useAccountProfileMfa() {
 
                 setDisableCode('');
                 setDisablePassword('');
+                setShowDisableDialog(false);
                 setMfaState('disabled');
             } else {
                 toast.error('Failed to disable 2FA. Check your password and code.');
@@ -146,7 +148,9 @@ export function useAccountProfileMfa() {
         secret,
         setDisableCode,
         setDisablePassword,
+        setShowDisableDialog,
         setVerifyCode,
+        showDisableDialog,
         verifyCode,
     };
 }

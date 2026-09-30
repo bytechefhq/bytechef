@@ -16,6 +16,7 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
     const {
         handleClose: handleDeleteDialogClose,
         handleConfirm: handleDeleteConfirm,
+        isPending: isDeletePending,
         open: deleteDialogOpen,
     } = useKnowledgeBaseDocumentListItemDeleteDialog({knowledgeBaseId});
 
@@ -38,6 +39,7 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
                     ))}
 
                     <AlertDialog
+                        isPending={isDeletePending}
                         onCancel={handleDeleteDialogClose}
                         onConfirm={handleDeleteConfirm}
                         open={deleteDialogOpen}

@@ -62,6 +62,7 @@ const useApiKeys = () => {
         apiKeysLoading,
         handleDelete,
         handleSave,
+        isDeletePending: deleteApiKeyMutation.isPending,
     };
 };
 

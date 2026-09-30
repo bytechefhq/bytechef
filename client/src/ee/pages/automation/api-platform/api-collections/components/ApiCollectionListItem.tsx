@@ -59,6 +59,8 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
             queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
+
+            setShowDeleteDialog(false);
         },
     });
 
@@ -229,6 +231,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
             {showDeleteDialog && (
                 <AlertDialog
+                    isPending={deleteApiCollection.isPending}
                     onCancel={() => setShowDeleteDialog(false)}
                     onConfirm={() => deleteApiCollection.mutate(apiCollection.id!)}
                     open={showDeleteDialog}

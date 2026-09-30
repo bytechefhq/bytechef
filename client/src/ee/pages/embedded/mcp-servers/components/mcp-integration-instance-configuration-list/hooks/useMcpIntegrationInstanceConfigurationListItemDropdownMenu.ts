@@ -22,7 +22,12 @@ const useMcpIntegrationInstanceConfigurationListItemDropdownMenu = (mcpIntegrati
         });
     };
 
-    return {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog};
+    return {
+        handleConfirmDelete,
+        isDeletePending: deleteMcpIntegrationInstanceConfigurationMutation.isPending,
+        setShowDeleteDialog,
+        showDeleteDialog,
+    };
 };
 
 export default useMcpIntegrationInstanceConfigurationListItemDropdownMenu;

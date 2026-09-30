@@ -24,6 +24,7 @@ export default function useWorkflowInputs({
     const [currentInputIndex, setCurrentInputIndex] = useState<number>(-1);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isDeletePending, setIsDeletePending] = useState(false);
 
     const queryClient = useQueryClient();
     const {updateWorkflowMutation} = useWorkflowEditor();
@@ -212,16 +213,21 @@ export default function useWorkflowInputs({
             inputs: removeInput(originalInputs),
         });
 
+        setIsDeletePending(true);
+
         saveWorkflowDefinitionUpdate({
             onError: () => {
                 setWorkflow({
                     ...useWorkflowDataStore.getState().workflow,
                     inputs: originalInputs,
                 });
+
+                setIsDeletePending(false);
             },
             onSuccess: () => {
                 invalidateWorkflowQueries();
 
+                setIsDeletePending(false);
                 setIsDeleteDialogOpen(false);
             },
             updateDefinition: (freshWorkflowDefinition) => ({
@@ -248,6 +254,7 @@ export default function useWorkflowInputs({
         form,
         getFormattedInputName,
         isDeleteDialogOpen,
+        isDeletePending,
         isEditDialogOpen,
         nameInputRef,
         openDeleteDialog,
