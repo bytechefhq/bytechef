@@ -53,6 +53,34 @@ it('should render the login page on "/login" path', () => {
     expect(screen.getByText('Welcome back')).toBeInTheDocument();
 });
 
+it('should prefill the email passed in the navigation state', () => {
+    render(
+        <MemoryRouter initialEntries={[{pathname: '/login', state: {email: 'test@example.com'}}]}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    expect(screen.getByLabelText('Email')).toHaveValue('test@example.com');
+});
+
+it('should redirect to the home page after login when the navigation state only carries the email', () => {
+    mockAuthenticationStore({authenticated: true});
+
+    render(
+        <MemoryRouter initialEntries={[{pathname: '/login', state: {email: 'test@example.com'}}]}>
+            <Routes>
+                <Route element={<Login />} path="/login" />
+
+                <Route element={<p>Home page</p>} path="/" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    expect(screen.getByText('Home page')).toBeInTheDocument();
+});
+
 it('should set type as password initially and toggle between types when "show password" icon is clicked', async () => {
     renderLoginPage();
 

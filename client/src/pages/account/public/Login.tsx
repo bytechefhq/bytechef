@@ -13,7 +13,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {EyeIcon, EyeOffIcon, ShieldCheckIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {Link, Navigate, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {Link, Navigate, type To, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {z} from 'zod';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -61,7 +61,7 @@ const Login = () => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            email: '',
+            email: (pageLocation.state as {email?: string} | null)?.email || '',
             password: '',
             rememberMe: false,
         },
@@ -139,9 +139,8 @@ const Login = () => {
         }
     }, [form]);
 
-    const {from} = pageLocation.state || {
-        from: getLoginRedirect(pageLocation.search) ?? {pathname: '/', search: pageLocation.search},
-    };
+    const from = (pageLocation.state as {from?: To} | null)?.from ??
+        getLoginRedirect(pageLocation.search) ?? {pathname: '/', search: pageLocation.search};
 
     useEffect(() => {
         const company = searchParams.get('company');
