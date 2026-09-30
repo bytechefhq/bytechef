@@ -41,5 +41,6 @@ public class WebhookAutoRespondWithHTTP200Trigger {
                 "validation of the received request.")
         .type(TriggerType.STATIC_WEBHOOK)
         .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of(), BODY, Map.of())))
+        .help("", "https://docs.bytechef.io/reference/components/webhook_v1#auto-respond-with-http-200-status")
         .webhookRequest(WebhookUtils::getWebhookResult);
 }

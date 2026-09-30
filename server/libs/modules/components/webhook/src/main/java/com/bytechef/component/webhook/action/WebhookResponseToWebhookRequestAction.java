@@ -94,6 +94,7 @@ public class WebhookResponseToWebhookRequestAction {
                 .defaultValue(200)
                 .displayCondition("responseType != '%s'".formatted(ResponseType.NO_DATA.name())))
         .output(WebhookResponseToWebhookRequestAction::output)
+        .help("", "https://docs.bytechef.io/reference/components/webhook_v1#response-to-webhook-request")
         .perform(WebhookResponseToWebhookRequestAction::perform);
 
     protected static OutputResponse output(
