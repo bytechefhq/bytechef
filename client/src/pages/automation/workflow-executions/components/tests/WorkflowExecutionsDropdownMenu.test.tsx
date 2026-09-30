@@ -7,15 +7,24 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionsDropdownMenu from '../WorkflowExecutionsDropdownMenu';
 
-const {stopJobMutateMock} = vi.hoisted(() => ({stopJobMutateMock: vi.fn()}));
+const {restartJobMutateMock, stopJobMutateMock} = vi.hoisted(() => ({
+    restartJobMutateMock: vi.fn(),
+    stopJobMutateMock: vi.fn(),
+}));
 
 vi.mock('@/shared/mutations/platform/jobs.mutations', () => ({
+    useRestartJobMutation: () => ({mutate: restartJobMutateMock}),
     useStopJobMutation: () => ({mutate: stopJobMutateMock}),
 }));
 
 const failedTriggerExecution = {
     id: 77,
     triggerExecution: {id: '77', status: 'FAILED'},
+} as unknown as WorkflowExecution;
+
+const failedJobExecution = {
+    id: 9,
+    job: {id: '9', status: 'FAILED'},
 } as unknown as WorkflowExecution;
 
 const jobExecution = {
@@ -32,6 +41,7 @@ const renderMenu = (execution: WorkflowExecution) =>
 
 describe('WorkflowExecutionsDropdownMenu', () => {
     beforeEach(() => {
+        restartJobMutateMock.mockReset();
         stopJobMutateMock.mockReset();
 
         useWorkflowExecutionSheetStore.setState({
@@ -74,5 +84,36 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         await user.click(screen.getByRole('button'));
 
         expect(await screen.findByRole('menu')).toHaveAttribute('data-align', 'end');
+    });
+
+    it('restarts a failed job', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(failedJobExecution);
+
+        await user.click(screen.getByRole('button'));
+        await user.click(await screen.findByText('Restart'));
+
+        expect(restartJobMutateMock).toHaveBeenCalledWith(9);
+    });
+
+    it('disables Restart for a job that has not failed', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(jobExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menuitem', {name: /Restart/})).toHaveAttribute('data-disabled');
+    });
+
+    it('disables Restart for a trigger-only row', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(failedTriggerExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menuitem', {name: /Restart/})).toHaveAttribute('data-disabled');
     });
 });

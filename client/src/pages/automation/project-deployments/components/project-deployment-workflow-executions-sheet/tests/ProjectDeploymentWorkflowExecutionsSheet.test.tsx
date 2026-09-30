@@ -58,6 +58,7 @@ vi.mock('@/shared/queries/automation/workflowExecutions.queries', () => ({
 }));
 
 vi.mock('@/shared/mutations/platform/jobs.mutations', () => ({
+    useRestartJobMutation: () => ({mutate: vi.fn()}),
     useStopJobMutation: () => ({mutate: vi.fn()}),
 }));
 
