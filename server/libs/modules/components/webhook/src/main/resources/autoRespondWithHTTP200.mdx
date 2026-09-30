@@ -5,3 +5,28 @@ Use the **static workflow webhook trigger URL** for this trigger type. This URL 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/db326975-06b1-4c41-880e-484eb14bd33d?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
 </div>
+
+#### Testing with Postman or Bruno
+
+For the URLs, body formats and trigger output, see [Testing Webhooks with Postman or Bruno](#testing-webhooks-with-postman-or-bruno).
+
+##### Request
+
+| Setting | Value |
+|:---|:---|
+| Method | `POST` or `GET` |
+| URL | The static workflow webhook trigger URL |
+| Required headers | None. Add `Content-Type` if you send a body. |
+| Body | Optional. Use any format. |
+
+##### Response
+
+ByteChef sends the response **before** the workflow runs. The response does not show the result of the workflow.
+
+| Situation | Status | Body |
+|:---|:---|:---|
+| The request is received | `200 OK` | Empty |
+| The workflow is disabled | `200 OK` | Empty. The workflow does not run. |
+| A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
+
+A `200 OK` response does not confirm that the workflow ran. To see the result, open **Executions** in ByteChef.

@@ -5,3 +5,35 @@ Use the **Static workflow webhook trigger URL** for this trigger type. This URL 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/86347f45-900a-4bca-8763-5f3982305010?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
 </div>
+
+#### Testing with Postman or Bruno
+
+For the URLs, body formats and trigger output, see [Testing Webhooks with Postman or Bruno](#testing-webhooks-with-postman-or-bruno).
+
+##### Request
+
+| Setting | Value |
+|:---|:---|
+| Method | `POST` or `GET` |
+| URL | The static workflow webhook trigger URL |
+| Required headers | `X-Csrf-Token`: the value of the **CSRF Token** property. Add `Content-Type` if you send a body. |
+| Body | Optional. Use any format. |
+
+##### Response
+
+ByteChef checks the token, then sends the response. The workflow runs **after** the response is sent, so the response does not show the result of the workflow.
+
+| Situation | Status | Body |
+|:---|:---|:---|
+| The token is correct | `200 OK` | Empty. The workflow starts. |
+| The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
+| The workflow is disabled | `200 OK` | Empty. The token is not checked and the workflow does not run. |
+| A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
+
+If you get `400 Bad Request`, make sure that:
+
+- The header name is exactly `X-Csrf-Token`.
+- The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
+- The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
+
+The test URL does not check the token. To test the validation, use the static workflow webhook trigger URL.
