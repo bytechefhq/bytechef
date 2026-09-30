@@ -1,9 +1,11 @@
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/shallow';
 
 const useWorkflowEditorLayout = () => {
+    const workflowId = useWorkflowDataStore((state) => state.workflow.id);
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
     const {
@@ -25,15 +27,27 @@ const useWorkflowEditorLayout = () => {
         [currentNode?.clusterRoot, currentNode?.isNestedClusterRoot]
     );
 
-    const handleClusterElementsCanvasOpenChange = (open: boolean) => {
-        setClusterElementsCanvasOpen(open);
+    const handleClusterElementsCanvasOpenChange = useCallback(
+        (open: boolean) => {
+            setClusterElementsCanvasOpen(open);
 
-        if (!open) {
-            setRootClusterElementNodeData(undefined);
-            setMainClusterRootComponentDefinition(undefined);
-            setNestedClusterRootsComponentDefinitions({});
-        }
-    };
+            if (!open) {
+                setRootClusterElementNodeData(undefined);
+                setMainClusterRootComponentDefinition(undefined);
+                setNestedClusterRootsComponentDefinitions({});
+            }
+        },
+        [
+            setClusterElementsCanvasOpen,
+            setMainClusterRootComponentDefinition,
+            setNestedClusterRootsComponentDefinitions,
+            setRootClusterElementNodeData,
+        ]
+    );
+
+    useEffect(() => {
+        handleClusterElementsCanvasOpenChange(false);
+    }, [handleClusterElementsCanvasOpenChange, workflowId]);
 
     useEffect(() => {
         if (clusterElementsCanvasOpen && isMainRootClusterElement) {
