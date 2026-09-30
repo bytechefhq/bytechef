@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -145,12 +145,11 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                        <AlertDialogAction
-                            className="bg-destructive"
+                        <DestructiveAlertDialogAction
                             onClick={() => handleDelete(workflow.outputs![currentInputIndex]!)}
                         >
                             Delete
-                        </AlertDialogAction>
+                        </DestructiveAlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

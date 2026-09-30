@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -28,7 +28,7 @@ const DeleteDataTableRowsDialog = () => {
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    <DestructiveAlertDialogAction onClick={handleDelete}>Delete</DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

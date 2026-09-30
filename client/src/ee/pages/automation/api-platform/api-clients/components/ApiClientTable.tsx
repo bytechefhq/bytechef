@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -57,9 +57,7 @@ const ApiClientDeleteDialog = ({apiClientId, onClose}: {apiClientId: number; onC
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-destructive" onClick={handleClick}>
-                        Delete
-                    </AlertDialogAction>
+                    <DestructiveAlertDialogAction onClick={handleClick}>Delete</DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

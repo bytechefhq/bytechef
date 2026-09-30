@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -46,12 +46,11 @@ const WorkflowInputsDeleteDialog = ({
                 <AlertDialogCancel onClick={() => closeDeleteDialog()}>Cancel</AlertDialogCancel>
 
                 {workflowInputs?.[currentInputIndex] && (
-                    <AlertDialogAction
-                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                    <DestructiveAlertDialogAction
                         onClick={() => deleteWorkflowInput(workflowInputs![currentInputIndex])}
                     >
                         Delete
-                    </AlertDialogAction>
+                    </DestructiveAlertDialogAction>
                 )}
             </AlertDialogFooter>
         </AlertDialogContent>

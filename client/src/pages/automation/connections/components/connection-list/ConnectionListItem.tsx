@@ -1,10 +1,10 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -263,12 +263,9 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         <AlertDialogFooter>
                             <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
 
-                            <AlertDialogAction
-                                className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                                onClick={handleAlertDeleteDialogClick}
-                            >
+                            <DestructiveAlertDialogAction onClick={handleAlertDeleteDialogClick}>
                                 Delete
-                            </AlertDialogAction>
+                            </DestructiveAlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
@@ -286,13 +283,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         <AlertDialogFooter>
                             <AlertDialogCancel onClick={() => setShowDisconnectDialog(false)}>Cancel</AlertDialogCancel>
 
-                            <AlertDialogAction
-                                className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                                onClick={handleDisconnectFromAllClick}
-                            >
+                            <DestructiveAlertDialogAction onClick={handleDisconnectFromAllClick}>
                                 <Link2OffIcon className="size-4" />
                                 Disconnect from all
-                            </AlertDialogAction>
+                            </DestructiveAlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

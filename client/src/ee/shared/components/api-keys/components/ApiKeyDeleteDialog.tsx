@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -43,9 +43,9 @@ const ApiKeyDeleteDialog = () => {
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
 
                     {currentApiKey && (
-                        <AlertDialogAction className="bg-destructive" onClick={() => handleDelete(+currentApiKey.id!)}>
+                        <DestructiveAlertDialogAction onClick={() => handleDelete(+currentApiKey.id!)}>
                             Delete
-                        </AlertDialogAction>
+                        </DestructiveAlertDialogAction>
                     )}
                 </AlertDialogFooter>
             </AlertDialogContent>
