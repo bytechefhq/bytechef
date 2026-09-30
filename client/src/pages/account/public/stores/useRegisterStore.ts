@@ -13,6 +13,8 @@ export interface RegisterI {
     reset: () => void;
 }
 
+const REGISTER_FAILED_MESSAGE = 'Registration failed. Please try again.';
+
 const fetchRegister = async (data: string): Promise<Response> => {
     return await fetch('/api/register', {
         body: data,
@@ -38,11 +40,14 @@ export const useRegisterStore = create<RegisterI>()(
                                 registerSuccess: true,
                             }));
                         } else {
-                            response.json().then((data) => {
-                                set(() => ({
-                                    registerErrorMessage: data.detail,
-                                }));
-                            });
+                            return response
+                                .json()
+                                .catch(() => ({}))
+                                .then((data) => {
+                                    set(() => ({
+                                        registerErrorMessage: data.detail || REGISTER_FAILED_MESSAGE,
+                                    }));
+                                });
                         }
                     }
                 );

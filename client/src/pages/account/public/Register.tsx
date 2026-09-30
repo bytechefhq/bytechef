@@ -105,10 +105,8 @@ const Register = () => {
     const handleSubmit = useCallback(
         async ({email, password}: z.infer<typeof formSchema>) => {
             await register(email, password);
-
-            reset();
         },
-        [register, reset]
+        [register]
     );
 
     useEffect(() => {
