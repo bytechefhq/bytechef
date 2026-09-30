@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 
 import KnowledgeBaseDocumentListRow from './KnowledgeBaseDocumentListRow';
@@ -37,9 +37,9 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
                         />
                     ))}
 
-                    <DeleteAlertDialog
+                    <AlertDialog
                         onCancel={handleDeleteDialogClose}
-                        onDelete={handleDeleteConfirm}
+                        onConfirm={handleDeleteConfirm}
                         open={deleteDialogOpen}
                     />
                 </>

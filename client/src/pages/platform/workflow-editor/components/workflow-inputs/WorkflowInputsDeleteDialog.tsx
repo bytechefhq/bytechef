@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import {WorkflowInput} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowInputsDeleteDialogProps {
@@ -19,10 +19,10 @@ const WorkflowInputsDeleteDialog = ({
     const currentInput = workflowInputs?.[currentInputIndex];
 
     return (
-        <DeleteAlertDialog
+        <AlertDialog
             description="This action cannot be undone. This will permanently delete the input."
             onCancel={closeDeleteDialog}
-            onDelete={() => currentInput && deleteWorkflowInput(currentInput)}
+            onConfirm={() => currentInput && deleteWorkflowInput(currentInput)}
             open={isDeleteDialogOpen}
         />
     );

@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import useKnowledgeBaseDeleteAlertDialog from '@/pages/automation/knowledge-base/components/hooks/useKnowledgeBaseDeleteAlertDialog';
 
 interface KnowledgeBaseDeleteAlertDialogProps {
@@ -13,7 +13,7 @@ const KnowledgeBaseDeleteAlertDialog = ({knowledgeBaseId, onClose, open}: Knowle
         onClose,
     });
 
-    return <DeleteAlertDialog onCancel={handleCancelClick} onDelete={handleDeleteClick} open={open} />;
+    return <AlertDialog onCancel={handleCancelClick} onConfirm={handleDeleteClick} open={open} />;
 };
 
 export default KnowledgeBaseDeleteAlertDialog;

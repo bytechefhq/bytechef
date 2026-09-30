@@ -1,22 +1,23 @@
 import Button from '@/components/Button/Button';
+import {
+    Dialog,
+    DialogBody,
+    DialogCancelButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogMain,
+} from '@/components/Dialog';
 import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import {ShieldCheckIcon, ShieldOffIcon} from 'lucide-react';
+import {useState} from 'react';
 
 import {useAccountProfileMfa} from './hooks/useAccountProfileMfa';
 
 const AccountProfileMfa = () => {
+    const [showDisableDialog, setShowDisableDialog] = useState(false);
+
     const {
         disableCode,
         disablePassword,
@@ -113,76 +114,75 @@ const AccountProfileMfa = () => {
                             <p className="text-sm text-green-700">Two-factor authentication is enabled.</p>
                         </div>
 
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button
-                                    icon={<ShieldOffIcon className="size-4" />}
-                                    label="Disable 2FA"
-                                    variant="outline"
-                                />
-                            </AlertDialogTrigger>
+                        <Button
+                            icon={<ShieldOffIcon className="size-4" />}
+                            label="Disable 2FA"
+                            onClick={() => setShowDisableDialog(true)}
+                            variant="outline"
+                        />
 
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Disable Two-Factor Authentication</AlertDialogTitle>
+                        <Dialog
+                            onOpenChange={(open) => {
+                                if (!open) {
+                                    setShowDisableDialog(false);
 
-                                    <AlertDialogDescription>
-                                        Enter your current password and a TOTP code to disable two-factor
-                                        authentication.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
+                                    setDisableCode('');
+                                    setDisablePassword('');
+                                }
+                            }}
+                            open={showDisableDialog}
+                        >
+                            <DialogContent>
+                                <DialogMain>
+                                    <DialogHeader
+                                        description="Enter your current password and a TOTP code to disable two-factor authentication."
+                                        title="Disable Two-Factor Authentication"
+                                    />
 
-                                <div className="space-y-3 py-2">
-                                    <fieldset className="space-y-2 border-0 p-0">
-                                        <label className="text-sm font-medium" htmlFor="disablePassword">
-                                            Password
-                                        </label>
+                                    <DialogBody className="space-y-3">
+                                        <fieldset className="space-y-2 border-0 p-0">
+                                            <label className="text-sm font-medium" htmlFor="disablePassword">
+                                                Password
+                                            </label>
 
-                                        <Input
-                                            id="disablePassword"
-                                            onChange={(event) => setDisablePassword(event.target.value)}
-                                            placeholder="Enter your password"
-                                            type="password"
-                                            value={disablePassword}
+                                            <Input
+                                                id="disablePassword"
+                                                onChange={(event) => setDisablePassword(event.target.value)}
+                                                placeholder="Enter your password"
+                                                type="password"
+                                                value={disablePassword}
+                                            />
+                                        </fieldset>
+
+                                        <fieldset className="space-y-2 border-0 p-0">
+                                            <label className="text-sm font-medium" htmlFor="disableCode">
+                                                Authentication Code
+                                            </label>
+
+                                            <Input
+                                                id="disableCode"
+                                                inputMode="numeric"
+                                                maxLength={6}
+                                                onChange={(event) => setDisableCode(event.target.value)}
+                                                pattern="[0-9]*"
+                                                placeholder="Enter 6-digit code"
+                                                value={disableCode}
+                                            />
+                                        </fieldset>
+                                    </DialogBody>
+
+                                    <DialogFooter>
+                                        <DialogCancelButton />
+
+                                        <Button
+                                            disabled={disableCode.length !== 6 || !disablePassword || loading}
+                                            label="Disable 2FA"
+                                            onClick={handleDisable}
                                         />
-                                    </fieldset>
-
-                                    <fieldset className="space-y-2 border-0 p-0">
-                                        <label className="text-sm font-medium" htmlFor="disableCode">
-                                            Authentication Code
-                                        </label>
-
-                                        <Input
-                                            id="disableCode"
-                                            inputMode="numeric"
-                                            maxLength={6}
-                                            onChange={(event) => setDisableCode(event.target.value)}
-                                            pattern="[0-9]*"
-                                            placeholder="Enter 6-digit code"
-                                            value={disableCode}
-                                        />
-                                    </fieldset>
-                                </div>
-
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel
-                                        onClick={() => {
-                                            setDisableCode('');
-                                            setDisablePassword('');
-                                        }}
-                                    >
-                                        Cancel
-                                    </AlertDialogCancel>
-
-                                    <AlertDialogAction
-                                        disabled={disableCode.length !== 6 || !disablePassword || loading}
-                                        onClick={handleDisable}
-                                    >
-                                        Disable 2FA
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                                    </DialogFooter>
+                                </DialogMain>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 )}
             </div>

@@ -1,14 +1,4 @@
-import Button from '@/components/Button/Button';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {Loader2Icon} from 'lucide-react';
+import AlertDialog from '@/components/AlertDialog';
 
 interface CancelPlanDialogPropsI {
     isPending: boolean;
@@ -19,36 +9,15 @@ interface CancelPlanDialogPropsI {
 
 const CancelPlanDialog = ({isPending, onClose, onConfirm, open}: CancelPlanDialogPropsI) => (
     <AlertDialog
-        onOpenChange={(isOpen) => {
-            if (!isOpen) {
-                onClose();
-            }
-        }}
+        cancelLabel="Keep plan"
+        confirmLabel={isPending ? 'Cancelling…' : 'Cancel subscription'}
+        description="Your subscription will be cancelled at the end of the current billing period. You will retain access until then and will not be charged again."
+        isPending={isPending}
+        onCancel={onClose}
+        onConfirm={onConfirm}
         open={open}
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Cancel subscription?</AlertDialogTitle>
-
-                <AlertDialogDescription>
-                    Your subscription will be cancelled at the end of the current billing period. You will retain access
-                    until then and will not be charged again.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter>
-                <AlertDialogCancel disabled={isPending}>Keep plan</AlertDialogCancel>
-
-                <Button
-                    disabled={isPending}
-                    icon={isPending ? <Loader2Icon className="animate-spin" /> : undefined}
-                    label={isPending ? 'Cancelling…' : 'Cancel subscription'}
-                    onClick={onConfirm}
-                    variant="destructive"
-                />
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+        title="Cancel subscription?"
+    />
 );
 
 export default CancelPlanDialog;

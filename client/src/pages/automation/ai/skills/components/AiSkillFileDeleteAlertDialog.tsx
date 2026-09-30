@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 const AiSkillFileDeleteAlertDialog = ({
     fileName,
@@ -9,11 +9,11 @@ const AiSkillFileDeleteAlertDialog = ({
     onClose: () => void;
     onDelete: () => void;
 }) => (
-    <DeleteAlertDialog
+    <AlertDialog
         confirmLabel="Remove"
         description={`This action cannot be undone. This will permanently remove "${fileName}" from the skill.`}
         onCancel={onClose}
-        onDelete={onDelete}
+        onConfirm={onDelete}
         open
     />
 );

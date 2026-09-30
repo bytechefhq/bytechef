@@ -1,5 +1,5 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -123,10 +123,10 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                 />
             )}
 
-            <DeleteAlertDialog
+            <AlertDialog
                 description="This action cannot be undone. This will permanently delete the input."
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={() => handleDelete(workflow.outputs![currentInputIndex]!)}
+                onConfirm={() => handleDelete(workflow.outputs![currentInputIndex]!)}
                 open={showDeleteDialog}
             />
         </>

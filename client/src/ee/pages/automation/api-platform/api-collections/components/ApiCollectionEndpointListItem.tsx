@@ -1,7 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -211,9 +211,9 @@ const ApiCollectionEndpointListItem = ({
             </div>
 
             {showDeleteDialog && (
-                <DeleteAlertDialog
+                <AlertDialog
                     onCancel={() => setShowDeleteDialog(false)}
-                    onDelete={() => deleteApiCollectionEndpoint.mutate(apiCollectionEndpoint.id!)}
+                    onConfirm={() => deleteApiCollectionEndpoint.mutate(apiCollectionEndpoint.id!)}
                     open={showDeleteDialog}
                 />
             )}

@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 
 interface IntegrationInstanceConfigurationListItemAlertDialogProps {
     onCancelClick: () => void;
@@ -11,11 +11,11 @@ const IntegrationInstanceConfigurationListItemAlertDialog = ({
     onCancelClick,
     onDeleteClick,
 }: IntegrationInstanceConfigurationListItemAlertDialogProps) => (
-    <DeleteAlertDialog
+    <AlertDialog
         description="This action cannot be undone. This will permanently delete the integration and workflows it contains."
         isPending={isPending}
         onCancel={onCancelClick}
-        onDelete={onDeleteClick}
+        onConfirm={onDeleteClick}
         open
     />
 );

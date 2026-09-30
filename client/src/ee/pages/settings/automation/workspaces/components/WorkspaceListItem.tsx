@@ -1,6 +1,6 @@
 import Badge from '@/components/Badge/Badge';
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -112,10 +112,10 @@ const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceLis
                 </div>
             </div>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 description="This action cannot be undone. This will permanently delete the workspace."
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleAlertDeleteDialogClick}
+                onConfirm={handleAlertDeleteDialogClick}
                 open={showDeleteDialog}
             />
 

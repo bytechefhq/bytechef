@@ -1,4 +1,4 @@
-import DeleteAlertDialog from '@/components/DeleteAlertDialog';
+import AlertDialog from '@/components/AlertDialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
@@ -140,9 +140,9 @@ const McpServerListItem = ({mcpProjectWorkflows, mcpServer, tags}: McpServerList
                 </div>
             </div>
 
-            <DeleteAlertDialog
+            <AlertDialog
                 onCancel={() => setShowDeleteDialog(false)}
-                onDelete={handleDeleteClick}
+                onConfirm={handleDeleteClick}
                 open={showDeleteDialog}
             />
 
