@@ -7,7 +7,7 @@ export interface EnvironmentConfigI {
     label: string;
     shortLabel: string;
     sidebarTheme: 'development' | 'production' | 'staging';
-    styleType: 'primary-outline' | 'secondary-outline' | 'warning-outline';
+    styleType: 'destructive-outline' | 'secondary-outline' | 'warning-outline';
 }
 
 export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
@@ -25,7 +25,7 @@ export const ENVIRONMENT_CONFIGS: Record<number, EnvironmentConfigI> = {
         label: 'PRODUCTION',
         shortLabel: 'PRD',
         sidebarTheme: 'production',
-        styleType: 'primary-outline',
+        styleType: 'destructive-outline',
     },
     [STAGING_ENVIRONMENT]: {
         description: 'Used for final testing, QA, and validation before release.',

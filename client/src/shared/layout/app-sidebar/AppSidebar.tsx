@@ -99,7 +99,7 @@ export function AppSidebar({navigation}: AppSidebarProps) {
                                     <SidebarMenuItem key={item.name}>
                                         <SidebarMenuButton
                                             asChild
-                                            className="h-10 gap-3 text-sm group-data-[collapsible=icon]:!size-10 data-[active=true]:font-medium data-[active=true]:text-content-brand-primary [&>svg]:size-6"
+                                            className="h-10 gap-3 text-sm group-data-[collapsible=icon]:!size-10 data-[active=true]:font-medium data-[active=true]:text-sidebar-active-foreground [&>svg]:size-6"
                                             isActive={isActive(item.href)}
                                             tooltip={item.name}
                                         >
