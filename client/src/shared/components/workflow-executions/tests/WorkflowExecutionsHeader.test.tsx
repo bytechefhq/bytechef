@@ -236,4 +236,21 @@ describe('WorkflowExecutionsHeader', () => {
             expect(screen.getByText('3 tasks executed')).toBeInTheDocument();
         });
     });
+
+    describe('task count', () => {
+        it('counts a restarted task once', () => {
+            const job = createJob({
+                status: 'FAILED',
+                taskExecutions: [
+                    {id: '1', workflowTask: {name: 'dataTable_1', type: 'dataTable/v1/getRecord'}} as never,
+                    {id: '2', workflowTask: {name: 'condition_1', type: 'condition/v1'}} as never,
+                    {id: '3', workflowTask: {name: 'condition_1', type: 'condition/v1'}} as never,
+                ],
+            });
+
+            render(<WorkflowExecutionsHeader job={job} />);
+
+            expect(screen.getByText('2 tasks executed')).toBeInTheDocument();
+        });
+    });
 });

@@ -11,6 +11,7 @@ import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/Wo
 import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions/WorkflowExecutionsTabsPanel';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
+import {TaskExecutionAttemptsI} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
@@ -33,7 +34,7 @@ interface WorkflowExecutionSheetContentProps {
     setActiveTab: (tab: TabValueType) => void;
     setDialogOpen: (open: boolean) => void;
     subflowStack: Array<{job: Job; label: string}>;
-    taskExecutions: TaskExecution[];
+    taskExecutionAttempts: TaskExecutionAttemptsI<TaskExecution>[];
     triggerExecution?: TriggerExecution;
     workflowExecutionId: number;
 }
@@ -54,7 +55,7 @@ const WorkflowExecutionSheetContent = ({
     setActiveTab,
     setDialogOpen,
     subflowStack,
-    taskExecutions,
+    taskExecutionAttempts,
     triggerExecution,
     workflowExecutionId,
 }: WorkflowExecutionSheetContentProps) => {
@@ -140,15 +141,23 @@ const WorkflowExecutionSheetContent = ({
                                     </WorkflowExecutionsAccordionItem>
                                 )}
 
-                                {taskExecutions.map((taskExecution) => (
+                                {taskExecutionAttempts.map(({latestTaskExecution, previousTaskExecutions}) => (
                                     <WorkflowExecutionsAccordionItem
                                         defaultValue={deepestFailedExecution?.path}
-                                        execution={taskExecution}
-                                        key={taskExecution.id}
+                                        execution={latestTaskExecution}
+                                        key={latestTaskExecution.id}
                                         onExecutionClick={handleTaskClick}
+                                        previousTaskExecutions={previousTaskExecutions}
                                         selectedExecutionId={selectedItem?.id || ''}
                                     >
-                                        <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                                        <WorkflowTaskExecutionItem
+                                            attemptLabel={
+                                                previousTaskExecutions.length > 0
+                                                    ? `Attempt ${previousTaskExecutions.length + 1}`
+                                                    : undefined
+                                            }
+                                            taskExecution={latestTaskExecution}
+                                        />
                                     </WorkflowExecutionsAccordionItem>
                                 ))}
                             </Accordion>
