@@ -46,7 +46,7 @@ describe('useWorkflowExecutionDetail', () => {
         expect(result.current.selectedItem).toEqual(failedTriggerExecution);
         expect(result.current.isTriggerExecution).toBe(true);
         expect(result.current.activeTab).toBe('error');
-        expect(result.current.taskExecutions).toEqual([]);
+        expect(result.current.taskExecutionAttempts).toEqual([]);
     });
 
     it('keeps asking for the job detail for a job-backed row', () => {
@@ -56,5 +56,61 @@ describe('useWorkflowExecutionDetail', () => {
         renderHook(() => useWorkflowExecutionDetail(5, true));
 
         expect(executionQueryMock).toHaveBeenCalledWith({id: 5}, true, undefined, 'JOB');
+    });
+
+    it('shows the latest attempt of a restarted task and selects its failure', () => {
+        const dataTableTaskExecution = {
+            endDate: new Date('2026-09-07T18:47:00.030Z'),
+            id: '10',
+            jobId: '7',
+            startDate: new Date('2026-09-07T18:47:00Z'),
+            status: 'COMPLETED',
+            workflowTask: {name: 'dataTable_1', type: 'dataTable/v1/getRecord'},
+        };
+        const firstConditionTaskExecution = {
+            error: {message: 'first failure', stackTrace: []},
+            id: '11',
+            jobId: '7',
+            startDate: new Date('2026-09-07T18:47:00Z'),
+            status: 'FAILED',
+            workflowTask: {name: 'condition_1', type: 'condition/v1'},
+        };
+        const restartedConditionTaskExecution = {
+            error: {message: 'restart failure', stackTrace: []},
+            id: '12',
+            jobId: '7',
+            startDate: new Date('2026-09-30T21:19:20Z'),
+            status: 'FAILED',
+            workflowTask: {name: 'condition_1', type: 'condition/v1'},
+        };
+
+        useWorkflowExecutionSheetStore.setState({workflowExecutionId: 7, workflowExecutionKind: 'JOB'});
+        executionQueryMock.mockReturnValue({
+            data: {
+                id: 7,
+                job: {
+                    id: '7',
+                    status: 'FAILED',
+                    taskExecutions: [
+                        dataTableTaskExecution,
+                        firstConditionTaskExecution,
+                        restartedConditionTaskExecution,
+                    ],
+                },
+            },
+            isLoading: false,
+        });
+
+        const {result} = renderHook(() => useWorkflowExecutionDetail(7, true));
+
+        expect(result.current.taskExecutionAttempts).toEqual([
+            {latestTaskExecution: dataTableTaskExecution, previousTaskExecutions: []},
+            {
+                latestTaskExecution: restartedConditionTaskExecution,
+                previousTaskExecutions: [firstConditionTaskExecution],
+            },
+        ]);
+        expect(result.current.selectedItem).toEqual(restartedConditionTaskExecution);
+        expect(result.current.activeTab).toBe('error');
     });
 });
