@@ -10,16 +10,32 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {Trash2Icon, XIcon} from 'lucide-react';
+import {ReactElement} from 'react';
 
 interface DeleteAlertDialogProps {
     open: boolean;
+    cancelLabel?: string;
+    confirmIcon?: ReactElement;
+    confirmLabel?: string;
     nodeName?: string;
     onCancel: () => void;
     onDelete: () => void;
 }
 
-const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDialogProps) => {
+const DeleteAlertDialog = ({
+    cancelLabel,
+    confirmIcon,
+    confirmLabel,
+    nodeName,
+    onCancel,
+    onDelete,
+    open,
+}: DeleteAlertDialogProps) => {
     const isNodeDeleteDialog = !!nodeName;
+
+    const resolvedCancelLabel = cancelLabel || (isNodeDeleteDialog ? 'Keep node' : 'Cancel');
+    const resolvedConfirmLabel = confirmLabel || (isNodeDeleteDialog ? 'Delete node' : 'Delete');
+    const resolvedConfirmIcon = confirmIcon || (isNodeDeleteDialog ? <Trash2Icon /> : undefined);
 
     return (
         <AlertDialog open={open}>
@@ -46,14 +62,12 @@ const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDial
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel}>
-                        {isNodeDeleteDialog ? 'Keep node' : 'Cancel'}
-                    </AlertDialogCancel>
+                    <AlertDialogCancel onClick={onCancel}>{resolvedCancelLabel}</AlertDialogCancel>
 
                     <DestructiveAlertDialogAction onClick={onDelete}>
-                        {isNodeDeleteDialog && <Trash2Icon />}
+                        {resolvedConfirmIcon}
 
-                        {isNodeDeleteDialog ? 'Delete node' : 'Delete'}
+                        {resolvedConfirmLabel}
                     </DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
