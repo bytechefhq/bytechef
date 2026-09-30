@@ -19,6 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.component.definition.TriggerDefinition;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -27,5 +28,22 @@ public class HttpHeadersImpl extends AbstractListMap implements TriggerDefinitio
 
     public HttpHeadersImpl(Map<String, List<String>> headers) {
         super(headers);
+    }
+
+    @Override
+    protected @Nullable List<String> getValues(String name) {
+        List<String> values = get(name);
+
+        if (values != null) {
+            return values;
+        }
+
+        for (Map.Entry<String, List<String>> entry : entrySet()) {
+            if (name.equalsIgnoreCase(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
     }
 }
