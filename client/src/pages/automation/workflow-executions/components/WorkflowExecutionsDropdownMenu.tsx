@@ -1,10 +1,10 @@
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
-import {useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
+import {useRestartJobMutation, useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {CircleStopIcon, EllipsisVerticalIcon, ViewIcon} from 'lucide-react';
+import {CircleStopIcon, EllipsisVerticalIcon, RotateCcwIcon, ViewIcon} from 'lucide-react';
 import {toast} from 'sonner';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
@@ -13,6 +13,16 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
     const queryClient = useQueryClient();
 
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
+
+    const restartJobMutation = useRestartJobMutation({
+        onSuccess: () => {
+            toast('Restarting Workflow Execution');
+
+            queryClient.invalidateQueries({
+                queryKey: WorkflowExecutionKeys.workflowExecutions,
+            });
+        },
+    });
 
     const stopJobMutation = useStopJobMutation({
         onSuccess: () => {
@@ -24,7 +34,8 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
         },
     });
 
-    const disabled = execution.job?.status !== 'STARTED';
+    const restartDisabled = execution.job?.status !== 'FAILED';
+    const stopDisabled = execution.job?.status !== 'STARTED';
 
     const handleViewClick = () => {
         const id = execution.id;
@@ -32,6 +43,14 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
         if (id != null) {
             setWorkflowExecutionId(id, execution.job ? 'JOB' : 'TRIGGER_EXECUTION');
             setWorkflowExecutionSheetOpen(true);
+        }
+    };
+
+    const handleRestartWorkflowExecutionClick = () => {
+        const jobId = execution.job?.id;
+
+        if (jobId != null) {
+            restartJobMutation.mutate(Number(jobId));
         }
     };
 
@@ -59,8 +78,16 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
+                    className="dropdown-menu-item"
+                    disabled={restartDisabled}
+                    onClick={handleRestartWorkflowExecutionClick}
+                >
+                    <RotateCcwIcon /> Restart
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
                     className="dropdown-menu-item-destructive"
-                    disabled={disabled}
+                    disabled={stopDisabled}
                     onClick={handleStopWorkflowExecutionClick}
                     variant="destructive"
                 >
