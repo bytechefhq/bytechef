@@ -234,7 +234,7 @@ const InputConfigurationList = ({
 
     if (!regularInputs.length && !subflowInputTree.size && !topLevelStubs.length) {
         return (
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-4 p-4">
                 <h3 className="font-medium text-content-neutral-primary">No Inputs yet</h3>
 
                 {onOpenInputs && (

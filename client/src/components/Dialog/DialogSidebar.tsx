@@ -9,7 +9,7 @@ interface DialogSidebarProps extends Omit<ComponentPropsWithRef<'div'>, 'title'>
 
 const DialogSidebar = ({children, className, description, icon, title, ...props}: DialogSidebarProps) => (
     <div
-        className={twMerge('hidden w-80 shrink-0 flex-col gap-4 p-6 lg:flex', className)}
+        className={twMerge('hidden w-80 shrink-0 flex-col gap-4 p-4 lg:flex', className)}
         data-slot="dialog-sidebar"
         {...props}
     >

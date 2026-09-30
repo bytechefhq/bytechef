@@ -68,7 +68,7 @@ describe('DialogSidebar - Layout', () => {
 
         const sidebar = screen.getByRole('dialog').querySelector('[data-slot="dialog-sidebar"]');
 
-        expect(sidebar).toHaveClass('hidden', 'w-80', 'shrink-0', 'flex-col', 'gap-4', 'p-6', 'lg:flex');
+        expect(sidebar).toHaveClass('hidden', 'w-80', 'shrink-0', 'flex-col', 'gap-4', 'p-4', 'lg:flex');
     });
 
     it('should merge className', () => {
