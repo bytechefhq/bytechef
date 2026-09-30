@@ -722,6 +722,15 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }, [autoFocus, editor]);
 
         useEffect(() => {
+            if (!editor) {
+                return;
+            }
+
+            editor.storage.MentionStorage.dataPills = dataPills;
+            editor.storage.MentionStorage.controlType = controlType;
+        }, [controlType, dataPills, editor]);
+
+        useEffect(() => {
             if (!editor || !focusRequest || appliedFocusTokenRef.current === focusRequest.token) {
                 return;
             }
@@ -770,16 +779,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }
             };
         }, [editor, ref]);
-
-        // MentionStorage: suggestion list + NodeView controlType (icon sizing); dataPills also drive NodeView via store
-        useEffect(() => {
-            if (!editor) {
-                return;
-            }
-
-            editor.storage.MentionStorage.dataPills = dataPills;
-            editor.storage.MentionStorage.controlType = controlType;
-        }, [controlType, dataPills, editor]);
 
         // Keep the function suggestion catalog in editor storage so the suggestion items callback can read it
         // without recreating the editor.
