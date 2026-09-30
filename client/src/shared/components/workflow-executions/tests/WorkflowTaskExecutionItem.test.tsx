@@ -109,4 +109,18 @@ describe('WorkflowTaskExecutionItem', () => {
             expect(screen.getByText('0ms')).toBeInTheDocument();
         });
     });
+
+    describe('attempt label', () => {
+        it('shows the attempt label when one is given', () => {
+            render(<WorkflowTaskExecutionItem attemptLabel="Attempt 3" taskExecution={createTaskExecution()} />);
+
+            expect(screen.getByText('Attempt 3')).toBeInTheDocument();
+        });
+
+        it('shows no attempt label by default', () => {
+            render(<WorkflowTaskExecutionItem taskExecution={createTaskExecution()} />);
+
+            expect(screen.queryByText(/Attempt/)).not.toBeInTheDocument();
+        });
+    });
 });

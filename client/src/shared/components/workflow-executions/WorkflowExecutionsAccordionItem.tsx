@@ -34,6 +34,7 @@ interface WorkflowExecutionsAccordionItemProps {
     defaultValue?: string[];
     execution: TaskExecution | TriggerExecution;
     onExecutionClick: (execution: TaskExecution | TriggerExecution) => void;
+    previousTaskExecutions?: TaskExecution[];
     selectedExecutionId: string;
 }
 
@@ -42,6 +43,7 @@ const WorkflowExecutionsAccordionItem = ({
     defaultValue,
     execution,
     onExecutionClick,
+    previousTaskExecutions = [],
     selectedExecutionId,
 }: WorkflowExecutionsAccordionItemProps) => {
     const [visibleIterationCount, setVisibleIterationCount] = useState(ITERATIONS_PAGE_SIZE);
@@ -54,8 +56,9 @@ const WorkflowExecutionsAccordionItem = ({
     const hasIterations = taskExecution?.iterations && taskExecution.iterations.length > 0;
     const remainingIterationCount = (taskExecution?.iterations?.length ?? 0) - visibleIterationCount;
     const hasMoreIterations = remainingIterationCount > 0;
+    const hasPreviousTaskExecutions = previousTaskExecutions.length > 0;
 
-    const isExpandable = hasChildren || hasIterations;
+    const isExpandable = hasChildren || hasIterations || hasPreviousTaskExecutions;
     const isSelected = selectedExecutionId === execution.id;
 
     useEffect(() => {
@@ -218,7 +221,7 @@ const WorkflowExecutionsAccordionItem = ({
                             </div>
                         )}
                     </Accordion>
-                ) : (
+                ) : hasChildren ? (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
                         {taskExecution.children?.map((childTaskExecution) => (
                             <WorkflowExecutionsAccordionItem
@@ -229,6 +232,25 @@ const WorkflowExecutionsAccordionItem = ({
                                 selectedExecutionId={selectedExecutionId}
                             >
                                 <WorkflowTaskExecutionItem taskExecution={childTaskExecution} />
+                            </WorkflowExecutionsAccordionItem>
+                        ))}
+                    </Accordion>
+                ) : null}
+
+                {hasPreviousTaskExecutions && (
+                    <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
+                        {previousTaskExecutions.map((previousTaskExecution, index) => (
+                            <WorkflowExecutionsAccordionItem
+                                defaultValue={defaultValue}
+                                execution={previousTaskExecution}
+                                key={previousTaskExecution.id}
+                                onExecutionClick={onExecutionClick}
+                                selectedExecutionId={selectedExecutionId}
+                            >
+                                <WorkflowTaskExecutionItem
+                                    attemptLabel={`Attempt ${index + 1}`}
+                                    taskExecution={previousTaskExecution}
+                                />
                             </WorkflowExecutionsAccordionItem>
                         ))}
                     </Accordion>

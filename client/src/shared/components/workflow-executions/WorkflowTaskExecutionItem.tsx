@@ -2,7 +2,12 @@ import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {getExecutionStatusIcon} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
 
-const WorkflowTaskExecutionItem = ({taskExecution}: {taskExecution: TaskExecution}) => {
+interface WorkflowTaskExecutionItemProps {
+    attemptLabel?: string;
+    taskExecution: TaskExecution;
+}
+
+const WorkflowTaskExecutionItem = ({attemptLabel, taskExecution}: WorkflowTaskExecutionItemProps) => {
     const {endDate, icon, startDate, status, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
@@ -26,7 +31,13 @@ const WorkflowTaskExecutionItem = ({taskExecution}: {taskExecution: TaskExecutio
                 </div>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-x-2">
+                {attemptLabel && (
+                    <span className="rounded-sm border border-stroke-neutral-primary px-1.5 py-0.5 text-xs text-content-neutral-secondary">
+                        {attemptLabel}
+                    </span>
+                )}
+
                 <span className="p-1 text-xs">{duration ?? 0}ms</span>
             </div>
         </li>

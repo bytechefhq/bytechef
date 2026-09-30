@@ -29,7 +29,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
         setActiveTab,
         setDialogOpen,
         subflowStack,
-        taskExecutions,
+        taskExecutionAttempts,
         triggerExecution,
         workflowExecution,
         workflowExecutionLoading,
@@ -68,7 +68,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             setActiveTab={setActiveTab}
                             setDialogOpen={setDialogOpen}
                             subflowStack={subflowStack}
-                            taskExecutions={taskExecutions}
+                            taskExecutionAttempts={taskExecutionAttempts}
                             triggerExecution={triggerExecution}
                             workflowExecutionId={workflowExecutionId}
                         />

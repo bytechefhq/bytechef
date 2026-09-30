@@ -1,3 +1,4 @@
+import {groupTaskExecutionAttempts} from '@/shared/components/workflow-executions/util/groupTaskExecutionAttempts';
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
 import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -46,7 +47,10 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     const activeJob = subflowStack.length > 0 ? subflowStack[subflowStack.length - 1].job : rootJob;
 
-    const taskExecutions = useMemo(() => activeJob?.taskExecutions || [], [activeJob?.taskExecutions]);
+    const taskExecutionAttempts = useMemo(
+        () => groupTaskExecutionAttempts(activeJob?.taskExecutions || []),
+        [activeJob?.taskExecutions]
+    );
 
     const deepestFailedExecution = useMemo(() => {
         if (triggerExecution) {
@@ -61,8 +65,8 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
             }
         }
 
-        for (const taskExecution of taskExecutions) {
-            const result = getDeepestFailedExecution({currentPath: [], execution: taskExecution});
+        for (const {latestTaskExecution} of taskExecutionAttempts) {
+            const result = getDeepestFailedExecution({currentPath: [], execution: latestTaskExecution});
 
             if (result) {
                 return result;
@@ -70,7 +74,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         }
 
         return null;
-    }, [taskExecutions, triggerExecution]);
+    }, [taskExecutionAttempts, triggerExecution]);
 
     const jobFailedWithNoExecutions = !activeJob?.taskExecutions?.length && activeJob?.status === JobStatusEnum.Failed;
 
@@ -143,7 +147,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         setActiveTab,
         setDialogOpen,
         subflowStack,
-        taskExecutions,
+        taskExecutionAttempts,
         triggerExecution,
         workflowExecution,
         workflowExecutionLoading,
