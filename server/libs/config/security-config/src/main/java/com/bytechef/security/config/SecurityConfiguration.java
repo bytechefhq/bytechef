@@ -27,6 +27,7 @@ import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import com.bytechef.platform.security.web.config.SpaWebFilterContributor;
 import com.bytechef.security.web.filter.CookieCsrfFilter;
+import com.bytechef.security.web.filter.CsrfCookieIssuingFilter;
 import com.bytechef.security.web.filter.SpaWebFilter;
 import com.bytechef.security.web.filter.TwoFactorVerificationFilter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -83,6 +84,7 @@ public class SecurityConfiguration {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
     private final List<OAuth2LoginCustomizer> oAuth2LoginCustomizers;
     private final PasswordEncoder passwordEncoder;
     private final RememberMeKey rememberMeKey;
@@ -203,7 +205,7 @@ public class SecurityConfiguration {
             .cors(withDefaults())
             .csrf(csrf -> {
                 csrf
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRepository(csrfTokenRepository)
                     // See https://stackoverflow.com/q/74447118/65681
                     .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                     // For CORS requests
@@ -306,6 +308,7 @@ public class SecurityConfiguration {
         List<SpaWebFilterContributor> spaWebFilterContributors) throws Exception {
 
         http
+            .addFilterBefore(new CsrfCookieIssuingFilter(csrfTokenRepository), BasicAuthenticationFilter.class)
             .addFilterAfter(new SpaWebFilter(spaWebFilterContributors), BasicAuthenticationFilter.class)
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
