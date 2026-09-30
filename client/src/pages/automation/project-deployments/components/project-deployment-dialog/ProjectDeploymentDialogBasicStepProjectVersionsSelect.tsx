@@ -3,6 +3,7 @@ import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {CheckIcon} from 'lucide-react';
 import {Select as SelectPrimitive} from 'radix-ui';
+import {useMemo} from 'react';
 
 const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
     onChange,
@@ -14,6 +15,19 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
     projectVersion?: number;
 }) => {
     const {data: projectVersions, isPending} = useGetProjectVersionsQuery(projectId);
+
+    const publishedProjectVersions = useMemo(
+        () => (projectVersions ?? []).filter((projectVersion) => projectVersion.status === ProjectStatus.Published),
+        [projectVersions]
+    );
+
+    if (!isPending && publishedProjectVersions.length === 0) {
+        return (
+            <p className="text-sm text-muted-foreground">
+                This project has no published version yet. Publish it first.
+            </p>
+        );
+    }
 
     return (
         <Select
@@ -31,31 +45,27 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
                         Loading versions…
                     </span>
                 ) : (
-                    projectVersions &&
-                    projectVersions.map(
-                        (projectVersion) =>
-                            projectVersion.status == ProjectStatus.Published && (
-                                <SelectPrimitive.Item
-                                    className="radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden"
-                                    key={projectVersion.version}
-                                    value={projectVersion.version!.toString()}
-                                >
-                                    <span className="absolute right-2 flex size-3.5 items-center justify-center">
-                                        <SelectPrimitive.ItemIndicator>
-                                            <CheckIcon className="size-4" />
-                                        </SelectPrimitive.ItemIndicator>
-                                    </span>
+                    publishedProjectVersions.map((projectVersion) => (
+                        <SelectPrimitive.Item
+                            className="radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden"
+                            key={projectVersion.version}
+                            value={projectVersion.version!.toString()}
+                        >
+                            <span className="absolute right-2 flex size-3.5 items-center justify-center">
+                                <SelectPrimitive.ItemIndicator>
+                                    <CheckIcon className="size-4" />
+                                </SelectPrimitive.ItemIndicator>
+                            </span>
 
-                                    <div className="flex flex-col">
-                                        <SelectPrimitive.ItemText>V{projectVersion.version}</SelectPrimitive.ItemText>
+                            <div className="flex flex-col">
+                                <SelectPrimitive.ItemText>V{projectVersion.version}</SelectPrimitive.ItemText>
 
-                                        <div className="max-w-96 text-xs text-muted-foreground">
-                                            {projectVersion.description}
-                                        </div>
-                                    </div>
-                                </SelectPrimitive.Item>
-                            )
-                    )
+                                <div className="max-w-96 text-xs text-muted-foreground">
+                                    {projectVersion.description}
+                                </div>
+                            </div>
+                        </SelectPrimitive.Item>
+                    ))
                 )}
             </SelectContent>
         </Select>
