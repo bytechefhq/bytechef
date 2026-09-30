@@ -42,6 +42,10 @@ import org.springframework.mock.web.MockHttpServletResponse;
  */
 class WebhookTriggerControllerTest {
 
+    private static final WebhookTriggerFlags ASYNC_EXECUTION_FLAGS =
+        new WebhookTriggerFlags(false, false, false, false);
+    private static final WebhookTriggerFlags ASYNC_EXECUTION_WITH_VALIDATION_FLAGS =
+        new WebhookTriggerFlags(false, false, true, false);
     private static final WebhookTriggerFlags SYNC_EXECUTION_WITH_VALIDATION_FLAGS =
         new WebhookTriggerFlags(false, true, true, false);
 
@@ -88,6 +92,57 @@ class WebhookTriggerControllerTest {
         assertThat(responseEntity.getStatusCode()
             .value()).isEqualTo(200);
         assertThat(responseEntity.getBody()).isEqualTo(Map.of("result", "done"));
+    }
+
+    @Test
+    void testDisabledWorkflowReturnsGoneForAsyncTrigger() {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_FLAGS);
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any())).thenReturn(true);
+
+        ResponseEntity<?> responseEntity = executeWorkflow("POST");
+
+        assertThat(responseEntity.getStatusCode()
+            .value()).isEqualTo(410);
+        assertThat(responseEntity.getBody()).isEqualTo(Map.of("detail", "Workflow is disabled."));
+
+        verify(webhookWorkflowExecutor, never()).executeAsync(any(), any());
+    }
+
+    @Test
+    void testDisabledWorkflowReturnsGoneForValidatingAsyncTrigger() {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_WITH_VALIDATION_FLAGS);
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any())).thenReturn(true);
+
+        ResponseEntity<?> responseEntity = executeWorkflow("POST");
+
+        assertThat(responseEntity.getStatusCode()
+            .value()).isEqualTo(410);
+
+        verify(webhookWorkflowExecutor, never()).validateAndExecuteAsync(any(), any());
+    }
+
+    @Test
+    void testDisabledWorkflowReturnsGoneForSyncTrigger() {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(SYNC_EXECUTION_WITH_VALIDATION_FLAGS);
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any())).thenReturn(true);
+
+        ResponseEntity<?> responseEntity = executeWorkflow("POST");
+
+        assertThat(responseEntity.getStatusCode()
+            .value()).isEqualTo(410);
+
+        verify(webhookWorkflowExecutor, never()).executeSync(any(), any());
+    }
+
+    @Test
+    void testHeadRequestReturnsOkForDisabledAsyncTrigger() {
+        when(webhookWorkflowExecutor.getWebhookTriggerFlags(any())).thenReturn(ASYNC_EXECUTION_FLAGS);
+        when(webhookWorkflowExecutor.isWorkflowDisabled(any())).thenReturn(true);
+
+        ResponseEntity<?> responseEntity = executeWorkflow("HEAD");
+
+        assertThat(responseEntity.getStatusCode()
+            .value()).isEqualTo(200);
     }
 
     private ResponseEntity<?> executeWorkflow(String method) {
