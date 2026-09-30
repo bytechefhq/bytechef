@@ -374,7 +374,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                         <AlertDialogDescription>
                             This action cannot be undone. This will permanently delete the integration and workflows it
-                            contains..
+                            contains.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
