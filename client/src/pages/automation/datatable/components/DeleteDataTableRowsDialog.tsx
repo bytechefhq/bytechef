@@ -1,37 +1,18 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 
 import useDeleteDataTableRowsDialog from '../hooks/useDeleteDataTableRowsDialog';
 
 const DeleteDataTableRowsDialog = () => {
-    const {handleDelete, handleOpenChange, open, rowCount} = useDeleteDataTableRowsDialog();
+    const {handleClose, handleDelete, open, rowCount} = useDeleteDataTableRowsDialog();
 
     return (
-        <AlertDialog onOpenChange={handleOpenChange} open={open}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Delete records</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        {`Are you sure you want to delete ${rowCount} selected record${rowCount === 1 ? '' : 's'}? This action cannot be undone.`}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <DestructiveAlertDialogAction onClick={handleDelete}>Delete</DestructiveAlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <DeleteAlertDialog
+            description={`Are you sure you want to delete ${rowCount} selected record${rowCount === 1 ? '' : 's'}? This action cannot be undone.`}
+            onCancel={handleClose}
+            onDelete={handleDelete}
+            open={open}
+            title="Delete records"
+        />
     );
 };
 

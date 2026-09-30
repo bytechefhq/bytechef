@@ -1,13 +1,4 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {WorkflowInput} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowInputsDeleteDialogProps {
@@ -24,37 +15,17 @@ const WorkflowInputsDeleteDialog = ({
     deleteWorkflowInput,
     isDeleteDialogOpen,
     workflowInputs,
-}: WorkflowInputsDeleteDialogProps) => (
-    <AlertDialog
-        onOpenChange={(isOpen) => {
-            if (!isOpen) {
-                closeDeleteDialog();
-            }
-        }}
-        open={isDeleteDialogOpen}
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+}: WorkflowInputsDeleteDialogProps) => {
+    const currentInput = workflowInputs?.[currentInputIndex];
 
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the input.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => closeDeleteDialog()}>Cancel</AlertDialogCancel>
-
-                {workflowInputs?.[currentInputIndex] && (
-                    <DestructiveAlertDialogAction
-                        onClick={() => deleteWorkflowInput(workflowInputs![currentInputIndex])}
-                    >
-                        Delete
-                    </DestructiveAlertDialogAction>
-                )}
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
-);
+    return (
+        <DeleteAlertDialog
+            description="This action cannot be undone. This will permanently delete the input."
+            onCancel={closeDeleteDialog}
+            onDelete={() => currentInput && deleteWorkflowInput(currentInput)}
+            open={isDeleteDialogOpen}
+        />
+    );
+};
 
 export default WorkflowInputsDeleteDialog;

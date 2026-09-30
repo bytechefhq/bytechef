@@ -1,6 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {
@@ -250,25 +251,12 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     </div>
                 </div>
 
-                <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the connection.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                            <DestructiveAlertDialogAction onClick={handleAlertDeleteDialogClick}>
-                                Delete
-                            </DestructiveAlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                <DeleteAlertDialog
+                    description="This action cannot be undone. This will permanently delete the connection."
+                    onCancel={() => setShowDeleteDialog(false)}
+                    onDelete={handleAlertDeleteDialogClick}
+                    open={showDeleteDialog}
+                />
 
                 <AlertDialog onOpenChange={setShowDisconnectDialog} open={showDisconnectDialog}>
                     <AlertDialogContent>

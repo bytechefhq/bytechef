@@ -1,13 +1,4 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 
 const AiSkillFileDeleteAlertDialog = ({
     fileName,
@@ -18,30 +9,13 @@ const AiSkillFileDeleteAlertDialog = ({
     onClose: () => void;
     onDelete: () => void;
 }) => (
-    <AlertDialog
-        onOpenChange={(open) => {
-            if (!open) {
-                onClose();
-            }
-        }}
+    <DeleteAlertDialog
+        confirmLabel="Remove"
+        description={`This action cannot be undone. This will permanently remove "${fileName}" from the skill.`}
+        onCancel={onClose}
+        onDelete={onDelete}
         open
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                <AlertDialogDescription>
-                    This action cannot be undone. This will permanently remove &quot;{fileName}&quot; from the skill.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
-
-                <DestructiveAlertDialogAction onClick={onDelete}>Remove</DestructiveAlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+    />
 );
 
 export default AiSkillFileDeleteAlertDialog;

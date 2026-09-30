@@ -207,6 +207,84 @@ describe('DeleteAlertDialog overrides', () => {
         expect(onDelete).toHaveBeenCalledTimes(1);
         expect(onCancel).not.toHaveBeenCalled();
     });
+
+    it('should use title in place of the generic question', () => {
+        render(<DeleteAlertDialog {...defaultProps} title="Delete column" />);
+
+        expect(screen.getByRole('heading', {level: 2})).toHaveTextContent('Delete column');
+        expect(screen.queryByText('Are you absolutely sure?')).not.toBeInTheDocument();
+    });
+
+    it('should use description in place of the generic one', () => {
+        render(<DeleteAlertDialog {...defaultProps} description="This will permanently delete the connection." />);
+
+        expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
+            'This will permanently delete the connection.'
+        );
+        expect(
+            screen.queryByText('This action cannot be undone. This will permanently delete data.')
+        ).not.toBeInTheDocument();
+    });
+
+    it('should accept a description built from elements rather than a plain string', () => {
+        render(
+            <DeleteAlertDialog
+                {...defaultProps}
+                description={
+                    <>
+                        This will permanently remove <strong>notes.md</strong> from the skill.
+                    </>
+                }
+            />
+        );
+
+        expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription(
+            'This will permanently remove notes.md from the skill.'
+        );
+    });
+
+    it('should name the confirming action with ariaLabel for the benefit of assistive tech', () => {
+        render(<DeleteAlertDialog {...defaultProps} ariaLabel="Confirm Project Deletion" />);
+
+        expect(screen.getByRole('button', {name: 'Confirm Project Deletion'})).toBeInTheDocument();
+    });
+
+    it('should leave the confirming action named by its label when no ariaLabel is given', () => {
+        render(<DeleteAlertDialog {...defaultProps} />);
+
+        expect(screen.getByRole('button', {name: 'Delete'})).not.toHaveAttribute('aria-label');
+    });
+});
+
+describe('DeleteAlertDialog pending state', () => {
+    it('should disable the confirming action while the deletion is in flight', () => {
+        render(<DeleteAlertDialog {...defaultProps} isPending />);
+
+        expect(screen.getByRole('button', {name: 'Delete'})).toBeDisabled();
+    });
+
+    it('should not call onDelete while the deletion is in flight', async () => {
+        render(<DeleteAlertDialog {...defaultProps} isPending />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Delete'}), {pointerEventsCheck: 0});
+
+        expect(onDelete).not.toHaveBeenCalled();
+    });
+
+    it('should show a loading icon in place of the confirm icon while pending', () => {
+        render(
+            <DeleteAlertDialog {...defaultProps} confirmIcon={<Trash2Icon data-testid="custom-icon" />} isPending />
+        );
+
+        expect(screen.queryByTestId('custom-icon')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Delete'}).querySelector('svg')).toBeInTheDocument();
+    });
+
+    it('should enable the confirming action when it is not pending', () => {
+        render(<DeleteAlertDialog {...defaultProps} isPending={false} />);
+
+        expect(screen.getByRole('button', {name: 'Delete'})).toBeEnabled();
+    });
 });
 
 describe('DeleteAlertDialog override precedence over the nodeName preset', () => {

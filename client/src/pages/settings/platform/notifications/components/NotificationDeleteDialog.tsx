@@ -1,16 +1,5 @@
-import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Notification} from '@/shared/middleware/platform/notification';
-import {XIcon} from 'lucide-react';
 
 interface NotificationDeleteDialogProps {
     closeDeleteDialog: () => void;
@@ -25,34 +14,13 @@ const NotificationDeleteDialog = ({
     isDeleteDialogOpen,
     selectedNotification,
 }: NotificationDeleteDialogProps) => (
-    <AlertDialog open={isDeleteDialogOpen}>
-        <AlertDialogContent onEscapeKeyDown={closeDeleteDialog}>
-            <AlertDialogHeader>
-                <AlertDialogTitle>{`Delete ${selectedNotification?.name} notification?`}</AlertDialogTitle>
-
-                <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
-
-                <Button
-                    aria-label="Close"
-                    className="absolute top-0 right-2"
-                    icon={<XIcon />}
-                    onClick={closeDeleteDialog}
-                    size="icon"
-                    variant="ghost"
-                />
-            </AlertDialogHeader>
-
-            <AlertDialogFooter>
-                <AlertDialogCancel onClick={closeDeleteDialog}>Cancel</AlertDialogCancel>
-
-                <DestructiveAlertDialogAction
-                    onClick={() => selectedNotification && handleDeleteNotification(selectedNotification.id!)}
-                >
-                    Delete
-                </DestructiveAlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+    <DeleteAlertDialog
+        description="This action cannot be undone."
+        onCancel={closeDeleteDialog}
+        onDelete={() => selectedNotification && handleDeleteNotification(selectedNotification.id!)}
+        open={isDeleteDialogOpen}
+        title={`Delete ${selectedNotification?.name} notification?`}
+    />
 );
 
 export default NotificationDeleteDialog;

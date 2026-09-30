@@ -1,13 +1,4 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
 import {useShallow} from 'zustand/react/shallow';
@@ -23,33 +14,18 @@ const ApiKeyDeleteDialog = () => {
 
     const {handleDelete} = useApiKeys();
 
-    const handleOpenChange = () => {
+    const handleCancel = () => {
         setOnShowDeleteDialog(false);
         setCurrentApiKey(undefined);
     };
 
     return (
-        <AlertDialog onOpenChange={handleOpenChange} open={true}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the API key.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    {currentApiKey && (
-                        <DestructiveAlertDialogAction onClick={() => handleDelete(+currentApiKey.id!)}>
-                            Delete
-                        </DestructiveAlertDialogAction>
-                    )}
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <DeleteAlertDialog
+            description="This action cannot be undone. This will permanently delete the API key."
+            onCancel={handleCancel}
+            onDelete={() => currentApiKey && handleDelete(+currentApiKey.id!)}
+            open
+        />
     );
 };
 
