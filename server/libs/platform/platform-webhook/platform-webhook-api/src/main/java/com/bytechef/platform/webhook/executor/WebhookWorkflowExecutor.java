@@ -113,6 +113,17 @@ public interface WebhookWorkflowExecutor {
     boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId);
 
     /**
+     * Validates the provided webhook request against the trigger of the given workflow execution without executing the
+     * workflow.
+     *
+     * @param workflowExecutionId the unique identifier for the workflow execution containing details such as tenant,
+     *                            type, and trigger
+     * @param webhookRequest      the webhook request with headers, parameters, and body to validate
+     * @return a {@link WebhookValidateResponse} instance encapsulating the status, headers, and body of the validation
+     */
+    WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+
+    /**
      * Validates the provided webhook request and executes the associated workflow asynchronously based on the given
      * workflow execution identifier.
      *
