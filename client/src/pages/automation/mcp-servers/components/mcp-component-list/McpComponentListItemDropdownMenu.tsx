@@ -50,6 +50,7 @@ const McpComponentListItemDropdownMenu = ({mcpComponent, onEditClick}: McpCompon
             </DropdownMenu>
 
             <AlertDialog
+                isPending={deleteMcpComponentMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

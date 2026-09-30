@@ -17,6 +17,7 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
     const {
         handleCloseEditDialog,
         handleConfirmDelete,
+        isDeletePending,
         projectDeploymentWorkflow,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,
@@ -85,6 +86,7 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
             </Popover>
 
             <AlertDialog
+                isPending={isDeletePending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

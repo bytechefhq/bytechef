@@ -51,6 +51,7 @@ const McpProjectListItemDropdownMenu = ({
             </DropdownMenu>
 
             <AlertDialog
+                isPending={isDeletePending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

@@ -243,6 +243,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
 
                 <AlertDialog
                     description="This action cannot be undone. This will permanently delete the connection."
+                    isPending={deleteConnectionMutation.isPending}
                     onCancel={() => setShowDeleteDialog(false)}
                     onConfirm={handleAlertDeleteDialogClick}
                     open={showDeleteDialog}
@@ -252,6 +253,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                     confirmIcon={<Link2OffIcon />}
                     confirmLabel="Disconnect from all"
                     description="This action cannot be undone."
+                    isPending={disconnectConnectionMutation.isPending}
                     onCancel={() => setShowDisconnectDialog(false)}
                     onConfirm={handleDisconnectFromAllClick}
                     open={showDisconnectDialog}

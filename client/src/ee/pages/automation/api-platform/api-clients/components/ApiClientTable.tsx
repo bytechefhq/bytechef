@@ -37,6 +37,7 @@ const ApiClientDeleteDialog = ({apiClientId, onClose}: {apiClientId: number; onC
     return (
         <AlertDialog
             description="This action cannot be undone. This will permanently delete API key."
+            isPending={deleteApiClientMutation.isPending}
             onCancel={onClose}
             onConfirm={handleClick}
             open

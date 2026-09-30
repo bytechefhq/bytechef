@@ -88,6 +88,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
             queryClient.invalidateQueries({
                 queryKey: IntegrationTagKeys.integrationTags,
             });
+
+            setShowDeleteDialog(false);
         },
     });
 
@@ -360,6 +362,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
             <AlertDialog
                 description="This action cannot be undone. This will permanently delete the integration and workflows it contains."
+                isPending={deleteIntegrationMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() => {
                     if (integration.id) {

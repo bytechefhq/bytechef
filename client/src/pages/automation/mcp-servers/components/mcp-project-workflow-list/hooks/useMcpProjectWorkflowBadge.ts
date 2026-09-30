@@ -58,6 +58,7 @@ export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjec
     return {
         handleCloseEditDialog,
         handleConfirmDelete,
+        isDeletePending: deleteMcpProjectWorkflowMutation.isPending,
         projectDeploymentWorkflow,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,

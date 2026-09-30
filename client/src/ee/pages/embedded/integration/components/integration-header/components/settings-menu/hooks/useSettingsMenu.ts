@@ -105,5 +105,6 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
         handleDeleteIntegrationAlertDialogClick,
         handleDeleteWorkflowAlertDialogClick,
         handleImportWorkflow,
+        isDeleteIntegrationPending: deleteIntegrationMutation.isPending,
     };
 };

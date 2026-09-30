@@ -259,5 +259,64 @@ describe('useDeleteDataTableRowsDialog', () => {
 
             expect(useSelectedRowsStore.getState().selectedRows.size).toBe(0);
         });
+
+        it('should report isPending while deletes are in flight', async () => {
+            let resolveDelete: (value: unknown) => void = () => {};
+
+            hoisted.mockMutateAsync.mockImplementationOnce(
+                () =>
+                    new Promise((resolve) => {
+                        resolveDelete = resolve;
+                    })
+            );
+
+            useCurrentDataTableStore.getState().setDataTable({baseName: 'test-table', id: 'test-table-id'} as never);
+            useSelectedRowsStore.getState().setSelectedRows(new Set<string>(['1']));
+
+            const {result} = renderHook(() => useDeleteDataTableRowsDialog(), {
+                wrapper: createWrapper(),
+            });
+
+            expect(result.current.isPending).toBe(false);
+
+            act(() => {
+                result.current.handleDelete();
+            });
+
+            expect(result.current.isPending).toBe(true);
+
+            await act(async () => {
+                resolveDelete({});
+            });
+
+            expect(result.current.isPending).toBe(false);
+        });
+
+        it('should keep dialog open with only the failed rows selected when some deletes fail', async () => {
+            hoisted.mockMutateAsync
+                .mockResolvedValueOnce({})
+                .mockRejectedValueOnce(new Error('Delete failed'))
+                .mockResolvedValueOnce({});
+
+            useCurrentDataTableStore.getState().setDataTable({baseName: 'test-table', id: 'test-table-id'} as never);
+            useSelectedRowsStore.getState().setSelectedRows(new Set<string>(['1', '2', '3']));
+
+            const {result} = renderHook(() => useDeleteDataTableRowsDialog(), {
+                wrapper: createWrapper(),
+            });
+
+            act(() => {
+                result.current.handleOpen();
+            });
+
+            await act(async () => {
+                await result.current.handleDelete();
+            });
+
+            expect(result.current.open).toBe(true);
+            expect(result.current.isPending).toBe(false);
+            expect(result.current.rowCount).toBe(1);
+            expect(Array.from(useSelectedRowsStore.getState().selectedRows)).toEqual(['2']);
+        });
     });
 });

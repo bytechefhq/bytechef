@@ -227,6 +227,7 @@ const ProjectWorkflowListItem = ({
 
             {showDeleteDialog && (
                 <AlertDialog
+                    isPending={deleteWorkflowMutation.isPending}
                     onCancel={() => setShowDeleteDialog(false)}
                     onConfirm={() => {
                         if (workflow?.id) {

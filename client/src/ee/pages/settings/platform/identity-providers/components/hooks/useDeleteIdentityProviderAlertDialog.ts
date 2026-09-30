@@ -6,6 +6,7 @@ interface UseDeleteIdentityProviderAlertDialogI {
     handleClose: () => void;
     handleDelete: () => void;
     handleOpen: (id: string | null) => void;
+    isPending: boolean;
     open: boolean;
 }
 
@@ -39,6 +40,7 @@ export default function useDeleteIdentityProviderAlertDialog(): UseDeleteIdentit
         handleClose,
         handleDelete,
         handleOpen,
+        isPending: deleteIdentityProviderMutation.isPending,
         open: idToDelete !== null,
     };
 }

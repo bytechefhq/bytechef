@@ -12,7 +12,7 @@ const ApiKeyDeleteDialog = () => {
         }))
     );
 
-    const {handleDelete} = useApiKeys();
+    const {handleDelete, isDeletePending} = useApiKeys();
 
     const handleCancel = () => {
         setOnShowDeleteDialog(false);
@@ -22,6 +22,7 @@ const ApiKeyDeleteDialog = () => {
     return (
         <AlertDialog
             description="This action cannot be undone. This will permanently delete the API key."
+            isPending={isDeletePending}
             onCancel={handleCancel}
             onConfirm={() => currentApiKey && handleDelete(+currentApiKey.id!)}
             open

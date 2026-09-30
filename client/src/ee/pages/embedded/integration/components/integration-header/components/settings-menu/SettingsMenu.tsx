@@ -42,8 +42,12 @@ const SettingsMenu = ({integration, updateWorkflowMutation, workflow}: Integrati
 
     const queryClient = useQueryClient();
 
-    const {handleDeleteIntegrationAlertDialogClick, handleDeleteWorkflowAlertDialogClick, handleImportWorkflow} =
-        useSettingsMenu({integration, workflow});
+    const {
+        handleDeleteIntegrationAlertDialogClick,
+        handleDeleteWorkflowAlertDialogClick,
+        handleImportWorkflow,
+        isDeleteIntegrationPending,
+    } = useSettingsMenu({integration, workflow});
 
     return (
         <>
@@ -105,6 +109,7 @@ const SettingsMenu = ({integration, updateWorkflowMutation, workflow}: Integrati
 
             {showDeleteIntegrationAlertDialog && (
                 <DeleteIntegrationAlertDialog
+                    isPending={isDeleteIntegrationPending}
                     onClose={() => setShowDeleteIntegrationAlertDialog(false)}
                     onDelete={handleDeleteIntegrationAlertDialogClick}
                 />

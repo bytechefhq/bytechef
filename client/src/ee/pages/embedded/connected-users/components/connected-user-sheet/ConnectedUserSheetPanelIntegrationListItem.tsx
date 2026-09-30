@@ -209,6 +209,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
             </CollapsibleContent>
 
             <AlertDialog
+                isPending={deleteIntegrationInstanceMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() => deleteIntegrationInstanceMutation.mutate({id: connectedUserIntegrationInstance.id!})}
                 open={showDeleteDialog}

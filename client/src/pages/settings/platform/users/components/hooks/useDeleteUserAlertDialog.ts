@@ -7,6 +7,7 @@ interface UseDeleteUserAlertDialogI {
     handleDelete: () => void;
     handleOpen: (login: string | null) => void;
     handleOpenChange: (open: boolean) => void;
+    isPending: boolean;
     open: boolean;
 }
 
@@ -47,6 +48,7 @@ export default function useDeleteUserAlertDialog(): UseDeleteUserAlertDialogI {
         handleDelete,
         handleOpen,
         handleOpenChange,
+        isPending: deleteUserMutation.isPending,
         open: loginToDelete !== null,
     };
 }
