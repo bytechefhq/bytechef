@@ -27,7 +27,14 @@ const KnowledgeBaseListItemDeleteDialog = ({
     });
 
     return (
-        <AlertDialog open={open}>
+        <AlertDialog
+            onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                    handleCancelClick();
+                }
+            }}
+            open={open}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

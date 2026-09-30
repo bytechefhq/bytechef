@@ -132,7 +132,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                 />
             )}
 
-            <AlertDialog open={showDeleteDialog}>
+            <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

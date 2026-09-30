@@ -22,7 +22,14 @@ const IntegrationInstanceConfigurationListItemAlertDialog = ({
     onDeleteClick,
 }: IntegrationInstanceConfigurationListItemAlertDialogProps) => {
     return (
-        <AlertDialog open={true}>
+        <AlertDialog
+            onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                    onCancelClick();
+                }
+            }}
+            open={true}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

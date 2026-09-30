@@ -10,7 +10,14 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const DeleteIntegrationAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
-    <AlertDialog open>
+    <AlertDialog
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                onClose();
+            }
+        }}
+        open
+    >
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
