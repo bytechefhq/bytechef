@@ -202,7 +202,7 @@ class PropertyValidator {
 
         JsonNode valueJsonNode = taskParametersJsonNode.get(fieldName);
 
-        if (valueJsonNode.isString() && TypeValidator.isDataPillExpression(valueJsonNode.asString())) {
+        if (valueJsonNode.isString() && TypeValidator.isExpression(valueJsonNode.asString())) {
             return;
         }
 

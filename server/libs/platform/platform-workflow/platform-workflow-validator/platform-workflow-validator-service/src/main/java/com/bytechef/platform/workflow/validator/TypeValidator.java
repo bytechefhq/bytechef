@@ -36,7 +36,7 @@ class TypeValidator {
     static void validateType(
         JsonNode valueJsonNode, String expectedType, String propertyPath, StringBuilder errors) {
 
-        if (valueJsonNode.isString() && isDataPillExpression(valueJsonNode.asString())) {
+        if (valueJsonNode.isString() && isExpression(valueJsonNode.asString())) {
             return;
         }
 
@@ -74,8 +74,8 @@ class TypeValidator {
         };
     }
 
-    static boolean isDataPillExpression(@Nullable String value) {
-        return value != null && value.matches("\\$\\{[^}]+}");
+    static boolean isExpression(@Nullable String value) {
+        return value != null && (value.startsWith("=") || value.matches("\\$\\{[^}]+}"));
     }
 
     private static boolean isDateTimeType(String expectedType) {
