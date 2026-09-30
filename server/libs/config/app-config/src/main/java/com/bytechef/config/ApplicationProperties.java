@@ -532,6 +532,11 @@ public class ApplicationProperties {
         public static class Logging {
 
             /**
+             * AWS Signature Version 4 signing of the OTLP logging export requests
+             */
+            private Aws aws = new Aws();
+
+            /**
              * Whether observability logging features are enabled
              */
             private boolean enabled;
@@ -541,20 +546,71 @@ public class ApplicationProperties {
              */
             private String endpoint;
 
-            public String getEndpoint() {
-                return endpoint;
+            public Aws getAws() {
+                return aws;
             }
 
-            public void setEndpoint(String endpoint) {
-                this.endpoint = endpoint;
+            public String getEndpoint() {
+                return endpoint;
             }
 
             public boolean isEnabled() {
                 return enabled;
             }
 
+            public void setAws(Aws aws) {
+                this.aws = aws;
+            }
+
+            public void setEndpoint(String endpoint) {
+                this.endpoint = endpoint;
+            }
+
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public static class Aws {
+
+                /**
+                 * Whether OTLP logging export requests are signed with AWS Signature Version 4, required by the
+                 * CloudWatch OTLP endpoint (https://logs.{region}.amazonaws.com/v1/logs)
+                 */
+                private boolean enabled;
+
+                /**
+                 * AWS region used in the signature scope; derived from the endpoint host when not set
+                 */
+                private String region;
+
+                /**
+                 * AWS service name used in the signature scope
+                 */
+                private String service = "logs";
+
+                public String getRegion() {
+                    return region;
+                }
+
+                public String getService() {
+                    return service;
+                }
+
+                public boolean isEnabled() {
+                    return enabled;
+                }
+
+                public void setEnabled(boolean enabled) {
+                    this.enabled = enabled;
+                }
+
+                public void setRegion(String region) {
+                    this.region = region;
+                }
+
+                public void setService(String service) {
+                    this.service = service;
+                }
             }
         }
 
