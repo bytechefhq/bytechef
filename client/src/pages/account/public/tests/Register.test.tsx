@@ -1,10 +1,12 @@
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {act, render, resetAll, screen, userEvent, waitFor, windowResizeObserver} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
+import AccountErrorPage from '../AccountErrorPage';
 import Register from '../Register';
-import {mockApplicationInfoStore} from '../tests/mocks/mockApplicationInfoStore';
+import {createMockApplicationInfoStore, mockApplicationInfoStore} from '../tests/mocks/mockApplicationInfoStore';
 
 screen.debug();
 
@@ -111,4 +113,56 @@ it('should show socials login buttons with correct feature flag', async () => {
 
     expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
     expect(screen.queryByText('Continue with Github')).toBeInTheDocument();
+});
+
+it('should navigate to the account error page with a message when registration fails without an error body', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, {status: 403}));
+
+    render(
+        <MemoryRouter initialEntries={['/register']}>
+            <Routes>
+                <Route element={<Register />} path="/register" />
+
+                <Route element={<AccountErrorPage />} path="/account-error" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    await triggerShowPasswordInputField();
+
+    await userEvent.type(await screen.findByLabelText('Password'), 'Password1');
+    await userEvent.click(screen.getByRole('button', {name: 'Continue with password'}));
+
+    expect(await screen.findByText('Registration failed. Please try again.')).toBeInTheDocument();
+
+    vi.restoreAllMocks();
+});
+
+it('should navigate to the verify email page after a successful registration', async () => {
+    const applicationInfoStore = createMockApplicationInfoStore({signUp: {activationRequired: true, enabled: true}});
+
+    (useApplicationInfoStore as unknown as Mock).mockImplementation(
+        (selector: (state: typeof applicationInfoStore) => unknown) => selector(applicationInfoStore)
+    );
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, {status: 201}));
+
+    render(
+        <MemoryRouter initialEntries={['/register']}>
+            <Routes>
+                <Route element={<Register />} path="/register" />
+
+                <Route element={<p>Verify email page</p>} path="/verify-email" />
+            </Routes>
+        </MemoryRouter>
+    );
+
+    await triggerShowPasswordInputField();
+
+    await userEvent.type(await screen.findByLabelText('Password'), 'Password1');
+    await userEvent.click(screen.getByRole('button', {name: 'Continue with password'}));
+
+    expect(await screen.findByText('Verify email page')).toBeInTheDocument();
+
+    vi.restoreAllMocks();
 });
