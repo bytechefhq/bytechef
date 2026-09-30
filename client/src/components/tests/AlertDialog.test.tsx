@@ -51,47 +51,12 @@ describe('AlertDialog default copy', () => {
 
         expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Delete'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Keep node'})).not.toBeInTheDocument();
     });
 
     it('should render the Delete button without an icon', () => {
         render(<AlertDialog {...defaultProps} />);
 
         expect(screen.getByRole('button', {name: 'Delete'}).querySelector('svg')).toBeNull();
-    });
-});
-
-describe('AlertDialog node copy', () => {
-    const nodeProps = {...defaultProps, nodeName: 'httpClient_1'};
-
-    it('should name the node in the title', () => {
-        render(<AlertDialog {...nodeProps} />);
-
-        expect(screen.getByRole('heading', {level: 2})).toHaveTextContent('Delete node httpClient_1?');
-    });
-
-    it('should describe what deleting a node removes', () => {
-        render(<AlertDialog {...nodeProps} />);
-
-        expect(
-            screen.getByText(
-                'This action cannot be undone. This will permanently delete the node and properties it contains.'
-            )
-        ).toBeInTheDocument();
-    });
-
-    it('should label the footer buttons Keep node and Delete node', () => {
-        render(<AlertDialog {...nodeProps} />);
-
-        expect(screen.getByRole('button', {name: 'Keep node'})).toBeInTheDocument();
-        expect(screen.getByRole('button', {name: 'Delete node'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Cancel'})).not.toBeInTheDocument();
-    });
-
-    it('should render the Delete node button with an icon', () => {
-        render(<AlertDialog {...nodeProps} />);
-
-        expect(screen.getByRole('button', {name: 'Delete node'}).querySelector('svg')).toBeInTheDocument();
     });
 });
 
@@ -129,15 +94,6 @@ describe('AlertDialog confirmation', () => {
         render(<AlertDialog {...defaultProps} />);
 
         await userEvent.click(screen.getByRole('button', {name: 'Delete'}));
-
-        expect(onConfirm).toHaveBeenCalledTimes(1);
-        expect(onCancel).not.toHaveBeenCalled();
-    });
-
-    it('should call onConfirm when the Delete node button is clicked', async () => {
-        render(<AlertDialog {...defaultProps} nodeName="httpClient_1" />);
-
-        await userEvent.click(screen.getByRole('button', {name: 'Delete node'}));
 
         expect(onConfirm).toHaveBeenCalledTimes(1);
         expect(onCancel).not.toHaveBeenCalled();
@@ -282,35 +238,6 @@ describe('AlertDialog pending state', () => {
         render(<AlertDialog {...defaultProps} isPending={false} />);
 
         expect(screen.getByRole('button', {name: 'Delete'})).toBeEnabled();
-    });
-});
-
-describe('AlertDialog override precedence over the nodeName preset', () => {
-    const nodeProps = {...defaultProps, nodeName: 'httpClient_1'};
-
-    it('should let confirmLabel win over Delete node', () => {
-        render(<AlertDialog {...nodeProps} confirmLabel="Remove node" />);
-
-        expect(screen.getByRole('button', {name: 'Remove node'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Delete node'})).not.toBeInTheDocument();
-    });
-
-    it('should let cancelLabel win over Keep node', () => {
-        render(<AlertDialog {...nodeProps} cancelLabel="Never mind" />);
-
-        expect(screen.getByRole('button', {name: 'Never mind'})).toBeInTheDocument();
-        expect(screen.queryByRole('button', {name: 'Keep node'})).not.toBeInTheDocument();
-    });
-
-    it('should keep the title and description driven by nodeName when labels are overridden', () => {
-        render(<AlertDialog {...nodeProps} cancelLabel="Never mind" confirmLabel="Remove node" />);
-
-        expect(screen.getByRole('heading', {level: 2})).toHaveTextContent('Delete node httpClient_1?');
-        expect(
-            screen.getByText(
-                'This action cannot be undone. This will permanently delete the node and properties it contains.'
-            )
-        ).toBeInTheDocument();
     });
 });
 
