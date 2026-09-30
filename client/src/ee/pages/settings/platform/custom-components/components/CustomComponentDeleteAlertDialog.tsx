@@ -1,6 +1,6 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -31,9 +31,7 @@ const CustomComponentDeleteAlertDialog = ({onClose, onDelete}: {onClose: () => v
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-red-600" onClick={onDelete}>
-                        Delete
-                    </AlertDialogAction>
+                    <DestructiveAlertDialogAction onClick={onDelete}>Delete</DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

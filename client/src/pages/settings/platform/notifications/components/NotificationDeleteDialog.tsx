@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -45,12 +45,11 @@ const NotificationDeleteDialog = ({
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={closeDeleteDialog}>Cancel</AlertDialogCancel>
 
-                <AlertDialogAction
-                    className="bg-surface-destructive-primary hover:bg-surface-destructive-primary-hover"
+                <DestructiveAlertDialogAction
                     onClick={() => selectedNotification && handleDeleteNotification(selectedNotification.id!)}
                 >
                     Delete
-                </AlertDialogAction>
+                </DestructiveAlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

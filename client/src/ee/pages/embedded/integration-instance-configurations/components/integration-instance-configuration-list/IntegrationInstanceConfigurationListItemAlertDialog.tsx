@@ -1,7 +1,7 @@
+import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
 import LoadingIcon from '@/components/LoadingIcon';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -43,14 +43,10 @@ const IntegrationInstanceConfigurationListItemAlertDialog = ({
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onCancelClick}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction
-                        className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
-                        disabled={isPending}
-                        onClick={onDeleteClick}
-                    >
+                    <DestructiveAlertDialogAction disabled={isPending} onClick={onDeleteClick}>
                         {isPending && <LoadingIcon />}
                         Delete
-                    </AlertDialogAction>
+                    </DestructiveAlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
