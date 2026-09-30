@@ -134,6 +134,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             queryClient.invalidateQueries({
                 queryKey: ProjectTagKeys.projectTags,
             });
+
+            setShowDeleteDialog(false);
         },
     });
 
@@ -595,6 +597,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
             <AlertDialog
                 ariaLabel="Confirm Project Deletion"
                 description="This action cannot be undone. This will permanently delete the project and workflows it contains."
+                isPending={deleteProjectMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() => {
                     if (project.id) {

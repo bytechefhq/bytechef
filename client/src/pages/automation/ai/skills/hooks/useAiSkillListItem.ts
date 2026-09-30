@@ -12,6 +12,7 @@ interface UseAiSkillListItemPropsI {
 }
 
 export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, skill}: UseAiSkillListItemPropsI) {
+    const [isDeletePending, setIsDeletePending] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -27,12 +28,16 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, s
     }, [location.pathname, navigate, openSkillDetail, skill.id, skill.name]);
 
     const handleDeleteClick = useCallback(async () => {
+        setIsDeletePending(true);
+
         try {
             await deleteSkill(skill.id);
 
             setShowDeleteDialog(false);
         } catch {
             setShowDeleteDialog(false);
+        } finally {
+            setIsDeletePending(false);
         }
     }, [deleteSkill, skill.id]);
 
@@ -54,6 +59,7 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, s
         handleDeleteClick,
         handleDownloadClick,
         handleEditSave,
+        isDeletePending,
         setShowDeleteDialog,
         setShowEditDialog,
         showDeleteDialog,

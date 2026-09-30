@@ -27,6 +27,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
         handleDeleteClick,
         handleDownloadClick,
         handleEditSave,
+        isDeletePending,
         setShowDeleteDialog,
         setShowEditDialog,
         showDeleteDialog,
@@ -102,7 +103,11 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
             </div>
 
             {showDeleteDialog && (
-                <AiSkillDeleteAlertDialog onClose={() => setShowDeleteDialog(false)} onDelete={handleDeleteClick} />
+                <AiSkillDeleteAlertDialog
+                    isPending={isDeletePending}
+                    onClose={() => setShowDeleteDialog(false)}
+                    onDelete={handleDeleteClick}
+                />
             )}
 
             {showEditDialog && (

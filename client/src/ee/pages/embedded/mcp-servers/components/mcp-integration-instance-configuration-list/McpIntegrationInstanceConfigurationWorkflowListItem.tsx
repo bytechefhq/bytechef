@@ -22,6 +22,7 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
         handleCloseEditDialog,
         handleConfirmDelete,
         integrationInstanceConfigurationWorkflow,
+        isDeletePending,
         setShowDeleteDialog,
         setShowEditWorkflowDialog,
         showDeleteDialog,
@@ -85,6 +86,7 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
             </Popover>
 
             <AlertDialog
+                isPending={isDeletePending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={handleConfirmDelete}
                 open={showDeleteDialog}

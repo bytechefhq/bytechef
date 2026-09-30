@@ -121,6 +121,7 @@ const ConnectedUserProjectWorkflowListItem = ({
             </li>
 
             <AlertDialog
+                isPending={deleteConnectedUserProjectWorkflowMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() =>
                     deleteConnectedUserProjectWorkflowMutation.mutate({id: connectedUserProjectWorkflow.id})

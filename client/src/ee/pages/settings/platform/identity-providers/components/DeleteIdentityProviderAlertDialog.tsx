@@ -3,9 +3,9 @@ import AlertDialog from '@/components/AlertDialog';
 import useDeleteIdentityProviderAlertDialog from './hooks/useDeleteIdentityProviderAlertDialog';
 
 const DeleteIdentityProviderAlertDialog = () => {
-    const {handleClose, handleDelete, open} = useDeleteIdentityProviderAlertDialog();
+    const {handleClose, handleDelete, isPending, open} = useDeleteIdentityProviderAlertDialog();
 
-    return <AlertDialog onCancel={handleClose} onConfirm={handleDelete} open={open} />;
+    return <AlertDialog isPending={isPending} onCancel={handleClose} onConfirm={handleDelete} open={open} />;
 };
 
 export default DeleteIdentityProviderAlertDialog;

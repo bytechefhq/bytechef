@@ -137,6 +137,7 @@ const ConnectedUserMcpServerListItem = ({
             </Collapsible>
 
             <AlertDialog
+                isPending={deleteConnectedUserMcpServerMutation.isPending}
                 onCancel={() => setShowDeleteDialog(false)}
                 onConfirm={() =>
                     deleteConnectedUserMcpServerMutation.mutate({

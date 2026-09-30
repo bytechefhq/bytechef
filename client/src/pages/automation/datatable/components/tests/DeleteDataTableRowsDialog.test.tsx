@@ -8,6 +8,7 @@ const hoisted = vi.hoisted(() => {
         mockHandleClose: vi.fn(),
         mockHandleDelete: vi.fn(),
         storeState: {
+            isPending: false,
             open: true,
             rowCount: 5,
         },
@@ -18,6 +19,7 @@ vi.mock('../../hooks/useDeleteDataTableRowsDialog', () => ({
     default: () => ({
         handleClose: hoisted.mockHandleClose,
         handleDelete: hoisted.mockHandleDelete,
+        isPending: hoisted.storeState.isPending,
         open: hoisted.storeState.open,
         rowCount: hoisted.storeState.rowCount,
     }),
@@ -25,6 +27,7 @@ vi.mock('../../hooks/useDeleteDataTableRowsDialog', () => ({
 
 beforeEach(() => {
     windowResizeObserver();
+    hoisted.storeState.isPending = false;
     hoisted.storeState.open = true;
     hoisted.storeState.rowCount = 5;
 });
@@ -109,6 +112,14 @@ describe('DeleteDataTableRowsDialog', () => {
             await user.click(screen.getByRole('button', {name: 'Close'}));
 
             expect(hoisted.mockHandleClose).toHaveBeenCalledTimes(1);
+        });
+
+        it('should disable the delete button while deleting', () => {
+            hoisted.storeState.isPending = true;
+
+            render(<DeleteDataTableRowsDialog />);
+
+            expect(screen.getByRole('button', {name: 'Delete'})).toBeDisabled();
         });
     });
 

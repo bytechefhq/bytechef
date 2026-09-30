@@ -10,6 +10,7 @@ interface UseDeleteDataTableAlertDialogI {
     handleDelete: () => void;
     handleOpen: (tableId: string, tableName: string) => void;
     handleOpenChange: (open: boolean) => void;
+    isPending: boolean;
     open: boolean;
     tableName: string | null;
 }
@@ -82,6 +83,7 @@ export default function useDeleteDataTableAlertDialog(): UseDeleteDataTableAlert
         handleDelete,
         handleOpen,
         handleOpenChange,
+        isPending: dropMutation.isPending,
         open: tableIdToDelete !== null,
         tableName: tableNameToDelete,
     };

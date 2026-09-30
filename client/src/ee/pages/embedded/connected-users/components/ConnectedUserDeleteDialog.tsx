@@ -23,6 +23,7 @@ const ConnectedUserDeleteDialog = ({connectedUserId, onClose}: {connectedUserId:
     return (
         <AlertDialog
             description="This action cannot be undone. This will permanently delete the connected user."
+            isPending={deleteConnectedUserMutation.isPending}
             onCancel={onClose}
             onConfirm={handleClick}
             open

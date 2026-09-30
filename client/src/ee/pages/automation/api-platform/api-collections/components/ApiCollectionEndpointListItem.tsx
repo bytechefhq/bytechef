@@ -66,6 +66,8 @@ const ApiCollectionEndpointListItem = ({
             queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
             });
+
+            setShowDeleteDialog(false);
         },
     });
 
@@ -212,6 +214,7 @@ const ApiCollectionEndpointListItem = ({
 
             {showDeleteDialog && (
                 <AlertDialog
+                    isPending={deleteApiCollectionEndpoint.isPending}
                     onCancel={() => setShowDeleteDialog(false)}
                     onConfirm={() => deleteApiCollectionEndpoint.mutate(apiCollectionEndpoint.id!)}
                     open={showDeleteDialog}

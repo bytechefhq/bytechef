@@ -11,13 +11,10 @@ import {
 import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {ShieldCheckIcon, ShieldOffIcon} from 'lucide-react';
-import {useState} from 'react';
 
 import {useAccountProfileMfa} from './hooks/useAccountProfileMfa';
 
 const AccountProfileMfa = () => {
-    const [showDisableDialog, setShowDisableDialog] = useState(false);
-
     const {
         disableCode,
         disablePassword,
@@ -31,7 +28,9 @@ const AccountProfileMfa = () => {
         secret,
         setDisableCode,
         setDisablePassword,
+        setShowDisableDialog,
         setVerifyCode,
+        showDisableDialog,
         verifyCode,
     } = useAccountProfileMfa();
 
@@ -176,6 +175,7 @@ const AccountProfileMfa = () => {
 
                                         <Button
                                             disabled={disableCode.length !== 6 || !disablePassword || loading}
+                                            icon={loading ? <LoadingIcon /> : undefined}
                                             label="Disable 2FA"
                                             onClick={handleDisable}
                                         />
