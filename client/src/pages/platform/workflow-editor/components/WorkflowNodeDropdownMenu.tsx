@@ -1,5 +1,4 @@
 import '@/shared/styles/dropdownMenu.css';
-import AlertDialog from '@/components/AlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import WorkflowNodeDeleteAlertDialog from '@/pages/platform/workflow-editor/components/WorkflowNodeDeleteAlertDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getWorkflowNodeMenuItems} from '@/pages/platform/workflow-editor/utils/getWorkflowNodeMenuItems';
 import {NodeDataType} from '@/shared/types';
@@ -150,8 +150,8 @@ const WorkflowNodeDropdownMenu = ({
             </DropdownMenu>
 
             {showDeleteAction && (
-                <AlertDialog
-                    nodeName={data.label}
+                <WorkflowNodeDeleteAlertDialog
+                    nodeLabel={data.label}
                     onCancel={handleDeleteCancel}
                     onConfirm={onDelete}
                     open={deleteDialogOpen}

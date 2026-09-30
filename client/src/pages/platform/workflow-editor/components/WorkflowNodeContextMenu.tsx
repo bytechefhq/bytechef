@@ -1,5 +1,4 @@
 import '@/shared/styles/dropdownMenu.css';
-import AlertDialog from '@/components/AlertDialog';
 import {
     ContextMenu,
     ContextMenuContent,
@@ -7,6 +6,7 @@ import {
     ContextMenuSeparator,
     ContextMenuTrigger,
 } from '@/components/ui/context-menu';
+import WorkflowNodeDeleteAlertDialog from '@/pages/platform/workflow-editor/components/WorkflowNodeDeleteAlertDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getWorkflowNodeMenuItems} from '@/pages/platform/workflow-editor/utils/getWorkflowNodeMenuItems';
 import {NodeDataType} from '@/shared/types';
@@ -156,8 +156,8 @@ const WorkflowNodeContextMenu = ({
             </ContextMenu>
 
             {showDeleteAction && (
-                <AlertDialog
-                    nodeName={data.label}
+                <WorkflowNodeDeleteAlertDialog
+                    nodeLabel={data.label}
                     onCancel={handleDeleteCancel}
                     onConfirm={onDelete}
                     open={deleteDialogOpen}
