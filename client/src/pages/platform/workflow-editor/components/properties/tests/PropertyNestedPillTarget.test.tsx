@@ -482,7 +482,7 @@ describe('pill target inside an object or array builder', () => {
         fireEvent.click(labelElement);
 
         expect(useWorkflowNodeDetailsPanelStore.getState().pillTarget?.acceptsPill()).toBe(true);
-        expect(screen.getByText('Drop or click a data pill')).toHaveClass('ring-2');
+        expect(screen.getByText('Drop or click a data pill, or type $')).toHaveClass('ring-2');
 
         (saveProperty as unknown as Mock).mockClear();
 
@@ -493,7 +493,7 @@ describe('pill target inside an object or array builder', () => {
         expect(savedPaths()).toEqual(['counts']);
         expect(saveProperty).toHaveBeenCalledWith(expect.objectContaining({value: '${trigger_1.items}'}));
         expect(container.querySelector('input[type=number]')).toBeNull();
-        expect(screen.queryByText('Drop or click a data pill')).toBeNull();
+        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
     });
 
     it('clicking the add item button of an empty array adds an item and leaves no accepting container target', async () => {
@@ -522,13 +522,13 @@ describe('pill target inside an object or array builder', () => {
 
         await settle();
 
-        expect(screen.getByText('Drop or click a data pill')).toBeInTheDocument();
+        expect(screen.getByText('Drop or click a data pill, or type $')).toBeInTheDocument();
 
         fireEvent.click(screen.getByRole('button', {name: /add array item/i}));
 
         await settle();
 
-        expect(screen.queryByText('Drop or click a data pill')).toBeNull();
+        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
     });
 
     it('does not show the data pill hint on a non-empty array', async () => {
@@ -536,7 +536,7 @@ describe('pill target inside an object or array builder', () => {
 
         await settle();
 
-        expect(screen.queryByText('Drop or click a data pill')).toBeNull();
+        expect(screen.queryByText('Drop or click a data pill, or type $')).toBeNull();
     });
 
     it('a click on a nested field of a non-empty object registers the nested field, not the object', async () => {
