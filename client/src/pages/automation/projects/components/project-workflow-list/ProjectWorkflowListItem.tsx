@@ -111,15 +111,17 @@ const ProjectWorkflowListItem = ({
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
                 <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
-                    <Tooltip>
-                        <TooltipTrigger className="line-clamp-1 w-full truncate text-start">
-                            {workflow.label}
-                        </TooltipTrigger>
+                    <div className="flex min-w-0 items-center">
+                        <Tooltip>
+                            <TooltipTrigger className="line-clamp-1 min-w-0 truncate text-start">
+                                {workflow.label}
+                            </TooltipTrigger>
 
-                        <TooltipContent align="start" className="max-w-md break-all">
-                            {workflow.label}
-                        </TooltipContent>
-                    </Tooltip>
+                            <TooltipContent align="start" className="max-w-md break-all">
+                                {workflow.label}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
 
                     <div className="flex gap-x-6">
                         <Tooltip>
