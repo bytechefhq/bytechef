@@ -18,7 +18,7 @@ package com.bytechef.platform.webhook.rest;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeType;
@@ -102,14 +103,14 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
-            Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+            WebhookValidateResponse webhookValidateResponse = webhookTriggerFlags.workflowSyncValidation()
+                ? webhookWorkflowExecutor.validate(workflowExecutionId, webhookRequest) : WebhookValidateResponse.ok();
 
-            if (outputs instanceof Map<?, ?> responseMap &&
-                responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
-
-                responseEntity = processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
+            if (webhookValidateResponse.status() == HttpStatus.OK.value()) {
+                responseEntity = executeSync(
+                    workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
             } else {
-                responseEntity = ResponseEntity.ok(outputs);
+                responseEntity = toResponseEntity(webhookValidateResponse);
             }
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
             responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
@@ -217,18 +218,31 @@ public abstract class AbstractWebhookTriggerController {
         return responseEntity;
     }
 
+    private ResponseEntity<Object> executeSync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest,
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+
+        Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+
+        if (outputs instanceof Map<?, ?> responseMap && responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
+            return processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
+        }
+
+        return ResponseEntity.ok(outputs);
+    }
+
+    private static ResponseEntity<Object> toResponseEntity(WebhookValidateResponse webhookValidateResponse) {
+        Map<String, List<String>> headers = webhookValidateResponse.headers();
+
+        return ResponseEntity.status(webhookValidateResponse.status())
+            .headers(headers == null ? null : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(headers)))
+            .body(webhookValidateResponse.body());
+    }
+
     private ResponseEntity<Object> validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        TriggerDefinition.WebhookValidateResponse response = webhookWorkflowExecutor.validateAndExecuteAsync(
-            workflowExecutionId, webhookRequest);
-
-        return ResponseEntity.status(response.status())
-            .headers(
-                response.headers() == null
-                    ? null
-                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
-            .body(response.body());
+        return toResponseEntity(webhookWorkflowExecutor.validateAndExecuteAsync(workflowExecutionId, webhookRequest));
     }
 
     @SuppressWarnings("unchecked")
