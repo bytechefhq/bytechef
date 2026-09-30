@@ -21,13 +21,13 @@ For the URLs, body formats and trigger output, see [Testing Webhooks with Postma
 
 ##### Response
 
-The HTTP connection stays open while the workflow runs. ByteChef sends the response when **all steps of the workflow are complete**, not when the **Response to Webhook Request** step runs. Steps after **Response to Webhook Request** also make the response wait. ByteChef waits at most 5 minutes.
+The HTTP connection stays open while the workflow runs. ByteChef sends the response when **all steps of the workflow are complete**, not when the **Response to Webhook Request** step runs. Steps after **Response to Webhook Request** also make the response wait. ByteChef waits at most the **Timeout (ms)** value, or 5 minutes if it is empty. Values longer than 5 minutes are reduced to 5 minutes.
 
 | Situation | Status | Body |
 |:---|:---|:---|
 | The workflow runs a **Response to Webhook Request** step | The **Status Code** of that step | The body and headers of that step. See [Response to Webhook Request](#response-to-webhook-request). |
 | The workflow has no **Response to Webhook Request** step | `200 OK` | The outputs of the workflow as JSON. If the workflow has no outputs, the body is empty. |
-| The `X-Csrf-Token` header is missing, or its value is incorrect | `500 Internal Server Error` | A JSON error object with `"detail": "Invalid trigger signature."`. The workflow does not run. |
+| The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
 | A step of the workflow fails | `500 Internal Server Error` | A JSON error object. The `detail` field contains the error message of the step that failed. |
 | The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}` |
 

@@ -164,7 +164,7 @@ ByteChef sends the response **before** the workflow runs. The response does not 
 | Situation | Status | Body |
 |:---|:---|:---|
 | The request is received | `200 OK` | Empty |
-| The workflow is disabled | `200 OK` | Empty. The workflow does not run. |
+| The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The workflow does not run. |
 | A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
 
 A `200 OK` response does not confirm that the workflow ran. To see the result, open **Executions** in ByteChef.
@@ -239,12 +239,12 @@ ByteChef checks the token, then sends the response. The workflow runs **after** 
 |:---|:---|:---|
 | The token is correct | `200 OK` | Empty. The workflow starts. |
 | The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
-| The workflow is disabled | `200 OK` | Empty. The token is not checked and the workflow does not run. |
+| The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The token is not checked and the workflow does not run. |
 | A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
 
 If you get `400 Bad Request`, make sure that:
 
-- The header name is exactly `X-Csrf-Token`.
+- The request has an `X-Csrf-Token` header.
 - The value is the same as the **CSRF Token** property, including uppercase and lowercase letters, with no extra spaces.
 - The deployed version of the workflow has the token that you send. If you change the token in the editor, publish and deploy the workflow again.
 
@@ -316,13 +316,13 @@ For the URLs, body formats and trigger output, see [Testing Webhooks with Postma
 
 ##### Response
 
-The HTTP connection stays open while the workflow runs. ByteChef sends the response when **all steps of the workflow are complete**, not when the **Response to Webhook Request** step runs. Steps after **Response to Webhook Request** also make the response wait. ByteChef waits at most 5 minutes.
+The HTTP connection stays open while the workflow runs. ByteChef sends the response when **all steps of the workflow are complete**, not when the **Response to Webhook Request** step runs. Steps after **Response to Webhook Request** also make the response wait. ByteChef waits at most the **Timeout (ms)** value, or 5 minutes if it is empty. Values longer than 5 minutes are reduced to 5 minutes.
 
 | Situation | Status | Body |
 |:---|:---|:---|
 | The workflow runs a **Response to Webhook Request** step | The **Status Code** of that step | The body and headers of that step. See [Response to Webhook Request](#response-to-webhook-request). |
 | The workflow has no **Response to Webhook Request** step | `200 OK` | The outputs of the workflow as JSON. If the workflow has no outputs, the body is empty. |
-| The `X-Csrf-Token` header is missing, or its value is incorrect | `500 Internal Server Error` | A JSON error object with `"detail": "Invalid trigger signature."`. The workflow does not run. |
+| The `X-Csrf-Token` header is missing, or its value is incorrect | `400 Bad Request` | Empty. The workflow does not run. |
 | A step of the workflow fails | `500 Internal Server Error` | A JSON error object. The `detail` field contains the error message of the step that failed. |
 | The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}` |
 
@@ -396,7 +396,7 @@ The test URL records a request only while the trigger waits for test data (after
 ### Headers
 
 - **Content-Type**: Tells ByteChef how to read the body. Postman and Bruno set it automatically when you select a body type.
-- **X-Csrf-Token**: Required for the **Validate and Respond** trigger and the **Await Workflow and Respond** trigger. The value must be the same as the value in the **CSRF Token** property of the trigger. Write the header name exactly as `X-Csrf-Token`. The name and the value are case-sensitive.
+- **X-Csrf-Token**: Required for the **Validate and Respond** trigger and the **Await Workflow and Respond** trigger. The value must be the same as the value in the **CSRF Token** property of the trigger. The value is case-sensitive. The header name is not.
 - All other headers are sent to the workflow in the `headers` output.
 
 ### Body Formats
