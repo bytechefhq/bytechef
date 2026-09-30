@@ -115,7 +115,7 @@ const ComponentsFilter = ({
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 
-                    <TooltipContent>{filterConfig.tooltip}</TooltipContent>
+                    <TooltipContent side="left">{filterConfig.tooltip}</TooltipContent>
                 </Tooltip>
 
                 <DropdownMenuContent align="start" className="mr-2 overflow-hidden p-1">
