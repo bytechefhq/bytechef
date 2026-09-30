@@ -1,37 +1,18 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 
 import useDeleteDataTableColumnDialog from '../hooks/useDeleteDataTableColumnDialog';
 
 const DeleteDataTableColumnDialog = () => {
-    const {columnName, handleDelete, handleOpenChange, open} = useDeleteDataTableColumnDialog();
+    const {columnName, handleClose, handleDelete, open} = useDeleteDataTableColumnDialog();
 
     return (
-        <AlertDialog onOpenChange={handleOpenChange} open={open}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Delete column</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        {`Are you sure you want to delete column "${columnName}"? This action cannot be undone and will remove all data in this column.`}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <DestructiveAlertDialogAction onClick={handleDelete}>Delete</DestructiveAlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <DeleteAlertDialog
+            description={`Are you sure you want to delete column "${columnName}"? This action cannot be undone and will remove all data in this column.`}
+            onCancel={handleClose}
+            onDelete={handleDelete}
+            open={open}
+            title="Delete column"
+        />
     );
 };
 

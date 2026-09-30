@@ -5,8 +5,8 @@ import DeleteDataTableColumnDialog from '../DeleteDataTableColumnDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
+        mockHandleClose: vi.fn(),
         mockHandleDelete: vi.fn(),
-        mockHandleOpenChange: vi.fn(),
         storeState: {
             columnName: 'TestColumn',
             open: true,
@@ -17,8 +17,8 @@ const hoisted = vi.hoisted(() => {
 vi.mock('../../hooks/useDeleteDataTableColumnDialog', () => ({
     default: () => ({
         columnName: hoisted.storeState.columnName,
+        handleClose: hoisted.mockHandleClose,
         handleDelete: hoisted.mockHandleDelete,
-        handleOpenChange: hoisted.mockHandleOpenChange,
         open: hoisted.storeState.open,
     }),
 }));
@@ -81,7 +81,7 @@ describe('DeleteDataTableColumnDialog', () => {
             expect(hoisted.mockHandleDelete).toHaveBeenCalledTimes(1);
         });
 
-        it('should call handleOpenChange when cancel is clicked', async () => {
+        it('should call handleClose when cancel is clicked', async () => {
             const user = userEvent.setup();
 
             render(<DeleteDataTableColumnDialog />);
@@ -90,7 +90,17 @@ describe('DeleteDataTableColumnDialog', () => {
 
             await user.click(cancelButton);
 
-            expect(hoisted.mockHandleOpenChange).toHaveBeenCalledWith(false);
+            expect(hoisted.mockHandleClose).toHaveBeenCalledTimes(1);
+        });
+
+        it('should call handleClose when the close button is clicked', async () => {
+            const user = userEvent.setup();
+
+            render(<DeleteDataTableColumnDialog />);
+
+            await user.click(screen.getByRole('button', {name: 'Close'}));
+
+            expect(hoisted.mockHandleClose).toHaveBeenCalledTimes(1);
         });
     });
 

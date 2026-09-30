@@ -1,14 +1,4 @@
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import LoadingIcon from '@/components/LoadingIcon';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 
 interface ProjectDeploymentListItemAlertDialogProps {
     onCancelClick: () => void;
@@ -20,37 +10,14 @@ const ProjectDeploymentListItemAlertDialog = ({
     isPending,
     onCancelClick,
     onDeleteClick,
-}: ProjectDeploymentListItemAlertDialogProps) => {
-    return (
-        <AlertDialog
-            onOpenChange={(isOpen) => {
-                if (!isOpen) {
-                    onCancelClick();
-                }
-            }}
-            open={true}
-        >
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the project and workflows it
-                        contains.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancelClick}>Cancel</AlertDialogCancel>
-
-                    <DestructiveAlertDialogAction disabled={isPending} onClick={onDeleteClick}>
-                        {isPending && <LoadingIcon />}
-                        Delete
-                    </DestructiveAlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
-};
+}: ProjectDeploymentListItemAlertDialogProps) => (
+    <DeleteAlertDialog
+        description="This action cannot be undone. This will permanently delete the project and workflows it contains."
+        isPending={isPending}
+        onCancel={onCancelClick}
+        onDelete={onDeleteClick}
+        open
+    />
+);
 
 export default ProjectDeploymentListItemAlertDialog;

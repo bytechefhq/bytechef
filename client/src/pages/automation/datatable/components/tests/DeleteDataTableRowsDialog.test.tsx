@@ -5,8 +5,8 @@ import DeleteDataTableRowsDialog from '../DeleteDataTableRowsDialog';
 
 const hoisted = vi.hoisted(() => {
     return {
+        mockHandleClose: vi.fn(),
         mockHandleDelete: vi.fn(),
-        mockHandleOpenChange: vi.fn(),
         storeState: {
             open: true,
             rowCount: 5,
@@ -16,8 +16,8 @@ const hoisted = vi.hoisted(() => {
 
 vi.mock('../../hooks/useDeleteDataTableRowsDialog', () => ({
     default: () => ({
+        handleClose: hoisted.mockHandleClose,
         handleDelete: hoisted.mockHandleDelete,
-        handleOpenChange: hoisted.mockHandleOpenChange,
         open: hoisted.storeState.open,
         rowCount: hoisted.storeState.rowCount,
     }),
@@ -89,7 +89,7 @@ describe('DeleteDataTableRowsDialog', () => {
             expect(hoisted.mockHandleDelete).toHaveBeenCalledTimes(1);
         });
 
-        it('should call handleOpenChange when cancel is clicked', async () => {
+        it('should call handleClose when cancel is clicked', async () => {
             const user = userEvent.setup();
 
             render(<DeleteDataTableRowsDialog />);
@@ -98,7 +98,17 @@ describe('DeleteDataTableRowsDialog', () => {
 
             await user.click(cancelButton);
 
-            expect(hoisted.mockHandleOpenChange).toHaveBeenCalledWith(false);
+            expect(hoisted.mockHandleClose).toHaveBeenCalledTimes(1);
+        });
+
+        it('should call handleClose when the close button is clicked', async () => {
+            const user = userEvent.setup();
+
+            render(<DeleteDataTableRowsDialog />);
+
+            await user.click(screen.getByRole('button', {name: 'Close'}));
+
+            expect(hoisted.mockHandleClose).toHaveBeenCalledTimes(1);
         });
     });
 

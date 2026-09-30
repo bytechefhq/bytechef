@@ -1,14 +1,5 @@
 import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
@@ -44,23 +35,12 @@ const ApiClientDeleteDialog = ({apiClientId, onClose}: {apiClientId: number; onC
     };
 
     return (
-        <AlertDialog onOpenChange={onClose} open={true}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete API key.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                    <DestructiveAlertDialogAction onClick={handleClick}>Delete</DestructiveAlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <DeleteAlertDialog
+            description="This action cannot be undone. This will permanently delete API key."
+            onCancel={onClose}
+            onDelete={handleClick}
+            open
+        />
     );
 };
 

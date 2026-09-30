@@ -1,16 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
@@ -367,32 +358,16 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                 </div>
             </div>
 
-            <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the integration and workflows it
-                            contains.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                        <DestructiveAlertDialogAction
-                            onClick={() => {
-                                if (integration.id) {
-                                    deleteIntegrationMutation.mutate(integration.id);
-                                }
-                            }}
-                        >
-                            Delete
-                        </DestructiveAlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteAlertDialog
+                description="This action cannot be undone. This will permanently delete the integration and workflows it contains."
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={() => {
+                    if (integration.id) {
+                        deleteIntegrationMutation.mutate(integration.id);
+                    }
+                }}
+                open={showDeleteDialog}
+            />
 
             {showEditDialog && <IntegrationDialog integration={integration} onClose={() => setShowEditDialog(false)} />}
 

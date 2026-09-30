@@ -1,17 +1,8 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -189,25 +180,12 @@ const ConnectionListItem = ({componentDefinitions, connection, remainingTags}: C
                     </div>
                 </div>
 
-                <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the connection.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                            <DestructiveAlertDialogAction onClick={handleAlertDeleteDialogClick}>
-                                Delete
-                            </DestructiveAlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                <DeleteAlertDialog
+                    description="This action cannot be undone. This will permanently delete the connection."
+                    onCancel={() => setShowDeleteDialog(false)}
+                    onDelete={handleAlertDeleteDialogClick}
+                    open={showDeleteDialog}
+                />
 
                 {showEditDialog && componentDefinitions && (
                     <ConnectionDialog

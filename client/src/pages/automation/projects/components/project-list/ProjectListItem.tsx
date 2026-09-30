@@ -1,16 +1,7 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
@@ -601,35 +592,17 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 </div>
             </div>
 
-            <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the project and workflows it
-                            contains.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="shadow-none" onClick={() => setShowDeleteDialog(false)}>
-                            Cancel
-                        </AlertDialogCancel>
-
-                        <DestructiveAlertDialogAction
-                            aria-label="Confirm Project Deletion"
-                            onClick={() => {
-                                if (project.id) {
-                                    deleteProjectMutation.mutate(project.id);
-                                }
-                            }}
-                        >
-                            Delete
-                        </DestructiveAlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteAlertDialog
+                ariaLabel="Confirm Project Deletion"
+                description="This action cannot be undone. This will permanently delete the project and workflows it contains."
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={() => {
+                    if (project.id) {
+                        deleteProjectMutation.mutate(project.id);
+                    }
+                }}
+                open={showDeleteDialog}
+            />
 
             {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
 

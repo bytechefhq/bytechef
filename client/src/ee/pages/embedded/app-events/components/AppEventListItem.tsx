@@ -1,15 +1,6 @@
 import '@/shared/styles/dropdownMenu.css';
 import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -97,25 +88,12 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                 </DropdownMenu>
             </div>
 
-            <AlertDialog onOpenChange={setShowDeleteDialog} open={showDeleteDialog}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the app event.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
-
-                        <DestructiveAlertDialogAction onClick={handleAlertDeleteDialogClick}>
-                            Delete
-                        </DestructiveAlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteAlertDialog
+                description="This action cannot be undone. This will permanently delete the app event."
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={handleAlertDeleteDialogClick}
+                open={showDeleteDialog}
+            />
 
             {showEditDialog && <AppEventDialog appEvent={appEvent} onClose={() => setShowEditDialog(false)} />}
         </li>
