@@ -205,6 +205,37 @@ describe('DialogHeader - Slots', () => {
 
         expect(screen.queryByRole('button', {name: 'Close'})).not.toBeInTheDocument();
     });
+
+    it('should show the close button by default', () => {
+        render(
+            <Dialog open>
+                <DialogContent aria-describedby={undefined}>
+                    <DialogMain>
+                        <DialogHeader title="Edit Skill" />
+                    </DialogMain>
+                </DialogContent>
+            </Dialog>
+        );
+
+        expect(screen.getByRole('button', {name: 'Close'})).toBeInTheDocument();
+    });
+
+    it('should align the close button to the top of the header rather than centring it', () => {
+        render(
+            <Dialog open>
+                <DialogContent aria-describedby={undefined}>
+                    <DialogMain>
+                        <DialogHeader
+                            description="A description long enough to make the header taller than the close button."
+                            title="Edit Skill"
+                        />
+                    </DialogMain>
+                </DialogContent>
+            </Dialog>
+        );
+
+        expect(screen.getByRole('dialog').querySelector('[data-slot="dialog-header"]')).toHaveClass('items-start');
+    });
 });
 
 describe('DialogMain, DialogBody, DialogFooter', () => {

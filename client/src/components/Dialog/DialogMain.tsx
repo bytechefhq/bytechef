@@ -80,7 +80,7 @@ const DialogHeader = ({
 
     return (
         <div
-            className={twMerge('flex items-center justify-between gap-2 p-4', className)}
+            className={twMerge('flex items-start justify-between gap-2 p-4', className)}
             data-slot="dialog-header"
             {...props}
         >
