@@ -106,7 +106,7 @@ const ProjectDeploymentDialogBasicStep = ({
             onChange(value);
         }
 
-        setValue('projectVersion', value);
+        setValue('projectVersion', value, {shouldValidate: true});
         setValue('projectDeploymentWorkflows', []);
 
         setCurrentProjectVersion(value);
@@ -122,7 +122,9 @@ const ProjectDeploymentDialogBasicStep = ({
         setValue('projectId', item.value);
         setValue('projectVersion', undefined);
 
-        if (!getValues('name')) {
+        const name = getValues('name');
+
+        if (!name || name === currentProjectName) {
             setValue('name', item.name!.toString());
         }
 
