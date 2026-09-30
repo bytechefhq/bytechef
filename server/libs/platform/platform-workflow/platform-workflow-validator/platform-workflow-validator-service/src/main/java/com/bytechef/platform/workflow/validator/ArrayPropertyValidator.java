@@ -366,7 +366,7 @@ class ArrayPropertyValidator {
             } else if (elementJsonNode.has(fieldName)) {
                 JsonNode valueJsonNode = elementJsonNode.get(fieldName);
 
-                if (!valueJsonNode.isString() || !TypeValidator.isDataPillExpression(valueJsonNode.asString())) {
+                if (!valueJsonNode.isString() || !TypeValidator.isExpression(valueJsonNode.asString())) {
                     TypeValidator.validateType(valueJsonNode, propertyInfo.type(), fieldPath, errors);
                 }
             }
