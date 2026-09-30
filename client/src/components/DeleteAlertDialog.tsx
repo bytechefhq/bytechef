@@ -1,15 +1,6 @@
 import Button from '@/components/Button/Button';
-import DestructiveAlertDialogAction from '@/components/DestructiveAlertDialogAction';
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {Trash2Icon, XIcon} from 'lucide-react';
+import {Dialog, DialogCancelButton, DialogContent, DialogFooter, DialogHeader, DialogMain} from '@/components/Dialog';
+import {Trash2Icon} from 'lucide-react';
 import {ReactElement} from 'react';
 
 interface DeleteAlertDialogProps {
@@ -38,40 +29,38 @@ const DeleteAlertDialog = ({
     const resolvedConfirmIcon = confirmIcon || (isNodeDeleteDialog ? <Trash2Icon /> : undefined);
 
     return (
-        <AlertDialog open={open}>
-            <AlertDialogContent onEscapeKeyDown={onCancel}>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>
-                        {isNodeDeleteDialog ? `Delete node ${nodeName}?` : 'Are you absolutely sure?'}
-                    </AlertDialogTitle>
-
-                    <AlertDialogDescription>
-                        {isNodeDeleteDialog
-                            ? 'This action cannot be undone. This will permanently delete the node and properties it contains.'
-                            : 'This action cannot be undone. This will permanently delete data.'}
-                    </AlertDialogDescription>
-
-                    <Button
-                        aria-label="Close"
-                        className="absolute top-4 right-4"
-                        icon={<XIcon />}
-                        onClick={onCancel}
-                        size="icon"
-                        variant="ghost"
+        <Dialog
+            onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                    onCancel();
+                }
+            }}
+            open={open}
+        >
+            <DialogContent onInteractOutside={(event) => event.preventDefault()} role="alertdialog">
+                <DialogMain>
+                    <DialogHeader
+                        description={
+                            isNodeDeleteDialog
+                                ? 'This action cannot be undone. This will permanently delete the node and properties it contains.'
+                                : 'This action cannot be undone. This will permanently delete data.'
+                        }
+                        title={isNodeDeleteDialog ? `Delete node ${nodeName}?` : 'Are you absolutely sure?'}
                     />
-                </AlertDialogHeader>
 
-                <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel}>{resolvedCancelLabel}</AlertDialogCancel>
+                    <DialogFooter>
+                        <DialogCancelButton label={resolvedCancelLabel} />
 
-                    <DestructiveAlertDialogAction onClick={onDelete}>
-                        {resolvedConfirmIcon}
-
-                        {resolvedConfirmLabel}
-                    </DestructiveAlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                        <Button
+                            icon={resolvedConfirmIcon}
+                            label={resolvedConfirmLabel}
+                            onClick={onDelete}
+                            variant="destructive"
+                        />
+                    </DialogFooter>
+                </DialogMain>
+            </DialogContent>
+        </Dialog>
     );
 };
 
