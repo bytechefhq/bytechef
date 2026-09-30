@@ -280,6 +280,11 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
+    public WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+        return webhookWorkflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
+    }
+
+    @Override
     public WebhookValidateResponse validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
