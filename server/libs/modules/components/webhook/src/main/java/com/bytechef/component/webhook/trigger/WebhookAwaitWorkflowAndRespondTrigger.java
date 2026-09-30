@@ -56,6 +56,7 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
                     "The incoming request will time out after the specified number of milliseconds. The max wait " +
                         "time before a timeout is 5 minutes."))
         .output(placeholder(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of(), BODY, Map.of())))
+        .help("", "https://docs.bytechef.io/reference/components/webhook_v1#await-workflow-and-respond")
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils::getWebhookValidate);
 }
