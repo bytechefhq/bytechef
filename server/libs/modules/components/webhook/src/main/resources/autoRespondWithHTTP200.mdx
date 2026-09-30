@@ -26,7 +26,7 @@ ByteChef sends the response **before** the workflow runs. The response does not 
 | Situation | Status | Body |
 |:---|:---|:---|
 | The request is received | `200 OK` | Empty |
-| The workflow is disabled | `200 OK` | Empty. The workflow does not run. |
+| The workflow is disabled | `410 Gone` | `{"detail": "Workflow is disabled."}`. The workflow does not run. |
 | A step of the workflow fails | `200 OK` | Empty. The response was sent before the step ran. |
 
 A `200 OK` response does not confirm that the workflow ran. To see the result, open **Executions** in ByteChef.

@@ -27,7 +27,7 @@ The test URL records a request only while the trigger waits for test data (after
 ### Headers
 
 - **Content-Type**: Tells ByteChef how to read the body. Postman and Bruno set it automatically when you select a body type.
-- **X-Csrf-Token**: Required for the **Validate and Respond** trigger and the **Await Workflow and Respond** trigger. The value must be the same as the value in the **CSRF Token** property of the trigger. Write the header name exactly as `X-Csrf-Token`. The name and the value are case-sensitive.
+- **X-Csrf-Token**: Required for the **Validate and Respond** trigger and the **Await Workflow and Respond** trigger. The value must be the same as the value in the **CSRF Token** property of the trigger. The value is case-sensitive. The header name is not.
 - All other headers are sent to the workflow in the `headers` output.
 
 ### Body Formats
