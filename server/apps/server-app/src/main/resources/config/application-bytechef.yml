@@ -111,6 +111,13 @@ bytechef:
     redirect-uri: ${bytechef.public-url}/callback
   observability:
     logging:
+      aws:
+        # Sign OTLP log export requests with AWS SigV4 (CloudWatch OTLP endpoint https://logs.{region}.amazonaws.com/v1/logs).
+        # CloudWatch also requires the management.opentelemetry.logging.export.otlp.headers.x-aws-log-group and
+        # x-aws-log-stream headers.
+        enabled: false
+        # region: derived from the endpoint host when not set
+        service: logs
       enabled: false
       endpoint: http://localhost:4318/v1/logs
     metrics:
