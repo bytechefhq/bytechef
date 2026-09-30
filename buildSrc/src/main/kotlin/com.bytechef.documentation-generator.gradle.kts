@@ -276,7 +276,20 @@ ${getPropertiesString()}
     @JsonIgnoreProperties(ignoreUnknown = true)
     class OutputResponse {
         var outputSchema: OutputSchema? = null
+        var placeholder: Any? = null
         var sampleOutput: Any? = null
+
+        private fun getPlaceholderString(): String {
+            if (placeholder == null) return ""
+
+            val mapper = ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+
+            return """
+```json
+${mapper.writeValueAsString(placeholder)}
+```
+"""
+        }
 
         private fun getSampleOutputString(): String {
             if (sampleOutput == null) return ""
@@ -294,7 +307,7 @@ ___Sample Output:___
 #### Output
 
 ${getSampleOutputString()}
-$outputSchema
+${outputSchema ?: getPlaceholderString()}
 """
         }
 
