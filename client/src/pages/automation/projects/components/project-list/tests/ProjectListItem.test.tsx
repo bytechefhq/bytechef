@@ -56,6 +56,8 @@ const renderProjectListItem = (activeTab?: ProjectListItemTabType, projectOverri
                 <Collapsible open={!!activeTab}>
                     <ProjectListItem
                         activeTab={activeTab}
+                        agentCount={0}
+                        agentsContent={<div>Agents content</div>}
                         deploymentsContent={<div>Deployments content</div>}
                         onTabChange={onTabChange}
                         project={{...project, ...projectOverrides}}

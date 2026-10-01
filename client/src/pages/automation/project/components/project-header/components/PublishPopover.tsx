@@ -18,10 +18,14 @@ const PublishPopover = ({
     disabled,
     isPending,
     onPublishProjectSubmit,
+    title = 'Publish Project',
+    tooltip = 'Publish the project',
 }: {
     disabled?: boolean;
     isPending: boolean;
     onPublishProjectSubmit: ({description, onSuccess}: {description?: string; onSuccess: () => void}) => void;
+    title?: string;
+    tooltip?: string;
 }) => {
     const [open, setOpen] = useState(false);
 
@@ -77,7 +81,7 @@ const PublishPopover = ({
                     </TooltipTrigger>
                 </PopoverTrigger>
 
-                <TooltipContent>Publish the project</TooltipContent>
+                <TooltipContent>{tooltip}</TooltipContent>
             </Tooltip>
 
             <PopoverContent
@@ -87,7 +91,7 @@ const PublishPopover = ({
             >
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(handlePublishProject)}>
-                        <h3 className="font-semibold">Publish Project</h3>
+                        <h3 className="font-semibold">{title}</h3>
 
                         <div className="flex-1">
                             <FormField
