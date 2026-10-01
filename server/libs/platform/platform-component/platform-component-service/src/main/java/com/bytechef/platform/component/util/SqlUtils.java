@@ -28,8 +28,10 @@ import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -108,6 +110,18 @@ public class SqlUtils {
                             }
                         }
                     }
+                } else if (jdbcType == JDBCType.TIMESTAMP || jdbcType == JDBCType.TIMESTAMP_WITH_TIMEZONE) {
+                    for (Map<String, Object> row : rows) {
+                        if (row.containsKey(columnName)) {
+                            Object value = row.get(columnName);
+
+                            if (value instanceof String string) {
+                                row.put(columnName, parseDateTime(string));
+                            } else if (value instanceof Number number) {
+                                row.put(columnName, new Timestamp(number.longValue()));
+                            }
+                        }
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -123,6 +137,14 @@ public class SqlUtils {
         return types.stream()
             .map(type -> option(type.name(), type.name()))
             .collect(Collectors.toList());
+    }
+
+    private static Object parseDateTime(String dateTimeString) {
+        try {
+            return OffsetDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        } catch (DateTimeParseException dateTimeParseException) {
+            return parseUnknownFormat(dateTimeString);
+        }
     }
 
     /**
