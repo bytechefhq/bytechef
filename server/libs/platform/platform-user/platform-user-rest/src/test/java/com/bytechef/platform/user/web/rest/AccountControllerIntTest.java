@@ -19,6 +19,7 @@ package com.bytechef.platform.user.web.rest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +36,7 @@ import com.bytechef.platform.user.domain.PersistentToken;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.dto.PasswordChangeDTO;
+import com.bytechef.platform.user.exception.UserErrorType;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
@@ -43,6 +45,7 @@ import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
+import com.bytechef.platform.user.web.rest.webhook.SignUpWebhook;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -63,6 +66,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
@@ -94,6 +98,9 @@ class AccountControllerIntTest {
 
     @Autowired
     private PersistentTokenRepository persistentTokenRepository;
+
+    @MockitoSpyBean
+    private SignUpWebhook signUpWebhook;
 
     @Autowired
     private MockMvc restAccountMockMvc;
@@ -215,6 +222,35 @@ class AccountControllerIntTest {
         Optional<User> user = userRepository.findByEmailIgnoreCase("funky@example.com");
 
         assertThat(user).isEmpty();
+    }
+
+    @Test
+    @Transactional
+    void testRegisterRejectedEmailDomain() throws Exception {
+        ManagedUserVM rejectedUser = new ManagedUserVM();
+
+        rejectedUser.setLogin("test-register-rejected");
+        rejectedUser.setPassword("Password1");
+        rejectedUser.setFirstName("Rejected");
+        rejectedUser.setLastName("Test");
+        rejectedUser.setEmail("test-register-rejected@rejected.com");
+        rejectedUser.setImageUrl("http://placehold.it/50x50");
+        rejectedUser.setLangKey(UserConstants.DEFAULT_LANGUAGE);
+        rejectedUser.setAuthorities(Collections.singleton(AuthorityConstants.USER));
+
+        doReturn(false).when(signUpWebhook)
+            .isEmailDomainValid("test-register-rejected@rejected.com");
+
+        restAccountMockMvc
+            .perform(
+                post("/api/register").contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(rejectedUser))
+                    .with(csrf()))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.entityClass").value("User"))
+            .andExpect(jsonPath("$.errorKey").value(UserErrorType.INVALID_EMAIL.getErrorKey()));
+
+        assertThat(userRepository.findByLogin("test-register-rejected")).isEmpty();
     }
 
     static Stream<ManagedUserVM> invalidUsers() {
