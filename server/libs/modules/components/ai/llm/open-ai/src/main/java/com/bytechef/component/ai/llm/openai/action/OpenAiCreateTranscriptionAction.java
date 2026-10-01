@@ -97,14 +97,16 @@ public class OpenAiCreateTranscriptionAction {
         (inputParameters, connectionParameters) -> {
 
             Language language = inputParameters.get(LANGUAGE, Language.class);
+            String token = connectionParameters.getString(TOKEN);
 
             return OpenAiAudioTranscriptionModel.builder()
                 .openAiClient(
                     OpenAIOkHttpClient.builder()
-                        .apiKey(connectionParameters.getString(TOKEN))
+                        .apiKey(token)
                         .build())
                 .options(
                     OpenAiAudioTranscriptionOptions.builder()
+                        .apiKey(token)
                         .model(inputParameters.getRequiredString(MODEL))
                         .prompt(inputParameters.getString(PROMPT))
                         .language(language.getCode())
