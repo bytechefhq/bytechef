@@ -40,6 +40,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import org.jspecify.annotations.Nullable;
@@ -133,7 +134,10 @@ public final class AwsHttpSender implements HttpSender {
     }
 
     @Override
-    public void send(MessageWriter messageWriter, Consumer<HttpResponse> onResponse, Consumer<Throwable> onError) {
+    public void send(
+        @ParametersAreNonnullByDefault MessageWriter messageWriter,
+        @ParametersAreNonnullByDefault Consumer<HttpResponse> onResponse,
+        @ParametersAreNonnullByDefault Consumer<Throwable> onError) {
         try {
             executorService.execute(() -> {
                 HttpResponse httpResponse;
