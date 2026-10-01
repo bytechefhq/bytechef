@@ -15,7 +15,6 @@ export interface RegisterI {
 }
 
 const EMAIL_ALREADY_USED_ERROR_KEY = 101;
-const LOGIN_ALREADY_USED_ERROR_KEY = 102;
 
 const fetchRegister = async (data: string): Promise<Response> => {
     return await fetch('/api/register', {
@@ -44,11 +43,7 @@ export const useRegisterStore = create<RegisterI>()(
                             }));
                         } else {
                             response.json().then((data) => {
-                                if (
-                                    data.entityClass === 'User' &&
-                                    (data.errorKey === EMAIL_ALREADY_USED_ERROR_KEY ||
-                                        data.errorKey === LOGIN_ALREADY_USED_ERROR_KEY)
-                                ) {
+                                if (data.entityClass === 'User' && data.errorKey === EMAIL_ALREADY_USED_ERROR_KEY) {
                                     set(() => ({
                                         registerAlreadyUsedEmail: email,
                                     }));
