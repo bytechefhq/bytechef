@@ -22,6 +22,7 @@ import {useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 import {useStoreWithEqualityFn} from 'zustand/traditional';
 
+import {getNestedClusterElements, isPlainObject} from '../../cluster-element-editor/utils/clusterElementsUtils';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -56,21 +57,49 @@ import {containsNodePosition} from '../utils/postDagreConstraints';
 import {buildStickyNoteNodes} from '../utils/stickyNoteUtils';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
+function getClusterElementsFingerprint(clusterElements: unknown): string {
+    if (!clusterElements || typeof clusterElements !== 'object') {
+        return '';
+    }
+
+    return Object.entries(clusterElements as Record<string, unknown>)
+        .map(([elementKey, elementValue]) => {
+            const elements = (Array.isArray(elementValue) ? elementValue : [elementValue]).filter(
+                (element): element is {name?: string; type?: string; workflowNodeName?: string} =>
+                    isPlainObject(element)
+            );
+
+            if (elements.length === 0) {
+                return '';
+            }
+
+            const elementFingerprints = elements.map((element) => {
+                const elementName = element.name || element.workflowNodeName;
+                const nestedFingerprint = getClusterElementsFingerprint(getNestedClusterElements(element));
+
+                return `${elementName}:${element.type}${nestedFingerprint ? `{${nestedFingerprint}}` : ''}`;
+            });
+
+            return `${elementKey}[${elementFingerprints.join(';')}]`;
+        })
+        .filter(Boolean)
+        .join(';');
+}
+
 /**
  * Builds a string key that changes only when the task graph structure changes
- * (task names, types, nested task counts) but NOT when parameter values change.
+ * (task names, types, nested task counts, cluster element names and types) but NOT when parameter values change.
  * This prevents unnecessary dagre layout recalculations on every property save.
  */
 export function getTasksStructuralFingerprint(tasks: WorkflowTask[]): string {
     return tasks
         .map((task) => {
-            const hasFilledClusterElements =
-                task.clusterElements &&
-                Object.values(task.clusterElements).some(
-                    (value) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-                );
-
-            const parts = [task.name, task.type, task.clusterRoot ? 'cr' : '', hasFilledClusterElements ? 'ce' : ''];
+            const parts = [
+                task.name,
+                task.type,
+                task.clusterRoot ? 'cr' : '',
+                getClusterElementsFingerprint(task.clusterElements),
+            ];
 
             if (task.parameters) {
                 const keyCounts = new Map<string, number[]>();

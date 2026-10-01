@@ -170,6 +170,23 @@ export function extractClusterElementComponentOperations(
     }, existingClusterElementsOperations);
 }
 
+/**
+ * Returns the nested cluster elements of a cluster element. The workflow definition keeps them under
+ * `clusterElements`, while the server-computed workflow tasks keep them under `extensions.clusterElements`.
+ */
+export function getNestedClusterElements(element: unknown): ClusterElementsType | undefined {
+    if (!isPlainObject(element)) {
+        return undefined;
+    }
+
+    const {clusterElements, extensions} = element as {
+        clusterElements?: ClusterElementsType;
+        extensions?: {clusterElements?: ClusterElementsType};
+    };
+
+    return clusterElements || extensions?.clusterElements;
+}
+
 export function extractClusterElementIcons(
     clusterElements: ClusterElementsType,
     collectedIcons: Array<{icon: string; label: string}> = []
@@ -194,8 +211,10 @@ export function extractClusterElementIcons(
             label: element.label || componentName || '',
         });
 
-        if (element.clusterElements) {
-            extractClusterElementIcons(element.clusterElements, collectedIcons);
+        const nestedClusterElements = getNestedClusterElements(element);
+
+        if (nestedClusterElements) {
+            extractClusterElementIcons(nestedClusterElements, collectedIcons);
         }
     };
 

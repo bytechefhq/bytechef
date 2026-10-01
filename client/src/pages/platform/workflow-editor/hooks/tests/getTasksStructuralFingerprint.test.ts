@@ -87,4 +87,111 @@ describe('getTasksStructuralFingerprint', () => {
 
         expect(getTasksStructuralFingerprint(withNullValues)).toBe(getTasksStructuralFingerprint(withoutElements));
     });
+
+    it('should produce different fingerprints when a nested cluster element is replaced', () => {
+        const makeAiAgentTask = (vectorStoreType: string, vectorStoreName: string) =>
+            makeTask({
+                clusterElements: {
+                    model: {name: 'openAi_1', type: 'openAi/v1/model'},
+                    rag: {
+                        clusterElements: {
+                            vectorStore: {name: vectorStoreName, type: vectorStoreType},
+                        },
+                        name: 'questionAnswerRag_1',
+                        type: 'questionAnswerRag/v1/rag',
+                    },
+                } as Record<string, unknown>,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            });
+
+        expect(getTasksStructuralFingerprint([makeAiAgentTask('pgVector/v1/vectorStore', 'pgVector_1')])).not.toBe(
+            getTasksStructuralFingerprint([makeAiAgentTask('knowledgeBase/v1/vectorStore', 'knowledgeBase_1')])
+        );
+    });
+
+    it('should produce different fingerprints when a cluster element is added to a filled slot', () => {
+        const oneTool = [
+            makeTask({
+                clusterElements: {tools: [{name: 'dateHelper_1', type: 'dateHelper/v1/getCurrentDate'}]} as Record<
+                    string,
+                    unknown
+                >,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            }),
+        ];
+        const twoTools = [
+            makeTask({
+                clusterElements: {
+                    tools: [
+                        {name: 'dateHelper_1', type: 'dateHelper/v1/getCurrentDate'},
+                        {name: 'googleCalendar_1', type: 'googleCalendar/v1/createEvent'},
+                    ],
+                } as Record<string, unknown>,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            }),
+        ];
+
+        expect(getTasksStructuralFingerprint(oneTool)).not.toBe(getTasksStructuralFingerprint(twoTools));
+    });
+
+    it('should produce the same fingerprint for cluster elements differing only in parameter values', () => {
+        const makeAiAgentTask = (systemPrompt: string) =>
+            makeTask({
+                clusterElements: {
+                    model: {name: 'openAi_1', parameters: {systemPrompt}, type: 'openAi/v1/model'},
+                } as Record<string, unknown>,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            });
+
+        expect(getTasksStructuralFingerprint([makeAiAgentTask('a')])).toBe(
+            getTasksStructuralFingerprint([makeAiAgentTask('b')])
+        );
+    });
+
+    it('should produce the same fingerprint for the workflow definition and workflow task cluster element shapes', () => {
+        const definitionShape = [
+            makeTask({
+                clusterElements: {
+                    rag: {
+                        clusterElements: {
+                            vectorStore: {name: 'knowledgeBase_1', type: 'knowledgeBase/v1/vectorStore'},
+                        },
+                        name: 'questionAnswerRag_1',
+                        type: 'questionAnswerRag/v1/rag',
+                    },
+                } as Record<string, unknown>,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            }),
+        ];
+        const taskShape = [
+            makeTask({
+                clusterElements: {
+                    rag: {
+                        extensions: {
+                            clusterElements: {
+                                vectorStore: {name: 'knowledgeBase_1', type: 'knowledgeBase/v1/vectorStore'},
+                            },
+                        },
+                        type: 'questionAnswerRag/v1/rag',
+                        workflowNodeName: 'questionAnswerRag_1',
+                    },
+                } as Record<string, unknown>,
+                clusterRoot: true,
+                name: 'aiAgent_1',
+                type: 'aiAgent/v1/chat',
+            }),
+        ];
+
+        expect(getTasksStructuralFingerprint(definitionShape)).toBe(getTasksStructuralFingerprint(taskShape));
+    });
 });
