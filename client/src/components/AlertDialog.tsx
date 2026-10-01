@@ -36,7 +36,7 @@ const AlertDialog = ({
 }: AlertDialogProps) => (
     <Dialog
         onOpenChange={(isOpen) => {
-            if (!isOpen) {
+            if (!isOpen && !isPending) {
                 onCancel();
             }
         }}
@@ -44,7 +44,7 @@ const AlertDialog = ({
     >
         <DialogContent onInteractOutside={(event) => event.preventDefault()} role="alertdialog">
             <DialogMain>
-                <DialogHeader description={description} title={title} />
+                <DialogHeader description={description} showCloseButton={!isPending} title={title} />
 
                 <DialogFooter>
                     <DialogCancelButton disabled={isPending} label={cancelLabel} />
