@@ -124,7 +124,9 @@ public class TaskCoordinator {
             log.trace("onResumeJobEvent: resumeJobEvent={}", resumeJobEvent);
         }
 
-        Job job = jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
+        Job job = resumeJobEvent.isStarted()
+            ? jobService.getJob(resumeJobEvent.getJobId())
+            : jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
 
         Map<String, ?> data = resumeJobEvent.getData();
 
