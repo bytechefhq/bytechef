@@ -45,7 +45,7 @@ const AutomationWorkflowEditorWorkflowsFilter = forwardRef<
                         </TooltipTrigger>
                     </DropdownMenuTrigger>
 
-                    <TooltipContent>Sort workflows</TooltipContent>
+                    <TooltipContent side="left">Sort workflows</TooltipContent>
                 </Tooltip>
 
                 <DropdownMenuContent align="end">
