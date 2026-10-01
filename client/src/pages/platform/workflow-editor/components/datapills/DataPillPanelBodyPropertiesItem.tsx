@@ -114,7 +114,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     <h3 className="flex flex-col items-start text-sm">
                         {workflowNodeLabel || title}
 
-                        <span className="truncate text-xs text-gray-400">({workflowNodeName})</span>
+                        <span className="truncate text-xs text-content-neutral-tertiary">({workflowNodeName})</span>
                     </h3>
                 </div>
 
@@ -124,7 +124,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     </span>
                 )}
 
-                <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                <ChevronDownIcon className="size-5 text-content-neutral-tertiary transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
 
             <AccordionContent

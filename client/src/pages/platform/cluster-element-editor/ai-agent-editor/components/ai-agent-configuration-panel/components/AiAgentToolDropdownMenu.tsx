@@ -16,7 +16,7 @@ export default function AiAgentToolDropdownMenu({tool}: AiAgentToolDropdownMenuP
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button className="h-6" size="sm" variant="ghost">
-                    <EllipsisVerticalIcon className="size-3 text-gray-400" />
+                    <EllipsisVerticalIcon className="size-3 text-content-neutral-tertiary" />
                 </Button>
             </DropdownMenuTrigger>
 

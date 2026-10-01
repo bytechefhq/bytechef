@@ -281,7 +281,7 @@ export default function useLayout({
                     data: {
                         ...task,
                         componentName,
-                        icon: <ComponentIcon className="size-9 flex-none text-gray-900" />,
+                        icon: <ComponentIcon className="size-9 flex-none text-content-neutral-primary" />,
                         operationName: type.split('/')[2],
                         taskDispatcher: isTaskDispatcher,
                         taskDispatcherId: isTaskDispatcher ? name : undefined,
