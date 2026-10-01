@@ -301,6 +301,18 @@
         "value": "gpt-5.4-nano-2026-03-17"
       }, {
         "description": null,
+        "label": "gpt-5.6-luna",
+        "value": "gpt-5.6-luna"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-sol",
+        "value": "gpt-5.6-sol"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-terra",
+        "value": "gpt-5.6-terra"
+      }, {
+        "description": null,
         "label": "o1",
         "value": "o1"
       }, {
@@ -1555,6 +1567,18 @@
         "description": null,
         "label": "gpt-5.4-nano-2026-03-17",
         "value": "gpt-5.4-nano-2026-03-17"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-luna",
+        "value": "gpt-5.6-luna"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-sol",
+        "value": "gpt-5.6-sol"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-terra",
+        "value": "gpt-5.6-terra"
       }, {
         "description": null,
         "label": "o1",
@@ -3521,6 +3545,10 @@
         "value": "gpt-4o-transcribe-diarize"
       }, {
         "description": null,
+        "label": "gpt-transcribe",
+        "value": "gpt-transcribe"
+      }, {
+        "description": null,
         "label": "whisper-1",
         "value": "whisper-1"
       } ],
@@ -4208,6 +4236,18 @@
         "description": null,
         "label": "gpt-5.4-nano-2026-03-17",
         "value": "gpt-5.4-nano-2026-03-17"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-luna",
+        "value": "gpt-5.6-luna"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-sol",
+        "value": "gpt-5.6-sol"
+      }, {
+        "description": null,
+        "label": "gpt-5.6-terra",
+        "value": "gpt-5.6-terra"
       }, {
         "description": null,
         "label": "o1",
