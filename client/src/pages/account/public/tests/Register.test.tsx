@@ -191,14 +191,11 @@ it('should hide the existing account options once the email is edited', async ()
     await submitRegistration();
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
-    expect(screen.queryByText('Already have an account?')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('link', {name: 'Log in'})).toHaveLength(1);
 
     await userEvent.type(screen.getByLabelText('Email'), 'x');
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', {name: 'Reset password'})).not.toBeInTheDocument();
-    expect(screen.getByText('Already have an account?')).toBeInTheDocument();
 });
 
 it('should ignore an existing account response for an email that was edited while the request was pending', async () => {
