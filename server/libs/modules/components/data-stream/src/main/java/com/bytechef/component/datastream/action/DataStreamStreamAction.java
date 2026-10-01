@@ -35,7 +35,8 @@ public class DataStreamStreamAction {
         return new DataStreamStreamActionDefinition(
             action(STREAM)
                 .title("Stream Data")
-                .description("Stream large volume of data between source and destination applications."),
+                .description("Stream large volume of data between source and destination applications.")
+                .help("", "https://docs.bytechef.io/reference/components/data-stream_v1#stream-data"),
             job, jobLauncher, inMemoryBatchJobFactory);
     }
 

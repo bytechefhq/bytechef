@@ -80,6 +80,7 @@ public class DataTableUpdateRecordAction {
                     .properties(DataTableUtils.createDynamicProperties(dataTableService, true))
                     .required(true))
             .output(this::output)
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#update-record")
             .perform(this::perform);
     }
 

@@ -74,6 +74,7 @@ public class DataTableClearTableAction {
                 outputSchema(
                     object()
                         .properties(integer("deletedCount"))))
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#clear-table")
             .perform(this::perform);
     }
 

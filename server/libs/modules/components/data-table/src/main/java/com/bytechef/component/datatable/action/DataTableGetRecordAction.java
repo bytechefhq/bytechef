@@ -74,6 +74,7 @@ public class DataTableGetRecordAction {
                     .label("Record ID")
                     .required(true))
             .output(this::output)
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#get-record")
             .perform(this::perform);
     }
 

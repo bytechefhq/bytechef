@@ -79,6 +79,7 @@ public class DataTableCreateRecordsAction {
                     .properties(DataTableUtils.createDynamicProperties(dataTableService, false))
                     .required(true))
             .output(this::output)
+            .help("", "https://docs.bytechef.io/reference/components/data-table_v1#create-records")
             .perform(this::perform);
     }
 
