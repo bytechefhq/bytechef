@@ -1,0 +1,9 @@
+mutation addAiAgentChannel($input: AddAiAgentChannelInput!) {
+    addAiAgentChannel(input: $input) {
+        id
+        channelType
+        position
+        parameters
+        connectionId
+    }
+}

@@ -3,8 +3,13 @@ import EmptyFilterResult from '@/components/EmptyFilterResult';
 import PageLoader from '@/components/PageLoader';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import AgentsFilterLeftSidebarNav, {
+    getAgentsFilter,
+} from '@/pages/automation/agents/components/AgentsFilterLeftSidebarNav';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
+import isScheduleTrigger from '@/pages/automation/project-deployments/components/agent-deployment-channel-list/isScheduleTrigger';
 import ProjectDeploymentWorkflowExecutionsSheet from '@/pages/automation/project-deployments/components/project-deployment-workflow-executions-sheet/ProjectDeploymentWorkflowExecutionsSheet';
+import useAgentDeployments from '@/pages/automation/project-deployments/hooks/useAgentDeployments';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useInitialLoadComplete} from '@/shared/hooks/useInitialLoadComplete';
@@ -19,7 +24,7 @@ import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {RefreshCwIcon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useLocation, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -71,7 +76,11 @@ const ProjectDeployments = () => {
         type: tagId ? Type.Tag : Type.Project,
     };
 
-    const isFiltered = filterData.id !== undefined;
+    const agentsFilter = getAgentsFilter(searchParams);
+
+    const agentsFilterSuffix = agentsFilter ? `&agents=${agentsFilter}` : '';
+
+    const isFiltered = filterData.id !== undefined || agentsFilter !== undefined;
 
     const {
         data: projects,
@@ -99,10 +108,31 @@ const ProjectDeployments = () => {
 
     const initialLoadComplete = useInitialLoadComplete(projectDeploymentsIsLoading);
 
+    const {agentDeployments, agentDeploymentsError, agentDeploymentsIsLoading} = useAgentDeployments();
+
+    const filteredProjectDeployments = useMemo(() => {
+        if (!projectDeployments || !agentsFilter) {
+            return projectDeployments;
+        }
+
+        const matchingAgentDeployments =
+            agentsFilter === 'scheduled'
+                ? agentDeployments.filter((agentDeployment) =>
+                      agentDeployment.workflows.some((workflow) => workflow.triggers.some(isScheduleTrigger))
+                  )
+                : agentDeployments;
+
+        const agentProjectDeploymentIds = new Set(
+            matchingAgentDeployments.map((agentDeployment) => +agentDeployment.id)
+        );
+
+        return projectDeployments.filter((projectDeployment) => agentProjectDeploymentIds.has(projectDeployment.id!));
+    }, [agentDeployments, agentsFilter, projectDeployments]);
+
     const projectDeploymentMap: Map<number, ProjectDeployment[]> = new Map<number, ProjectDeployment[]>();
 
-    if (projectDeployments) {
-        for (const projectDeployment of projectDeployments) {
+    if (filteredProjectDeployments) {
+        for (const projectDeployment of filteredProjectDeployments) {
             let currentProjectDeployments: ProjectDeployment[];
 
             if (projectDeployment.project) {
@@ -177,7 +207,12 @@ const ProjectDeployments = () => {
                     }
                     title={
                         (projectDeployments && projectDeployments.length > 0) || isFiltered ? (
-                            <ProjectDeploymentFilterTitle filterData={filterData} projects={projects} tags={tags} />
+                            <ProjectDeploymentFilterTitle
+                                agentsFilter={agentsFilter}
+                                filterData={filterData}
+                                projects={projects}
+                                tags={tags}
+                            />
                         ) : (
                             isFirstRun && 'Deployments'
                         )
@@ -191,15 +226,18 @@ const ProjectDeployments = () => {
                             current: filterData?.id === project.id && filterData.type === Type.Project,
                             id: project.id!,
                             name: project.name,
-                            toLink: `?projectId=${project.id}`,
+                            toLink: `?projectId=${project.id}${agentsFilterSuffix}`,
                         }))}
                         leadItem={{
-                            current: !filterData?.id && filterData.type === Type.Project,
+                            current: !filterData?.id && filterData.type === Type.Project && !agentsFilter,
                             name: 'All Projects',
+                            toLink: agentsFilter ? `?agents=${agentsFilter}` : '',
                         }}
                         loading={projectsIsLoading}
                         title="Projects"
                     />
+
+                    <AgentsFilterLeftSidebarNav currentAgentsFilter={agentsFilter} />
 
                     <LeftSidebarFilterNav
                         emptyMessage="No defined tags."
@@ -208,7 +246,7 @@ const ProjectDeployments = () => {
                             current: filterData?.id === tag.id && filterData.type === Type.Tag,
                             id: tag.id!,
                             name: tag.name,
-                            toLink: `?tagId=${tag.id}`,
+                            toLink: `?tagId=${tag.id}${agentsFilterSuffix}`,
                         }))}
                         loading={tagsIsLoading}
                         title="Tags"
@@ -220,10 +258,20 @@ const ProjectDeployments = () => {
             leftSidebarWidth="64"
         >
             <PageLoader
-                errors={[projectsError, projectDeploymentsError, tagsError]}
-                loading={projectsIsLoading || projectDeploymentsIsLoading || tagsIsLoading}
+                errors={[
+                    projectsError,
+                    projectDeploymentsError,
+                    tagsError,
+                    agentsFilter ? agentDeploymentsError : null,
+                ]}
+                loading={
+                    projectsIsLoading ||
+                    projectDeploymentsIsLoading ||
+                    tagsIsLoading ||
+                    (!!agentsFilter && agentDeploymentsIsLoading)
+                }
             >
-                {projectDeployments && projectDeployments?.length > 0 ? (
+                {filteredProjectDeployments && filteredProjectDeployments.length > 0 ? (
                     <div className="w-full divide-y divide-border/50 self-start p-4 pt-0 3xl:mx-auto 3xl:w-4/5">
                         <WorkflowReadOnlyProvider
                             value={{
@@ -236,6 +284,7 @@ const ProjectDeployments = () => {
                                     tags && (
                                         <ProjectDeploymentList
                                             componentDefinitions={componentDefinitions}
+                                            defaultActiveTab={agentsFilter ? 'agents' : 'workflows'}
                                             key={projectId}
                                             newlyCreatedDeploymentId={expandedProjectDeploymentId}
                                             project={projects.find(
