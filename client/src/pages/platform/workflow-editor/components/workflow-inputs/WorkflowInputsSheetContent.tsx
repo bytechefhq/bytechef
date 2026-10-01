@@ -1,9 +1,9 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {SheetCloseButton} from '@/components/ui/sheet';
 import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 import {PlusIcon, SlidersIcon} from 'lucide-react';
 
-import WorkflowInputsDeleteDialog from './WorkflowInputsDeleteDialog';
 import WorkflowInputsEditDialog from './WorkflowInputsEditDialog';
 import WorkflowInputsTable from './WorkflowInputsTable';
 import useWorkflowInputs from './hooks/useWorkflowInputs';
@@ -77,13 +77,18 @@ const WorkflowInputsSheetContent = ({
                 )}
 
                 {isDeleteDialogOpen && (
-                    <WorkflowInputsDeleteDialog
-                        closeDeleteDialog={closeDeleteDialog}
-                        currentInputIndex={currentInputIndex}
-                        deleteWorkflowInput={deleteWorkflowInput}
-                        isDeleteDialogOpen={isDeleteDialogOpen}
-                        isDeletePending={isDeletePending}
-                        workflowInputs={workflow.inputs!}
+                    <AlertDialog
+                        description="This action cannot be undone. This will permanently delete the input."
+                        isPending={isDeletePending}
+                        onCancel={closeDeleteDialog}
+                        onConfirm={() => {
+                            const currentInput = workflow.inputs?.[currentInputIndex];
+
+                            if (currentInput) {
+                                deleteWorkflowInput(currentInput);
+                            }
+                        }}
+                        open={isDeleteDialogOpen}
                     />
                 )}
 

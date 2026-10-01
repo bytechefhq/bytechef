@@ -1,9 +1,9 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationVersionHistorySheet from '@/ee/pages/embedded/integration/components/IntegrationVersionHistorySheet';
-import DeleteIntegrationAlertDialog from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/components/DeleteIntegrationAlertDialog';
 import IntegrationTabButtons from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/components/IntegrationTabButtons';
 import WorkflowTabButtons from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/components/WorkflowTabButtons';
 import {useSettingsMenu} from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/hooks/useSettingsMenu';
@@ -108,10 +108,13 @@ const SettingsMenu = ({integration, updateWorkflowMutation, workflow}: Integrati
             </DropdownMenu>
 
             {showDeleteIntegrationAlertDialog && (
-                <DeleteIntegrationAlertDialog
+                <AlertDialog
+                    ariaLabel="Confirm Integration Deletion"
+                    description="This action cannot be undone. This will permanently delete the integration and workflows it contains."
                     isPending={isDeleteIntegrationPending}
-                    onClose={() => setShowDeleteIntegrationAlertDialog(false)}
-                    onDelete={handleDeleteIntegrationAlertDialogClick}
+                    onCancel={() => setShowDeleteIntegrationAlertDialog(false)}
+                    onConfirm={handleDeleteIntegrationAlertDialogClick}
+                    open
                 />
             )}
 

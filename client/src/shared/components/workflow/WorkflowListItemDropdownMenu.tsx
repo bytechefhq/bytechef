@@ -1,4 +1,3 @@
-import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {
     DropdownMenu,
@@ -7,6 +6,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 
 import '@/shared/styles/dropdownMenu.css';
 import {EditIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
@@ -65,14 +65,13 @@ const WorkflowListItemDropdownMenu = ({
             </DropdownMenu>
 
             {showDeleteWorkflowAlertDialog && (
-                <AlertDialog
-                    onCancel={() => setShowDeleteWorkflowAlertDialog(false)}
-                    onConfirm={() => {
+                <DeleteWorkflowAlertDialog
+                    onClose={() => setShowDeleteWorkflowAlertDialog(false)}
+                    onDelete={() => {
                         onDelete();
 
                         setShowDeleteWorkflowAlertDialog(false);
                     }}
-                    open={showDeleteWorkflowAlertDialog}
                 />
             )}
 

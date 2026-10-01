@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
@@ -8,7 +9,6 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Link2Icon, PlusIcon} from 'lucide-react';
 import {UseFormReturn} from 'react-hook-form';
 
-import NotificationDeleteDialog from './components/NotificationDeleteDialog';
 import useNotifications, {NotificationFormValuesType} from './hooks/useNotifications';
 
 const Notifications = () => {
@@ -73,11 +73,12 @@ const Notifications = () => {
             )}
 
             {isDeleteDialogOpen && !!selectedNotification && (
-                <NotificationDeleteDialog
-                    closeDeleteDialog={closeDeleteDialog}
-                    handleDeleteNotification={handleDeleteNotification}
-                    isDeleteDialogOpen={isDeleteDialogOpen}
-                    selectedNotification={selectedNotification}
+                <AlertDialog
+                    description="This action cannot be undone."
+                    onCancel={closeDeleteDialog}
+                    onConfirm={() => handleDeleteNotification(selectedNotification.id!)}
+                    open={isDeleteDialogOpen}
+                    title={`Delete ${selectedNotification.name} notification?`}
                 />
             )}
         </LayoutContainer>

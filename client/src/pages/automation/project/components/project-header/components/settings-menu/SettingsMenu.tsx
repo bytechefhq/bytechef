@@ -1,4 +1,3 @@
-import AlertDialog from '@/components/AlertDialog';
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
@@ -13,6 +12,7 @@ import WorkflowTabButtons from '@/pages/automation/project/components/project-he
 import {useSettingsMenu} from '@/pages/automation/project/components/project-header/components/settings-menu/hooks/useSettingsMenu';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
@@ -132,14 +132,13 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             )}
 
             {showDeleteWorkflowAlertDialog && (
-                <AlertDialog
-                    onCancel={() => setShowDeleteWorkflowAlertDialog(false)}
-                    onConfirm={() => {
+                <DeleteWorkflowAlertDialog
+                    onClose={() => setShowDeleteWorkflowAlertDialog(false)}
+                    onDelete={() => {
                         handleDeleteWorkflowAlertDialogClick();
 
                         setShowDeleteWorkflowAlertDialog(false);
                     }}
-                    open={showDeleteWorkflowAlertDialog}
                 />
             )}
 
