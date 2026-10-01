@@ -132,7 +132,7 @@ function distributeBranches(tasks: WorkflowTask[]): {
     rightBranches: WorkflowTask[];
 } {
     if (tasks.length === 1) {
-        return {leftBranches: tasks, middleBranch: null, rightBranches: []};
+        return {leftBranches: [], middleBranch: null, rightBranches: tasks};
     }
 
     const isEvenCount = tasks.length % 2 === 0;
@@ -156,6 +156,17 @@ function distributeBranches(tasks: WorkflowTask[]): {
     }
 }
 
+function markAddBranchEdge(edges: Edge[], lastLaneEntryEdgeId: string, parallelId: string): void {
+    const lastLaneEntryEdge = edges.find((edge) => edge.id === lastLaneEntryEdgeId);
+
+    if (lastLaneEntryEdge) {
+        lastLaneEntryEdge.data = {
+            ...lastLaneEntryEdge.data,
+            addBranchPlaceholderId: `${parallelId}-parallel-placeholder-0`,
+        };
+    }
+}
+
 /**
  * Creates all edges for a parallel node and its branches
  */
@@ -172,13 +183,15 @@ export default function createParallelEdges(parallelNode: Node): Edge[] {
         type: 'smoothstep',
     });
 
-    const hasSubtasks = nodeData.parameters?.tasks?.length > 0;
+    const laneCount = nodeData.parameters?.tasks?.length ?? 0;
 
-    if (!hasSubtasks) {
+    if (laneCount <= 1) {
         const leftGhostEdges = createEdgesForLeftGhost(parallelId);
 
         edges.push(...leftGhostEdges);
-    } else {
+    }
+
+    if (laneCount > 0) {
         const parallelTasks: WorkflowTask[] = nodeData.parameters?.tasks;
 
         const {leftBranches, middleBranch, rightBranches} = distributeBranches(parallelTasks);
@@ -197,6 +210,10 @@ export default function createParallelEdges(parallelNode: Node): Edge[] {
             const taskEdges = createParallelTaskEdges(parallelId, task, 'right');
             edges.push(...taskEdges);
         });
+
+        const lastTaskName = parallelTasks[parallelTasks.length - 1].name;
+
+        markAddBranchEdge(edges, `${parallelId}-parallel-top-ghost=>${lastTaskName}`, parallelId);
     }
 
     const placeholderEdges = createEdgesForPlaceholder(parallelNode.id);

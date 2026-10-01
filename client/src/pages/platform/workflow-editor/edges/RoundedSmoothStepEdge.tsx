@@ -1,6 +1,7 @@
 import {BaseEdge, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import AddBranchChip from './AddBranchChip';
 import computeExitEdgeJogCenter from './computeExitEdgeJogCenter';
 import {getTriggerFanInBusCenter} from './computeTriggerFanIn';
 
@@ -19,6 +20,8 @@ export default function RoundedSmoothStepEdge({
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const isTriggerFanIn = !!(data as Record<string, unknown>)?.triggerFanIn;
+
+    const addBranchPlaceholderId = (data as Record<string, unknown>)?.addBranchPlaceholderId as string | undefined;
 
     const busCenter = getTriggerFanInBusCenter({
         isTriggerFanIn,
@@ -55,6 +58,25 @@ export default function RoundedSmoothStepEdge({
     });
 
     return (
-        <BaseEdge className="fill-none stroke-stroke-neutral-tertiary stroke-2" id={id} path={edgePath} style={style} />
+        <>
+            <BaseEdge
+                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
+                id={id}
+                path={edgePath}
+                style={style}
+            />
+
+            {addBranchPlaceholderId && (
+                <AddBranchChip
+                    edgeId={id}
+                    layoutDirection={layoutDirection}
+                    placeholderId={addBranchPlaceholderId}
+                    sourceX={sourceX}
+                    sourceY={sourceY}
+                    targetX={targetX}
+                    targetY={targetY}
+                />
+            )}
+        </>
     );
 }

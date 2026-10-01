@@ -381,13 +381,13 @@ export default function useLayout({
                     },
                 });
             } else if (componentName === 'parallel') {
-                const hasSubtasks = parameters?.tasks?.length > 0;
+                const hasMultipleLanes = parameters?.tasks?.length > 1;
 
                 allNodes = createParallelNode({
                     allNodes: [...allNodes, taskNode],
                     isNested,
                     options: {
-                        createLeftGhost: !hasSubtasks,
+                        createLeftGhost: !hasMultipleLanes,
                     },
                     parallelId: taskNode.id,
                 });
@@ -403,14 +403,16 @@ export default function useLayout({
                     },
                 });
             } else if (componentName === 'fork-join') {
-                const hasSubtasks = parameters?.branches?.length > 0;
+                const laneCount = ((parameters?.branches as WorkflowTask[][] | undefined) ?? []).filter(
+                    (branch) => Array.isArray(branch) && branch.length > 0
+                ).length;
 
                 allNodes = createForkJoinNode({
                     allNodes: [...allNodes, taskNode],
                     forkJoinId: taskNode.id,
                     isNested,
                     options: {
-                        createLeftGhost: !hasSubtasks,
+                        createLeftGhost: laneCount <= 1,
                     },
                 });
             } else {
@@ -794,9 +796,17 @@ export default function useLayout({
             if (lastEdge && lastEdge.target === FINAL_PLACEHOLDER_NODE_ID) {
                 edges.pop();
             }
-
-            ({edges, nodes: layoutNodes} = removeTrailingBranchPlaceholders(layoutNodes, edges));
         }
+
+        const layoutWithoutTrailingBranchPlaceholders = removeTrailingBranchPlaceholders(layoutNodes, edges);
+
+        const keptLayoutNodeIds = new Set(layoutWithoutTrailingBranchPlaceholders.nodes.map((node) => node.id));
+
+        const hiddenTrailingBranchPlaceholderNodes: Node[] = readOnlyWorkflow
+            ? []
+            : layoutNodes.filter((node) => !keptLayoutNodeIds.has(node.id)).map((node) => ({...node, hidden: true}));
+
+        ({edges, nodes: layoutNodes} = layoutWithoutTrailingBranchPlaceholders);
 
         // Sync position metadata from the latest workflow definition into layout
         // nodes. storeTasks uses fingerprint equality that ignores position metadata,
@@ -884,7 +894,9 @@ export default function useLayout({
         // Immediately remove nodes that are no longer part of the layout so that
         // deleted task dispatcher children disappear at the same time as the parent,
         // rather than lingering until the async layout calculation resolves.
-        const newNodeIds = new Set([...layoutNodes, ...stickyNoteNodes].map((node) => node.id));
+        const newNodeIds = new Set(
+            [...layoutNodes, ...hiddenTrailingBranchPlaceholderNodes, ...stickyNoteNodes].map((node) => node.id)
+        );
         const prunedNodes = frozenNodes.filter((node) => newNodeIds.has(node.id));
 
         if (prunedNodes.length < frozenNodes.length) {
@@ -913,7 +925,11 @@ export default function useLayout({
 
                 useLayoutEngineStore.getState().setLastAppliedLayoutEngine(elements.engine);
 
-                const targetNodes: Node[] = [...elements.nodes, ...buildCurrentStickyNoteNodes()];
+                const targetNodes: Node[] = [
+                    ...elements.nodes,
+                    ...hiddenTrailingBranchPlaceholderNodes,
+                    ...buildCurrentStickyNoteNodes(),
+                ];
 
                 if (isInitialLayoutRef.current || readOnlyWorkflow) {
                     setNodes(targetNodes);

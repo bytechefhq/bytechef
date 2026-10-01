@@ -14,6 +14,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import getTaskDispatcherContext from '../utils/getTaskDispatcherContext';
 import pasteNode from '../utils/pasteNode';
+import AddBranchChip from './AddBranchChip';
 import BranchCaseLabel from './BranchCaseLabel';
 import computeEdgeButtonPosition from './computeEdgeButtonPosition';
 import computeEdgeCorrectedCoordinates from './computeEdgeCorrectedCoordinates';
@@ -112,6 +113,8 @@ export default function WorkflowEdge({
     });
 
     const caseKey = (targetNode?.data as NodeDataType)?.branchData?.caseKey;
+
+    const addBranchPlaceholderId = (data as Record<string, unknown>)?.addBranchPlaceholderId as string | undefined;
 
     const sourceNodeComponentName = (sourceNode?.data as NodeDataType)?.componentName;
 
@@ -253,6 +256,18 @@ export default function WorkflowEdge({
                     caseKey={caseKey}
                     edgeId={id}
                     layoutDirection={layoutDirection}
+                    sourceX={sourceX}
+                    sourceY={sourceY}
+                    targetX={targetX}
+                    targetY={targetY}
+                />
+            )}
+
+            {addBranchPlaceholderId && (
+                <AddBranchChip
+                    edgeId={id}
+                    layoutDirection={layoutDirection}
+                    placeholderId={addBranchPlaceholderId}
                     sourceX={sourceX}
                     sourceY={sourceY}
                     targetX={targetX}
