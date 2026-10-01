@@ -1038,12 +1038,12 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "sanitizeText": [ "sanitizeText" ],
-    "jailbreak": [ "model" ],
     "nsfw": [ "model" ],
     "custom": [ "model" ],
     "topicalAlignment": [ "model" ],
-    "checkForViolations": [ "checkForViolations" ]
+    "checkForViolations": [ "checkForViolations" ],
+    "sanitizeText": [ "sanitizeText" ],
+    "jailbreak": [ "model" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1061,7 +1061,7 @@
     "name": "RAG",
     "key": "rag",
     "label": "RAG",
-    "multipleElements": false,
+    "multipleElements": true,
     "required": false
   }, {
     "name": "GUARDRAILS",
