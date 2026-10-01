@@ -1,0 +1,23 @@
+query aiAgentDeployments($workspaceId: ID!) {
+    aiAgentDeployments(workspaceId: $workspaceId) {
+        id
+        name
+        agentId
+        agentTitle
+        projectId
+        environmentId
+        enabled
+        projectVersion
+        lastExecutionDate
+        workflows {
+            workflowId
+            enabled
+            triggers {
+                name
+                type
+                parameters
+                staticWebhookUrl
+            }
+        }
+    }
+}

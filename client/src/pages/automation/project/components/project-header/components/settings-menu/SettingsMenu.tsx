@@ -23,16 +23,24 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {LoaderCircleIcon, SettingsIcon} from 'lucide-react';
-import {RefObject, Suspense, lazy, useState} from 'react';
+import {ReactNode, RefObject, Suspense, lazy, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
+export interface SettingsMenuFirstTabProps {
+    ariaLabel: string;
+    content: (onCloseDropdownMenu: () => void) => ReactNode;
+    label: string;
+    value: string;
+}
+
 interface ProjectHeaderSettingsMenuProps {
     bottomResizablePanelRef?: RefObject<PanelImperativeHandle | null>;
+    firstTab?: SettingsMenuFirstTabProps;
     project: Project;
-    updateWorkflowMutation: UpdateWorkflowMutationType;
-    workflow: Workflow;
+    updateWorkflowMutation?: UpdateWorkflowMutationType;
+    workflow?: Workflow;
 }
 
 const ProjectGitConfigurationDialog = lazy(
@@ -41,6 +49,7 @@ const ProjectGitConfigurationDialog = lazy(
 
 const SettingsMenu = ({
     bottomResizablePanelRef,
+    firstTab,
     project,
     updateWorkflowMutation,
     workflow,
@@ -92,6 +101,27 @@ const SettingsMenu = ({
         restoreProjectVersionPending,
     } = useSettingsMenu({project, workflow});
 
+    const resolvedFirstTab: SettingsMenuFirstTabProps | undefined =
+        firstTab ??
+        (workflow
+            ? {
+                  ariaLabel: 'Workflow tab',
+                  content: (onCloseDropdownMenu: () => void) => (
+                      <WorkflowTabButtons
+                          onCloseDropdownMenu={onCloseDropdownMenu}
+                          onDuplicateWorkflow={handleDuplicateWorkflowClick}
+                          onShareWorkflow={() => setShowWorkflowShareDialog(true)}
+                          onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
+                          onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
+                          onShowLoadWorkflowVersionDialog={() => setShowLoadWorkflowVersionDialog(true)}
+                          workflowId={workflow.id!}
+                      />
+                  ),
+                  label: 'Workflow',
+                  value: 'workflow',
+              }
+            : undefined);
+
     return (
         <>
             <DropdownMenu onOpenChange={setOpenDropdownMenu} open={openDropdownMenu}>
@@ -120,36 +150,32 @@ const SettingsMenu = ({
                 </Tooltip>
 
                 <DropdownMenuContent align="end" className="p-0">
-                    <Tabs aria-label="Settings menu" defaultValue="workflow">
-                        <TabsList className="rounded-none">
-                            <TabsTrigger
-                                aria-label="Workflow tab"
-                                className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                                value="workflow"
-                            >
-                                Workflow
-                            </TabsTrigger>
+                    <Tabs aria-label="Settings menu" defaultValue={resolvedFirstTab?.value ?? 'project'}>
+                        {resolvedFirstTab && (
+                            <TabsList className="rounded-none">
+                                <TabsTrigger
+                                    aria-label={resolvedFirstTab.ariaLabel}
+                                    className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                    value={resolvedFirstTab.value}
+                                >
+                                    {resolvedFirstTab.label}
+                                </TabsTrigger>
 
-                            <TabsTrigger
-                                aria-label="Project tab"
-                                className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
-                                value="project"
-                            >
-                                Project
-                            </TabsTrigger>
-                        </TabsList>
+                                <TabsTrigger
+                                    aria-label="Project tab"
+                                    className="w-1/2 px-9 py-1 data-[state=active]:shadow-none"
+                                    value="project"
+                                >
+                                    Project
+                                </TabsTrigger>
+                            </TabsList>
+                        )}
 
-                        <TabsContent className="mt-0" value="workflow">
-                            <WorkflowTabButtons
-                                onCloseDropdownMenu={() => setOpenDropdownMenu(false)}
-                                onDuplicateWorkflow={handleDuplicateWorkflowClick}
-                                onShareWorkflow={() => setShowWorkflowShareDialog(true)}
-                                onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
-                                onShowEditWorkflowDialog={() => setShowEditWorkflowDialog(true)}
-                                onShowLoadWorkflowVersionDialog={() => setShowLoadWorkflowVersionDialog(true)}
-                                workflowId={workflow.id!}
-                            />
-                        </TabsContent>
+                        {resolvedFirstTab && (
+                            <TabsContent className="mt-0" value={resolvedFirstTab.value}>
+                                {resolvedFirstTab.content(() => setOpenDropdownMenu(false))}
+                            </TabsContent>
+                        )}
 
                         <TabsContent className="mt-0" value="project">
                             <ProjectTabButtons
@@ -223,7 +249,7 @@ const SettingsMenu = ({
                 <ProjectDialog onClose={() => setShowEditProjectDialog(false)} project={project} />
             )}
 
-            {showEditWorkflowDialog && (
+            {showEditWorkflowDialog && workflow && updateWorkflowMutation && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
                     onSave={() =>
@@ -237,7 +263,7 @@ const SettingsMenu = ({
                 />
             )}
 
-            {showLoadWorkflowVersionDialog && workflow.workflowUuid && (
+            {showLoadWorkflowVersionDialog && workflow?.workflowUuid && (
                 <LoadWorkflowVersionDialog
                     onClose={() => setShowLoadWorkflowVersionDialog(false)}
                     projectId={project.id!}
@@ -281,7 +307,7 @@ const SettingsMenu = ({
                 />
             )}
 
-            {showWorkflowShareDialog && (
+            {showWorkflowShareDialog && workflow && (
                 <WorkflowShareDialog
                     onOpenChange={() => setShowWorkflowShareDialog(false)}
                     open={showWorkflowShareDialog}

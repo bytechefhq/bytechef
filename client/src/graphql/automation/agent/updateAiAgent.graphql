@@ -1,0 +1,5 @@
+mutation updateAiAgent($input: UpdateAiAgentInput!) {
+    updateAiAgent(input: $input) {
+        id
+    }
+}

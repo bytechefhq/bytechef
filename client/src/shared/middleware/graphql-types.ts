@@ -67,6 +67,21 @@ export type ActionDefinition = {
   workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
 };
 
+export type AddAiAgentChannelInput = {
+  agentId: Scalars['ID']['input'];
+  channelType: Scalars['String']['input'];
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
+export type AddAiAgentElementInput = {
+  agentId: Scalars['ID']['input'];
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  kind: Scalars['String']['input'];
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+  referenceId?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type AddColumnInput = {
   column: ColumnInput;
   environmentId: Scalars['ID']['input'];
@@ -98,6 +113,92 @@ export type AdminUserPage = {
   size: Scalars['Int']['output'];
   totalElements: Scalars['Int']['output'];
   totalPages: Scalars['Int']['output'];
+};
+
+export type AiAgent = {
+  __typename?: 'AiAgent';
+  channels: Array<AiAgentChannel>;
+  description?: Maybe<Scalars['String']['output']>;
+  draftWorkflowId: Scalars['String']['output'];
+  elements: Array<AiAgentElement>;
+  id: Scalars['ID']['output'];
+  instructions?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  lastPublishedVersion: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  projectWorkflowUuid: Scalars['String']['output'];
+  publishedDate?: Maybe<Scalars['String']['output']>;
+  settings?: Maybe<Scalars['Map']['output']>;
+  title: Scalars['String']['output'];
+  unpublishedChanges: Scalars['Boolean']['output'];
+  uuid: Scalars['String']['output'];
+  workspaceId?: Maybe<Scalars['ID']['output']>;
+};
+
+export type AiAgentChannel = {
+  __typename?: 'AiAgentChannel';
+  channelType: Scalars['String']['output'];
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
+  position: Scalars['Int']['output'];
+};
+
+export type AiAgentChannelDefinition = {
+  __typename?: 'AiAgentChannelDefinition';
+  approvalCapable: Scalars['Boolean']['output'];
+  channelType: Scalars['String']['output'];
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  connectionRequired: Scalars['Boolean']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  pinned: Scalars['Boolean']['output'];
+  propertiesConfigurable: Scalars['Boolean']['output'];
+  replyActionName?: Maybe<Scalars['String']['output']>;
+  schedule: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+  triggerName: Scalars['String']['output'];
+};
+
+export type AiAgentDeployment = {
+  __typename?: 'AiAgentDeployment';
+  agentId: Scalars['ID']['output'];
+  agentTitle: Scalars['String']['output'];
+  enabled: Scalars['Boolean']['output'];
+  environmentId: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  lastExecutionDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  projectId: Scalars['ID']['output'];
+  projectVersion: Scalars['Int']['output'];
+  workflows: Array<AiAgentDeploymentWorkflow>;
+};
+
+export type AiAgentDeploymentTrigger = {
+  __typename?: 'AiAgentDeploymentTrigger';
+  name: Scalars['String']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
+  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
+  type: Scalars['String']['output'];
+};
+
+export type AiAgentDeploymentWorkflow = {
+  __typename?: 'AiAgentDeploymentWorkflow';
+  enabled: Scalars['Boolean']['output'];
+  triggers: Array<AiAgentDeploymentTrigger>;
+  workflowId: Scalars['String']['output'];
+};
+
+export type AiAgentElement = {
+  __typename?: 'AiAgentElement';
+  connectionId?: Maybe<Scalars['ID']['output']>;
+  id: Scalars['ID']['output'];
+  kind: Scalars['String']['output'];
+  parameters?: Maybe<Scalars['Map']['output']>;
+  position: Scalars['Int']['output'];
+  referenceId?: Maybe<Scalars['ID']['output']>;
 };
 
 export type AiAgentEvalResult = {
@@ -233,6 +334,14 @@ export enum AiAgentScenarioType {
   MultiTurn = 'MULTI_TURN',
   SingleTurn = 'SINGLE_TURN'
 }
+
+export type AiAgentVersion = {
+  __typename?: 'AiAgentVersion';
+  description?: Maybe<Scalars['String']['output']>;
+  publishedDate?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+};
 
 export type AiAutoMemory = {
   __typename?: 'AiAutoMemory';
@@ -554,6 +663,16 @@ export type Category = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type ChatAgent = {
+  __typename?: 'ChatAgent';
+  agentName: Scalars['String']['output'];
+  agentTitle: Scalars['String']['output'];
+  aiAgentId: Scalars['ID']['output'];
+  projectDeploymentId: Scalars['ID']['output'];
+  workflowExecutionId: Scalars['String']['output'];
+  workflowLabel: Scalars['String']['output'];
+};
+
 export type ChatWorkflow = {
   __typename?: 'ChatWorkflow';
   projectDeploymentId: Scalars['ID']['output'];
@@ -809,6 +928,13 @@ export type CreateA2aServerInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+export type CreateAiAgentInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  title: Scalars['String']['input'];
+  workspaceId: Scalars['ID']['input'];
 };
 
 export type CreateApiConnectorInput = {
@@ -1618,12 +1744,15 @@ export type McpToolInputForComponent = {
 export type Mutation = {
   __typename?: 'Mutation';
   _placeholder?: Maybe<Scalars['Boolean']['output']>;
+  addAiAgentChannel: AiAgentChannel;
+  addAiAgentElement: AiAgentElement;
   addDataTableColumn: Scalars['Boolean']['output'];
   cancelAiAgentEvalRun: AiAgentEvalRun;
   cancelGenerationJob: Scalars['Boolean']['output'];
   createA2aProject?: Maybe<A2aProject>;
   createA2aServer?: Maybe<A2aServer>;
   createAdditionalFilesInSkill: AiSkill;
+  createAiAgent: AiAgent;
   createAiAgentEvalScenario: AiAgentEvalScenario;
   createAiAgentEvalTest: AiAgentEvalTest;
   createAiAgentJudge: AiAgentJudge;
@@ -1652,6 +1781,9 @@ export type Mutation = {
   createWorkspaceMcpServer?: Maybe<McpServer>;
   deleteA2aProject?: Maybe<Scalars['Boolean']['output']>;
   deleteA2aServer?: Maybe<Scalars['Boolean']['output']>;
+  deleteAiAgent: Scalars['Boolean']['output'];
+  deleteAiAgentChannel: Scalars['Boolean']['output'];
+  deleteAiAgentElement: Scalars['Boolean']['output'];
   deleteAiAgentEvalScenario: Scalars['Boolean']['output'];
   deleteAiAgentEvalTest: Scalars['Boolean']['output'];
   deleteAiAgentJudge: Scalars['Boolean']['output'];
@@ -1708,6 +1840,7 @@ export type Mutation = {
   exportSharedWorkflow: Scalars['Boolean']['output'];
   generateFromDocumentation: ApiConnector;
   generateSpecification: GenerateSpecificationResponse;
+  importAiAgent: AiAgent;
   importDataTableCsv: Scalars['Boolean']['output'];
   importOpenApiSpecification: ApiConnector;
   importProjectTemplate: Scalars['ID']['output'];
@@ -1733,11 +1866,15 @@ export type Mutation = {
   updateA2aProjectWorkflowParameters?: Maybe<A2aProjectWorkflow>;
   updateA2aServer?: Maybe<A2aServer>;
   updateA2aServerTags?: Maybe<Array<Maybe<Tag>>>;
+  updateAiAgent: AiAgent;
+  updateAiAgentChannel: Scalars['Boolean']['output'];
+  updateAiAgentElement: Scalars['Boolean']['output'];
   updateAiAgentEvalScenario: AiAgentEvalScenario;
   updateAiAgentEvalTest: AiAgentEvalTest;
   updateAiAgentJudge: AiAgentJudge;
   updateAiAgentScenarioJudge: AiAgentScenarioJudge;
   updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
+  updateAiAgentSettings: Scalars['Boolean']['output'];
   /**
    * Partial update of a memory by primary key, resolved within the supplied environment and scoped to the
    * resolved principal. The environment identifies which row the key addresses, not a value to write — a memory's
@@ -1788,6 +1925,16 @@ export type Mutation = {
 };
 
 
+export type MutationAddAiAgentChannelArgs = {
+  input: AddAiAgentChannelInput;
+};
+
+
+export type MutationAddAiAgentElementArgs = {
+  input: AddAiAgentElementInput;
+};
+
+
 export type MutationAddDataTableColumnArgs = {
   input: AddColumnInput;
 };
@@ -1816,6 +1963,11 @@ export type MutationCreateA2aServerArgs = {
 export type MutationCreateAdditionalFilesInSkillArgs = {
   additionalFiles: Scalars['Map']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationCreateAiAgentArgs = {
+  input: CreateAiAgentInput;
 };
 
 
@@ -1993,6 +2145,21 @@ export type MutationDeleteA2aProjectArgs = {
 
 
 export type MutationDeleteA2aServerArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiAgentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiAgentChannelArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAiAgentElementArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2259,6 +2426,13 @@ export type MutationGenerateSpecificationArgs = {
 };
 
 
+export type MutationImportAiAgentArgs = {
+  json: Scalars['String']['input'];
+  projectId?: InputMaybe<Scalars['ID']['input']>;
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type MutationImportDataTableCsvArgs = {
   input: ImportCsvInput;
 };
@@ -2424,6 +2598,21 @@ export type MutationUpdateA2aServerTagsArgs = {
 };
 
 
+export type MutationUpdateAiAgentArgs = {
+  input: UpdateAiAgentInput;
+};
+
+
+export type MutationUpdateAiAgentChannelArgs = {
+  input: UpdateAiAgentChannelInput;
+};
+
+
+export type MutationUpdateAiAgentElementArgs = {
+  input: UpdateAiAgentElementInput;
+};
+
+
 export type MutationUpdateAiAgentEvalScenarioArgs = {
   expectedOutput?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
@@ -2461,6 +2650,12 @@ export type MutationUpdateAiAgentScenarioToolSimulationArgs = {
   responsePrompt?: InputMaybe<Scalars['String']['input']>;
   simulationModel?: InputMaybe<Scalars['String']['input']>;
   toolName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUpdateAiAgentSettingsArgs = {
+  id: Scalars['ID']['input'];
+  settings: Scalars['Map']['input'];
 };
 
 
@@ -2959,6 +3154,9 @@ export type Query = {
   actionDefinition: ActionDefinition;
   actionDefinitions: Array<ActionDefinition>;
   adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
+  aiAgent?: Maybe<AiAgent>;
+  aiAgentChannelDefinitions: Array<AiAgentChannelDefinition>;
+  aiAgentDeployments: Array<AiAgentDeployment>;
   aiAgentEvalResult?: Maybe<AiAgentEvalResult>;
   aiAgentEvalResultTranscript?: Maybe<Scalars['String']['output']>;
   aiAgentEvalRun?: Maybe<AiAgentEvalRun>;
@@ -2966,6 +3164,8 @@ export type Query = {
   aiAgentEvalTest?: Maybe<AiAgentEvalTest>;
   aiAgentEvalTests: Array<AiAgentEvalTest>;
   aiAgentJudges: Array<AiAgentJudge>;
+  aiAgentVersions: Array<AiAgentVersion>;
+  aiAgents: Array<AiAgent>;
   /**
    * Lists memories in the workspace, scoped to the supplied environment so DEVELOPMENT preferences do not bleed
    * into PRODUCTION sessions and vice versa. The optional memoryType filter narrows results to a single category.
@@ -3054,6 +3254,7 @@ export type Query = {
   environments?: Maybe<Array<Maybe<Environment>>>;
   evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
   evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
+  exportAiAgent: Scalars['String']['output'];
   exportDataTableCsv: Scalars['String']['output'];
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
@@ -3126,6 +3327,7 @@ export type Query = {
   workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
   workflowTemplate?: Maybe<WorkflowTemplate>;
   workspaceApiKeys: Array<ApiKey>;
+  workspaceChatAgents: Array<ChatAgent>;
   workspaceChatWorkflows: Array<ChatWorkflow>;
   workspaceMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
@@ -3167,6 +3369,16 @@ export type QueryAdminApiKeysArgs = {
 };
 
 
+export type QueryAiAgentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiAgentDeploymentsArgs = {
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryAiAgentEvalResultArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3203,6 +3415,16 @@ export type QueryAiAgentEvalTestsArgs = {
 export type QueryAiAgentJudgesArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type QueryAiAgentVersionsArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAiAgentsArgs = {
+  workspaceId: Scalars['ID']['input'];
 };
 
 
@@ -3520,6 +3742,11 @@ export type QueryEvaluatorFunctionDefinitionArgs = {
 
 export type QueryEvaluatorFunctionDefinitionsArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryExportAiAgentArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3848,6 +4075,12 @@ export type QueryWorkspaceApiKeysArgs = {
 };
 
 
+export type QueryWorkspaceChatAgentsArgs = {
+  environmentId: Scalars['ID']['input'];
+  workspaceId: Scalars['ID']['input'];
+};
+
+
 export type QueryWorkspaceChatWorkflowsArgs = {
   environmentId: Scalars['ID']['input'];
   workspaceId: Scalars['ID']['input'];
@@ -4074,6 +4307,25 @@ export type UpdateA2aServerInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAiAgentChannelInput = {
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
+export type UpdateAiAgentElementInput = {
+  connectionId?: InputMaybe<Scalars['ID']['input']>;
+  id: Scalars['ID']['input'];
+  parameters?: InputMaybe<Scalars['Map']['input']>;
+};
+
+export type UpdateAiAgentInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  instructions?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 /**

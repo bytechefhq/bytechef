@@ -193,6 +193,7 @@ export default [
                         '^connect-',
                         '^dropdown-menu-item',
                         '^is-(active|checked|selected|unchecked)$',
+                        '^markdown-editor$',
                         '^not-prose$',
                         '^property-',
                         '^radio-card-',

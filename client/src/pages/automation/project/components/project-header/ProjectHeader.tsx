@@ -124,6 +124,7 @@ const ProjectHeader = ({
                                 currentLabel={workflow?.label}
                                 currentProjectWorkflowId={projectWorkflowId}
                                 onWorkflowValueChange={handleProjectWorkflowValueChange}
+                                projectId={project.id!}
                                 projectWorkflows={projectWorkflows}
                             />
                         }

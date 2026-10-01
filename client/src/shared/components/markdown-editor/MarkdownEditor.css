@@ -1,0 +1,20 @@
+@reference '../../../styles/index.css';
+
+.markdown-editor {
+    .ProseMirror > :first-child {
+        @apply mt-0;
+    }
+
+    .ProseMirror > :last-child {
+        @apply mb-0;
+    }
+
+    /* placeholder */
+    p.is-editor-empty:first-child::before {
+        @apply content-[attr(data-placeholder)];
+        @apply text-foreground/40;
+        @apply absolute;
+        @apply h-0;
+        @apply pointer-events-none;
+    }
+}

@@ -17,6 +17,7 @@ export type ComboBoxItemType = {
 };
 
 export interface ComboBoxProps {
+    ariaLabel?: string;
     disabled?: boolean;
     emptyMessage?: string;
     items: ComboBoxItemType[];
@@ -63,6 +64,7 @@ const ComboBoxCommandItem = ({children, onSelect, searchValue, value}: ComboBoxC
 };
 
 const ComboBox: FC<ComboBoxProps> = ({
+    ariaLabel,
     disabled,
     emptyMessage,
     items,
@@ -115,6 +117,7 @@ const ComboBox: FC<ComboBoxProps> = ({
             <PopoverTrigger asChild onBlur={onBlur}>
                 <Button
                     aria-expanded={open}
+                    aria-label={ariaLabel}
                     className="w-full justify-between"
                     disabled={disabled}
                     name={name}
