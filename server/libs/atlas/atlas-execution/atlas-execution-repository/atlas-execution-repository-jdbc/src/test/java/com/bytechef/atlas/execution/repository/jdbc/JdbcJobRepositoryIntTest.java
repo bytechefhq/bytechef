@@ -23,9 +23,9 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -64,16 +64,20 @@ public class JdbcJobRepositoryIntTest {
 
         Assertions.assertEquals(pageTotal + 1, page.getNumberOfElements());
 
-        Job one = OptionalUtils.get(jobRepository.findById(Validate.notNull(job.getId(), "id")));
+        Optional<Job> one = jobRepository.findById(Validate.notNull(job.getId(), "id"));
 
-        Assertions.assertNotNull(one);
+        Assertions.assertTrue(one.isPresent());
     }
 
     @Test
     public void testFindById() {
         Job job = jobRepository.save(getJob(Job.Status.CREATED));
 
-        Job resultJob = OptionalUtils.get(jobRepository.findById(Validate.notNull(job.getId(), "id")));
+        Optional<Job> jobOptional = jobRepository.findById(Validate.notNull(job.getId(), "id"));
+
+        Assertions.assertTrue(jobOptional.isPresent());
+
+        Job resultJob = jobOptional.get();
 
         resultJob.setId(null);
         resultJob.setStatus(Job.Status.FAILED);
@@ -83,7 +87,11 @@ public class JdbcJobRepositoryIntTest {
 
         job = jobRepository.save(resultJob);
 
-        resultJob = OptionalUtils.get(jobRepository.findById(Validate.notNull(job.getId(), "id")));
+        jobOptional = jobRepository.findById(Validate.notNull(job.getId(), "id"));
+
+        Assertions.assertTrue(jobOptional.isPresent());
+
+        resultJob = jobOptional.get();
 
         Assertions.assertEquals(Job.Status.FAILED, resultJob.getStatus());
     }
