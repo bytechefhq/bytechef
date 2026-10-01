@@ -27,6 +27,6 @@ class OracleComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/oracle_v1.json", new OracleComponentHandler(null).getDefinition());
+            "definition/oracleVectorStore_v1.json", new OracleComponentHandler(null).getDefinition());
     }
 }

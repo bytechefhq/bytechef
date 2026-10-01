@@ -27,6 +27,6 @@ class S3ComponentHandlerTest {
     @Test
     void testGetDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/s3_v1.json", new S3ComponentHandler(null).getDefinition());
+            "definition/s3VectorStore_v1.json", new S3ComponentHandler(null).getDefinition());
     }
 }

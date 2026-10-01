@@ -26,6 +26,7 @@ class RedisComponentHandlerTest {
 
     @Test
     void testGetDefinition() {
-        JsonFileAssert.assertEquals("definition/redis_v1.json", new RedisComponentHandler(null).getDefinition());
+        JsonFileAssert.assertEquals("definition/redisVectorStore_v1.json",
+            new RedisComponentHandler(null).getDefinition());
     }
 }

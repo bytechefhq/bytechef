@@ -12,7 +12,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete documents from the vector store by metadata",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/couchbase_v1#delete-documents"
+    },
     "metadata": null,
     "name": "delete",
     "outputDefinition": null,
@@ -208,7 +211,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Loads documents into the vector store using LLM embeddings.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/couchbase_v1#load-documents"
+    },
     "metadata": null,
     "name": "load",
     "outputDefinition": null,
@@ -404,7 +410,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Query documents from the vector store using LLM embeddings.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/couchbase_v1#search-documents"
+    },
     "metadata": null,
     "name": "search",
     "outputDefinition": {
@@ -668,7 +677,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates documents in the vector store by deleting existing ones matching the metadata filter and loading new ones using LLM embeddings.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/couchbase_v1#update-documents"
+    },
     "metadata": null,
     "name": "update",
     "outputDefinition": null,

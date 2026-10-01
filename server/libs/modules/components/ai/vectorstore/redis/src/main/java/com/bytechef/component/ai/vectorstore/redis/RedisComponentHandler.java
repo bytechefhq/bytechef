@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.redis;
 
-import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS;
+import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS_VECTOR_STORE;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -37,13 +37,13 @@ import org.springframework.stereotype.Component;
 /**
  * @author Monika Kušter
  */
-@Component(REDIS + "_v1_ComponentHandler")
+@Component(REDIS_VECTOR_STORE + "_v1_ComponentHandler")
 public class RedisComponentHandler implements ComponentHandler {
 
     private final VectorStoreComponentDefinition componentDefinition;
 
     public RedisComponentHandler(ClusterElementDefinitionService clusterElementDefinitionService) {
-        this.componentDefinition = new RedisComponentDefinitionImpl(component(REDIS)
+        this.componentDefinition = new RedisComponentDefinitionImpl(component(REDIS_VECTOR_STORE)
             .title("Redis")
             .description(
                 "Redis is an open-source, in-memory data structure store used as a database, cache, and message " +

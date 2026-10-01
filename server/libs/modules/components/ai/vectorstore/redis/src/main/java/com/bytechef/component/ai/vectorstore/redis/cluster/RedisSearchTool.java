@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.redis.cluster;
 
-import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS;
+import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.REDIS_VECTOR_STORE;
 import static com.bytechef.component.ai.vectorstore.redis.constant.RedisConstants.VECTOR_STORE;
 
 import com.bytechef.component.ai.vectorstore.cluster.SearchToolDefinition;
@@ -33,6 +33,7 @@ public class RedisSearchTool {
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        return SearchToolDefinition.of("Redis", REDIS, VECTOR_STORE, List.of(), clusterElementDefinitionService);
+        return SearchToolDefinition.of("Redis", REDIS_VECTOR_STORE, VECTOR_STORE, List.of(),
+            clusterElementDefinitionService);
     }
 }
