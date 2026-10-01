@@ -46,14 +46,14 @@ const useWorkflowEditorLayout = () => {
     );
 
     useEffect(() => {
-        handleClusterElementsCanvasOpenChange(false);
-    }, [handleClusterElementsCanvasOpenChange, workflowId]);
-
-    useEffect(() => {
         if (clusterElementsCanvasOpen && isMainRootClusterElement) {
             setRootClusterElementNodeData(currentNode);
         }
     }, [clusterElementsCanvasOpen, isMainRootClusterElement, setRootClusterElementNodeData, currentNode]);
+
+    useEffect(() => {
+        handleClusterElementsCanvasOpenChange(false);
+    }, [handleClusterElementsCanvasOpenChange, workflowId]);
 
     return {
         handleClusterElementsCanvasOpenChange,
