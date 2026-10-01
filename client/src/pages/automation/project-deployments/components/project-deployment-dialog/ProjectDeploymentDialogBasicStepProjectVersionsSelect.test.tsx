@@ -9,6 +9,8 @@ vi.mock('@/shared/queries/automation/projectVersions.queries', () => ({
     useGetProjectVersionsQuery: vi.fn(),
 }));
 
+const loadErrorMessage = 'Could not load the project versions. Try again later.';
+
 const noPublishedVersionMessage = 'This project has no published version yet. Publish it first.';
 
 describe('ProjectDeploymentDialogBasicStepProjectVersionsSelect', () => {
@@ -37,5 +39,19 @@ describe('ProjectDeploymentDialogBasicStepProjectVersionsSelect', () => {
 
         expect(screen.getByRole('combobox')).toBeInTheDocument();
         expect(screen.queryByText(noPublishedVersionMessage)).not.toBeInTheDocument();
+    });
+
+    it('should not ask to publish the project when loading the versions fails', () => {
+        (useGetProjectVersionsQuery as Mock).mockReturnValue({
+            data: undefined,
+            isError: true,
+            isPending: false,
+        });
+
+        render(<ProjectDeploymentDialogBasicStepProjectVersionsSelect onChange={vi.fn()} projectId={1} />);
+
+        expect(screen.getByText(loadErrorMessage)).toBeInTheDocument();
+        expect(screen.queryByText(noPublishedVersionMessage)).not.toBeInTheDocument();
+        expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     });
 });

@@ -14,12 +14,16 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
     projectId: number;
     projectVersion?: number;
 }) => {
-    const {data: projectVersions, isPending} = useGetProjectVersionsQuery(projectId);
+    const {data: projectVersions, isError, isPending} = useGetProjectVersionsQuery(projectId);
 
     const publishedProjectVersions = useMemo(
         () => (projectVersions ?? []).filter((projectVersion) => projectVersion.status === ProjectStatus.Published),
         [projectVersions]
     );
+
+    if (isError) {
+        return <p className="text-sm text-destructive">Could not load the project versions. Try again later.</p>;
+    }
 
     if (!isPending && publishedProjectVersions.length === 0) {
         return (
