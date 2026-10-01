@@ -115,6 +115,16 @@ describe('useWorkflowEditorLayout', () => {
         expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toBeUndefined();
     });
 
+    it('does not re-seed the previous root cluster element when the editor mounts with a stale canvas', () => {
+        useWorkflowEditorStore.setState({clusterElementsCanvasOpen: true, rootClusterElementNodeData: aiAgentRootNode});
+        useWorkflowNodeDetailsPanelStore.setState({currentNode: aiAgentRootNode});
+
+        renderHook(() => useWorkflowEditorLayout());
+
+        expect(useWorkflowEditorStore.getState().clusterElementsCanvasOpen).toBe(false);
+        expect(useWorkflowEditorStore.getState().rootClusterElementNodeData).toBeUndefined();
+    });
+
     it('re-seeds when the canvas is reopened on the same cluster root', () => {
         const {result} = renderHook(() => useWorkflowEditorLayout());
 
