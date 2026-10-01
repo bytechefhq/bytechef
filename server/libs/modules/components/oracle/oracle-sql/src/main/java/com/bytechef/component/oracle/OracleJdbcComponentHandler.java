@@ -32,6 +32,7 @@ public class OracleJdbcComponentHandler implements JdbcComponentHandler {
         .title("Oracle SQL")
         .description("Select, insert, update and delete data from Oracle Databases.")
         .icon("path:assets/oracle.svg")
+        .resources("https://docs.bytechef.io/reference/components/oracle_v1")
         .urlTemplate("jdbc:oracle:thin:@{host}:{port}:{database}")
         .jdbcDriverClassName("oracle.jdbc.OracleDriver");
 
