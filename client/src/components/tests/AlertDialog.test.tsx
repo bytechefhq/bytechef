@@ -298,4 +298,27 @@ describe('AlertDialog pending cancel', () => {
 
         expect(screen.getByRole('button', {name: 'Cancel'})).toBeEnabled();
     });
+
+    it('should not call onCancel when the cancel button is clicked while the confirmed action is in flight', async () => {
+        render(<AlertDialog {...defaultProps} isPending />);
+
+        await userEvent.click(screen.getByRole('button', {name: 'Cancel'}), {pointerEventsCheck: 0});
+
+        expect(onCancel).not.toHaveBeenCalled();
+    });
+
+    it('should hide the close button while the confirmed action is in flight', () => {
+        render(<AlertDialog {...defaultProps} isPending />);
+
+        expect(screen.queryByRole('button', {name: 'Close'})).not.toBeInTheDocument();
+    });
+
+    it('should stay open and not call onCancel when Escape is pressed while the confirmed action is in flight', async () => {
+        render(<AlertDialog {...defaultProps} isPending />);
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(onCancel).not.toHaveBeenCalled();
+        expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    });
 });
