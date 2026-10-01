@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +29,10 @@ public interface ProjectWorkflowService {
 
     ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId);
 
-    ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, UUID uuid);
+    ProjectWorkflow addWorkflow(
+        long projectId, int projectVersion, String workflowId, UUID uuid, ProjectWorkflowType type);
+
+    ProjectWorkflow addWorkflow(long projectId, int projectVersion, String workflowId, ProjectWorkflowType type);
 
     void delete(List<Long> ids);
 
@@ -37,6 +41,8 @@ public interface ProjectWorkflowService {
     Optional<String> fetchLastProjectWorkflowId(Long projectId, String workflowUuid);
 
     Optional<ProjectWorkflow> fetchProjectWorkflow(long projectId, int projectVersion, String workflowUuid);
+
+    Optional<ProjectWorkflow> fetchWorkflowProjectWorkflow(String workflowId);
 
     Optional<String> fetchProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid);
 
