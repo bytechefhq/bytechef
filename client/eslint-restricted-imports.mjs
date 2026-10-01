@@ -28,7 +28,13 @@ export const restrictedImports = {
         {
             name: '@/components/ui/select',
             message:
-                "Import Select primitives from '@/components/Select/Select' instead. The wrapper defaults SelectContent to position=\"popper\" so the dropdown renders below the trigger at the trigger width.",
+                'Import Select primitives from \'@/components/Select/Select\' instead. The wrapper defaults SelectContent to position="popper" so the dropdown renders below the trigger at the trigger width.',
+            allowTypeImports: true,
+        },
+        {
+            name: '@/components/ui/alert-dialog',
+            message:
+                "Import AlertDialog from '@/components/AlertDialog' instead. It builds on the design-system Dialog and handles the pending state, so a confirmed action cannot be submitted twice or dismissed mid-flight.",
             allowTypeImports: true,
         },
     ],
