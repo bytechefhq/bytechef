@@ -383,13 +383,15 @@ const Register = () => {
                             </Alert>
                         )}
 
-                        <div className="flex items-center justify-center gap-1 text-sm">
-                            <span className="text-content-neutral-secondary">Already have an account?</span>
+                        {!showAlreadyUsedEmailOptions && (
+                            <div className="flex items-center justify-center gap-1 text-sm">
+                                <span className="text-content-neutral-secondary">Already have an account?</span>
 
-                            <Link to="/login">
-                                <Button className="px-1" label="Log in" variant="link" />
-                            </Link>
-                        </div>
+                                <Link to="/login">
+                                    <Button className="px-1" label="Log in" variant="link" />
+                                </Link>
+                            </div>
+                        )}
                     </Form>
                 </CardContent>
             </Card>
