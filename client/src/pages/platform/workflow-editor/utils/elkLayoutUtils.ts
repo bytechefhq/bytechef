@@ -1,4 +1,6 @@
 import {
+    FINAL_PLACEHOLDER_NODE_ID,
+    FINAL_PLACEHOLDER_NODE_SIZE,
     LayoutDirectionType,
     NODE_HEIGHT,
     PLACEHOLDER_NODE_HEIGHT,
@@ -786,6 +788,11 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
         }
 
         if (node.type === 'placeholder') {
+            // met it 10px above its middle and the last edge in LR sloped down into it.
+            if (node.id === FINAL_PLACEHOLDER_NODE_ID) {
+                return {height: FINAL_PLACEHOLDER_NODE_SIZE, width: NODE_ANCHOR_SIZE};
+            }
+
             // The 28px "+" square renders with mx-[22px] margins (PlaceholderNode.tsx),
             // so the node's DOM box is 72px wide with the "+" at its center
             return {height: PLACEHOLDER_NODE_HEIGHT, width: NODE_ANCHOR_SIZE};

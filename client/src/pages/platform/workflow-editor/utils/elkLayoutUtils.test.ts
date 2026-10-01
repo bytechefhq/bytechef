@@ -1,3 +1,4 @@
+import {FINAL_PLACEHOLDER_NODE_ID, FINAL_PLACEHOLDER_NODE_SIZE} from '@/shared/constants';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
@@ -451,6 +452,29 @@ describe('getElkLayoutElements', () => {
         // LR footprint width is 120 (see getDagreNodeSize) + 50 spacing
         expect(firstGap).toBe(CHAIN_STEP);
         expect(secondGap).toBe(CHAIN_STEP);
+    });
+
+    it('keeps the LR chain level through the end-of-chain placeholder', async () => {
+        const finalPlaceholderNode: Node = {
+            data: {label: '+'},
+            id: FINAL_PLACEHOLDER_NODE_ID,
+            position: {x: 0, y: 0},
+            type: 'placeholder',
+        };
+
+        const result = await getElkLayoutElements({
+            canvasHeight: 800,
+            canvasWidth: 1000,
+            direction: 'LR',
+            edges: [edge('task1', FINAL_PLACEHOLDER_NODE_ID)],
+            nodes: [taskNode('task1'), finalPlaceholderNode],
+        });
+
+        const taskAnchorCentreY = positionOf(result.nodes, 'task1').y + 72 / 2;
+        const placeholderCentreY =
+            positionOf(result.nodes, FINAL_PLACEHOLDER_NODE_ID).y + FINAL_PLACEHOLDER_NODE_SIZE / 2;
+
+        expect(placeholderCentreY).toBe(taskAnchorCentreY);
     });
 
     it('gives LR frame entries the same bar-to-child run as TB', async () => {
