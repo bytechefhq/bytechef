@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Execute an SQL query.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#query"
+    },
     "metadata": null,
     "name": "query",
     "outputDefinition": {
@@ -155,7 +158,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Insert rows in database.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#insert"
+    },
     "metadata": null,
     "name": "insert",
     "outputDefinition": {
@@ -357,7 +363,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update rows in database.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#update"
+    },
     "metadata": null,
     "name": "update",
     "outputDefinition": {
@@ -581,7 +590,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete rows from database.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#delete"
+    },
     "metadata": null,
     "name": "delete",
     "outputDefinition": {
@@ -669,7 +681,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Execute an SQL DML or DML statement.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#execute"
+    },
     "metadata": null,
     "name": "execute",
     "outputDefinition": {
@@ -1402,7 +1417,10 @@
     "deprecated": null,
     "description": "Triggers when new row is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oracle_v1#new-row"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newRow",
