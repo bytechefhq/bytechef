@@ -11,7 +11,7 @@ const ReadOnlyPlaceholderNode = ({id}: {id: string}) => {
     const isHorizontal = layoutDirection === 'LR';
 
     return (
-        <div className="size-0.5 bg-gray-300" data-nodetype="readonlyPlaceholderNode" key={id}>
+        <div className="size-0.5 bg-surface-neutral-tertiary" data-nodetype="readonlyPlaceholderNode" key={id}>
             <Handle
                 className={twMerge(isHorizontal ? 'left-8' : 'top-8', styles.handle)}
                 id={`${id}-left-ghost-top`}

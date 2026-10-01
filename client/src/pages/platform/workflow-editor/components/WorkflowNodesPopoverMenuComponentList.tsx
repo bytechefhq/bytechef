@@ -137,7 +137,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                 <header className="flex items-center gap-1 rounded-t-lg px-3 pt-3 text-center">
                     <div className="relative w-full">
                         <Input
-                            className={twMerge('bg-white shadow-none', isSearchFetching && 'pr-8')}
+                            className={twMerge('bg-surface-neutral-primary shadow-none', isSearchFetching && 'pr-8')}
                             id="filter-components"
                             name="workflowNodeFilter"
                             onChange={(event) => setFilter(event.target.value)}

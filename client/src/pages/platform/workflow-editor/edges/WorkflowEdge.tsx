@@ -283,7 +283,7 @@ export default function WorkflowEdge({
                                             'flex cursor-pointer items-center justify-center rounded border-2 transition-all',
                                             isDropzoneActive
                                                 ? 'size-16 border-surface-brand-secondary-hover bg-surface-brand-secondary-hover'
-                                                : 'size-6 border-stroke-neutral-tertiary bg-white hover:scale-110 hover:border-stroke-brand-secondary-hover'
+                                                : 'size-6 border-stroke-neutral-tertiary bg-surface-neutral-primary hover:scale-110 hover:border-stroke-brand-secondary-hover'
                                         )}
                                         id={`${id}-button`}
                                     >

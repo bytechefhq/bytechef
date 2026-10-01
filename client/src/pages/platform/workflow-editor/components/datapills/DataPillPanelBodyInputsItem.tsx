@@ -32,7 +32,7 @@ const DataPillPanelBodyInputsItem = () => {
                     <span className="text-sm">Inputs</span>
                 </div>
 
-                <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                <ChevronDownIcon className="size-5 text-content-neutral-tertiary transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
 
             <AccordionContent className="size-full space-y-2 border-b border-b-border/50 px-4 pb-4">

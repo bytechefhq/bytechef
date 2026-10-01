@@ -65,7 +65,7 @@ export default function BranchCaseLabel({
         <EdgeLabelRenderer key={`${edgeId}-case-label`}>
             <div
                 className={twMerge(
-                    'z-10 flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-xs font-medium shadow-xs hover:border-stroke-brand-secondary-hover',
+                    'z-10 flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-1 text-xs font-medium shadow-xs hover:border-stroke-brand-secondary-hover',
                     // the TB nudge below the bar keeps chips off the bar line; in LR the
                     // chip is row-centered, so any static offset would miss the row
                     layoutDirection === 'LR' ? 'top-0' : 'top-6'

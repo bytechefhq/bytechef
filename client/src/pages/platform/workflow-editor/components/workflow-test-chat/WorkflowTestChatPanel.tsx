@@ -47,7 +47,7 @@ const WorkflowTestChatPanel = () => {
                 copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
             )}
         >
-            <div className="flex h-full flex-col divide-y divide-gray-100 bg-surface-main">
+            <div className="flex h-full flex-col divide-y divide-stroke-neutral-secondary bg-surface-main">
                 <header className="flex items-center p-4 text-lg font-medium">
                     <span>Playground</span>
 
