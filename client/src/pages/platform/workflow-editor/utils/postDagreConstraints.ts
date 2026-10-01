@@ -1819,8 +1819,9 @@ export function applySavedPositions(
 ): Map<string, {x: number; y: number}> {
     const dispatcherDeltas = new Map<string, {x: number; y: number}>();
 
-    // so nothing below would carry it: when the last node of the chain was pinned somewhere else,
-    let trailingPlaceholderDelta: {x: number; y: number} | undefined;
+    const trailingPredecessorStartPosition = trailingPlaceholder
+        ? {...allNodes.find((node) => node.id === trailingPlaceholder.predecessorId)?.position}
+        : undefined;
 
     for (let nodeIndex = 0; nodeIndex < allNodes.length; nodeIndex++) {
         const nodeData = allNodes[nodeIndex].data as NodeDataType;
@@ -1847,27 +1848,6 @@ export function applySavedPositions(
                     y: savedPosition.y - dagrePosition.y,
                 });
             }
-
-            if (allNodes[nodeIndex].id === trailingPlaceholder?.predecessorId) {
-                trailingPlaceholderDelta = {
-                    x: savedPosition.x - dagrePosition.x,
-                    y: savedPosition.y - dagrePosition.y,
-                };
-            }
-        }
-    }
-
-    if (trailingPlaceholder && trailingPlaceholderDelta) {
-        const placeholderIndex = allNodes.findIndex((node) => node.id === trailingPlaceholder.id && !node.parentId);
-
-        if (placeholderIndex !== -1) {
-            allNodes[placeholderIndex] = {
-                ...allNodes[placeholderIndex],
-                position: {
-                    x: allNodes[placeholderIndex].position.x + trailingPlaceholderDelta.x,
-                    y: allNodes[placeholderIndex].position.y + trailingPlaceholderDelta.y,
-                },
-            };
         }
     }
 
@@ -1955,6 +1935,26 @@ export function applySavedPositions(
                         dispatcherDeltas.set(allNodes[nodeIndex].id, delta);
                     }
                 }
+            }
+        }
+    }
+
+    if (trailingPlaceholder && trailingPredecessorStartPosition?.x !== undefined) {
+        const predecessorNode = allNodes.find((node) => node.id === trailingPlaceholder.predecessorId);
+        const placeholderIndex = allNodes.findIndex((node) => node.id === trailingPlaceholder.id && !node.parentId);
+
+        if (predecessorNode && placeholderIndex !== -1) {
+            const predecessorDeltaX = predecessorNode.position.x - trailingPredecessorStartPosition.x!;
+            const predecessorDeltaY = predecessorNode.position.y - trailingPredecessorStartPosition.y!;
+
+            if (predecessorDeltaX !== 0 || predecessorDeltaY !== 0) {
+                allNodes[placeholderIndex] = {
+                    ...allNodes[placeholderIndex],
+                    position: {
+                        x: allNodes[placeholderIndex].position.x + predecessorDeltaX,
+                        y: allNodes[placeholderIndex].position.y + predecessorDeltaY,
+                    },
+                };
             }
         }
     }

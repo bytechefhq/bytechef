@@ -1468,6 +1468,37 @@ describe('applySavedPositions', () => {
         expect(allNodes[1].position).toEqual({x: 400, y: 1020});
     });
 
+    it('carries the trailing placeholder when its predecessor is a pinned dispatcher bottom ghost', () => {
+        const allNodes: Node[] = [
+            {
+                data: {
+                    componentName: 'condition',
+                    metadata: {ui: {nodePosition: {x: 400, y: 900}}},
+                    taskDispatcher: true,
+                    taskDispatcherId: 'condition_1',
+                },
+                id: 'condition_1',
+                position: {x: 100, y: 200},
+                type: 'workflow',
+            },
+            {
+                data: {taskDispatcherId: 'condition_1'},
+                id: 'condition_1-condition-bottom-ghost',
+                position: {x: 100, y: 500},
+                type: 'taskDispatcherBottomGhostNode',
+            },
+            {data: {label: '+'}, id: 'final', position: {x: 100, y: 620}, type: 'placeholder'},
+        ];
+
+        applySavedPositions(allNodes, 'x', 0, {
+            id: 'final',
+            predecessorId: 'condition_1-condition-bottom-ghost',
+        });
+
+        expect(allNodes[1].position).toEqual({x: 400, y: 1200});
+        expect(allNodes[2].position).toEqual({x: 400, y: 1320});
+    });
+
     it('leaves the trailing placeholder alone when its predecessor is not pinned', () => {
         const allNodes: Node[] = [
             {data: {componentName: 'httpClient'}, id: 'httpClient_1', position: {x: 100, y: 200}, type: 'workflow'},
