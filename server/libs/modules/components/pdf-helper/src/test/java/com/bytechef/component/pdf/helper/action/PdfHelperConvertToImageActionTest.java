@@ -43,6 +43,7 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 /**
@@ -70,10 +71,10 @@ class PdfHelperConvertToImageActionTest {
 
         try (MockedStatic<Loader> mockedLoader = mockStatic(Loader.class);
             MockedStatic<ImageIO> mockedImageIO = mockStatic(ImageIO.class);
-            MockedStatic<PdfHelperUtils> mockedPdfHelperUtils = mockStatic(PdfHelperUtils.class)) {
-
-            mockConstruction(PDFRenderer.class, (mock, context) -> when(mock.renderImageWithDPI(0, DPI, ImageType.RGB))
-                .thenReturn(mockedBufferedImage));
+            MockedStatic<PdfHelperUtils> mockedPdfHelperUtils = mockStatic(PdfHelperUtils.class);
+            MockedConstruction<PDFRenderer> mockedPDFRenderer = mockConstruction(
+                PDFRenderer.class, (mock, context) -> when(mock.renderImageWithDPI(0, DPI, ImageType.RGB))
+                    .thenReturn(mockedBufferedImage))) {
 
             mockedLoader.when(() -> Loader.loadPDF(mockedFile))
                 .thenReturn(mockedPDDocument);
@@ -95,6 +96,9 @@ class PdfHelperConvertToImageActionTest {
 
             assertEquals(List.of(mockedFileEntry), result);
 
+            List<PDFRenderer> constructedPDFRenderers = mockedPDFRenderer.constructed();
+
+            assertEquals(1, constructedPDFRenderers.size());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
             assertEquals("TestFile1.jpeg", stringArgumentCaptor.getValue());
         }

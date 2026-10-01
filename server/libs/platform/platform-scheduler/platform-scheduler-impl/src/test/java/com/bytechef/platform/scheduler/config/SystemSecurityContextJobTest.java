@@ -107,7 +107,9 @@ class SystemSecurityContextJobTest {
             throw thrown;
         };
 
-        catchThrowable(() -> new SystemSecurityContextJob(delegate).execute(null));
+        Throwable caughtThrowable = catchThrowable(() -> new SystemSecurityContextJob(delegate).execute(null));
+
+        assertThat(caughtThrowable).isSameAs(thrown);
 
         assertThat(SecurityUtils.isAuthenticated()).isFalse();
     }
