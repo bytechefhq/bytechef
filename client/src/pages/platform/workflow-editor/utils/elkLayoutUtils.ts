@@ -20,7 +20,6 @@ import {
     getLabelCrossOverhang,
     getLayoutElements,
     positionTriggerPlaceholder,
-    tuckTrailingBranchPlaceholders,
 } from './layoutUtils';
 import {
     CHAIN_CENTERING_MAX_SLACK,
@@ -1989,8 +1988,6 @@ export const getElkLayoutElements = async ({
                 ? {id: FINAL_PLACEHOLDER_NODE_ID, predecessorId: trailingPlaceholderEdge.source}
                 : undefined
         );
-
-        tuckTrailingBranchPlaceholders(allNodes, edges, direction);
 
         return {edges: filterAndDedupeLayoutEdges(allNodes, edges), engine: 'elk' as const, nodes: allNodes};
     } catch (error) {
