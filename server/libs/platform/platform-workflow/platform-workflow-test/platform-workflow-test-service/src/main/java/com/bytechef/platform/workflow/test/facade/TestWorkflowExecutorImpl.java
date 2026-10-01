@@ -46,6 +46,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.constant.JobInputConstants;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
@@ -411,7 +412,18 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
 
                 inputs = MapUtils.concat(
                     (Map<String, Object>) workflowTestConfigurationInputs,
-                    Map.of(workflowTrigger.getName(), sampleOutput));
+                    Map.of(
+                        workflowTrigger.getName(), sampleOutput,
+                        JobInputConstants.TRIGGER_NAME_INPUT, workflowTrigger.getName()));
+            } else {
+                String matchedTriggerName = workflowTriggers.stream()
+                    .map(WorkflowTrigger::getName)
+                    .filter(inputs::containsKey)
+                    .findFirst()
+                    .orElse(workflowTrigger.getName());
+
+                inputs = MapUtils.concat(
+                    inputs, Map.of(JobInputConstants.TRIGGER_NAME_INPUT, matchedTriggerName));
             }
         }
 
