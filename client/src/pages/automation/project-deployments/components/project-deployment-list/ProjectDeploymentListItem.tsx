@@ -1,10 +1,10 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import Switch from '@/components/Switch/Switch';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ProjectDeploymentListItemAlertDialog from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemAlertDialog';
 import ProjectDeploymentListItemDropdownMenu from '@/pages/automation/project-deployments/components/project-deployment-list/ProjectDeploymentListItemDropdownMenu';
 import useOpenInProject from '@/pages/automation/project-deployments/hooks/useOpenInProject';
 import {useProjectDeploymentsEnabledStore} from '@/pages/automation/project-deployments/stores/useProjectDeploymentsEnabledStore';
@@ -245,14 +245,16 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
             </div>
 
             {showDeleteDialog && (
-                <ProjectDeploymentListItemAlertDialog
+                <AlertDialog
+                    description="This action cannot be undone. This will permanently delete the deployment. The project and its workflows are not affected."
                     isPending={deleteProjectDeploymentMutation.isPending}
-                    onCancelClick={() => setShowDeleteDialog(false)}
-                    onDeleteClick={() => {
+                    onCancel={() => setShowDeleteDialog(false)}
+                    onConfirm={() => {
                         if (projectDeployment.id) {
                             deleteProjectDeploymentMutation.mutate(projectDeployment.id);
                         }
                     }}
+                    open
                 />
             )}
 

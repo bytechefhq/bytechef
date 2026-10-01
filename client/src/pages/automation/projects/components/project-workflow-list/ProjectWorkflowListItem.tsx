@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {WorkflowShareDialog} from '@/pages/automation/project/components/WorkflowShareDialog';
+import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import WorkflowTriggerAndComponentsRow from '@/shared/components/workflow/WorkflowTriggerAndComponentsRow';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
@@ -23,7 +24,6 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 
 import '@/shared/styles/dropdownMenu.css';
-import AlertDialog from '@/components/AlertDialog';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, DownloadIcon, EditIcon, EllipsisVerticalIcon, Share2Icon, Trash2Icon} from 'lucide-react';
@@ -226,17 +226,16 @@ const ProjectWorkflowListItem = ({
             </div>
 
             {showDeleteDialog && (
-                <AlertDialog
+                <DeleteWorkflowAlertDialog
                     isPending={deleteWorkflowMutation.isPending}
-                    onCancel={() => setShowDeleteDialog(false)}
-                    onConfirm={() => {
+                    onClose={() => setShowDeleteDialog(false)}
+                    onDelete={() => {
                         if (workflow?.id) {
                             deleteWorkflowMutation.mutate({
                                 id: workflow.id,
                             });
                         }
                     }}
-                    open={showDeleteDialog}
                 />
             )}
 

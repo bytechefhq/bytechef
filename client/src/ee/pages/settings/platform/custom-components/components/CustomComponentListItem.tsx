@@ -1,3 +1,4 @@
+import AlertDialog from '@/components/AlertDialog';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
@@ -5,7 +6,6 @@ import Switch from '@/components/Switch/Switch';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import CustomComponentDeleteAlertDialog from '@/ee/pages/settings/platform/custom-components/components/CustomComponentDeleteAlertDialog';
 import {
     CustomComponent,
     useCustomComponentDefinitionQuery,
@@ -258,9 +258,11 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                 </CollapsibleContent>
 
                 {showDeleteDialog && (
-                    <CustomComponentDeleteAlertDialog
-                        onClose={() => setShowDeleteDialog(false)}
-                        onDelete={handleAlertDeleteDialogClick}
+                    <AlertDialog
+                        description="This action cannot be undone. This will permanently delete the custom component."
+                        onCancel={() => setShowDeleteDialog(false)}
+                        onConfirm={handleAlertDeleteDialogClick}
+                        open
                     />
                 )}
             </div>
