@@ -122,7 +122,7 @@ const WorkflowExecutionsAccordionItem = ({
                 className="border-l border-stroke-neutral-secondary p-0 pl-4"
                 onClick={(event) => event.stopPropagation()}
             >
-                {hasIterations ? (
+                {hasIterations && (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
                         {taskExecution.iterations
                             ?.slice(0, visibleIterationCount)
@@ -221,7 +221,9 @@ const WorkflowExecutionsAccordionItem = ({
                             </div>
                         )}
                     </Accordion>
-                ) : hasChildren ? (
+                )}
+
+                {!hasIterations && hasChildren && (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
                         {taskExecution.children?.map((childTaskExecution) => (
                             <WorkflowExecutionsAccordionItem
@@ -235,7 +237,7 @@ const WorkflowExecutionsAccordionItem = ({
                             </WorkflowExecutionsAccordionItem>
                         ))}
                     </Accordion>
-                ) : null}
+                )}
 
                 {hasPreviousTaskExecutions && (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
