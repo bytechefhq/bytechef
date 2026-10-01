@@ -71,6 +71,7 @@ public class MongoDbChatMemoryAddMessagesAction {
                                 .label("Content")
                                 .description("The content of the message.")
                                 .required(true))))
+        .help("", "https://docs.bytechef.io/reference/components/mongo-db-chat-memory_v1#add-messages")
         .perform(MongoDbChatMemoryAddMessagesAction::perform);
 
     private MongoDbChatMemoryAddMessagesAction() {

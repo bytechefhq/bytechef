@@ -79,6 +79,7 @@ public class ChatMemoryAddMessagesAction {
                         .properties(
                             string(CONVERSATION_ID),
                             integer("messageCount"))))
+            .help("", "https://docs.bytechef.io/reference/components/chat-memory_v1#add-messages")
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
                 inputParameters, chatMemoryRepository));
     }

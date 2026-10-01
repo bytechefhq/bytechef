@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#create-user"
+    },
     "metadata": null,
     "name": "createUser",
     "outputDefinition": {
@@ -6580,7 +6583,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Assigns a role to a user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#assign-role-to-user"
+    },
     "metadata": null,
     "name": "assignRoleToUser",
     "outputDefinition": {
@@ -7092,7 +7098,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Assigns a product license to a user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#assign-license"
+    },
     "metadata": null,
     "name": "assignLicense",
     "outputDefinition": {
@@ -7576,7 +7585,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Suspends a user.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#suspend-user"
+    },
     "metadata": null,
     "name": "suspendUser",
     "outputDefinition": {

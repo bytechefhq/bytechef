@@ -7,7 +7,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds messages to the vector store chat memory for a conversation.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vector-store-chat-memory_v1#add-messages"
+    },
     "metadata": null,
     "name": "addMessages",
     "outputDefinition": {
@@ -273,7 +276,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Retrieves messages from the vector store chat memory for a conversation.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vector-store-chat-memory_v1#get-messages"
+    },
     "metadata": null,
     "name": "getMessages",
     "outputDefinition": {
@@ -597,7 +603,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes all messages for a conversation from the vector store.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vector-store-chat-memory_v1#delete-conversation"
+    },
     "metadata": null,
     "name": "deleteConversation",
     "outputDefinition": {

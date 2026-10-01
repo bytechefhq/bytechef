@@ -46,6 +46,7 @@ public class RedisChatMemoryListConversationsAction {
                         array("conversationIds")
                             .items(string()),
                         integer("count"))))
+        .help("", "https://docs.bytechef.io/reference/components/redis-chat-memory_v1#list-conversations")
         .perform(RedisChatMemoryListConversationsAction::perform);
 
     private RedisChatMemoryListConversationsAction() {

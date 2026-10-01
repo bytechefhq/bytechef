@@ -46,6 +46,7 @@ public class InMemoryChatMemoryListConversationsAction {
                         array("conversationIds")
                             .items(string()),
                         integer("count"))))
+        .help("", "https://docs.bytechef.io/reference/components/in-memory-chat-memory_v1#list-conversations")
         .perform(InMemoryChatMemoryListConversationsAction::perform);
 
     private InMemoryChatMemoryListConversationsAction() {

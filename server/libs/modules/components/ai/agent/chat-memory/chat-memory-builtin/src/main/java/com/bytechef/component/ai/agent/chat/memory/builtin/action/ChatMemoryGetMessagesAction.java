@@ -60,6 +60,7 @@ public class ChatMemoryGetMessagesAction {
                                         .properties(
                                             string("role"),
                                             string("content"))))))
+            .help("", "https://docs.bytechef.io/reference/components/chat-memory_v1#get-messages")
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
                 inputParameters, chatMemoryRepository));
     }

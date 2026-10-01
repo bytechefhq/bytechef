@@ -71,6 +71,7 @@ public class Neo4jChatMemoryAddMessagesAction {
                                 .label("Content")
                                 .description("The content of the message.")
                                 .required(true))))
+        .help("", "https://docs.bytechef.io/reference/components/neo4j-chat-memory_v1#add-messages")
         .perform(Neo4jChatMemoryAddMessagesAction::perform);
 
     private Neo4jChatMemoryAddMessagesAction() {

@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Appends new files to an existing AI skill archive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#append-files-to-ai-skill"
+    },
     "metadata": null,
     "name": "appendFilesToAiSkill",
     "outputDefinition": {
@@ -305,7 +308,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new AI skill from instructions.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#create-ai-skill"
+    },
     "metadata": null,
     "name": "createAiSkill",
     "outputDefinition": {
@@ -648,7 +654,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Deletes an existing AI skill by its ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#delete-ai-skill"
+    },
     "metadata": null,
     "name": "deleteAiSkill",
     "outputDefinition": null,
@@ -687,7 +696,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Removes a single file from an existing AI skill archive.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#remove-file-from-ai-skill"
+    },
     "metadata": null,
     "name": "removeFileFromAiSkill",
     "outputDefinition": {
@@ -923,7 +935,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates an AI skill. Provide name/description to rename the skill, or files to update archive contents.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai_agent-utils_v1#update-ai-skill"
+    },
     "metadata": null,
     "name": "updateAiSkill",
     "outputDefinition": {

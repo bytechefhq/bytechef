@@ -51,6 +51,7 @@ public class JdbcChatMemoryListConversationsAction {
                             array("conversationIds")
                                 .items(string()),
                             integer("count"))))
+            .help("", "https://docs.bytechef.io/reference/components/jdbc-chat-memory_v1#list-conversations")
             .perform(
                 (MultipleConnectionsPerformFunction) (
                     inputParameters, componentConnections, extensions, context) -> perform(inputParameters,

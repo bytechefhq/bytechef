@@ -51,6 +51,7 @@ public class CassandraChatMemoryDeleteAction {
                     .properties(
                         string(CONVERSATION_ID),
                         bool("deleted"))))
+        .help("", "https://docs.bytechef.io/reference/components/cassandra-chat-memory_v1#delete-conversation")
         .perform(CassandraChatMemoryDeleteAction::perform);
 
     private CassandraChatMemoryDeleteAction() {

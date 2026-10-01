@@ -86,6 +86,7 @@ public class VectorStoreChatMemoryAddMessagesAction {
                         .properties(
                             string(CONVERSATION_ID),
                             integer("messageCount"))))
+            .help("", "https://docs.bytechef.io/reference/components/vector-store-chat-memory_v1#add-messages")
             .perform(
                 (MultipleConnectionsPerformFunction) (
                     inputParameters, componentConnections, extensions, context) -> perform(inputParameters,

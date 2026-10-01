@@ -47,6 +47,7 @@ public class GoogleWorkspaceAdminSuspendUserAction {
                 .options((OptionsFunction<String>) GoogleWorkspaceAdminUtils::getUserIdOptions)
                 .required(true))
         .output(outputSchema(USER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#suspend-user")
         .perform(GoogleWorkspaceAdminSuspendUserAction::perform)
         .processErrorResponse(GoogleUtils::processErrorResponse);
 

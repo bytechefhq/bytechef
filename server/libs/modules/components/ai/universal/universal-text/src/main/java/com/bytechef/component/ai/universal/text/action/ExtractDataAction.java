@@ -82,7 +82,8 @@ public class ExtractDataAction implements AiTextAction {
 
                         return OutputResponse.of(
                             context.outputSchema(outputSchema -> outputSchema.getOutputSchema(responseSchema)));
-                    }),
+                    })
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#extract-data"),
             provider, new ExtractDataAction(), propertyService);
     }
 

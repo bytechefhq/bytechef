@@ -51,6 +51,7 @@ public class MongoDbChatMemoryDeleteAction {
                     .properties(
                         string(CONVERSATION_ID),
                         bool("deleted"))))
+        .help("", "https://docs.bytechef.io/reference/components/mongo-db-chat-memory_v1#delete-conversation")
         .perform(MongoDbChatMemoryDeleteAction::perform);
 
     private MongoDbChatMemoryDeleteAction() {

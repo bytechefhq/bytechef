@@ -76,6 +76,7 @@ public class GoogleWorkspaceAdminCreateUserAction {
                 .description("The user's phone number.")
                 .required(false))
         .output(outputSchema(USER_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/google-workspace-admin_v1#create-user")
         .perform(GoogleWorkspaceAdminCreateUserAction::perform)
         .processErrorResponse(GoogleUtils::processErrorResponse);
 

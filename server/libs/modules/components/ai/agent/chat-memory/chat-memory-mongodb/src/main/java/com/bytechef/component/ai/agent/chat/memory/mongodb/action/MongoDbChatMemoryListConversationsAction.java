@@ -46,6 +46,7 @@ public class MongoDbChatMemoryListConversationsAction {
                         array("conversationIds")
                             .items(string()),
                         integer("count"))))
+        .help("", "https://docs.bytechef.io/reference/components/mongo-db-chat-memory_v1#list-conversations")
         .perform(MongoDbChatMemoryListConversationsAction::perform);
 
     private MongoDbChatMemoryListConversationsAction() {

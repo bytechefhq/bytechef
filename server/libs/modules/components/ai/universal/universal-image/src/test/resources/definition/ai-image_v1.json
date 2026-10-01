@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "AI generate an image that you prompt.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/ai-image_v1#generate-image"
+    },
     "metadata": null,
     "name": "generateImage",
     "outputDefinition": {

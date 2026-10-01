@@ -51,6 +51,7 @@ public class InMemoryChatMemoryDeleteAction {
                     .properties(
                         string(CONVERSATION_ID),
                         bool("deleted"))))
+        .help("", "https://docs.bytechef.io/reference/components/in-memory-chat-memory_v1#delete-conversation")
         .perform(InMemoryChatMemoryDeleteAction::perform);
 
     private InMemoryChatMemoryDeleteAction() {

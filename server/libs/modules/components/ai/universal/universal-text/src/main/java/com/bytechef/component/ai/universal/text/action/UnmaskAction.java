@@ -77,7 +77,8 @@ public class UnmaskAction implements AiTextAction {
                     TEMPERATURE_PROPERTY)
                 .output(
                     outputSchema(string().description("The text with sensitive content redacted.")),
-                    sampleOutput("Hello, my name is [REDACTED] and my email is [EMAIL].")),
+                    sampleOutput("Hello, my name is [REDACTED] and my email is [EMAIL]."))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#unmask"),
             provider, new UnmaskAction(), propertyService);
     }
 

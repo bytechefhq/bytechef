@@ -63,6 +63,7 @@ public class InMemoryChatMemoryGetMessagesAction {
                                     .properties(
                                         string(MESSAGE_ROLE),
                                         string(MESSAGE_CONTENT))))))
+        .help("", "https://docs.bytechef.io/reference/components/in-memory-chat-memory_v1#get-messages")
         .perform(InMemoryChatMemoryGetMessagesAction::perform);
 
     private InMemoryChatMemoryGetMessagesAction() {

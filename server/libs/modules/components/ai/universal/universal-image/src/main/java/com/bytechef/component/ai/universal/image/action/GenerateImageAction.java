@@ -107,7 +107,8 @@ public class GenerateImageAction implements AiImageAction {
                                 string("url")
                                     .description("URL of the generated image."),
                                 string("b64Json")
-                                    .description("Base64 encoded JSON of the generated image.")))),
+                                    .description("Base64 encoded JSON of the generated image."))))
+                .help("", "https://docs.bytechef.io/reference/components/ai-image_v1#generate-image"),
             provider, new GenerateImageAction(), propertyService);
     }
 

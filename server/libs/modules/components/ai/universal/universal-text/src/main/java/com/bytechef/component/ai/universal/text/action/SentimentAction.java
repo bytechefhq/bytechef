@@ -69,7 +69,8 @@ public class SentimentAction implements AiTextAction {
                     outputSchema(
                         string()
                             .description("The chosen category.")),
-                    sampleOutput("sample category")),
+                    sampleOutput("sample category"))
+                .help("", "https://docs.bytechef.io/reference/components/ai-text_v1#sentiment-analysis"),
             provider, new SentimentAction(), propertyService);
     }
 

@@ -45,6 +45,7 @@ public class ChatMemoryListConversationsAction {
                             array("conversationIds")
                                 .items(string()),
                             integer("count"))))
+            .help("", "https://docs.bytechef.io/reference/components/chat-memory_v1#list-conversations")
             .perform((PerformFunction) (inputParameters, connectionParameters, context) -> perform(
                 chatMemoryRepository));
     }

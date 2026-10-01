@@ -45,6 +45,7 @@ public class AwsS3GetUrlAction {
                 .placeholder("file.txt")
                 .required(true))
         .output(outputSchema(string()), sampleOutput("https://s3.amazonaws.com/bucket-name/key"))
+        .help("", "https://docs.bytechef.io/reference/components/aws-s3_v1#get-url")
         .perform(AwsS3GetUrlAction::perform);
 
     protected static String perform(
