@@ -304,6 +304,41 @@ describe('ConnectionTabConnectionSelect', () => {
     });
 
     describe('onConnectionCreate callback', () => {
+        it('keys a cluster element on its root resolved from the node when no root is in the store', async () => {
+            mockUseWorkflowNodeDetailsPanelStore.mockReturnValue({
+                connectionDialogAllowed: true,
+                currentComponent: {id: 'comp1'},
+                currentNode: {
+                    clusterElementType: 'tools',
+                    id: 'activeCampaign_2',
+                    parentClusterRootId: 'aiAgent_1',
+                    workflowNodeName: 'activeCampaign_2',
+                },
+                setCurrentComponent: mockSetCurrentComponent,
+                setCurrentNode: mockSetCurrentNode,
+            });
+
+            render(
+                <ConnectionTabConnectionSelect
+                    componentConnection={mockComponentConnection}
+                    componentConnectionsCount={1}
+                    componentDefinition={mockComponentDefinition}
+                    workflowId="workflow-1"
+                    workflowNodeName="activeCampaign_2"
+                />
+            );
+
+            fireEvent.click(screen.getByTitle('Create a new connection'));
+            fireEvent.click(screen.getByTestId('create-connection'));
+
+            await waitFor(() => {
+                expect(mockSaveWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith(
+                    expect.objectContaining({workflowNodeName: 'aiAgent_1'}),
+                    expect.anything()
+                );
+            });
+        });
+
         it('should invalidate queries before setting connection ID', async () => {
             const callOrder: string[] = [];
 
