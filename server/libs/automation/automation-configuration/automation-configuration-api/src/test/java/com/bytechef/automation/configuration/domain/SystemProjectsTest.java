@@ -49,6 +49,15 @@ class SystemProjectsTest {
     }
 
     @Test
+    void testAgentNamedProjectIsNotASystemProject() {
+        Project project = new Project();
+
+        project.setName("__AI_AGENT__3f1c");
+
+        assertFalse(SystemProjects.isSystemProject(project));
+    }
+
+    @Test
     void testIsSystemProjectReadsTheProjectName() {
         Project project = new Project();
 

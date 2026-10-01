@@ -40,6 +40,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.DisplayConditionResultDTO;
 import com.bytechef.platform.configuration.dto.ParameterResultDTO;
+import com.bytechef.platform.configuration.workflow.WorkflowUpdateGuard;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
@@ -87,6 +88,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final List<WorkflowUpdateGuard> workflowUpdateGuards;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeParameterFacadeImpl(
@@ -94,7 +96,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionService triggerDefinitionService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        List<WorkflowUpdateGuard> workflowUpdateGuards) {
 
         this.actionDefinitionService = actionDefinitionService;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
@@ -104,12 +107,15 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workflowUpdateGuards = workflowUpdateGuards;
     }
 
     @Override
     public ParameterResultDTO deleteClusterElementParameter(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String parameterPath, long environmentId) {
+
+        checkUpdatable(workflowId);
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -147,8 +153,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        Workflow updatedWorkflow = workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+        Workflow updatedWorkflow = updateWorkflow(workflowId, definitionMap, workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -159,6 +164,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     public ParameterResultDTO deleteWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath,
         long environmentId) {
+
+        checkUpdatable(workflowId);
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -193,8 +200,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        Workflow updatedWorkflow = workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+        Workflow updatedWorkflow = updateWorkflow(workflowId, definitionMap, workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -331,6 +337,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         String clusterElementWorkflowNodeName, String parameterPath, Object value, String type,
         boolean fromAiInMetadata, boolean includeInMetadata, long environmentId) {
 
+        checkUpdatable(workflowId);
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
@@ -369,8 +377,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        Workflow updatedWorkflow = workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+        Workflow updatedWorkflow = updateWorkflow(workflowId, definitionMap, workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -381,6 +388,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     public ParameterResultDTO updateWorkflowNodeParameter(
         String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
         boolean includeInMetadata, long environmentId) {
+
+        checkUpdatable(workflowId);
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -417,8 +426,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             removeEmptyCollections(workflowNodeStructure.parameterMap);
         }
 
-        Workflow updatedWorkflow = workflowService.update(
-            workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
+        Workflow updatedWorkflow = updateWorkflow(workflowId, definitionMap, workflow.getVersion());
 
         return new ParameterResultDTO(
             displayConditionMap, metadataMap, workflowNodeStructure.missingRequiredProperties,
@@ -522,6 +530,16 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         } else {
             fromAiPaths.remove(parameterPath);
         }
+    }
+
+    private void checkUpdatable(String workflowId) {
+        for (WorkflowUpdateGuard workflowUpdateGuard : workflowUpdateGuards) {
+            workflowUpdateGuard.checkUpdatable(workflowId);
+        }
+    }
+
+    private Workflow updateWorkflow(String workflowId, Map<String, ?> definitionMap, int version) {
+        return workflowService.update(workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), version);
     }
 
     private void checkDependOn(
