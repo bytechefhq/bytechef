@@ -45,7 +45,7 @@ export const useRegisterStore = create<RegisterI>()(
                                 .catch(() => ({}))
                                 .then((data) => {
                                     set(() => ({
-                                        registerErrorMessage: data.detail || REGISTER_FAILED_MESSAGE,
+                                        registerErrorMessage: data?.detail || REGISTER_FAILED_MESSAGE,
                                     }));
                                 });
                         }
