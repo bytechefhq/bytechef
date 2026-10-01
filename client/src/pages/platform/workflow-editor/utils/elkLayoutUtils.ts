@@ -788,7 +788,6 @@ function getRenderedNodeSize(node: Node, direction: LayoutDirectionType): {heigh
         }
 
         if (node.type === 'placeholder') {
-            // met it 10px above its middle and the last edge in LR sloped down into it.
             if (node.id === FINAL_PLACEHOLDER_NODE_ID) {
                 return {height: FINAL_PLACEHOLDER_NODE_SIZE, width: NODE_ANCHOR_SIZE};
             }

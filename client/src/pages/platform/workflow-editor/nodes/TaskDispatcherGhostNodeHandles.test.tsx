@@ -30,8 +30,6 @@ describe('ghost bar side handles', () => {
     beforeEach(() => {
         directionStoreState.layoutDirection = 'TB';
 
-        // The ring-bar flip is ELK geometry (content above the main axis); the
-        // flip tests below assume an ELK-produced canvas.
         useLayoutEngineStore.setState({lastAppliedLayoutEngine: 'elk'});
     });
 
@@ -95,11 +93,6 @@ describe('ghost bar side handles', () => {
     });
 
     it('leaves an LR iteration-ring top bar unflipped when dagre produced the layout', () => {
-        // Dagre keeps the loop body BELOW the main axis in LR, so the plain LR
-        // mapping is already correct: body via -right from the bar's bottom
-        // end, rail via -left from its top end. Flipping here (the pre-fix
-        // behavior) made every ring connector double back in box-shaped
-        // detours across the canvas.
         directionStoreState.layoutDirection = 'LR';
 
         useLayoutEngineStore.setState({lastAppliedLayoutEngine: 'dagre'});
