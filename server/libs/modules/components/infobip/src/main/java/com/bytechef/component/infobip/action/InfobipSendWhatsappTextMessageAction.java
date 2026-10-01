@@ -17,10 +17,12 @@
 package com.bytechef.component.infobip.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONTENT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.FROM;
+import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
 import static com.bytechef.component.infobip.constant.InfobipConstants.WHATSAPP_MESSAGE_OUTPUT_PROPERTY;
@@ -34,6 +36,12 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
+ * The reply half of the {@code infobip} agent channel.
+ * <p>
+ * The sender comes from the channel row's own {@code number} rather than from the inbound message, so two channel rows
+ * on one Infobip account each answer as the number they were configured with. The paired trigger already requires that
+ * property, so there is no row on which the sender can go unset.
+ *
  * @author Monika Kušter
  */
 public class InfobipSendWhatsappTextMessageAction {
@@ -61,6 +69,11 @@ public class InfobipSendWhatsappTextMessageAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output(outputSchema(WHATSAPP_MESSAGE_OUTPUT_PROPERTY))
+        .agentReply(
+            agentReply()
+                .conversationId(TO)
+                .message(TEXT)
+                .channelParameter(NUMBER, FROM))
         .help("", "https://docs.bytechef.io/reference/components/infobip_v1#send-whatsapp-text-message")
         .perform(InfobipSendWhatsappTextMessageAction::perform);
 

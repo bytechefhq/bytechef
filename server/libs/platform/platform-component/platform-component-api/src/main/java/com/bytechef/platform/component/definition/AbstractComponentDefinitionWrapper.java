@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -40,6 +41,7 @@ import java.util.Optional;
 public abstract class AbstractComponentDefinitionWrapper implements ComponentDefinition {
 
     protected final List<ActionDefinition> actions;
+    protected final List<AgentChannelDefinition> agentChannels;
     protected final List<ComponentCategory> componentCategories;
     protected final ConnectionDefinition connection;
     protected final boolean customAction;
@@ -59,6 +61,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
 
     public AbstractComponentDefinitionWrapper(ComponentDefinition componentDefinition) {
         this.actions = componentDefinition.getActions();
+        this.agentChannels = componentDefinition.getAgentChannels();
         this.componentCategories = componentDefinition.getComponentCategories();
         this.connection = OptionalUtils.orElse(componentDefinition.getConnection(), null);
         this.customAction = componentDefinition.getCustomAction();
@@ -80,6 +83,11 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public List<ActionDefinition> getActions() {
         return actions == null ? List.of() : new ArrayList<>(actions);
+    }
+
+    @Override
+    public List<AgentChannelDefinition> getAgentChannels() {
+        return agentChannels == null ? List.of() : new ArrayList<>(agentChannels);
     }
 
     @Override

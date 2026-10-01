@@ -16,8 +16,11 @@
 
 package com.bytechef.component.twilio;
 
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
+import static com.bytechef.component.twilio.constant.TwilioConstants.TWILIO;
+import static com.bytechef.component.twilio.constant.TwilioConstants.WHATS_APP;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,7 +41,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class TwilioComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("twilio")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component(TWILIO)
         .title("Twilio")
         .description(
             "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and " +
@@ -59,7 +62,13 @@ public class TwilioComponentHandler implements ComponentHandler {
             tool(TwilioSendWhatsAppMessageAction.ACTION_DEFINITION))
         .triggers(
             TwilioInboundCallTrigger.TRIGGER_DEFINITION,
-            TwilioNewWhatsappMessageTrigger.TRIGGER_DEFINITION);
+            TwilioNewWhatsappMessageTrigger.TRIGGER_DEFINITION)
+        .agentChannels(
+            agentChannel(
+                TWILIO, TwilioNewWhatsappMessageTrigger.TRIGGER_DEFINITION,
+                TwilioSendWhatsAppMessageAction.ACTION_DEFINITION)
+                    .title("Twilio (WhatsApp)")
+                    .approvalChannel(WHATS_APP));
 
     @Override
     public ComponentDefinition getDefinition() {
