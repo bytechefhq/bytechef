@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.instance.config.ProjectDeploymentJobPrincipalAccessorIntTestConfiguration;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
@@ -85,7 +86,8 @@ class ProjectDeploymentJobPrincipalAccessorIntTest {
 
         String workflowId = "workflow-" + UUID.randomUUID();
 
-        projectWorkflowService.addWorkflow(project.getId(), 2, workflowId, UUID.randomUUID());
+        projectWorkflowService.addWorkflow(
+            project.getId(), 2, workflowId, UUID.randomUUID(), ProjectWorkflowType.WORKFLOW);
 
         assertThat(projectDeploymentJobPrincipalAccessor.getJobPrincipalSummary(projectDeployment.getId(), workflowId))
             .isEqualTo(

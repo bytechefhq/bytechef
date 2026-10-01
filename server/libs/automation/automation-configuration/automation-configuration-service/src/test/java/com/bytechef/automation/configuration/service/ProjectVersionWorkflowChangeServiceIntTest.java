@@ -26,6 +26,7 @@ import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
@@ -227,7 +228,8 @@ class ProjectVersionWorkflowChangeServiceIntTest {
             "{\"label\":\"" + label + "\",\"tasks\":[]" + description + "}", Workflow.Format.JSON,
             Workflow.SourceType.JDBC);
 
-        projectWorkflowService.addWorkflow(projectId, projectVersion, workflow.getId(), uuid(key));
+        projectWorkflowService.addWorkflow(
+            projectId, projectVersion, workflow.getId(), uuid(key), ProjectWorkflowType.WORKFLOW);
     }
 
     private void createVersions(int lastVersion) {
