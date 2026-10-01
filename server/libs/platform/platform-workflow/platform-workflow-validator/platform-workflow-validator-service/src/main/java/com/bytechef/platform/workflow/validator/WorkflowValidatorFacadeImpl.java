@@ -41,6 +41,8 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.domain.OutputResponse;
@@ -78,6 +80,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     private final ActionDefinitionService actionDefinitionService;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectionService connectionService;
     private final Map<ResourceType, ResourceReferenceResolver> resourceReferenceResolverMap;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -106,7 +109,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     public WorkflowValidatorFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         ClusterElementDefinitionService clusterElementDefinitionService,
-        ComponentDefinitionService componentDefinitionService,
+        ComponentDefinitionService componentDefinitionService, ConnectionService connectionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
@@ -117,6 +120,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         this.actionDefinitionService = actionDefinitionService;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
+        this.connectionService = connectionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -348,11 +352,14 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
             workflowId, name, environmentId);
 
         String componentTitle = getTitleOfComponentRequiringConnection(type);
+        Set<String> nodeConnectionKeys = getNodeConnectionKeys(nodeJsonNode, type);
 
-        if (componentTitle != null && !isConnected(connections, getNodeConnectionKeys(nodeJsonNode, type))) {
+        if (componentTitle != null && !isConnected(connections, nodeConnectionKeys)) {
             StringUtils.appendWithNewline(
                 "[" + name + "] " + ValidationErrorUtils.missingConnection(componentTitle), errors);
         }
+
+        appendInvalidConnections(name, connections, nodeConnectionKeys, errors);
 
         appendMissingClusterElementConnections(nodeJsonNode.get("clusterElements"), connections, errors);
 
@@ -433,7 +440,41 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 "[" + elementName + "] " + ValidationErrorUtils.missingConnection(componentTitle), errors);
         }
 
+        appendInvalidConnections(elementName, connections, Set.of(elementName), errors);
+
         appendMissingClusterElementConnections(elementJsonNode.get("clusterElements"), connections, errors);
+    }
+
+    private void appendInvalidConnections(
+        String nodeName, List<WorkflowTestConfigurationConnection> connections, Set<String> connectionKeys,
+        StringBuilder errors) {
+
+        for (WorkflowTestConfigurationConnection testConfigurationConnection : connections) {
+            if (!connectionKeys.contains(testConfigurationConnection.getWorkflowConnectionKey())) {
+                continue;
+            }
+
+            String invalidConnectionName = getInvalidConnectionName(testConfigurationConnection.getConnectionId());
+
+            if (invalidConnectionName != null) {
+                StringUtils.appendWithNewline(
+                    "[" + nodeName + "] " + ValidationErrorUtils.invalidConnection(invalidConnectionName), errors);
+            }
+        }
+    }
+
+    private @Nullable String getInvalidConnectionName(long connectionId) {
+        try {
+            Connection connection = connectionService.getConnection(connectionId);
+
+            if (connection.getCredentialStatus() == Connection.CredentialStatus.INVALID) {
+                return connection.getName();
+            }
+        } catch (Exception e) {
+            log.debug("Failed to read the credential status of connection '{}'", connectionId, e);
+        }
+
+        return null;
     }
 
     private List<WorkflowTestConfigurationConnection> getTestConfigurationConnections(
