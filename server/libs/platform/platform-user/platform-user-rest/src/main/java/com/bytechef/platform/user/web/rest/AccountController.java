@@ -27,6 +27,7 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.dto.PasswordChangeDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
+import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
@@ -107,6 +108,8 @@ public class AccountController {
      *
      * @param managedUserVM the managed user View Model.
      * @throws InvalidPasswordException  {@code 400 (Bad Request)} if the password is incorrect.
+     * @throws InvalidEmailException     {@code 400 (Bad Request)} if the email is invalid or its domain is rejected by
+     *                                   the sign-up webhook.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already used.
      */
@@ -114,7 +117,7 @@ public class AccountController {
     @ResponseStatus(HttpStatus.CREATED)
     public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
         if (!signUpWebhook.isEmailDomainValid(managedUserVM.getEmail())) {
-            throw new EmailAlreadyUsedException();
+            throw new InvalidEmailException(managedUserVM.getEmail());
         }
 
         ApplicationProperties.SignUp signUp = applicationProperties.getSignUp();
