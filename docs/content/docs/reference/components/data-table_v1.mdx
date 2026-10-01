@@ -1,0 +1,363 @@
+---
+title: "Data Table"
+description: "Work with ByteChef Data Tables and react to row changes."
+---
+
+
+Categories: Helpers
+
+
+Type: dataTable/v1
+
+<hr />
+
+
+
+
+## Actions
+
+
+### Create Record(s)
+Name: createRecords
+
+`Insert one or more new records to a table`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+| records | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Record(s)",
+  "name" : "createRecords",
+  "parameters" : {
+    "table" : "",
+    "records" : { }
+  },
+  "type" : "dataTable/v1/createRecords"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Delete Record(s)
+Name: deleteRecords
+
+`Delete record(s) from a table`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+| ids | Record IDs | ARRAY <details> <summary> Items </summary> [INTEGER\($id)] </details> | IDs of records to delete | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Record(s)",
+  "name" : "deleteRecords",
+  "parameters" : {
+    "table" : "",
+    "ids" : [ 1 ]
+  },
+  "type" : "dataTable/v1/deleteRecords"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deletedCount | INTEGER |  |
+| deletedIds | ARRAY <details> <summary> Items </summary> [INTEGER] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "deletedCount" : 1,
+  "deletedIds" : [ 1 ]
+}
+```
+
+
+
+
+### Update Record
+Name: updateRecord
+
+`Update values in an existing record`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+| id | Record ID | INTEGER |  | true |
+| values | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> table </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Record",
+  "name" : "updateRecord",
+  "parameters" : {
+    "table" : "",
+    "id" : 1,
+    "values" : { }
+  },
+  "type" : "dataTable/v1/updateRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Get Record
+Name: getRecord
+
+`Get single record by its id`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+| id | Record ID | INTEGER |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Record",
+  "name" : "getRecord",
+  "parameters" : {
+    "table" : "",
+    "id" : 1
+  },
+  "type" : "dataTable/v1/getRecord"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Find Records
+Name: findRecords
+
+`Find records in a table with filters`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+| limit | Limit | INTEGER | Maximum number of records to return | false |
+| offset | Offset | INTEGER | Number of records to skip | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Find Records",
+  "name" : "findRecords",
+  "parameters" : {
+    "table" : "",
+    "limit" : 1,
+    "offset" : 1
+  },
+  "type" : "dataTable/v1/findRecords"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Clear Table
+Name: clearTable
+
+`Delete all records from a table`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Clear Table",
+  "name" : "clearTable",
+  "parameters" : {
+    "table" : ""
+  },
+  "type" : "dataTable/v1/clearTable"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deletedCount | INTEGER |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "deletedCount" : 1
+}
+```
+
+
+
+
+
+## Triggers
+
+
+### Record Created
+Name: recordCreated
+
+`Triggers when a new record is inserted into the selected table.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING | Select a Data Table. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Record Created",
+  "name" : "recordCreated",
+  "parameters" : {
+    "table" : ""
+  },
+  "type" : "dataTable/v1/recordCreated"
+}
+```
+
+
+
+### Record Updated
+Name: recordUpdated
+
+`Triggers when a record is updated in the selected table.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING | Select a Data Table. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Record Updated",
+  "name" : "recordUpdated",
+  "parameters" : {
+    "table" : ""
+  },
+  "type" : "dataTable/v1/recordUpdated"
+}
+```
+
+
+
+### Record Deleted
+Name: recordDeleted
+
+`Triggers when a record is deleted from the selected table.`
+
+Type: DYNAMIC_WEBHOOK
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| table | Table | STRING | Select a Data Table. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "Record Deleted",
+  "name" : "recordDeleted",
+  "parameters" : {
+    "table" : ""
+  },
+  "type" : "dataTable/v1/recordDeleted"
+}
+```
+
+
+
+
+
