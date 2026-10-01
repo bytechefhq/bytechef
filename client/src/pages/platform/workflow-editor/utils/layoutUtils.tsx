@@ -373,6 +373,12 @@ export interface GetLayoutElementsProps {
     savedPositionCrossAxisShift?: number;
 }
 
+export interface LayoutElementsResultI {
+    edges: Edge[];
+    engine: 'dagre' | 'elk';
+    nodes: Node[];
+}
+
 export const getClusterElementsLayoutElements = ({
     canvasHeight,
     canvasWidth,
@@ -994,7 +1000,7 @@ export const getLayoutElements = async ({
 
     edges = filterAndDedupeLayoutEdges(allNodes, edges);
 
-    return {edges, nodes: allNodes};
+    return {edges, engine: 'dagre' as const, nodes: allNodes};
 };
 
 interface CreateEdgeFromTaskDispatcherBottomGhostNodeProps {
