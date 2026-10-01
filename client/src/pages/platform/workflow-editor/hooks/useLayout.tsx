@@ -78,8 +78,9 @@ function getClusterElementsFingerprint(clusterElements: unknown): string {
                 const elementName = element.name || element.workflowNodeName;
                 const nestedClusterElements = getNestedClusterElements(element);
                 const nestedFingerprint = getClusterElementsFingerprint(nestedClusterElements);
+                const nestedFingerprintPart = nestedFingerprint ? '{' + nestedFingerprint + '}' : '';
 
-                return `${elementName}:${element.type}${nestedFingerprint ? `{${nestedFingerprint}}` : ''}`;
+                return `${elementName}:${element.type}${nestedFingerprintPart}`;
             });
 
             return `${elementKey}[${elementFingerprints.join(';')}]`;
