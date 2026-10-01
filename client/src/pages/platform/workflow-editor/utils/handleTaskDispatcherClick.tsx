@@ -120,6 +120,8 @@ export default async function handleTaskDispatcherClick({
         ([key, value]) => key.endsWith('Id') && !!value
     );
 
+    const isPlaceholderSource = !!sourceNodeId?.includes('-placeholder-');
+
     let nodeIndex = workflow.tasks?.length;
 
     if (hasTaskDispatcherId) {
@@ -144,7 +146,7 @@ export default async function handleTaskDispatcherClick({
                 queryClient,
                 workflow,
             }),
-        placeholderId: hasTaskDispatcherId ? undefined : sourceNodeId,
+        placeholderId: hasTaskDispatcherId && !isPlaceholderSource ? undefined : sourceNodeId,
         taskDispatcherContext,
         updateWorkflowMutation,
     });
