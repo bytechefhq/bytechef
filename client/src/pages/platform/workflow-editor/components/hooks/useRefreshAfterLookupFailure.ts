@@ -30,7 +30,7 @@ export default function useRefreshAfterLookupFailure({
 
     useEffect(() => {
         if (nodeLookupFailures) {
-            queryClient.invalidateQueries({queryKey: connectionsQueryKey});
+            void queryClient.invalidateQueries({queryKey: connectionsQueryKey});
 
             invalidateWorkflowValidation(queryClient);
         }
