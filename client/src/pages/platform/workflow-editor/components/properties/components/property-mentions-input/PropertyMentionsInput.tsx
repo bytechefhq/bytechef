@@ -294,7 +294,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                     <div
                         className={twMerge(
-                            'property-mentions-editor flex h-full min-h-9 w-full rounded-md bg-white',
+                            'property-mentions-editor flex h-full min-h-9 w-full rounded-md bg-surface-neutral-primary dark:bg-surface-neutral-secondary',
                             // Data pill chips size themselves, so the editor's own text-xs does not
                             // reach them. The modifier lets the stylesheet bring them down to match.
                             isFormulaMode && 'property-mentions-editor--formula-mode',
@@ -333,7 +333,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 </div>
 
                 {error && (
-                    <p className="mt-2 text-sm text-rose-600" role="alert">
+                    <p className="mt-2 text-sm text-content-destructive" role="alert">
                         {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                     </p>
                 )}

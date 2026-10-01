@@ -91,7 +91,7 @@ const WorkflowExecutionsTestOutput = ({
                 <div className="absolute inset-0 overflow-y-auto">
                     {workflowIsRunning && (
                         <div className="flex size-full items-center justify-center gap-x-1 p-3">
-                            <span className="flex animate-spin text-gray-400">
+                            <span className="flex animate-spin text-content-neutral-tertiary">
                                 <RefreshCwIcon className="size-5" />
                             </span>
 

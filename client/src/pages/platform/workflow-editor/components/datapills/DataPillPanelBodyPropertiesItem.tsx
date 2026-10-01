@@ -116,7 +116,9 @@ const DataPillPanelBodyPropertiesItem = ({
                             {workflowNodeLabel || title}
                         </span>
 
-                        <span className="w-full truncate text-xs text-gray-400">({workflowNodeName})</span>
+                        <span className="w-full truncate text-xs text-content-neutral-tertiary">
+                            ({workflowNodeName})
+                        </span>
                     </h3>
                 </div>
 
@@ -129,7 +131,7 @@ const DataPillPanelBodyPropertiesItem = ({
                     </span>
                 )}
 
-                <ChevronDownIcon className="size-5 shrink-0 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
+                <ChevronDownIcon className="size-5 shrink-0 text-content-neutral-tertiary transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
 
             <AccordionContent

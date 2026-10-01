@@ -97,7 +97,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
             ) : (
                 <div className="flex h-full flex-col justify-center">
                     <div className="flex flex-col items-center self-center align-middle">
-                        <CableIcon className="size-24 text-gray-300" />
+                        <CableIcon className="size-24 text-content-neutral-tertiary" />
 
                         <h3 className="mt-2 text-sm font-semibold">No outputs</h3>
 

@@ -30,7 +30,7 @@ const PropertyDropdownMenu = ({id = 0, menuItems, trigger}: PropertyDropdownMenu
             {trigger ? (
                 trigger
             ) : (
-                <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-gray-100">
+                <div className="flex h-8 w-7 cursor-pointer items-center justify-center rounded hover:bg-surface-neutral-secondary">
                     <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
                 </div>
             )}

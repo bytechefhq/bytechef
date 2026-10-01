@@ -149,10 +149,10 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         {inputOverlay || (
                             <Input
                                 className={twMerge(
-                                    'bg-white shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
+                                    'bg-surface-neutral-primary shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
                                     error &&
                                         'border-stroke-destructive-secondary pr-10 text-content-destructive placeholder-stroke-destructive-secondary ring-stroke-destructive-secondary focus-visible:ring-stroke-destructive-secondary',
-                                    disabled && 'bg-gray-100 text-content-neutral-secondary',
+                                    disabled && 'bg-surface-neutral-secondary text-content-neutral-secondary',
                                     leadingIcon && 'pl-property-input-position leading-relaxed',
                                     trailingAction &&
                                         'h-full flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0',

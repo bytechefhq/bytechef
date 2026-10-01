@@ -82,7 +82,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                         <div className="mt-16 w-full place-self-center px-2 3xl:mx-auto 3xl:w-4/5">
                             <div className="text-center">
                                 <span className="mx-auto inline-block">
-                                    <LinkIcon className="size-6 text-gray-400" />
+                                    <LinkIcon className="size-6 text-content-neutral-tertiary" />
                                 </span>
 
                                 <h3 className="mt-2 text-sm font-semibold">No defined components</h3>
@@ -101,7 +101,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                         </div>
 
                         {showConnectionNote && (
-                            <div className="mt-4 flex flex-col rounded-md bg-amber-100 p-4 text-gray-800">
+                            <div className="mt-4 flex flex-col rounded-md bg-surface-warning-secondary p-4 text-content-neutral-primary">
                                 <div className="flex items-center pb-2">
                                     <span className="font-medium">Note</span>
 
@@ -115,7 +115,7 @@ const PropertyCodeEditorDialogRightPanelConnections = ({
                                     />
                                 </div>
 
-                                <p className="text-sm text-gray-800">
+                                <p className="text-sm text-content-neutral-primary">
                                     The selected connections are used for testing purposes only.
                                 </p>
                             </div>

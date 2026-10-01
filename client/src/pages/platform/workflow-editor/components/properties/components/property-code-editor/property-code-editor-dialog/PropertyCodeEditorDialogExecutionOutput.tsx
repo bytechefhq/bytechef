@@ -16,7 +16,7 @@ const PropertyCodeEditorDialogExecutionOutput = () => {
         if (scriptIsRunning) {
             return (
                 <div className="flex items-center gap-x-1">
-                    <span className="flex animate-spin text-gray-400">
+                    <span className="flex animate-spin text-content-neutral-tertiary">
                         <RefreshCwIcon className="size-4" />
                     </span>
 

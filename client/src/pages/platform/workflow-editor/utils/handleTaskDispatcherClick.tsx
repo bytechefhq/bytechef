@@ -22,7 +22,7 @@ import handleComponentAddedSuccess, {
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 import {TASK_DISPATCHER_CONFIG} from './taskDispatcherConfig';
 
-const fallbackIcon = <ComponentIcon className="size-9 text-gray-700" />;
+const fallbackIcon = <ComponentIcon className="size-9 text-content-neutral-primary" />;
 
 interface HandleTaskDispatcherClickProps {
     edge?: Edge;
@@ -61,7 +61,7 @@ export default async function handleTaskDispatcherClick({
         ...taskDispatcherDefinition,
         componentName: name,
         description: undefined,
-        icon: icon ? <InlineSVG className="size-9 text-gray-700" src={icon} /> : fallbackIcon,
+        icon: icon ? <InlineSVG className="size-9 text-content-neutral-primary" src={icon} /> : fallbackIcon,
         label: title,
         name: workflowNodeName,
         taskDispatcher: true,

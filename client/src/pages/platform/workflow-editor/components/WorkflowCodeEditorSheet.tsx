@@ -227,7 +227,7 @@ const WorkflowCodeEditorSheet = ({
                                 <ResizablePanel className="rounded-lg bg-surface-neutral-primary" defaultSize={500}>
                                     {workflowIsRunning ? (
                                         <div className="flex size-full items-center justify-center gap-x-1 p-3 text-center">
-                                            <span className="flex animate-spin text-gray-400">
+                                            <span className="flex animate-spin text-content-neutral-tertiary">
                                                 <RefreshCwIcon className="size-4" />
                                             </span>
 
