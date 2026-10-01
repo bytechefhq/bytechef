@@ -58,6 +58,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.ObjectProvider;
 
 /**
  * @author Ivica Cardic
@@ -249,7 +250,7 @@ public class WorkflowNewWorkflowCallTriggerAgentChannelTest {
     private static AgentChannelDefinition getAgentChannelDefinition() {
         WorkflowComponentHandler workflowComponentHandler = new WorkflowComponentHandler(
             Mockito.mock(SubflowDataSource.class), Mockito.mock(SubflowResolver.class),
-            Mockito.mock(SubflowSyncExecutor.class));
+            Mockito.mock(SubflowSyncExecutor.class), Mockito.mock(ObjectProvider.class));
 
         ComponentDefinition componentDefinition = workflowComponentHandler.getDefinition();
 
