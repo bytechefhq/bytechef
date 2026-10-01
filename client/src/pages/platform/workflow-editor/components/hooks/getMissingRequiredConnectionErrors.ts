@@ -1,9 +1,10 @@
+import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 
 import {WorkflowIssueI, WorkflowIssueKindType, WorkflowIssueSeverityType} from '../../stores/useWorkflowIssuesStore';
 
 export interface WorkflowNodeDetailsErrorI {
-    kind: 'CONNECTION' | 'ISSUE' | 'PROPERTY';
+    kind: 'CONNECTION' | 'INVALID_CONNECTION' | 'ISSUE' | 'PROPERTY';
     name: string;
     propertyLabel?: string;
     severity: WorkflowIssueSeverityType;
@@ -18,7 +19,17 @@ interface GetMissingRequiredConnectionErrorsProps {
     workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
 }
 
-const SEPARATELY_REPORTED_ISSUE_KINDS = new Set<WorkflowIssueKindType>(['MISSING_CONNECTION', 'MISSING_REQUIRED']);
+interface GetInvalidConnectionErrorsProps {
+    availableConnections?: Array<Pick<ConnectionI, 'credentialStatus' | 'id' | 'name'>>;
+    connections: Array<ComponentConnection>;
+    workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
+}
+
+const SEPARATELY_REPORTED_ISSUE_KINDS = new Set<WorkflowIssueKindType>([
+    'INVALID_CONNECTION',
+    'MISSING_CONNECTION',
+    'MISSING_REQUIRED',
+]);
 
 /**
  * A cluster root lists its own connection (keyed by its component name) together with the connections of its cluster
@@ -49,6 +60,36 @@ export default function getMissingRequiredConnectionErrors({
                 clusterRoot && connection.key !== connection.componentName
                     ? connection.key
                     : componentTitle || connection.componentName,
+            severity: 'ERROR',
+        }));
+}
+
+/**
+ * The server marks a connection INVALID when refreshing its credentials fails, so a selected connection in that state
+ * cannot be used until it is reconnected.
+ */
+export function getInvalidConnectionErrors({
+    availableConnections,
+    connections,
+    workflowTestConfigurationConnections,
+}: GetInvalidConnectionErrorsProps): Array<WorkflowNodeDetailsErrorI> {
+    if (!availableConnections || !workflowTestConfigurationConnections) {
+        return [];
+    }
+
+    return workflowTestConfigurationConnections
+        .filter((testConfigurationConnection) =>
+            connections.some((connection) => connection.key === testConfigurationConnection.workflowConnectionKey)
+        )
+        .map((testConfigurationConnection) =>
+            availableConnections.find(
+                (availableConnection) => availableConnection.id === testConfigurationConnection.connectionId
+            )
+        )
+        .filter((availableConnection) => availableConnection?.credentialStatus === 'INVALID')
+        .map((availableConnection) => ({
+            kind: 'INVALID_CONNECTION',
+            name: availableConnection!.name,
             severity: 'ERROR',
         }));
 }

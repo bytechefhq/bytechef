@@ -4,6 +4,7 @@ import {devtools} from 'zustand/middleware';
 export type WorkflowIssueKindType =
     | 'BROKEN_REFERENCE'
     | 'DUPLICATE_NODE_NAME'
+    | 'INVALID_CONNECTION'
     | 'LOOKUP_FAILED'
     | 'MISSING_CLUSTER_ELEMENT'
     | 'MISSING_CONNECTION'
