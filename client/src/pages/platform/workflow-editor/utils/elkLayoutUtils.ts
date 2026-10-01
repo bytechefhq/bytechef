@@ -21,13 +21,13 @@ import {
     getLayoutElements,
     positionTriggerPlaceholder,
 } from './layoutUtils';
-import {nestedDispatcherGhostSegment} from './nestedBottomGhostId';
 import {
     CHAIN_CENTERING_MAX_SLACK,
     applySavedPositions,
     hasConfiguredClusterElements,
     isNodePositioned,
 } from './postDagreConstraints';
+import {toWorkflowNodeNamePrefix} from './workflowNodeNameUtils';
 
 import type {ElkExtendedEdge, ElkNode} from 'elkjs/lib/elk-api';
 
@@ -289,7 +289,7 @@ function isFrameDispatcherNode(node: Node): boolean {
 // Ghost bar ids embed the dispatcher kind: `<id>-condition-top-ghost`,
 // `<id>-loop-bottom-ghost`, `<id>-forkJoin-top-ghost`, ...
 function getGhostIds(dispatcherNode: Node): {bottomGhostId: string; topGhostId: string} {
-    const ghostIdSegment = nestedDispatcherGhostSegment((dispatcherNode.data as NodeDataType).componentName);
+    const ghostIdSegment = toWorkflowNodeNamePrefix((dispatcherNode.data as NodeDataType).componentName);
 
     return {
         bottomGhostId: `${dispatcherNode.id}-${ghostIdSegment}-bottom-ghost`,
@@ -922,7 +922,7 @@ export const getElkLayoutElements = async ({
                                 ? dispatcherBox.x + dispatcherBox.width / 2
                                 : dispatcherBox.y + dispatcherBox.height / 2;
 
-                        const topGhostId = `${dispatcherId}-${nestedDispatcherGhostSegment(dispatcherKind)}-top-ghost`;
+                        const topGhostId = `${dispatcherId}-${toWorkflowNodeNamePrefix(dispatcherKind)}-top-ghost`;
                         const branchEntryCenters: number[] = [];
 
                         (child.edges || []).forEach((frameEdge) => {
@@ -1529,7 +1529,7 @@ export const getElkLayoutElements = async ({
                 const topBarNode = allNodes.find(
                     (candidateNode) =>
                         candidateNode.id ===
-                        `${railDispatcherId}-${nestedDispatcherGhostSegment(dispatcherKind || '')}-top-ghost`
+                        `${railDispatcherId}-${toWorkflowNodeNamePrefix(dispatcherKind || '')}-top-ghost`
                 );
 
                 if (!topBarNode) {
@@ -1600,7 +1600,7 @@ export const getElkLayoutElements = async ({
                 const bottomBarNode = allNodes.find(
                     (candidateNode) =>
                         candidateNode.id ===
-                        `${railDispatcherId}-${nestedDispatcherGhostSegment(dispatcherKind || '')}-bottom-ghost`
+                        `${railDispatcherId}-${toWorkflowNodeNamePrefix(dispatcherKind || '')}-bottom-ghost`
                 );
 
                 let railCross: number;
