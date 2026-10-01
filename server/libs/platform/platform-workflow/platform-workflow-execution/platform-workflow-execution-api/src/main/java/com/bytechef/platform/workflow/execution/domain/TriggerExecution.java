@@ -362,6 +362,7 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
         return workflowExecutionId;
     }
 
+    @SuppressFBWarnings("EI")
     public WorkflowTrigger getWorkflowTrigger() {
         return workflowTrigger;
     }
@@ -464,6 +465,7 @@ public class TriggerExecution implements Cloneable, Errorable, Prioritizable, Re
         this.workflowExecutionId = workflowExecutionId;
     }
 
+    @SuppressFBWarnings("EI2")
     public void setWorkflowTrigger(WorkflowTrigger workflowTrigger) {
         this.workflowTrigger = workflowTrigger;
     }
