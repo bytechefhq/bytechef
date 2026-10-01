@@ -34,7 +34,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
         },
     });
 
-    const restartDisabled = execution.job?.status !== 'FAILED';
+    const restartDisabled = execution.job?.status !== 'FAILED' || execution.job?.parentTaskExecutionId != null;
     const stopDisabled = execution.job?.status !== 'STARTED';
 
     const handleViewClick = () => {
