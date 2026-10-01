@@ -27,7 +27,6 @@ import {
     ChevronsUpDownIcon,
     DiamondIcon,
     HelpCircleIcon,
-    PlusIcon,
     SettingsIcon,
     User2Icon,
     UserRoundCogIcon,
@@ -233,10 +232,12 @@ export function AppSidebarFooter() {
                                     <DropdownMenuSeparator />
 
                                     <DropdownMenuItem
-                                        className="flex space-x-2"
+                                        className="pl-8"
                                         onClick={() => navigate('/automation/settings/workspaces')}
                                     >
-                                        <PlusIcon /> <span>New Workspace</span>
+                                        <SettingsIcon className="absolute left-2 size-3.5" />
+
+                                        <span>Manage Workspaces</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuSubContent>
                             </DropdownMenuPortal>
