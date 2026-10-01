@@ -115,6 +115,10 @@ public class OpenRouterCreateTranscriptionAction {
             .retrieve()
             .body(new ParameterizedTypeReference<>() {});
 
+        if (response == null) {
+            throw new IllegalStateException("Transcription response body is missing");
+        }
+
         return (String) response.get("text");
     }
 }

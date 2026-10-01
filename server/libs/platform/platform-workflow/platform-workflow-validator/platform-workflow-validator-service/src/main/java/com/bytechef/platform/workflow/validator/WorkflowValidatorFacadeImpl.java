@@ -286,8 +286,10 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
                 outputResponse = taskDispatcherDefinition.getOutputResponse();
             }
 
-            if (outputResponse != null && outputResponse.outputSchema() != null) {
-                return toPropertyInfo(outputResponse.outputSchema());
+            BaseProperty outputSchema = outputResponse == null ? null : outputResponse.outputSchema();
+
+            if (outputSchema != null) {
+                return toPropertyInfo(outputSchema);
             }
 
             return null;
@@ -649,11 +651,13 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
     }
 
     private static @Nullable PropertyInfo toOutputPropertyInfo(@Nullable OutputResponse outputResponse) {
-        if (outputResponse == null || outputResponse.outputSchema() == null) {
+        BaseProperty outputSchema = outputResponse == null ? null : outputResponse.outputSchema();
+
+        if (outputSchema == null) {
             return null;
         }
 
-        PropertyInfo propertyInfo = toPropertyInfo(outputResponse.outputSchema());
+        PropertyInfo propertyInfo = toPropertyInfo(outputSchema);
 
         List<PropertyInfo> nestedPropertyInfos = propertyInfo.nestedProperties();
 

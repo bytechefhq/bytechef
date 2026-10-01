@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
@@ -81,9 +82,9 @@ class CodeFenceStrippingAdvisorTest {
         ChatClientResponse chatClientResponse = codeFenceStrippingAdvisor.adviseCall(
             chatClientRequest, callAdvisorChain);
 
-        ChatResponse advisedChatResponse = chatClientResponse.chatResponse();
+        ChatResponse advisedChatResponse = Objects.requireNonNull(chatClientResponse.chatResponse(), "chatResponse");
 
-        Generation result = advisedChatResponse.getResult();
+        Generation result = Objects.requireNonNull(advisedChatResponse.getResult(), "result");
 
         AssistantMessage output = result.getOutput();
 

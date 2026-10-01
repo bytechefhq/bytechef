@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * @author Ivica Cardic
  */
-public class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
+public final class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
 
     private @Nullable String extension;
     private @Nullable String mimeType;

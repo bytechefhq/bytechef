@@ -9,6 +9,7 @@ package com.bytechef.ee.discovery.redis.registry;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
@@ -39,14 +40,22 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
 
     @Override
     @SuppressFBWarnings("EI2")
-    public void register(RedisRegistration redisRegistration) {
+    public void register(@Nullable RedisRegistration redisRegistration) {
+        if (redisRegistration == null) {
+            return;
+        }
+
         registerService(redisRegistration);
 
         this.redisRegistration = redisRegistration;
     }
 
     @Override
-    public void deregister(RedisRegistration redisRegistration) {
+    public void deregister(@Nullable RedisRegistration redisRegistration) {
+        if (redisRegistration == null) {
+            return;
+        }
+
         ListOperations<String, RedisRegistration> listOperations = redisTemplate.opsForList();
 
         listOperations.remove(redisRegistration.getServiceId(), 1, redisRegistration);

@@ -519,11 +519,10 @@ public class AiAgentEvalRunExecutor {
         int accumulatedCompletionTokens = 0;
 
         String userMessage;
+        String scenarioUserMessage = scenario.getUserMessage();
 
-        if (scenario.getUserMessage() != null && !scenario.getUserMessage()
-            .isBlank()) {
-
-            userMessage = scenario.getUserMessage();
+        if (scenarioUserMessage != null && !scenarioUserMessage.isBlank()) {
+            userMessage = scenarioUserMessage;
         } else {
             SimulationResult initialSimulation = userSimulator.generateNextMessage(Collections.emptyList());
 

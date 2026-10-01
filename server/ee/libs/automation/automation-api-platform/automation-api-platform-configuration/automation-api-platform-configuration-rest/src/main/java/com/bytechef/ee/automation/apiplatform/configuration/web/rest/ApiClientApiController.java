@@ -26,6 +26,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.Creat
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,8 +69,8 @@ public class ApiClientApiController implements ApiClientApi {
 
     @Override
     public ResponseEntity<ApiClientModel> getApiClient(Long id) {
-        ApiClientModel apiClientModel = conversionService.convert(
-            apiClientService.getApiClient(id), ApiClientModel.class);
+        ApiClientModel apiClientModel = Objects.requireNonNull(
+            conversionService.convert(apiClientService.getApiClient(id), ApiClientModel.class), "apiClientModel");
 
         return ResponseEntity.ok(apiClientModel.secretKey(obfuscate(apiClientModel.getSecretKey())));
     }
@@ -79,8 +80,12 @@ public class ApiClientApiController implements ApiClientApi {
         return ResponseEntity.ok(
             CollectionUtils.map(
                 apiClientService.getApiClients(),
-                apiKey -> conversionService.convert(apiKey, ApiClientModel.class)
-                    .secretKey(obfuscate(apiKey.getSecretKey()))));
+                apiClient -> {
+                    ApiClientModel apiClientModel = Objects.requireNonNull(
+                        conversionService.convert(apiClient, ApiClientModel.class), "apiClientModel");
+
+                    return apiClientModel.secretKey(obfuscate(apiClient.getSecretKey()));
+                }));
     }
 
     @Override

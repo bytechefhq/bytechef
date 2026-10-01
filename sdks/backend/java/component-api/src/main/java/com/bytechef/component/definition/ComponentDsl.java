@@ -4031,7 +4031,7 @@ public final class ComponentDsl {
         }
     }
 
-    private static class OptionsDataSourceImpl implements OptionsDataSource<BaseOptionsFunction> {
+    private static final class OptionsDataSourceImpl implements OptionsDataSource<BaseOptionsFunction> {
 
         private final List<String> optionsLookupDependsOn;
         private final BaseOptionsFunction options;

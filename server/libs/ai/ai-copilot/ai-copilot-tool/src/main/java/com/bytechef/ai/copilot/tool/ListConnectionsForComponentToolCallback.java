@@ -145,7 +145,9 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
                 componentName = resolvedComponentName;
             }
 
-            int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();
+            Integer inputComponentVersion = input.componentVersion();
+
+            int componentVersion = inputComponentVersion == null ? 1 : inputComponentVersion;
             ConnectionDefinition connectionDefinition;
 
             try {

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,7 @@ import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 
 /**
@@ -79,8 +81,9 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfacedViolations)
@@ -124,9 +127,12 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
-            .get(VIOLATIONS_METADATA_KEY);
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = Objects.requireNonNull(
+            chatResponse.getMetadata()
+                .get(VIOLATIONS_METADATA_KEY),
+            "surfacedViolations");
 
         String serialised = surfacedViolations.toString();
 
@@ -172,8 +178,9 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfacedViolations)
@@ -216,8 +223,9 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfacedViolations)
@@ -254,8 +262,9 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfacedViolations)
@@ -290,8 +299,9 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfacedViolations)
@@ -336,8 +346,9 @@ class CheckForViolationsAdvisorPublicMetadataTest {
 
         ChatClientResponse response = advisor.adviseCall(request, chain);
 
-        List<Map<String, Object>> surfacedViolations = response.chatResponse()
-            .getMetadata()
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
+        List<Map<String, Object>> surfacedViolations = chatResponse.getMetadata()
             .get(VIOLATIONS_METADATA_KEY);
 
         assertThat(surfacedViolations)

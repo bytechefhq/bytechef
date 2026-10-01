@@ -135,7 +135,9 @@ public class SelectPropertyOptionToolCallback implements ToolCallback {
                 return toolError("Invocation context unavailable.");
             }
 
-            int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();
+            Integer inputComponentVersion = input.componentVersion();
+
+            int componentVersion = inputComponentVersion == null ? 1 : inputComponentVersion;
 
             PropertyOptionsResolver.OptionsLookupResult result = resolver.resolveActionPropertyOptions(
                 actionDefinitionService, actionDefinitionFacade, invocationContext, componentName, componentVersion,

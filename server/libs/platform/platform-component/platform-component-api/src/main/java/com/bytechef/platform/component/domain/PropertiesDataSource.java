@@ -25,7 +25,7 @@ import org.apache.commons.lang3.Validate;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class PropertiesDataSource {
+public final class PropertiesDataSource {
 
     private final List<String> propertiesLookupDependsOn;
 

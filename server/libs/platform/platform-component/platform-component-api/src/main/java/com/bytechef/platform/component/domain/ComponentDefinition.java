@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public class ComponentDefinition {
+public final class ComponentDefinition {
 
     private Map<String, List<String>> actionClusterElementTypes;
     private List<ActionDefinition> actions;

@@ -30,6 +30,7 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,7 @@ import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 
 /**
@@ -78,10 +80,13 @@ class CheckForViolationsAdvisorExceptionMessageLeakageTest {
 
         ChatClientResponse response = advisor.adviseCall(request, mock(CallAdvisorChain.class));
 
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> violations = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
-            .get(VIOLATIONS_METADATA_KEY);
+        List<Map<String, Object>> violations = Objects.requireNonNull(
+            (List<Map<String, Object>>) chatResponse.getMetadata()
+                .get(VIOLATIONS_METADATA_KEY),
+            "violations");
 
         String serialised = violations.toString();
 
@@ -132,10 +137,13 @@ class CheckForViolationsAdvisorExceptionMessageLeakageTest {
 
         ChatClientResponse response = advisor.adviseCall(request, mock(CallAdvisorChain.class));
 
+        ChatResponse chatResponse = Objects.requireNonNull(response.chatResponse(), "chatResponse");
+
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> violations = (List<Map<String, Object>>) response.chatResponse()
-            .getMetadata()
-            .get(VIOLATIONS_METADATA_KEY);
+        List<Map<String, Object>> violations = Objects.requireNonNull(
+            (List<Map<String, Object>>) chatResponse.getMetadata()
+                .get(VIOLATIONS_METADATA_KEY),
+            "violations");
 
         String serialised = violations.toString();
 

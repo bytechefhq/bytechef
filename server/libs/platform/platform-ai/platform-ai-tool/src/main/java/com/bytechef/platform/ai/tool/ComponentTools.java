@@ -777,7 +777,9 @@ public class ComponentTools {
                 }
             }
 
-            if (outputResponse == null || outputResponse.outputSchema() == null) {
+            BaseProperty outputSchema = outputResponse == null ? null : outputResponse.outputSchema();
+
+            if (outputSchema == null) {
                 return null;
             }
 
@@ -787,7 +789,7 @@ public class ComponentTools {
                     operationName, version, componentName, operationName);
             }
 
-            return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
+            return ToolUtils.convertToPropertyInfo(outputSchema);
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {

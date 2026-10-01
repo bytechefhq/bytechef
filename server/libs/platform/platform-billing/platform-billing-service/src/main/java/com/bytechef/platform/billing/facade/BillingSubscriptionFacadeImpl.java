@@ -31,6 +31,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -91,9 +92,14 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
     private String getCustomerId() {
         String tenantId = TenantContext.getCurrentTenantId();
-        String userEmail = SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getName();
+        Authentication authentication = SecurityContextHolder.getContext()
+            .getAuthentication();
+
+        if (authentication == null) {
+            throw new IllegalStateException("Current user is not set!");
+        }
+
+        String userEmail = authentication.getName();
 
         return stripeClient.fetchCustomerId(userEmail, tenantId)
             .orElseGet(() -> {

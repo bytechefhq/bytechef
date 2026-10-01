@@ -109,6 +109,10 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
             .retrieve()
             .body(new ParameterizedTypeReference<>() {});
 
+        if (response == null) {
+            throw new IllegalStateException("Empty response from chat completions endpoint");
+        }
+
         return buildChatResponse(response);
     }
 
@@ -250,7 +254,9 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
                 if (media == null || media.isEmpty()) {
                     result.add(Map.of("role", "user", "content", message.getText()));
                 } else {
-                    result.add(buildUserMessageWithMedia(message.getText(), media));
+                    String text = message.getText();
+
+                    result.add(buildUserMessageWithMedia(text == null ? "" : text, media));
                 }
             } else if (messageType == MessageType.SYSTEM) {
                 result.add(Map.of("role", "system", "content", message.getText()));
