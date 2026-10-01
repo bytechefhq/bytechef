@@ -18,6 +18,7 @@ package com.bytechef.component.twilio.action;
 
 import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -29,6 +30,7 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_SID
 import static com.bytechef.component.twilio.constant.TwilioConstants.CONTENT_VARIABLES;
 import static com.bytechef.component.twilio.constant.TwilioConstants.FROM;
 import static com.bytechef.component.twilio.constant.TwilioConstants.MESSAGE_OUTPUT_PROPERTY;
+import static com.bytechef.component.twilio.constant.TwilioConstants.NUMBER;
 import static com.bytechef.component.twilio.constant.TwilioConstants.TO;
 import static com.bytechef.component.twilio.constant.TwilioConstants.USE_TEMPLATE;
 
@@ -46,6 +48,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * The reply half of the {@code twilio} agent channel.
+ * <p>
+ * The sender comes from the channel row's own {@code number} rather than from the inbound message's {@code To}, so two
+ * channel rows on one Twilio account each answer as the number they were configured with. {@code useTemplate} is pinned
+ * false because it defaults to true and hides {@code Body} behind {@code useTemplate == false}: without the pin the
+ * agent's free text has no property to arrive in.
+ *
  * @author Monika Kušter
  */
 public class TwilioSendWhatsAppMessageAction {
@@ -92,6 +101,12 @@ public class TwilioSendWhatsAppMessageAction {
                 .required(true))
         .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
         .help("", "https://docs.bytechef.io/reference/components/twilio_v1#send-whatsapp-message")
+        .agentReply(
+            agentReply()
+                .conversationId(TO)
+                .message(BODY)
+                .channelParameter(NUMBER, FROM)
+                .fixedParameter(USE_TEMPLATE, false))
         .perform(TwilioSendWhatsAppMessageAction::perform);
 
     private TwilioSendWhatsAppMessageAction() {

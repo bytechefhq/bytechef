@@ -16,6 +16,7 @@
 
 package com.bytechef.component.infobip.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
@@ -51,6 +52,10 @@ public class InfobipNewWhatsAppMessageTrigger {
                 .required(true),
             KEYWORD_PROPERTY)
         .output()
+        .agentRequest(
+            agentRequest()
+                .conversationId("results.from")
+                .message("results.message.text"))
         .help("", "https://docs.bytechef.io/reference/components/infobip_v1#new-whatsapp-message")
         .webhookEnable(InfobipNewWhatsAppMessageTrigger::webhookEnable)
         .webhookDisable(InfobipNewWhatsAppMessageTrigger::webhookDisable)

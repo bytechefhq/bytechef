@@ -16,9 +16,27 @@
 
 package com.bytechef.platform.component.index;
 
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentChannel;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.AgentChannelDefinition;
+import com.bytechef.component.definition.AgentReplyDefinition;
+import com.bytechef.component.definition.AgentRequestDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
@@ -220,5 +238,76 @@ public class ComponentIndexTest {
             assertThat(alphaEntry.tags()).isEmpty();
             assertThat(alphaEntry.inputs()).isEmpty();
         }
+    }
+
+    @Test
+    public void testAgentChannelsRoundTripThroughStub() {
+        ModifiableTriggerDefinition triggerDefinition = trigger("newAiAgentMessage")
+            .type(TriggerType.STATIC_WEBHOOK)
+            .output(
+                outputSchema(
+                    object()
+                        .properties(
+                            object("message")
+                                .properties(
+                                    string("text"),
+                                    array("files").items(fileEntry()),
+                                    object("chat")
+                                        .properties(string("id"))))))
+            .properties(string("channelId"))
+            .agentRequest(
+                agentRequest()
+                    .conversationId("message.chat.id")
+                    .message("message.text")
+                    .attachments("message.files"));
+        ModifiableActionDefinition actionDefinition = action("sendAiAgentReply")
+            .properties(string("response"))
+            .agentReply(
+                agentReply()
+                    .message("response.text")
+                    .conversationId("response.chatId")
+                    .attachments("response.files")
+                    .channelParameter("channelId", "response.channelId")
+                    .fixedParameter("response.locale", "en-US"));
+        ComponentDefinition componentDefinition = component("acme")
+            .triggers(triggerDefinition)
+            .actions(actionDefinition)
+            .agentChannels(agentChannel("acme", triggerDefinition, actionDefinition).title("Acme"));
+
+        ComponentIndex.Entry entry =
+            ComponentIndexGenerator.toEntry(componentDefinition, "Provider", ComponentHandlerLoaderKind.DEFAULT);
+        ComponentDefinition stub = ComponentIndex.toStubComponentDefinition(entry);
+
+        assertThat(stub.getAgentChannels()).hasSize(1);
+
+        AgentChannelDefinition stubAgentChannelDefinition = stub.getAgentChannels()
+            .getFirst();
+
+        assertThat(stubAgentChannelDefinition.getName()).isEqualTo("acme");
+
+        TriggerDefinition stubTriggerDefinition = stubAgentChannelDefinition.getTrigger();
+
+        assertThat(stubTriggerDefinition.getName()).isEqualTo("newAiAgentMessage");
+
+        AgentRequestDefinition stubAgentRequestDefinition = stubTriggerDefinition.getAgentRequestDefinition()
+            .orElseThrow();
+
+        assertThat(stubAgentRequestDefinition.getConversationIdPath()).isEqualTo("message.chat.id");
+        assertThat(stubAgentRequestDefinition.getMessagePath()).isEqualTo("message.text");
+        assertThat(stubAgentRequestDefinition.getAttachmentsPath()).contains("message.files");
+
+        ActionDefinition stubReplyActionDefinition = stubAgentChannelDefinition.getReplyAction()
+            .orElseThrow();
+
+        assertThat(stubReplyActionDefinition.getName()).isEqualTo("sendAiAgentReply");
+
+        AgentReplyDefinition stubAgentReplyDefinition = stubReplyActionDefinition.getAgentReplyDefinition()
+            .orElseThrow();
+
+        assertThat(stubAgentReplyDefinition.getMessageProperty()).isEqualTo("response.text");
+        assertThat(stubAgentReplyDefinition.getConversationIdProperty()).contains("response.chatId");
+        assertThat(stubAgentReplyDefinition.getAttachmentsProperty()).contains("response.files");
+        assertThat(stubAgentReplyDefinition.getChannelParameters()).containsEntry("channelId", "response.channelId");
+        assertThat(stubAgentReplyDefinition.getFixedParameters()).containsEntry("response.locale", "en-US");
     }
 }

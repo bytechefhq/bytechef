@@ -17,10 +17,13 @@
 package com.bytechef.component.rocketchat.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.CHANNEL_ID;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.ID;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.NAME;
+import static com.bytechef.component.rocketchat.constant.RocketchatConstants.TEXT;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.USERNAME;
 
 import com.bytechef.component.definition.Context.Http.Body;
@@ -49,6 +52,10 @@ public class RocketchatNewMessageTrigger {
         .help("", "https://docs.bytechef.io/reference/components/rocketchat_v1#new-message")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output()
+        .agentRequest(
+            agentRequest()
+                .conversationId(CHANNEL_ID)
+                .message(TEXT))
         .webhookDisable(RocketchatNewMessageTrigger::webhookDisable)
         .webhookEnable(RocketchatNewMessageTrigger::webhookEnable)
         .webhookRequest(RocketchatNewMessageTrigger::webhookRequest);

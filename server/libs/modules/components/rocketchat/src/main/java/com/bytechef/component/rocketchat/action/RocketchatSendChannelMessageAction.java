@@ -17,6 +17,7 @@
 package com.bytechef.component.rocketchat.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.rocketchat.constant.RocketchatConstants.POST_MESSAGE_RESPONSE_PROPERTY;
@@ -50,6 +51,10 @@ public class RocketchatSendChannelMessageAction {
                 .description("The message to send.")
                 .required(true))
         .output(outputSchema(POST_MESSAGE_RESPONSE_PROPERTY))
+        .agentReply(
+            agentReply()
+                .conversationId(ROOM_ID)
+                .message(TEXT))
         .perform(RocketchatSendChannelMessageAction::perform);
 
     private RocketchatSendChannelMessageAction() {

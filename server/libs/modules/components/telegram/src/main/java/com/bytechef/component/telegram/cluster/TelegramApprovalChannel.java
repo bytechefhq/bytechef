@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.approval.ApprovalChannelFunction
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.INPUTS;
 import static com.bytechef.component.definition.approval.ApprovalChannelFunction.SHORT_RESUME_ID;
 import static com.bytechef.component.telegram.constant.TelegramConstants.CHAT_ID;
+import static com.bytechef.component.telegram.constant.TelegramConstants.TELEGRAM;
 import static com.bytechef.component.telegram.constant.TelegramConstants.TEXT;
 import static com.bytechef.component.telegram.constant.TelegramConstants.WEBHOOK_SECRET_TOKEN;
 
@@ -46,7 +47,7 @@ import org.jspecify.annotations.Nullable;
 public class TelegramApprovalChannel {
 
     public static final ModifiableClusterElementDefinition<ApprovalChannelFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ApprovalChannelFunction>clusterElement("telegram")
+        ComponentDsl.<ApprovalChannelFunction>clusterElement(TELEGRAM)
             .title("Telegram")
             .description("Sends an approval request message to a Telegram chat.")
             .type(APPROVAL_CHANNELS)
