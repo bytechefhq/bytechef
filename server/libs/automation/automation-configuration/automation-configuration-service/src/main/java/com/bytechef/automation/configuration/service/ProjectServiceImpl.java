@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
 import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
+import com.bytechef.automation.configuration.listener.ProjectPublishPreListener;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
@@ -190,6 +191,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public int publishProject(long id, String description, boolean syncWithGit) {
+        for (ProjectPublishPreListener projectPublishPreListener : applicationContext
+            .getBeansOfType(ProjectPublishPreListener.class)
+            .values()) {
+
+            projectPublishPreListener.onBeforePublishProject(id);
+        }
+
         Project project = getProject(id);
 
         int newVersion = project.publish(description);
@@ -247,5 +255,4 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectRepository.save(curProject);
     }
-
 }

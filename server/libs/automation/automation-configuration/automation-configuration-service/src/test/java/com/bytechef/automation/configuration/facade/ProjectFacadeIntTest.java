@@ -28,17 +28,21 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.config.TestOwnerContributors;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.listener.ProjectContentContributor;
+import com.bytechef.automation.configuration.listener.ProjectDeleteEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.automation.configuration.repository.ProjectWorkflowRepository;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
@@ -66,9 +70,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -82,6 +90,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -100,7 +110,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     properties = {
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
-@Import(PostgreSQLContainerConfiguration.class)
+@Import({
+    PostgreSQLContainerConfiguration.class, ProjectFacadeIntTest.RecordingDeleteListenerConfiguration.class
+})
 @ProjectIntTestConfigurationSharedMocks
 public class ProjectFacadeIntTest {
 
@@ -130,6 +142,9 @@ public class ProjectFacadeIntTest {
 
     @Autowired
     private WorkflowCrudRepository workflowRepository;
+
+    @Autowired
+    private WorkflowService workflowService;
 
     @MockitoBean
     private SharedTemplateFileStorage sharedTemplateFileStorage;
@@ -368,6 +383,68 @@ public class ProjectFacadeIntTest {
         } catch (Exception e) {
             Assertions.fail("Failed to read exported ZIP file", e);
         }
+    }
+
+    @Test
+    public void testExportProjectSkipsAgentWorkflowsAndCarriesContributedContent() throws Exception {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        ProjectWorkflow agentProjectWorkflow = addAgentWorkflow(projectDTO);
+
+        byte[] exportedData = projectFacade.exportProject(projectDTO.id(), null);
+
+        List<String> workflowEntryNames = new ArrayList<>();
+        List<String> contentEntryNames = new ArrayList<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(exportedData))) {
+            ZipEntry zipEntry;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                String name = zipEntry.getName();
+
+                if (name.startsWith("workflow-")) {
+                    workflowEntryNames.add(name);
+                } else if (name.startsWith("test-content/")) {
+                    contentEntryNames.add(name);
+                }
+
+                zipInputStream.closeEntry();
+            }
+        }
+
+        assertThat(workflowEntryNames).hasSize(1)
+            .doesNotContain("workflow-" + agentProjectWorkflow.getUuid() + ".json");
+        assertThat(contentEntryNames).containsExactly(RecordingDeleteListenerConfiguration.CONTENT_FILE);
+
+        long importedProjectId = projectFacade.importProject(exportedData, workspace.getId());
+
+        assertThat(projectWorkflowServiceImpl.getProjectWorkflows(importedProjectId))
+            .extracting(ProjectWorkflow::getType)
+            .containsExactly(ProjectWorkflowType.WORKFLOW);
+        assertThat(RecordingDeleteListenerConfiguration.IMPORTED_CONTENT.get(importedProjectId))
+            .containsOnlyKeys(RecordingDeleteListenerConfiguration.CONTENT_FILE);
+    }
+
+    @Test
+    public void testDuplicateProjectSkipsAgentWorkflowsAndDuplicatesContributedContent() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
+
+        addAgentWorkflow(projectDTO);
+
+        RecordingDeleteListenerConfiguration.DUPLICATED_PROJECT_IDS.clear();
+
+        ProjectDTO duplicatedProjectDTO = projectFacade.duplicateProject(projectDTO.id());
+
+        assertThat(projectWorkflowServiceImpl.getProjectWorkflows(Objects.requireNonNull(duplicatedProjectDTO.id())))
+            .extracting(ProjectWorkflow::getType)
+            .containsExactly(ProjectWorkflowType.WORKFLOW);
+        assertThat(workflowRepository.findAll()).hasSize(3);
+        assertThat(RecordingDeleteListenerConfiguration.DUPLICATED_PROJECT_IDS)
+            .containsExactly(List.of(projectDTO.id(), duplicatedProjectDTO.id()));
     }
 
     @Test
@@ -1232,6 +1309,27 @@ public class ProjectFacadeIntTest {
     }
 
     @Test
+    public void testRestoreProjectVersionLeavesAgentWorkflowsToContentContributors() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        addAgentWorkflow(projectDTO);
+
+        projectFacade.publishProject(projectDTO.id(), "first", false);
+
+        ProjectWorkflow draftAgentProjectWorkflow = projectWorkflowRepository
+            .findAllByProjectIdAndProjectVersion(projectDTO.id(), 2)
+            .getFirst();
+
+        projectWorkflowServiceImpl.delete(List.of(Objects.requireNonNull(draftAgentProjectWorkflow.getId())));
+
+        projectFacade.restoreProjectVersion(projectDTO.id(), 1);
+
+        assertThat(projectWorkflowRepository.findAllByProjectIdAndProjectVersion(projectDTO.id(), 2)).isEmpty();
+        assertThat(RecordingDeleteListenerConfiguration.RESTORED_CONTENT)
+            .contains(List.of(projectDTO.id(), 1L));
+    }
+
+    @Test
     public void testRestoreProjectVersionRejectsDraftVersion() {
         ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
@@ -1422,6 +1520,89 @@ public class ProjectFacadeIntTest {
 
         @EnableMethodSecurity
         static class MethodSecurityConfiguration {
+        }
+    }
+
+    @Test
+    public void testDeleteProjectInvokesDeleteListenersFirst() {
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
+
+        RecordingDeleteListenerConfiguration.DELETED_PROJECT_IDS.clear();
+
+        projectFacade.deleteProject(projectDTO.id());
+
+        assertThat(RecordingDeleteListenerConfiguration.DELETED_PROJECT_IDS).containsExactly(projectDTO.id());
+    }
+
+    private ProjectWorkflow addAgentWorkflow(ProjectDTO projectDTO) {
+        Workflow agentWorkflow = workflowService.create(
+            "{\"label\":\"agent\",\"tasks\":[]}", Workflow.Format.JSON, Workflow.SourceType.JDBC);
+
+        Project project = projectRepository.findById(Objects.requireNonNull(projectDTO.id()))
+            .orElseThrow();
+
+        return projectWorkflowServiceImpl.addWorkflow(
+            project.getId(), project.getLastProjectVersion(), agentWorkflow.getId(), ProjectWorkflowType.AI_AGENT);
+    }
+
+    @TestConfiguration
+    static class RecordingDeleteListenerConfiguration {
+
+        static final List<Long> DELETED_PROJECT_IDS = new CopyOnWriteArrayList<>();
+        static final List<List<Long>> DUPLICATED_PROJECT_IDS = new CopyOnWriteArrayList<>();
+        static final Map<Long, Map<String, byte[]>> IMPORTED_CONTENT = new ConcurrentHashMap<>();
+        static final List<List<Long>> RESTORED_CONTENT = new CopyOnWriteArrayList<>();
+        static final String CONTENT_FILE = "test-content/item.json";
+
+        @Bean
+        ProjectDeleteEventListener recordingProjectDeleteEventListener() {
+            return DELETED_PROJECT_IDS::add;
+        }
+
+        @Bean
+        ProjectContentContributor recordingProjectContentContributor() {
+            return new ProjectContentContributor() {
+
+                @Override
+                public String getContentDirectory() {
+                    return "test-content/";
+                }
+
+                @Override
+                public void onProjectDuplicated(long sourceProjectId, long duplicateProjectId) {
+                    DUPLICATED_PROJECT_IDS.add(List.of(sourceProjectId, duplicateProjectId));
+                }
+
+                @Override
+                public Map<String, byte[]> exportProjectContent(long projectId, int projectVersion) {
+                    return Map.of(CONTENT_FILE, "{}".getBytes(StandardCharsets.UTF_8));
+                }
+
+                @Override
+                public void importProjectContent(long projectId, long workspaceId, Map<String, byte[]> files) {
+                    IMPORTED_CONTENT.put(projectId, files);
+                }
+
+                @Override
+                public boolean isProjectContentPublishable(long projectId) {
+                    return true;
+                }
+
+                @Override
+                public void pullProjectContent(long projectId, Map<String, byte[]> files) {
+                    throw new UnsupportedOperationException();
+                }
+
+                @Override
+                public void restoreProjectContent(long projectId, int projectVersion) {
+                    RESTORED_CONTENT.add(List.of(projectId, (long) projectVersion));
+                }
+
+                @Override
+                public void restoreProjectWorkflowContent(long projectId, int projectVersion, String workflowUuid) {
+                    throw new UnsupportedOperationException();
+                }
+            };
         }
     }
 }

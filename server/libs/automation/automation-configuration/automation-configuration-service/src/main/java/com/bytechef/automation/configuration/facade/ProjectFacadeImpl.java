@@ -22,6 +22,7 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectWorkflowType;
 import com.bytechef.automation.configuration.domain.SharedTemplate;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectTemplateDTO;
@@ -30,6 +31,8 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.exception.ProjectErrorType;
+import com.bytechef.automation.configuration.listener.ProjectContentContributor;
+import com.bytechef.automation.configuration.listener.ProjectDeleteEventListener;
 import com.bytechef.automation.configuration.ownership.ProjectOwner;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
@@ -64,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,6 +112,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
+    private final List<ProjectDeleteEventListener> projectDeleteEventListeners;
+    private final List<ProjectContentContributor> projectContentContributors;
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
@@ -121,7 +127,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
         TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService,
-        List<WorkflowPreDeleteListener> workflowPreDeleteListeners) {
+        List<WorkflowPreDeleteListener> workflowPreDeleteListeners,
+        List<ProjectDeleteEventListener> projectDeleteEventListeners,
+        List<ProjectContentContributor> projectContentContributors) {
 
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
@@ -140,6 +148,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
+        this.projectDeleteEventListeners = projectDeleteEventListeners;
+        this.projectContentContributors = projectContentContributors;
     }
 
     @Override
@@ -168,6 +178,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void deleteProject(long id) {
+        for (ProjectDeleteEventListener projectDeleteEventListener : projectDeleteEventListeners) {
+            projectDeleteEventListener.onBeforeDeleteProject(id);
+        }
+
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getAllProjectDeployments(id);
 
         for (ProjectDeployment projectDeployment : projectDeployments) {
@@ -247,13 +261,20 @@ public class ProjectFacadeImpl implements ProjectFacade {
         newProject.setWorkspaceId(project.getWorkspaceId());
 
         List<String> workflowIds = copyWorkflowIds(
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()));
+            getOrdinaryProjectWorkflows(project.getId(), project.getLastProjectVersion())
+                .stream()
+                .map(ProjectWorkflow::getWorkflowId)
+                .toList());
 
         newProject = projectService.create(newProject);
 
+        long newProjectId = Objects.requireNonNull(newProject.getId());
+
         for (String workflowId : workflowIds) {
-            projectWorkflowService.addWorkflow(newProject.getId(), newProject.getLastProjectVersion(), workflowId);
+            projectWorkflowService.addWorkflow(newProjectId, newProject.getLastProjectVersion(), workflowId);
         }
+
+        duplicateProjectContent(id, newProjectId);
 
         return toProjectDTO(newProject);
     }
@@ -436,6 +457,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
         return projectWorkflowService.getProjectWorkflows(projectService.getWorkspaceProjectIds(workspaceId))
             .stream()
+            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))
             .toList();
@@ -508,14 +530,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         Map<String, ProjectWorkflow> draftProjectWorkflowMap = new HashMap<>();
 
-        for (ProjectWorkflow draftProjectWorkflow : projectWorkflowService.getProjectWorkflows(
-            id, draftProjectVersion)) {
-
+        for (ProjectWorkflow draftProjectWorkflow : getOrdinaryProjectWorkflows(id, draftProjectVersion)) {
             draftProjectWorkflowMap.put(draftProjectWorkflow.getUuidAsString(), draftProjectWorkflow);
         }
 
-        for (ProjectWorkflow publishedProjectWorkflow : projectWorkflowService.getProjectWorkflows(
-            id, projectVersion)) {
+        for (ProjectWorkflow publishedProjectWorkflow : getOrdinaryProjectWorkflows(id, projectVersion)) {
 
             Workflow duplicatedWorkflow = workflowService.duplicateWorkflow(publishedProjectWorkflow.getWorkflowId());
 
@@ -524,7 +543,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
             if (draftProjectWorkflow == null) {
                 projectWorkflowService.addWorkflow(
-                    id, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid());
+                    id, draftProjectVersion, duplicatedWorkflow.getId(), publishedProjectWorkflow.getUuid(),
+                    publishedProjectWorkflow.getType());
 
                 continue;
             }
@@ -543,6 +563,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         for (ProjectWorkflow draftProjectWorkflow : draftProjectWorkflowMap.values()) {
             deleteProjectWorkflow(draftProjectWorkflow);
+        }
+
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            projectContentContributor.restoreProjectContent(id, projectVersion);
         }
     }
 
@@ -567,6 +591,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
+    }
+
+    private void duplicateProjectContent(long sourceProjectId, long duplicateProjectId) {
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            projectContentContributor.onProjectDuplicated(sourceProjectId, duplicateProjectId);
+        }
     }
 
     private List<String> copyWorkflowIds(List<String> workflowIds) {
@@ -595,8 +625,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 "Project version v=%s not found".formatted(exportedProjectVersion),
                 ProjectErrorType.PROJECT_VERSION_NOT_FOUND));
 
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            id, exportedProjectVersion);
+        List<ProjectWorkflow> projectWorkflows = getOrdinaryProjectWorkflows(id, exportedProjectVersion);
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
@@ -637,6 +666,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 zipOutputStream.closeEntry();
             }
 
+            for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+                for (Map.Entry<String, byte[]> entry : projectContentContributor
+                    .exportProjectContent(id, exportedProjectVersion)
+                    .entrySet()) {
+
+                    zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
+
+                    zipOutputStream.write(entry.getValue());
+
+                    zipOutputStream.closeEntry();
+                }
+            }
+
             zipOutputStream.finish();
 
             return byteArrayOutputStream.toByteArray();
@@ -659,6 +701,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
         workflowTestConfigurationService.delete(workflowId);
 
         workflowService.delete(workflowId);
+    }
+
+    private List<ProjectWorkflow> getOrdinaryProjectWorkflows(long projectId, int projectVersion) {
+        return projectWorkflowService.getProjectWorkflows(projectId, projectVersion)
+            .stream()
+            .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+            .toList();
     }
 
     private String generateName(String oldName) {
@@ -692,7 +741,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
                 .map(Project::getId)
                 .toList();
 
-            List<ProjectWorkflow> allProjectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds);
+            List<ProjectWorkflow> allProjectWorkflows = projectWorkflowService.getProjectWorkflows(projectIds)
+                .stream()
+                .filter(projectWorkflow -> projectWorkflow.getType() == ProjectWorkflowType.WORKFLOW)
+                .toList();
 
             List<Category> categories = categoryService.getCategories(
                 projects.stream()
@@ -784,6 +836,15 @@ public class ProjectFacadeImpl implements ProjectFacade {
             projectWorkflowFacade.addWorkflow(projectId, definition);
         }
 
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            Map<String, byte[]> contentFiles = getContentFiles(
+                templateFiles.contentFiles, projectContentContributor.getContentDirectory());
+
+            if (!contentFiles.isEmpty()) {
+                projectContentContributor.importProjectContent(projectId, workspaceId, contentFiles);
+            }
+        }
+
         return projectId;
     }
 
@@ -793,6 +854,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             String templateJson = null;
             ZipEntry zipEntry;
             List<String> workflowJsons = new ArrayList<>();
+            Map<String, byte[]> contentFiles = new LinkedHashMap<>();
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 byte[] entryData = zipInputStream.readAllBytes();
@@ -805,19 +867,47 @@ public class ProjectFacadeImpl implements ProjectFacade {
                     templateJson = new String(entryData, StandardCharsets.UTF_8);
                 } else if (name.startsWith("workflow-") && name.endsWith(".json")) {
                     workflowJsons.add(new String(entryData, StandardCharsets.UTF_8));
+                } else if (isContentFile(name)) {
+                    contentFiles.put(name, entryData);
                 }
 
                 zipInputStream.closeEntry();
             }
 
-            if (projectJson == null || sharedTemplate && (templateJson == null) || workflowJsons.isEmpty()) {
+            if (projectJson == null || sharedTemplate && (templateJson == null) ||
+                workflowJsons.isEmpty() && contentFiles.isEmpty()) {
+
                 throw new RuntimeException("Missing files in a shared project file");
             }
 
-            return new TemplateFiles(templateJson, projectJson, workflowJsons);
+            return new TemplateFiles(templateJson, projectJson, workflowJsons, contentFiles);
         } catch (IOException e) {
             throw new RuntimeException("Failed to read shared project", e);
         }
+    }
+
+    private boolean isContentFile(String name) {
+        for (ProjectContentContributor projectContentContributor : projectContentContributors) {
+            if (name.startsWith(projectContentContributor.getContentDirectory())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static Map<String, byte[]> getContentFiles(Map<String, byte[]> contentFiles, String contentDirectory) {
+        Map<String, byte[]> directoryContentFiles = new LinkedHashMap<>();
+
+        for (Map.Entry<String, byte[]> entry : contentFiles.entrySet()) {
+            if (entry.getKey()
+                .startsWith(contentDirectory)) {
+
+                directoryContentFiles.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return directoryContentFiles;
     }
 
     private ProjectDTO toProjectDTO(Project project) {
@@ -843,6 +933,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
         }
     }
 
-    private record TemplateFiles(String templateJson, String projectJson, List<String> workflowJsons) {
+    @SuppressFBWarnings("EI")
+    private record TemplateFiles(
+        String templateJson, String projectJson, List<String> workflowJsons, Map<String, byte[]> contentFiles) {
     }
 }
