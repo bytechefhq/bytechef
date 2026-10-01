@@ -121,10 +121,14 @@ function distributeBranches<T>(branches: T[]): {
     middleBranch: T | null;
     rightBranches: T[];
 } {
-    const isEvenCount = (branches.length + 1) % 2 === 0;
+    if (branches.length === 1) {
+        return {leftBranches: branches, middleBranch: null, rightBranches: []};
+    }
+
+    const isEvenCount = branches.length % 2 === 0;
 
     if (isEvenCount) {
-        const halfPoint = (branches.length + 1) / 2;
+        const halfPoint = branches.length / 2;
 
         return {
             leftBranches: branches.slice(0, halfPoint),
@@ -132,7 +136,7 @@ function distributeBranches<T>(branches: T[]): {
             rightBranches: branches.slice(halfPoint),
         };
     } else {
-        const middleIndex = Math.floor((branches.length + 1) / 2);
+        const middleIndex = Math.floor(branches.length / 2);
 
         return {
             leftBranches: branches.slice(0, middleIndex),

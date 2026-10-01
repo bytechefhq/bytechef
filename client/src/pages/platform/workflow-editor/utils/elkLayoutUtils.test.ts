@@ -1,4 +1,4 @@
-import {FINAL_PLACEHOLDER_NODE_ID, FINAL_PLACEHOLDER_NODE_SIZE} from '@/shared/constants';
+import {FINAL_PLACEHOLDER_NODE_ID, FINAL_PLACEHOLDER_NODE_SIZE, TRIGGER_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
@@ -3185,6 +3185,76 @@ describe('trigger row label separation', () => {
         const taskCenter = positionOf(result.nodes, 'task1').x + 36;
 
         expect(Math.abs((firstX + secondX) / 2 + 36 - taskCenter)).toBeLessThanOrEqual(1);
+    });
+
+    it('uses a single node-to-node gap when one trigger means no fan-in bus', async () => {
+        const nodes: Node[] = [triggerNode('trigger_1', 'Run'), taskNode('task1')];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const triggerBottom = positionOf(result.nodes, 'trigger_1').y + 72;
+
+        expect(positionOf(result.nodes, 'task1').y - triggerBottom).toBe(80);
+    });
+
+
+    it('splits an even row around the fan-in target', async () => {
+        const nodes: Node[] = [
+            triggerNode('trigger_1', 'Pokreni Svakog Radnog Dana'),
+            triggerNode('trigger_2', 'Go'),
+            taskNode('task1'),
+        ];
+
+        const edges: Edge[] = [edge('trigger_1', 'task1'), edge('trigger_2', 'task1')];
+
+        const result = await getElkLayoutElements({canvasWidth: 1400, direction: 'TB', edges, nodes});
+
+        const firstX = positionOf(result.nodes, 'trigger_1').x;
+        const secondX = positionOf(result.nodes, 'trigger_2').x;
+
+        expect((firstX + secondX) / 2).toBeCloseTo(positionOf(result.nodes, 'task1').x, 5);
+    });
+
+    it('starts the chain at the same height whether or not it has tasks yet', async () => {
+        const triggerPlaceholderNode: Node = {
+            data: {label: '+'},
+            id: TRIGGER_PLACEHOLDER_NODE_ID,
+            position: {x: 0, y: 0},
+            type: 'triggerPlaceholder',
+        };
+
+        const finalPlaceholderNode: Node = {
+            data: {label: '+'},
+            id: FINAL_PLACEHOLDER_NODE_ID,
+            position: {x: 0, y: 0},
+            type: 'placeholder',
+        };
+
+        const emptyResult = await getElkLayoutElements({
+            canvasWidth: 1400,
+            direction: 'TB',
+            edges: [edge('trigger_1', FINAL_PLACEHOLDER_NODE_ID)],
+            nodes: [triggerNode('trigger_1', 'Manual'), triggerPlaceholderNode, finalPlaceholderNode],
+        });
+
+        const oneTaskResult = await getElkLayoutElements({
+            canvasWidth: 1400,
+            direction: 'TB',
+            edges: [edge('trigger_1', 'task1'), edge('task1', FINAL_PLACEHOLDER_NODE_ID)],
+            nodes: [
+                triggerNode('trigger_1', 'Manual'),
+                triggerPlaceholderNode,
+                taskNode('task1'),
+                finalPlaceholderNode,
+            ],
+        });
+
+        expect(positionOf(emptyResult.nodes, 'trigger_1').y).toBe(positionOf(oneTaskResult.nodes, 'trigger_1').y);
+        expect(positionOf(emptyResult.nodes, TRIGGER_PLACEHOLDER_NODE_ID).y).toBe(
+            positionOf(oneTaskResult.nodes, TRIGGER_PLACEHOLDER_NODE_ID).y
+        );
     });
 
     it('keeps the tight trigger pitch when labels fit', async () => {
