@@ -77,6 +77,13 @@ pmd {
     ruleSets()
 }
 
+tasks.withType(Pmd::class) {
+    val javaLauncher = javaToolchains.launcherFor(java.toolchain)
+
+    classpath = files(
+        listOfNotNull(classpath), javaLauncher.map { it.metadata.installationPath.file("lib/jrt-fs.jar") })
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
