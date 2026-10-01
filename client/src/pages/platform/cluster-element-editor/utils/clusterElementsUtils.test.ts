@@ -232,3 +232,37 @@ describe('extractClusterElementIcons vs configured-cluster-elements predicate', 
         }
     );
 });
+
+describe('extractClusterElementIcons', () => {
+    it('should collect icons of nested cluster elements in the workflow definition shape', () => {
+        const clusterElements = {
+            rag: {
+                clusterElements: {vectorStore: {name: 'knowledgeBase_1', type: 'knowledgeBase/v1/vectorStore'}},
+                name: 'questionAnswerRag_1',
+                type: 'questionAnswerRag/v1/rag',
+            },
+        } as ClusterElementsType;
+
+        expect(extractClusterElementIcons(clusterElements).map((iconItem) => iconItem.icon)).toEqual([
+            '/icons/questionAnswerRag.svg',
+            '/icons/knowledgeBase.svg',
+        ]);
+    });
+
+    it('should collect icons of nested cluster elements in the workflow task shape', () => {
+        const clusterElements = {
+            rag: {
+                extensions: {
+                    clusterElements: {vectorStore: {name: 'knowledgeBase_1', type: 'knowledgeBase/v1/vectorStore'}},
+                },
+                type: 'questionAnswerRag/v1/rag',
+                workflowNodeName: 'questionAnswerRag_1',
+            },
+        } as unknown as ClusterElementsType;
+
+        expect(extractClusterElementIcons(clusterElements).map((iconItem) => iconItem.icon)).toEqual([
+            '/icons/questionAnswerRag.svg',
+            '/icons/knowledgeBase.svg',
+        ]);
+    });
+});
