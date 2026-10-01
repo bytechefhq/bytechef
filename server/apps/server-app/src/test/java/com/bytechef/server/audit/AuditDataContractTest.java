@@ -84,6 +84,7 @@ class AuditDataContractTest {
     private static final String SUGGESTION = "generates a suggestion without saving it";
     private static final String OUTPUT_PREVIEW = "computes a task output without saving it";
     private static final String CONNECTIVITY_CHECK = "connectivity check that saves nothing";
+    private static final String EXPORT_READ = "reads data for an export";
     private static final String TAGS = "tag assignment";
     private static final String RECORDED_BY_CALLER = "called only from audited methods";
     private static final String TOOL_SETTING = "parameter or skill edit of a tool of an audited MCP or A2A server";
@@ -95,6 +96,13 @@ class AuditDataContractTest {
     private static final Map<String, String> UNAUDITED_GUARDED_METHODS = Map.ofEntries(
         Map.entry("A2aProjectWorkflowFacadeImpl.updateA2aProjectWorkflowSkill", TOOL_SETTING),
         Map.entry("A2aServerFacadeImpl.updateA2aServerTags", TAGS),
+        Map.entry("AiAgentFacadeImpl.copyProjectAgents", RECORDED_BY_CALLER),
+        Map.entry("AiAgentFacadeImpl.deleteProjectAgents", RECORDED_BY_CALLER),
+        Map.entry("AiAgentFacadeImpl.exportAgent", EXPORT_READ),
+        Map.entry("AiAgentFacadeImpl.exportProjectAgentVersions", EXPORT_READ),
+        Map.entry("AiAgentFacadeImpl.prepareProjectPublish", RECORDED_BY_CALLER),
+        Map.entry("AiAgentFacadeImpl.restoreProjectAgent", RECORDED_BY_CALLER),
+        Map.entry("AiAgentFacadeImpl.restoreProjectAgents", RECORDED_BY_CALLER),
         Map.entry("AutomationWorkflowProjectAdminFacadeImpl.updateProjectWorkflow", DEFINITION_EDIT),
         Map.entry("AutomationWorkflowProjectConfigurationAdminFacadeImpl.updateConfigurationWorkflow", WORKFLOW_INPUTS),
         Map.entry("EmbeddedMcpServerFacadeImpl.createEmbeddedMcpComponent", DELEGATES),
