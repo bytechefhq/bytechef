@@ -101,7 +101,7 @@ function getClusterRootCrossOffset(node: Node, direction: LayoutDirectionType): 
  * Recursively collects node IDs belonging to a nested task dispatcher
  * (ghost nodes, placeholders, children, and any further nested dispatchers).
  */
-function collectNestedDispatcherNodes(dispatcherId: string, allNodes: Node[], collected: Set<string>): void {
+export function collectNestedDispatcherNodes(dispatcherId: string, allNodes: Node[], collected: Set<string>): void {
     const newNodeIds: string[] = [];
 
     allNodes.forEach((node) => {
@@ -273,12 +273,7 @@ export function alignBranchCaseChildren(
             return;
         }
 
-        const sourceData = sourceNode.data as NodeDataType;
-
-        const dispatcherId =
-            sourceData.branchId ||
-            ((sourceData as Record<string, unknown>).parallelId as string | undefined) ||
-            ((sourceData as Record<string, unknown>).forkJoinId as string | undefined);
+        const dispatcherId = (sourceNode.data as NodeDataType).branchId;
 
         if (!dispatcherId) {
             return;

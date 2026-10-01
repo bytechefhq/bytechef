@@ -20,6 +20,7 @@ import {
     getLabelCrossOverhang,
     getLayoutElements,
     positionTriggerPlaceholder,
+    tuckTrailingBranchPlaceholders,
 } from './layoutUtils';
 import {
     CHAIN_CENTERING_MAX_SLACK,
@@ -688,7 +689,11 @@ export function buildElkGraph(nodes: Node[], edges: Edge[], direction: LayoutDir
         const scopeDispatcherNode = nodesById.get(scope);
 
         nodes.forEach((node) => {
-            if (getScope(node.id) !== scope || node.type === 'taskDispatcherLeftGhostNode') {
+            if (
+                getScope(node.id) !== scope ||
+                node.type === 'taskDispatcherLeftGhostNode' ||
+                node.type === 'triggerPlaceholder'
+            ) {
                 return;
             }
 
@@ -1984,6 +1989,8 @@ export const getElkLayoutElements = async ({
                 ? {id: FINAL_PLACEHOLDER_NODE_ID, predecessorId: trailingPlaceholderEdge.source}
                 : undefined
         );
+
+        tuckTrailingBranchPlaceholders(allNodes, edges, direction);
 
         return {edges: filterAndDedupeLayoutEdges(allNodes, edges), engine: 'elk' as const, nodes: allNodes};
     } catch (error) {

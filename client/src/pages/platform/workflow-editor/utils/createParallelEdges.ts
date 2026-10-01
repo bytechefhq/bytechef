@@ -131,10 +131,14 @@ function distributeBranches(tasks: WorkflowTask[]): {
     middleBranch: WorkflowTask | null;
     rightBranches: WorkflowTask[];
 } {
-    const isEvenCount = (tasks.length + 1) % 2 === 0;
+    if (tasks.length === 1) {
+        return {leftBranches: tasks, middleBranch: null, rightBranches: []};
+    }
+
+    const isEvenCount = tasks.length % 2 === 0;
 
     if (isEvenCount) {
-        const halfPoint = (tasks.length + 1) / 2;
+        const halfPoint = tasks.length / 2;
 
         return {
             leftBranches: tasks.slice(0, halfPoint),
@@ -142,7 +146,7 @@ function distributeBranches(tasks: WorkflowTask[]): {
             rightBranches: tasks.slice(halfPoint),
         };
     } else {
-        const middleIndex = Math.floor((tasks.length + 1) / 2);
+        const middleIndex = Math.floor(tasks.length / 2);
 
         return {
             leftBranches: tasks.slice(0, middleIndex),
