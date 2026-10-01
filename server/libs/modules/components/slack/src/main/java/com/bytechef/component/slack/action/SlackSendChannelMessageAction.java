@@ -18,6 +18,7 @@ package com.bytechef.component.slack.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.agentReply;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -54,6 +55,8 @@ public class SlackSendChannelMessageAction {
                 .required(false),
             TEXT_PROPERTY)
         .output(outputSchema(CHAT_POST_MESSAGE_RESPONSE_PROPERTY))
+        .agentReply(agentReply().conversationId(CHANNEL)
+            .message(TEXT))
         .help("", "https://docs.bytechef.io/reference/components/slack_v1#send-channel-message")
         .perform(SlackSendChannelMessageAction::perform);
 

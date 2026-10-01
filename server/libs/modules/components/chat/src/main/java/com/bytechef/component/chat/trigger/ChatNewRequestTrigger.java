@@ -17,15 +17,14 @@
 package com.bytechef.component.chat.trigger;
 
 import static com.bytechef.component.chat.constant.ChatConstants.ATTACHMENTS;
-import static com.bytechef.component.chat.constant.ChatConstants.CONVERSATION_ID;
-import static com.bytechef.component.chat.constant.ChatConstants.MESSAGE;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
+import static com.bytechef.component.chat.constant.ChatConstants.MODE;
+import static com.bytechef.component.chat.constant.ChatConstants.MODE_EMBEDDED_CHAT;
+import static com.bytechef.component.chat.constant.ChatConstants.MODE_HOSTED_CHAT;
+import static com.bytechef.component.definition.ComponentDsl.agentChannelRequest;
+import static com.bytechef.component.definition.ComponentDsl.agentRequest;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -51,24 +50,17 @@ public class ChatNewRequestTrigger {
         .description("A new chat request comes from the chat interface.")
         .type(TriggerType.STATIC_WEBHOOK)
         .workflowSyncExecution(true)
-        .workflowSyncExecution(true)
         .properties(
-            integer("mode")
+            integer(MODE)
                 .options(
-                    option("Hosted Chat", 1, "Use ByteChef's hosted chat interface"),
-                    option("Embedded Chat", 2, "This option requires you to create your own chat interface"))
-                .defaultValue(1)
+                    option("Hosted Chat", MODE_HOSTED_CHAT, "Use ByteChef's hosted chat interface"),
+                    option("Embedded Chat", MODE_EMBEDDED_CHAT,
+                        "This option requires you to create your own chat interface"))
+                .defaultValue(MODE_HOSTED_CHAT)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(CONVERSATION_ID)
-                            .required(true),
-                        string(MESSAGE),
-                        array(ATTACHMENTS)
-                            .items(fileEntry()))))
+        .output(outputSchema(agentChannelRequest()))
         .help("", "https://docs.bytechef.io/reference/components/chat_v1#new-chat-request")
+        .agentRequest(agentRequest().attachments(ATTACHMENTS))
         .webhookRequest(ChatNewRequestTrigger::getWebhookResult);
 
     protected static Map<String, ?> getWebhookResult(
