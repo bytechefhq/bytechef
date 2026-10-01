@@ -27,6 +27,11 @@ const failedJobExecution = {
     job: {id: '9', status: 'FAILED'},
 } as unknown as WorkflowExecution;
 
+const failedSubflowChildJobExecution = {
+    id: 12,
+    job: {id: '12', parentTaskExecutionId: 30, status: 'FAILED'},
+} as unknown as WorkflowExecution;
+
 const jobExecution = {
     id: 5,
     job: {id: '5', status: 'STARTED'},
@@ -111,6 +116,16 @@ describe('WorkflowExecutionsDropdownMenu', () => {
         const user = userEvent.setup();
 
         renderMenu(failedTriggerExecution);
+
+        await user.click(screen.getByRole('button'));
+
+        expect(await screen.findByRole('menuitem', {name: /Restart/})).toHaveAttribute('data-disabled');
+    });
+
+    it('disables Restart for a failed subflow child job, which cannot be resumed on its own', async () => {
+        const user = userEvent.setup();
+
+        renderMenu(failedSubflowChildJobExecution);
 
         await user.click(screen.getByRole('button'));
 
