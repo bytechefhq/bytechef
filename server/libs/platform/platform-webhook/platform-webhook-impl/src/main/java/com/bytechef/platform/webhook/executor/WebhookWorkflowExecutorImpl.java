@@ -25,8 +25,10 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -69,6 +71,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     private static final String TIMEOUT = "timeout";
 
+    private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final JobSyncExecutor jobSyncExecutor;
@@ -81,12 +84,14 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
     @SuppressFBWarnings("EI")
     public WebhookWorkflowExecutorImpl(
-        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
+        Evaluator evaluator, ApplicationEventPublisher eventPublisher,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         JobSyncExecutor jobSyncExecutor, PrincipalJobFacade principalJobFacade,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor,
         TaskFileStorage taskFileStorage, TriggerDefinitionService triggerDefinitionService,
         WorkflowService workflowService) {
 
+        this.evaluator = evaluator;
         this.eventPublisher = eventPublisher;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.jobSyncExecutor = jobSyncExecutor;
@@ -155,7 +160,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
         String workflowId = getWorkflowId(workflowExecutionId);
 
-        Duration timeout = getTimeout(workflowExecutionId, workflowId);
+        Duration timeout = getTimeout(workflowExecutionId, workflowId, inputMap);
 
         if (!triggerOutput.batch() && triggerOutput.value() instanceof Collection<?> triggerOutputValues) {
             List<Map<String, ?>> outputsList = new ArrayList<>();
@@ -350,17 +355,21 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
-    private @Nullable Duration getTimeout(WorkflowExecutionId workflowExecutionId, String workflowId) {
+    private @Nullable Duration getTimeout(
+        WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap) {
+
         WorkflowTrigger workflowTrigger = WorkflowTrigger.of(
             workflowExecutionId.getTriggerName(), workflowService.getWorkflow(workflowId));
 
-        Map<String, ?> parameters = workflowTrigger.getParameters();
+        Map<String, ?> parameters = workflowTrigger.evaluateParameters(inputMap, evaluator, true);
 
-        if (parameters.get(TIMEOUT) instanceof Number timeout && timeout.longValue() > 0) {
-            return Duration.ofMillis(timeout.longValue());
+        Long timeout = NumberUtils.asLong(parameters.get(TIMEOUT));
+
+        if (timeout == null || timeout <= 0) {
+            return null;
         }
 
-        return null;
+        return Duration.ofMillis(timeout);
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {

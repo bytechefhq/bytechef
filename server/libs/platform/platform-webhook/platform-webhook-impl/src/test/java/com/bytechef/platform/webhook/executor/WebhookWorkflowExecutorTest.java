@@ -32,6 +32,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
+import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -64,6 +65,7 @@ public class WebhookWorkflowExecutorTest {
     private final WebhookRequest webhookRequest = new WebhookRequest(
         Map.of(), Map.of(), null, WebhookMethod.POST);
 
+    private Evaluator evaluator;
     private ApplicationEventPublisher eventPublisher;
     private JobSyncExecutor jobSyncExecutor;
     private WebhookWorkflowExecutor webhookWorkflowExecutor;
@@ -72,6 +74,7 @@ public class WebhookWorkflowExecutorTest {
 
     @BeforeEach
     void beforeEach() {
+        evaluator = mock(Evaluator.class);
         eventPublisher = mock(ApplicationEventPublisher.class);
         jobSyncExecutor = mock(JobSyncExecutor.class);
         webhookWorkflowSyncExecutor = mock(WebhookWorkflowSyncExecutor.class);
@@ -83,9 +86,10 @@ public class WebhookWorkflowExecutorTest {
         when(jobPrincipalAccessorRegistry.getJobPrincipalAccessor(any())).thenReturn(jobPrincipalAccessor);
         when(jobPrincipalAccessor.getInputMap(anyLong(), anyString())).thenReturn(Map.of());
         when(jobPrincipalAccessor.getWorkflowId(anyLong(), anyString())).thenReturn("workflow-id");
+        when(evaluator.evaluate(any(), any(), anyBoolean())).thenAnswer(invocation -> invocation.getArgument(0));
 
         webhookWorkflowExecutor = new WebhookWorkflowExecutorImpl(
-            eventPublisher, jobPrincipalAccessorRegistry, jobSyncExecutor, mock(PrincipalJobFacade.class),
+            evaluator, eventPublisher, jobPrincipalAccessorRegistry, jobSyncExecutor, mock(PrincipalJobFacade.class),
             mock(SseStreamBridgeRegistry.class), webhookWorkflowSyncExecutor, mock(TaskFileStorage.class),
             mock(TriggerDefinitionService.class), workflowService);
     }
@@ -118,6 +122,22 @@ public class WebhookWorkflowExecutorTest {
     @Test
     public void testExecuteSyncWaitsAtMostTriggerTimeout() {
         assertThat(executeSyncAndCaptureTimeout(Map.of("timeout", 1500))).isEqualTo(Duration.ofMillis(1500));
+    }
+
+    @Test
+    public void testExecuteSyncWaitsAtMostEvaluatedTriggerTimeout() {
+        when(evaluator.evaluate(any(), any(), anyBoolean())).thenReturn(
+            Map.of(
+                "name", "trigger_1", "type", "webhook/v1/awaitWorkflowAndRespond",
+                "parameters", Map.of("timeout", 2000)));
+
+        assertThat(executeSyncAndCaptureTimeout(Map.of("timeout", "${input.timeout}")))
+            .isEqualTo(Duration.ofMillis(2000));
+    }
+
+    @Test
+    public void testExecuteSyncAcceptsNumericTextTriggerTimeout() {
+        assertThat(executeSyncAndCaptureTimeout(Map.of("timeout", "1500"))).isEqualTo(Duration.ofMillis(1500));
     }
 
     @Test
