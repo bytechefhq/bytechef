@@ -64,7 +64,7 @@ describe('deleteProperty', () => {
         expect(callArgs.workflowNodeName).toBe('test_1');
     });
 
-    test('uses rootClusterElementNodeData.workflowNodeName when it is available', async () => {
+    test('sends a plain task its own name even when a root is in the store', async () => {
         const mutateAsync = vi.fn().mockResolvedValue({displayConditions: {}, metadata: {}, parameters: {}});
 
         useWorkflowNodeDetailsPanelStore.setState({
@@ -83,6 +83,26 @@ describe('deleteProperty', () => {
 
         const callArgs = mutateAsync.mock.calls[0][0];
 
-        expect(callArgs.workflowNodeName).toBe('root_1');
+        expect(callArgs.workflowNodeName).toBe('test_1');
+    });
+
+    test('sends a cluster root its own name, resolved from the node', async () => {
+        const mutateAsync = vi.fn().mockResolvedValue({displayConditions: {}, metadata: {}, parameters: {}});
+
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: {clusterRoot: true, componentName: 'aiAgent', workflowNodeName: 'aiAgent_1'} as never,
+        });
+
+        useWorkflowEditorStore.setState({
+            rootClusterElementNodeData: {componentName: 'root', workflowNodeName: 'root_1'} as never,
+        });
+
+        deleteProperty('workflow-1', 'parameters.field', createMockMutation(mutateAsync));
+
+        await vi.waitFor(() => {
+            expect(mutateAsync).toHaveBeenCalledTimes(1);
+        });
+
+        expect(mutateAsync.mock.calls[0][0].workflowNodeName).toBe('aiAgent_1');
     });
 });
