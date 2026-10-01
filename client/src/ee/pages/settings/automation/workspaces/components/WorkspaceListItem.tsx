@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {
     AlertDialog,
@@ -27,10 +28,12 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface WorkspaceListItemProps {
+    isCurrentWorkspace: boolean;
+    onOpen: (workspaceId: number) => void;
     workspace: Workspace;
 }
 
-const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
+const WorkspaceListItem = ({isCurrentWorkspace, onOpen, workspace}: WorkspaceListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -60,14 +63,29 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
         }
     };
 
+    const handleWorkspaceClick = () => {
+        if (workspace.id) {
+            onOpen(workspace.id);
+        }
+    };
+
     return (
         <li className="mb-2 rounded border border-border/50" key={workspace.id}>
-            <div className="flex items-center justify-between rounded-md bg-surface-neutral-primary px-3 py-3 hover:bg-surface-neutral-primary-hover">
-                <div className="flex-1">
-                    <span className="text-base font-semibold">{workspace.name}</span>
+            <div className="relative flex items-center justify-between rounded-md bg-surface-neutral-primary px-3 py-3 hover:bg-surface-neutral-primary-hover">
+                <div className="flex flex-1 items-center gap-2">
+                    <button
+                        aria-current={isCurrentWorkspace || undefined}
+                        className="cursor-pointer text-left text-base font-semibold after:absolute after:inset-0 after:rounded-md"
+                        onClick={handleWorkspaceClick}
+                        type="button"
+                    >
+                        {workspace.name}
+                    </button>
+
+                    {isCurrentWorkspace && <Badge label="Current" styleType="primary-outline" weight="semibold" />}
                 </div>
 
-                <div className="flex items-center justify-end gap-x-6">
+                <div className="relative z-10 flex items-center justify-end gap-x-6">
                     {workspace.createdDate && (
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
@@ -83,6 +101,7 @@ const WorkspaceListItem = ({workspace}: WorkspaceListItemProps) => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
+                                aria-label="Workspace actions"
                                 icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
                                 size="icon"
                                 variant="ghost"
