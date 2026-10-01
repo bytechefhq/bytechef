@@ -1,5 +1,10 @@
-import {WorkflowIssueI} from '../stores/useWorkflowIssuesStore';
+import {WorkflowIssueI, WorkflowIssueKindType} from '../stores/useWorkflowIssuesStore';
 import getWorkflowIssueOwnerName from './getWorkflowIssueOwnerName';
+
+const CLUSTER_ROOT_CONNECTION_ISSUE_KINDS = new Set<WorkflowIssueKindType>([
+    'INVALID_CONNECTION',
+    'MISSING_CONNECTION',
+]);
 
 interface GetNodeIssuesProps {
     clusterElementRootNames: ReadonlyMap<string, string>;
@@ -9,8 +14,9 @@ interface GetNodeIssuesProps {
 }
 
 /**
- * Returns the issues that belong to a node. A cluster root also gets the missing connections of its cluster elements,
- * because they are configured on the cluster root, and every cluster element issue when it is shown collapsed.
+ * Returns the issues that belong to a node. A cluster root also gets the missing and invalid connections of its cluster
+ * elements, because they are configured on the cluster root, and every cluster element issue when it is shown
+ * collapsed.
  */
 export default function getNodeIssues({
     clusterElementRootNames,
@@ -29,6 +35,6 @@ export default function getNodeIssues({
             return false;
         }
 
-        return includeClusterElementIssues || issue.kind === 'MISSING_CONNECTION';
+        return includeClusterElementIssues || CLUSTER_ROOT_CONNECTION_ISSUE_KINDS.has(issue.kind);
     });
 }

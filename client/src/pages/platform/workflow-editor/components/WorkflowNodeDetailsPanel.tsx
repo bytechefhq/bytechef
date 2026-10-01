@@ -28,8 +28,17 @@ import {getClusterElementsLabel} from '../../cluster-element-editor/utils/cluste
 import getAvailableComponentVersions from '../utils/getAvailableComponentVersions';
 import getNodeOperationDescription from '../utils/getNodeOperationDescription';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
-import {getWorkflowNodeDetailsErrorsSummary} from './hooks/getMissingRequiredConnectionErrors';
+import {
+    WorkflowNodeDetailsErrorI,
+    getWorkflowNodeDetailsErrorsSummary,
+} from './hooks/getMissingRequiredConnectionErrors';
 import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
+
+const ERROR_KIND_LABELS: Record<Exclude<WorkflowNodeDetailsErrorI['kind'], 'ISSUE'>, string> = {
+    CONNECTION: 'Missing required connection:',
+    INVALID_CONNECTION: 'Invalid connection:',
+    PROPERTY: 'Missing required property:',
+};
 
 interface WorkflowNodeDetailsPanelProps {
     className?: string;
@@ -230,9 +239,7 @@ const WorkflowNodeDetailsPanel = ({
 
                                                         {error.kind !== 'ISSUE' && (
                                                             <span className="font-light">
-                                                                {error.kind === 'CONNECTION'
-                                                                    ? 'Missing required connection:'
-                                                                    : 'Missing required property:'}
+                                                                {ERROR_KIND_LABELS[error.kind]}
                                                             </span>
                                                         )}
 
