@@ -105,7 +105,7 @@ public class WebhookConfiguration {
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 
         return new WebhookWorkflowExecutorImpl(
-            eventPublisher, jobPrincipalAccessorRegistry,
+            evaluator, eventPublisher, jobPrincipalAccessorRegistry,
             new JobSyncExecutor(
                 contextService, evaluator, jobService, -1, asyncMessageBroker,
                 getAdditionalApplicationEventListeners(
