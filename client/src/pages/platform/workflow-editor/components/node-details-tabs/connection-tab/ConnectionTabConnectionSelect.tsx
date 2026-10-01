@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
@@ -21,12 +22,14 @@ import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOpti
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {PlusIcon, XIcon} from 'lucide-react';
+import {PlusIcon} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorStore from '../../../stores/useWorkflowEditorStore';
+
+const CLEAR_CONNECTION_VALUE = 'clear';
 
 type ConnectionTabConnectionSelectPropsType = {
     componentConnection: ComponentConnection;
@@ -311,7 +314,11 @@ const ConnectionTabConnectionSelect = ({
 
                 <Select
                     key={connectionId !== undefined ? `conn-${connectionId}` : 'conn-none'}
-                    onValueChange={(value) => handleValueChange(+value, key)}
+                    onValueChange={(value) =>
+                        value === CLEAR_CONNECTION_VALUE
+                            ? handleClearConnectionClick(key)
+                            : handleValueChange(+value, key)
+                    }
                     required={required}
                     value={connectionId !== undefined ? connectionId.toString() : undefined}
                 >
@@ -322,16 +329,6 @@ const ConnectionTabConnectionSelect = ({
                                     <SelectValue placeholder="Choose Connection..." />
                                 </SelectTrigger>
                             </div>
-                        )}
-
-                        {connectionId !== undefined && (
-                            <Button
-                                icon={<XIcon />}
-                                onClick={() => handleClearConnectionClick(key)}
-                                size="icon"
-                                title="Clear connection"
-                                variant="outline"
-                            />
                         )}
 
                         {componentDefinition &&
@@ -359,6 +356,12 @@ const ConnectionTabConnectionSelect = ({
                     </div>
 
                     <SelectContent className="w-(--radix-select-trigger-width) max-w-(--radix-select-trigger-width) min-w-0">
+                        {connectionId !== undefined && (
+                            <SelectItem className="text-content-neutral-secondary" value={CLEAR_CONNECTION_VALUE}>
+                                Select...
+                            </SelectItem>
+                        )}
+
                         {componentConnections &&
                             componentConnections.map((connection) => (
                                 <SelectItem
@@ -376,11 +379,29 @@ const ConnectionTabConnectionSelect = ({
                                         <span className="shrink-0">
                                             <EnvironmentBadge environmentId={+connection.environmentId!} />
                                         </span>
+
+                                        {connection.credentialStatus === 'INVALID' && (
+                                            <span className="shrink-0">
+                                                <Badge
+                                                    className="uppercase"
+                                                    label="Invalid"
+                                                    styleType="destructive-outline"
+                                                    weight="semibold"
+                                                />
+                                            </span>
+                                        )}
                                     </div>
                                 </SelectItem>
                             ))}
                     </SelectContent>
                 </Select>
+
+                {currentConnection?.credentialStatus === 'INVALID' && (
+                    <p className="text-sm text-content-destructive-primary">
+                        The credentials of this connection could not be refreshed. Create a new connection or choose
+                        another one.
+                    </p>
+                )}
             </div>
 
             {currentConnection && connectionDefinition && (

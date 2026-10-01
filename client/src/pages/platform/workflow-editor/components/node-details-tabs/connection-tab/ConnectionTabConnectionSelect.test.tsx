@@ -468,7 +468,7 @@ describe('ConnectionTabConnectionSelect', () => {
         expect(screen.getByText('Test Connection 1')).toBeInTheDocument();
     });
 
-    it('should display clear connection button when connection is selected', () => {
+    it('should offer a Select... option instead of a clear button when a connection is selected', () => {
         const workflowTestConfigurationConnection = {
             connectionId: 1,
             workflowConnectionKey: 'connection_1',
@@ -486,9 +486,27 @@ describe('ConnectionTabConnectionSelect', () => {
             />
         );
 
-        const clearButton = screen.getByTitle('Clear connection');
+        expect(screen.queryByTitle('Clear connection')).not.toBeInTheDocument();
 
-        expect(clearButton).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.getByRole('option', {name: 'Select...'})).toBeInTheDocument();
+    });
+
+    it('should not offer the Select... option when no connection is selected', () => {
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+            />
+        );
+
+        fireEvent.click(screen.getByRole('combobox'));
+
+        expect(screen.queryByRole('option', {name: 'Select...'})).not.toBeInTheDocument();
     });
 
     it('should handle connection selection change', async () => {
@@ -568,14 +586,71 @@ describe('ConnectionTabConnectionSelect', () => {
             />
         );
 
-        const clearButton = screen.getByTitle('Clear connection');
+        fireEvent.click(screen.getByRole('combobox'));
 
-        fireEvent.click(clearButton);
+        fireEvent.click(screen.getByRole('option', {name: 'Select...'}));
 
         await waitFor(() => {
+            expect(mockDeleteWorkflowTestConfigurationConnectionMutation).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    deleteWorkflowTestConfigurationConnectionRequest: {connectionId: 1},
+                    workflowConnectionKey: 'connection_1',
+                }),
+                expect.anything()
+            );
             expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['connections']});
             expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['ValidateWorkflow']});
         });
+    });
+
+    it('should mark a selected connection with invalid credentials as invalid', () => {
+        const connectionsWithInvalidCredentials = [
+            {...mockConnections[0], credentialStatus: 'INVALID'},
+            mockConnections[1],
+        ];
+
+        mockUseWorkflowEditor.mockReturnValue({
+            ...mockUseWorkflowEditor(),
+            useGetConnectionsQuery: () => ({data: connectionsWithInvalidCredentials}),
+        });
+
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+                workflowTestConfigurationConnection={{
+                    connectionId: 1,
+                    workflowConnectionKey: 'connection_1',
+                    workflowNodeName: 'node-1',
+                }}
+            />
+        );
+
+        expect(screen.getByText('Invalid')).toBeInTheDocument();
+        expect(screen.getByText(/credentials of this connection could not be refreshed/)).toBeInTheDocument();
+    });
+
+    it('should not mark a selected connection with valid credentials as invalid', () => {
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+                workflowTestConfigurationConnection={{
+                    connectionId: 1,
+                    workflowConnectionKey: 'connection_1',
+                    workflowNodeName: 'node-1',
+                }}
+            />
+        );
+
+        expect(screen.queryByText('Invalid')).not.toBeInTheDocument();
+        expect(screen.queryByText(/credentials of this connection could not be refreshed/)).not.toBeInTheDocument();
     });
 
     it('should display connection parameters when connection is selected', () => {
